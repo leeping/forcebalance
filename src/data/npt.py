@@ -186,6 +186,48 @@ def energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True, dipole=F
             G[i,:]   = EDG[:]
     return G, GDx, GDy, GDz
 
+def rpmd_energy_derivatives(engine, FF, mvals, h, pgrad, length, AGrad=True, dipole=False):
+    """
+    Compute the first and second derivatives of a set of snapshot
+    energies with respect to the force field parameters.
+ 
+    This is analagous to the energy_derivatives function above, but is 
+    specific for calculating derivatives for rpmd, which has 
+    an additional term due to the force term in the centroid virial
+    estimator.
+    """
+    G              = np.zeros((FF.np,length))
+    GDx            = np.zeros((FF.np,length))
+    GDy            = np.zeros((FF.np,length))
+    GDz            = np.zeros((FF.np,length))
+    RPMDG          = np.zeros((FF.np,length))
+    RPMDG_frc_term = np.zeros((FF.np,length))  
+    if not AGrad:
+        return G, GDx, GDy, GDz, RPMDG, RPMDG_frc_term
+    def rpmd_energy_driver(mvals_):
+        FF.make(mvals_)
+        if dipole:
+            return engine.energy_dipole_rpmd()
+        else:
+            return engine.energy_rpmd()
+
+    ED0 = rpmd_energy_driver(mvals)
+    for i in pgrad:
+        logger.info("%i %s\r" % (i, (FF.plist[i] + " "*30)))
+        ERPMDG, _   = f12d3p(fdwrap(rpmd_energy_driver,mvals,i),h,f0=ED0)
+        if dipole:
+            G[i,:]              = ERPMDG[:,0] 
+            GDx[i,:]            = ERPMDG[:,1] 
+            GDy[i,:]            = ERPMDG[:,2]
+            GDz[i,:]            = ERPMDG[:,3]
+            RPMDG[i,:]          = ERPMDG[:,4]    
+            RPMDG_frc_term[i,:] = ERPMDG[:,5]
+        else:
+            G[i,:]              = ERPMDG[:,0]
+            RPMDG[i,:]          = ERPMDG[:,1]
+            RPMDG_frc_term[i,:] = ERPMDG[:,2]
+    return G, GDx, GDy, GDz, RPMDG, RPMDG_frc_term
+
 def property_derivatives(engine, FF, mvals, h, pgrad, kT, property_driver, property_kwargs, AGrad=True):
 
     """ 
@@ -312,7 +354,7 @@ def main():
     # Number of threads, multiple timestep integrator, anisotropic box etc.
     threads = TgtOptions.get('md_threads', 1)
     mts = TgtOptions.get('mts_integrator', 0)
-    rpmd_beads = TgtOptions.get('rpmd_beads', 0)
+    rpmd_opts = TgtOptions.get('rpmd_opts', [])
     force_cuda = TgtOptions.get('force_cuda', 0)
     nbarostat = TgtOptions.get('n_mcbarostat', 25)
     anisotropic = TgtOptions.get('anisotropic_box', 0)
@@ -375,7 +417,7 @@ def main():
         EngOpts["gas"]["gmx_top"] = os.path.splitext(gas_fnm)[0] + ".top"
         EngOpts["gas"]["gmx_mdp"] = os.path.splitext(gas_fnm)[0] + ".mdp"
         if force_cuda: logger.warn("force_cuda option has no effect on Gromacs engine.")
-        if rpmd_beads > 0: raise RuntimeError("Gromacs cannot handle RPMD.")
+        if len(rpmd_opts) > 0: raise RuntimeError("Gromacs cannot handle RPMD.")
         if mts: logger.warn("Gromacs not configured for multiple timestep integrator.")
         if anisotropic: logger.warn("Gromacs not configured for anisotropic box scaling.")
     elif engname == "tinker":
@@ -384,7 +426,7 @@ def main():
         EngOpts["liquid"]["tinker_key"] = os.path.splitext(liquid_fnm)[0] + ".key"
         EngOpts["gas"]["tinker_key"] = os.path.splitext(gas_fnm)[0] + ".key"
         if force_cuda: logger.warn("force_cuda option has no effect on Tinker engine.")
-        if rpmd_beads > 0: raise RuntimeError("TINKER cannot handle RPMD.")
+        if len(rpmd_opts) > 0: raise RuntimeError("TINKER cannot handle RPMD.")
         if mts: logger.warn("Tinker not configured for multiple timestep integrator.")
     EngOpts["liquid"].update(GenOpts)
     EngOpts["gas"].update(GenOpts)
@@ -399,11 +441,11 @@ def main():
                                     ("nsave", int(1000 * liquid_intvl / liquid_timestep)),
                                     ("verbose", True), ('save_traj', TgtOptions['save_traj']), 
                                     ("threads", threads), ("anisotropic", anisotropic), ("nbarostat", nbarostat),
-                                    ("mts", mts), ("rpmd_beads", rpmd_beads), ("faststep", faststep)])
+                                    ("mts", mts), ("rpmd_opts", rpmd_opts), ("faststep", faststep)])
     MDOpts["gas"] = OrderedDict([("nsteps", gas_nsteps), ("timestep", gas_timestep),
                                  ("temperature", temperature), ("nsave", int(1000 * gas_intvl / gas_timestep)),
                                  ("nequil", gas_nequil), ("minimize", minimize), ("threads", 1), ("mts", mts),
-                                 ("rpmd_beads", rpmd_beads), ("faststep", faststep)])
+                                 ("rpmd_opts", rpmd_opts), ("faststep", faststep)])
 
     # Energy components analysis disabled for OpenMM MTS because it uses force groups
     if (engname == "openmm" and mts): logger.warn("OpenMM with MTS integrator; energy components analysis will be disabled.\n")
@@ -418,17 +460,29 @@ def main():
 
     printcool("Condensed phase molecular dynamics", color=4, bold=True)
 
+    run_pimd = len(rpmd_opts) > 0
+
     # This line runs the condensed phase simulation.
     click()
-    prop_return = Liquid.molecular_dynamics(**MDOpts["liquid"])
+    if not run_pimd:
+        prop_return = Liquid.molecular_dynamics(**MDOpts["liquid"])
+    else:
+        prop_return = Liquid.run_pimd(**MDOpts["liquid"])
+        # Note: simulation will crash on xstream unless I delete
+        # the existing simulation here. Probably has to do with 
+        # a device pointer.
+        del Liquid.simulation
     logger.info("Liquid phase MD simulation took %.3f seconds\n" % click())
     Rhos = prop_return['Rhos']
     Potentials = prop_return['Potentials']
     Kinetics = prop_return['Kinetics']
+    if 'Primitive_kinetics' in prop_return:
+        Primitive_kinetics = prop_return['Primitive_kinetics']
+        Cp_corrections = prop_return['Cp_corrections']
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
     EDA = prop_return['Ecomps']
-
+    #getone = prop_return['One'] 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
     # Lengths are in nanometers.
@@ -452,6 +506,13 @@ def main():
     pV = atm_unit * pressure * Volumes
     pV_avg, pV_err = mean_stderr(pV)
     Rho_avg, Rho_err = mean_stderr(Rhos)
+    if run_pimd:
+        PKE = Potentials + Primitive_kinetics
+        PKE_avg, PKE_err = mean_stderr(PKE)
+        Cp_corr_avg, Cp_corr_err = mean_stderr(Cp_corrections)
+        # Express RPMDH using primitive estimator. H expressed
+        # in terms of centroid virial estimator. 
+        RPMDH = PKE + pV
     PrintEDA(EDA, NMol)
 
     #==============================================#
@@ -462,7 +523,11 @@ def main():
 
     printcool("Gas phase molecular dynamics", color=4, bold=True)
     click()
-    mprop_return = Gas.molecular_dynamics(**MDOpts["gas"])
+    if not run_pimd:
+        mprop_return = Gas.molecular_dynamics(**MDOpts["gas"])
+    else:
+        mprop_return = Gas.run_pimd(**MDOpts["gas"])
+        del Gas.simulation
     logger.info("Gas phase MD simulation took %.3f seconds\n" % click())
     mPotentials = mprop_return['Potentials']
     mKinetics = mprop_return['Kinetics']
@@ -486,19 +551,35 @@ def main():
         Liquid = Engine(name="liquid", openmm_precision="double", **EngOpts["liquid"])
         Gas = Engine(name="gas", openmm_precision="double", **EngOpts["gas"])
 
-    # Compute the energy and dipole derivatives.
-    printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True)
-    click()
-    G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
-    logger.info("Condensed phase energy derivatives took %.3f seconds\n" % click())
-    click()
-    printcool("Gas phase energy derivatives", color=4, bold=True)
-    mG, _, __, ___ = energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad, dipole=False)
-    logger.info("Gas phase energy derivatives took %.3f seconds\n" % click())
-
+    if not run_pimd:
+        # Compute the energy and dipole derivatives.
+        printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True)
+        click()
+        G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
+        logger.info("Condensed phase energy derivatives took %.3f seconds\n" % click())
+        click()
+        printcool("Gas phase energy derivatives", color=4, bold=True)
+        mG, _, __, ___ = energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad, dipole=False)
+        logger.info("Gas phase energy derivatives took %.3f seconds\n" % click())
+    else:
+        logger.info("Calculating derivatives of RPMD energy terms with finite difference step size: %f\n" % h)
+        printcool("Condensed phase rpmd derivatives\nInitializing array to length %i" % len(Energies), color=4, bold=True) 
+        click()
+        G, GDx, GDy, GDz, RPMDG, RPMDG_frc_term = rpmd_energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Energies), AGrad, dipole=True)
+        logger.info("Condensed phase rpmd derivatives took %.3f seconds\n" % click())  
+        del Liquid
+        click()
+        printcool("Gas phase rpmd term derivatives", color=4, bold=True)
+        mG, _, __, ___, RPMDmG, RPMDmG_frc_term = rpmd_energy_derivatives(Gas, FF, mvals, h, pgrad, len(mEnergies), AGrad)
+        logger.info("Gas phase rpmd cv term derivatives took %.3f seconds\n" % click())
+        del Gas
     #==============================================#
     #  Condensed phase properties and derivatives. #
     #==============================================#
+
+    #----
+    # Just get one
+    #----
 
     #----
     # Density
@@ -548,13 +629,22 @@ def main():
     Hvap_err = np.sqrt(Ene_err**2 / NMol**2 + mEne_err**2 + pV_err**2/NMol**2)
 
     # Build the first Hvap derivative.
-    GHvap = np.mean(G,axis=1)
-    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
-    GHvap /= NMol
-    GHvap -= np.mean(mG,axis=1)
-    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
-    GHvap *= -1
-    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
+    if not run_pimd:
+        GHvap = np.mean(G,axis=1)
+        GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
+        GHvap /= NMol
+        GHvap -= np.mean(mG,axis=1)
+        GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
+        GHvap *= -1
+        GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
+    else:                                                                                          
+        GHvap = np.mean(RPMDG,axis=1)
+        GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
+        GHvap /= NMol
+        GHvap -= np.mean(RPMDmG,axis=1)
+        GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
+        GHvap *= -1
+        GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
 
     Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol\nAnalytic Derivative:" % (Hvap_avg, Hvap_err))
     FF.print_map(vals=GHvap)
@@ -578,20 +668,36 @@ def main():
         if 'v_' in kwargs:
             v_ = kwargs['v_']
         return 1/(kT*T) * (bzavg(h_*v_,b)-bzavg(h_,b)*bzavg(v_,b))/bzavg(v_,b)
-    Alpha = calc_alpha(None, **{'h_':H, 'v_':V})
+    if not run_pimd:
+        Alpha = calc_alpha(None, **{'h_':H, 'v_':V})
+    else:
+        Alpha = calc_alpha(None, **{'h_':RPMDH, 'v_':V}) 
     Alphaboot = []
     for i in range(numboots):
         boot = np.random.randint(L,size=L)
-        Alphaboot.append(calc_alpha(None, **{'h_':H[boot], 'v_':V[boot]}))
+        if not run_pimd:
+            Alphaboot.append(calc_alpha(None, **{'h_':H[boot], 'v_':V[boot]}))
+        else:   
+            Alphaboot.append(calc_alpha(None, **{'h_':RPMDH[boot], 'v_':V[boot]}))
     Alphaboot = np.array(Alphaboot)
-    Alpha_err = np.std(Alphaboot) * max([np.sqrt(statisticalInefficiency(V)),np.sqrt(statisticalInefficiency(H))])
+    if not run_pimd:
+        Alpha_err = np.std(Alphaboot) * max([np.sqrt(statisticalInefficiency(V)),np.sqrt(statisticalInefficiency(H))])
+    else:
+        Alpha_err = np.std(Alphaboot) * max([np.sqrt(statisticalInefficiency(V)),np.sqrt(statisticalInefficiency(RPMDH))])
 
     # Thermal expansion coefficient analytic derivative
-    GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
-    GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
-    GAlpha3 = deprod(V)/avg(V) - Gbar
-    GAlpha4 = Beta * covde(H)
-    GAlpha  = (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
+    if not run_pimd:
+        GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
+        GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
+        GAlpha3 = deprod(V)/avg(V) - Gbar
+        GAlpha4 = Beta * covde(H)
+        GAlpha  = (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
+    else:
+        GAlpha1 = -1 * Beta * deprod(RPMDH*V) * avg(V) / avg(V)**2
+        GAlpha2 = +1 * Beta * avg(RPMDH*V) * deprod(V) / avg(V)**2
+        GAlpha3 = deprod(V)/avg(V) - Gbar
+        GAlpha4 = Beta * covde(RPMDH)
+        GAlpha  = (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
     Sep = printcool("Thermal expansion coefficient: % .4e +- %.4e K^-1\nAnalytic Derivative:" % (Alpha, Alpha_err))
     FF.print_map(vals=GAlpha)
     if FDCheck:
@@ -640,22 +746,45 @@ def main():
         if b is None: b = np.ones(L,dtype=float)
         if 'h_' in kwargs:
             h_ = kwargs['h_']
-        Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
+        if 'corrections' in kwargs:
+            corr = kwargs['corrections']
+        if 'PIMD' in kwargs:
+            Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2 + bzavg(corr,b))
+        else:
+            Cp_  = 1/(NMol*kT*T) * (bzavg(h_**2,b) - bzavg(h_,b)**2)
         Cp_ *= 1000 / 4.184
         return Cp_
-    Cp = calc_cp(None,**{'h_':H})
+    if not run_pimd:
+        Cp = calc_cp(None,**{'h_':H})
+    else:
+        Cp = calc_cp(None,**{'h_':RPMDH, 'PIMD':True, 'corrections':Cp_corrections})
     Cpboot = []
     for i in range(numboots):
         boot = np.random.randint(L,size=L)
-        Cpboot.append(calc_cp(None,**{'h_':H[boot]}))
+        if not run_pimd:
+            Cpboot.append(calc_cp(None,**{'h_':H[boot]}))
+        else:
+            Cpboot.append(calc_cp(None,**{'h_':RPMDH[boot], 'RPMD':True, 'corrections':Cp_corrections[boot]}))
     Cpboot = np.array(Cpboot)
-    Cp_err = np.std(Cpboot) * np.sqrt(statisticalInefficiency(H))
+    if not run_pimd:
+        Cp_err = np.std(Cpboot) * np.sqrt(statisticalInefficiency(H))
+    else:   
+        Cp_err = np.std(Cpboot) * np.sqrt(statisticalInefficiency(RPMDH))
 
     # Isobaric heat capacity analytic derivative
-    GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
-    GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
-    GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
-    GCp  = GCp1 + GCp2 + GCp3
+    if not run_pimd:
+        GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
+        GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
+        GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
+        GCp  = GCp1 + GCp2 + GCp3
+    else:
+        GCp1 = 2*covde(RPMDH) * 1000 / 4.184 / (NMol*kT*T)
+        GCp2 = mBeta*covde(RPMDH**2) * 1000 / 4.184 / (NMol*kT*T)
+        GCp3 = 2*Beta*avg(RPMDH)*covde(RPMDH) * 1000 / 4.184 / (NMol*kT*T)        
+        # One extra term due to the quantum correction from the
+        # primitive estimator.
+        GCp4 = mBeta*covde(Cp_corrections) * 1000 / 4.184 / (NMol*kT*T)
+        GCp  = GCp1 + GCp2 + GCp3 + GCp4
     Sep = printcool("Isobaric heat capacity:  % .4e +- %.4e cal mol-1 K-1\nAnalytic Derivative:" % (Cp, Cp_err))
     FF.print_map(vals=GCp)
     if FDCheck:
@@ -709,12 +838,41 @@ def main():
         Sep = printcool("Difference (Absolute, Fractional):")
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GEps0,GEps0_fd)]
         FF.print_map(vals=absfrac)
+    #------------------------------#
+    # Fit quantum kinetic energies #
+    #------------------------------#
+    if run_pimd:
+        # Centroid virial
+        RPMDGbar         = np.mean(RPMDG,axis=1)
+        RPMDG_frc_bar    = np.mean(RPMDG_frc_term,axis=1)
+        kin_avg, kin_err = mean_stderr(Kinetics) 
+        GCVQKE           = mBeta * covde(Kinetics)
+        GCVQKE          += RPMDG_frc_bar
+        GCVQKE          /= NMol
+        Sep = printcool("Centroid virial QKE:           % .4e +- %.4e\nAnalytic Derivative:" % (kin_avg/NMol, kin_err/NMol))
+        FF.print_map(vals=GCVQKE)
+
+        # Primitive
+        pke_avg, pke_err = mean_stderr(Primitive_kinetics) 
+        GPQKE            = mBeta * covde(Primitive_kinetics) / NMol
+        Sep = printcool("Primitive QKE:           % .4e +- %.4e\nAnalytic Derivative:" % (pke_avg/NMol, pke_err/NMol))
+        FF.print_map(vals=GPQKE)
 
     logger.info("Writing final force field.\n")
     pvals = FF.make(mvals)
 
     logger.info("Writing all simulation data to disk.\n")
-    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),'npt_result.p')
+
+    if not run_pimd:
+        RPMDG              = np.zeros(G.shape)
+        RPMDmG             = np.zeros(mG.shape)
+        RPMDG_frc_term     = np.zeros(G.shape)
+        Cp_corrections     = np.zeros(np.array(Kinetics).shape)
+        Primitive_kinetics = np.zeros(np.array(Kinetics).shape)
+        pke_err            = 0.0
+        kin_err            = 0.0
+
+    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx,GDy,GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, kin_err, pke_err, NMol, Cp_corrections, RPMDG, RPMDmG, RPMDG_frc_term, Kinetics, Primitive_kinetics, run_pimd),'npt_result.p')
 
 if __name__ == "__main__":
     main()

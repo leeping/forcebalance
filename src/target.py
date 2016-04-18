@@ -391,8 +391,10 @@ class Target(forcebalance.BaseClass):
         """
         mvals1 = np.loadtxt('mvals.txt')
 
-        if len(mvals) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
-            warn_press_key("mvals from mvals.txt does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
+        if mvals1.shape != mvals.shape:
+            warn_press_key("mvals from forcebalance.p has different shape compared to internal values!\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
+        elif len(mvals1) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
+            warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
         
         return lp_load('objective.p')
 

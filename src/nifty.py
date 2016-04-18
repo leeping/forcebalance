@@ -772,7 +772,7 @@ def lp_dump(obj, fnm, protocol=0):
         f = bz2.BZ2File(fnm, 'wb')
     else:
         f = open(fnm, 'wb')
-    Pickler_LP(f, protocol).dump(obj)
+    Pickler_LP(f,protocol).dump(obj)
     f.close()
 
 def lp_load(fnm):

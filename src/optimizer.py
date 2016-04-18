@@ -225,7 +225,9 @@ class Optimizer(forcebalance.BaseClass):
                 T.rd = T.tempdir
                 if os.path.exists(os.path.join(T.absrd(), 'mvals.txt')):
                     tmvals = np.loadtxt(os.path.join(T.absrd(), 'mvals.txt'))
-                    if len(tmvals) > 0 and np.max(np.abs(tmvals - self.mvals0) > 1e-4):
+                    if tmvals.shape != self.mvals0.shape:
+                        warn_press_key("mvals.txt in %s has different shape from loaded parameters." % T.absrd())
+                    elif len(tmvals) > 0 and np.max(np.abs(tmvals - self.mvals0) > 1e-4):
                         warn_press_key("mvals.txt in %s does not match loaded parameters.\nSave file : %s\Parameters : %s\n" % (T.absrd(), tmvals, self.mvals0))
                 else:
                     warn_press_key("mvals.txt does not exist in %s." % (T.absrd()))

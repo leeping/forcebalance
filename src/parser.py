@@ -78,15 +78,16 @@ gen_opts_types = {
                  },
     'lists'   : {"forcefield"     : ([],  200, 'The names of force fields, corresponding to directory forcefields/file_name.(itp,xml,prm,frcmod,mol2)', 'All (important)'),
                  "scanindex_num"  : ([], -100, 'Numerical index of the parameter to scan over', 'Job types scan_mvals and scan_pvals'),
-                 "scanindex_name" : ([], -100, 'Parameter name to scan over (should convert to a numerical index)', 'Job types scan_mvals and scan_pvals')
+                 "scanindex_name" : ([], -100, 'Parameter name to scan over (should convert to a numerical index)', 'Job types scan_mvals and scan_pvals'),
+                 "rpmd_opts"     : ([], -160, 'Number of beads / NB contracted beads / Recip contracted beads in ring polymer MD', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  },
     'ints'    : {"maxstep"      : (100, 50, 'Maximum number of steps in an optimization', 'Main Optimizer'),
                  "objective_history"  : (2, 20, 'Number of good optimization steps to average over when checking the objective convergence criterion', 'Main Optimizer (jobtype "newton")'),
                  "wq_port"   : (0, 0, 'The port number to use for Work Queue', 'Targets that use Work Queue (advanced usage)'),
                  "criteria"   : (1, 160, 'The number of convergence criteria that must be met for main optimizer to converge', 'Main Optimizer'),
-                 "rpmd_beads"       : (0, -160, 'Number of beads in ring polymer MD (zero to disable)', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  "zerograd"         : (-1, 0, 'Set to a nonnegative number to turn on zero gradient skipping at that optimization step.', 'All'),
-                 "amber_nbcut"            : (9999, -20, 'Specify the nonbonded cutoff for AMBER engine in Angstrom (I should port this to other engines too.)', 'AMBER targets, especially large nonperiodic systems', ['AMBER'])
+                 "amber_nbcut"            : (9999, -20, 'Specify the nonbonded cutoff for AMBER engine in Angstrom (I should port this to other engines too.)', 'AMBER targets, especially large nonperiodic systems', ['AMBER']),
+                 "rpmd_strides"            : (2, -100, 'Specify stride for evaluating properties on fewer copies. May help to resolve a memory issue.', 'Condensed phase property targets (advanced usage)', 'liquid_openmm')
                  },
     'bools'   : {"backup"           : (1,  10,  'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, -50,  'Write the checkpoint file at every optimization step'),
@@ -226,6 +227,8 @@ tgt_opts_types = {
                  "w_kappa"      : (1.0, 0, 'Weight of isothermal compressibility', 'Condensed phase property targets', 'liquid, lipid'),
                  "w_cp"         : (1.0, 0, 'Weight of isobaric heat capacity', 'Condensed phase property targets', 'liquid, lipid'),
                  "w_eps0"       : (1.0, 0, 'Weight of dielectric constant', 'Condensed phase property targets', 'liquid, lipid'),
+                 "w_cvqke"      : (1.0, 0, 'Weight of centroid virial QKE', 'Condensed phase property targets', 'liquid'),
+                 "w_pqke"       : (1.0, 0, 'Weight of primitive QKE', 'Condensed phase property targets', 'liquid'),
                  "w_al"         : (1.0, 0, 'Weight of average area per lipid', 'Lipid property targets', 'lipid'),
                  "w_scd"        : (1.0, 0, 'Weight of deuterium order parameter', 'Lipid property targets', 'lipid'),
                  "w_energy"     : (1.0, 0, 'Weight of energy', 'Ab initio targets', 'liquid'),

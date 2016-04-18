@@ -224,7 +224,7 @@ class FF(forcebalance.BaseClass):
         ## AMOEBA mutual dipole convergence tolerance.
         self.set_option(options, 'amoeba_eps')
         ## Switch for rigid water molecules
-        self.set_option(options, 'rigid_water')
+        self.set_option(options, 'rigid_water', forceprint=True)
         ## Bypass the transformation and use physical parameters directly
         self.set_option(options, 'use_pvals')
         ## Allow duplicate parameter names (internally construct unique names)
@@ -713,7 +713,7 @@ class FF(forcebalance.BaseClass):
 
         OMMFormat = "%%.%ie" % precision
         def TXTFormat(number, precision):
-            SciNot = "%% .%ie" % precision
+            SciNot = "%% .%if" % precision
             if abs(number) < 1000 and abs(number) > 0.001:
                 Decimal = "%% .%if" % precision
                 Num = Decimal % number
@@ -786,7 +786,7 @@ class FF(forcebalance.BaseClass):
                     whites[fld] = whites[fld][:-1]
                 # Actually replace the field with the physical parameter value.
                 if precision == 12:
-                    newrd  = "% 17.12e" % (wval)
+                    newrd  = "% 17.4f" % (wval)
                 else:
                     newrd  = TXTFormat(wval, precision)
                 # The new word might be longer than the old word.
@@ -1342,7 +1342,8 @@ class FF(forcebalance.BaseClass):
     def list_map(self):
         """ Create the plist, which is like a reversed version of the parameter map.  More convenient for printing. """
         if len(self.map) == 0:
-            warn_press_key('The parameter map has no elements (Okay if we are not actually tuning any parameters.)')
+            #warn_press_key('The parameter map has no elements (Okay if we are not actually tuning any parameters.)')
+            logger.warning('The parameter map has no elements (Okay if we are not actually tuning any parameters.)\n')
         else:
             self.plist = [[] for j in range(max([self.map[i] for i in self.map])+1)]
             for i in self.map:

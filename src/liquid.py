@@ -98,6 +98,10 @@ class Liquid(Target):
         self.set_option(tgt_opts,'w_cp',forceprint=True)
         # Weight of the dielectric constant
         self.set_option(tgt_opts,'w_eps0',forceprint=True)
+        # Weight of centroid virial QKE
+        self.set_option(tgt_opts,'w_cvqke',forceprint=True)
+        # Weight of primitive QKE
+        self.set_option(tgt_opts,'w_pqke',forceprint=True)
         # Normalize the contributions to the objective function
         self.set_option(tgt_opts,'w_normalize',forceprint=True)
         # Optionally pause on the zeroth step
@@ -224,7 +228,7 @@ class Liquid(Target):
         global_opts = OrderedDict()
         found_headings = False
         known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra',
-                      'cvib_inter','cni','devib_intra','devib_inter']
+                      'cvib_inter','cni','devib_intra','devib_inter','cvqke','pqke']
         self.RefData = OrderedDict()
         for line in R:
             if line[0] == "global":
@@ -380,6 +384,8 @@ class Liquid(Target):
         print_item("Kappa", "Isothermal Compressibility", "10^-6 bar^-1")
         print_item("Cp", "Isobaric Heat Capacity", "cal mol^-1 K^-1")
         print_item("Eps0", "Dielectric Constant", None)
+        print_item("Cvqke", "Centroid Virial QKE", "kJ mol^-1")
+        print_item("Pqke", "Primitive QKE", "kJ mol^-1")
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",self.Objective)
 
@@ -508,7 +514,9 @@ class Liquid(Target):
 
         unpack = lp_load('forcebalance.p')
         mvals1 = unpack[1]
-        if len(mvals) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
+        if mvals1.shape != mvals.shape:
+            warn_press_key("mvals from forcebalance.p has different shape compared to internal values!\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
+        elif len(mvals1) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
 
         for dn in range(Counter()-1, -1, -1):
@@ -537,7 +545,8 @@ class Liquid(Target):
     
             # Assign variable names to all the stuff in npt_result.p
             Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
-                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(17))
+                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, Kin_errs, Pke_errs, NMols, \
+                Cp_corrections, Grads_rpmd, mGrads_rpmd, Grads_rpmd_frc_term, Kinetics, Primitive_kinetics, RPMD_flags = ([Results[t][i] for t in range(len(Points))] for i in range(26))
             # Determine the number of molecules
             if len(set(NMols)) != 1:
                 logger.error(str(NMols))
@@ -545,7 +554,15 @@ class Liquid(Target):
                 raise RuntimeError
             else:
                 NMol = list(set(NMols))[0]
-        
+            # Determine if RPMD was run
+            if len(set(RPMD_flags)) != 1:
+                logger.error('Error: RPMD simulations have been mixed with classical simulations. Simulations should be of uniform kind.\n')
+                raise RuntimeError
+            elif all(RPMD_flags):
+                RPMD = True
+            else:
+                RPMD = False 
+
             if not self.adapt_errors:
                 self.AllResults = defaultdict(lambda:defaultdict(list))
 
@@ -568,10 +585,17 @@ class Liquid(Target):
             self.AllResults[astrm]['GDz'].append(np.array([gd[2] for gd in GDips]))
             self.AllResults[astrm]['L'].append(len(Energies[0]))
             self.AllResults[astrm]['Steps'].append(self.liquid_md_steps)
-    
+            self.AllResults[astrm]['RPMDG'].append(np.array(Grads_rpmd))
+            self.AllResults[astrm]['RPMDG_frc'].append(np.array(Grads_rpmd_frc_term))
+            self.AllResults[astrm]['E_PKE'].append(np.array(Primitive_kinetics) + np.array(Potentials))
+            self.AllResults[astrm]['Cp_corr'].append(np.array(Cp_corrections))
+            self.AllResults[astrm]['Kinetics'].append(np.array(Kinetics))
+            self.AllResults[astrm]['Primitive_kinetics'].append(np.array(Primitive_kinetics))
+           
             if len(mPoints) > 0:
                 self.AllResults[astrm]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
                 self.AllResults[astrm]['mG'].append(np.array([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
+                self.AllResults[astrm]['mRPMDG'].append(np.array([i for pt, i in zip(Points,mGrads_rpmd) if pt in mPoints]))
 
             os.chdir(cwd)
 
@@ -613,7 +637,9 @@ class Liquid(Target):
         
         unpack = lp_load('forcebalance.p')
         mvals1 = unpack[1]
-        if len(mvals) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
+        if mvals1.shape != mvals.shape:
+            warn_press_key("mvals from forcebalance.p has different shape compared to internal values!\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
+        elif len(mvals1) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from forcebalance.p does not match up with internal values! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
 
         mbar_verbose = False
@@ -654,7 +680,8 @@ class Liquid(Target):
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
-            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(17))
+            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, Kin_errs, Pke_errs, NMols, \
+            Cp_corrections, Grads_rpmd, mGrads_rpmd, Grads_rpmd_frc_term, Kinetics, Primitive_kinetics, RPMD_flags = ([Results[t][i] for t in range(len(Points))] for i in range(26))
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             logger.error(str(NMols))
@@ -662,7 +689,15 @@ class Liquid(Target):
             raise RuntimeError
         else:
             NMol = list(set(NMols))[0]
-    
+        # Determine if RPMD was run
+        if len(set(RPMD_flags)) != 1:
+            logger.error('Error: RPMD simulations have been mixed with classical simulations. Simulations should be of uniform kind.\n')
+            raise RuntimeError
+        elif all(RPMD_flags):
+            RPMD = True   
+        else:           
+            RPMD = False
+
         if not self.adapt_errors:
             self.AllResults = defaultdict(lambda:defaultdict(list))
 
@@ -670,8 +705,9 @@ class Liquid(Target):
         if len(Points) != len(self.Labels):
             logger.info("Data sets is not full, will not use for concatenation.")
             astrm += "_"*(Counter()+1)
-        self.AllResults[astrm]['Pts'].append(Points)
-        self.AllResults[astrm]['mPts'].append(Points)
+
+        self.AllResults[astrm]['Pts'].append(Points)                                        
+        self.AllResults[astrm]['mPts'].append(mPoints)
         self.AllResults[astrm]['E'].append(np.array(Energies))
         self.AllResults[astrm]['V'].append(np.array(Vols))
         self.AllResults[astrm]['R'].append(np.array(Rhos))
@@ -684,10 +720,17 @@ class Liquid(Target):
         self.AllResults[astrm]['GDz'].append(np.array([gd[2] for gd in GDips]))
         self.AllResults[astrm]['L'].append(len(Energies[0]))
         self.AllResults[astrm]['Steps'].append(self.liquid_md_steps)
+        self.AllResults[astrm]['RPMDG'].append(np.array(Grads_rpmd))
+        self.AllResults[astrm]['RPMDG_frc'].append(np.array(Grads_rpmd_frc_term))
+        self.AllResults[astrm]['E_PKE'].append(np.array(Primitive_kinetics) + np.array(Potentials))
+        self.AllResults[astrm]['Cp_corr'].append(np.array(Cp_corrections))
+        self.AllResults[astrm]['Kinetics'].append(np.array(Kinetics))
+        self.AllResults[astrm]['Primitive_kinetics'].append(np.array(Primitive_kinetics))
 
         if len(mPoints) > 0:
             self.AllResults[astrm]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
             self.AllResults[astrm]['mG'].append(np.array([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
+            self.AllResults[astrm]['mRPMDG'].append(np.array([i for pt, i in zip(Points,mGrads_rpmd) if pt in mPoints]))
 
         # Number of data sets belonging to this value of the parameters.
         Nrpt = len(self.AllResults[astrm]['R'])
@@ -712,9 +755,19 @@ class Liquid(Target):
         G, GDx, GDy, GDz = \
             (np.hstack((np.concatenate(tuple(self.AllResults[astrm][i]), axis=2))) for i in ['G', 'GDx', 'GDy', 'GDz'])
 
+        # These pertain to using RPMD and will not be used in classical
+        # optimizations.
+        E_PKE, Cp_corr, Kinetics, Primitive_kinetics = \
+            (np.hstack(tuple(self.AllResults[astrm][i])) for i in \
+            ['E_PKE', 'Cp_corr', 'Kinetics', 'Primitive_kinetics'])
+
+        RPMDG, RPMDG_frc = \
+            (np.hstack((np.concatenate(tuple(self.AllResults[astrm][i]), axis=2))) for i in ['RPMDG', 'RPMDG_frc']) 
+
         if len(mPoints) > 0:
             mE = np.hstack(tuple(self.AllResults[astrm]['mE']))
             mG = np.hstack((np.concatenate(tuple(self.AllResults[astrm]['mG']), axis=2)))
+            mRPMDG = np.hstack((np.concatenate(tuple(self.AllResults[astrm]['mRPMDG']), axis=2)))
         Rho_calc = OrderedDict([])
         Rho_grad = OrderedDict([])
         Rho_std  = OrderedDict([])
@@ -733,7 +786,13 @@ class Liquid(Target):
         Eps0_calc = OrderedDict([])
         Eps0_grad = OrderedDict([])
         Eps0_std  = OrderedDict([])
-
+        Cvqke_calc = OrderedDict([])
+        Cvqke_grad = OrderedDict([])
+        Cvqke_std = OrderedDict([])
+        Pqke_calc = OrderedDict([])        
+        Pqke_grad = OrderedDict([])
+        Pqke_std = OrderedDict([])
+ 
         # The unit that converts atmospheres * nm**3 into kj/mol :)
         pvkj=0.061019351687175
 
@@ -820,6 +879,10 @@ class Liquid(Target):
         Dx = Dx.flatten()
         Dy = Dy.flatten()
         Dz = Dz.flatten()
+        E_PKE = E_PKE.flatten() 
+        Cp_corr = Cp_corr.flatten()
+        Kinetics = Kinetics.flatten()
+        Primitive_kinetics = Primitive_kinetics.flatten()
         if len(mPoints) > 0: mE = mE.flatten()
             
         for i, PT in enumerate(Points):
@@ -827,10 +890,13 @@ class Liquid(Target):
             P = PT[1] / 1.01325 if PT[2] == 'bar' else PT[1]
             PV = P*V*pvkj
             H = E + PV
+            RPMDH = E_PKE + PV
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
             C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=mbar_verbose)
             Gbar = flat(np.matrix(G)*col(W))
+            RPMDGbar = flat(np.matrix(RPMDG)*col(W))
+            RPMDGbar_frc_term = flat(np.matrix(RPMDG_frc)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
             kT    = kb*T
@@ -849,10 +915,17 @@ class Liquid(Target):
                 ii = mPoints.index(PT)
                 mW = flat(mW2[:,ii])
                 mGbar = flat(np.matrix(mG)*col(mW))
+                if RPMD:
+                    mRPMDGbar = flat(np.matrix(mRPMDG)*col(mW))
                 Hvap_calc[PT]  = np.dot(mW,mE) - np.dot(W,E)/NMol + kb*T - np.dot(W, PV)/NMol
-                Hvap_grad[PT]  = mGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
-                Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
-                Hvap_grad[PT] -= (mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
+                if not RPMD:
+                    Hvap_grad[PT]  = mGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
+                    Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
+                    Hvap_grad[PT] -= (mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
+                else:
+                    Hvap_grad[PT]  = mRPMDGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
+                    Hvap_grad[PT] -= (RPMDGbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
+                    Hvap_grad[PT] -= (mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
                 if self.do_self_pol:
                     Hvap_calc[PT] -= EPol
                     Hvap_grad[PT] -= GEPol
@@ -878,12 +951,24 @@ class Liquid(Target):
                 Hvap_calc[PT]  = 0.0
                 Hvap_grad[PT]  = np.zeros(self.FF.np)
             ## Thermal expansion coefficient.
-            Alpha_calc[PT] = 1e4 * (avg(H*V)-avg(H)*avg(V))/avg(V)/(kT*T)
-            GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
-            GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
-            GAlpha3 = deprod(V)/avg(V) - Gbar
-            GAlpha4 = Beta * covde(H)
-            Alpha_grad[PT] = 1e4 * (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
+            if not RPMD:
+                Alpha_calc[PT] = 1e4 * (avg(H*V)-avg(H)*avg(V))/avg(V)/(kT*T)
+            else:
+                # RPMDH is the H timeseries calculaed with the primitive
+                # kinetic estimator.
+                Alpha_calc[PT] = 1e4 * (avg(RPMDH*V)-avg(RPMDH)*avg(V))/avg(V)/(kT*T)
+            if not RPMD:
+                GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
+                GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
+                GAlpha3 = deprod(V)/avg(V) - Gbar
+                GAlpha4 = Beta * covde(H)
+                Alpha_grad[PT] = 1e4 * (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
+            else:
+                GAlpha1 = -1 * Beta * deprod(RPMDH*V) * avg(V) / avg(V)**2                               
+                GAlpha2 = +1 * Beta * avg(RPMDH*V) * deprod(V) / avg(V)**2
+                GAlpha3 = deprod(V)/avg(V) - Gbar
+                GAlpha4 = Beta * covde(RPMDH)
+                Alpha_grad[PT] = 1e4 * (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
             ## Isothermal compressibility.
             bar_unit = 0.06022141793 * 1e6
             Kappa_calc[PT] = bar_unit / kT * (avg(V**2)-avg(V)**2)/avg(V)
@@ -892,17 +977,29 @@ class Liquid(Target):
             GKappa3 = +1 * Beta**2 * covde(V)
             Kappa_grad[PT] = bar_unit*(GKappa1 + GKappa2 + GKappa3)
             ## Isobaric heat capacity.
-            Cp_calc[PT] = 1000/(4.184*NMol*kT*T) * (avg(H**2) - avg(H)**2)
+            if not RPMD:
+                Cp_calc[PT] = 1000/(4.184*NMol*kT*T) * (avg(H**2) - avg(H)**2)
+            else:
+                Cp_calc[PT] = 1000/(4.184*NMol*kT*T) * (avg(RPMDH**2) - avg(RPMDH)**2 + avg(Cp_corr))
             if hasattr(self,'use_cvib_intra') and self.use_cvib_intra:
                 logger.debug("Adding " + str(self.RefData['devib_intra'][PT]) + " to the heat capacity\n")
                 Cp_calc[PT] += self.RefData['devib_intra'][PT]
             if hasattr(self,'use_cvib_inter') and self.use_cvib_inter:
                 logger.debug("Adding " + str(self.RefData['devib_inter'][PT]) + " to the heat capacity\n")
                 Cp_calc[PT] += self.RefData['devib_inter'][PT]
-            GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
-            GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
-            GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
-            Cp_grad[PT] = GCp1 + GCp2 + GCp3
+            if not RPMD:
+                GCp1 = 2*covde(H) * 1000 / 4.184 / (NMol*kT*T)
+                GCp2 = mBeta*covde(H**2) * 1000 / 4.184 / (NMol*kT*T)
+                GCp3 = 2*Beta*avg(H)*covde(H) * 1000 / 4.184 / (NMol*kT*T)
+                Cp_grad[PT] = GCp1 + GCp2 + GCp3
+            else:
+                GCp1 = 2*covde(RPMDH) * 1000 / 4.184 / (NMol*kT*T)
+                GCp2 = mBeta*covde(RPMDH**2) * 1000 / 4.184 / (NMol*kT*T)
+                GCp3 = 2*Beta*avg(RPMDH)*covde(RPMDH) * 1000 / 4.184 / (NMol*kT*T)
+                # One extra term due to the quantum correction from the
+                # primitive estimator.
+                GCp4 = mBeta*covde(Cp_corr) * 1000 / 4.184 / (NMol*kT*T)
+                Cp_grad[PT]  = GCp1 + GCp2 + GCp3 + GCp4
             ## Static dielectric constant.
             prefactor = 30.348705333964077
             D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
@@ -911,6 +1008,16 @@ class Liquid(Target):
             GD2 += 2*(flat(np.matrix(GDy)*col(W*Dy)) - avg(Dy)*flat(np.matrix(GDy)*col(W))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
             GD2 += 2*(flat(np.matrix(GDz)*col(W*Dz)) - avg(Dz)*flat(np.matrix(GDz)*col(W))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
             Eps0_grad[PT] = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
+            ## Centroid virial QKE
+            Cvqke_calc[PT] = avg(Kinetics) / NMol
+            GCvqke = mBeta*covde(Kinetics)
+            GCvqke += RPMDGbar_frc_term
+            GCvqke /= NMol
+            Cvqke_grad[PT] = GCvqke
+            ## Primitive QKE  
+            Pqke_calc[PT] = avg(Primitive_kinetics) / NMol
+            GPqke = mBeta*covde(Primitive_kinetics) / NMol
+            Pqke_grad[PT] = GPqke
             ## Estimation of errors.
             Rho_std[PT]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
             if PT in mPoints:
@@ -919,8 +1026,10 @@ class Liquid(Target):
                 Hvap_std[PT]   = 0.0
             Alpha_std[PT]   = np.sqrt(sum(C**2 * np.array(Alpha_errs)**2)) * 1e4
             Kappa_std[PT]   = np.sqrt(sum(C**2 * np.array(Kappa_errs)**2)) * 1e6
-            Cp_std[PT]   = np.sqrt(sum(C**2 * np.array(Cp_errs)**2))
-            Eps0_std[PT]   = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
+            Cp_std[PT]      = np.sqrt(sum(C**2 * np.array(Cp_errs)**2))
+            Eps0_std[PT]    = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
+            Cvqke_std[PT]   = np.sqrt(sum(C**2 * np.array(Kin_errs)**2))
+            Pqke_std[PT]    = np.sqrt(sum(C**2 * np.array(Pke_errs)**2))
 
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Points, 'rho', Rho_calc, Rho_std, Rho_grad, name="Density")
@@ -929,19 +1038,21 @@ class Liquid(Target):
         X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Points, 'kappa', Kappa_calc, Kappa_std, Kappa_grad, name="Compressibility")
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
+        X_Cvqke, G_Cvqke, H_Cvqke, CvqkePrint = self.objective_term(Points, 'cvqke', Cvqke_calc, Cvqke_std, Cvqke_grad, name="Centroid Virial QKE")
+        X_Pqke, G_Pqke, H_Pqke, PqkePrint = self.objective_term(Points, 'pqke', Pqke_calc, Pqke_std, Pqke_grad, name="Primitive QKE")
 
         Gradient = np.zeros(self.FF.np)
         Hessian = np.zeros((self.FF.np,self.FF.np))
 
-        if X_Rho == 0: self.w_rho = 0.0
-        if X_Hvap == 0: self.w_hvap = 0.0
         if X_Alpha == 0: self.w_alpha = 0.0
         if X_Kappa == 0: self.w_kappa = 0.0
         if X_Cp == 0: self.w_cp = 0.0
         if X_Eps0 == 0: self.w_eps0 = 0.0
+        if X_Cvqke == 0: self.w_cvqke = 0.0
+        if X_Pqke == 0: self.w_pqke = 0.0
 
         if self.w_normalize:
-            w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0
+            w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_cvqke + self.w_pqke
         else:
             w_tot = 1.0
         w_1 = self.w_rho / w_tot
@@ -950,23 +1061,25 @@ class Liquid(Target):
         w_4 = self.w_kappa / w_tot
         w_5 = self.w_cp / w_tot
         w_6 = self.w_eps0 / w_tot
+        w_7 = self.w_cvqke / w_tot
+        w_8 = self.w_pqke / w_tot
 
-        Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0
+        Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7 * X_Cvqke + w_8 * X_Pqke
         if AGrad:
-            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0
+            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0 + w_7 * G_Cvqke + w_8 * G_Pqke
         if AHess:
-            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0
+            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0 + w_7 * H_Cvqke + w_8 * H_Pqke
 
         if not in_fd():
             self.Xp = {"Rho" : X_Rho, "Hvap" : X_Hvap, "Alpha" : X_Alpha, 
-                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0}
+                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "Cvqke" : X_Cvqke, "Pqke" : X_Pqke}
             self.Wp = {"Rho" : w_1, "Hvap" : w_2, "Alpha" : w_3, 
-                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6}
+                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "Cvqke" : w_7, "Pqke" : w_8}
             self.Pp = {"Rho" : RhoPrint, "Hvap" : HvapPrint, "Alpha" : AlphaPrint, 
-                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print}
+                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "Cvqke" : CvqkePrint, "Pqke" : PqkePrint}
             if AGrad:
                 self.Gp = {"Rho" : G_Rho, "Hvap" : G_Hvap, "Alpha" : G_Alpha, 
-                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0}
+                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "Cvqke" : G_Cvqke, "Pqke" : G_Pqke}
             self.Objective = Objective
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}

@@ -17,7 +17,7 @@ import numpy as np
 import sys
 from forcebalance.finite_difference import *
 import pickle
-import shutil
+import shutil, time
 from copy import deepcopy
 from forcebalance.engine import Engine
 from forcebalance.molecule import *
@@ -49,13 +49,69 @@ def get_mask(grps):
     return mask
 
 def energy_components(Sim, verbose=False):
-    # Before using EnergyComponents, make sure each Force is set to a different group.
+    # Before using energy_components(), make sure each Force is set to a different group.
     EnergyTerms = OrderedDict()
     if type(Sim.integrator) in [LangevinIntegrator, VerletIntegrator]:
         for i in range(Sim.system.getNumForces()):
             EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     return EnergyTerms
 
+def evaluate_potential(Sim, state=None):
+    # Speed up postprocessing of PIMD gradients by pulling
+    # only from first bead.
+    if isinstance(Sim.integrator, RPMDIntegrator):
+        if state is None: raise RuntimeError("State should not be none here.")
+        return state.getPotentialEnergy()
+    else:
+        return Sim.context.getState(getEnergy=True).getPotentialEnergy() 
+
+def evaluate_kinetic(Sim, props):
+    # A primitive quantum K.E. estimator for PIMD simulation. 
+    # Returns classical K.E. in a classical simulation. 
+    if isinstance(Sim.integrator, RPMDIntegrator):
+        spring_term = 0.0
+        hbar = 0.06350780 * nanometer**2*dalton/picosecond           # 1 nm**2 * Da / ps**2 is 1 kJ/mol    
+        kb = 0.00831446 * nanometer**2*dalton/(picosecond**2*kelvin)
+        T = props['T']                                               # Note: this method call does NOT return instantaneous temp, but rather whatever the integrator was set to
+        P = props['P']
+        const1 = (kb*T)**2*P/(2.0*hbar**2)
+        const2 = (kb*T)**3*P/hbar**2
+        for i in range(P):
+            j = (i+1) % P
+            diff = props['Positions'][j] - props['Positions'][i]
+            spring_term -= np.dot((diff*diff).sum(axis=1), props['Masses'])
+        spring_term = Quantity(spring_term, nanometer**2*dalton)
+        return spring_term*const1, spring_term*const2 
+    else:
+        return Sim.context.getState(getEnergy=True).getKineticEnergy()
+
+def get_forces(Sim):
+    """Return forces on each atom or forces averaged over all copies in case of RPMD."""
+    if isinstance(Sim.integrator, RPMDIntegrator):
+        P = Sim.integrator.getNumCopies()
+        frcs = Sim.integrator.getState(0,getForces=True).getForces() / P
+        for i in range(1,P):
+            frcs += Sim.integrator.getState(i,getForces=True).getForces() / P
+        return frcs
+    else:
+        State = Sim.context.getState(getPositions=True, getEnergy=True, getForces=True)
+        return State.getForces() 
+
+# Probably don't need this anymore
+#def rpmd_dips(Sim, qvals, masses, postprocess_rpmd=False):
+#    """Return dipole moments averaged over all copies of the system."""
+#    rpmdIntegrator = Sim.context.getIntegrator()
+#    temp_dips = []
+#    if postprocess_rpmd:
+#        temp_positions = rpmdIntegrator.getState(0,getPositions=True).getPositions()
+#        temp_dips.append(get_dipole(Sim, q=qvals, mass=masses, positions=temp_positions))
+#    else:
+#        for i in range(rpmdIntegrator.getNumCopies()):
+#            temp_positions = rpmdIntegrator.getState(i,getPositions=True).getPositions()
+#            temp_dips.append(get_dipole(Sim, q=qvals, mass=masses, positions=temp_positions))
+#    dip_avg = [sum(col) / float(len(col)) for col in zip(*temp_dips)]
+#    return dip_avg
+ 
 def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
     """Return the current multipole moments in Debye and Buckingham units. """
     dx = 0.0
@@ -217,6 +273,10 @@ def GetVirtualSiteParameters(system):
                 vsprm.append(_openmm.OutOfPlaneSite_getWeightCross(vs))
     return np.array(vsprm)
 
+def GetSystemConstraints(system):
+    """Return boolean value indicating whether system has constraints. RPMD simulations should have no constraints."""
+    return system.getNumConstraints() > 0
+
 def CopyAmoebaBondParameters(src,dest):
     dest.setAmoebaGlobalBondCubic(src.getAmoebaGlobalBondCubic())
     dest.setAmoebaGlobalBondQuartic(src.getAmoebaGlobalBondQuartic())
@@ -290,12 +350,19 @@ def CopyCustomNonbondedParameters(src, dest):
     for i in range(src.getNumParticles()):
         dest.setParticleParameters(i, list(src.getParticleParameters(i)))
 
+def CopyCustomBondedParameters(src, dest):
+    '''
+    Copy whatever update parameters in context can 
+    '''
+    for i in range(src.getNumBonds()):
+        dest.setBondParameters(i, *src.getBondParameters(i))
+
 def do_nothing(src, dest):
     return
 
 def CopySystemParameters(src,dest):
     """Copy parameters from one system (i.e. that which is created by a new force field)
-    sto another system (i.e. the one stored inside the Target object).
+    to another system (i.e. the one stored inside the Target object).
     DANGER: These need to be implemented manually!!!"""
     Copiers = {'AmoebaBondForce':CopyAmoebaBondParameters,
                'AmoebaOutOfPlaneBendForce':CopyAmoebaOutOfPlaneBendParameters,
@@ -309,7 +376,8 @@ def CopySystemParameters(src,dest):
                'NonbondedForce':CopyNonbondedParameters,
                'CustomNonbondedForce':CopyCustomNonbondedParameters,
                'GBSAOBCForce':CopyGBSAOBCParameters,
-               'CMMotionRemover':do_nothing}
+               'CMMotionRemover':do_nothing,
+               'CustomBondForce':CopyCustomBondedParameters}
     for i in range(src.getNumForces()):
         nm = src.getForce(i).__class__.__name__
         if nm in Copiers:
@@ -538,6 +606,7 @@ class OpenMM(Engine):
         if self.platname == 'CUDA':
             ## Set the device to the environment variable or zero otherwise
             device = os.environ.get('CUDA_DEVICE',"0")
+            logger.info("Using CUDA device " + str(device) + "\n") 
             if self.verbose: logger.info("Setting CUDA Device to %s\n" % device)
             self.platform.setPropertyDefaultValue("CudaDeviceIndex", device)
             if self.verbose: logger.info("Setting CUDA Precision to %s\n" % self.precision)
@@ -708,7 +777,7 @@ class OpenMM(Engine):
             else:
                 box_omm = None
             # Finally append it to list.
-            self.xyz_omms.append((mod.getPositions(), box_omm))
+            self.xyz_omms.append((mod.getPositions(), box_omm))       
 
         ## Build a topology and atom lists.
         Top = mod.getTopology()
@@ -724,56 +793,93 @@ class OpenMM(Engine):
         self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
 
-    def create_simulation(self, timestep=1.0, faststep=0.25, temperature=None, pressure=None, anisotropic=False, mts=False, collision=1.0, nbarostat=25, rpmd_beads=0, **kwargs):
+    def create_simulation(self, timestep=1.0, faststep=0.25, temperature=None, pressure=None, anisotropic=False, mts=False, collision=1.0, nbarostat=25, rpmd_opts=[], **kwargs):
 
         """
         Create simulation object.  Note that this also takes in some
         options pertinent to system setup, including the type of MD
         integrator and type of pressure control.
         """
-
         # Divisor for the temperature (RPMD sets it to nonzero.)
         self.tdiv = 1
+        
+        # Boolean flag indicating an RPMD simulation
+        self.rpmd = len(rpmd_opts) > 0
+        rpmd_opts = [int(i) for i in rpmd_opts]
 
         ## Determine the integrator.
         if temperature:
             ## If temperature control is turned on, then run Langevin dynamics.
             if mts:
-                if rpmd_beads > 0:
-                    logger.error("No multiple timestep integrator without temperature control.\n")
-                    raise RuntimeError
+                if len(rpmd_opts) > 0:
+                    raise RuntimeError("No multiple timestep integrator without temperature control.")
                 integrator = MTSVVVRIntegrator(temperature*kelvin, collision/picosecond,
                                                timestep*femtosecond, self.system, ninnersteps=int(timestep/faststep))
             else:
-                if rpmd_beads > 0:
-                    logger.info("Creating RPMD integrator with %i beads.\n" % rpmd_beads)
-                    self.tdiv = rpmd_beads
-                    integrator = RPMDIntegrator(rpmd_beads, temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                if self.rpmd:
+                    self.tdiv = rpmd_opts[0]
+                    if len(rpmd_opts) == 1:
+                        logger.info("Creating RPMD integrator with %i beads.\n" % (rpmd_opts[0]))
+                        integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                    elif len(rpmd_opts) == 2:
+                        contract = False
+                        for frc in self.system.getForces():
+                            if any([isinstance(frc, fc) for fc in [NonbondedForce, AmoebaMultipoleForce, AmoebaVdwForce, CustomNonbondedForce]]):
+                                contract = True
+                                frc.setForceGroup(1)
+                        if contract:
+                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i).\n" % (rpmd_opts[0], rpmd_opts[1]))
+                            integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_opts[1]})
+                        else:
+                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (rpmd_opts[0]))
+                            integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                    elif len(rpmd_opts) == 3:
+                        contract = False
+                        contract_recip = False
+                        for frc in self.system.getForces():
+                            if any([isinstance(frc, fc) for fc in [NonbondedForce, AmoebaMultipoleForce, AmoebaVdwForce, CustomNonbondedForce]]):
+                                contract = True
+                                frc.setForceGroup(1)
+                                if isinstance(frc, NonbondedForce):
+                                    contract_recip = True
+                                    frc.setReciprocalSpaceForceGroup(2)
+                        if contract_recip:
+                            logger.info("Creating RPMD integrator with %i beads (NB/Recip forces contracted to %i/%i).\n" % (rpmd_opts[0], rpmd_opts[1], rpmd_opts[2]))
+                            integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_opts[1], 2:rpmd_opts[2]})
+                        elif contract:
+                            logger.info("Creating RPMD integrator with %i beads (NB forces contracted to %i, no Recip).\n" % (rpmd_opts[0], rpmd_opts[1]))
+                            integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond, {1:rpmd_opts[1]})
+                        else:
+                            logger.info("Creating RPMD integrator with %i beads (no NB forces to contract).\n" % (rpmd_opts[0]))
+                            integrator = RPMDIntegrator(rpmd_opts[0], temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                    else:
+                        raise RuntimeError("Please provide a list of length 1, 2, or 3 to rpmd_opts")
                 else:
                     integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
         else:
             ## If no temperature control, default to the Verlet integrator.
-            if rpmd_beads > 0:
-                logger.error("No RPMD integrator without temperature control.\n")
-                raise RuntimeError
+            if self.rpmd:
+                raise RuntimeError("No RPMD integrator without temperature control.")
             if mts: warn_once("No multiple timestep integrator without temperature control.")
             integrator = VerletIntegrator(timestep*femtoseconds)
-
         ## Add the barostat.
         if pressure is not None:
             if anisotropic:
                 barostat = MonteCarloAnisotropicBarostat([pressure, pressure, pressure]*atmospheres,
                                                          temperature*kelvin, nbarostat)
             else:
-                barostat = MonteCarloBarostat(pressure*atmospheres, temperature*kelvin, nbarostat)
-        if self.pbc and pressure is not None: self.system.addForce(barostat)
-        elif pressure is not None: warn_once("Pressure is ignored because pbc is set to False.")
+                if not self.rpmd:
+                    barostat = MonteCarloBarostat(pressure*atmospheres, temperature*kelvin, nbarostat)
+                else:
+                    barostat = RPMDMonteCarloBarostat(pressure*atmospheres, nbarostat)
+        if self.pbc and pressure != None: self.system.addForce(barostat)
+        elif pressure != None: warn_once("Pressure is ignored because pbc is set to False.")
 
         ## Set up for energy component analysis.
         GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce','AmoebaWcaDispersionForce',
                         'CustomNonbondedForce',  'NonbondedForce']
         GrpNums = {}
-        if not mts:
+        if not mts and len(rpmd_opts) == 0:
             for j in self.system.getForces():
                 i = -1
                 if j.__class__.__name__ in GrpTogether:
@@ -787,18 +893,17 @@ class OpenMM(Engine):
 
         ## If virtual particles are used with AMOEBA...
         SetAmoebaVirtualExclusions(self.system)
-        
+
         ## Finally create the simulation object.
         self.simulation = Simulation(self.mod.topology, self.system, integrator, self.platform)
-        
+        #fffff.write(XmlSerializer.serialize(self.simulation.system))
         ## Print platform properties.
         # logger.info("I'm using the platform %s\n" % self.simulation.context.getPlatform().getName())
         # printcool_dictionary({i:self.simulation.context.getPlatform().getPropertyValue(self.simulation.context,i) \
         #                           for i in self.simulation.context.getPlatform().getPropertyNames()}, \
         #                          title="Platform %s has properties:" % self.simulation.context.getPlatform().getName())
-
     def update_simulation(self, **kwargs):
-
+        
         """ 
         Create the simulation object, or update the force field
         parameters in the existing simulation object.  This should be
@@ -824,10 +929,13 @@ class OpenMM(Engine):
         # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
         # for b in list(self.mod.topology.bonds()):
         #     print b[0].index, b[1].index
+        if 'rpmd_opts' in kwargs:
+            self.mmopts['rigidWater'] = False
+            self.mmopts['constraints'] = 'None'
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
-        
+
         for i in self.system.getForces():
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
@@ -836,7 +944,6 @@ class OpenMM(Engine):
             if isinstance(i, AmoebaMultipoleForce):
                 if self.SetPME:
                     i.setNonbondedMethod(i.PME)
-
         #----
         # If the virtual site parameters have changed,
         # the simulation object must be remade.
@@ -846,13 +953,20 @@ class OpenMM(Engine):
             if hasattr(self, 'simulation'): 
                 delattr(self, 'simulation')
         self.vsprm = vsprm.copy()
-
+        #----
+	    # If number of of constraints in the new
+	    # system differs from simulation's system,
+	    # similarly remake the simulation object
+	    #----
+        if hasattr(self, 'simulation'):
+            new_system_constraints = GetSystemConstraints(self.system)
+            simulation_system_constraints = GetSystemConstraints(self.simulation.system)
+            if new_system_constraints != simulation_system_constraints: delattr(self, 'simulation')
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)
         else:
             self.create_simulation(**self.simkwargs)
-
-    def set_positions(self, shot=0, traj=None):
+    def set_positions(self, shot=0, traj=None, postprocess=False):
         
         """
         Set the positions and periodic box vectors to one of the
@@ -872,12 +986,41 @@ class OpenMM(Engine):
         #----
         # NOTE: Periodic box vectors must be set FIRST
         if self.pbc:
-            self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
+            if not hasattr(self, 'xyz_rpmd'):
+                self.simulation.context.setPeriodicBoxVectors(*self.xyz_omms[shot][1])
+            else:
+                self.simulation.context.setPeriodicBoxVectors(*self.xyz_rpmd[shot][1])
         # self.simulation.context.setPositions(ResetVirtualSites(self.xyz_omms[shot][0], self.system))
         # self.simulation.context.setPositions(ResetVirtualSites_fast(self.xyz_omms[shot][0], self.vsinfo))
-        self.simulation.context.setPositions(self.xyz_omms[shot][0])
-        self.simulation.context.computeVirtualSites()
-
+        if not hasattr(self, 'xyz_rpmd'):
+            self.simulation.context.setPositions(self.xyz_omms[shot][0])
+            self.simulation.context.computeVirtualSites()
+            #-----------------
+            # For RPMD, initially it is fine to set all beads using coordinates in xyz_omms. We also need to 
+            # compute virtual sites by processing each copy via the context. We should NOT redo this each 
+            # time set_positions() is called, as by then the virtual sites are already contained in xyz_rpmd.
+            #-----------------
+            # EDIT: Is this even necessary?
+            if isinstance(self.simulation.integrator, RPMDIntegrator):
+                rpmdIntegrator = self.simulation.context.getIntegrator()
+                for i in range(rpmdIntegrator.getNumCopies()):
+                    temp_positions = self.xyz_omms[shot][0]
+                    self.simulation.context.setPositions(temp_positions)
+                    self.simulation.context.computeVirtualSites()
+                    posWithVsites = self.simulation.context.getState(getPositions=True).getPositions()
+                    rpmdIntegrator.setPositions(i,posWithVsites)
+        else:
+            rpmdIntegrator = self.simulation.context.getIntegrator()
+            if postprocess:
+                # Try speeding up gradient calculation by 
+                # including data from just one bead. 
+                temp_positions = self.xyz_rpmd[shot][0]
+                rpmdIntegrator.setPositions(0,temp_positions)
+            else:
+                for i in range(rpmdIntegrator.getNumCopies()):
+                    temp_positions = self.xyz_rpmd[shot][0]
+                    rpmdIntegrator.setPositions(i,temp_positions)
+    
     def get_charges(self):
         logger.error('OpenMM engine does not have get_charges (should be trivial to implement however.)')
         raise NotImplementedError
@@ -897,20 +1040,64 @@ class OpenMM(Engine):
             mass += system.getParticleMass(i)
         return mass
 
-    def evaluate_one_(self, force=False, dipole=False):
+    # No longer necessary. Bulky function and we use numpy now.
+    #def calc_cv(self):
+    #    if not hasattr(self,'rpmd_frame_props'):
+    #        self.rpmd_frame_props = {}
+    #        self.rpmd_frame_props['States'] = []
+    #        vsites = []
+    #        for i in range(self.simulation.system.getNumParticles()):
+    #            if self.simulation.system.isVirtualSite(i): vsites.append(True)
+    #            else: vsites.append(False)
+    #        mass_matrix = np.array([])
+    #        for i in range(self.simulation.system.getNumParticles()):
+    #            mass_matrix = np.append(mass_matrix, self.simulation.system.getParticleMass(i).value_in_unit(dalton))
+    #        rpmd_states     = []
+    #        state_positions = []
+    #        for i in range(self.simulation.integrator.getNumCopies()):
+    #            rpmd_state = self.simulation.integrator.getState(i,getPositions=True,getForces=True,getEnergy=False, 
+    #                            getParameters=False,enforcePeriodicBox=True,groups=-1)
+    #            rpmd_states.append(rpmd_state)
+    #            state_positions.append(np.array(rpmd_state.getPositions().value_in_unit(nanometer)))
+    #        self.rpmd_frame_props['States']    = rpmd_states
+    #        self.rpmd_frame_props['Positions'] = state_positions
+    #        self.rpmd_frame_props['T']         = self.simulation.integrator.getTemperature()
+    #        self.rpmd_frame_props['P']         = self.simulation.integrator.getNumCopies()
+    #        if any(vsites):
+    #            total_N                        = self.simulation.system.getNumParticles()
+    #            self.rpmd_frame_props['N']     = total_N - total_N / 4
+    #        else:
+    #            self.rpmd_frame_props['N']     = self.simulation.system.getNumParticles()
+    #        self.rpmd_frame_props['Masses']    = mass_matrix
+    #        self.rpmd_frame_props['Vsites']    = vsites
+    #    self.rpmd_states = []
+    #    self.state_positions = []
+    #    for i in range(self.simulation.integrator.getNumCopies()):
+    #        rpmd_state = self.simulation.integrator.getState(i,getPositions=True,getForces=True,getEnergy=False,
+    #                        getParameters=False,enforcePeriodicBox=True,groups=-1)
+    #        self.rpmd_states.append(rpmd_state)
+    #        self.state_positions.append(np.array(rpmd_state.getPositions().value_in_unit(nanometer)))
+    #    self.rpmd_frame_props['States'] = self.rpmd_states
+    #    self.rpmd_frame_props['Positions'] = self.state_positions
+    #    return centroid_kinetic(self.simulation, self.rpmd_frame_props).value_in_unit(kilojoules_per_mole)
+
+    def evaluate_one_(self, force=False, dipole=False, pimd_state=None):
         """ Perform a single point calculation on the current geometry. """
-        
-        State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
-        Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
+        if not hasattr(self, 'xyz_rpmd'): 
+            State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
+            Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
+        else:
+            if pimd_state is None: raise RuntimeError("Make sure you provide a state for PIMD!")
+            Result["Energy"] = pimd_state.getPotentialEnergy() / kilojoules_per_mole
         if force: 
-            Force = list(np.array(State.getForces() / kilojoules_per_mole * nanometer).flatten())
+            Force = list(np.array(get_forces(self.simulation) / kilojoules_per_mole * nanometer).flatten())
             # Extract forces belonging to real atoms only
             Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]])))
         if dipole: Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
         return Result
 
-    def evaluate_(self, force=False, dipole=False, traj=False):
+    def evaluate_(self, force=False, dipole=False, traj=False, rpmd=False):
 
         """ 
         Utility function for computing energy, and (optionally) forces and dipoles using OpenMM. 
@@ -928,22 +1115,50 @@ class OpenMM(Engine):
         self.update_simulation()
         
         # If trajectory flag set to False, perform a single-point calculation.
-        if not traj: return evaluate_one_(force, dipole)
+        if not traj: return self.evaluate_one_(force, dipole)
         Energies = []
         Forces = []
         Dipoles = []
-        for I in range(len(self.xyz_omms)):
-            self.set_positions(I)
-            R1 = self.evaluate_one_(force, dipole)
-            Energies.append(R1["Energy"])
-            if force: Forces.append(R1["Force"])
-            if dipole: Dipoles.append(R1["Dipole"])
+        RPMD_CV_est = []
+        if hasattr(self, 'xyz_rpmd'):
+            for I in range(len(self.xyz_rpmd)):
+                self.set_positions(I, postprocess=True) 
+                pimd_state_tmp = self.simulation.integrator.getState(0,getPositions=True,getEnergy=True,getForces=True)
+                R1 = self.evaluate_one_(force,dipole=False,pimd_state=pimd_state_tmp)
+                Energies.append(R1["Energy"])
+                if dipole:
+                    # Use the stored centroid coordinates to calculate
+                    # the dipole moment (MUCH faster).
+                    enm_debye = 48.03204255928332 # Conversion factor from e*nm to Debye
+                    dip = enm_debye * np.sum(self.centroids[I]*self.nbcharges.reshape(-1,1),axis=0) 
+                    dx, dy, dz = dip[0], dip[1], dip[2]
+                    Dipoles.append([dx,dy,dz])
+                if rpmd:
+                    centroids = self.centroids[I]
+                    x = np.array(pimd_state_tmp.getPositions().value_in_unit(nanometer))
+                    forces = np.array(pimd_state_tmp.getForces().value_in_unit(kilojoules_per_mole/nanometer))
+                    cv_qke = 1.5 * self.natoms / self.beta
+                    d_c = x - centroids
+                    d_c[self.vsite_idxs,:] = 0.0
+                    # Note: this calculation only uses one bead.
+                    # This may not be okay.
+                    cv_qke -= 0.5 * (forces * d_c).sum() 
+                    RPMD_CV_est.append(cv_qke)                
+        else:
+            for I in range(len(self.xyz_omms)):
+                self.set_positions(I)
+                R1 = self.evaluate_one_(force, dipole)
+                Energies.append(R1["Energy"])
+                if force: Forces.append(R1["Force"])
+                if dipole: Dipoles.append(R1["Dipole"])
         # Compile it all into the dictionary object
         Result = OrderedDict()
-        
         Result["Energy"] = np.array(Energies)
         if force: Result["Force"] = np.array(Forces)
         if dipole: Result["Dipole"] = np.array(Dipoles)
+        if rpmd: 
+            Result["RPMD_CV_est"] = np.array(RPMD_CV_est) + np.array(Energies)
+            Result["RPMD_CV_frc_term"] = np.array(RPMD_CV_est)
         return Result
 
     def energy_one(self, shot):
@@ -969,6 +1184,14 @@ class OpenMM(Engine):
         """ Loop through the snapshots and compute the energies and forces using OpenMM. """
         Result = self.evaluate_(dipole=True, traj=True)
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
+
+    def energy_dipole_rpmd(self):
+        Result = self.evaluate_(dipole=True, traj=True, rpmd=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"], Result["RPMD_CV_est"].reshape(-1,1), Result["RPMD_CV_frc_term"].reshape(-1,1)))
+
+    def energy_rpmd(self, rpmd=True):
+        Result = self.evaluate_(traj=True, rpmd=True)
+        return np.hstack((Result["Energy"].reshape(-1,1), Result["RPMD_CV_est"].reshape(-1,1), Result["RPMD_CV_frc_term"].reshape(-1,1)))
 
     def normal_modes(self, shot=0, optimize=True):
         logger.error("OpenMM cannot do normal mode analysis\n")
@@ -1080,6 +1303,259 @@ class OpenMM(Engine):
         B = self.B.energy()
 
         return (D - A - B) / 4.184
+
+    def run_pimd(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, save_traj=False, verbose=False, **kwargs):
+        
+        """
+        Method for running PIMD simulation. I'm trying this as a
+        separate function because I have discovered a massive speed-up
+        when using a custom reporter to calculate the quantum kinetic
+        energies.
+
+        Required arguments:
+        nsteps      = (int)   Number of total time steps
+        timestep    = (float) Time step in FEMTOSECONDS
+        temperature = (float) Temperature control (Kelvin)
+        pressure    = (float) Pressure control (atmospheres)
+        nequil      = (int)   Number of additional time steps at the beginning for equilibration
+        nsave       = (int)   Step interval for saving and printing data
+        minimize    = (bool)  Perform an energy minimization prior to dynamics
+
+        Returns simulation data:
+        Rhos               = (array)     Density in kilogram m^-3
+        Potentials         = (array)     Potential energies
+        Kinetics           = (array)     Centroid virial kinetic energy
+        Primitive_kinetics = (array)     Primitive kinetic energy
+        Volumes            = (array)     Box volumes
+        Dips               = (3xN array) Dipole moments
+        EComps             = (dict)      Energy components
+        """
+
+        if float(int(float(nequil)/float(nsave))) != float(nequil)/float(nsave):
+            logger.error("Please set nequil to an integer multiple of nsave\n")
+            raise RuntimeError
+        iequil = int(nequil/nsave)
+
+        if float(int(float(nsteps)/float(nsave))) != float(nsteps)/float(nsave):
+            logger.error("Please set nsteps to an integer multiple of nsave\n")
+            raise RuntimeError
+        isteps = int(nsteps/nsave)
+        nsave = int(nsave)
+
+        if hasattr(self, 'simulation'):
+            logger.warning('Deleting the simulation object and re-creating for MD\n')
+            delattr(self, 'simulation')
+
+        self.update_simulation(timestep=timestep, temperature=temperature, pressure=pressure, anisotropic=anisotropic, **kwargs)
+        self.set_positions()
+
+        # Minimize the energy.
+        if minimize:
+            if verbose: logger.info("Minimizing the energy... (starting energy % .3f kJ/mol)\n" % 
+                                    self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole))
+            self.simulation.minimizeEnergy()
+            if verbose: 
+                logger.info("Done (final energy % .3f kJ/mol)\n" % 
+                                    self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole))
+                logger.info("\n")
+
+        # Serialize the system if we want.
+        Serialize = 0
+        if Serialize:
+            serial = XmlSerializer.serializeSystem(system)
+            with wopen('%s_system.xml' % phase) as f: f.write(serial)
+
+        # Determine number of degrees of freedom; the center of mass motion remover is also a constraint.
+        kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
+        
+        # Compute total mass.
+        self.mass = self.compute_mass(self.system).in_units_of(gram / mole) /  AVOGADRO_CONSTANT_NA
+
+        # Initialize statistics.
+        edecomp = OrderedDict()
+
+        # Check that we should be running PIMD.
+        if not isinstance(self.simulation.integrator, RPMDIntegrator):
+            logger.error('Specified an RPMD simulation but the integrator is wrong!\n')
+            raise RuntimeError
+        else:
+            self.pimd_integrator = self.simulation.context.getIntegrator()
+
+        # How many beads are we running?
+        P = self.simulation.context.getIntegrator().getNumCopies()
+
+        # Custom reporter for calculating quantum kinetic energies and
+        # other quantities of interest.
+        class ReporterPIMDEstimators(object):
+
+            def __init__(self, simulation, integrator, system, reportInterval, **kwargs):
+
+                self.vsite_bool = np.array([system.isVirtualSite(i) \
+                                             for i in range(system.getNumParticles())])
+                self.N = system.getNumParticles() - sum(self.vsite_bool) 
+                self.P = integrator.getNumCopies()
+                self.masses = np.array([system.getParticleMass(i).value_in_unit(dalton) \
+                                         for i in range(system.getNumParticles())])
+                self.q = None
+                for frc in simulation.system.getForces():
+                    # This distinguishes iAMOEBA from qtip4pf
+                    if isinstance(frc, NonbondedForce):
+                        self.q = np.array([frc.getParticleParameters(i)[0]._value \
+                                            for i in range(frc.getNumParticles())])
+                self.vsite_idxs = np.where(self.vsite_bool == True)[0]
+                self.thermo_T = integrator.getTemperature().value_in_unit(kelvin)
+                self.kb = 0.0083144621
+                self.kT = self.thermo_T * self.kb
+                self.beta = 1. / self.kT
+                self.hbar = 0.06350780
+                self.const_cv_qke = 1.5 * self.N / self.beta
+                self.const_p_qke = self.const_cv_qke * self.P
+                self.omega_P = 0.5 * self.P / self.beta**2 / self.hbar**2
+                self._reportInterval = reportInterval
+                self.pimd_properties = {'potentials': [],
+                                             'p_qke': [],
+                                            'cv_qke': [],
+                                                 'T': [],
+                                          'xyz_rpmd': [],
+                                         'centroids': [],
+                                           'dipoles': []}
+
+            def describeNextReport(self, simulation):
+
+                steps = self._reportInterval - simulation.currentStep%self._reportInterval
+                return (steps, True, False, True, True)
+
+            def extract_potentials(self):
+
+                potentials_tmp = [s.getPotentialEnergy().value_in_unit(kilojoules_per_mole) \
+                                  for s in self.states]
+                return np.average(potentials_tmp)
+
+            def extract_T(self):
+
+                total_KE = sum([s.getKineticEnergy().value_in_unit(kilojoules_per_mole) for s in self.states])
+                denominator = 3. * self.N * self.kb * self.P**2
+                return 2.0 * total_KE / denominator
+
+            def extract_kinetic_energies(self):
+
+                x = self.state_positions
+                centroids = np.mean(x,axis=0)
+                # Initialize qke estimators with their constant terms.
+                cv_qke = self.const_cv_qke
+                p_qke = self.const_p_qke
+                # Calculate kinetic energy estimators.
+                # Displacement from centroid:
+                d_c = x - centroids
+                # Zero out displacements of virtual sites.
+                d_c[:,self.vsite_idxs,:] = 0.0
+                # Calculate virial estimator.
+                cv_qke -= 0.5 * (self.state_forces * d_c).sum() / self.P
+                # Use np.roll to calculate differences between beads.
+                x_roll = np.roll(x,1,axis=0)
+                d_x = x - x_roll
+                # Calculate primitive estimator.
+                p_qke -=  self.omega_P * (self.masses * (d_x**2).sum(axis=2)).sum()
+                return p_qke, cv_qke, centroids
+
+            def extract_dipoles(self, simulation):
+                enm_debye = 48.03204255928332 # Conversion factor from e*nm to Debye
+                if self.q is not None:
+                    dip = enm_debye * np.sum(self.pimd_properties['centroids'][-1] \
+                                             *self.q.reshape(-1,1),axis=0)
+                    dx, dy, dz = dip[0], dip[1], dip[2] 
+                    return [dx, dy, dz]
+                else:
+                    return get_dipole(simulation, mass=self.masses, positions=self.states[0].getPositions())
+
+            def report(self, simulation, state):
+
+                self.integrator = simulation.context.getIntegrator()
+                desc = self.describeNextReport(simulation)
+                getP, getV, getF, getE = desc[1:]
+                self.states = [self.integrator.getState(i,
+                                                        getPositions=getP,
+                                                        getVelocities=getV,
+                                                        getForces=getF,
+                                                        getEnergy=getE) for i in range(self.P)]
+                self.state_positions = np.array([s.getPositions().value_in_unit(nanometer) \
+                                                 for s in self.states])
+                self.state_forces = np.array([s.getForces().value_in_unit(kilojoules_per_mole/nanometer) \
+                                              for s in self.states])
+                QKEs = self.extract_kinetic_energies()
+                self.pimd_properties['potentials'].append(self.extract_potentials())
+                self.pimd_properties['p_qke'].append(QKEs[0])
+                self.pimd_properties['cv_qke'].append(QKEs[1])
+                self.pimd_properties['T'].append(self.extract_T())
+                self.pimd_properties['centroids'].append(QKEs[2])
+                self.pimd_properties['xyz_rpmd'].append([self.states[0].getPositions(),
+                                                         self.states[0].getPeriodicBoxVectors()])
+                self.pimd_properties['dipoles'].append(self.extract_dipoles(simulation))
+
+        #========================#
+        # Now run the simulation #
+        #========================#
+        # Generate thermal velocities for each copy separately to speed up
+        # equilibration of the ring polymers.
+        logger.info('Generating thermal velocities...\n')
+        for i in range(P):
+            self.simulation.context.setVelocitiesToTemperature(temperature*kelvin)
+            velocities_tmp = self.simulation.context.getState(getVelocities=True).getVelocities()
+            self.pimd_integrator.setVelocities(i,velocities_tmp)
+        logger.info('Done.\n')
+        logger.info('\n')
+        # Equilibration    
+        if iequil > 0:
+            logger.info("Equilibrating...\n")
+            self.simulation.step(nequil)
+            logger.info("Done.\n")
+            logger.info("\n")
+        # Production
+        if verbose: logger.info("Production...\n")
+        # Add our custom PIMD reporter to the simulation
+        self.simulation.reporters.append(ReporterPIMDEstimators(self.simulation,
+                                                                self.pimd_integrator,
+                                                                self.system,
+                                                                nsave))
+        self.simulation.step(nsteps)
+        if verbose: 
+            logger.info("Done.\n")
+            logger.info("\n")
+        # Simulation finished. Gather all properties 
+        # that we are returning to npt.py.
+        reporter_props = self.simulation.reporters[0].pimd_properties
+        self.xyz_rpmd = reporter_props['xyz_rpmd']
+        self.centroids = reporter_props['centroids']
+        Potentials = np.array(reporter_props['potentials'])
+        Kinetics = np.array(reporter_props['cv_qke'])
+        Primitive_kinetics = np.array(reporter_props['p_qke'])
+        Temps = np.array(reporter_props['T'])
+        Dips = np.array(reporter_props['dipoles'])
+        total_frames = len(self.xyz_rpmd)
+        if self.pbc:
+            vol_tmp = [self.compute_volume(self.xyz_rpmd[i][1]) for i in range(total_frames)]
+            rho_tmp = [(self.mass / vol).in_units_of(kilogram / meter**3) for vol in vol_tmp]
+            Volumes = np.array([v / nanometer**3 for v in vol_tmp])
+            Rhos = np.array([r.value_in_unit(kilogram / meter**3) for r in rho_tmp])
+        else:
+            Volumes = np.zeros(total_frames)
+            Rhos = np.zeros(total_frames)
+        self.natoms = self.simulation.reporters[0].N
+        self.vsite_idxs = self.simulation.reporters[0].vsite_idxs
+        kT = 0.0083144621 * self.pimd_integrator.getTemperature().value_in_unit(kelvin) 
+        self.beta = 1. / kT
+        Cp_corrections = 2. * kT * Primitive_kinetics - 3. * self.natoms * P * kT**2 / 2. 
+        Ecomps = {}
+        Ecomps["Potential Energy"] = Potentials
+        Ecomps["CV Kinetic Energy"] = Kinetics
+        Ecomps["Primitive Kinetic Energy"] = Primitive_kinetics
+        Ecomps["Temperature"] = Temps
+        Ecomps["Total Energy"] = Potentials + Kinetics
+        # Initialized property dictionary.
+        prop_return = OrderedDict()
+        prop_return.update({'Rhos':Rhos, 'Potentials':Potentials, 'Kinetics':Kinetics, 'Volumes':Volumes, 'Dips':Dips, 'Ecomps':Ecomps,
+            'Cp_corrections':Cp_corrections, 'Primitive_kinetics':Primitive_kinetics})
+        return prop_return
 
     def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, save_traj=False, verbose=False, **kwargs):
         
@@ -1258,7 +1734,7 @@ class Liquid_OpenMM(Liquid):
         # Enable multiple timestep integrator
         self.set_option(tgt_opts,'mts_integrator',forceprint=True)
         # Enable ring polymer MD
-        self.set_option(options,'rpmd_beads',forceprint=True)
+        self.set_option(options,'rpmd_opts',forceprint=True)
         # OpenMM precision
         self.set_option(tgt_opts,'openmm_precision','precision',default="mixed")
         # OpenMM platform
@@ -1268,7 +1744,7 @@ class Liquid_OpenMM(Liquid):
         # Name of the gas coordinate file.
         self.set_option(tgt_opts,'gas_coords',default='gas.pdb',forceprint=True)
         # Set the number of steps between MC barostat adjustments.
-        self.set_option(tgt_opts,'mc_nbarostat')
+        self.set_option(tgt_opts,'n_mcbarostat')
         # Class for creating engine object.
         self.engine_ = OpenMM
         # Name of the engine to pass to npt.py.
@@ -1356,3 +1832,4 @@ class Hydration_OpenMM(Hydration):
         ## Send back the trajectory file.
         if self.save_traj > 0:
             self.extra_output = ['openmm-md.dcd']
+
