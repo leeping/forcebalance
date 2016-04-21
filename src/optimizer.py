@@ -1190,6 +1190,9 @@ class Optimizer(forcebalance.BaseClass):
         @param[in] MathPhys Switch to use mathematical (True) or physical (False) parameters.
         
         """
+        # Iteration number counter.
+        global ITERATION
+        ITERATION = self.iterinit
         # First make sure that the user entered the correct syntax.
         try:
             vals_in = [float(i) for i in self.scan_vals.split(":")]
@@ -1218,13 +1221,17 @@ class Optimizer(forcebalance.BaseClass):
                 logger.info("Scanning parameter %i (%s) in the physical space\n" % (pidx,self.FF.plist[pidx]))
                 self.FF.use_pvals = True
                 vals = self.FF.pvals0.copy()
+            counter = 1
             for i in scanvals:
+                printcool("Parameter %i (%s) Value is now % .4e ; Step %i/%i" % (pidx, self.FF.plist[pidx],i,counter,len(scanvals)), color=1,sym="@")
                 vals[pidx] = i
-                data        = self.Objective.Full(vals,Order=0)
+                data        = self.Objective.Full(vals,Order=0,verbose=True)
                 if data['X'] < minobj:
                     minobj = data['X']
                     minvals = vals.copy()
                 logger.info("Value = % .4e Objective = % .4e\n" % (i, data['X']))
+                ITERATION += 1
+                counter += 1
         return minvals
 
     def ScanMVals(self):
