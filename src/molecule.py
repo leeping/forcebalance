@@ -103,7 +103,7 @@
 # qm_grads   = List of arrays of gradients (i.e. negative of the atomistic forces) from QM calculations
 # qm_espxyzs = List of arrays of xyz coordinates for ESP evaluation
 # qm_espvals = List of arrays of ESP values
-FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_grads', 'qm_energies', 'qm_interaction', 
+FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_grads', 'qm_energies', 'qm_interaction',
                           'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins'])
 #=========================================#
 #| Data attributes in AtomVariableNames  |#
@@ -111,7 +111,7 @@ FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_grads', '
 #| and they must have the same length.   |#
 #=========================================#
 # elem       = List of elements
-# partial_charge = List of atomic partial charges 
+# partial_charge = List of atomic partial charges
 # atomname   = List of atom names (can come from MM coordinate file)
 # atomtype   = List of atom types (can come from MM force field)
 # tinkersuf  = String that comes after the XYZ coordinates in TINKER .xyz or .arc files
@@ -150,9 +150,9 @@ from warnings import warn
 #================================#
 #       Set up the logger        #
 #================================#
-try: 
+try:
     from output import *
-except: 
+except:
     from logging import *
     class RawStreamHandler(StreamHandler):
         """Exactly like output.StreamHandler except it does no extra formatting
@@ -161,7 +161,7 @@ except:
         changed from stderr to stdout"""
         def __init__(self, stream = sys.stdout):
             super(RawStreamHandler, self).__init__(stream)
-        
+
         def emit(self, record):
             message = record.getMessage()
             self.stream.write(message)
@@ -176,13 +176,13 @@ module_name = __name__.replace('.molecule','')
 Radii = [0.31, 0.28, # H and He
          1.28, 0.96, 0.84, 0.76, 0.71, 0.66, 0.57, 0.58, # First row elements
          1.66, 1.41, 1.21, 1.11, 1.07, 1.05, 1.02, 1.06, # Second row elements
-         2.03, 1.76, 1.70, 1.60, 1.53, 1.39, 1.61, 1.52, 1.50, 
+         2.03, 1.76, 1.70, 1.60, 1.53, 1.39, 1.61, 1.52, 1.50,
          1.24, 1.32, 1.22, 1.22, 1.20, 1.19, 1.20, 1.20, 1.16, # Third row elements, K through Kr
-         2.20, 1.95, 1.90, 1.75, 1.64, 1.54, 1.47, 1.46, 1.42, 
+         2.20, 1.95, 1.90, 1.75, 1.64, 1.54, 1.47, 1.46, 1.42,
          1.39, 1.45, 1.44, 1.42, 1.39, 1.39, 1.38, 1.39, 1.40, # Fourth row elements, Rb through Xe
-         2.44, 2.15, 2.07, 2.04, 2.03, 2.01, 1.99, 1.98, 
+         2.44, 2.15, 2.07, 2.04, 2.03, 2.01, 1.99, 1.98,
          1.98, 1.96, 1.94, 1.92, 1.92, 1.89, 1.90, 1.87, # Fifth row elements, s and f blocks
-         1.87, 1.75, 1.70, 1.62, 1.51, 1.44, 1.41, 1.36, 
+         1.87, 1.75, 1.70, 1.62, 1.51, 1.44, 1.41, 1.36,
          1.36, 1.32, 1.45, 1.46, 1.48, 1.40, 1.50, 1.50, # Fifth row elements, d and p blocks
          2.60, 2.21, 2.15, 2.06, 2.00, 1.96, 1.90, 1.87, 1.80, 1.69] # Sixth row elements
 
@@ -197,19 +197,19 @@ Elements = ["None",'H','He',
             'Fr','Ra','Ac','Th','Pa','U','Np','Pu','Am','Cm','Bk','Cf','Es','Fm','Md','No','Lr','Rf','Db','Sg','Bh','Hs','Mt']
 
 # Dictionary of atomic masses ; also serves as the list of elements (periodic table)
-PeriodicTable = OrderedDict([('H' , 1.0079), ('He' , 4.0026), 
+PeriodicTable = OrderedDict([('H' , 1.0079), ('He' , 4.0026),
                              ('Li' , 6.941), ('Be' , 9.0122), ('B' , 10.811), ('C' , 12.0107), ('N' , 14.0067), ('O' , 15.9994), ('F' , 18.9984), ('Ne' , 20.1797),
-                             ('Na' , 22.9897), ('Mg' , 24.305), ('Al' , 26.9815), ('Si' , 28.0855), ('P' , 30.9738), ('S' , 32.065), ('Cl' , 35.453), ('Ar' , 39.948), 
-                             ('K' , 39.0983), ('Ca' , 40.078), ('Sc' , 44.9559), ('Ti' , 47.867), ('V' , 50.9415), ('Cr' , 51.9961), ('Mn' , 54.938), ('Fe' , 55.845), ('Co' , 58.9332), 
-                             ('Ni' , 58.6934), ('Cu' , 63.546), ('Zn' , 65.39), ('Ga' , 69.723), ('Ge' , 72.64), ('As' , 74.9216), ('Se' , 78.96), ('Br' , 79.904), ('Kr' , 83.8), 
-                             ('Rb' , 85.4678), ('Sr' , 87.62), ('Y' , 88.9059), ('Zr' , 91.224), ('Nb' , 92.9064), ('Mo' , 95.94), ('Tc' , 98), ('Ru' , 101.07), ('Rh' , 102.9055), 
-                             ('Pd' , 106.42), ('Ag' , 107.8682), ('Cd' , 112.411), ('In' , 114.818), ('Sn' , 118.71), ('Sb' , 121.76), ('Te' , 127.6), ('I' , 126.9045), ('Xe' , 131.293), 
-                             ('Cs' , 132.9055), ('Ba' , 137.327), ('La' , 138.9055), ('Ce' , 140.116), ('Pr' , 140.9077), ('Nd' , 144.24), ('Pm' , 145), ('Sm' , 150.36), 
-                             ('Eu' , 151.964), ('Gd' , 157.25), ('Tb' , 158.9253), ('Dy' , 162.5), ('Ho' , 164.9303), ('Er' , 167.259), ('Tm' , 168.9342), ('Yb' , 173.04), 
-                             ('Lu' , 174.967), ('Hf' , 178.49), ('Ta' , 180.9479), ('W' , 183.84), ('Re' , 186.207), ('Os' , 190.23), ('Ir' , 192.217), ('Pt' , 195.078), 
-                             ('Au' , 196.9665), ('Hg' , 200.59), ('Tl' , 204.3833), ('Pb' , 207.2), ('Bi' , 208.9804), ('Po' , 209), ('At' , 210), ('Rn' , 222), 
-                             ('Fr' , 223), ('Ra' , 226), ('Ac' , 227), ('Th' , 232.0381), ('Pa' , 231.0359), ('U' , 238.0289), ('Np' , 237), ('Pu' , 244), 
-                             ('Am' , 243), ('Cm' , 247), ('Bk' , 247), ('Cf' , 251), ('Es' , 252), ('Fm' , 257), ('Md' , 258), ('No' , 259), 
+                             ('Na' , 22.9897), ('Mg' , 24.305), ('Al' , 26.9815), ('Si' , 28.0855), ('P' , 30.9738), ('S' , 32.065), ('Cl' , 35.453), ('Ar' , 39.948),
+                             ('K' , 39.0983), ('Ca' , 40.078), ('Sc' , 44.9559), ('Ti' , 47.867), ('V' , 50.9415), ('Cr' , 51.9961), ('Mn' , 54.938), ('Fe' , 55.845), ('Co' , 58.9332),
+                             ('Ni' , 58.6934), ('Cu' , 63.546), ('Zn' , 65.39), ('Ga' , 69.723), ('Ge' , 72.64), ('As' , 74.9216), ('Se' , 78.96), ('Br' , 79.904), ('Kr' , 83.8),
+                             ('Rb' , 85.4678), ('Sr' , 87.62), ('Y' , 88.9059), ('Zr' , 91.224), ('Nb' , 92.9064), ('Mo' , 95.94), ('Tc' , 98), ('Ru' , 101.07), ('Rh' , 102.9055),
+                             ('Pd' , 106.42), ('Ag' , 107.8682), ('Cd' , 112.411), ('In' , 114.818), ('Sn' , 118.71), ('Sb' , 121.76), ('Te' , 127.6), ('I' , 126.9045), ('Xe' , 131.293),
+                             ('Cs' , 132.9055), ('Ba' , 137.327), ('La' , 138.9055), ('Ce' , 140.116), ('Pr' , 140.9077), ('Nd' , 144.24), ('Pm' , 145), ('Sm' , 150.36),
+                             ('Eu' , 151.964), ('Gd' , 157.25), ('Tb' , 158.9253), ('Dy' , 162.5), ('Ho' , 164.9303), ('Er' , 167.259), ('Tm' , 168.9342), ('Yb' , 173.04),
+                             ('Lu' , 174.967), ('Hf' , 178.49), ('Ta' , 180.9479), ('W' , 183.84), ('Re' , 186.207), ('Os' , 190.23), ('Ir' , 192.217), ('Pt' , 195.078),
+                             ('Au' , 196.9665), ('Hg' , 200.59), ('Tl' , 204.3833), ('Pb' , 207.2), ('Bi' , 208.9804), ('Po' , 209), ('At' , 210), ('Rn' , 222),
+                             ('Fr' , 223), ('Ra' , 226), ('Ac' , 227), ('Th' , 232.0381), ('Pa' , 231.0359), ('U' , 238.0289), ('Np' , 237), ('Pu' , 244),
+                             ('Am' , 243), ('Cm' , 247), ('Bk' , 247), ('Cf' , 251), ('Es' , 252), ('Fm' , 257), ('Md' , 258), ('No' , 259),
                              ('Lr' , 262), ('Rf' , 261), ('Db' , 262), ('Sg' , 266), ('Bh' , 264), ('Hs' , 277), ('Mt' , 268)])
 
 def getElement(mass):
@@ -228,33 +228,33 @@ if "forcebalance" in __name__:
     try: _dcdlib = CDLL("_dcdlib.so")
     except:
         try: _dcdlib = CDLL(os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"))
-        except: 
+        except:
             warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
-    
+
     #============================#
     #| PDB read/write functions |#
     #============================#
     try: from PDB import *
-    except: 
+    except:
         warn('The pdb module cannot be miported (Cannot read/write PDB files)')
-    
+
     #=============================#
     #| Mol2 read/write functions |#
     #=============================#
     try: import Mol2
-    except: 
+    except:
         warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
-    
+
     #==============================#
     #| OpenMM interface functions |#
     #==============================#
-    try: 
+    try:
         from simtk.unit import *
         from simtk.openmm import *
         from simtk.openmm.app import *
-    except: 
+    except:
         warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
-    
+
 #===========================#
 #| Convenience subroutines |#
 #===========================#
@@ -263,12 +263,12 @@ if "forcebalance" in __name__:
 bohrang = 0.529177249
 
 def unmangle(M1, M2):
-    """ 
-    Create a mapping that takes M1's atom indices to M2's atom indices based on position.  
-    
-    If we start with atoms in molecule "PDB", and the new molecule "M" 
+    """
+    Create a mapping that takes M1's atom indices to M2's atom indices based on position.
+
+    If we start with atoms in molecule "PDB", and the new molecule "M"
     contains re-numbered atoms, then this code works:
-    
+
     M.elem = list(np.array(PDB.elem)[unmangled])
     """
     if M1.na != M2.na:
@@ -413,7 +413,7 @@ def TopEqual(mol1, mol2):
     return GraphEqual and AtomEqual
 
 def MolEqual(mol1, mol2):
-    """ 
+    """
     Determine whether two Molecule objects have the same fragments by
     looking at elements and connectivity graphs.  This is less strict
     than TopEqual (i.e. more often returns True).
@@ -444,7 +444,7 @@ def format_gro_coord(resid, resname, aname, seqno, xyz):
     @param[in] aname The name of the atom
     @param[in] seqno The sequential number of the atom
     @param[in] xyz A 3-element array containing x, y, z coordinates of that atom
-    
+
     """
     return "%5i%-5s%5s%5i % 13.9f % 13.9f % 13.9f" % (resid,resname,aname,seqno,xyz[0],xyz[1],xyz[2])
 
@@ -463,7 +463,7 @@ def format_gro_box(box):
     """ Print a line corresponding to the box vector in accordance with .gro file format
 
     @param[in] box Box NamedTuple
-    
+
     """
     if box.alpha == 90.0 and box.beta == 90.0 and box.gamma == 90.0:
         return ' '.join(["% 13.9f" % (i/10) for i in [box.a, box.b, box.c]])
@@ -474,7 +474,7 @@ def is_gro_coord(line):
     """ Determines whether a line contains GROMACS data or not
 
     @param[in] line The line to be tested
-    
+
     """
     sline = line.split()
     if len(sline) == 6:
@@ -488,7 +488,7 @@ def is_charmm_coord(line):
     """ Determines whether a line contains CHARMM data or not
 
     @param[in] line The line to be tested
-    
+
     """
     sline = line.split()
     if len(sline) >= 7:
@@ -500,7 +500,7 @@ def is_gro_box(line):
     """ Determines whether a line contains a GROMACS box vector or not
 
     @param[in] line The line to be tested
-    
+
     """
     sline = line.split()
     if len(sline) == 9 and all([isfloat(i) for i in sline]):
@@ -512,7 +512,7 @@ def is_gro_box(line):
 
 def add_strip_to_mat(mat,strip):
     out = list(mat)
-    if out == [] and strip != []: 
+    if out == [] and strip != []:
         out = list(strip)
     elif out != [] and strip != []:
         for (i,j) in zip(out,strip):
@@ -542,9 +542,9 @@ def even_list(totlen, splitsize):
 class MolfileTimestep(Structure):
     """ Wrapper for the timestep C structure used in molfile plugins. """
     _fields_ = [("coords",POINTER(c_float)), ("velocities",POINTER(c_float)),
-                ("A",c_float), ("B",c_float), ("C",c_float), ("alpha",c_float), 
+                ("A",c_float), ("B",c_float), ("C",c_float), ("alpha",c_float),
                 ("beta",c_float), ("gamma",c_float), ("physical_time",c_double)]
-    
+
 def both(A, B, key):
     return key in A.Data and key in B.Data
 
@@ -590,7 +590,7 @@ def EulerMatrix(T1,T2,T3):
     return np.matrix(EMat)
 
 def ComputeOverlap(theta,elem,xyz1,xyz2):
-    """ 
+    """
     Computes an 'overlap' between two molecules based on some
     fictitious density.  Good for fine-tuning alignment but gets stuck
     in local minima.
@@ -607,7 +607,7 @@ def ComputeOverlap(theta,elem,xyz1,xyz2):
     return Obj
 
 def AlignToDensity(elem,xyz1,xyz2,binary=False):
-    """ 
+    """
     Computes a "overlap density" from two frames.
     This function can be called by AlignToMoments to get rid of inversion problems
     """
@@ -646,10 +646,10 @@ def AlignToMoments(elem,xyz1,xyz2=None):
 
 def get_rotate_translate(matrix1,matrix2):
     assert np.shape(matrix1) == np.shape(matrix2), 'Matrices not of same dimensions'
-    
+
     # Store number of rows
     nrows = np.shape(matrix1)[0]
-    
+
     # Getting centroid position for each selection
     avg_pos1 = matrix1.sum(axis=0)/nrows
     avg_pos2 = matrix2.sum(axis=0)/nrows
@@ -660,12 +660,12 @@ def get_rotate_translate(matrix1,matrix2):
 
     # Covariance matrix
     covar = np.dot(avg_matrix1.T,avg_matrix2)
-    
+
     # Do the SVD in order to get rotation matrix
     v,s,wt = np.linalg.svd(covar)
     v = np.matrix(v)
     wt = np.matrix(wt)
-    
+
     # Rotation matrix
     # Transposition of v,wt
     wvt = wt.T*v.T
@@ -674,7 +674,7 @@ def get_rotate_translate(matrix1,matrix2):
     d = np.matrix(np.eye(3))
     if np.linalg.det(wvt) < 0:
         d[2,2] = -1.0
-    
+
     rot_matrix = np.array((wt.T*d*v.T).T)
     # rot_matrix = np.transpose(np.dot(np.transpose(wt),np.transpose(v)))
     trans_matrix = avg_pos2-np.dot(avg_pos1,rot_matrix)
@@ -689,27 +689,27 @@ def cartesian_product2(arrays):
     return arr.reshape(-1, la)
 
 def extract_int(arr, avgthre, limthre, label="value", verbose=True):
-    """ 
-    Get the representative integer value from an array.  
-    The integer value is the rounded mean.  Perform sanity 
-    checks to ensure the array isn't overly "non-integer".  
+    """
+    Get the representative integer value from an array.
+    The integer value is the rounded mean.  Perform sanity
+    checks to ensure the array isn't overly "non-integer".
 
     Parameters
     ----------
     arr : numpy.ndarray
-        NumPy array containing a series of floating point values 
+        NumPy array containing a series of floating point values
         where we'd like to extract the representative integer value.
     avgthre : float
-        If the average deviates from the closest integer by 
+        If the average deviates from the closest integer by
         more than this amount, do not pass.
     limthre : float
-        If any element in this array deviates from the closest integer by 
+        If any element in this array deviates from the closest integer by
         more than this amount, do not pass.
     label : str
         Descriptive name of this variable, used only in printout.
     verbose : bool
         Print information in case array makes excursions larger than the threshold
-        
+
     Returns
     -------
     int
@@ -723,22 +723,22 @@ def extract_int(arr, avgthre, limthre, label="value", verbose=True):
     rounded = round(average)
     passed = True
     if abs(average - rounded) > avgthre:
-        if verbose: 
+        if verbose:
             logger.info("Average %s (%f) deviates from integer %s (%i) by more than threshold of %f" % (label, average, label, rounded, avgthre))
         passed = False
     if abs(maximum - minimum) > limthre:
-        if verbose: 
+        if verbose:
             logger.info("Maximum %s fluctuation (%f) is larger than threshold of %f" % (label, abs(maximum-minimum), limthre))
         passed = False
     return int(rounded), passed
 
 def extract_qsz(M, verbose=True):
-    """ 
+    """
     Extract our best estimate of charge and spin-z from the comments
     section of a Molecule object created with Nanoreactor.  Note that
     spin-z is 1.0 if there is one unpaired electron (not one/half) because
     the unit is in terms of populations.
-    
+
     This function is intended to work on atoms that are *extracted*
     from an ab initio MD trajectory, where the Mulliken charge and spin
     populations are not exactly integers.  It attempts to return the closest
@@ -746,21 +746,21 @@ def extract_qsz(M, verbose=True):
 
     If the number of electrons and spin-z are inconsistent, then
     return -999,-999 (indicates failure).
-    
+
 
     Parameters
     ----------
     M : Molecule
         Molecule object that we're getting charge and spin from, with a known comment syntax
         Reaction: formula CHO -> CO+H atoms ['0-2'] -> ['0-1','2'] frame 219482 charge -0.742 sz +0.000 sz^2 0.000
-    
+
     Returns
     -------
     chg : int
         Representative integer net charge of this Molecule, or -999 if inconsistent
     spn : int
         Representative integer spin-z of this Molecule (one unpaired electron: sz=1), or -999 if inconsistent
-    
+
     """
 
     # Read in the charge and spin on the whole system.
@@ -768,10 +768,10 @@ def extract_qsz(M, verbose=True):
     Chgs  = srch('charge') # An array of the net charge.
     SpnZs = srch('sz')    # An array of the net Z-spin.
     Spn2s = srch('sz\^2') # An array of the sum of sz^2 by atom.
-    
+
     chg, chgpass = extract_int(Chgs, 0.3, 1.0, label="charge")
     spn, spnpass = extract_int(abs(SpnZs), 0.3, 1.0, label="spin-z")
-    
+
     # Try to calculate the correct spin.
     nproton = sum([Elements.index(i) for i in M.elem])
     nelectron = nproton + chg
@@ -781,7 +781,7 @@ def extract_qsz(M, verbose=True):
             spn = 0
         else:
             spn = 1
-    
+
     # The number of electrons should be odd iff the spin is odd.
     if ((nelectron-spn)/2)*2 != (nelectron-spn):
         if verbose: logger.info("\x1b[91mThe number of electrons (%i) is inconsistent with the spin-z (%i)\x1b[0m" % (nelectron, spn))
@@ -792,7 +792,7 @@ def extract_qsz(M, verbose=True):
 
 def arc(Mol, begin=None, end=None, RMSD=True):
     """
-    Get the arc-length for a trajectory segment.  
+    Get the arc-length for a trajectory segment.
     Uses RMSD or maximum displacement of any atom in the trajectory.
 
     Parameters
@@ -805,7 +805,7 @@ def arc(Mol, begin=None, end=None, RMSD=True):
         Ending frame, defaults to final frame
     RMSD : bool
         Set to True to use frame-to-frame RMSD; otherwise use the maximum displacement of any atom
-        
+
     Returns
     -------
     Arc : np.ndarray
@@ -824,15 +824,15 @@ def arc(Mol, begin=None, end=None, RMSD=True):
 
 def EqualSpacing(Mol, frames=0, dx=0, RMSD=True):
     """
-    Equalize the spacing of frames in a trajectory with linear interpolation.  
-    This is done in a very simple way, first calculating the arc length 
+    Equalize the spacing of frames in a trajectory with linear interpolation.
+    This is done in a very simple way, first calculating the arc length
     between frames, then creating an equally spaced array, and interpolating
     all Cartesian coordinates along this equally spaced array.
 
     This is intended to be used on trajectories with smooth transformations and
-    ensures that concatenated frames containing both optimization coordinates 
+    ensures that concatenated frames containing both optimization coordinates
     and dynamics trajectories don't have sudden changes in their derivatives.
-    
+
     Parameters
     ----------
     Mol : Molecule
@@ -856,7 +856,7 @@ def EqualSpacing(Mol, frames=0, dx=0, RMSD=True):
         frames = int(float(max(ArcMolCumul))/dx)
     elif frames == 0:
         frames = len(ArcMolCumul)
-    
+
     ArcMolEqual = np.linspace(0, max(ArcMolCumul), frames)
     xyzold = np.array(Mol.xyzs)
     xyznew = np.zeros((frames, Mol.na, 3))
@@ -866,8 +866,8 @@ def EqualSpacing(Mol, frames=0, dx=0, RMSD=True):
     if len(xyzold) == len(xyznew):
         Mol1 = copy.deepcopy(Mol)
     else:
-        # If we changed the number of coordinates, then 
-        # do some integer interpolation of the comments and 
+        # If we changed the number of coordinates, then
+        # do some integer interpolation of the comments and
         # other frame variables.
         Mol1 = Mol[np.array([int(round(i)) for i in np.linspace(0, len(xyzold)-1, len(xyznew))])]
     Mol1.xyzs = list(xyznew)
@@ -878,29 +878,29 @@ class Molecule(object):
 
     The purpose of this class is to read and write chemical file formats in a
     way that is convenient for research.  There are highly general file format
-    converters out there (e.g. catdcd, openbabel) but I find that writing 
+    converters out there (e.g. catdcd, openbabel) but I find that writing
     my own class can be very helpful for specific purposes.  Here are some things
     this class can do:
-    
+
     - Convert a .gro file to a .xyz file, or a .pdb file to a .dcd file.
     Data is stored internally, so any readable file can be converted into
-    any writable file as long as there is sufficient information to write 
+    any writable file as long as there is sufficient information to write
     that file.
-    
+
     - Accumulate information from different files.  For example, we may read
     A.gro to get a list of coordinates, add quantum settings from a B.in file,
     and write A.in (this gives us a file that we can use to run QM calculations)
 
     - Concatenate two trajectories together as long as they're compatible.  This
     is done by creating two Molecule objects and then simply adding them.  Addition
-    means two things:  (1) Information fields missing from each class, but present 
+    means two things:  (1) Information fields missing from each class, but present
     in the other, are added to the sum, and (2) Appendable or per-frame fields
     (i.e. coordinates) are concatenated together.
 
     - Slice trajectories using reasonable Python language.  That is to
     say, MyMolecule[1:10] returns a new Molecule object that contains
     frames 1 through 9 (inclusive and numbered starting from zero.)
-    
+
     Special variables:  These variables cannot be set manually because
     there is a special method associated with getting them.
 
@@ -976,7 +976,7 @@ class Molecule(object):
         return super(Molecule,self).__setattr__(key, value)
 
     def __getitem__(self, key):
-        """ 
+        """
         The Molecule class has list-like behavior, so we can get slices of it.
         If we say MyMolecule[0:10], then we'll return a copy of MyMolecule with frames 0 through 9.
         """
@@ -997,7 +997,7 @@ class Molecule(object):
             raise RuntimeError
 
     def __delitem__(self, key):
-        """ 
+        """
         Similarly, in order to delete a frame, we simply perform item deletion on
         framewise variables.
         """
@@ -1005,7 +1005,7 @@ class Molecule(object):
             del self.Data[k][key]
 
     def __iter__(self):
-        """ List-like behavior for looping over trajectories. Note that these values are returned by reference. 
+        """ List-like behavior for looping over trajectories. Note that these values are returned by reference.
         Note that this is intended to be more efficient than __getitem__, so when we loop over a trajectory,
         it's best to go "for m in M" instead of "for i in range(len(M)): m = M[i]"
         """
@@ -1059,7 +1059,7 @@ class Molecule(object):
                     logger.error('Key %s is a FrameKey, must exist in both self and other for them to be added (for now).\n' % key)
                     raise RuntimeError
         return Sum
- 
+
     def __iadd__(self,other):
         """ Add method for Molecule objects. """
         # Check type of other
@@ -1107,7 +1107,7 @@ class Molecule(object):
         if kthis == 'comms':
             # Append empty comments if necessary because this causes way too many crashes.
             if diff > 0:
-                for i in range(diff): 
+                for i in range(diff):
                     self.Data['comms'].append('')
             else:
                 for i in range(-1*diff):
@@ -1117,20 +1117,20 @@ class Molecule(object):
             for i in range(diff): self.Data['boxes'].append(self.Data['boxes'][-1])
         else:
             logger.error('The keys %s and %s have different lengths (%i %i)'
-                         '- this isn\'t supposed to happen for two AtomKeys member variables.' 
+                         '- this isn\'t supposed to happen for two AtomKeys member variables.'
                          % (key, klast, len(self.Data[key]), len(self.Data[klast])))
             raise RuntimeError
 
     def reorder_according_to(self, other):
 
-        """ 
+        """
 
         Reorder atoms according to some other Molecule object.  This
         happens when we run a program like pdb2gmx or pdbxyz and it
         scrambles our atom ordering, forcing us to reorder the atoms
         for all frames in the current Molecule object.
 
-        Directions: 
+        Directions:
         (1) Load up the scrambled file as a new Molecule object.
         (2) Call this function: Original_Molecule.reorder_according_to(scrambled)
         (3) Save Original_Molecule to a new file name.
@@ -1151,13 +1151,13 @@ class Molecule(object):
 
     def reorder_indices(self, other):
 
-        """ 
+        """
 
         Return the indices that would reorder atoms according to some
         other Molecule object.  This happens when we run a program
         like pdb2gmx or pdbxyz and it scrambles our atom ordering.
 
-        Directions: 
+        Directions:
         (1) Load up the scrambled file as a new Molecule object.
         (2) Call this function: Original_Molecule.reorder_indices(scrambled)
 
@@ -1168,9 +1168,9 @@ class Molecule(object):
         self += other
 
     def __init__(self, fnm = None, ftype = None, top = None, ttype = None, **kwargs):
-        """ 
+        """
         Create a Molecule object.
-        
+
         Parameters
         ----------
         fnm : str, optional
@@ -1184,7 +1184,7 @@ class Molecule(object):
             file types.  Provide this if you have a nonstandard file extension
             or if you wish to force to invoke a particular parser.
         top : str, optional
-            "Topology" file name.  If provided, will build the Molecule 
+            "Topology" file name.  If provided, will build the Molecule
             using this file name, then "fnm" will load frames instead.
         ttype : str, optional
             "Typology" file type.
@@ -1266,7 +1266,9 @@ class Molecule(object):
         self.top_settings = {'toppbc' : kwargs.get('toppbc', False),
                              'topframe' : kwargs.get('topframe', 0),
                              'Fac' : kwargs.get('Fac', 1.2),
-                             'read_bonds' : False}
+                             'read_bonds' : False,
+                             'fragment' : kwargs.get('fragment', False),
+                             'radii' : kwargs.get('radii', {})}
 
         for i in set(self.Read_Tab.keys() + self.Write_Tab.keys()):
             self.Funnel[i] = i
@@ -1351,13 +1353,13 @@ class Molecule(object):
             if fnm is None or fnm == sys.stdout:
                 outfile = sys.stdout
             elif append:
-                # Writing to symbolic links risks unintentionally overwriting the source file - 
+                # Writing to symbolic links risks unintentionally overwriting the source file -
                 # thus we delete the link first.
-                if os.path.islink(fnm): 
+                if os.path.islink(fnm):
                     os.unlink(fnm)
                 outfile = open(fnm,'a')
             else:
-                if os.path.islink(fnm): 
+                if os.path.islink(fnm):
                     os.unlink(fnm)
                 outfile = open(fnm,'w')
             for line in Answer:
@@ -1382,7 +1384,7 @@ class Molecule(object):
             xyz1 -= coms[i]
             rgs.append(np.sum([PeriodicTable[self.elem[i]]*np.dot(x,x) for i, x in enumerate(xyz1)])/M)
         return np.array(rgs)
-            
+
     def rigid_water(self):
         """ If one atom is oxygen and the next two are hydrogen, make the water molecule rigid. """
         self.require('elem', 'xyzs')
@@ -1497,7 +1499,7 @@ class Molecule(object):
             raise RuntimeError
 
     def replace_peratom_conditional(self, key1, cond, key2, orig, want):
-        """ Replace all of the data for a attribute key2 from orig to want, contingent on key1 being equal to cond. 
+        """ Replace all of the data for a attribute key2 from orig to want, contingent on key1 being equal to cond.
         For instance: replace H1 with H2 if resname is SOL."""
         if key2 in self.Data and key1 in self.Data:
             for i in range(self.na):
@@ -1507,7 +1509,7 @@ class Molecule(object):
             logger.error('Either the comparison or replacement key (%s, %s) doesn\'t exist.\n' % (key1, key2))
             raise RuntimeError
 
-    def atom_select(self,atomslice):
+    def atom_select(self,atomslice,build_topology=True):
         """ Return a copy of the object with certain atoms selected.  Takes an integer, list or array as argument. """
         if isinstance(atomslice, int):
             atomslice = [atomslice]
@@ -1539,7 +1541,8 @@ class Molecule(object):
         if 'bonds' in self.Data:
             New.Data['bonds'] = [(list(atomslice).index(b[0]), list(atomslice).index(b[1])) for b in self.bonds if (b[0] in atomslice and b[1] in atomslice)]
         New.top_settings = self.top_settings
-        New.build_topology(force_bonds=False)
+        if build_topology:
+            New.build_topology(force_bonds=False)
         return New
 
     def atom_stack(self, other):
@@ -1551,7 +1554,7 @@ class Molecule(object):
         New = Molecule()
         for key in self.FrameKeys | self.MetaKeys:
             New.Data[key] = copy.deepcopy(self.Data[key])
-            
+
         # This is how we're going to stack things like Cartesian coordinates and QM forces.
         def FrameStack(k):
             if k in self.Data and k in other.Data:
@@ -1587,8 +1590,8 @@ class Molecule(object):
         return New
 
     def align_by_moments(self):
-        """ Align molecules using the moment of inertia.  
-        Departs from MSMBuilder convention of 
+        """ Align molecules using the moment of inertia.
+        Departs from MSMBuilder convention of
         using arithmetic mean for mass. """
         coms  = self.center_of_mass()
         xyz1  = self.xyzs[0]
@@ -1618,9 +1621,9 @@ class Molecule(object):
         self.qm_mulliken_spins = list(np.array(QS.xyzs)[:, :, 1])
 
     def align(self, smooth = False, center = True, center_mass = False, select=None):
-        """ Align molecules. 
-        
-        Has the option to create smooth trajectories 
+        """ Align molecules.
+
+        Has the option to create smooth trajectories
         (align each frame to the previous one)
         or to align each frame to the first one.
 
@@ -1662,13 +1665,14 @@ class Molecule(object):
         Fac = self.top_settings['Fac']
         mindist = 1.0 # Any two atoms that are closer than this distance are bonded.
         # Create an atom-wise list of covalent radii.
-        R = np.array([(Radii[Elements.index(i)-1] if i in Elements else 0.0) for i in self.elem])
+        # Molecule object can have its own set of radii that overrides the global ones
+        R = np.array([self.top_settings['radii'].get(i, (Radii[Elements.index(i)-1] if i in Elements else 0.0)) for i in self.elem])
         # Create a list of 2-tuples corresponding to combinations of atomic indices using a grid algorithm.
         mins = np.min(self.xyzs[sn],axis=0)
         maxs = np.max(self.xyzs[sn],axis=0)
         # Grid size in Angstrom.  This number is optimized for speed in a 15,000 atom system (united atom pentadecane).
         gsz = 6.0
-        if hasattr(self, 'boxes'): 
+        if hasattr(self, 'boxes'):
             xmin = 0.0
             ymin = 0.0
             zmin = 0.0
@@ -1757,7 +1761,7 @@ class Molecule(object):
                     if zi < j: break
                     zidx += 1
                 gasn[(xidx,yidx,zidx)].append(i)
-                    
+
             # 5) Create list of 2-tuples corresponding to combinations of atomic indices.
             # This is done by looping over pairs of neighboring grid cells and getting Cartesian products of atom indices inside.
             # It may be possible to get a 2x speedup by eliminating forward-reverse pairs (e.g. (5, 4) and (4, 5) and duplicates (5,5).)
@@ -1804,6 +1808,8 @@ class Molecule(object):
         for i, bi in enumerate(atom_bonds):
             for j in bi:
                 if i == j: continue
+                # Do not add a bond between resids if fragment is set to True.
+                if self.top_settings['fragment'] and 'resid' in self.Data.keys() and self.resid[i] != self.resid[j] : continue
                 elif i < j:
                     bondlist.append((i, j))
                 else:
@@ -1812,7 +1818,7 @@ class Molecule(object):
         self.built_bonds = True
 
     def build_topology(self, force_bonds=True, **kwargs):
-        ''' 
+        '''
 
         Create self.topology and self.molecules; these are graph
         representations of the individual molecules (fragments)
@@ -1854,18 +1860,18 @@ class Molecule(object):
         # LPW: Molecule.molecules is a funny misnomer... it should be fragments or substructures or something
         self.molecules = list(nx.connected_component_subgraphs(G))
 
-    def distance_matrix(self):
+    def distance_matrix(self, pbc=True):
         ''' Build a distance matrix between atoms. '''
         AtomIterator = np.ascontiguousarray(np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=np.int32), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=np.int32))).T)
         dxij = []
         if 'nanoreactor.contact' in sys.modules:
-            if hasattr(self, 'boxes'):
+            if hasattr(self, 'boxes') and pbc:
                 dxij = contact.atom_distances(np.array(self.xyzs),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
             else:
                 dxij = contact.atom_distances(np.array(self.xyzs),AtomIterator)
         else:
             # Inefficient implementation if importing contact doesn't work.
-            if hasattr(self, 'boxes'):
+            if hasattr(self, 'boxes') and pbc:
                 logger.error("No minimum image convention available (import 'nanoreactor.contact' if you need it).")
                 raise RuntimeError
             for sn in range(len(self)):
@@ -1918,12 +1924,12 @@ class Molecule(object):
         return angidx
 
     def find_dihedrals(self):
-        
+
         """ Return a list of 4-tuples corresponding to all of the
         dihedral angles in the system.  Verified for alanine and
         tryptophan dipeptide when comparing to TINKER's analyze
         program. """
-        
+
         if not hasattr(self, 'topology'):
             logger.error("Need to have built a topology to find dihedrals\n")
             raise RuntimeError
@@ -2159,9 +2165,9 @@ class Molecule(object):
         simulation.context.setPeriodicBoxVectors(Mol.openmm_boxes()[0])
         or something like that.
         """
-        
+
         self.require('boxes')
-        return [(Vec3(box.A)/10.0, Vec3(box.B)/10.0, Vec3(box.C)/10.0) * nanometer for box in self.boxes]
+        return [(Vec3(*box.A)/10.0, Vec3(*box.B)/10.0, Vec3(*box.C)/10.0) * nanometer for box in self.boxes]
 
     def split(self, fnm=None, ftype=None, method="chunks", num=None):
 
@@ -2179,7 +2185,7 @@ class Molecule(object):
 
         If the number of chunks / frames is not specified, then one file
         is written for each frame.
-        
+
         @return fnms A list of the file names that were written.
         """
         logger.error('Apparently this function has not been implemented!!')
@@ -2214,7 +2220,7 @@ class Molecule(object):
             return self.read_xyz0(fnm, **kwargs)
         except:
             return self.read_arc(fnm, **kwargs)
-            
+
     def read_xyz0(self, fnm, **kwargs):
         """ Parse a .xyz file which contains several xyz coordinates, and return their elements.
 
@@ -2320,28 +2326,28 @@ class Molecule(object):
             elif mode == 'x':
                 xyz.append([float(line[:12]), float(line[12:24]), float(line[24:36])])
                 an += 1
-                if an == na: 
+                if an == na:
                     xyzs.append(np.array(xyz))
                     mode = 'v'
                     an = 0
                 if len(line) > 36:
                     xyz.append([float(line[36:48]), float(line[48:60]), float(line[60:72])])
                     an += 1
-                    if an == na: 
+                    if an == na:
                         xyzs.append(np.array(xyz))
                         mode = 'v'
                         an = 0
             elif mode == 'v':
                 vel.append([float(line[:12]), float(line[12:24]), float(line[24:36])])
                 an += 1
-                if an == na: 
+                if an == na:
                     vels.append(np.array(vel))
                     mode = 'b'
                     an = 0
                 if len(line) > 36:
                     vel.append([float(line[36:48]), float(line[48:60]), float(line[60:72])])
                     an += 1
-                    if an == na: 
+                    if an == na:
                         vels.append(np.array(vel))
                         mode = 'b'
                         an = 0
@@ -2415,7 +2421,7 @@ class Molecule(object):
 
         resname = [data.compounds.items()[0][0] for i in range(len(elem))]
         resid = [1 for i in range(len(elem))]
-        
+
         # Deprecated 'abonds' format.
         # bonds    = [[] for i in range(len(elem))]
         # for bond in data.compounds.items()[0][1].bonds:
@@ -2915,12 +2921,16 @@ class Molecule(object):
 
         # Build a list of chemical elements
         elem = []
-        for i in AtomNames:
-            thiselem = i
-            if len(thiselem) > 1:
-                thiselem = re.sub('^[0-9]','',thiselem)
-                thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
-            elem.append(thiselem)
+        for i in range(len(AtomNames)):
+            # QYD: try to use original element list
+            if X[i].element:
+                elem.append(X[i].element)
+            else:
+                thiselem = AtomNames[i]
+                if len(thiselem) > 1:
+                    thiselem = re.sub('^[0-9]','',thiselem)
+                    thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
+                elem.append(thiselem)
 
         XYZList=list(np.array(XYZList).reshape((-1,len(ChainID),3)))
 
@@ -2961,13 +2971,13 @@ class Molecule(object):
                   'qm_espvals'  : [np.array(espval)]
                   }
         return Answer
-    
+
     def read_qcout(self, fnm, errok = [], **kwargs):
-        """ Q-Chem output file reader, adapted for our parser. 
-    
+        """ Q-Chem output file reader, adapted for our parser.
+
         Q-Chem output files are very flexible and there's no way I can account for all of them.  Here's what
         I am able to account for:
-        
+
         A list of:
         - Coordinates
         - Energies
@@ -2976,9 +2986,9 @@ class Molecule(object):
         Calling with errok will proceed with reading file even if the specified error messages are encountered.
 
         Note that each step in a geometry optimization counts as a frame.
-    
+
         As with all Q-Chem output files, note that successive calculations can have different numbers of atoms.
-    
+
         """
 
         Answer   = {}
@@ -3040,7 +3050,7 @@ class Molecule(object):
         #  2 : IRC calculation failed in this direction (i.e. set to 2 once we encounter first_irc_step).
         # Two dictionaries of coordinates, energies, Mulliken Charges and Spin Populations.
         IRCData = [OrderedDict([('stat', -1), ('X', []), ('E', []), ('Q', []), ('Sz', [])]) for i in range(2)]
-    
+
         Answer['qcerr'] = ''
         fatal = 0
         for line in open(fnm):
@@ -3244,7 +3254,7 @@ class Molecule(object):
         elif 'SCF failed to converge' not in errok:
             logger.error('There are no energies in %s\n' % fnm)
             raise RuntimeError
-    
+
         #### Sanity checks
         # We currently don't have a graceful way of dealing with SCF convergence failures in the output file.
         # For instance, a failed calculation will have elem / xyz but no forces. :/
@@ -3300,7 +3310,7 @@ class Molecule(object):
             for i in np.where(np.array(conv) == 0)[0]:
                 Answer['qm_mulliken_spins'].insert(i, np.array([0.0 for i in mkspn[-1]]))
             Answer['qm_mulliken_spins'] = Answer['qm_mulliken_spins'][:len(Answer['qm_energies'])]
-        
+
         Answer['Irc'] = IRCData
         if len(modes) > 0:
             unnorm = [np.array(i) for i in modes]
@@ -3308,7 +3318,7 @@ class Molecule(object):
             Answer['modes'] = [i/np.linalg.norm(i) for i in unnorm]
 
         return Answer
-    
+
     #=====================================#
     #|         Writing functions         |#
     #=====================================#
@@ -3405,7 +3415,7 @@ class Molecule(object):
     def write_mdcrd(self, select, **kwargs):
         self.require('xyzs')
         # In mdcrd files, there is only one comment line
-        out = ['mdcrd file generated using ForceBalance'] 
+        out = ['mdcrd file generated using ForceBalance']
         for I in select:
             xyz = self.xyzs[I]
             out += [''.join(["%8.3f" % i for i in g]) for g in grouper(10, list(xyz.flatten()))]
@@ -3532,7 +3542,7 @@ class Molecule(object):
                 ATOMS.append("%s%i" % (self.elem[i], count))
         else:
             ATOMS = self.atomname
-        
+
         CHAIN = self.chain if 'chain' in self.Data else [1 for i in range(self.na)]
         RESNAMES = self.resname
         RESNUMS = self.resid
@@ -3576,7 +3586,7 @@ class Molecule(object):
             line[55:66]=np.array(list(str("P 21 21 21").rjust(11)))
             line[66:70]=np.array(list(str(4).rjust(4)))
             out.append(line.tostring())
-            
+
         for I in select:
             XYZ = self.xyzs[I]
             Serial = 1
@@ -3679,7 +3689,7 @@ class Molecule(object):
             connects = ["CONECT%5i" % (b0+1) + "".join(["%5i" % (b[1]+1) for b in self.bonds if b[0] == b0]) for b0 in sorted(list(set(b[0] for b in self.bonds)))]
             out += connects
         return out
-        
+
     def write_qdata(self, select, **kwargs):
         """ Text quantum data format. """
         #self.require('xyzs','qm_energies','qm_grads')
@@ -3697,7 +3707,7 @@ class Molecule(object):
             if 'qm_espxyzs' in self.Data and 'qm_espvals' in self.Data:
                 out.append("ESPXYZ"+pvec(self.qm_espxyzs[I]))
                 out.append("ESPVAL"+pvec(self.qm_espvals[I]))
-            if 'qm_interaction' in self.Data: 
+            if 'qm_interaction' in self.Data:
                 out.append("INTERACTION % .12e" % self.qm_interaction[I])
             out.append('')
         return out
@@ -3709,12 +3719,12 @@ class Molecule(object):
                 self.resid = [1 for i in range(self.na)]
             else:
                 self.resid = [1 + i/na_res for i in range(self.na)]
-            
+
     def require_resname(self):
         if 'resname' not in self.Data:
             resname = raw_input("Enter a residue name (3-letter like 'SOL') -> ")
             self.resname = [resname for i in range(self.na)]
-            
+
     def require_boxes(self):
         def buildbox(line):
             s = [float(i) for i in line.split()]
@@ -3750,7 +3760,7 @@ class Molecule(object):
             else:
                 logger.error("Not sure what to do since you gave me %i numbers\n" % len(s))
                 raise RuntimeError
-            
+
         if 'boxes' not in self.Data or len(self.boxes) != self.ns:
             sys.stderr.write("Please specify the periodic box using:\n")
             sys.stderr.write("1 float (cubic lattice length in Angstrom)\n")
