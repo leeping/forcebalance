@@ -1969,6 +1969,123 @@ class Molecule(object):
             #print phimod
         return phis
 
+    def find_rings(M, max_size=6):
+        """ 
+        Return a list of rings in the molecule. Tested on a DNA base
+        pair and C60.  Warning: Using large max_size for rings
+        (e.g. for finding the macrocycle in porphyrin) could lead to
+        some undefined behavior.
+        
+        Parameters
+        ----------
+        max_size : int
+            The maximum ring size.  If a large ring contains smaller
+            sub-rings, they are all mapped into one.
+
+        Returns
+        -------
+        list
+            A list of rings sorted in ascending order of the smallest
+            atom number. The atoms in each ring are ordered starting
+            from the lowest number and going along the ring, with the
+            second atom being the lower of the two possible choices.
+        """
+        friends = []
+        for i in range(M.na):
+            friends.append(M.topology.neighbors(i))
+        # Determine if atom is in a ring
+        M.build_topology()
+        # Get triplets of atoms that are in rings
+        triplets = []
+        for i in range(M.na):
+            g = copy.deepcopy(M.topology)
+            n = g.neighbors(i)
+            g.remove_node(i)
+            for a, b in itertools.combinations(n, 2):
+                try:
+                    PathLength = nx.shortest_path_length(g, a, b)
+                except nx.exception.NetworkXNoPath:
+                    PathLength = 0
+                if PathLength > 0 and PathLength <= (max_size-2):
+                    if b > a:
+                        triplets.append((a, i, b))
+                    else:
+                        triplets.append((b, i, a))
+        # Organize triplets into rings
+        rings = []
+        # Triplets are assigned to rings
+        assigned = {}
+        # For each triplet that isn't already counted, see if it belongs to a ring already
+        while set(assigned.keys()) != set(triplets):
+            for t in triplets:
+                if t not in assigned:
+                    # print t, "has not been assigned yet"
+                    # Whether this triplet has been assigned to a ring
+                    has_been_assigned = False
+                    # Create variable for new rings
+                    new_rings = copy.deepcopy(rings)
+                    # Assign triplet to a ring
+                    for iring, ring in enumerate(rings):
+                        # Loop over triplets in the ring
+                        for r in ring:
+                            # Two triplets belong to the same ring if two of the atoms
+                            # are the same AND there exists a path connecting them with the
+                            # center atom deleted.  Check the forward and reverse orientations
+                            if ((r[0] == t[1] and r[1] == t[2]) or
+                                (r[::-1][0] == t[1] and r[::-1][1] == t[2]) or
+                                (r[0] == t[::-1][1] and r[1] == t[::-1][2]) or
+                                (r[::-1][0] == t[::-1][1] and r[1] == t[::-1][2])):
+                                ends = list(set(r).symmetric_difference(t))
+                                mids = set(r).intersection(t)
+                                g = copy.deepcopy(M.topology)
+                                for m in mids: g.remove_node(m)
+                                try:
+                                    PathLength = nx.shortest_path_length(g, ends[0], ends[1])
+                                except nx.exception.NetworkXNoPath:
+                                    PathLength = 0
+                                if PathLength <= 0 or PathLength > (max_size-2): 
+                                    # print r, t, "share two atoms but are on different rings"
+                                    continue
+                                if has_been_assigned: 
+                                    # This happens if two rings have separately been found but they're actually the same
+                                    # print "trying to assign t=", t, "to r=", r, "but it's already in", rings[assigned[t]]
+                                    # print "Merging", rings[iring], "into", rings[assigned[t]]
+                                    for r1 in rings[iring]:
+                                        new_rings[assigned[t]].append(r1)
+                                    del new_rings[new_rings.index(rings[iring])]
+                                    break
+                                new_rings[iring].append(t)
+                                assigned[t] = iring
+                                has_been_assigned = True
+                                # print t, "assigned to ring", iring
+                                break
+                    # If the triplet was not assigned to a ring,
+                    # then create a new one
+                    if not has_been_assigned:
+                        # print t, "creating new ring", len(new_rings)
+                        assigned[t] = len(new_rings)
+                        new_rings.append([t])
+                    # Now the ring has a new triplet assigned to it
+                    rings = copy.deepcopy(new_rings)
+        # Keep the middle atom in each triplet
+        rings = [sorted(list(set([t[1] for t in r]))) for r in rings]
+        # print rings
+        # Sorted rings start from the lowest atom and go around the ring in ascending order
+        sorted_rings = []
+        for ring in rings:
+            # print "Sorting Ring", ring
+            minr = min(ring)
+            ring.remove(minr)
+            sring = [minr]
+            while len(ring) > 0:
+                for r in sorted(ring):
+                    if sring[-1] in friends[r]:
+                        ring.remove(r)
+                        sring.append(r)
+                        break
+            sorted_rings.append(sring[:])
+        return sorted(sorted_rings, key = lambda val: val[0])
+
     def all_pairwise_rmsd(self):
         """ Find pairwise RMSD (super slow, not like the one in MSMBuilder.) """
         N = len(self)
