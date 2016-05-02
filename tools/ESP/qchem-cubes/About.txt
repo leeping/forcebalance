@@ -1,0 +1,2 @@
+These are scripts for generating Cube files from Q-Chem volumetric data (i.e. plot.hf and plot.esp).
+Stored here for convenience.
