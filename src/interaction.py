@@ -32,15 +32,15 @@ class Interaction(Target):
     This subclass contains the 'get' method for building the objective
     function from any simulation software (a driver to run the program and
     read output is still required)."""
-    
+
     def __init__(self,options,tgt_opts,forcefield):
         # Initialize the SuperClass!
         super(Interaction,self).__init__(options,tgt_opts,forcefield)
-        
+
         #======================================#
         # Options that are given by the parser #
         #======================================#
-        
+
         ## Number of snapshots
         self.set_option(tgt_opts,'shots','ns')
         ## Do we call Q-Chem for dielectric energies? (Currently needs to be fixed)
@@ -79,7 +79,7 @@ class Interaction(Target):
         self.e_err = 0.0
         self.e_err_pct = None
         ## Read in the trajectory file
-        self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords), 
+        self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords),
                             top=(os.path.join(self.root,self.tgtdir,self.pdb) if hasattr(self, 'pdb') else None))
         if self.ns != -1:
             self.mol = self.mol[:self.ns]
@@ -111,7 +111,7 @@ class Interaction(Target):
                     self.divisor[i] = np.sqrt(denom**2 + (self.eqm[i]-denom)**2)
         else:
             self.divisor = np.ones(len(self.eqm)) * denom
-        
+
         if self.cauchy:
             logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )\n")
         if self.energy_upper > 0:
@@ -124,7 +124,7 @@ class Interaction(Target):
             self.prefactor /= len(self.prefactor)
 
     def read_reference_data(self):
-        
+
         """ Read the reference ab initio data from a file such as qdata.txt.
 
         After reading in the information from qdata.txt, it is converted
@@ -153,7 +153,7 @@ class Interaction(Target):
             PrintDict = OrderedDict()
             for i,label in enumerate(self.label):
                 PrintDict[label] = "% 9.3f % 9.3f % 9.3f % 9.3f % 11.5f" % (self.emm[i], self.eqm[i], delta[i], self.divisor[i], deltanrm[i])
-            printcool_dictionary(PrintDict,title="Target: %s\nInteraction Energies (kcal/mol), Objective = % .5e\n %-10s %9s %9s %9s %9s %11s" % 
+            printcool_dictionary(PrintDict,title="Target: %s\nInteraction Energies (kcal/mol), Objective = % .5e\n %-10s %9s %9s %9s %9s %11s" %
                                  (self.name, self.objective, "Label", "Calc.", "Ref.", "Delta", "Divisor", "Term"),keywidth=15)
         else:
             # logger.info("Target: %s Objective: % .5e (add LABEL keywords in qdata.txt for full printout)\n" % (self.name,self.objective))
@@ -164,7 +164,7 @@ class Interaction(Target):
                                        "%.4f%%" % (np.sqrt(np.mean(delta/self.divisor)**2)*100)]
             self.printcool_table(data=Data, headings=Headings, color=0)
             logger.info("add LABEL keywords in qdata.txt to print out each snapshot\n")
-    
+
 
         # if len(self.RMSDDict) > 0:x
         #     printcool_dictionary(self.RMSDDict,title="Geometry Optimized Systems (Angstrom), Objective = %.5e\n %-38s %11s %11s" % (self.rmsd_part, "System", "RMSD", "Term"), keywidth=45)
@@ -172,7 +172,7 @@ class Interaction(Target):
     def get(self, mvals, AGrad=False, AHess=False):
         """ Evaluate objective function. """
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
-        
+
         # If the weight is zero, turn all derivatives off.
         if (self.weight == 0.0):
             AGrad = False
@@ -199,7 +199,7 @@ class Interaction(Target):
                 dV[p,:], _ = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = emm)
             # Create the force field one last time.
             pvals  = self.FF.make(mvals)
-                
+
         Answer['X'] = np.dot(self.prefactor*D/self.divisor,D/self.divisor)
         for p in self.pgrad:
             Answer['G'][p] = 2*np.dot(self.prefactor*D/self.divisor, dV[p,:]/self.divisor)
@@ -210,5 +210,13 @@ class Interaction(Target):
             self.emm = emm
             self.objective = Answer['X']
 
-        return Answer
+        ## QYD: try to clean up OpenMM engine.simulation objects to free up GPU memory
+        try:
+            if self.engine.name == 'openmm':
+                if hasattr(self.engine, 'simulation'): del self.engine.simulation
+                if hasattr(self.engine, 'A'): del self.engine.A
+                if hasattr(self.engine, 'B'): del self.engine.B
+        except:
+            pass
 
+        return Answer
