@@ -3630,8 +3630,10 @@ class Molecule(object):
                     line[12:16]=np.array(list(" "+str(ATOMS[i])+" "))
                 elif len(str(ATOMS[i]))==1:
                     line[12:16]=np.array(list(" "+str(ATOMS[i])+"  "))
-                else:
+                elif len(str(ATOMS[i]))==4:
                     line[12:16]=np.array(list(str(ATOMS[i]).center(4)))
+                else: # QYD: if > 4, reduse atomname to 4 letters
+                    line[12:16]=np.array(list(str(ATOMS[i])[0]+str(ATOMS[i])[-3:]))
                 if len(str(RESNAMES[i]))==3:
                     line[17:20]=np.array(list(str(RESNAMES[i])))
                 else:
