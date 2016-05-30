@@ -1975,7 +1975,7 @@ class Molecule(object):
             #print phimod
         return phis
 
-    def find_rings(M, max_size=6):
+    def find_rings(self, max_size=6):
         """ 
         Return a list of rings in the molecule. Tested on a DNA base
         pair and C60.  Warning: Using large max_size for rings
@@ -1997,14 +1997,14 @@ class Molecule(object):
             second atom being the lower of the two possible choices.
         """
         friends = []
-        for i in range(M.na):
-            friends.append(M.topology.neighbors(i))
+        for i in range(self.na):
+            friends.append(self.topology.neighbors(i))
         # Determine if atom is in a ring
-        M.build_topology()
+        self.build_topology()
         # Get triplets of atoms that are in rings
         triplets = []
-        for i in range(M.na):
-            g = copy.deepcopy(M.topology)
+        for i in range(self.na):
+            g = copy.deepcopy(self.topology)
             n = g.neighbors(i)
             g.remove_node(i)
             for a, b in itertools.combinations(n, 2):
@@ -2043,7 +2043,7 @@ class Molecule(object):
                                 (r[::-1][0] == t[::-1][1] and r[1] == t[::-1][2])):
                                 ends = list(set(r).symmetric_difference(t))
                                 mids = set(r).intersection(t)
-                                g = copy.deepcopy(M.topology)
+                                g = copy.deepcopy(self.topology)
                                 for m in mids: g.remove_node(m)
                                 try:
                                     PathLength = nx.shortest_path_length(g, ends[0], ends[1])
@@ -2091,6 +2091,16 @@ class Molecule(object):
                         break
             sorted_rings.append(sring[:])
         return sorted(sorted_rings, key = lambda val: val[0])
+
+    def aliphatic_hydrogens(self):
+        hyds = []
+        for i in range(self.na):
+            if self.elem[i] != "H": continue
+            if len(self.topology.neighbors(i)) != 1:
+                raise RuntimeError("Hydrogen with not one bond?")
+            if self.elem[self.topology.neighbors(i)[0]] not in ["N", "O", "F", "P", "S", "Cl"]:
+                hyds.append(i)
+        return hyds
 
     def all_pairwise_rmsd(self):
         """ Find pairwise RMSD (super slow, not like the one in MSMBuilder.) """
