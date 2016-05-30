@@ -309,6 +309,7 @@ def isfloat(word):
     """
     try: word = str(word)
     except: return False
+    if len(word) == 0: return False
     return re.match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
 
 def isdecimal(word):
