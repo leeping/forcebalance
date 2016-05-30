@@ -2125,17 +2125,18 @@ class Molecule(object):
             Vec[i] = rmsd
         return Vec
 
-    def ref_rmsd(self, i):
+    def ref_rmsd(self, i, align=True):
         """ Find RMSD to a reference frame. """
         N = len(self)
         Vec = np.zeros(N)
         xyzi = self.xyzs[i].copy()
-        xyzi -= xyzi.mean(0)
+        if align: xyzi -= xyzi.mean(0)
         for j in range(N):
             xyzj = self.xyzs[j].copy()
-            xyzj -= xyzj.mean(0)
-            tr, rt = get_rotate_translate(xyzj, xyzi)
-            xyzj = np.dot(xyzj, rt) + tr
+            if align:
+                xyzj -= xyzj.mean(0)
+                tr, rt = get_rotate_translate(xyzj, xyzi)
+                xyzj = np.dot(xyzj, rt) + tr
             rmsd = np.sqrt(3*np.mean((xyzj - xyzi) ** 2))
             Vec[j] = rmsd
         return Vec
