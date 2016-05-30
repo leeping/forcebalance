@@ -122,7 +122,8 @@ FF_Extensions = {"itp" : "gmx",
                  "frcmod" : "frcmod",
                  "mol2" : "mol2",
                  "gbs"  : "gbs",
-                 "grid" : "grid"
+                 "grid" : "grid",
+                 "ffield" : "reaxff"
                  }
 
 """ Recognized force field formats. """
