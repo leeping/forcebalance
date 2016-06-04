@@ -47,7 +47,7 @@ then
     show_help
 fi
 
-program=ForceBalance.py
+program=$(dirname $0)/ForceBalance.py
 input=$(basename "$1")
 if [ ! -f $input ] ; then
     echo "Input file does not exist! Exiting.."

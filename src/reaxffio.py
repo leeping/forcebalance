@@ -1,7 +1,13 @@
 #!/usr/bin/env python
 
-from collections import namedtuple
+import os, sys, re
+from forcebalance import BaseReader
+import forcebalance.nifty as nif
+from forcebalance.nifty import _exec
+from collections import namedtuple, defaultdict, OrderedDict
 import itertools
+from forcebalance.output import getLogger
+logger = getLogger(__name__)
 
 #===============================================================#
 #| This code is used for interpreting a ReaxFF parameter file. |#
@@ -153,25 +159,25 @@ BondParamNames = [["at1", "at2", "De_sigma", "De_pi", "De_pipi", "p_be1", "p_bo5
                   ["p_ovun1", "p_be2", "p_bo3", "p_bo4", "unused2", "p_bo1", "p_bo2", "unused3"]]
 
 # Format follows the bonds section
-OffdiagParamNames = ["Dij", "RvdW", "alfa", "ro_sigma", "ro_pi", "ro_pipi"]
+OffdiagParamNames = ["at1", "at2", "Dij", "RvdW", "alfa", "ro_sigma", "ro_pi", "ro_pipi"]
 
 # Three atom indices are used in angles
-AngleParamNames = ["Theta_oo", "p_val1", "p_val2", "p_coa1", "p_val7", "p_pen1", "p_val4"]
+AngleParamNames = ["at1", "at2", "at3", "Theta_oo", "p_val1", "p_val2", "p_coa1", "p_val7", "p_pen1", "p_val4"]
 
 # Four atom indices are used in torsions
-TorsionParamNames = ["V1", "V2", "V3", "p_tor1", "p_cot1", "unused1", "unused2"]
+TorsionParamNames = ["at1", "at2", "at3", "at4", "V1", "V2", "V3", "p_tor1", "p_cot1", "unused1", "unused2"]
 
 # Three atom indices are used in hydrogen bonds
-HbondParamNames = ["r_hb", "p_hb1", "p_hb2", "p_hb3"]
+HbondParamNames = ["at1", "at2", "at3", "r_hb", "p_hb1", "p_hb2", "p_hb3"]
 
 UnusedParamNames = {"global": [i for i in GlobalParamNames if 'unused' in i] + ["cutoff"],
                     "atom": ([i for i in itertools.chain(*AtomParamNames) if 'unused' in i] +
                              ["atomID", "Val", "atom_mass", "Val_e", "Val_angle", "Heat_increment", "Val_boc"]),
                     "bond": [i for i in itertools.chain(*BondParamNames) if 'unused' in i] + ["13corr"],
-                    "offdiag": [i for i in OffdiagParamNames if 'unused' in i],
-                    "angle": [i for i in AngleParamNames if 'unused' in i],
-                    "torsion": [i for i in TorsionParamNames if 'unused' in i],
-                    "hbond": [i for i in HbondParamNames if 'unused' in i]}
+                    "offdiag": [i for i in OffdiagParamNames if ('unused' in i or i.startswith("at"))],
+                    "angle": [i for i in AngleParamNames if ('unused' in i or i.startswith("at"))],
+                    "torsion": [i for i in TorsionParamNames if ('unused' in i or i.startswith("at"))],
+                    "hbond": [i for i in HbondParamNames if ('unused' in i or i.startswith("at"))]}
 
 class ReaxFF_Reader(BaseReader):
     """Finite state machine for parsing ReaxFF force field files.
@@ -191,24 +197,18 @@ class ReaxFF_Reader(BaseReader):
         self.atoms   = []
         ## List of the atoms involved in the current interaction
         self.involved = []
-        ## The number of global parameters (I think this is almost always 39)
-        self.nglob = 0
-        ## The number of atom types
-        self.natom = 0
-        ## The number of bond types
-        
-        ## The global parameter that we're currently on
-        self.globn = -1
-        ## The number of the global parameter that we're currently on
-        self.paramnr = defaultdict(int)
+        ## List of the parameter names in the current line
+        self.field_names = []
+        ## The number of interaction types defined for each section
+        self.num_types = defaultdict(int)
         ## The section of the force field that we're currently on
-        self.section_length = OrderedDict([("global_header", 2), ("global_params", None),
-                                     ("atom_header", 4), ("atom_params", None),
-                                     ("bond_header", 2), ("bond_params", None),
-                                     ("offdiag_header", 1), ("offdiag_params", None),
-                                     ("angle_header", 1), ("angle_params", None),
-                                     ("torsion_header", 1), ("torsion_params", None),
-                                     ("hbond_header", 1), ("hbond_params", None)])
+        self.section_length = OrderedDict([("global_header", 2), ("global", None),
+                                     ("atom_header", 4), ("atom", None),
+                                     ("bond_header", 2), ("bond", None),
+                                     ("offdiag_header", 1), ("offdiag", None),
+                                     ("angle_header", 1), ("angle", None),
+                                     ("torsion_header", 1), ("torsion", None),
+                                     ("hbond_header", 1), ("hbond", None)])
         ## The current section that we're in
         self.this_section = None
         ## The line number within a section
@@ -247,12 +247,14 @@ class ReaxFF_Reader(BaseReader):
         Atom/p_boc4/C
         Offdiag/C.O/alfa
         """
-        
+
         s          = line.split()
+        self.line  = line
         self.ln   += 1
 
         section_end = 0
         for sname in self.section_length:
+            # print sname, self.section_length[sname]
             section_end += self.section_length[sname]
             if self.ln <= section_end: break
 
@@ -263,43 +265,83 @@ class ReaxFF_Reader(BaseReader):
             
         self.this_section = sname
 
-        if self.this_section == "global_header":
-            if self.line_section == 2:
-                self.nglob = int(s[0])
-                self.section_length["globals"] = int(s[0])
-        elif self.this_section == "globals":
-            self.field_names = [GlobalParamNames[line_section-1]]
-        elif self.this_section == "atom_header":
-            if self.line_section == 1:
-                self.natom = int(s[0])
-                self.section_length["atoms"] = self.natom*4
-        elif self.this_section == "atoms":
-            self.field_names = AtomParamNames[(line_section-1)%4]
-        elif self.this_section == "bond_header":
-            if self.line_section == 1:
-                self.nbond = int(s[0])
-                self.section_length["bonds"] = self.nbond*2
-        elif self.this_section == "bonds":
-            self.field_names = BondParamNames[(line_section-1)%2]
-        elif self.this_section == "offdiag_header":
-            self.noffdiag = int(s[0])
-            self.section_length(["offdiag"]) = self.noffdiag
-        elif self.this_section == "offdiag":
-            self.field_names = OffdiagParamNames
-        elif self.this_section == "angle_header":
-            self.nangle = int(s[0])
-            self.section_length(["angle"]) = self.nangle
-        elif self.this_section == "angle":
-            self.field_names = AngleParamNames
-        elif self.this_section == "torsion_header":
-            self.ntorsion = int(s[0])
-            self.section_length(["torsion"]) = self.ntorsion
-        elif self.this_section == "torsion":
-            self.field_names = TorsionParamNames
-        elif self.this_section == "hbond_header":
-            self.nhbond = int(s[0])
-            self.section_length(["hbond"]) = self.nhbond
-        elif self.this_section == "hbond":
-            self.field_names = HbondParamNames
         
-        print self.section, line,
+
+        if "header" in self.this_section:
+            self.field_names = []
+            if self.this_section == "global_header":
+                if self.line_section == 2:
+                    self.section_length["global"] = int(s[0])
+            elif self.this_section == "atom_header":
+                if self.line_section == 1:
+                    self.num_types["atom"] = int(s[0])
+                    self.section_length["atom"] = self.num_types["atom"]*4
+            elif self.this_section == "bond_header":
+                if self.line_section == 1:
+                    self.num_types["bond"] = int(s[0])
+                    self.section_length["bond"] = self.num_types["bond"]*2
+            else:
+                basename = self.this_section.replace("_header","")
+                self.num_types[basename] = int(s[0])
+                self.section_length[basename] = self.num_types[basename]
+        else:
+            if self.this_section == "global":
+                self.field_names = [GlobalParamNames[self.line_section-1]]
+            elif self.this_section == "atom":
+                if (self.line_section-1)%4 == 0:
+                    self.atoms.append(s[0])
+                    self.involved = self.atoms[-1]
+                self.field_names = AtomParamNames[(self.line_section-1)%4]
+            elif self.this_section == "bond":
+                if self.line_section == 0:
+                    self.involved = [self.atoms[int(i)-1] for i in s[:2]]
+                self.field_names = BondParamNames[(self.line_section-1)%2]
+            elif self.this_section == "offdiag":
+                self.involved = [self.atoms[int(i)-1] for i in s[:2]]
+                self.field_names = OffdiagParamNames
+            elif self.this_section == "angle":
+                self.involved = [self.atoms[int(i)-1] for i in s[:3]]
+                self.field_names = AngleParamNames
+            elif self.this_section == "torsion":
+                self.involved = [(self.atoms[int(i)-1] if int(i) > 0 else "X") for i in s[:4]]
+                self.field_names = TorsionParamNames
+            elif self.this_section == "hbond":
+                self.involved = [self.atoms[int(i)-1] for i in s[:3]]
+                self.field_names = HbondParamNames
+        
+        print "%-100s" % re.sub(" *\n$", "", line), "%-15s" % self.this_section, self.involved, self.field_names
+
+    def build_pid(self, pfld):
+        if self.this_section not in ["global", "atom", "bond", "offdiag", "angle", "torsion", "hbond"]:
+            logger.info("%s\n" % re.sub(" *\n$", "", self.line))
+            nif.warn_press_key("This line is not part of a section that contains parameters.")
+        SectionID = self.this_section.capitalize()
+        AtomsID = '-'.join(self.involved)
+        if pfld >= len(self.field_names):
+            logger.info("%s\n" % re.sub(" *\n$", "", self.line))
+            nif.warn_press_key("Field number %i is not recognized in the line above, will lead to an error.\nThe fields for this line are: %s" % (pfld, str(self.field_names)))
+        ParamID = self.field_names[pfld]
+        if ParamID in UnusedParamNames[self.this_section]:
+            nif.warn_press_key("Field number %i has parameter type %s which is not supposed to be parameterized" % (pfld, ParamID))
+        
+        if self.this_section == "global":
+            return "/".join([SectionID, ParamID])
+        else:
+            return "/".join(SectionID, AtomsID, ParamID)
+        
+
+        # """ Build the parameter identifier (see _link_ for an example)
+        # @todo Add a link here """
+        # #InteractionType = ".".join([i.tag for i in list(element.iterancestors())][::-1][1:] + [element.tag])
+        # ParentType = ".".join([i.tag for i in list(element.iterancestors())][::-1][1:])
+        # InteractionType = element.tag
+        # try:
+        #     if ParentType == "Residues.Residue":
+        #         pfx = list(element.iterancestors())[0].attrib["name"]
+        #         Involved = '.'.join([pfx+"-"+element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
+        #     else:
+        #         Involved = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType] if i in element.attrib])
+        #     return "/".join([InteractionType, parameter, Involved])
+        # except:
+        #     logger.info("Minor warning: Parameter ID %s doesn't contain any atom types, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
+        #     return "/".join([InteractionType, parameter])

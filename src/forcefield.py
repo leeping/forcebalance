@@ -99,7 +99,7 @@ import numpy as np
 from numpy import sin, cos, tan, exp, log, sqrt, pi
 from re import match, sub, split
 import forcebalance
-from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io 
+from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io, reaxffio
 from forcebalance.finite_difference import in_fd
 from forcebalance.nifty import *
 from string import count
@@ -135,7 +135,8 @@ FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 "frcmod" : amberio.FrcMod_Reader,
                 "mol2" : amberio.Mol2_Reader,
                 "gbs" : psi4io.GBS_Reader,
-                "grid" : psi4io.Grid_Reader
+                "grid" : psi4io.Grid_Reader,
+                "reaxff" : reaxffio.ReaxFF_Reader
                 }
 
 def determine_fftype(ffname,verbose=False):
