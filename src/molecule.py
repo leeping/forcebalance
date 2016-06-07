@@ -1234,6 +1234,7 @@ class Molecule(object):
         ## The table of file writers
         self.Write_Tab = {'gromacs' : self.write_gro,
                           'xyz'     : self.write_xyz,
+                          'lammps'  : self.write_lammps_data,
                           'molproq' : self.write_molproq,
                           'dcd'     : self.write_dcd,
                           'inpcrd'  : self.write_inpcrd,
@@ -1328,7 +1329,7 @@ class Molecule(object):
     #     Answer = self.Read_Tab[self.Funnel[ftype.lower()]](fnm)
     #     return Answer
 
-    def write(self,fnm=None,ftype=None,append=False,select=None,**kwargs):
+    def write(self,fnm=None,ftype=None,append=False,selection=None,**kwargs):
         if fnm is None and ftype is None:
             logger.error("Output file name and file type are not specified.\n")
             raise RuntimeError
@@ -1343,11 +1344,11 @@ class Molecule(object):
         ## I needed to add in this line because the DCD writer requires the file name,
         ## but the other methods don't.
         self.fout = fnm
-        if type(select) in [int, np.int64, np.int32]:
-            select = [select]
-        if select is None:
-            select = range(len(self))
-        Answer = self.Write_Tab[self.Funnel[ftype.lower()]](select,**kwargs)
+        if type(selection) in [int, np.int64, np.int32]:
+            selection = [selection]
+        if selection is None:
+            selection = range(len(self))
+        Answer = self.Write_Tab[self.Funnel[ftype.lower()]](selection,**kwargs)
         ## Any method that returns text will give us a list of lines, which we then write to the file.
         if Answer is not None:
             if fnm is None or fnm == sys.stdout:
@@ -1620,7 +1621,7 @@ class Molecule(object):
         self.qm_mulliken_charges = list(np.array(QS.xyzs)[:, :, 0])
         self.qm_mulliken_spins = list(np.array(QS.xyzs)[:, :, 1])
 
-    def align(self, smooth = False, center = True, center_mass = False, select=None):
+    def align(self, smooth = False, center = True, center_mass = False, atom_select=None):
         """ Align molecules.
 
         Has the option to create smooth trajectories
@@ -1632,8 +1633,8 @@ class Molecule(object):
         Provide a list of atom indices to align along selected atoms.
 
         """
-        if isinstance(select, list):
-            select = np.array(select)
+        if isinstance(atom_select, list):
+            atom_select = np.array(atom_select)
         if center and center_mass:
             logger.error('Specify center=True or center_mass=True but set the other one to False\n')
             raise RuntimeError
@@ -1651,8 +1652,8 @@ class Molecule(object):
                 ref = index2-1
             else:
                 ref = 0
-            if select is not None:
-                tr, rt = get_rotate_translate(xyz2[select],self.xyzs[ref][select])
+            if atom_select is not None:
+                tr, rt = get_rotate_translate(xyz2[atom_select],self.xyzs[ref][atom_select])
             else:
                 tr, rt = get_rotate_translate(xyz2,self.xyzs[ref])
             xyz2 = np.dot(xyz2, rt) + tr
@@ -2758,7 +2759,7 @@ class Molecule(object):
         options at the end.
 
         3) We should accommodate the use case that the Q-Chem file may have
-        follow-up calculations delimited by '@@@@'.
+        follow-up calculations delimited by '@@@'.
 
         4) We can read in all of the xyz's as a trajectory, but only the
         Q-Chem settings belonging to the first xyz will be saved.
@@ -2823,7 +2824,7 @@ class Molecule(object):
                     if (not infsm) and (len(dline) >= 4 and all([isfloat(dline[i]) for i in range(1,4)])):
                         if fff:
                             reading_template = False
-                            template_cut = list(i for i, dat in enumerate(template) if dat[0] == '@@@@')[-1]
+                            template_cut = list(i for i, dat in enumerate(template) if dat[0] == '@@@')[-1]
                         else:
                             if re.match('^@', sline[0]): # This is a ghost atom
                                 ghost.append(True)
@@ -2852,9 +2853,9 @@ class Molecule(object):
                     else:
                         SectionData.append(line)
             elif re.match('^@+$', line) and reading_template:
-                template.append(('@@@@', []))
+                template.append(('@@@', []))
             elif re.match('Welcome to Q-Chem', line) and reading_template and fff:
-                template.append(('@@@@', []))
+                template.append(('@@@', []))
 
         if template_cut != 0:
             template = template[:template_cut]
@@ -3334,14 +3335,14 @@ class Molecule(object):
     #|         Writing functions         |#
     #=====================================#
 
-    def write_qcin(self, select, **kwargs):
+    def write_qcin(self, selection, **kwargs):
         self.require('qctemplate','qcrems','charge','mult')
         out = []
         if 'read' in kwargs:
             read = kwargs['read']
         else:
             read = False
-        for SI, I in enumerate(select):
+        for SI, I in enumerate(selection):
             fsm = False
             remidx = 0
             molecule_printed = False
@@ -3355,10 +3356,10 @@ class Molecule(object):
             for SectName, SectData in self.qctemplate:
                 if 'jobtype' in self.qcrems[remidx] and self.qcrems[remidx]['jobtype'].lower() == 'fsm':
                     fsm = True
-                    if len(select) != 2:
+                    if len(selection) != 2:
                         logger.error('For freezing string method, please provide two structures only.\n')
                         raise RuntimeError
-                if SectName != '@@@@':
+                if SectName != '@@@':
                     out.append('$%s' % SectName)
                     for line in SectData:
                         out.append(line)
@@ -3378,7 +3379,7 @@ class Molecule(object):
                                 if fsm:
                                     out.append("****")
                                     an = 0
-                                    for e, x in zip(self.elem, self.xyzs[select[SI+1]]):
+                                    for e, x in zip(self.elem, self.xyzs[selection[SI+1]]):
                                         pre = '@' if ('qm_ghost' in self.Data and self.Data['qm_ghost'][an]) else ''
                                         suf =  self.Data['qcsuf'][an] if 'qcsuf' in self.Data else ''
                                         out.append(pre + format_xyz_coord(e, x) + suf)
@@ -3391,19 +3392,19 @@ class Molecule(object):
                     out.append('$end')
                 else:
                     remidx += 1
-                    out.append('@@@@')
+                    out.append('@@@')
                 out.append('')
             #if I < (len(self) - 1):
             if fsm: break
-            if I != select[-1]:
-                out.append('@@@@')
+            if I != selection[-1]:
+                out.append('@@@')
                 out.append('')
         return out
 
-    def write_xyz(self, select, **kwargs):
+    def write_xyz(self, selection, **kwargs):
         self.require('elem','xyzs')
         out = []
-        for I in select:
+        for I in selection:
             xyz = self.xyzs[I]
             out.append("%-5i" % self.na)
             out.append(self.comms[I])
@@ -3411,10 +3412,95 @@ class Molecule(object):
                 out.append(format_xyz_coord(self.elem[i],xyz[i]))
         return out
 
-    def write_molproq(self, select, **kwargs):
+    def get_reaxff_atom_types(self):
+        """
+        Return a list of element names which maps the LAMMPS atom types
+        to the ReaxFF elements
+        """
+        elist = []
+        for i in range(self.na):
+            if self.elem[i] not in elist:
+                elist.append(self.elem[i])
+        return elist
+
+    def write_lammps_data(self, selection, **kwargs):
+        """
+        Write the first frame of the selection to a LAMMPS data file
+        for the purpose of automatically initializing a LAMMPS simulation.
+        This function makes several assumptions until further notice:
+
+        (1) We are interested in a ReaxFF simulation
+        (2) Atom types will be generated from elements
+        """
+        print selection
+        print self.comms
+        I = selection[0]
+        out = []
+        comm = self.comms[I]
+        if not comm.startswith("#"):
+            comm = "# " + comm
+        atmap = OrderedDict()
+        for i in range(self.na):
+            if self.elem[i] not in atmap:
+                atmap[self.elem[i]] = len(atmap.keys()) + 1
+
+        # First line is a comment
+        out.append(comm)
+        out.append("")
+        # Next, print the number of atoms and atom types
+        out.append("%i atoms" % self.na)
+        out.append("%i atom types" % len(atmap.keys()))
+        out.append("")
+        # Next, print the simulation box
+        # We throw an error if the atoms are outside the simulation box
+        # If there is no simulation box, then we print upper and lower bounds
+        xlo = 0.0
+        ylo = 0.0
+        zlo = 0.0
+        if 'boxes' in self.Data:
+            xhi = self.boxes[I].a
+            yhi = self.boxes[I].b
+            zhi = self.boxes[I].c
+        else:
+            xlo = np.floor(np.min(self.xyzs[I][:,0]))
+            ylo = np.floor(np.min(self.xyzs[I][:,1]))
+            zlo = np.floor(np.min(self.xyzs[I][:,2]))
+            xhi = np.ceil(np.max(self.xyzs[I][:,0]))+30
+            yhi = np.ceil(np.max(self.xyzs[I][:,1]))+30
+            zhi = np.ceil(np.max(self.xyzs[I][:,2]))+30
+        if (np.min(self.xyzs[I][:,0]) < xlo or
+            np.min(self.xyzs[I][:,1]) < ylo or
+            np.min(self.xyzs[I][:,2]) < zlo or
+            np.max(self.xyzs[I][:,0]) > xhi or
+            np.max(self.xyzs[I][:,1]) > yhi or
+            np.max(self.xyzs[I][:,2]) > zhi):
+            warn("Some atom positions are outside the simulation box, be careful")
+        out.append("% .3f % .3f xlo xhi" % (xlo, xhi))
+        out.append("% .3f % .3f ylo yhi" % (ylo, yhi))
+        out.append("% .3f % .3f zlo zhi" % (zlo, zhi))
+        out.append("")
+        # Next, get the masses
+        out.append("Masses")
+        out.append("")
+        for i, a in enumerate(atmap.keys()):
+            out.append("%i %.4f" % (i+1, PeriodicTable[a]))
+        out.append("")
+        # Next, print the atom positions
+        out.append("Atoms")
+        out.append("")
+        for i in range(self.na):
+            # First number is the index of the atom starting from 1.
+            # Second number is a molecule tag that is unimportant.
+            # Third number is the atom type.
+            # Fourth number is the charge (set to zero).
+            # Fifth through seventh numbers are the positions
+            out.append("%4i 1 %2i 0.0 % 15.10f % 15.10f % 15.10f" % (i+1, atmap.keys().index(self.elem[i])+1, self.xyzs[I][i, 0], self.xyzs[I][i, 1], self.xyzs[I][i, 2]))
+        return out
+
+    def write_molproq(self, selection, **kwargs):
         self.require('xyzs','partial_charge')
         out = []
-        for I in select:
+        for I in selection:
             xyz = self.xyzs[I]
             # Comment comes first, then number of atoms.
             out.append(self.comms[I])
@@ -3423,18 +3509,18 @@ class Molecule(object):
                 out.append("% 15.10f % 15.10f % 15.10f % 15.10f   0" % (xyz[i,0],xyz[i,1],xyz[i,2],self.partial_charge[i]))
         return out
 
-    def write_mdcrd(self, select, **kwargs):
+    def write_mdcrd(self, selection, **kwargs):
         self.require('xyzs')
         # In mdcrd files, there is only one comment line
         out = ['mdcrd file generated using ForceBalance']
-        for I in select:
+        for I in selection:
             xyz = self.xyzs[I]
             out += [''.join(["%8.3f" % i for i in g]) for g in grouper(10, list(xyz.flatten()))]
             if 'boxes' in self.Data:
                 out.append(''.join(["%8.3f" % i for i in [self.boxes[I].a, self.boxes[I].b, self.boxes[I].c]]))
         return out
 
-    def write_inpcrd(self, select, sn=None, **kwargs):
+    def write_inpcrd(self, selection, sn=None, **kwargs):
         self.require('xyzs')
         if len(self.xyzs) != 1 and sn is None:
             logger.error("inpcrd can only be written for a single-frame trajectory\n")
@@ -3457,12 +3543,12 @@ class Molecule(object):
             out.append(''.join(["%12.7f" % i for i in [self.boxes[0].a, self.boxes[0].b, self.boxes[0].c]]))
         return out
 
-    def write_arc(self, select, **kwargs):
+    def write_arc(self, selection, **kwargs):
         self.require('elem','xyzs')
         out = []
         if 'tinkersuf' not in self.Data:
             sys.stderr.write("Beware, this .arc file contains no atom type or topology info\n")
-        for I in select:
+        for I in selection:
             xyz = self.xyzs[I]
             out.append("%6i  %s" % (self.na, self.comms[I]))
             if 'boxes' in self.Data:
@@ -3472,7 +3558,7 @@ class Molecule(object):
                 out.append("%6i  %s%s" % (i+1,format_xyz_coord(self.elem[i],xyz[i],tinker=True),self.tinkersuf[i] if 'tinkersuf' in self.Data else ''))
         return out
 
-    def write_gro(self, select, **kwargs):
+    def write_gro(self, selection, **kwargs):
         out = []
         if sys.stdin.isatty():
             self.require('elem','xyzs')
@@ -3495,7 +3581,7 @@ class Molecule(object):
         else:
             atomname = self.atomname
 
-        for I in select:
+        for I in selection:
             xyz = self.xyzs[I]
             xyzwrite = xyz.copy()
             xyzwrite /= 10.0 # GROMACS uses nanometers
@@ -3507,7 +3593,7 @@ class Molecule(object):
             out.append(format_gro_box(self.boxes[I]))
         return out
 
-    def write_dcd(self, select, **kwargs):
+    def write_dcd(self, selection, **kwargs):
         if _dcdlib.vmdplugin_init() != 0:
             logger.error("Unable to init DCD plugin\n")
             raise IOError
@@ -3515,7 +3601,7 @@ class Molecule(object):
         dcd       = _dcdlib.open_dcd_write(self.fout, "dcd", natoms)
         ts        = MolfileTimestep()
         _xyz      = c_float * (natoms.value * 3)
-        for I in select:
+        for I in selection:
             xyz = self.xyzs[I]
             ts.coords = _xyz(*list(xyz.flatten()))
             ts.A      = self.boxes[I].a if 'boxes' in self.Data else 1.0
@@ -3529,7 +3615,7 @@ class Molecule(object):
         _dcdlib.close_file_write(dcd)
         dcd = None
 
-    def write_pdb(self, select, **kwargs):
+    def write_pdb(self, selection, **kwargs):
         """Save to a PDB. Copied wholesale from MSMBuilder. """
 
         if sys.stdin.isatty():
@@ -3598,7 +3684,7 @@ class Molecule(object):
             line[66:70]=np.array(list(str(4).rjust(4)))
             out.append(line.tostring())
 
-        for I in select:
+        for I in selection:
             XYZ = self.xyzs[I]
             Serial = 1
             for i in range(self.na):
@@ -3703,11 +3789,11 @@ class Molecule(object):
             out += connects
         return out
 
-    def write_qdata(self, select, **kwargs):
+    def write_qdata(self, selection, **kwargs):
         """ Text quantum data format. """
         #self.require('xyzs','qm_energies','qm_grads')
         out = []
-        for I in select:
+        for I in selection:
             xyz = self.xyzs[I]
             out.append("JOB %i" % I)
             out.append("COORDS"+pvec(xyz))

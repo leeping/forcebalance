@@ -474,7 +474,7 @@ class FF(forcebalance.BaseClass):
             duplns  = [i[2] for i in self.pfields if pid == i[0]]
             dupflds = [i[3] for i in self.pfields if pid == i[0]]
             while pid in have_pids:
-                pid = "%s%i" % (pid0, extranum)
+                pid = "%s.%i" % (pid0, extranum)
                 extranum += 1
             def warn_or_err(*args):
                 if self.duplicate_pnames:
@@ -701,6 +701,8 @@ class FF(forcebalance.BaseClass):
         and use physical parameters directly.
         
         """
+        if vals is None:
+            vals = np.zeros(self.np)
         if type(vals)==np.ndarray and vals.ndim != 1:
             logger.error('Please only pass 1-D arrays\n')
             raise RuntimeError
@@ -928,13 +930,15 @@ class FF(forcebalance.BaseClass):
         @return pvals The physical parameters
         
         """
+        if isinstance(mvals, list):
+            mvals = np.array(mvals)
         for p in self.redirect:
             mvals[p] = 0.0
         if self.logarithmic_map:
             try:
                 pvals = np.exp(mvals.flatten()) * self.pvals0
             except:
-                logger.exception(mvals + '\n')
+                logger.exception(str(mvals) + '\n')
                 logger.error('What the hell did you do?\n')
                 raise RuntimeError
         else:

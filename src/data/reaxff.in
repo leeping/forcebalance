@@ -1,0 +1,22 @@
+# Unit system: g/mol, Angstrom, fs, kcal/mol
+units		real
+
+# Format for atomic data
+atom_style	full
+
+# Read in the atom definitions
+read_data	lammps.data
+
+# Non-periodic system (seems to not be necessary)
+# change_box all boundary fm fm fm
+
+# Use reax/c implementation of ReaxFF
+pair_style	reax/c reaxff.control
+pair_coeff	* * REPLACE_WITH_FFIELD REPLACE_WITH_ATOMS
+
+# Neighbor list buffer size and algorithm
+neighbor	2 nsq
+
+# Use QEq charge equlibration with reax/c and parameters from force field file
+fix             1 all qeq/reax 1 0.0 10.0 1e-6 reax/c
+

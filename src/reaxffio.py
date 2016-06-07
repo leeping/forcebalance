@@ -147,16 +147,18 @@ GlobalParamNames = ["p_boc1", "p_boc2", "p_coa2", "p_trip4", "p_trip3", "p_kc2",
 # The atom section starts with an integer for the number of atoms, followed by blocks of
 # parameters for each atom.
 # Each sub-list indicates the parameter names on the lines in an atom-block
-AtomParamNames = [["atomID", "ro_sigma", "Val", "atom_mass", "Rvdw", "Dij", "gamma", "ro_pi", "Val_e"],
-                  ["alfa", "gamma_w", "Val_angle", "ovun5", "unused1", "chiEEM", "etaEEM", "unused2"],
+# unused 6-8 are called "rcore2", "ecore2", "acore2" in LAMMPS source code (unclear what this means)
+AtomParamNames = [["atomID", "ro_sigma", "Val", "atom_mass", "Rvdw", "epsilon", "gamma", "ro_pi", "Val_e"],
+                  ["alpha", "gamma_w", "Val_angle", "ovun5", "unused1", "chiEEM", "etaEEM", "unused2"],
                   ["ro_pipi", "p_lp2", "Heat_increment", "p_boc4", "p_boc3", "p_boc5", "unused3", "unused4"],
                   ["p_ovun2", "p_val3", "unused5", "Val_boc", "p_val5", "unused6", "unused7", "unused8"]]
 
 # The bonds section starts with an integer for the number of bonds, followed by blocks of
 # parameters for each bond. Each block starts with integer indices of the atom types
-# that are involved (starting from 1).
-BondParamNames = [["at1", "at2", "De_sigma", "De_pi", "De_pipi", "p_be1", "p_bo5", "13corr", "unused1", "p_bo6"],
-                  ["p_ovun1", "p_be2", "p_bo3", "p_bo4", "unused2", "p_bo1", "p_bo2", "unused3"]]
+# that are involved (starting from 1). 
+# Corroborated with LAMMPS source code.
+BondParamNames = [["at1", "at2", "De_sigma", "De_pi", "De_pipi", "p_be1", "p_bo5", "13corr", "p_bo6", "p_ovun1"],
+                  ["p_be2", "p_bo3", "p_bo4", "unused2", "p_bo1", "p_bo2", "ovc", "unused3"]]
 
 # Format follows the bonds section
 OffdiagParamNames = ["at1", "at2", "Dij", "RvdW", "alfa", "ro_sigma", "ro_pi", "ro_pipi"]
@@ -173,7 +175,7 @@ HbondParamNames = ["at1", "at2", "at3", "r_hb", "p_hb1", "p_hb2", "p_hb3"]
 UnusedParamNames = {"global": [i for i in GlobalParamNames if 'unused' in i] + ["cutoff"],
                     "atom": ([i for i in itertools.chain(*AtomParamNames) if 'unused' in i] +
                              ["atomID", "Val", "atom_mass", "Val_e", "Val_angle", "Heat_increment", "Val_boc"]),
-                    "bond": [i for i in itertools.chain(*BondParamNames) if 'unused' in i] + ["13corr"],
+                    "bond": [i for i in itertools.chain(*BondParamNames) if 'unused' in i],
                     "offdiag": [i for i in OffdiagParamNames if ('unused' in i or i.startswith("at"))],
                     "angle": [i for i in AngleParamNames if ('unused' in i or i.startswith("at"))],
                     "torsion": [i for i in TorsionParamNames if ('unused' in i or i.startswith("at"))],
@@ -293,7 +295,7 @@ class ReaxFF_Reader(BaseReader):
                     self.involved = self.atoms[-1]
                 self.field_names = AtomParamNames[(self.line_section-1)%4]
             elif self.this_section == "bond":
-                if self.line_section == 0:
+                if (self.line_section-1)%2 == 0:
                     self.involved = [self.atoms[int(i)-1] for i in s[:2]]
                 self.field_names = BondParamNames[(self.line_section-1)%2]
             elif self.this_section == "offdiag":
@@ -322,12 +324,12 @@ class ReaxFF_Reader(BaseReader):
             nif.warn_press_key("Field number %i is not recognized in the line above, will lead to an error.\nThe fields for this line are: %s" % (pfld, str(self.field_names)))
         ParamID = self.field_names[pfld]
         if ParamID in UnusedParamNames[self.this_section]:
-            nif.warn_press_key("Field number %i has parameter type %s which is not supposed to be parameterized" % (pfld, ParamID))
-        
+            logger.warning("Field number %i has parameter type %s which is not supposed to be parameterized\n" % (pfld, ParamID))
+        print SectionID, AtomsID, ParamID
         if self.this_section == "global":
             return "/".join([SectionID, ParamID])
         else:
-            return "/".join(SectionID, AtomsID, ParamID)
+            return "/".join([SectionID, ParamID, AtomsID])
         
 
         # """ Build the parameter identifier (see _link_ for an example)
