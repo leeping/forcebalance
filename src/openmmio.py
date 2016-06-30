@@ -669,7 +669,7 @@ class OpenMM(Engine):
                 self.mmopts.setdefault('nonbondedCutoff', nonbonded_cutoff*nanometer)
                 self.mmopts.setdefault('vdwCutoff', vdw_cutoff*nanometer)
                 self.mmopts.setdefault('aEwald', 5.4459052)
-                self.mmopts.setdefault('pmeGridDimensions', [24,24,24])
+                #self.mmopts.setdefault('pmeGridDimensions', [24,24,24])
             else:
                 if 'vdw_cutoff' in kwargs:
                     warn_press_key('AMOEBA not detected, your provided vdw_cutoff will not be used')
@@ -822,7 +822,7 @@ class OpenMM(Engine):
         self.mod.addExtraParticles(self.forcefield)
         # Add bonds for virtual sites. (Experimental)
         if self.vbonds: AddVirtualSiteBonds(self.mod, self.forcefield)
-        # printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
+        printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
         # for b in list(self.mod.topology.bonds()):
         #     print b[0].index, b[1].index
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
@@ -835,6 +835,9 @@ class OpenMM(Engine):
                 if self.SetPME:
                     i.setNonbondedMethod(i.PME)
             if isinstance(i, AmoebaMultipoleForce):
+                if self.SetPME:
+                    i.setNonbondedMethod(i.PME)
+            if isinstance(i, CustomNonbondedForce):
                 if self.SetPME:
                     i.setNonbondedMethod(i.PME)
 
