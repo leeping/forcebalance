@@ -99,7 +99,7 @@ import numpy as np
 from numpy import sin, cos, tan, exp, log, sqrt, pi
 from re import match, sub, split
 import forcebalance
-from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io 
+from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io
 from forcebalance.finite_difference import in_fd
 from forcebalance.nifty import *
 from string import count
@@ -129,7 +129,7 @@ FF_Extensions = {"itp" : "gmx",
 FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 "qchem": qchemio.QCIn_Reader ,
                 "tinker": tinkerio.Tinker_Reader ,
-                "custom": custom_io.Gen_Reader , 
+                "custom": custom_io.Gen_Reader ,
                 "openmm" : openmmio.OpenMM_Reader,
                 "frcmod" : amberio.FrcMod_Reader,
                 "mol2" : amberio.Mol2_Reader,
@@ -191,7 +191,7 @@ class FF(forcebalance.BaseClass):
     inside this class pertaining to force field generation is self-contained.
 
     For details on force field parsing, see the detailed documentation for addff.
-    
+
     """
     def __init__(self, options, verbose=True, printopt=True):
 
@@ -199,7 +199,7 @@ class FF(forcebalance.BaseClass):
 
         Many variables here are initialized to zero, but they are filled out by
         methods like addff, rsmake, and mktransmat.
-        
+
         """
         super(FF, self).__init__(options)
         #======================================#
@@ -229,12 +229,12 @@ class FF(forcebalance.BaseClass):
         self.set_option(options, 'use_pvals')
         ## Allow duplicate parameter names (internally construct unique names)
         self.set_option(options, 'duplicate_pnames')
-        
+
         #======================================#
         #     Variables which are set here     #
         #======================================#
         # A lot of these variables are filled out by calling the methods.
-        
+
         ## The content of all force field files are stored in memory
         self.ffdata       = {}
         self.ffdata_isxml = {}
@@ -265,7 +265,7 @@ class FF(forcebalance.BaseClass):
         self.Readers           = OrderedDict()
         ## A list of atom names (this is new, for ESP fitting)
         self.atomnames   = []
-        
+
         # Read the force fields into memory.
         for fnm in self.fnms:
             if verbose:
@@ -280,7 +280,7 @@ class FF(forcebalance.BaseClass):
                 if k in self.FFAtomTypes:
                     warn_press_key('Trying to insert atomtype %s into the force field, but it is already there' % k)
                 self.FFAtomTypes[k] = v
-        # This is an ordered dictionary of {'Molecule' : [{'AtomType' : string, 'ResidueNumber' : int, 'ResidueName' : string, 
+        # This is an ordered dictionary of {'Molecule' : [{'AtomType' : string, 'ResidueNumber' : int, 'ResidueName' : string,
         #                                                  'AtomName' : string, 'ChargeGroup' : int, 'Charge' : float}]}
         # Each value in the dictionary is a list of BackedUpDictionaries.
         # If we query a BackedUpDictionary and the value does not exist,
@@ -306,10 +306,10 @@ class FF(forcebalance.BaseClass):
         if verbose:
             ## Prints the plist to screen.
             bar = printcool("Starting parameter indices, physical values and IDs")
-            self.print_map()                       
+            self.print_map()
             logger.info(bar)
         ## Make the rescaling factors.
-        self.rsmake(printfacs=verbose)            
+        self.rsmake(printfacs=verbose)
         ## Make the transformation matrix.
         self.mktransmat()
         ## Redirection dictionary (experimental).
@@ -351,7 +351,7 @@ class FF(forcebalance.BaseClass):
         3) Build a list of physical parameter values
         4) Figure out where to replace the parameter values in the force field file when the values are changed
         5) Figure out which parameters need to be repeated or sign-flipped
-        
+
         Generally speaking, each parameter value in the force field
         file has a <tt> unique parameter identifier <tt>.  The
         identifier consists of three parts - the interaction type, the
@@ -366,7 +366,7 @@ class FF(forcebalance.BaseClass):
 
         @code
         <AmoebaVdwForce type="BUFFERED-14-7">
-           <Vdw class="74" sigma="0.2655" epsilon="0.056484" reduction="0.910" parameterize="sigma, epsilon, reduction" /> 
+           <Vdw class="74" sigma="0.2655" epsilon="0.056484" reduction="0.910" parameterize="sigma, epsilon, reduction" />
         @endcode
 
         In this example, the parameter identifier would look like <tt> Vdw/74/epsilon </tt>.
@@ -381,7 +381,7 @@ class FF(forcebalance.BaseClass):
         from zero.)
 
         --- If normal text : ---
-        
+
         The parameter identifier is simply built using the file name,
         line number, and field.  Thus, the identifier is unique but
         completely noninformative (which is not ideal for our
@@ -436,9 +436,9 @@ class FF(forcebalance.BaseClass):
 
         # Open the force field using an absolute path and read its contents into memory.
         absff = os.path.join(self.root,self.ffdir,ffname)
-        
+
         # Create an instance of the Reader.
-        # The reader is essentially a finite state machine that allows us to 
+        # The reader is essentially a finite state machine that allows us to
         # build the pid.
         self.Readers[ffname] = Reader(ffname)
         if fftype == "openmm":
@@ -480,7 +480,7 @@ class FF(forcebalance.BaseClass):
                 else:
                     logger.error(*args)
             warn_or_err("Encountered an duplicate parameter ID (%s)\n" % pid_)
-            warn_or_err("file %s line %i field %i duplicates:\n" 
+            warn_or_err("file %s line %i field %i duplicates:\n"
                         % (os.path.basename(ffname), ln+1, pfld))
             for dupfnm, dupln, dupfld in zip(dupfnms, duplns, dupflds):
                 warn_or_err("file %s line %i field %i\n" % (dupfnm, dupln+1, dupfld))
@@ -502,7 +502,7 @@ class FF(forcebalance.BaseClass):
         When 'PRM' or 'RPT' is encountered, we do several things:
         - Build the parameter identifier and insert it into the map
         - Point to the file name, line number, and field where the parameter may be modified
-        
+
         Additionally, when 'PRM' is encountered:
         - Store the physical parameter value (this is permanent; it's the original value)
         - Increment the total number of parameters
@@ -524,7 +524,7 @@ class FF(forcebalance.BaseClass):
                 traceback.print_exc()
                 warn_press_key("The force field parser got confused!  The traceback and line in question are printed above.")
             sline = self.Readers[ffname].Split(line)
-            
+
             kwds = list(itertools.chain(*[[i, "/%s" % i] for i in ['PRM', 'PARM', 'RPT', 'EVAL']]))
 
             marks = OrderedDict()
@@ -536,12 +536,12 @@ class FF(forcebalance.BaseClass):
                 elif sline.count(k) == 1:
                     marks[k] = (np.array(sline) == k).argmax()
             marks['END'] = len(sline)
-            
+
             pmark = marks.get('PRM',None)
             if pmark is None: pmark = marks.get('PARM',None)
             rmark = marks.get('RPT',None)
             emark = marks.get('EVAL',None)
-            
+
             if pmark is not None:
                 pstop = min([i for i in marks.values() if i > pmark])
                 pflds = [int(i) for i in sline[pmark+1:pstop]] # The integers that specify the parameter word positions
@@ -578,7 +578,7 @@ class FF(forcebalance.BaseClass):
                                 sys.stderr.write("\n")
                             count += 1
                         sys.stderr.write("\nOffending ID: %s\n" % sline[parse+1])
-                        
+
                         logger.error('Parameter repetition entry in force field file is incorrect (see above)\n')
                         raise RuntimeError
                     pid = self.Readers[ffname].build_pid(pfld)
@@ -606,7 +606,7 @@ class FF(forcebalance.BaseClass):
                     #self.patoms[prep].append(self.Readers[ffname].molatom)
                     self.assign_field(None,pid,ffname,ln,pfld,None,evalcmd)
                     parse += 2
-    
+
     def addff_xml(self, ffname):
         """ Parse an XML force field file and create important instance variables.
 
@@ -654,7 +654,7 @@ class FF(forcebalance.BaseClass):
             wfile.close()
             self.addff(ffnameScript, xmlScript=True)
             os.unlink(absScript)
-            
+
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
@@ -679,10 +679,10 @@ class FF(forcebalance.BaseClass):
                 dest = self.Readers[ffname].build_pid(e, field.strip().split('=')[0])
                 evalcmd  = field.strip().split('=')[1]
                 self.assign_field(None,dest,ffname,fflist.index(e),dest.split('/')[1],None,evalcmd)
-            
+
     def make(self,vals=None,use_pvals=False,printdir=None,precision=12):
         """ Create a new force field using provided parameter values.
-        
+
         This big kahuna does a number of things:
         1) Creates the physical parameters from the mathematical parameters
         2) Creates force fields with physical parameters substituted in
@@ -697,7 +697,7 @@ class FF(forcebalance.BaseClass):
         stored values in the class state, but I don't think that's a good idea anymore.
         @param[in] use_pvals Switch for whether to bypass the coordinate transformation
         and use physical parameters directly.
-        
+
         """
         if type(vals)==np.ndarray and vals.ndim != 1:
             logger.error('Please only pass 1-D arrays\n')
@@ -723,7 +723,7 @@ class FF(forcebalance.BaseClass):
                 else:
                     return Decimal % number
             else:
-                Num = SciNot % number 
+                Num = SciNot % number
                 Mum = SciNot % (-1 * number)
                 if (float(Num) == float(Mum)):
                     return SciNot % abs(number)
@@ -733,7 +733,7 @@ class FF(forcebalance.BaseClass):
         pvals = list(pvals)
         # pvec1d(vals, precision=4)
         newffdata = deepcopy(self.ffdata)
-    
+
         # The dictionary that takes parameter names to physical values.
         PRM = {i:pvals[self.map[i]] for i in self.map}
 
@@ -742,11 +742,11 @@ class FF(forcebalance.BaseClass):
         #======================================#
 
         xml_lines = OrderedDict([(fnm, list(newffdata[fnm].iter())) for fnm in self.fnms if self.ffdata_isxml[fnm]])
-        
+
         for i in range(len(self.pfields)):
             pfield = self.pfields[i]
             pid,fnm,ln,fld,mult,cmd = pfield
-            # XML force fields are easy to print.  
+            # XML force fields are easy to print.
             # Our 'pointer' to where to replace the value
             # is given by the position of this line in the
             # iterable representation of the tree and the
@@ -839,7 +839,7 @@ class FF(forcebalance.BaseClass):
                 with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
 
         return pvals
-        
+
     def make_redirect(self,mvals):
         Groups = defaultdict(list)
         for p, pid in enumerate(self.plist):
@@ -914,7 +914,7 @@ class FF(forcebalance.BaseClass):
             if len(spacs) > 0:
                 spacdict[gnm] = np.mean(np.array(spacs))
         return spacdict
-        
+
     def create_pvals(self,mvals):
         """Converts mathematical to physical parameters.
 
@@ -924,15 +924,17 @@ class FF(forcebalance.BaseClass):
 
         @param[in] mvals The mathematical parameters
         @return pvals The physical parameters
-        
+
         """
+        if isinstance(mvals, list):
+            mvals = np.array(mvals)
         for p in self.redirect:
             mvals[p] = 0.0
         if self.logarithmic_map:
             try:
                 pvals = np.exp(mvals.flatten()) * self.pvals0
             except:
-                logger.exception(mvals + '\n')
+                logger.exception(str(mvals) + '\n')
                 logger.error('What the hell did you do?\n')
                 raise RuntimeError
         else:
@@ -969,7 +971,7 @@ class FF(forcebalance.BaseClass):
         mvals = flat(invert_svd(self.tmI) * col(pvals - self.pvals0))
 
         return mvals
-        
+
     def rsmake(self,printfacs=True):
         """Create the rescaling factors for the coordinate transformation in parameter space.
 
@@ -986,7 +988,7 @@ class FF(forcebalance.BaseClass):
         rsfac_list = []
         ## Takes the dictionary 'BONDS':{3:'B', 4:'K'}, 'VDW':{4:'S', 5:'T'},
         ## and turns it into a list of term types ['BONDSB','BONDSK','VDWS','VDWT']
-        
+
         if any([self.Readers[i].pdict == "XML_Override" for i in self.fnms]):
             termtypelist = ['/'.join([i.split('/')[0],i.split('/')[1]]) for i in self.map]
         else:
@@ -1014,7 +1016,7 @@ class FF(forcebalance.BaseClass):
                 rsfac_list.remove(termtype)
             rsfac_list.append(termtype)
             rsfactors[termtype] = self.priors[termtype]
-    
+
         # for line in os.popen("awk '/rsfactor/ {print $2,$3}' %s" % pkg.options).readlines():
         #     rsfactors[line.split()[0]] = float(line.split()[1])
         if printfacs:
@@ -1046,7 +1048,7 @@ class FF(forcebalance.BaseClass):
             logger.info(bar)
 
     def make_rescale(self, scales, mvals=None, G=None, H=None, multiply=True, verbose=False):
-        """ Obtain rescaled versions of the inputs according to dictionary values 
+        """ Obtain rescaled versions of the inputs according to dictionary values
         in "scales" (i.e. a replacement or multiplicative factor on self.rs_ord).
         Note that self.rs and self.rs_ord are not updated in this function. You
         need to do that outside.
@@ -1057,19 +1059,19 @@ class FF(forcebalance.BaseClass):
         N in the physical parameters. Thus, for a given point in the physical
         parameter space, the mathematical parameters are proportional to 1/N,
         the gradient is proportional to N, and the Hessian is proportional to N^2.
-        
+
         Parameters
         ----------
         mvals : numpy.ndarray
             Parameters to be transformed, if desired.  Must be same length as number of parameters.
-        G : numpy.ndarray 
+        G : numpy.ndarray
             Gradient to be transformed, if desired.  Must be same length as number of parameters.
         H : numpy.ndarray
             Hessian to be transformed, if desired.  Must be square matrix with side-length = number of parameters.
         scales : OrderedDict
             A dictionary with the same keys as self.rs_ord and floating point values.
-            These represent the values with which to multiply the existing scale factors 
-            (if multiply == True) or replace them (if multiply == False).  
+            These represent the values with which to multiply the existing scale factors
+            (if multiply == True) or replace them (if multiply == False).
             Pro Tip: Create this variable from a copy of self.rs_ord
         multiply : bool
             When set to True, the new scale factors are the existing scale factors
@@ -1079,7 +1081,7 @@ class FF(forcebalance.BaseClass):
         Returns
         -------
         answer : OrderedDict
-            Output dictionary containing : 
+            Output dictionary containing :
             'rs' : New parameter scale factors (multiplied by scales if multiply=True, or replaced if multiply=False)
             'rs_ord' : New parameter scale factor dictionary
             'mvals' : New parameter values (if mvals is provided)
@@ -1130,34 +1132,34 @@ class FF(forcebalance.BaseClass):
         # The final parameters, gradient and Hessian should be consistent with the
         # returned scale factors.
         return answer
-                
+
     def mktransmat(self):
         """ Create the transformation matrix to rescale and rotate the mathematical parameters.
 
         For point charge parameters, project out perturbations that
         change the total charge.
-        
+
         First build these:
-        
+
         'qmap'    : Just a list of parameter indices that point to charges.
-        
+
         'qid'     : For each parameter in the qmap, a list of the affected atoms :)
                     A potential target for the molecule-specific thang.
-                    
+
         Then make this:
-        
+
         'qtrans2' : A transformation matrix that rotates the charge parameters.
                     The first row is all zeros (because it corresponds to increasing the charge on all atoms)
                     The other rows correspond to changing one of the parameters and decreasing all of the others
                     equally such that the overall charge is preserved.
-                    
+
         'qmat2'   : An identity matrix with 'qtrans2' pasted into the right place
-        
+
         'transmat': 'qmat2' with rows and columns scaled using self.rs
-        
+
         'excision': Parameter indices that need to be 'cut out' because they are irrelevant and
                     mess with the matrix diagonalization
-        
+
         @todo Only project out changes in total charge of a molecule, and perhaps generalize to
         fragments of molecules or other types of parameters.
         @todo The AMOEBA selection of charge depends not only on the atom type, but what that atom is bonded to.
@@ -1338,7 +1340,7 @@ class FF(forcebalance.BaseClass):
             transmat[i, :] = np.zeros(self.np)
         self.tm = transmat
         self.tmI = transmat.T
-        
+
     def list_map(self):
         """ Create the plist, which is like a reversed version of the parameter map.  More convenient for printing. """
         if len(self.map) == 0:
@@ -1349,7 +1351,7 @@ class FF(forcebalance.BaseClass):
                 self.plist[self.map[i]].append(i)
             for i in range(self.np):
                 self.plist[i] = ' '.join(natural_sort(self.plist[i]))
-            
+
     def print_map(self,vals = None,precision=4):
         """Prints out the (physical or mathematical) parameter indices, IDs and values in a visually appealing way."""
         if vals is None:
@@ -1363,7 +1365,7 @@ class FF(forcebalance.BaseClass):
             vals = self.pvals0
         out = '\n'.join(["%4i [ %s ]" % (self.plist.index(i), "%% .%ie" % precision % float(vals[self.plist.index(i)]) if isfloat(str(vals[self.plist.index(i)])) else (str(vals[self.plist.index(i)]))) + " : " + "%s" % i.split()[0] for i in self.plist])
         return out
-        
+
     def assign_p0(self,idx,val):
         """ Assign physical parameter values to the 'pvals0' array.
 
@@ -1374,7 +1376,7 @@ class FF(forcebalance.BaseClass):
             self.pvals0.append(val)
         else:
             self.pvals0[idx] = val
-            
+
     def assign_field(self,idx,pid,fnm,ln,pfld,mult,cmd=None):
         """ Record the locations of a parameter in a txt file; [[file name, line number, field number, and multiplier]].
 
@@ -1386,10 +1388,10 @@ class FF(forcebalance.BaseClass):
         @param[in] ln   The line number within the file (or the node index in the flattened xml)
         @param[in] pfld The field within the line (or the name of the attribute in the xml)
         @param[in] mult The multiplier (this is usually 1.0)
-        
+
         """
         self.pfields.append([pid,fnm,ln,pfld,mult,cmd])
-    
+
     def __eq__(self, other):
         # check equality of forcefields using comparison of pfields and map
         if isinstance(other, FF):
@@ -1406,7 +1408,7 @@ class FF(forcebalance.BaseClass):
 
 def rs_override(rsfactors,termtype,Temperature=298.15):
     """ This function takes in a dictionary (rsfactors) and a string (termtype).
-    
+
     If termtype matches any of the strings below, rsfactors[termtype] is assigned
     to one of the numbers below.
 
@@ -1415,7 +1417,7 @@ def rs_override(rsfactors,termtype,Temperature=298.15):
     @param[out] rsfactors The computed rescaling factor.
     @param[in] termtype The interaction type (corresponding to a physical unit)
     @param[in] Temperature The temperature for computing the kT energy scale
-    
+
     """
     if match('PIMPDIHS[1-6]K|PDIHMULS[1-6]K|PDIHS[1-6]K|RBDIHSK[1-5]|MORSEC',termtype):
         # eV or eV rad^-2
