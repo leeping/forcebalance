@@ -3,7 +3,7 @@
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                    Last updated May 22, 2015                       |#
+#|                    Last updated July 5, 2016                       |#
 #|                                                                    |#
 #|   This is free software released under version 2 of the GNU GPL,   |#
 #|   please use or redistribute as you see fit under the terms of     |#
@@ -73,6 +73,9 @@
 #|                     Pierre Tuffery (Mol2 Plugin)                   |#
 #|                     #python IRC chat on FreeNode                   |#
 #|                                                                    |#
+#|             Contributors: Leah Isseroff Bendavid                   |#
+#|                           Yudong Qiu                               |#
+#|                                                                    |#
 #|             Instructions:                                          |#
 #|                                                                    |#
 #|               To import:                                           |#
@@ -103,8 +106,12 @@
 # qm_grads   = List of arrays of gradients (i.e. negative of the atomistic forces) from QM calculations
 # qm_espxyzs = List of arrays of xyz coordinates for ESP evaluation
 # qm_espvals = List of arrays of ESP values
+# qm_zpe     = Zero point energy, kcal/mol (from a qchem freq calculation)
+# qm_entropy = Entropy contribution at STP, cal/mol.K (from a qchem freq calculation)
+# qm_enthalpy= Enthalpic contribution at STP, excluding electronic energy and ZPE, kcal/mol (from a qchem freq calculation)
 FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_grads', 'qm_energies', 'qm_interaction',
-                          'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins'])
+                          'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins',
+                          'qm_zpe', 'qm_entropy', 'qm_enthalpy'])
 #=========================================#
 #| Data attributes in AtomVariableNames  |#
 #| must be a list along the atom axis,   |#
@@ -175,7 +182,8 @@ module_name = __name__.replace('.molecule','')
 # Covalent radii from Cordero et al. 'Covalent radii revisited' Dalton Transactions 2008, 2832-2838.
 Radii = [0.31, 0.28, # H and He
          1.28, 0.96, 0.84, 0.76, 0.71, 0.66, 0.57, 0.58, # First row elements
-         1.66, 1.41, 1.21, 1.11, 1.07, 1.05, 1.02, 1.06, # Second row elements
+         0.00, 1.41, 1.21, 1.11, 1.07, 1.05, 1.02, 1.06, # Second row elements
+         # 1.66, 1.41, 1.21, 1.11, 1.07, 1.05, 1.02, 1.06, # Second row elements
          2.03, 1.76, 1.70, 1.60, 1.53, 1.39, 1.61, 1.52, 1.50,
          1.24, 1.32, 1.22, 1.22, 1.20, 1.19, 1.20, 1.20, 1.16, # Third row elements, K through Kr
          2.20, 1.95, 1.90, 1.75, 1.64, 1.54, 1.47, 1.46, 1.42,
@@ -732,7 +740,7 @@ def extract_int(arr, avgthre, limthre, label="value", verbose=True):
         passed = False
     return int(rounded), passed
 
-def extract_qsz(M, verbose=True):
+def extract_pop(M, verbose=True):
     """
     Extract our best estimate of charge and spin-z from the comments
     section of a Molecule object created with Nanoreactor.  Note that
@@ -1977,12 +1985,12 @@ class Molecule(object):
         return phis
 
     def find_rings(self, max_size=6):
-        """ 
+        """
         Return a list of rings in the molecule. Tested on a DNA base
         pair and C60.  Warning: Using large max_size for rings
         (e.g. for finding the macrocycle in porphyrin) could lead to
         some undefined behavior.
-        
+
         Parameters
         ----------
         max_size : int
@@ -2050,10 +2058,10 @@ class Molecule(object):
                                     PathLength = nx.shortest_path_length(g, ends[0], ends[1])
                                 except nx.exception.NetworkXNoPath:
                                     PathLength = 0
-                                if PathLength <= 0 or PathLength > (max_size-2): 
+                                if PathLength <= 0 or PathLength > (max_size-2):
                                     # print r, t, "share two atoms but are on different rings"
                                     continue
-                                if has_been_assigned: 
+                                if has_been_assigned:
                                     # This happens if two rings have separately been found but they're actually the same
                                     # print "trying to assign t=", t, "to r=", r, "but it's already in", rings[assigned[t]]
                                     # print "Merging", rings[iring], "into", rings[assigned[t]]
@@ -2219,7 +2227,7 @@ class Molecule(object):
 
     def read_comm_charge_mult(self, verbose=False):
         """ Set charge and multiplicity from reading the comment line, formatted in a specific way. """
-        q, sz = extract_qsz(self, verbose=verbose)
+        q, sz = extract_pop(self, verbose=verbose)
         self.charge = q
         self.mult = abs(sz) + 1
 
@@ -2824,7 +2832,7 @@ class Molecule(object):
                     if (not infsm) and (len(dline) >= 4 and all([isfloat(dline[i]) for i in range(1,4)])):
                         if fff:
                             reading_template = False
-                            template_cut = list(i for i, dat in enumerate(template) if dat[0] == '@@@')[-1]
+                            template_cut = list(i for i, dat in enumerate(template) if '@@@' in dat[0])[-1]
                         else:
                             if re.match('^@', sline[0]): # This is a ghost atom
                                 ghost.append(True)
@@ -3028,6 +3036,9 @@ class Molecule(object):
                         'energy_mp2'       : ("^(ri)*(-)*mp2 +total energy += +[-+]?([0-9]*\.)?[0-9]+ +au$",-2),
                         'energy_ccsd'      : ("^CCSD Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1),
                         'energy_ccsdt'     : ("^CCSD\(T\) Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1),
+                        'zpe'              : ("^(\s+)?Zero point vibrational energy:\s+[-+]?([0-9]*\.)?[0-9]+\s+kcal\/mol$", -2),
+                        'entropy'          : ("^(\s+)?Total Entropy:\s+[-+]?([0-9]*\.)?[0-9]+\s+cal\/mol\.K$", -2),
+                        'enthalpy'         : ("^(\s+)?Total Enthalpy:\s+[-+]?([0-9]*\.)?[0-9]+\s+kcal\/mol$", -2)
                         }
         matrix_match = {'analytical_grad'  :'Full Analytical Gradient',
                         'gradient_scf'     :'Gradient of SCF Energy',
@@ -3266,6 +3277,13 @@ class Molecule(object):
         elif 'SCF failed to converge' not in errok:
             logger.error('There are no energies in %s\n' % fnm)
             raise RuntimeError
+        # Process ZPE, entropy, and enthalpy from a freq calculation
+        if len(Floats['zpe']) > 0:
+            Answer['qm_zpe'] = Floats['zpe']
+        if len(Floats['entropy']) > 0:
+            Answer['qm_entropy'] = Floats['entropy']
+        if len(Floats['enthalpy']) > 0:
+            Answer['qm_enthalpy'] = Floats['enthalpy']
 
         #### Sanity checks
         # We currently don't have a graceful way of dealing with SCF convergence failures in the output file.
@@ -3286,6 +3304,13 @@ class Molecule(object):
                 Answer['xyzs'] = Answer['xyzs'][:-1]
             # Catch the case of freezing string method, it prints out two extra coordinates.
             if len(Answer['xyzs']) == len(Answer['qm_energies']) + 2:
+                for i in range(2):
+                    Answer['qm_energies'].append(0.0)
+                    mkchg.append([0.0 for j in mkchg[-1]])
+                    mkspn.append([0.0 for j in mkchg[-1]])
+            # Q-Chem 4.4 prints out three more coordinates.
+            if FSM and (len(Answer['xyzs']) == len(Answer['qm_energies']) + 3):
+                Answer['xyzs'] = Answer['xyz'][1:]
                 for i in range(2):
                     Answer['qm_energies'].append(0.0)
                     mkchg.append([0.0 for j in mkchg[-1]])
@@ -3432,8 +3457,6 @@ class Molecule(object):
         (1) We are interested in a ReaxFF simulation
         (2) Atom types will be generated from elements
         """
-        print selection
-        print self.comms
         I = selection[0]
         out = []
         comm = self.comms[I]
