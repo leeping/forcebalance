@@ -996,7 +996,7 @@ class Molecule(object):
                 if k == 'boxes':
                     New.Data[k] = [j for i, j in enumerate(self.Data[k]) if i in np.arange(len(self))[key]]
                 else:
-                    New.Data[k] = list(np.array(self.Data[k])[key])
+                    New.Data[k] = list(np.array(copy.deepcopy(self.Data[k]))[key])
             for k in self.AtomKeys | self.MetaKeys:
                 New.Data[k] = copy.deepcopy(self.Data[k])
             return New
