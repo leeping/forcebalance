@@ -572,8 +572,6 @@ class AbInitio(Target):
         roots of the numerator and denominator, divided by the number of 
         atoms (molecules) for forces (net forces / torques).
 
-        The weights are provided by the user.  
-
         In equation form, the objective function is given by:
        
         \[ = {W_E}\left[ {\frac{{\left( {\sum\limits_{i \in {N_s}} 
@@ -1034,15 +1032,12 @@ class AbInitio(Target):
     def get(self, mvals, AGrad=False, AHess=False):
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         tw = self.w_energy + self.w_force + self.w_netforce + self.w_torque + self.w_resp
-        if tw > 0.0:
-            w_ef = (self.w_energy + self.w_force + self.w_netforce + self.w_torque)
-            w_resp = self.w_resp
-            if self.w_normalize:
-                w_ef /= tw
-                w_resp /= tw
+        if self.w_normalize:
+            w_ef /= tw
+            w_resp = self.w_resp / tw
         else:
-            w_ef = 0.0
-            w_resp = 0.0
+            w_ef = 1.0
+            w_resp = self.w_resp
         if self.energy or self.force:
             Answer_EF = self.get_energy_force(mvals, AGrad, AHess)
             for i in Answer_EF:
