@@ -428,6 +428,8 @@ def main():
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
     EDA = prop_return['Ecomps']
+    RDF=prop_return['RDF']
+        
 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
@@ -452,6 +454,7 @@ def main():
     pV = atm_unit * pressure * Volumes
     pV_avg, pV_err = mean_stderr(pV)
     Rho_avg, Rho_err = mean_stderr(Rhos)
+    
     PrintEDA(EDA, NMol)
 
     #==============================================#
@@ -499,7 +502,10 @@ def main():
     #==============================================#
     #  Condensed phase properties and derivatives. #
     #==============================================#
-
+    #----
+    # RDF
+    #----
+   
     #----
     # Density
     #----
@@ -714,7 +720,7 @@ def main():
     pvals = FF.make(mvals)
 
     logger.info("Writing all simulation data to disk.\n")
-    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, NMol),'npt_result.p')
+    lp_dump((Rhos, Volumes, Potentials, Energies, Dips, G, [GDx, GDy, GDz], mPotentials, mEnergies, mG, Rho_err, Hvap_err, Alpha_err, Kappa_err, Cp_err, Eps0_err, RDF, NMol),'npt_result.p')
 
 if __name__ == "__main__":
     main()
