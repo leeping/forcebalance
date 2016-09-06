@@ -2957,12 +2957,19 @@ class Molecule(object):
         bonds = []
         # Read in CONECT records.
         F2=open(fnm,'r')
+        # QYD: Rewrite to support atom indices with 5 digits
+        # i.e. CONECT143321433314334 -> 14332 connected to 14333 and 14334
         for line in F2:
-            s = line.split()
-            if s[0].upper() == "CONECT":
-                if len(s) > 2:
-                    for i in range(2, len(s)):
-                        bonds.append((int(s[1])-1, int(s[i])-1))
+            if line[:6] == "CONECT":
+                conect_A = int(line[6:11]) - 1
+                conect_B_list = []
+                line_rest = line[11:]
+                while line_rest.strip():
+                    # Take 5 characters a time until run out of characters
+                    conect_B_list.append(int(line_rest[:5]) - 1)
+                    line_rest = line_rest[5:]
+                for conect_B in conect_B_list:
+                    bonds.append([conect_A, conect_B])
 
         Answer={"xyzs":XYZList, "chain":ChainID, "altloc":AltLoc, "icode":ICode, "atomname":[str(i) for i in AtomNames],
                 "resid":ResidueID, "resname":ResidueNames, "elem":elem,
