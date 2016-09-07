@@ -827,7 +827,8 @@ def lp_load(fnm):
 try:
     import work_queue
 except:
-    logger.warning("Work Queue library import fail (You can't queue up jobs using Work Queue)\n")
+    pass
+    #logger.warning("Work Queue library import fail (You can't queue up jobs using Work Queue)\n")
 
 # Global variable corresponding to the Work Queue object
 WORK_QUEUE = None
