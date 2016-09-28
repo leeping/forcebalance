@@ -1200,6 +1200,7 @@ class OpenMM(Engine):
         if save_traj:
             self.simulation.reporters.append(PDBReporter('%s-md.pdb' % self.name, nsteps))
             self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsave))
+
         for iteration in range(-1, isteps):
             # Propagate dynamics.
             if iteration >= 0: self.simulation.step(nsave)
@@ -1216,7 +1217,7 @@ class OpenMM(Engine):
                 box_vectors = None
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
-            self.xyz_omms.append([state.getPositions(), box_vectors])
+            self.xyz_omms.append([state.getPositions(asNumpy=True), box_vectors])
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
                 if comp in edecomp:
@@ -1242,14 +1243,47 @@ class OpenMM(Engine):
         Volumes = np.array(Volumes)
         Dips = np.array(Dips)
         Ecomps = OrderedDict([(key, np.array(val)) for key, val in edecomp.items()])
-        Ecomps["Potential Energy"] = np.array(Potentials)
-        Ecomps["Kinetic Energy"] = np.array(Kinetics)
-        Ecomps["Temperature"] = np.array(Temps)
-        Ecomps["Total Energy"] = np.array(Potentials) + np.array(Kinetics)
+        Ecomps["Potential Energy"] = Potentials
+        Ecomps["Kinetic Energy"] = Kinetics
+        Ecomps["Temperature"] = Temps
+        Ecomps["Total Energy"] = Potentials + Kinetics
         # Initialized property dictionary.
         prop_return = OrderedDict()
         prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
         return prop_return
+
+    def scale_box(self, x=1.0, y=1.0, z=1.0):
+        """ Scale the positions of molecules and box vectors. Molecular structures will be kept the same.
+        Input: x, y, z :scaling factors (float)
+        Output: None
+        After this function call, self.xyz_omms will be overwritten with the new positions and box_vectors.
+        """
+        if not hasattr(self, 'xyz_omms'):
+            logger.error("molecular_dynamics has not finished correctly!")
+            raise RuntimeError
+        # record the indices of each residue
+        if not hasattr(self, 'residues_idxs'):
+            self.residues_idxs = np.array([[a.index for a in r.atoms()] for r in self.simulation.topology.residues()])
+        scale_xyz = np.array([x,y,z])
+        # The resulting list
+        new_xyz_omms = []
+        for pos, box in self.xyz_omms: # loop over each frame
+            # scale the box vectors
+            new_box = np.array(box/nanometer) * scale_xyz
+            # convert pos to np.array
+            positions = np.array(pos/nanometer)
+            # Positions of each residue
+            residue_positions = np.take(positions, self.residues_idxs, axis=0)
+            # Center of each residue
+            res_center_positions = np.mean(residue_positions, axis=1)
+            # Shift of each residue
+            center_pos_shift = res_center_positions * (scale_xyz-1)
+            # New positions
+            new_pos = (residue_positions + center_pos_shift[:,np.newaxis,:]).reshape(-1,3)
+            # Append result
+            new_xyz_omms.append([new_pos*nanometer, new_box*nanometer])
+        # replace the original xyz_omms with new one
+        self.xyz_omms = new_xyz_omms
 
 class Liquid_OpenMM(Liquid):
     """ Condensed phase property matching using OpenMM. """
@@ -1268,6 +1302,8 @@ class Liquid_OpenMM(Liquid):
         self.set_option(tgt_opts,'liquid_coords',default='liquid.pdb',forceprint=True)
         # Name of the gas coordinate file.
         self.set_option(tgt_opts,'gas_coords',default='gas.pdb',forceprint=True)
+        # Name of the surface tension coordinate file. (e.g. an elongated box with a film of water)
+        self.set_option(tgt_opts,'nvt_coords',default='surf.pdb',forceprint=True)
         # Set the number of steps between MC barostat adjustments.
         self.set_option(tgt_opts,'mc_nbarostat')
         # Class for creating engine object.
@@ -1280,6 +1316,7 @@ class Liquid_OpenMM(Liquid):
             self.nptpfx += " -b"
         # Extra files to be linked into the temp-directory.
         self.nptfiles = []
+        self.nvtfiles = []
         # Set some options for the polarization correction calculation.
         self.gas_engine_args = {}
         # Scripts to be copied from the ForceBalance installation directory.
