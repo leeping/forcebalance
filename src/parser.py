@@ -183,7 +183,7 @@ tgt_opts_types = {
                  "gas_md_steps"       : (100000, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "gas_eq_steps"       : (10000, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "nvt_md_steps"       : (100000, 0, 'Number of time steps for the liquid NVT production run.', 'Condensed phase property targets', 'liquid'),
-                 "nvt_eq_steps"       : (10000, 0, 'Number of time steps for the liquid NVT equilibration run.', 'Condensed phase property targets', 'liquid'),                 
+                 "nvt_eq_steps"       : (10000, 0, 'Number of time steps for the liquid NVT equilibration run.', 'Condensed phase property targets', 'liquid'),
                  "writelevel"         : (0, 0, 'Affects the amount of data being printed to the temp directory.', 'Energy + Force Matching', 'AbInitio'),
                  "md_threads"         : (1, 0, 'Set the number of threads used by Gromacs or TINKER processes in MD simulations', 'Condensed phase properties in GROMACS and TINKER', 'Liquid_GMX, Lipid_GMX, Liquid_TINKER'),
                  "save_traj"          : (0, -10, 'Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save', 'Condensed phase properties', 'Liquid, Lipid'),
@@ -217,6 +217,7 @@ tgt_opts_types = {
                  "adapt_errors"     : (0, 50, 'Adapt to simulation uncertainty by combining property estimations and adjusting simulation length.', 'Condensed phase property targets', 'liquid'),
                  "force_average"    : (0, -50, 'Average over all atoms when normalizing force errors.', 'Force matching', 'abinitio'),
                  "remote_backup"    : (0, -50, 'When running remote target, back up files at the remote location.', 'Liquid, lipid and remote targets', 'liquid, lipid, remote'),
+                 "pure_num_grad"    : (0, -50, 'Pure numerical gradients -- launch two additional simulations for each perturbed forcefield parameter, and compute derivatives using 3-point formula. (This is very expensive and should only serve as a sanity check)')
                  },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
                  "w_rho"        : (1.0, 0, 'Weight of experimental density', 'Condensed phase property targets', 'liquid, lipid'),
