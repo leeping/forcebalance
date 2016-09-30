@@ -409,25 +409,22 @@ def main():
     Liquid.scale_box(scale_x, scale_y, scale_z)
     logger.info("scale_box+ took %.3f seconds\n" %click())
     # Obtain energies and gradients
-    click()
     Potentials_plus = Liquid.energy()
     logger.info("Calculation of energies for perturbed box+ took %.3f seconds\n" %click())
-    click()
-    G_plus, _, _, _ = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Potentials), AGrad, dipole=False)
-    logger.info("Calculation of energy gradients for perturbed box+ took %.3f seconds\n" %click())
+    if AGrad:
+        G_plus, _, _, _ = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Potentials), AGrad, dipole=False)
+        logger.info("Calculation of energy gradients for perturbed box+ took %.3f seconds\n" %click())
     # perturb xy area - ( Note: also need to cancel the previous scaling)
     scale_x = scale_y = np.sqrt(1 - perturb_proportion) * (1.0/scale_x)
     scale_z = 1.0 / (1-perturb_proportion) * (1.0/scale_z)
-    click()
     Liquid.scale_box(scale_x, scale_y, scale_z)
     logger.info("scale_box- took %.3f seconds\n" %click())
     # Obtain energies and gradients
-    click()
     Potentials_minus = Liquid.energy()
     logger.info("Calculation of energies for perturbed box- took %.3f seconds\n" %click())
-    click()
-    G_minus, _, _, _ = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Potentials), AGrad, dipole=False)
-    logger.info("Calculation of energy gradients for perturbed box- took %.3f seconds\n" %click())
+    if AGrad:
+        G_minus, _, _, _ = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Potentials), AGrad, dipole=False)
+        logger.info("Calculation of energy gradients for perturbed box- took %.3f seconds\n" %click())
     # Compute surface tension
     dE_plus = Potentials_plus - Potentials # Unit: kJ/mol
     dE_minus = Potentials_minus - Potentials # Unit: kJ/mol
@@ -462,7 +459,7 @@ def main():
         beta = 1.0 / kT
         plus_denom = np.mean(np.exp(-beta*dE_plus))
         minus_demon = np.mean(np.exp(-beta*dE_minus))
-        for param_i in xrange(len(G_plus)):
+        for param_i in xrange(n_params):
              plus_left = np.mean(-beta * G_plus[param_i] * np.exp(-beta*dE_plus))
              plus_right = np.mean(-beta * G[param_i]) * plus_denom
              minus_left = np.mean(-beta * G_minus[param_i] * np.exp(-beta*dE_minus))
