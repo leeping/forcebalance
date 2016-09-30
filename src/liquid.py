@@ -24,6 +24,7 @@ import itertools
 from forcebalance.optimizer import Counter
 from collections import defaultdict, namedtuple, OrderedDict
 import csv
+import copy
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -152,7 +153,8 @@ class Liquid(Target):
         self.set_option(tgt_opts,'nvt_timestep', forceprint=True)
         # Time interval (in ps) for writing coordinates
         self.set_option(tgt_opts,'nvt_interval', forceprint=True)
-
+        # Switch for pure numerical gradients
+        self.set_option(tgt_opts,'pure_num_grad', forceprint=True)
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -361,7 +363,7 @@ class Liquid(Target):
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
             else:
-                queue_up(wq, command = cmdstr+' &> npt.out',
+                queue_up(wq, command = cmdstr+' 2>&1 > npt.out',
                          input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
                          output_files = ['npt_result.p', 'npt.out'] + self.extra_output, tgt=self)
 
@@ -376,7 +378,7 @@ class Liquid(Target):
                 logger.info("You may tail -f %s/nvt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='nvt.out')
             else:
-                queue_up(wq, command = cmdstr+' &> nvt.out',
+                queue_up(wq, command = cmdstr+' 2>&1 > nvt.out',
                          input_files = self.nvtfiles + self.scripts + ['forcebalance.p'],
                          output_files = ['nvt_result.p', 'nvt.out'] + self.extra_output, tgt=self)
 
@@ -472,7 +474,7 @@ class Liquid(Target):
                 Delta = calc[PT] - exp[PT]
             if LeastSquares:
                 # Least-squares objective function.
-                ThisObj = Weights[PT] * Delta ** 2 44.74264/ Denom**2
+                ThisObj = Weights[PT] * Delta ** 2 / Denom**2
                 Objs[PT] = ThisObj
                 ThisGrad = 2.0 * Weights[PT] * Delta * G / Denom**2
                 GradMap.append(G)
@@ -511,7 +513,13 @@ class Liquid(Target):
         #
         # First dump the force field to a pickle file
         printcool("Target: %s - launching MD simulations\nTime steps: %i (eq) + %i (md)" % (self.name, self.liquid_eq_steps, self.liquid_md_steps), color=0)
-        lp_dump((self.FF,mvals,self.OptionDict,AGrad),'forcebalance.p')
+        if 'surf_ten' in self.RefData:
+            logger.info("Launching additional NVT simulations for computing surface tension. Time steps: %i (eq) + %i (md)\n" % (self.nvt_eq_steps, self.nvt_md_steps))
+
+        if AGrad and self.pure_num_grad:
+            lp_dump((self.FF,mvals,self.OptionDict,False),'forcebalance.p')
+        else:
+            lp_dump((self.FF,mvals,self.OptionDict,AGrad),'forcebalance.p')
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
         if (not self.evaluated) and self.manual:
@@ -524,23 +532,51 @@ class Liquid(Target):
                     os.remove(fn)
         self.last_traj = []
 
-        # Set up and run the NPT simulations.
-        snum = 0
-        for label, pt in zip(self.Labels, self.PhasePoints):
-            T = pt[0]
-            P = pt[1]
-            Punit = pt[2]
-            if Punit == 'bar':
-                P *= 1.0 / 1.01325
-            if not os.path.exists(label):
-                os.makedirs(label)
-            os.chdir(label)
-            self.npt_simulation(T,P,snum)
-            if 'surf_ten' in self.RefData and pt in self.RefData['surf_ten']:
-                logger.info("Launching additional NVT simulations for computing surface tension. Time steps: %i (eq) + %i (md)\n" % (self.nvt_eq_steps, self.nvt_md_steps))
-                self.nvt_simulation(T)
-            os.chdir('..')
-            snum += 1
+        def submit_one_setm():
+            snum = 0
+            for label, pt in zip(self.Labels, self.PhasePoints):
+                T = pt[0]
+                P = pt[1]
+                Punit = pt[2]
+                if Punit == 'bar':
+                    P *= 1.0 / 1.01325
+                if not os.path.exists(label):
+                    os.makedirs(label)
+                os.chdir(label)
+                self.npt_simulation(T,P,snum)
+                if 'surf_ten' in self.RefData and pt in self.RefData['surf_ten']:
+                    self.nvt_simulation(T)
+                os.chdir('..')
+                snum += 1
+
+        # Set up and run the simulations.
+        submit_one_setm()
+        # if pure_num_grad is set, submit additional simulations with AGrad=False
+        if AGrad and self.pure_num_grad:
+            logger.info("Running in Pure Numerical Gradient Mode! Two additional simulation will be submitted for each parameter.\n")
+            for i_m in range(len(mvals)):
+                for delta_m in [-self.h, +self.h]:
+                    pure_num_grad_label = 'mvals_%03d_%f' % (i_m, delta_m)
+                    if not os.path.exists(pure_num_grad_label):
+                        os.mkdir(pure_num_grad_label)
+                    os.chdir(pure_num_grad_label)
+                    # copy the original mvals and perturb
+                    new_mvals = copy.copy(mvals)
+                    new_mvals[i_m] += delta_m
+                    # create a new forcebalance.p, turn off gradient
+                    lp_dump((self.FF, new_mvals, self.OptionDict, False),'forcebalance.p')
+                    # link files from parent folder to here
+                    link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+                    # backup self.rundir
+                    rundir_backup = self.rundir
+                    # change the self.rundir temporarily so the new forcebalance.p will be used by npt_simulation() and nvt_simulation()
+                    self.rundir = os.getcwd()
+                    # submit simulations
+                    submit_one_setm()
+                    # change the self.rundir back
+                    self.rundir = rundir_backup
+                    os.chdir('..')
+
 
     def read(self, mvals, AGrad=True, AHess=True):
 
@@ -620,6 +656,14 @@ class Liquid(Target):
         return self.get(mvals, AGrad, AHess)
 
     def get(self, mvals, AGrad=True, AHess=True):
+        """ Wrapper of self.get_normal() and self.get_pure_num_grad() """
+        if self.pure_num_grad:
+            property_results = self.get_pure_num_grad(mvals, AGrad=AGrad, AHess=AHess)
+        else:
+            property_results = self.get_normal(mvals, AGrad=AGrad, AHess=AHess)
+        return self.form_get_result(property_results, AGrad=AGrad, AHess=AHess)
+
+    def get_normal(self, mvals, AGrad=True, AHess=True):
 
         """
         Fitting of liquid bulk properties.  This is the current major
@@ -649,7 +693,7 @@ class Liquid(Target):
         @param[in] mvals Mathematical parameter values
         @param[in] AGrad Switch to turn on analytic gradient
         @param[in] AHess Switch to turn on analytic Hessian
-        @return Answer Contribution to the objective function
+        @return property_results
 
         """
 
@@ -983,6 +1027,76 @@ class Liquid(Target):
             Kappa_std[PT]   = np.sqrt(sum(C**2 * np.array(Kappa_errs)**2)) * 1e6
             Cp_std[PT]   = np.sqrt(sum(C**2 * np.array(Cp_errs)**2))
             Eps0_std[PT]   = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
+
+        property_results = dict()
+        property_results['rho'] = Rho_calc, Rho_std, Rho_grad
+        property_results['hvap'] = Hvap_calc, Hvap_std, Hvap_grad
+        property_results['alpha'] = Alpha_calc, Alpha_std, Alpha_grad
+        property_results['kappa'] = Kappa_calc, Kappa_std, Kappa_grad
+        property_results['cp'] = Cp_calc, Cp_std, Cp_grad
+        property_results['eps0'] = Eps0_calc, Eps0_std, Eps0_grad
+        property_results['surf_ten'] = Surf_ten_calc, Surf_ten_std, Surf_ten_grad
+        return property_results
+
+    def get_pure_num_grad(self, mvals, AGrad=True, AHess=True):
+        """
+        This function calls self.get_normal(AGrad=False) to get the property values and std_err,
+        but compute the property gradients using finite difference of the FF parameters.
+
+        @param[in] mvals Mathematical parameter values
+        @param[in] AGrad Switch to turn on analytic gradient
+        @param[in] AHess Switch to turn on analytic Hessian
+        @return property_results
+
+        """
+        if not self.pure_num_grad:
+            raise RuntimeError("Not running in pure numerical gradients mode. Please use self.get_normal()) instead!")
+
+        if not AGrad:
+            return self.get_normal(mvals, AGrad=AGrad, AHess=AHess)
+
+        # Read the original property results
+        property_results = self.get_normal(mvals, AGrad=False, AHess=False)
+        # Update the gradients of each property with the finite differences from simulations
+        logger.info("Pure numerical gradient mode: loading property values from sub-directorys.\n")
+        # The folder structure should be consistent with self.submit_jobs()
+        for i_m in range(len(mvals)):
+            property_results_pm = dict()
+            for delta_m in [+self.h, -self.h]:
+                pure_num_grad_label = 'mvals_%03d_%f' % (i_m, delta_m)
+                os.chdir(pure_num_grad_label)
+                # copy the original mvals and perturb
+                new_mvals = copy.copy(mvals)
+                new_mvals[i_m] += delta_m
+                # reset self.AllResults?
+                #self.AllResults = defaultdict(lambda:defaultdict(list))
+                property_results_pm[delta_m] = self.get_normal(new_mvals, AGrad=False, AHess=False)
+                os.chdir('..')
+            for key in property_results:
+                for PT in property_results[key][2].keys():
+                    property_results[key][2][PT][i_m] = (property_results_pm[+self.h][key][0][PT] - property_results_pm[-self.h][key][0][PT]) / (2.0*self.h)
+
+        return property_results
+
+    def form_get_result(self, property_results, AGrad=True, AHess=True):
+        """
+        This function takes the property_results from get_normal() or get_pure_num_grad()
+        and form the answer for the return of the self.get() function
+
+        @in property_results
+        @return Answer Contribution to the objective function
+
+        """
+
+        Rho_calc, Rho_std, Rho_grad = property_results['rho']
+        Hvap_calc, Hvap_std, Hvap_grad = property_results['hvap']
+        Alpha_calc, Alpha_std, Alpha_grad = property_results['alpha']
+        Kappa_calc, Kappa_std, Kappa_grad = property_results['kappa']
+        Cp_calc, Cp_std, Cp_grad = property_results['cp']
+        Eps0_calc, Eps0_std, Eps0_grad = property_results['eps0']
+        Surf_ten_calc, Surf_ten_std, Surf_ten_grad = property_results['surf_ten']
+
+        Points = Rho_calc.keys()
 
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Points, 'rho', Rho_calc, Rho_std, Rho_grad, name="Density")
