@@ -453,7 +453,7 @@ def main():
     # Formula:      β = 1/kT
     #           ∂γ/∂α = -kT/(2ΔS) * { 1/<exp(-βΔE+)> * [<-β ∂E+/∂α exp(-βΔE+)> - <-β ∂E/∂α><exp(-βΔE+)>]
     #                                -1/<exp(-βΔE-)> * [<-β ∂E-/∂α exp(-βΔE-)> - <-β ∂E/∂α><exp(-βΔE-)>] }
-    n_params = len(G_plus)
+    n_params = len(mvals)
     G_surf_ten = np.zeros(n_params)
     if AGrad:
         beta = 1.0 / kT
@@ -466,7 +466,7 @@ def main():
              minus_right = np.mean(-beta * G[param_i]) * minus_demon
              G_surf_ten[param_i] = prefactor * (1.0/plus_denom*(plus_left-plus_right) - 1.0/minus_demon*(minus_left-minus_right))
 
-    FF.print_map(vals=G_surf_ten)
+        FF.print_map(vals=G_surf_ten)
 
     logger.info("Writing final force field.\n")
     pvals = FF.make(mvals)
