@@ -658,6 +658,9 @@ class FF(forcebalance.BaseClass):
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
             parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
             for p in parameters_to_optimize:
+                if p not in e.attrib:
+                    logger.error("Parameter \'%s\' is not found for \'%s\', please check %s" % (p, e.get('type'), ffname) )
+                    raise RuntimeError
                 pid = self.Readers[ffname].build_pid(e, p)
                 self.map[pid] = self.np
                 self.assign_p0(self.np,float(e.get(p)))
@@ -666,7 +669,11 @@ class FF(forcebalance.BaseClass):
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_repeat/..'):
             for field in e.get('parameter_repeat').split(','):
-                dest = self.Readers[ffname].build_pid(e, field.strip().split('=')[0])
+                parameter_name = field.strip().split('=')[0]
+                if parameter_name not in e.attrib:
+                    logger.error("Parameter \'%s\' is not found for \'%s\', please check %s" % (parameter_name, e.get('type'), ffname) )
+                    raise RuntimeError
+                dest = self.Readers[ffname].build_pid(e, parameter_name)
                 src  = field.strip().split('=')[1]
                 if src in self.map:
                     self.map[dest] = self.map[src]
@@ -676,7 +683,11 @@ class FF(forcebalance.BaseClass):
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
             for field in e.get('parameter_eval').split(','):
-                dest = self.Readers[ffname].build_pid(e, field.strip().split('=')[0])
+                parameter_name = field.strip().split('=')[0]
+                if parameter_name not in e.attrib:
+                    logger.error("Parameter \'%s\' is not found for \'%s\', please check %s" % (parameter_name, e.get('type'), ffname) )
+                    raise RuntimeError
+                dest = self.Readers[ffname].build_pid(e, parameter_name)
                 evalcmd  = field.strip().split('=')[1]
                 self.assign_field(None,dest,ffname,fflist.index(e),dest.split('/')[1],None,evalcmd)
 
