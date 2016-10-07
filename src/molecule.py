@@ -111,7 +111,7 @@
 # qm_enthalpy= Enthalpic contribution at STP, excluding electronic energy and ZPE, kcal/mol (from a qchem freq calculation)
 FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_grads', 'qm_energies', 'qm_interaction',
                           'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins',
-                          'qm_zpe', 'qm_entropy', 'qm_enthalpy'])
+                          'qm_zpe', 'qm_entropy', 'qm_enthalpy', 'bond_orders'])
 #=========================================#
 #| Data attributes in AtomVariableNames  |#
 #| must be a list along the atom axis,   |#
