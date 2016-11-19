@@ -448,7 +448,7 @@ def main():
         surf_ten_boots[i] = prefactor * ( np.log(np.mean(boots_exp_dE_plus)) - np.log(np.mean(boots_exp_dE_minus)) )
     surf_ten_err = np.std(surf_ten_boots) * np.sqrt(np.mean([statisticalInefficiency(exp_dE_plus), statisticalInefficiency(exp_dE_minus)]))
 
-    printcool("Surface Tension:       % .4f +- %.4f mJ m^-2\nAnalytic Derivative:" % (surf_ten, surf_ten_err))
+    printcool("Surface Tension:       % .4f +- %.4f mJ m^-2" % (surf_ten, surf_ten_err))
     # Analytic Gradient of surface tension
     # Formula:      β = 1/kT
     #           ∂γ/∂α = -kT/(2ΔS) * { 1/<exp(-βΔE+)> * [<-β ∂E+/∂α exp(-βΔE+)> - <-β ∂E/∂α><exp(-βΔE+)>]
@@ -460,18 +460,18 @@ def main():
         plus_denom = np.mean(np.exp(-beta*dE_plus))
         minus_demon = np.mean(np.exp(-beta*dE_minus))
         for param_i in xrange(n_params):
-             plus_left = np.mean(-beta * G_plus[param_i] * np.exp(-beta*dE_plus))
-             plus_right = np.mean(-beta * G[param_i]) * plus_denom
-             minus_left = np.mean(-beta * G_minus[param_i] * np.exp(-beta*dE_minus))
-             minus_right = np.mean(-beta * G[param_i]) * minus_demon
-             G_surf_ten[param_i] = prefactor * (1.0/plus_denom*(plus_left-plus_right) - 1.0/minus_demon*(minus_left-minus_right))
-
+            plus_left = np.mean(-beta * G_plus[param_i] * np.exp(-beta*dE_plus))
+            plus_right = np.mean(-beta * G[param_i]) * plus_denom
+            minus_left = np.mean(-beta * G_minus[param_i] * np.exp(-beta*dE_minus))
+            minus_right = np.mean(-beta * G[param_i]) * minus_demon
+            G_surf_ten[param_i] = prefactor * (1.0/plus_denom*(plus_left-plus_right) - 1.0/minus_demon*(minus_left-minus_right))
+        printcool("Analytic Derivatives:")
         FF.print_map(vals=G_surf_ten)
 
     logger.info("Writing final force field.\n")
     pvals = FF.make(mvals)
 
-    logger.info("Writing all simulation data to disk.\n")
+    logger.info("Writing all results to disk.\n")
     result_dict = {'surf_ten': surf_ten, 'surf_ten_err': surf_ten_err, 'G_surf_ten': G_surf_ten}
     lp_dump(result_dict, 'nvt_result.p')
 
