@@ -999,6 +999,7 @@ class Molecule(object):
                     New.Data[k] = list(np.array(self.Data[k])[key])
             for k in self.AtomKeys | self.MetaKeys:
                 New.Data[k] = copy.deepcopy(self.Data[k])
+            New.top_settings = copy.deepcopy(self.top_settings)
             return New
         else:
             logger.error('getitem is not implemented for keys of type %s\n' % str(key))
