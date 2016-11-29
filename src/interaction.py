@@ -80,7 +80,7 @@ class Interaction(Target):
         self.e_err_pct = None
         ## Read in the trajectory file
         self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords),
-                            top=(os.path.join(self.root,self.tgtdir,self.pdb) if hasattr(self, 'pdb') else None))
+                            top=(os.path.join(self.root,self.tgtdir,self.pdb) if hasattr(self, 'pdb') else None), build_topology=False if self.coords.endswith('.pdb') else True)
         if self.ns != -1:
             self.mol = self.mol[:self.ns]
         self.ns = len(self.mol)
