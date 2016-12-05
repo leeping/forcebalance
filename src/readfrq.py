@@ -40,6 +40,43 @@ def read_frq_gau(gauout):
     unnorm = [np.array(i) for i in modes]
     return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm]
 
+def read_frq_tc(tcout):
+    lineCounter = -100
+    for lineNumber, line in enumerate(open(tcout).readlines()):
+        s = line.split()
+        if lineNumber == 0:
+            numAtoms = int(s[-1])
+        elif lineNumber == 1:
+            numModes = int(s[-1])
+            # Make list of unnormalized modes to be read in
+            frqs = np.zeros(numModes, dtype=float)
+            unnorm = [np.zeros(3*numAtoms, dtype=float) for i in range(numModes)]
+        elif all([isint(i) for i in s]):
+            lineCounter = 0
+            modeNumbers = [int(i) for i in s]
+        elif lineCounter == 1:
+            theseFrqs = [float(i) for i in s]
+            if len(theseFrqs) != len(modeNumbers):
+                raise RuntimeError('Parser error! Expected # frequencies to equal # modes')
+            for i in range(len(theseFrqs)):
+                frqs[modeNumbers[i]] = theseFrqs[i]
+        elif lineCounter >= 3:
+            if lineCounter%3 == 0:
+                if not isint(s[0]):
+                    raise RuntimeError('Parser error! Expected integer at start of line')
+                disps = [float(i) for i in s[1:]]
+            else:
+                disps = [float(i) for i in s]
+            idx = lineCounter-3
+            if len(disps) != len(modeNumbers):
+                raise RuntimeError('Parser error! Expected # displacements to equal # modes')
+            for i in range(len(disps)):
+                unnorm[modeNumbers[i]][lineCounter-3] = disps[i]
+            if idx == 3*numAtoms-1:
+                lineCounter = -100
+        lineCounter += 1
+    return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm]
+
 def read_frq_qc(qcout):
     VMode = 0
     frqs = []
