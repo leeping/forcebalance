@@ -362,6 +362,21 @@ def AddVirtualSiteBonds(mod, ff):
                 # print "Adding Bond", ai, vi
                 mod.topology.addBond(*bi)
 
+def SetAmoebaNonbondedExcludeAll(system, topology):
+    """ Manually set the AmoebaVdwForce, AmoebaMultipoleForce to exclude all atoms belonging to the same residue """
+    # find atoms and residues
+    atom_residue_index = [a.residue.index for a in topology.atoms()]
+    residue_atoms = [[a.index for a in r.atoms()] for r in topology.residues()]
+    for f in system.getForces():
+        if f.__class__.__name__ == "AmoebaVdwForce":
+            for i in range(f.getNumParticles()):
+                f.setParticleExclusions(i, residue_atoms[atom_residue_index[i]])
+        elif f.__class__.__name__ == "AmoebaMultipoleForce":
+            for i in range(f.getNumMultipoles()):
+                f.setCovalentMap(i, 0, residue_atoms[atom_residue_index[i]])
+                for m in range(1, 4):
+                    f.setCovalentMap(i, m, [])
+
 def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps=4):
     """
     Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.
@@ -789,6 +804,9 @@ class OpenMM(Engine):
         ## If virtual particles are used with AMOEBA...
         SetAmoebaVirtualExclusions(self.system)
 
+        # test: exclude all Amoeba Nonbonded Forces within each residue
+        #SetAmoebaNonbondedExcludeAll(self.system, self.mod.topology)
+
         ## Finally create the simulation object.
         self.simulation = Simulation(self.mod.topology, self.system, integrator, self.platform)
 
@@ -837,6 +855,7 @@ class OpenMM(Engine):
             if isinstance(i, AmoebaMultipoleForce):
                 if self.SetPME:
                     i.setNonbondedMethod(i.PME)
+
 
         #----
         # If the virtual site parameters have changed,
