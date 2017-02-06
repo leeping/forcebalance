@@ -460,7 +460,8 @@ class Liquid(Target):
         avgCalc = 0.0
         avgExp  = 0.0
         avgGrad = np.zeros(self.FF.np)
-        for i, PT in enumerate(points):
+        
+        for PT in points:
             avgCalc += Weights[PT]*calc[PT]
             avgExp  += Weights[PT]*exp[PT]
             avgGrad += Weights[PT]*grad[PT]
@@ -1013,10 +1014,6 @@ class Liquid(Target):
                  Surf_ten_calc[PT] = stResults[PT]["surf_ten"]
                  Surf_ten_grad[PT] = stResults[PT]["G_surf_ten"]
                  Surf_ten_std[PT] = stResults[PT]["surf_ten_err"]
-            else:
-                 Surf_ten_calc[PT] = 0
-                 Surf_ten_grad[PT] = np.zeros(self.FF.np)
-                 Surf_ten_std[PT] = 0
             ## Estimation of errors.
             Rho_std[PT]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
             if PT in mPoints:
@@ -1105,7 +1102,7 @@ class Liquid(Target):
         X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Points, 'kappa', Kappa_calc, Kappa_std, Kappa_grad, name="Compressibility")
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
-        X_Surf_ten, G_Surf_ten, H_Surf_ten, Surf_tenPrint = self.objective_term(Points, 'surf_ten', Surf_ten_calc, Surf_ten_std, Surf_ten_grad, name="Surface Tension")
+        X_Surf_ten, G_Surf_ten, H_Surf_ten, Surf_tenPrint = self.objective_term(Surf_ten_calc.keys(), 'surf_ten', Surf_ten_calc, Surf_ten_std, Surf_ten_grad, name="Surface Tension")
 
         Gradient = np.zeros(self.FF.np)
         Hessian = np.zeros((self.FF.np,self.FF.np))
