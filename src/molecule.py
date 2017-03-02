@@ -988,7 +988,7 @@ class Molecule(object):
         The Molecule class has list-like behavior, so we can get slices of it.
         If we say MyMolecule[0:10], then we'll return a copy of MyMolecule with frames 0 through 9.
         """
-        if isinstance(key, int) or isinstance(key, slice) or isinstance(key,np.ndarray):
+        if isinstance(key, int) or isinstance(key, slice) or isinstance(key,np.ndarray) or isinstance(key,list):
             if isinstance(key, int):
                 key = [key]
             New = Molecule()
