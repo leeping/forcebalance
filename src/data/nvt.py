@@ -369,7 +369,6 @@ def main():
     #=================================================================#
 
     printcool("Condensed phase NVT molecular dynamics", color=4, bold=True)
-
     click()
     prop_return = Liquid.molecular_dynamics(**MDOpts["liquid"])
     logger.info("Liquid phase MD simulation took %.3f seconds\n" % click())
@@ -378,15 +377,14 @@ def main():
     #============================================#
     #  Compute the potential energy derivatives. #
     #============================================#
-    logger.info("Calculating potential energy derivatives with finite difference step size: %f\n" % h)
-    # Switch for whether to compute the derivatives two different ways for consistency.
-    FDCheck = False
-
-    # Compute the energy and dipole derivatives.
-    printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Potentials), color=4, bold=True)
-    click()
-    G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Potentials), AGrad, dipole=False)
-    logger.info("Condensed phase energy derivatives took %.3f seconds\n" % click())
+    if AGrad:
+        logger.info("Calculating potential energy derivatives with finite difference step size: %f\n" % h)
+        # Switch for whether to compute the derivatives two different ways for consistency.
+        FDCheck = False
+        printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Potentials), color=4, bold=True)
+        click()
+        G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Potentials), AGrad, dipole=False)
+        logger.info("Condensed phase energy derivatives took %.3f seconds\n" % click())
 
     #==============================================#
     #  Condensed phase properties and derivatives. #
