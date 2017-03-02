@@ -1236,7 +1236,8 @@ class OpenMM(Engine):
                 box_vectors = None
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
-            self.xyz_omms.append([state.getPositions(asNumpy=True), box_vectors])
+            positions = state.getPositions(asNumpy=True).astype(np.float32) * nanometer
+            self.xyz_omms.append([positions, box_vectors])
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
                 if comp in edecomp:
@@ -1284,9 +1285,9 @@ class OpenMM(Engine):
         if not hasattr(self, 'residues_idxs'):
             self.residues_idxs = np.array([[a.index for a in r.atoms()] for r in self.simulation.topology.residues()])
         scale_xyz = np.array([x,y,z])
-        # The resulting list
-        new_xyz_omms = []
-        for pos, box in self.xyz_omms: # loop over each frame
+        # loop over each frame and replace items
+        for i in xrange(len(self.xyz_omms)):
+            pos, box = self.xyz_omms[i]
             # scale the box vectors
             new_box = np.array(box/nanometer) * scale_xyz
             # convert pos to np.array
@@ -1299,10 +1300,8 @@ class OpenMM(Engine):
             center_pos_shift = res_center_positions * (scale_xyz-1)
             # New positions
             new_pos = (residue_positions + center_pos_shift[:,np.newaxis,:]).reshape(-1,3)
-            # Append result
-            new_xyz_omms.append([new_pos*nanometer, new_box*nanometer])
-        # replace the original xyz_omms with new one
-        self.xyz_omms = new_xyz_omms
+            # update this frame
+            self.xyz_omms[i] = [new_pos.astype(np.float32)*nanometer, new_box*nanometer]
 
 class Liquid_OpenMM(Liquid):
     """ Condensed phase property matching using OpenMM. """
