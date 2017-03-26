@@ -3096,6 +3096,9 @@ class Molecule(object):
 
         Answer['qcerr'] = ''
         fatal = 0
+        pcmgradmode = False
+        pcmgrads = []
+        pcmgrad = []
         for line in open(fnm):
             line = line.strip().expandtabs()
             if 'Welcome to Q-Chem' in line:
@@ -3204,6 +3207,17 @@ class Molecule(object):
                 FSM = True
             if 'needFdiff: TRUE' in line:
                 FDiff = True
+            #----- Gradient from PCM
+            if "total gradient after adding PCM contribution" in line:
+                pcmgradmode = True
+            if pcmgradmode:
+                # Perfectionist here; matches integer, and three floating points
+                if re.match("^[0-9]+ +( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
+                    pcmgrad.append([float(i) for i in line.split()[1:]])
+                if 'Gradient time' in line:
+                    pcmgradmode = False
+                    pcmgrads.append(np.array(pcmgrad).T)
+                    pcmgrad = []
             #----- Vibrational stuff
             VModeNxt = None
             if 'VIBRATIONAL ANALYSIS' in line:
@@ -3267,7 +3281,9 @@ class Molecule(object):
         # Copy out the energies and forces
         # Q-Chem can print out gradients with several different headings.
         # We start with the most reliable heading and work our way down.
-        if len(Mats['analytical_grad']['All']) > 0:
+        if len(pcmgrads) > 0:
+            Answer['qm_grads'] = pcmgrads
+        elif len(Mats['analytical_grad']['All']) > 0:
             Answer['qm_grads'] = Mats['analytical_grad']['All']
         elif len(Mats['gradient_mp2']['All']) > 0:
             Answer['qm_grads'] = Mats['gradient_mp2']['All']
