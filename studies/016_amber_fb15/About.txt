@@ -1,0 +1,2 @@
+Published parameters will no longer be contained under "studies" ; they are moved to "Products".
+Please go to <ForceBalance_Root>/Products/AMBER-FB15.
