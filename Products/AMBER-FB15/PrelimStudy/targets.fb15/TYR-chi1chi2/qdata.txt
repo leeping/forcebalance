@@ -1,0 +1,1 @@
+../../../Optimize/ScanData/TYR-chi1chi2/qdata.txt
