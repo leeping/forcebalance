@@ -115,7 +115,7 @@ export PYTHONUNBUFFERED="y"
 # Text overwritten by carriage returns are not saved
 if [ $blkwht -eq 1 ] ; then
     # Option for black and white output
-    $program $input 2>$error | sed -u -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)?[m|K]//g" | tee >(awk -F '\r' '{print $NF}' > $output)
+    $program $input 2>$error | sed -u -r "s/\x1B\[([0-9]{1,2}(;[0-9]{1,2})?)*[m|K]//g" | tee >(awk -F '\r' '{print $NF}' > $output)
 else
     $program $input 2>$error | tee >(awk -F '\r' '{print $NF}' > $output)
 fi
