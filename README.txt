@@ -43,6 +43,6 @@ python setup.py sdist
 #========================#
 
 If you are here to obtain data for a published force field (e.g. AMBER-FB15), you can
-find it in the Products folder.  Please email me at leeping@ucdavis.edu if you notice
-anything that should be added.
+find it in the Products folder.  Please email me at leeping (at) ucdavis (dot) edu
+if you notice anything that should be added.
 
