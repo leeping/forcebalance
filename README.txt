@@ -38,3 +38,11 @@ To turn the package into a distributable .tar.bz2 file:
 
 python setup.py sdist
 
+#========================#
+#| Published Parameters |#
+#========================#
+
+If you are here to obtain data for a published force field (e.g. AMBER-FB15), you can
+find it in the Products folder.  Please email me at leeping@ucdavis.edu if you notice
+anything that should be added.
+
