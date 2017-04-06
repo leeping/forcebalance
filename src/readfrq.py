@@ -257,17 +257,18 @@ def scale_freqs(arr):
         if frq > div:
             if hscal < 1.0:
                 # Amount that the frequency is above the dividing line
-                above = (frq-div)
+                # above = (frq-div)
                 # Maximum frequency shift
-                maxshf = (div/hscal-div)
+                # maxshf = (div/hscal-div)
                 # Close to the dividing line, the frequency should be
                 # scaled less because we don't want the orderings of
                 # the frequencies to switch.
                 # Far from the dividing line, we want the frequency shift
                 # to approach the uncorrected shift.
                 # 1.0/(1.0 + maxshf/above) is a scale of how far we are from the dividing line.
-                att = 1.0/(1.0 + maxshf/above)
+                # att = 1.0/(1.0 + maxshf/above)
                 # shift is the uncorrected shift.
+                att = (frq-div)/(frq-hscal*div)
                 shift = (hscal - 1.0) * frq
                 newshift = att*shift
                 print "%10.3f %10.3f  % 9.3f % 9.3f % 8.3f" % (frq, frq+newshift, shift, newshift, newshift-shift)
@@ -277,9 +278,10 @@ def scale_freqs(arr):
                 return frq*hscal
         elif frq <= div:
             if lscal > 1.0:
-                below = (div-frq)
-                maxshf = (div-div/lscal)
-                att = 1.0/(1.0 + maxshf/below)
+                # below = (div-frq)
+                # maxshf = (div-div/lscal)
+                # att = 1.0/(1.0 + maxshf/below)
+                att = (frq-div)/(frq-lscal*div)
                 shift = (lscal - 1.0) * frq
                 newshift = att*shift
                 print "%10.3f %10.3f  % 9.3f % 9.3f % 8.3f" % (frq, frq+newshift, shift, newshift, newshift-shift)
