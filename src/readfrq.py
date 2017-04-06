@@ -75,7 +75,7 @@ def read_frq_tc(tcout, scrdir='scr'):
         raise RuntimeError("%s doesn't exist; please provide a scratch folder to this function" % xyzpath)
     if not os.path.exists(tcdat):
         raise RuntimeError("%s doesn't exist; please provide a scratch folder to this function" % tcdat)
-    Mxyz = Molecule(xyzfile)
+    Mxyz = Molecule(xyzpath)
 
     # This piece of Yudong's code reads the intensities
     found_vib = False
