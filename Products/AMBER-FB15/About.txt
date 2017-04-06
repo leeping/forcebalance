@@ -1,0 +1,109 @@
+Parameterization data and optimization outputs for AMBER-FB15 protein
+force field.  
+
+Last updated on April 1, 2017 (this FF is not an April Fools' joke!)
+
+Please consider citing our paper: Lee-Ping Wang, Keri A. McKiernan, 
+Joseph Gomes, Kyle A. Beauchamp, Teresa Head-Gordon, Julia E. Rice, 
+William C. Swope, Todd J. Martínez, and Vijay S. Pande. "Building a 
+More Predictive Protein Force Field: A Systematic and Reproducible 
+Route to AMBER-FB15." (2017) J. Phys. Chem. B, DOI: 10.1021/acs.jpcb.7b02320.
+
+This repository contains three top-level folders: FinalParams, PrelimStudy
+and Optimize, described below.  The QM output files are too large and
+cannot be included with ForceBalance.  They will be uploaded to the
+SimTK website at https://simtk.org/projects/amberfb15 .
+
+FinalParams
+-----------
+
+Contains the AMBER-FB15 force field parameters for the AMBER, Gromacs
+and OpenMM software packages.  All three codes should produce the same
+simulation results.
+
+The Gromacs folder also contains the A99SB-V parameters.  These are 
+not intended for production runs - only for comparison to AMBER-FB15.
+
+The AMBER-FB15 parameters are already part of the AMBER main branch, and 
+will be included in the OpenMM main branch shortly.  I have not yet submitted
+the parameters to the GROMACS developers yet.
+
+To use the AMBER-FB15 parameters in your simulation (if they are not already
+included in your AMBER, GROMACS or OpenMM distribution), follow these instructions:
+
+-> OpenMM: Make sure amberfb15.xml and tip3pfb.xml are located in your
+current folder, and then create the ForceField object using the command:
+
+forcefield = ForceField('amberfb15.xml', 'tip3pfb.xml')
+
+-> Gromacs: Copy the amberfb15.ff folder to your Gromacs installation into
+the $GMXDATA/top folder, for example (assuming Gromacs is installed into
+$HOME/opt/gromacs) :
+
+cp -r FinalParams/GMX/amberfb15.ff $HOME/opt/gromacs/share/gromacs/top/
+
+Now pdb2gmx should give AMBER-FB15 as a menu choice when setting up the system.
+
+-> AMBER: Copy the files in the directory structure to your AMBER installation,
+for example: 
+
+cp dat/leap/parm/frcmod.fb15 $AMBERHOME/dat/leap/parm, etc.
+
+Now in tleap, use these commands to load the force field:
+
+source leaprc.protein.fb15
+source leaprc.water.fb3
+
+PrelimStudy
+-----------
+
+The calculations in this folder correspond to the data in Table 3,
+where groups of parameters were turned on/off to determine their
+impact on the quality of fit.
+
+Note that the "targets" folder contains topology files for the
+blocked dipeptides, which differ between A99SB-V and AMBER-FB15
+due to the side chain dihedral overrides.  Thus, to run calculation
+#5, replace the targets folder with targets.fb15.
+
+Optimize
+--------
+
+These folders contain the data and calculation outputs needed to
+reproduce the AMBER-FB15 and A99SB-V parameters.  The "Cycle"
+subfolders contain a sequence of optimizations where the optimized
+parameters are used to generate a set of energy-minimized structures,
+and new QM data is calculated for these structures.  This process
+is terminated at Cycle 3.
+
+--
+
+In July 2016, the abinitio.py code was updated to simplify the
+objective function definition in the energies and forces.  As a
+consequence, the result will be slightly different from these files if
+you are using the latest version of ForceBalance.  It should not
+affect the quality of the optimized model in any significant way.
+
+If you get the code from GitHub, run 
+"git checkout 2fb85e65e6fd508f37f1265b0aca7f0090fbe7c8"
+to revert to the older version that exactly reproduces the result.
+
+--
+
+The procedure to generate additional data from clustered MM-minima 
+is implemented in a bunch of scripts, and is harder to reproduce 
+than the rest of the optimization. It depends on Psi4 and MSMbuilder,
+and I haven't tested whether the latest versions still work.
+Here is roughly what I did.
+
+In order to get from "Cycle1" to "Cycle2":
+Copy Cycle1/optimize.sav to Cycle2/optimize.in
+Copy Cycle1/forcefield and Cycle1/targets to Cycle2
+Copy the result file, e.g. Cycle1/result/optimize/a99sc-v2.itp to Cycle2
+Copy the scripts from CycleScripts into Cycle2
+Run reopt.py (this part requires Psi4 and MSMBuilder)
+This should generate a bunch of new targets, e.g. Cycle2/targets/ALA-mmopt
+Add these targets to Cycle2/optimize.in
+In Cycle2, run ForceBalance optimize.in
+
+Repeat the procedure for Cycle3.
