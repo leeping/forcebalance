@@ -1672,6 +1672,16 @@ class Molecule(object):
             xyz2 = np.dot(xyz2, rt) + tr
             self.xyzs[index2] = xyz2
 
+    def center(self, center_mass = False):
+        """ Move geometric center to the origin. """
+        if center_mass:
+            coms = self.center_of_mass()
+            for i in range(len(self)):
+                self.xyzs[i] -= coms[i]
+        else:
+            for i in range(len(self)):
+                self.xyzs[i] -= self.xyzs[i].mean(0)
+            
     def build_bonds(self):
         """ Build the bond connectivity graph. """
         sn = self.top_settings['topframe']
