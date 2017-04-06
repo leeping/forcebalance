@@ -1,0 +1,1 @@
+../../../Optimize/ScanData/PHE-chi1chi2/qdata.txt
