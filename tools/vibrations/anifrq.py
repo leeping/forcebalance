@@ -28,7 +28,7 @@ spac = np.linspace(0, 1, 101)
 disp = np.concatenate((spac, spac[::-1][1:], -1*spac[1:], -1*spac[::-1][1:-1]))
 
 for i in disp:
-    M.xyzs.append(xyz+i*xmode)
+    M.xyzs.append(xyz+i*xmode.reshape(-1,3))
 
 M.comms = ['Vibrational Mode %i Frequency %.3f Displacement %.3f' % (modenum, frqs[modenum-1], disp[i]*(np.linalg.norm(xmode)/np.sqrt(M.na))) for i in range(len(M))]
 

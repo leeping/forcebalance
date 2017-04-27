@@ -799,7 +799,7 @@ def extract_pop(M, verbose=True):
     if verbose: logger.info("%i electrons; charge %i, spin %i" % (nelectron, chg, spn))
     return chg, spn
 
-def arc(Mol, begin=None, end=None, RMSD=True):
+def arc(Mol, begin=None, end=None, RMSD=True, align=True):
     """
     Get the arc-length for a trajectory segment.
     Uses RMSD or maximum displacement of any atom in the trajectory.
@@ -820,18 +820,19 @@ def arc(Mol, begin=None, end=None, RMSD=True):
     Arc : np.ndarray
         Arc length between frames in Angstrom, length is n_frames - 1
     """
-    Mol.align()
+    if align: 
+        Mol.align()
     if begin is None:
         begin = 0
     if end is None:
         end = len(Mol)
     if RMSD:
-        Arc = Mol.pathwise_rmsd()
+        Arc = Mol.pathwise_rmsd(align)
     else:
         Arc = np.array([np.max([np.linalg.norm(Mol.xyzs[i+1][j]-Mol.xyzs[i][j]) for j in range(Mol.na)]) for i in range(begin, end-1)])
     return Arc
 
-def EqualSpacing(Mol, frames=0, dx=0, RMSD=True):
+def EqualSpacing(Mol, frames=0, dx=0, RMSD=True, align=True):
     """
     Equalize the spacing of frames in a trajectory with linear interpolation.
     This is done in a very simple way, first calculating the arc length
@@ -857,7 +858,7 @@ def EqualSpacing(Mol, frames=0, dx=0, RMSD=True):
         New molecule object, either the same one (if frames > len(Mol))
         or with equally spaced frames.
     """
-    ArcMol = arc(Mol, RMSD=RMSD)
+    ArcMol = arc(Mol, RMSD=RMSD, align=align)
     ArcMolCumul = np.insert(np.cumsum(ArcMol), 0, 0.0)
     if frames != 0 and dx != 0:
         logger.error("Provide dx or frames or neither")
@@ -1078,7 +1079,7 @@ class Molecule(object):
             raise TypeError
         # Create the sum of the two classes by copying the first class.
         for key in AtomVariableNames | MetaVariableNames:
-            if key in ['fnm', 'ftype', 'bonds']: pass
+            if key in ['fnm', 'ftype', 'bonds', 'molecules', 'topology']: pass
             elif diff(self, other, key):
                 for i, j in zip(self.Data[key], other.Data[key]):
                     print i, j, i==j
@@ -2143,18 +2144,19 @@ class Molecule(object):
                 Mat[j,i] = rmsd
         return Mat
 
-    def pathwise_rmsd(self):
+    def pathwise_rmsd(self, align=True):
         """ Find RMSD between frames along path. """
         N = len(self)
         Vec = np.zeros(N-1, dtype=float)
         for i in range(N-1):
             xyzi = self.xyzs[i].copy()
-            xyzi -= xyzi.mean(0)
             j=i+1
             xyzj = self.xyzs[j].copy()
-            xyzj -= xyzj.mean(0)
-            tr, rt = get_rotate_translate(xyzj, xyzi)
-            xyzj = np.dot(xyzj, rt) + tr
+            if align: 
+                xyzi -= xyzi.mean(0)
+                xyzj -= xyzj.mean(0)
+                tr, rt = get_rotate_translate(xyzj, xyzi)
+                xyzj = np.dot(xyzj, rt) + tr
             rmsd = np.sqrt(3*np.mean((xyzj - xyzi) ** 2))
             Vec[i] = rmsd
         return Vec

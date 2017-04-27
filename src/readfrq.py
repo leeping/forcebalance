@@ -89,6 +89,9 @@ def read_frq_tc(tcout, scrdir='scr'):
             if len(ls) == 8 and ls[0].isdigit():
                 freqs.append(float(ls[2]))
                 intensities.append(float(ls[3]))
+            elif len(ls) == 3 and ls[2].endswith('i'):
+                freqs.append(-1*float(ls[2][:-1]))
+                intensities.append(0.0)
             if line.strip() == '':
                 break
     if found_vib is False:
