@@ -1,0 +1,1 @@
+../../../Optimize/ScanData/ASN-chi1chi2/qdata.txt
