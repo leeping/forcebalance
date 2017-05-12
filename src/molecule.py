@@ -1652,7 +1652,7 @@ class Molecule(object):
         if center:
             xyz1 -= xyz1.mean(0)
         elif center_mass:
-            xyz1 = coms[0]
+            xyz1 -= coms[0]
         for index2, xyz2 in enumerate(self.xyzs):
             if index2 == 0: continue
             xyz2 -= xyz2.mean(0)
@@ -2100,6 +2100,78 @@ class Molecule(object):
                         break
             sorted_rings.append(sring[:])
         return sorted(sorted_rings, key = lambda val: val[0])
+
+    def order_by_connectivity(self, m, i, currList, max_min_path):
+        """
+        Recursive function that orders atoms based on connectivity.
+        To call the function, pass in the topology object (e.g. M.molecules[0])
+        and the index of the atom assigned to be "first".
+        
+        The neighbors of "i" are placed in decreasing order of the
+        maximum length of the shortest path to all other atoms - i.e.
+        an atom closer to the "edge" of the molecule has a longer
+        shortest-path to atoms on the other "edge", and they should
+        be added first.
+        
+        Snippet:
+
+        from forcebalance.molecule import *
+        import numpy as np
+        M = Molecule('movProt.xyz', Fac=1.25)
+        # Arbitrarily select heaviest atom as the first atom in each molecule
+        firstAtom = [m.L()[np.argmax([PeriodicTable[M.elem[i]] for i in m.L()])] for m in M.molecules]
+        # Explicitly set the first atom in the first molecule
+        firstAtom[0] = 40
+        # Build a list of new atom orderings
+        newOrder = []
+        for i in range(len(M.molecules)):
+            newOrder += M.order_by_connectivity(M.molecules[i], firstAtom[i], [], None)
+        # Write the new Molecule object
+        newM = M.atom_select(newOrder)
+        newM.write('reordered1.xyz')
+        
+        Parameters
+        ----------
+        m : topology object (contained in Molecule)
+        i : integer
+            Index of the atom to be added first (if called recursively,
+            the index of subsequent atoms to be added)
+        currList : list
+            Current list of new atom orderings
+        max_min_path : dict
+            Dictionary mapping 
+        """
+        if m not in self.molecules:
+            raise RuntimeError("topology is not part of Molecule object")
+        if max_min_path is None: 
+            spl = nx.shortest_path_length(m)
+            # Dictionary mapping atom index to
+            # maximum length of shortest path to all other atoms
+            # The larger this number, the closer to the "edge" of the molecule
+            max_min_path = dict([(k, max(spl[k].values())) for k in m.L()])
+        #currList = currList[:]
+        #print currList
+        #print max_min_path
+        #raw_input()
+        currList.append(i)
+        matom = m.L()
+        #print spl.keys()
+        #print matom
+        #raw_input()
+        if i not in matom:
+            raise RuntimeError('atom %i not in molecule' % i)
+        jlist = np.array(m.neighbors(i))
+        jmass = [PeriodicTable[self.elem[j]] for j in jlist]
+        jnghs = [len(m.neighbors(j)) for j in jlist]
+        jpath = [max_min_path[j] for j in jlist]
+        #print "i", i, M.elem[i], "currList", currList, "jpath", jpath
+        #raw_input()
+        for j in jlist[np.argsort(jpath)[::-1]]:
+            if j in currList: continue
+            #print "adding", j, "to currList"
+            #print "calling order_by_connectivity: j", j, "currList", currList
+            self.order_by_connectivity(m, j, currList, max_min_path)
+        return currList
 
     def aliphatic_hydrogens(self):
         hyds = []
