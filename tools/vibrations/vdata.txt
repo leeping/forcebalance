@@ -1,6 +1,6 @@
 #==========================================#
 #| File containing vibrational modes from |#
-#|           Q-Chem calculation           |#
+#|      experiment/QM for ForceBalance    |#
 #|                                        |#
 #| Octothorpes are comments               |#
 #| This file should be formatted like so: |#
@@ -51,7 +51,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
  H   -3.554   -0.356   -0.377
  H   -2.664   -1.861   -0.251
 
-33.3100
+33.7049
    0.004   -0.037    0.028
    0.004   -0.009    0.028
    0.002    0.011    0.015
@@ -72,7 +72,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.043   -0.258    0.507
    0.240   -0.224   -0.462
 
-74.2100
+75.0893
   -0.138   -0.270   -0.033
    0.093    0.099    0.020
    0.129    0.496   -0.349
@@ -93,7 +93,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.046    0.147   -0.047
   -0.137    0.100    0.031
 
-82.6600
+83.6393
    0.032    0.160   -0.115
    0.076    0.106   -0.106
    0.063    0.157   -0.128
@@ -114,7 +114,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.097   -0.102    0.325
    0.026   -0.195   -0.270
 
-100.4600
+101.6498
    0.387    0.516    0.093
    0.104    0.097    0.029
   -0.039   -0.162    0.445
@@ -135,7 +135,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.054    0.150    0.024
   -0.173    0.082    0.039
 
-141.5100
+143.1850
    0.088   -0.171    0.084
    0.068   -0.043    0.080
    0.073    0.008    0.034
@@ -156,7 +156,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.147    0.022    0.217
   -0.185    0.003    0.244
 
-189.5700
+191.8120
    0.176    0.232    0.023
    0.084    0.088    0.002
   -0.022    0.134    0.123
@@ -177,7 +177,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.056   -0.378   -0.080
    0.406   -0.092    0.086
 
-244.4900
+247.3785
   -0.181    0.139   -0.161
   -0.002    0.019   -0.122
    0.081   -0.022   -0.211
@@ -198,7 +198,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.042   -0.101    0.271
    0.094   -0.006    0.304
 
-292.4000
+295.8510
    0.075   -0.161    0.066
    0.005   -0.046    0.052
    0.006   -0.067    0.066
@@ -219,7 +219,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.005   -0.080    0.228
    0.155    0.023    0.257
 
-326.0400
+329.8848
    0.123    0.069    0.177
   -0.064    0.074    0.135
   -0.209    0.180    0.266
@@ -240,7 +240,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.228    0.264    0.306
   -0.002    0.138    0.237
 
-400.3600
+405.0712
    0.201   -0.156    0.226
   -0.049    0.008    0.171
   -0.160    0.053    0.300
@@ -261,7 +261,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.113   -0.100   -0.137
   -0.064   -0.084   -0.130
 
-499.2300
+505.0822
   -0.257    0.215   -0.146
   -0.020    0.031   -0.094
    0.067    0.013   -0.210
@@ -282,7 +282,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.017    0.026   -0.021
   -0.099   -0.030   -0.042
 
-621.1700
+628.3978
   -0.114    0.024   -0.015
   -0.039    0.019    0.000
    0.038   -0.049   -0.057
@@ -303,7 +303,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.046    0.021    0.046
    0.071    0.040    0.055
 
-646.4000
+653.9051
    0.269   -0.044    0.009
    0.134   -0.091   -0.018
    0.011    0.049    0.059
@@ -324,7 +324,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.040    0.007   -0.055
   -0.123   -0.052   -0.078
 
-675.2600
+683.0777
    0.121   -0.333   -0.048
    0.189   -0.096   -0.029
    0.385   -0.380   -0.099
@@ -345,7 +345,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.089    0.063    0.068
    0.054    0.052    0.069
 
-696.4200
+704.4629
   -0.220   -0.141   -0.005
   -0.087    0.084    0.023
    0.162   -0.256   -0.081
@@ -366,7 +366,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.077   -0.026   -0.088
   -0.136   -0.074   -0.094
 
-840.3800
+849.7672
   -0.006   -0.052   -0.017
    0.042   -0.009   -0.005
    0.107   -0.093   -0.036
@@ -387,7 +387,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.059   -0.044   -0.022
    0.006   -0.014   -0.042
 
-875.3100
+884.9016
    0.032   -0.011   -0.026
    0.086   -0.055   -0.011
    0.112   -0.058   -0.046
@@ -408,7 +408,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.164   -0.127   -0.143
   -0.051   -0.083   -0.091
 
-905.0200
+914.6749
   -0.221    0.143    0.010
   -0.097    0.055    0.035
   -0.043    0.039   -0.035
@@ -429,7 +429,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.076   -0.049   -0.141
   -0.044   -0.058   -0.135
 
-951.8300
+960.9957
    0.180   -0.097   -0.007
    0.061   -0.042   -0.032
   -0.008    0.003    0.038
@@ -450,7 +450,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.072   -0.023   -0.189
   -0.097   -0.087   -0.197
 
-1059.5500
+1034.6149
    0.439   -0.291    0.018
   -0.081    0.071   -0.105
   -0.343    0.115    0.250
@@ -471,7 +471,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.013   -0.001   -0.003
    0.049    0.023    0.005
 
-1093.0300
+1062.8334
    0.210   -0.121    0.010
   -0.072    0.046   -0.058
   -0.230    0.101    0.134
@@ -492,7 +492,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.113   -0.047   -0.036
   -0.144   -0.092   -0.044
 
-1175.8800
+1137.8534
   -0.286    0.244    0.025
   -0.043   -0.014    0.082
    0.053    0.063   -0.124
@@ -513,7 +513,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.024    0.010   -0.057
    0.052    0.018   -0.055
 
-1193.6200
+1154.3303
    0.253    0.257    0.039
   -0.083   -0.137   -0.038
   -0.451    0.464    0.059
@@ -534,7 +534,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.002   -0.004    0.009
    0.007    0.004    0.009
 
-1200.6300
+1160.8635
   -0.450    0.313    0.032
   -0.021   -0.021    0.133
    0.188    0.002   -0.203
@@ -555,7 +555,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.053   -0.021    0.015
   -0.050   -0.034    0.014
 
-1274.0500
+1229.8137
   -0.000   -0.002   -0.000
    0.001    0.001   -0.000
    0.002   -0.003    0.001
@@ -576,7 +576,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.444   -0.495   -0.026
    0.642    0.153    0.053
 
-1312.5700
+1266.2428
    0.018   -0.008   -0.001
    0.002   -0.002   -0.005
   -0.007   -0.001    0.008
@@ -597,7 +597,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.286   -0.075   -0.360
   -0.185   -0.261   -0.347
 
-1370.2300
+1320.9652
    0.165   -0.119   -0.014
    0.019    0.001   -0.050
   -0.046   -0.034    0.083
@@ -618,7 +618,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.018    0.015    0.014
    0.009   -0.020    0.017
 
-1405.7100
+1354.7185
   -0.253    0.159    0.015
   -0.036    0.013    0.068
    0.042    0.071   -0.114
@@ -639,7 +639,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.020    0.003   -0.012
   -0.004   -0.020   -0.009
 
-1446.4100
+1393.4927
   -0.022    0.020   -0.000
   -0.002   -0.001    0.003
   -0.005    0.000    0.007
@@ -660,7 +660,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.004    0.023    0.018
    0.019   -0.005    0.020
 
-1512.3600
+1456.4152
   -0.023    0.024   -0.001
   -0.003   -0.001    0.003
   -0.009    0.015   -0.003
@@ -681,7 +681,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.004   -0.011   -0.001
   -0.009    0.000   -0.008
 
-1560.1800
+1502.0933
    0.430   -0.291    0.129
   -0.115    0.070    0.019
    0.330   -0.449   -0.193
@@ -702,7 +702,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.001    0.002    0.001
    0.002    0.000    0.001
 
-1617.0400
+1556.4499
   -0.058    0.051   -0.021
    0.000    0.001   -0.012
   -0.008   -0.099    0.086
@@ -723,7 +723,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.287    0.301    0.293
    0.376    0.141    0.300
 
-1619.3000
+1558.6112
   -0.226    0.170   -0.080
   -0.000    0.006   -0.048
   -0.038   -0.383    0.343
@@ -744,7 +744,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.091   -0.103   -0.088
   -0.130   -0.042   -0.094
 
-1636.3700
+1574.9375
   -0.187    0.118   -0.057
    0.004    0.003   -0.026
   -0.025   -0.239    0.222
@@ -765,7 +765,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.024    0.029    0.023
    0.037    0.009    0.021
 
-1655.9900
+1593.7065
    0.389    0.593    0.089
   -0.027   -0.043   -0.005
    0.271   -0.038   -0.415
@@ -786,7 +786,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.001   -0.002    0.005
   -0.006   -0.003   -0.008
 
-1666.3200
+1603.5899
    0.003    0.011    0.001
   -0.000   -0.001   -0.000
    0.004   -0.004   -0.004
@@ -807,7 +807,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.201   -0.096   -0.428
    0.139    0.189    0.432
 
-1679.2800
+1615.9909
   -0.191    0.167   -0.044
   -0.006    0.003   -0.010
   -0.004   -0.191    0.150
@@ -828,7 +828,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.020    0.061   -0.029
    0.062   -0.018   -0.031
 
-1691.3700
+1627.5608
    0.017   -0.010    0.004
    0.000   -0.000    0.000
    0.001    0.013   -0.012
@@ -849,7 +849,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.144    0.522   -0.401
    0.558   -0.165   -0.329
 
-1727.7500
+1662.3826
    0.031   -0.014    0.007
   -0.002    0.000   -0.002
   -0.001    0.016   -0.014
@@ -870,7 +870,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.018   -0.088    0.148
   -0.092    0.047    0.141
 
-1854.0900
+1783.3762
    0.252   -0.162    0.052
   -0.031    0.025   -0.032
   -0.099    0.191   -0.054
@@ -891,7 +891,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.007    0.014   -0.028
    0.012   -0.006   -0.028
 
-1897.2200
+1824.6991
    0.047   -0.031    0.009
   -0.006    0.005   -0.007
   -0.022    0.037   -0.007
@@ -912,7 +912,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.058    0.066    0.096
    0.078    0.032    0.099
 
-3207.8700
+3081.9319
    0.001    0.000   -0.003
   -0.000    0.000   -0.000
    0.004    0.002    0.003
@@ -933,7 +933,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.475   -0.311   -0.191
   -0.028    0.595   -0.291
 
-3213.1700
+3087.0182
   -0.067   -0.008    0.340
    0.038   -0.032    0.016
   -0.466   -0.270   -0.316
@@ -954,7 +954,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
    0.004   -0.003   -0.002
   -0.000    0.005   -0.002
 
-3257.8800
+3129.9260
   -0.000    0.000    0.000
    0.000    0.001    0.000
   -0.004   -0.002   -0.003
@@ -975,7 +975,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.577    0.351    0.248
   -0.008    0.608   -0.313
 
-3262.6200
+3134.4750
   -0.000   -0.000    0.004
    0.000    0.000   -0.000
   -0.004   -0.002   -0.003
@@ -996,7 +996,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.026    0.016    0.011
   -0.000    0.030   -0.015
 
-3268.4200
+3140.0413
   -0.003   -0.019   -0.045
   -0.051   -0.075   -0.010
    0.552    0.292    0.384
@@ -1017,7 +1017,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.004    0.002    0.002
   -0.000    0.005   -0.003
 
-3289.4200
+3160.1951
    0.000   -0.000   -0.002
   -0.000   -0.000    0.000
    0.001    0.000    0.000
@@ -1038,7 +1038,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.273    0.179    0.089
    0.017   -0.260    0.104
 
-3328.2000
+3197.4126
   -0.201   -0.005    0.917
    0.004    0.008   -0.090
    0.194    0.111    0.115
@@ -1059,7 +1059,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.000    0.000    0.000
    0.000   -0.000    0.000
 
-3333.1900
+3202.2016
   -0.001   -0.000    0.003
    0.000   -0.000   -0.000
    0.001    0.000    0.000
@@ -1080,7 +1080,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.002    0.001    0.000
   -0.000   -0.003    0.001
 
-3764.0500
+3615.7239
    0.001   -0.000   -0.000
    0.000    0.000   -0.000
   -0.001   -0.000   -0.001
@@ -1101,7 +1101,7 @@ Coordinates and vibrations calculated from frequency.qchem.out
   -0.011    0.000    0.001
   -0.005   -0.009    0.002
 
-3830.7400
+3679.7331
    0.000   -0.000    0.000
    0.000   -0.000   -0.000
    0.001   -0.000    0.001

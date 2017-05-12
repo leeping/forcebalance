@@ -12,7 +12,8 @@ from numpy import array
 from numpy import absolute
 
 # expected results (mvals) taken from previous runs. Update this if it changes and seems reasonable (updated 10/24/13)
-EXPECTED_WATER_RESULTS = array([3.3192e-02, 4.3287e-02, 5.5072e-03, -4.5933e-02, 1.5499e-02, -3.7655e-01, 2.4720e-03, 1.1914e-02, 1.5066e-01])
+#EXPECTED_WATER_RESULTS = array([3.3192e-02, 4.3287e-02, 5.5072e-03, -4.5933e-02, 1.5499e-02, -3.7655e-01, 2.4720e-03, 1.1914e-02, 1.5066e-01])
+EXPECTED_WATER_RESULTS = array([4.2370e-02, 3.1217e-02, 5.6925e-03, -4.8114e-02, 1.6735e-02, -4.1722e-01, 6.2716e-03, 4.6306e-03, 2.5960e-01])
 
 # expected results (mvals) taken from previous runs. Update this if it changes and seems reasonable (updated 01/24/14)
 EXPECTED_BROMINE_RESULTS = array([-0.305718, -0.12497])

@@ -1,0 +1,1927 @@
+#======================================================================#
+#| [1m             Welcome to ForceBalance version 1.3! =D              [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Arthur Vigil, Keri McKiernan,                   [0m |#
+#| [1m                   Erik Brandt, Johnny Israeli                    [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: single-bd-an-bk-sd-eq.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: amber99sb-bd-an-bk-sd-eq.itp
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  1.4090e-01 ] : BONDSB:CCA
+   1 [  3.9246e+05 ] : BONDSK:CCA
+   2 [  1.5220e-01 ] : BONDSB:CCT
+   3 [  2.6527e+05 ] : BONDSK:CCT
+   4 [  1.2290e-01 ] : BONDSB:CO
+   5 [  4.7698e+05 ] : BONDSK:CO
+   6 [  1.2500e-01 ] : BONDSB:CO2
+   7 [  5.4894e+05 ] : BONDSK:CO2
+   8 [  1.3640e-01 ] : BONDSB:COH
+   9 [  3.7656e+05 ] : BONDSK:COH
+  10 [  1.4000e-01 ] : BONDSB:CACA
+  11 [  3.9246e+05 ] : BONDSK:CACA
+  12 [  1.4040e-01 ] : BONDSB:CACB
+  13 [  3.9246e+05 ] : BONDSK:CACB
+  14 [  1.5100e-01 ] : BONDSB:CACT
+  15 [  2.6527e+05 ] : BONDSK:CACT
+  16 [  1.0800e-01 ] : BONDSB:CAHA
+  17 [  3.0711e+05 ] : BONDSK:CAHA
+  18 [  1.3400e-01 ] : BONDSB:CAN2
+  19 [  4.0250e+05 ] : BONDSK:CAN2
+  20 [  1.5260e-01 ] : BONDSB:CTCT
+  21 [  2.5941e+05 ] : BONDSK:CTCT
+  22 [  1.0900e-01 ] : BONDSB:CTHC
+  23 [  2.8451e+05 ] : BONDSK:CTHC
+  24 [  1.0900e-01 ] : BONDSB:CTH1
+  25 [  2.8451e+05 ] : BONDSK:CTH1
+  26 [  1.0900e-01 ] : BONDSB:CTHP
+  27 [  2.8451e+05 ] : BONDSK:CTHP
+  28 [  1.4630e-01 ] : BONDSB:CTN2
+  29 [  2.8200e+05 ] : BONDSK:CTN2
+  30 [  1.4100e-01 ] : BONDSB:CTOH
+  31 [  2.6778e+05 ] : BONDSK:CTOH
+  32 [  1.0100e-01 ] : BONDSB:HN2
+  33 [  3.6317e+05 ] : BONDSK:HN2
+  34 [  1.0100e-01 ] : BONDSB:HNA
+  35 [  3.6317e+05 ] : BONDSK:HNA
+  36 [  9.6000e-02 ] : BONDSB:HOOH
+  37 [  4.6275e+05 ] : BONDSK:HOOH
+  38 [  1.3350e-01 ] : BONDSB:CN
+  39 [  4.1003e+05 ] : BONDSK:CN
+  40 [  1.4590e-01 ] : BONDSB:C*CB
+  41 [  3.2468e+05 ] : BONDSK:C*CB
+  42 [  1.4950e-01 ] : BONDSB:C*CT
+  43 [  2.6527e+05 ] : BONDSK:C*CT
+  44 [  1.3520e-01 ] : BONDSB:C*CW
+  45 [  4.5689e+05 ] : BONDSK:C*CW
+  46 [  1.4000e-01 ] : BONDSB:CACN
+  47 [  3.9246e+05 ] : BONDSK:CACN
+  48 [  1.4190e-01 ] : BONDSB:CBCN
+  49 [  3.7405e+05 ] : BONDSK:CBCN
+  50 [  1.5040e-01 ] : BONDSB:CCCT
+  51 [  2.6527e+05 ] : BONDSK:CCCT
+  52 [  1.3750e-01 ] : BONDSB:CCCV
+  53 [  4.2844e+05 ] : BONDSK:CCCV
+  54 [  1.3710e-01 ] : BONDSB:CCCW
+  55 [  4.3346e+05 ] : BONDSK:CCCW
+  56 [  1.3850e-01 ] : BONDSB:CCNA
+  57 [  3.5313e+05 ] : BONDSK:CCNA
+  58 [  1.3940e-01 ] : BONDSB:CCNB
+  59 [  3.4309e+05 ] : BONDSK:CCNB
+  60 [  1.3800e-01 ] : BONDSB:CNNA
+  61 [  3.5815e+05 ] : BONDSK:CNNA
+  62 [  1.0800e-01 ] : BONDSB:CRH5
+  63 [  3.0711e+05 ] : BONDSK:CRH5
+  64 [  1.3430e-01 ] : BONDSB:CRNA
+  65 [  3.9915e+05 ] : BONDSK:CRNA
+  66 [  1.3350e-01 ] : BONDSB:CRNB
+  67 [  4.0836e+05 ] : BONDSK:CRNB
+  68 [  1.4490e-01 ] : BONDSB:CTN
+  69 [  2.8200e+05 ] : BONDSK:CTN
+  70 [  1.4710e-01 ] : BONDSB:CTN3
+  71 [  3.0711e+05 ] : BONDSK:CTN3
+  72 [  1.8100e-01 ] : BONDSB:CTS
+  73 [  1.8995e+05 ] : BONDSK:CTS
+  74 [  1.8100e-01 ] : BONDSB:CTSH
+  75 [  1.9832e+05 ] : BONDSK:CTSH
+  76 [  1.0800e-01 ] : BONDSB:CVH4
+  77 [  3.0711e+05 ] : BONDSK:CVH4
+  78 [  1.3940e-01 ] : BONDSB:CVNB
+  79 [  3.4309e+05 ] : BONDSK:CVNB
+  80 [  1.0800e-01 ] : BONDSB:CWH4
+  81 [  3.0711e+05 ] : BONDSK:CWH4
+  82 [  1.3810e-01 ] : BONDSB:CWNA
+  83 [  3.5731e+05 ] : BONDSK:CWNA
+  84 [  1.0100e-01 ] : BONDSB:HN
+  85 [  3.6317e+05 ] : BONDSK:HN
+  86 [  1.0100e-01 ] : BONDSB:HN3
+  87 [  3.6317e+05 ] : BONDSK:HN3
+  88 [  1.3360e-01 ] : BONDSB:HSSH
+  89 [  2.2928e+05 ] : BONDSK:HSSH
+  90 [  1.1400e+02 ] : ANGLESB:CACTCT
+  91 [  5.2718e+02 ] : ANGLESK:CACTCT
+  92 [  1.2040e+02 ] : ANGLESB:CTCO
+  93 [  6.6944e+02 ] : ANGLESK:CTCO
+  94 [  1.1700e+02 ] : ANGLESB:CTCO2
+  95 [  5.8576e+02 ] : ANGLESK:CTCO2
+  96 [  1.1660e+02 ] : ANGLESB:CTCN
+  97 [  5.8576e+02 ] : ANGLESK:CTCN
+  98 [  1.2290e+02 ] : ANGLESB:NCO
+  99 [  6.6944e+02 ] : ANGLESK:NCO
+ 100 [  1.2600e+02 ] : ANGLESB:O2CO2
+ 101 [  6.6944e+02 ] : ANGLESK:O2CO2
+ 102 [  1.2000e+02 ] : ANGLESB:CACCA
+ 103 [  5.2718e+02 ] : ANGLESK:CACCA
+ 104 [  1.2000e+02 ] : ANGLESB:CACOH
+ 105 [  5.8576e+02 ] : ANGLESK:CACOH
+ 106 [  1.2000e+02 ] : ANGLESB:CCACA
+ 107 [  5.2718e+02 ] : ANGLESK:CCACA
+ 108 [  1.2000e+02 ] : ANGLESB:CACACA
+ 109 [  5.2718e+02 ] : ANGLESK:CACACA
+ 110 [  1.2000e+02 ] : ANGLESB:CACACB
+ 111 [  5.2718e+02 ] : ANGLESK:CACACB
+ 112 [  1.2000e+02 ] : ANGLESB:CACACT
+ 113 [  5.8576e+02 ] : ANGLESK:CACACT
+ 114 [  1.2000e+02 ] : ANGLESB:CACAHA
+ 115 [  4.1840e+02 ] : ANGLESK:CACAHA
+ 116 [  1.2000e+02 ] : ANGLESB:CBCAHA
+ 117 [  4.1840e+02 ] : ANGLESK:CBCAHA
+ 118 [  1.2000e+02 ] : ANGLESB:CCAHA
+ 119 [  4.1840e+02 ] : ANGLESK:CCAHA
+ 120 [  1.2000e+02 ] : ANGLESB:N2CAN2
+ 121 [  5.8576e+02 ] : ANGLESK:N2CAN2
+ 122 [  1.2000e+02 ] : ANGLESB:CNCAHA
+ 123 [  4.1840e+02 ] : ANGLESK:CNCAHA
+ 124 [  1.2000e+02 ] : ANGLESB:CACACN
+ 125 [  5.2718e+02 ] : ANGLESK:CACACN
+ 126 [  1.3490e+02 ] : ANGLESB:C*CBCA
+ 127 [  5.2718e+02 ] : ANGLESK:C*CBCA
+ 128 [  1.0880e+02 ] : ANGLESB:C*CBCN
+ 129 [  5.2718e+02 ] : ANGLESK:C*CBCN
+ 130 [  1.1620e+02 ] : ANGLESB:CACBCN
+ 131 [  5.2718e+02 ] : ANGLESK:CACBCN
+ 132 [  1.0950e+02 ] : ANGLESB:CTCTCT
+ 133 [  3.3472e+02 ] : ANGLESK:CTCTCT
+ 134 [  1.0950e+02 ] : ANGLESB:CTCTHC
+ 135 [  4.1840e+02 ] : ANGLESK:CTCTHC
+ 136 [  1.0950e+02 ] : ANGLESB:CTCTH1
+ 137 [  4.1840e+02 ] : ANGLESK:CTCTH1
+ 138 [  1.0950e+02 ] : ANGLESB:CTCTHP
+ 139 [  4.1840e+02 ] : ANGLESK:CTCTHP
+ 140 [  1.0950e+02 ] : ANGLESB:CTCTOH
+ 141 [  4.1840e+02 ] : ANGLESK:CTCTOH
+ 142 [  1.0950e+02 ] : ANGLESB:HCCTHC
+ 143 [  2.9288e+02 ] : ANGLESK:HCCTHC
+ 144 [  1.0950e+02 ] : ANGLESB:H1CTH1
+ 145 [  2.9288e+02 ] : ANGLESK:H1CTH1
+ 146 [  1.0950e+02 ] : ANGLESB:HPCTHP
+ 147 [  2.9288e+02 ] : ANGLESK:HPCTHP
+ 148 [  1.0950e+02 ] : ANGLESB:H1CTOH
+ 149 [  4.1840e+02 ] : ANGLESK:H1CTOH
+ 150 [  1.0950e+02 ] : ANGLESB:H1CTN
+ 151 [  4.1840e+02 ] : ANGLESK:H1CTN
+ 152 [  1.0950e+02 ] : ANGLESB:CCTH1
+ 153 [  4.1840e+02 ] : ANGLESK:CCTH1
+ 154 [  1.0950e+02 ] : ANGLESB:H1CTS
+ 155 [  4.1840e+02 ] : ANGLESK:H1CTS
+ 156 [  1.0950e+02 ] : ANGLESB:H1CTSH
+ 157 [  4.1840e+02 ] : ANGLESK:H1CTSH
+ 158 [  1.1470e+02 ] : ANGLESB:CTCTS
+ 159 [  4.1840e+02 ] : ANGLESK:CTCTS
+ 160 [  1.0860e+02 ] : ANGLESB:CTCTSH
+ 161 [  4.1840e+02 ] : ANGLESK:CTCTSH
+ 162 [  1.0950e+02 ] : ANGLESB:H1CTN2
+ 163 [  4.1840e+02 ] : ANGLESK:H1CTN2
+ 164 [  1.0950e+02 ] : ANGLESB:HPCTN3
+ 165 [  4.1840e+02 ] : ANGLESK:HPCTN3
+ 166 [  1.0950e+02 ] : ANGLESB:CCTHC
+ 167 [  4.1840e+02 ] : ANGLESK:CCTHC
+ 168 [  1.1010e+02 ] : ANGLESB:CCTN
+ 169 [  5.2718e+02 ] : ANGLESK:CCTN
+ 170 [  1.1120e+02 ] : ANGLESB:CTCTN2
+ 171 [  6.6944e+02 ] : ANGLESK:CTCTN2
+ 172 [  1.0970e+02 ] : ANGLESB:CTCTN
+ 173 [  6.6944e+02 ] : ANGLESK:CTCTN
+ 174 [  1.1110e+02 ] : ANGLESB:CCTCT
+ 175 [  5.2718e+02 ] : ANGLESK:CCTCT
+ 176 [  1.0950e+02 ] : ANGLESB:CACTHC
+ 177 [  4.1840e+02 ] : ANGLESK:CACTHC
+ 178 [  1.1120e+02 ] : ANGLESB:CTCTN3
+ 179 [  6.6944e+02 ] : ANGLESK:CTCTN3
+ 180 [  1.1310e+02 ] : ANGLESB:CCCTCT
+ 181 [  5.2718e+02 ] : ANGLESK:CCCTCT
+ 182 [  1.0950e+02 ] : ANGLESB:CCCTHC
+ 183 [  4.1840e+02 ] : ANGLESK:CCCTHC
+ 184 [  1.1560e+02 ] : ANGLESB:C*CTCT
+ 185 [  5.2718e+02 ] : ANGLESK:C*CTCT
+ 186 [  1.0950e+02 ] : ANGLESB:C*CTHC
+ 187 [  4.1840e+02 ] : ANGLESK:C*CTHC
+ 188 [  1.2000e+02 ] : ANGLESB:CTCCNA
+ 189 [  5.8576e+02 ] : ANGLESK:CTCCNA
+ 190 [  1.2000e+02 ] : ANGLESB:CTCCCV
+ 191 [  5.8576e+02 ] : ANGLESK:CTCCCV
+ 192 [  1.2000e+02 ] : ANGLESB:CTCCNB
+ 193 [  5.8576e+02 ] : ANGLESK:CTCCNB
+ 194 [  1.2000e+02 ] : ANGLESB:CVCCNA
+ 195 [  5.8576e+02 ] : ANGLESK:CVCCNA
+ 196 [  1.2000e+02 ] : ANGLESB:CWCCNB
+ 197 [  5.8576e+02 ] : ANGLESK:CWCCNB
+ 198 [  1.2000e+02 ] : ANGLESB:CTCCCW
+ 199 [  5.8576e+02 ] : ANGLESK:CTCCCW
+ 200 [  1.2000e+02 ] : ANGLESB:H5CRNA
+ 201 [  4.1840e+02 ] : ANGLESK:H5CRNA
+ 202 [  1.2000e+02 ] : ANGLESB:H5CRNB
+ 203 [  4.1840e+02 ] : ANGLESK:H5CRNB
+ 204 [  1.2000e+02 ] : ANGLESB:NACRNB
+ 205 [  5.8576e+02 ] : ANGLESK:NACRNB
+ 206 [  1.2000e+02 ] : ANGLESB:CCCVH4
+ 207 [  4.1840e+02 ] : ANGLESK:CCCVH4
+ 208 [  1.2000e+02 ] : ANGLESB:CCCVNB
+ 209 [  5.8576e+02 ] : ANGLESK:CCCVNB
+ 210 [  1.2000e+02 ] : ANGLESB:H4CVNB
+ 211 [  4.1840e+02 ] : ANGLESK:H4CVNB
+ 212 [  1.2000e+02 ] : ANGLESB:CCCWH4
+ 213 [  4.1840e+02 ] : ANGLESK:CCCWH4
+ 214 [  1.2000e+02 ] : ANGLESB:CCCWNA
+ 215 [  5.8576e+02 ] : ANGLESK:CCCWNA
+ 216 [  1.2000e+02 ] : ANGLESB:H4CWNA
+ 217 [  4.1840e+02 ] : ANGLESK:H4CWNA
+ 218 [  1.2000e+02 ] : ANGLESB:C*CWH4
+ 219 [  4.1840e+02 ] : ANGLESK:C*CWH4
+ 220 [  1.0870e+02 ] : ANGLESB:C*CWNA
+ 221 [  5.8576e+02 ] : ANGLESK:C*CWNA
+ 222 [  1.2500e+02 ] : ANGLESB:CTC*CW
+ 223 [  5.8576e+02 ] : ANGLESK:CTC*CW
+ 224 [  1.2860e+02 ] : ANGLESB:CBC*CT
+ 225 [  5.8576e+02 ] : ANGLESK:CBC*CT
+ 226 [  1.0640e+02 ] : ANGLESB:CBC*CW
+ 227 [  5.2718e+02 ] : ANGLESK:CBC*CW
+ 228 [  1.3280e+02 ] : ANGLESB:CACNNA
+ 229 [  5.8576e+02 ] : ANGLESK:CACNNA
+ 230 [  1.0440e+02 ] : ANGLESB:CBCNNA
+ 231 [  5.8576e+02 ] : ANGLESK:CBCNNA
+ 232 [  1.2270e+02 ] : ANGLESB:CACNCB
+ 233 [  5.2718e+02 ] : ANGLESK:CACNCB
+ 234 [  1.2190e+02 ] : ANGLESB:CNCT
+ 235 [  4.1840e+02 ] : ANGLESK:CNCT
+ 236 [  1.2000e+02 ] : ANGLESB:CNH
+ 237 [  4.1840e+02 ] : ANGLESK:CNH
+ 238 [  1.1804e+02 ] : ANGLESB:CTNH
+ 239 [  4.1840e+02 ] : ANGLESK:CTNH
+ 240 [  1.2000e+02 ] : ANGLESB:HNH
+ 241 [  2.9288e+02 ] : ANGLESK:HNH
+ 242 [  1.2000e+02 ] : ANGLESB:CAN2H
+ 243 [  4.1840e+02 ] : ANGLESK:CAN2H
+ 244 [  1.2000e+02 ] : ANGLESB:HN2H
+ 245 [  2.9288e+02 ] : ANGLESK:HN2H
+ 246 [  1.1840e+02 ] : ANGLESB:CTN2H
+ 247 [  4.1840e+02 ] : ANGLESK:CTN2H
+ 248 [  1.2320e+02 ] : ANGLESB:CAN2CT
+ 249 [  4.1840e+02 ] : ANGLESK:CAN2CT
+ 250 [  1.0950e+02 ] : ANGLESB:CTN3H
+ 251 [  4.1840e+02 ] : ANGLESK:CTN3H
+ 252 [  1.0950e+02 ] : ANGLESB:HN3H
+ 253 [  2.9288e+02 ] : ANGLESK:HN3H
+ 254 [  1.2000e+02 ] : ANGLESB:CCNACR
+ 255 [  5.8576e+02 ] : ANGLESK:CCNACR
+ 256 [  1.2000e+02 ] : ANGLESB:CCNAH
+ 257 [  4.1840e+02 ] : ANGLESK:CCNAH
+ 258 [  1.2000e+02 ] : ANGLESB:CRNACW
+ 259 [  5.8576e+02 ] : ANGLESK:CRNACW
+ 260 [  1.2000e+02 ] : ANGLESB:CRNAH
+ 261 [  4.1840e+02 ] : ANGLESK:CRNAH
+ 262 [  1.2000e+02 ] : ANGLESB:CWNAH
+ 263 [  4.1840e+02 ] : ANGLESK:CWNAH
+ 264 [  1.1160e+02 ] : ANGLESB:CNNACW
+ 265 [  5.8576e+02 ] : ANGLESK:CNNACW
+ 266 [  1.2310e+02 ] : ANGLESB:CNNAH
+ 267 [  4.1840e+02 ] : ANGLESK:CNNAH
+ 268 [  1.1700e+02 ] : ANGLESB:CCNBCR
+ 269 [  5.8576e+02 ] : ANGLESK:CCNBCR
+ 270 [  1.1700e+02 ] : ANGLESB:CRNBCV
+ 271 [  5.8576e+02 ] : ANGLESK:CRNBCV
+ 272 [  1.1300e+02 ] : ANGLESB:COHHO
+ 273 [  4.1840e+02 ] : ANGLESK:COHHO
+ 274 [  1.0850e+02 ] : ANGLESB:CTOHHO
+ 275 [  4.6024e+02 ] : ANGLESK:CTOHHO
+ 276 [  9.8900e+01 ] : ANGLESB:CTSCT
+ 277 [  5.1882e+02 ] : ANGLESK:CTSCT
+ 278 [  9.6000e+01 ] : ANGLESB:CTSHHS
+ 279 [  3.5982e+02 ] : ANGLESK:CTSHHS
+ 280 [  1.8000e+02 ] : PIMPDIHS2B:CCTNH
+ 281 [  4.6024e+00 ] : PIMPDIHS2K:CCTNH
+ 282 [  1.8000e+02 ] : PIMPDIHS2B:CTCCCWNA
+ 283 [  4.6024e+00 ] : PIMPDIHS2K:CTCCCWNA
+ 284 [  1.8000e+02 ] : PIMPDIHS2B:CACACACT
+ 285 [  4.6024e+00 ] : PIMPDIHS2K:CACACACT
+ 286 [  1.8000e+02 ] : PIMPDIHS2B:CACACOH
+ 287 [  4.6024e+00 ] : PIMPDIHS2K:CACACOH
+ 288 [  1.8000e+02 ] : PIMPDIHS2B:N2CAN2X
+ 289 [  4.3932e+01 ] : PIMPDIHS2K:N2CAN2X
+ 290 [  1.8000e+02 ] : PIMPDIHS2B:OCXX
+ 291 [  4.3932e+01 ] : PIMPDIHS2K:OCXX
+ 292 [  1.8000e+02 ] : PIMPDIHS2B:HNXX
+ 293 [  4.1840e+00 ] : PIMPDIHS2K:HNXX
+ 294 [  1.8000e+02 ] : PIMPDIHS2B:HN2XX
+ 295 [  4.1840e+00 ] : PIMPDIHS2K:HN2XX
+ 296 [  1.8000e+02 ] : PIMPDIHS2B:HNAXX
+ 297 [  4.1840e+00 ] : PIMPDIHS2K:HNAXX
+ 298 [  1.8000e+02 ] : PIMPDIHS2B:HACAXX
+ 299 [  4.6024e+00 ] : PIMPDIHS2K:HACAXX
+ 300 [  1.8000e+02 ] : PIMPDIHS2B:H4CWXX
+ 301 [  4.6024e+00 ] : PIMPDIHS2K:H4CWXX
+ 302 [  1.8000e+02 ] : PIMPDIHS2B:H5CRXX
+ 303 [  4.6024e+00 ] : PIMPDIHS2K:H5CRXX
+ 304 [  1.8000e+02 ] : PIMPDIHS2B:H4CVXX
+ 305 [  4.6024e+00 ] : PIMPDIHS2K:H4CVXX
+ 306 [  0.0000e+00 ] : PDIHMULS2B:CNCTC
+ 307 [  1.1297e+00 ] : PDIHMULS2K:CNCTC
+ 308 [  0.0000e+00 ] : PDIHMULS3B:CNCTC
+ 309 [  1.7573e+00 ] : PDIHMULS3K:CNCTC
+ 310 [  1.8000e+02 ] : PDIHMULS1B:NCTCN
+ 311 [  1.8828e+00 ] : PDIHMULS1K:NCTCN
+ 312 [  1.8000e+02 ] : PDIHMULS2B:NCTCN
+ 313 [  6.6107e+00 ] : PDIHMULS2K:NCTCN
+ 314 [  1.8000e+02 ] : PDIHMULS3B:NCTCN
+ 315 [  2.3012e+00 ] : PDIHMULS3K:NCTCN
+ 316 [  0.0000e+00 ] : PDIHMULS1B:CNCTCT
+ 317 [  8.3680e+00 ] : PDIHMULS1K:CNCTCT
+ 318 [  0.0000e+00 ] : PDIHMULS2B:CNCTCT
+ 319 [  8.3680e+00 ] : PDIHMULS2K:CNCTCT
+ 320 [  0.0000e+00 ] : PDIHMULS3B:CNCTCT
+ 321 [  1.6736e+00 ] : PDIHMULS3K:CNCTCT
+ 322 [  0.0000e+00 ] : PDIHMULS1B:CTCTCN
+ 323 [  8.3680e-01 ] : PDIHMULS1K:CTCTCN
+ 324 [  0.0000e+00 ] : PDIHMULS2B:CTCTCN
+ 325 [  8.3680e-01 ] : PDIHMULS2K:CTCTCN
+ 326 [  0.0000e+00 ] : PDIHMULS3B:CTCTCN
+ 327 [  1.6736e+00 ] : PDIHMULS3K:CTCTCN
+ 328 [  1.8000e+02 ] : PDIHMULS2B:HNCO
+ 329 [  1.0460e+01 ] : PDIHMULS2K:HNCO
+ 330 [  0.0000e+00 ] : PDIHMULS1B:HNCO
+ 331 [  8.3680e+00 ] : PDIHMULS1K:HNCO
+ 332 [  0.0000e+00 ] : PDIHMULS1B:H1CTCO
+ 333 [  3.3472e+00 ] : PDIHMULS1K:H1CTCO
+ 334 [  1.8000e+02 ] : PDIHMULS3B:H1CTCO
+ 335 [  3.3472e-01 ] : PDIHMULS3K:H1CTCO
+ 336 [  0.0000e+00 ] : PDIHMULS1B:HCCTCO
+ 337 [  3.3472e+00 ] : PDIHMULS1K:HCCTCO
+ 338 [  1.8000e+02 ] : PDIHMULS3B:HCCTCO
+ 339 [  3.3472e-01 ] : PDIHMULS3K:HCCTCO
+ 340 [  0.0000e+00 ] : PDIHMULS3B:HCCTCTHC
+ 341 [  6.2760e-01 ] : PDIHMULS3K:HCCTCTHC
+ 342 [  0.0000e+00 ] : PDIHMULS3B:CTCTCTHC
+ 343 [  6.6944e-01 ] : PDIHMULS3K:CTCTCTHC
+ 344 [  0.0000e+00 ] : PDIHMULS3B:CTCTOHHO
+ 345 [  6.6944e-01 ] : PDIHMULS3K:CTCTOHHO
+ 346 [  0.0000e+00 ] : PDIHMULS1B:CTCTOHHO
+ 347 [  1.0460e+00 ] : PDIHMULS1K:CTCTOHHO
+ 348 [  0.0000e+00 ] : PDIHMULS3B:CTCTCTCT
+ 349 [  7.5312e-01 ] : PDIHMULS3K:CTCTCTCT
+ 350 [  1.8000e+02 ] : PDIHMULS2B:CTCTCTCT
+ 351 [  1.0460e+00 ] : PDIHMULS2K:CTCTCTCT
+ 352 [  1.8000e+02 ] : PDIHMULS1B:CTCTCTCT
+ 353 [  8.3680e-01 ] : PDIHMULS1K:CTCTCTCT
+ 354 [  0.0000e+00 ] : PDIHMULS1B:H1CTCTOH
+ 355 [  1.0460e+00 ] : PDIHMULS1K:H1CTCTOH
+ 356 [  0.0000e+00 ] : PDIHMULS1B:HCCTCTOH
+ 357 [  1.0460e+00 ] : PDIHMULS1K:HCCTCTOH
+ 358 [  1.8000e+02 ] : PDIHMULS2B:XCCAX
+ 359 [  1.5167e+01 ] : PDIHMULS2K:XCCAX
+ 360 [  1.8000e+02 ] : PDIHMULS2B:XCOHX
+ 361 [  9.6232e+00 ] : PDIHMULS2K:XCOHX
+ 362 [  0.0000e+00 ] : PDIHMULS0:559.5:XCCTX
+ 363 [  0.0000e+00 ] : PDIHMULS0:559.6:XCCTX
+ 364 [  1.8000e+02 ] : PDIHMULS2B:XCACAX
+ 365 [  1.5167e+01 ] : PDIHMULS2K:XCACAX
+ 366 [  1.8000e+02 ] : PDIHMULS2B:XCACBX
+ 367 [  1.4644e+01 ] : PDIHMULS2K:XCACBX
+ 368 [  0.0000e+00 ] : PDIHMULS0:563.5:XCACTX
+ 369 [  0.0000e+00 ] : PDIHMULS0:563.6:XCACTX
+ 370 [  1.8000e+02 ] : PDIHMULS2B:XCAN2X
+ 371 [  1.0042e+01 ] : PDIHMULS2K:XCAN2X
+ 372 [  0.0000e+00 ] : PDIHMULS3B:XCTCTX
+ 373 [  6.5084e-01 ] : PDIHMULS3K:XCTCTX
+ 374 [  0.0000e+00 ] : PDIHMULS0:578.5:XCTNX
+ 375 [  0.0000e+00 ] : PDIHMULS0:578.6:XCTNX
+ 376 [  0.0000e+00 ] : PDIHMULS0:580.5:XCTN2X
+ 377 [  0.0000e+00 ] : PDIHMULS0:580.6:XCTN2X
+ 378 [  0.0000e+00 ] : PDIHMULS3B:XCTOHX
+ 379 [  6.9733e-01 ] : PDIHMULS3K:XCTOHX
+ 380 [  1.8000e+02 ] : PDIHMULS2B:XCNX
+ 381 [  1.0460e+01 ] : PDIHMULS2K:XCNX
+ 382 [  0.0000e+00 ] : PDIHMULS3B:XCTN3X
+ 383 [  6.5084e-01 ] : PDIHMULS3K:XCTN3X
+ 384 [  0.0000e+00 ] : PDIHMULS3B:XCTSX
+ 385 [  1.3947e+00 ] : PDIHMULS3K:XCTSX
+ 386 [  0.0000e+00 ] : PDIHMULS3B:XCTSHX
+ 387 [  1.0460e+00 ] : PDIHMULS3K:XCTSHX
+ 388 [  1.8000e+02 ] : PDIHMULS2B:XC*CBX
+ 389 [  7.0082e+00 ] : PDIHMULS2K:XC*CBX
+ 390 [  0.0000e+00 ] : PDIHMULS0:590.5:XC*CTX
+ 391 [  0.0000e+00 ] : PDIHMULS0:590.6:XC*CTX
+ 392 [  1.8000e+02 ] : PDIHMULS2B:XC*CWX
+ 393 [  2.7301e+01 ] : PDIHMULS2K:XC*CWX
+ 394 [  1.8000e+02 ] : PDIHMULS2B:XCACNX
+ 395 [  1.5167e+01 ] : PDIHMULS2K:XCACNX
+ 396 [  1.8000e+02 ] : PDIHMULS2B:XCBCNX
+ 397 [  1.2552e+01 ] : PDIHMULS2K:XCBCNX
+ 398 [  0.0000e+00 ] : PDIHMULS0:594.5:XCCCTX
+ 399 [  0.0000e+00 ] : PDIHMULS0:594.6:XCCCTX
+ 400 [  1.8000e+02 ] : PDIHMULS2B:XCCCVX
+ 401 [  2.1548e+01 ] : PDIHMULS2K:XCCCVX
+ 402 [  1.8000e+02 ] : PDIHMULS2B:XCCCWX
+ 403 [  2.2489e+01 ] : PDIHMULS2K:XCCCWX
+ 404 [  1.8000e+02 ] : PDIHMULS2B:XCCNAX
+ 405 [  5.8576e+00 ] : PDIHMULS2K:XCCNAX
+ 406 [  1.8000e+02 ] : PDIHMULS2B:XCCNBX
+ 407 [  1.0042e+01 ] : PDIHMULS2K:XCCNBX
+ 408 [  1.8000e+02 ] : PDIHMULS2B:XCNNAX
+ 409 [  6.3806e+00 ] : PDIHMULS2K:XCNNAX
+ 410 [  1.8000e+02 ] : PDIHMULS2B:XCRNAX
+ 411 [  9.7278e+00 ] : PDIHMULS2K:XCRNAX
+ 412 [  1.8000e+02 ] : PDIHMULS2B:XCRNBX
+ 413 [  2.0920e+01 ] : PDIHMULS2K:XCRNBX
+ 414 [  1.8000e+02 ] : PDIHMULS2B:XCVNBX
+ 415 [  1.0042e+01 ] : PDIHMULS2K:XCVNBX
+ 416 [  1.8000e+02 ] : PDIHMULS2B:XCWNAX
+ 417 [  6.2760e+00 ] : PDIHMULS2K:XCWNAX
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   PDIHMULS2B                           : 6.00000e+01
+   PDIHMULS3B                           : 6.00000e+01
+   PDIHMULS2K                           : 1.00000e+01
+   PDIHMULS3K                           : 1.00000e+01
+   PIMPDIHS2K                           : 1.00000e+01
+   PDIHMULS1K                           : 1.00000e+01
+   PDIHS2B                              : 6.00000e+01
+   PIMPDIHS2B                           : 6.00000e+01
+   PDIHS2K                              : 1.00000e+01
+   PDIHMULS1B                           : 6.00000e+01
+   ANGLESB                              : 5.00000e+00
+   ANGLESK                              : 1.00000e+02
+   BONDSB                               : 1.00000e-02
+   BONDSK                               : 1.00000e+05
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CCA
+   1 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CCA
+   2 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CCT
+   3 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CCT
+   4 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CO
+   5 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CO
+   6 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CO2
+   7 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CO2
+   8 [    BONDSB                        : 1.00000e-02 ] : BONDSB:COH
+   9 [    BONDSK                        : 1.00000e+05 ] : BONDSK:COH
+  10 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CACA
+  11 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CACA
+  12 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CACB
+  13 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CACB
+  14 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CACT
+  15 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CACT
+  16 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CAHA
+  17 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CAHA
+  18 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CAN2
+  19 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CAN2
+  20 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CTCT
+  21 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CTCT
+  22 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CTHC
+  23 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CTHC
+  24 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CTH1
+  25 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CTH1
+  26 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CTHP
+  27 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CTHP
+  28 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CTN2
+  29 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CTN2
+  30 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CTOH
+  31 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CTOH
+  32 [    BONDSB                        : 1.00000e-02 ] : BONDSB:HN2
+  33 [    BONDSK                        : 1.00000e+05 ] : BONDSK:HN2
+  34 [    BONDSB                        : 1.00000e-02 ] : BONDSB:HNA
+  35 [    BONDSK                        : 1.00000e+05 ] : BONDSK:HNA
+  36 [    BONDSB                        : 1.00000e-02 ] : BONDSB:HOOH
+  37 [    BONDSK                        : 1.00000e+05 ] : BONDSK:HOOH
+  38 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CN
+  39 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CN
+  40 [    BONDSB                        : 1.00000e-02 ] : BONDSB:C*CB
+  41 [    BONDSK                        : 1.00000e+05 ] : BONDSK:C*CB
+  42 [    BONDSB                        : 1.00000e-02 ] : BONDSB:C*CT
+  43 [    BONDSK                        : 1.00000e+05 ] : BONDSK:C*CT
+  44 [    BONDSB                        : 1.00000e-02 ] : BONDSB:C*CW
+  45 [    BONDSK                        : 1.00000e+05 ] : BONDSK:C*CW
+  46 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CACN
+  47 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CACN
+  48 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CBCN
+  49 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CBCN
+  50 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CCCT
+  51 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CCCT
+  52 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CCCV
+  53 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CCCV
+  54 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CCCW
+  55 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CCCW
+  56 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CCNA
+  57 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CCNA
+  58 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CCNB
+  59 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CCNB
+  60 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CNNA
+  61 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CNNA
+  62 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CRH5
+  63 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CRH5
+  64 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CRNA
+  65 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CRNA
+  66 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CRNB
+  67 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CRNB
+  68 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CTN
+  69 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CTN
+  70 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CTN3
+  71 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CTN3
+  72 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CTS
+  73 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CTS
+  74 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CTSH
+  75 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CTSH
+  76 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CVH4
+  77 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CVH4
+  78 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CVNB
+  79 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CVNB
+  80 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CWH4
+  81 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CWH4
+  82 [    BONDSB                        : 1.00000e-02 ] : BONDSB:CWNA
+  83 [    BONDSK                        : 1.00000e+05 ] : BONDSK:CWNA
+  84 [    BONDSB                        : 1.00000e-02 ] : BONDSB:HN
+  85 [    BONDSK                        : 1.00000e+05 ] : BONDSK:HN
+  86 [    BONDSB                        : 1.00000e-02 ] : BONDSB:HN3
+  87 [    BONDSK                        : 1.00000e+05 ] : BONDSK:HN3
+  88 [    BONDSB                        : 1.00000e-02 ] : BONDSB:HSSH
+  89 [    BONDSK                        : 1.00000e+05 ] : BONDSK:HSSH
+  90 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACTCT
+  91 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACTCT
+  92 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCO
+  93 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCO
+  94 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCO2
+  95 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCO2
+  96 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCN
+  97 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCN
+  98 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:NCO
+  99 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:NCO
+ 100 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:O2CO2
+ 101 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:O2CO2
+ 102 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACCA
+ 103 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACCA
+ 104 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACOH
+ 105 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACOH
+ 106 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCACA
+ 107 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCACA
+ 108 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACACA
+ 109 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACACA
+ 110 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACACB
+ 111 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACACB
+ 112 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACACT
+ 113 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACACT
+ 114 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACAHA
+ 115 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACAHA
+ 116 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CBCAHA
+ 117 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CBCAHA
+ 118 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCAHA
+ 119 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCAHA
+ 120 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:N2CAN2
+ 121 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:N2CAN2
+ 122 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CNCAHA
+ 123 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CNCAHA
+ 124 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACACN
+ 125 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACACN
+ 126 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:C*CBCA
+ 127 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:C*CBCA
+ 128 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:C*CBCN
+ 129 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:C*CBCN
+ 130 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACBCN
+ 131 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACBCN
+ 132 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCTCT
+ 133 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCTCT
+ 134 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCTHC
+ 135 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCTHC
+ 136 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCTH1
+ 137 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCTH1
+ 138 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCTHP
+ 139 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCTHP
+ 140 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCTOH
+ 141 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCTOH
+ 142 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:HCCTHC
+ 143 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:HCCTHC
+ 144 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:H1CTH1
+ 145 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:H1CTH1
+ 146 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:HPCTHP
+ 147 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:HPCTHP
+ 148 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:H1CTOH
+ 149 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:H1CTOH
+ 150 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:H1CTN
+ 151 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:H1CTN
+ 152 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCTH1
+ 153 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCTH1
+ 154 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:H1CTS
+ 155 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:H1CTS
+ 156 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:H1CTSH
+ 157 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:H1CTSH
+ 158 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCTS
+ 159 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCTS
+ 160 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCTSH
+ 161 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCTSH
+ 162 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:H1CTN2
+ 163 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:H1CTN2
+ 164 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:HPCTN3
+ 165 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:HPCTN3
+ 166 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCTHC
+ 167 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCTHC
+ 168 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCTN
+ 169 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCTN
+ 170 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCTN2
+ 171 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCTN2
+ 172 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCTN
+ 173 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCTN
+ 174 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCTCT
+ 175 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCTCT
+ 176 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACTHC
+ 177 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACTHC
+ 178 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCTN3
+ 179 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCTN3
+ 180 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCCTCT
+ 181 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCCTCT
+ 182 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCCTHC
+ 183 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCCTHC
+ 184 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:C*CTCT
+ 185 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:C*CTCT
+ 186 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:C*CTHC
+ 187 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:C*CTHC
+ 188 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCCNA
+ 189 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCCNA
+ 190 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCCCV
+ 191 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCCCV
+ 192 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCCNB
+ 193 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCCNB
+ 194 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CVCCNA
+ 195 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CVCCNA
+ 196 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CWCCNB
+ 197 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CWCCNB
+ 198 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTCCCW
+ 199 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTCCCW
+ 200 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:H5CRNA
+ 201 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:H5CRNA
+ 202 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:H5CRNB
+ 203 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:H5CRNB
+ 204 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:NACRNB
+ 205 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:NACRNB
+ 206 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCCVH4
+ 207 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCCVH4
+ 208 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCCVNB
+ 209 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCCVNB
+ 210 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:H4CVNB
+ 211 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:H4CVNB
+ 212 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCCWH4
+ 213 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCCWH4
+ 214 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCCWNA
+ 215 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCCWNA
+ 216 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:H4CWNA
+ 217 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:H4CWNA
+ 218 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:C*CWH4
+ 219 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:C*CWH4
+ 220 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:C*CWNA
+ 221 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:C*CWNA
+ 222 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTC*CW
+ 223 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTC*CW
+ 224 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CBC*CT
+ 225 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CBC*CT
+ 226 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CBC*CW
+ 227 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CBC*CW
+ 228 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACNNA
+ 229 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACNNA
+ 230 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CBCNNA
+ 231 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CBCNNA
+ 232 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CACNCB
+ 233 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CACNCB
+ 234 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CNCT
+ 235 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CNCT
+ 236 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CNH
+ 237 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CNH
+ 238 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTNH
+ 239 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTNH
+ 240 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:HNH
+ 241 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:HNH
+ 242 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CAN2H
+ 243 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CAN2H
+ 244 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:HN2H
+ 245 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:HN2H
+ 246 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTN2H
+ 247 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTN2H
+ 248 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CAN2CT
+ 249 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CAN2CT
+ 250 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTN3H
+ 251 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTN3H
+ 252 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:HN3H
+ 253 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:HN3H
+ 254 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCNACR
+ 255 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCNACR
+ 256 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCNAH
+ 257 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCNAH
+ 258 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CRNACW
+ 259 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CRNACW
+ 260 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CRNAH
+ 261 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CRNAH
+ 262 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CWNAH
+ 263 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CWNAH
+ 264 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CNNACW
+ 265 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CNNACW
+ 266 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CNNAH
+ 267 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CNNAH
+ 268 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CCNBCR
+ 269 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CCNBCR
+ 270 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CRNBCV
+ 271 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CRNBCV
+ 272 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:COHHO
+ 273 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:COHHO
+ 274 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTOHHO
+ 275 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTOHHO
+ 276 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTSCT
+ 277 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTSCT
+ 278 [    ANGLESB                       : 5.00000e+00 ] : ANGLESB:CTSHHS
+ 279 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:CTSHHS
+ 280 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:CCTNH
+ 281 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:CCTNH
+ 282 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:CTCCCWNA
+ 283 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:CTCCCWNA
+ 284 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:CACACACT
+ 285 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:CACACACT
+ 286 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:CACACOH
+ 287 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:CACACOH
+ 288 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:N2CAN2X
+ 289 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:N2CAN2X
+ 290 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:OCXX
+ 291 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:OCXX
+ 292 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:HNXX
+ 293 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:HNXX
+ 294 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:HN2XX
+ 295 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:HN2XX
+ 296 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:HNAXX
+ 297 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:HNAXX
+ 298 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:HACAXX
+ 299 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:HACAXX
+ 300 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:H4CWXX
+ 301 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:H4CWXX
+ 302 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:H5CRXX
+ 303 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:H5CRXX
+ 304 [    PDIHS2B                       : 6.00000e+01 ] : PIMPDIHS2B:H4CVXX
+ 305 [    PIMPDIHS2K                    : 1.00000e+01 ] : PIMPDIHS2K:H4CVXX
+ 306 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:CNCTC
+ 307 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:CNCTC
+ 308 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:CNCTC
+ 309 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:CNCTC
+ 310 [    PDIHMULS1B                    : 6.00000e+01 ] : PDIHMULS1B:NCTCN
+ 311 [    PDIHMULS1K                    : 1.00000e+01 ] : PDIHMULS1K:NCTCN
+ 312 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:NCTCN
+ 313 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:NCTCN
+ 314 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:NCTCN
+ 315 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:NCTCN
+ 316 [    PDIHMULS1B                    : 6.00000e+01 ] : PDIHMULS1B:CNCTCT
+ 317 [    PDIHMULS1K                    : 1.00000e+01 ] : PDIHMULS1K:CNCTCT
+ 318 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:CNCTCT
+ 319 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:CNCTCT
+ 320 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:CNCTCT
+ 321 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:CNCTCT
+ 322 [    PDIHMULS1B                    : 6.00000e+01 ] : PDIHMULS1B:CTCTCN
+ 323 [    PDIHMULS1K                    : 1.00000e+01 ] : PDIHMULS1K:CTCTCN
+ 324 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:CTCTCN
+ 325 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:CTCTCN
+ 326 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:CTCTCN
+ 327 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:CTCTCN
+ 328 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:HNCO
+ 329 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:HNCO
+ 330 [    PDIHMULS1B                    : 6.00000e+01 ] : PDIHMULS1B:HNCO
+ 331 [    PDIHMULS1K                    : 1.00000e+01 ] : PDIHMULS1K:HNCO
+ 332 [    PDIHMULS1B                    : 6.00000e+01 ] : PDIHMULS1B:H1CTCO
+ 333 [    PDIHMULS1K                    : 1.00000e+01 ] : PDIHMULS1K:H1CTCO
+ 334 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:H1CTCO
+ 335 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:H1CTCO
+ 336 [    PDIHMULS1B                    : 6.00000e+01 ] : PDIHMULS1B:HCCTCO
+ 337 [    PDIHMULS1K                    : 1.00000e+01 ] : PDIHMULS1K:HCCTCO
+ 338 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:HCCTCO
+ 339 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:HCCTCO
+ 340 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:HCCTCTHC
+ 341 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:HCCTCTHC
+ 342 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:CTCTCTHC
+ 343 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:CTCTCTHC
+ 344 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:CTCTOHHO
+ 345 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:CTCTOHHO
+ 346 [    PDIHMULS1B                    : 6.00000e+01 ] : PDIHMULS1B:CTCTOHHO
+ 347 [    PDIHMULS1K                    : 1.00000e+01 ] : PDIHMULS1K:CTCTOHHO
+ 348 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:CTCTCTCT
+ 349 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:CTCTCTCT
+ 350 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:CTCTCTCT
+ 351 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:CTCTCTCT
+ 352 [    PDIHMULS1B                    : 6.00000e+01 ] : PDIHMULS1B:CTCTCTCT
+ 353 [    PDIHMULS1K                    : 1.00000e+01 ] : PDIHMULS1K:CTCTCTCT
+ 354 [    PDIHMULS1B                    : 6.00000e+01 ] : PDIHMULS1B:H1CTCTOH
+ 355 [    PDIHMULS1K                    : 1.00000e+01 ] : PDIHMULS1K:H1CTCTOH
+ 356 [    PDIHMULS1B                    : 6.00000e+01 ] : PDIHMULS1B:HCCTCTOH
+ 357 [    PDIHMULS1K                    : 1.00000e+01 ] : PDIHMULS1K:HCCTCTOH
+ 358 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCCAX
+ 359 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCCAX
+ 360 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCOHX
+ 361 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCOHX
+ 362 [    P                             : 1.00000e+00 ] : PDIHMULS0:559.5:XCCTX
+ 363 [    P                             : 1.00000e+00 ] : PDIHMULS0:559.6:XCCTX
+ 364 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCACAX
+ 365 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCACAX
+ 366 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCACBX
+ 367 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCACBX
+ 368 [    P                             : 1.00000e+00 ] : PDIHMULS0:563.5:XCACTX
+ 369 [    P                             : 1.00000e+00 ] : PDIHMULS0:563.6:XCACTX
+ 370 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCAN2X
+ 371 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCAN2X
+ 372 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:XCTCTX
+ 373 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:XCTCTX
+ 374 [    P                             : 1.00000e+00 ] : PDIHMULS0:578.5:XCTNX
+ 375 [    P                             : 1.00000e+00 ] : PDIHMULS0:578.6:XCTNX
+ 376 [    P                             : 1.00000e+00 ] : PDIHMULS0:580.5:XCTN2X
+ 377 [    P                             : 1.00000e+00 ] : PDIHMULS0:580.6:XCTN2X
+ 378 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:XCTOHX
+ 379 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:XCTOHX
+ 380 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCNX
+ 381 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCNX
+ 382 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:XCTN3X
+ 383 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:XCTN3X
+ 384 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:XCTSX
+ 385 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:XCTSX
+ 386 [    PDIHMULS3B                    : 6.00000e+01 ] : PDIHMULS3B:XCTSHX
+ 387 [    PDIHMULS3K                    : 1.00000e+01 ] : PDIHMULS3K:XCTSHX
+ 388 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XC*CBX
+ 389 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XC*CBX
+ 390 [    P                             : 1.00000e+00 ] : PDIHMULS0:590.5:XC*CTX
+ 391 [    P                             : 1.00000e+00 ] : PDIHMULS0:590.6:XC*CTX
+ 392 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XC*CWX
+ 393 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XC*CWX
+ 394 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCACNX
+ 395 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCACNX
+ 396 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCBCNX
+ 397 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCBCNX
+ 398 [    P                             : 1.00000e+00 ] : PDIHMULS0:594.5:XCCCTX
+ 399 [    P                             : 1.00000e+00 ] : PDIHMULS0:594.6:XCCCTX
+ 400 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCCCVX
+ 401 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCCCVX
+ 402 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCCCWX
+ 403 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCCCWX
+ 404 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCCNAX
+ 405 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCCNAX
+ 406 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCCNBX
+ 407 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCCNBX
+ 408 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCNNAX
+ 409 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCNNAX
+ 410 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCRNAX
+ 411 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCRNAX
+ 412 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCRNBX
+ 413 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCRNBX
+ 414 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCVNBX
+ 415 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCVNBX
+ 416 [    PDIHMULS2B                    : 6.00000e+01 ] : PDIHMULS2B:XCWNAX
+ 417 [    PDIHMULS2K                    : 1.00000e+01 ] : PDIHMULS2K:XCWNAX
+----------------------------------------------------------
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['amber99sb-bd-an-bk-sd-eq.itp'] 
+priors                    OrderedDict([('PDIHMULS2B', 60.0), ('PDIHMULS3B', 60.0), ('PDIHMULS2K', 10.0), ('PDIHMULS3K', 10.0), ('PIMPDIHS2K', 10.0), ('PDIHMULS1K', 10.0), ('PDIHS2B', 60.0), ('PIMPDIHS2B', 60.0), ('PDIHS2K', 10.0), ('PDIHMULS1B', 60.0), ('ANGLESB', 5.0), ('ANGLESK', 100.0), ('BONDSB', 0.01), ('BONDSK', 100000.0)]) 
+duplicate_pnames          True 
+----------------------------------------------------------
+File specified by shot.mdp does not exist - will try to autodetect .mdp extension
+Cannot find a unique file with extension .mdp in /home/leeping/projects/VSP27-Protein/Dihedrals/Optimize/AMBER99SB/targets/ALA-phipsi (0 found; )
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target ALA-phipsi :            [0m |#
+#========================================================#
+name                      ALA-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/ALA-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target ARG-chi1chi2 :           [0m |#
+#========================================================#
+name                      ARG-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/ARG-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target ARG-phipsi :            [0m |#
+#========================================================#
+name                      ARG-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/ARG-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target ASN-chi1chi2 :           [0m |#
+#========================================================#
+name                      ASN-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/ASN-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target ASN-phipsi :            [0m |#
+#========================================================#
+name                      ASN-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/ASN-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target ASP-chi1chi2 :           [0m |#
+#========================================================#
+name                      ASP-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/ASP-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target ASP-phipsi :            [0m |#
+#========================================================#
+name                      ASP-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/ASP-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target CYS-chi1chi2 :           [0m |#
+#========================================================#
+name                      CYS-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/CYS-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target CYS-phipsi :            [0m |#
+#========================================================#
+name                      CYS-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/CYS-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target GLN-chi1chi2 :           [0m |#
+#========================================================#
+name                      GLN-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/GLN-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target GLN-phipsi :            [0m |#
+#========================================================#
+name                      GLN-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/GLN-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target GLU-chi1chi2 :           [0m |#
+#========================================================#
+name                      GLU-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/GLU-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target GLU-phipsi :            [0m |#
+#========================================================#
+name                      GLU-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/GLU-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target GLY-phipsi :            [0m |#
+#========================================================#
+name                      GLY-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/GLY-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target HID-chi1chi2 :           [0m |#
+#========================================================#
+name                      HID-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/HID-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target HID-phipsi :            [0m |#
+#========================================================#
+name                      HID-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/HID-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target HIE-chi1chi2 :           [0m |#
+#========================================================#
+name                      HIE-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/HIE-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target HIE-phipsi :            [0m |#
+#========================================================#
+name                      HIE-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/HIE-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target ILE-chi1chi2 :           [0m |#
+#========================================================#
+name                      ILE-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/ILE-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target ILE-phipsi :            [0m |#
+#========================================================#
+name                      ILE-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/ILE-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target LEU-chi1chi2 :           [0m |#
+#========================================================#
+name                      LEU-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/LEU-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target LEU-phipsi :            [0m |#
+#========================================================#
+name                      LEU-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/LEU-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target LYS-chi1chi2 :           [0m |#
+#========================================================#
+name                      LYS-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/LYS-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     574 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target LYS-phipsi :            [0m |#
+#========================================================#
+name                      LYS-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/LYS-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     575 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target MET-chi1chi2 :           [0m |#
+#========================================================#
+name                      MET-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/MET-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target MET-phipsi :            [0m |#
+#========================================================#
+name                      MET-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/MET-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target PHE-chi1chi2 :           [0m |#
+#========================================================#
+name                      PHE-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/PHE-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target PHE-phipsi :            [0m |#
+#========================================================#
+name                      PHE-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/PHE-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target SER-chi1chi2 :           [0m |#
+#========================================================#
+name                      SER-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/SER-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target SER-phipsi :            [0m |#
+#========================================================#
+name                      SER-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/SER-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target THR-chi1chi2 :           [0m |#
+#========================================================#
+name                      THR-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/THR-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target THR-phipsi :            [0m |#
+#========================================================#
+name                      THR-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/THR-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target TRP-chi1chi2 :           [0m |#
+#========================================================#
+name                      TRP-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/TRP-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     575 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target TRP-phipsi :            [0m |#
+#========================================================#
+name                      TRP-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/TRP-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m          Setup for target TYR-chi1chi2 :           [0m |#
+#========================================================#
+name                      TYR-chi1chi2 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/TYR-chi1chi2 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target TYR-phipsi :            [0m |#
+#========================================================#
+name                      TYR-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/TYR-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Force field file is not referenced in the .top file
+Assuming the first .itp file is to be included
+Trying to write to a symbolic link topol.top, removing it first
+#========================================================#
+#| [92m           Setup for target VAL-phipsi :            [0m |#
+#========================================================#
+name                      VAL-phipsi 
+type                      ABINITIO_GMX 
+backup                    False 
+zerograd                  1 
+tgtdir                    targets/VAL-phipsi 
+force                     False 
+writelevel                1 
+attenuate                 True 
+energy_denom              5.0 
+energy_upper              20.0 
+shots                     576 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e-02 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          0.01 
+normalize_weights         False 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   SINGLE 
+trust0                    -1.0 
+mintrust                  0.05 
+maxstep                   1000 
+print_vals                False 
+backup                    False 
+input_file                single-bd-an-bk-sd-eq.in 
+criteria                  2 
+----------------------------------------------------------
+#=====================================================================================#
+#|          Target: ALA-phipsi  Type: AbInitio_GMX  Objective = 9.56966e-01          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      13.4970       13.7971     97.8247%    1.000         0.9570 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: ARG-chi1chi2  Type: AbInitio_GMX  Objective = 8.88182e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      13.4690       14.2917     94.2434%    1.000         0.8882 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: ARG-phipsi  Type: AbInitio_GMX  Objective = 1.86305e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      17.8767       13.0971    136.4935%    1.000         1.8630 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: ASN-chi1chi2  Type: AbInitio_GMX  Objective = 1.14489e+00         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      14.1916       13.2632    106.9997%    1.000         1.1449 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: ASN-phipsi  Type: AbInitio_GMX  Objective = 1.40354e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      17.9194       15.1256    118.4709%    1.000         1.4035 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: ASP-chi1chi2  Type: AbInitio_GMX  Objective = 2.55790e+00         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      25.2826       15.8081    159.9344%    1.000         2.5579 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: ASP-phipsi  Type: AbInitio_GMX  Objective = 1.04483e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      17.6597       17.2767    102.2167%    1.000         1.0448 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: CYS-chi1chi2  Type: AbInitio_GMX  Objective = 6.06776e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)       7.1626        9.1950     77.8958%    1.000         0.6068 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: CYS-phipsi  Type: AbInitio_GMX  Objective = 1.10822e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      14.8805       14.1353    105.2718%    1.000         1.1082 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: GLN-chi1chi2  Type: AbInitio_GMX  Objective = 7.77978e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      11.0217       12.4958     88.2031%    1.000         0.7780 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: GLN-phipsi  Type: AbInitio_GMX  Objective = 1.26551e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      17.1308       15.2281    112.4949%    1.000         1.2655 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: GLU-chi1chi2  Type: AbInitio_GMX  Objective = 7.47408e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      17.8080       20.5985     86.4528%    1.000         0.7474 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: GLU-phipsi  Type: AbInitio_GMX  Objective = 1.81001e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      23.7719       17.6695    134.5366%    1.000         1.8100 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: GLY-phipsi  Type: AbInitio_GMX  Objective = 5.28510e-01          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)       9.8589       13.5613     72.6987%    1.000         0.5285 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: HID-chi1chi2  Type: AbInitio_GMX  Objective = 5.95517e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      10.0875       13.0718     77.1698%    1.000         0.5955 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: HID-phipsi  Type: AbInitio_GMX  Objective = 1.09189e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      16.0683       15.3773    104.4935%    1.000         1.0919 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: HIE-chi1chi2  Type: AbInitio_GMX  Objective = 5.00721e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)       8.2462       11.6534     70.7616%    1.000         0.5007 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: HIE-phipsi  Type: AbInitio_GMX  Objective = 1.37848e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      17.5068       14.9110    117.4085%    1.000         1.3785 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: ILE-chi1chi2  Type: AbInitio_GMX  Objective = 2.31520e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)       6.1181       12.7151     48.1165%    1.000         0.2315 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: ILE-phipsi  Type: AbInitio_GMX  Objective = 9.87863e-01          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      14.9800       15.0717     99.3913%    1.000         0.9879 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: LEU-chi1chi2  Type: AbInitio_GMX  Objective = 1.28374e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)       4.9997       13.9541     35.8293%    1.000         0.1284 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: LEU-phipsi  Type: AbInitio_GMX  Objective = 1.08716e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      14.6578       14.0579    104.2669%    1.000         1.0872 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: LYS-chi1chi2  Type: AbInitio_GMX  Objective = 1.72267e+00         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      18.0684       13.7663    131.2504%    1.000         1.7227 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: LYS-phipsi  Type: AbInitio_GMX  Objective = 2.75919e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      22.5028       13.5471    166.1080%    1.000         2.7592 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: MET-chi1chi2  Type: AbInitio_GMX  Objective = 3.19238e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)       6.6283       11.7312     56.5012%    1.000         0.3192 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: MET-phipsi  Type: AbInitio_GMX  Objective = 1.02958e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      15.1284       14.9095    101.4685%    1.000         1.0296 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: PHE-chi1chi2  Type: AbInitio_GMX  Objective = 2.71457e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)       6.4043       12.2920     52.1016%    1.000         0.2715 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: PHE-phipsi  Type: AbInitio_GMX  Objective = 1.29755e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      16.9719       14.8994    113.9103%    1.000         1.2976 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: SER-chi1chi2  Type: AbInitio_GMX  Objective = 9.36787e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      10.0571       10.3908     96.7878%    1.000         0.9368 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: SER-phipsi  Type: AbInitio_GMX  Objective = 9.27540e-01          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      13.4154       13.9295     96.3089%    1.000         0.9275 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: THR-chi1chi2  Type: AbInitio_GMX  Objective = 6.92692e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)       9.2696       11.1376     83.2281%    1.000         0.6927 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: THR-phipsi  Type: AbInitio_GMX  Objective = 8.37398e-01          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      13.5291       14.7844     91.5094%    1.000         0.8374 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: TRP-chi1chi2  Type: AbInitio_GMX  Objective = 4.49668e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)       8.3720       12.4848     67.0573%    1.000         0.4497 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: TRP-phipsi  Type: AbInitio_GMX  Objective = 1.56169e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      18.7871       15.0335    124.9677%    1.000         1.5617 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|         Target: TYR-chi1chi2  Type: AbInitio_GMX  Objective = 2.76118e-01         |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)       6.5051       12.3797     52.5470%    1.000         0.2761 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: TYR-phipsi  Type: AbInitio_GMX  Objective = 1.22255e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      16.5674       14.9837    110.5689%    1.000         1.2225 
+---------------------------------------------------------------------------------------
+#=====================================================================================#
+#|          Target: VAL-phipsi  Type: AbInitio_GMX  Objective = 1.00937e+00          |#
+#|                    Difference   Denominator     Percent                           |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference   Weight   Contribution  |#
+#=====================================================================================#
+    Energy (kJ/mol)      15.1705       15.0999    100.4674%    1.000         1.0094 
+---------------------------------------------------------------------------------------
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+ALA-phipsi                     0.95697      1.000 [94m     9.56966e-01[0m 
+ARG-chi1chi2                   0.88818      1.000 [94m     8.88182e-01[0m 
+ARG-phipsi                     1.86305      1.000 [94m     1.86305e+00[0m 
+ASN-chi1chi2                   1.14489      1.000 [94m     1.14489e+00[0m 
+ASN-phipsi                     1.40354      1.000 [94m     1.40354e+00[0m 
+ASP-chi1chi2                   2.55790      1.000 [94m     2.55790e+00[0m 
+ASP-phipsi                     1.04483      1.000 [94m     1.04483e+00[0m 
+CYS-chi1chi2                   0.60678      1.000 [94m     6.06776e-01[0m 
+CYS-phipsi                     1.10822      1.000 [94m     1.10822e+00[0m 
+GLN-chi1chi2                   0.77798      1.000 [94m     7.77978e-01[0m 
+GLN-phipsi                     1.26551      1.000 [94m     1.26551e+00[0m 
+GLU-chi1chi2                   0.74741      1.000 [94m     7.47408e-01[0m 
+GLU-phipsi                     1.81001      1.000 [94m     1.81001e+00[0m 
+GLY-phipsi                     0.52851      1.000 [94m     5.28510e-01[0m 
+HID-chi1chi2                   0.59552      1.000 [94m     5.95517e-01[0m 
+HID-phipsi                     1.09189      1.000 [94m     1.09189e+00[0m 
+HIE-chi1chi2                   0.50072      1.000 [94m     5.00721e-01[0m 
+HIE-phipsi                     1.37848      1.000 [94m     1.37848e+00[0m 
+ILE-chi1chi2                   0.23152      1.000 [94m     2.31520e-01[0m 
+ILE-phipsi                     0.98786      1.000 [94m     9.87863e-01[0m 
+LEU-chi1chi2                   0.12837      1.000 [94m     1.28374e-01[0m 
+LEU-phipsi                     1.08716      1.000 [94m     1.08716e+00[0m 
+LYS-chi1chi2                   1.72267      1.000 [94m     1.72267e+00[0m 
+LYS-phipsi                     2.75919      1.000 [94m     2.75919e+00[0m 
+MET-chi1chi2                   0.31924      1.000 [94m     3.19238e-01[0m 
+MET-phipsi                     1.02958      1.000 [94m     1.02958e+00[0m 
+PHE-chi1chi2                   0.27146      1.000 [94m     2.71457e-01[0m 
+PHE-phipsi                     1.29755      1.000 [94m     1.29755e+00[0m 
+SER-chi1chi2                   0.93679      1.000 [94m     9.36787e-01[0m 
+SER-phipsi                     0.92754      1.000 [94m     9.27540e-01[0m 
+THR-chi1chi2                   0.69269      1.000 [94m     6.92692e-01[0m 
+THR-phipsi                     0.83740      1.000 [94m     8.37398e-01[0m 
+TRP-chi1chi2                   0.44967      1.000 [94m     4.49668e-01[0m 
+TRP-phipsi                     1.56169      1.000 [94m     1.56169e+00[0m 
+TYR-chi1chi2                   0.27612      1.000 [94m     2.76118e-01[0m 
+TYR-phipsi                     1.22255      1.000 [94m     1.22255e+00[0m 
+VAL-phipsi                     1.00937      1.000 [94m     1.00937e+00[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     3.80188e+01[0m 
+----------------------------------------------------------------------
+#========================================================#
+#| [92m    Objective Function Single Point: 38.01878171    [0m |#
+#========================================================#
+Parameter file same as original; will not be printed to results folder.
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#
