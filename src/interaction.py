@@ -67,6 +67,8 @@ class Interaction(Target):
             self.select2 = None
         ## Set upper cutoff energy
         self.set_option(tgt_opts,'energy_upper','energy_upper')
+        ## Option for how much data to write to disk.
+        self.set_option(tgt_opts,'writelevel','writelevel')
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -189,9 +191,11 @@ class Interaction(Target):
         D = emm - self.eqm
         dV = np.zeros((self.FF.np,len(emm)))
 
-        # Dump interaction energies to disk.
-        np.savetxt('M.txt',emm)
-        np.savetxt('Q.txt',self.eqm)
+        if self.writelevel > 0:
+            # Dump interaction energies to disk.
+            np.savetxt('M.txt',emm)
+            np.savetxt('Q.txt',self.eqm)
+            plot_interaction_qm_vs_mm(self.eqm, emm)
 
         # Do the finite difference derivative.
         if AGrad or AHess:
@@ -220,3 +224,12 @@ class Interaction(Target):
             pass
 
         return Answer
+
+def plot_interaction_qm_vs_mm(eqm, emm):
+    import matplotlib.pyplot as plt
+    plt.plot(eqm, label='QM')
+    plt.plot(emm, label='MM')
+    plt.xlabel('Snapshots')
+    plt.ylabel('Interaction Energy (kcal/mol)')
+    plt.savefig("qm_vs_mm.pdf")
+    plt.close()
