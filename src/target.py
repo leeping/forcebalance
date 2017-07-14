@@ -793,7 +793,7 @@ class RemoteTarget(Target):
         forcebalance.nifty.queue_up(wq, "%spython rtarget.py > rtarget.out 2>&1" % (("sh %s%s " % (self.rpfx, " -b" if self.rbak else "")) 
                                                                                     if len(self.rpfx) > 0 else ""),
                                     ["forcefield.p", "options.p", "rtarget.py", "target.tar.bz2"] + ([self.rpfx] if len(self.rpfx) > 0 else []),
-                                    ['objective.p', 'indicate.log', 'rtarget.out'],
+                                    ['objective.p', 'indicate.log', 'rtarget.out', 'M.txt', 'Q.txt', 'e_qm_vs_mm.pdf'],
                                     tgt=self, tag=self.name, verbose=False)
 
     def read(self,mvals,AGrad=False,AHess=False):

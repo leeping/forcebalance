@@ -229,7 +229,8 @@ def plot_interaction_qm_vs_mm(eqm, emm):
     import matplotlib.pyplot as plt
     plt.plot(eqm, label='QM')
     plt.plot(emm, label='MM')
+    plt.legends()
     plt.xlabel('Snapshots')
     plt.ylabel('Interaction Energy (kcal/mol)')
-    plt.savefig("qm_vs_mm.pdf")
+    plt.savefig("e_qm_vs_mm.pdf")
     plt.close()
