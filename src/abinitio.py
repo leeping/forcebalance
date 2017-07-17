@@ -442,35 +442,40 @@ class AbInitio(Target):
         self.boltz_wts /= sum(self.boltz_wts)
 
     def indicate(self):
-        Headings = ["Observable", "Difference\n(Calc-Ref)", "Denominator\n RMS (Ref)", " Percent \nDifference", "Weight", "Contribution"]
+        Headings = ["Observable", "Difference\n(Calc-Ref)", "Denominator\n RMS (Ref)", " Percent \nDifference", "Term", "x Wt =", "Contrib."]
         Data = OrderedDict([])
         if self.energy:
             Data['Energy (kJ/mol)'] = ["%8.4f" % self.e_err,
                                        "%8.4f" % self.e_ref,
                                        "%.4f%%" % (self.e_err_pct*100),
+                                       "%8.4f" % self.e_trm,
                                        "%.3f" % self.w_energy,
                                        "%8.4f" % self.e_ctr]
         if self.force:
             Data['Gradient (kJ/mol/A)'] = ["%8.4f" % (self.f_err/10),
                                            "%8.4f" % (self.f_ref/10),
                                            "%.4f%%" % (self.f_err_pct*100),
+                                           "%8.4f" % self.f_trm,
                                            "%.3f" % self.w_force,
                                            "%8.4f" % self.f_ctr]
             if self.use_nft:
                 Data['Net Force (kJ/mol/A)'] = ["%8.4f" % (self.nf_err/10),
                                                 "%8.4f" % (self.nf_ref/10),
                                                 "%.4f%%" % (self.nf_err_pct*100),
+                                                "%8.4f" % self.nf_trm,
                                                 "%.3f" % self.w_netforce,
                                                 "%8.4f" % self.nf_ctr]
                 Data['Torque (kJ/mol/rad)'] = ["%8.4f" % self.tq_err,
                                                "%8.4f" % self.tq_ref,
                                                "%.4f%%" % (self.tq_err_pct*100),
+                                               "%8.4f" % self.tq_trm,
                                                "%.3f" % self.w_torque,
                                                "%8.4f" % self.tq_ctr]
         if self.resp:
             Data['Potential (a.u.'] = ["%8.4f" % (self.esp_err/10),
                                        "%8.4f" % (self.esp_ref/10),
                                        "%.4f%%" % (self.esp_err_pct*100),
+                                       "%8.4f" % self.esp_trm,
                                        "%.3f" % self.w_resp,
                                        "%8.4f" % self.esp_ctr]
         self.printcool_table(data=Data, headings=Headings, color=0)
@@ -895,24 +900,35 @@ class AbInitio(Target):
         # Save values to qualitative indicator if not inside finite difference code.
         if not in_fd():
             # Contribution from energy and force parts.
-            self.e_ctr = X2_Components[0]
+            tw = self.w_energy + self.w_force + self.w_netforce + self.w_torque + self.w_resp
+            self.e_trm = X2_Components[0]
+            self.e_ctr = X2_Components[0]*W_Components[0]
+            if self.w_normalize: self.e_ctr /= tw
             self.e_ref = np.sqrt(X2_Normalize[0])
             self.e_err = np.sqrt(X2_Physical[0])
             self.e_err_pct = self.e_err/self.e_ref
             if self.force:
-                self.f_ctr = X2_Components[1]
+                self.f_trm = X2_Components[1]
+                self.f_ctr = X2_Components[1]*W_Components[1]
+                if self.w_normalize: self.f_ctr /= tw
                 self.f_ref = np.sqrt(X2_Normalize[1]/nat)
                 self.f_err = np.sqrt(X2_Physical[1]/nat)
                 self.f_err_pct = self.f_err/self.f_ref
             if self.use_nft:
-                self.nf_ctr = X2_Components[2]
+                self.nf_trm = X2_Components[2]
+                self.nf_ctr = X2_Components[2]*W_Components[2]
                 self.nf_ref = np.sqrt(X2_Normalize[2]/nnf)
                 self.nf_err = np.sqrt(X2_Physical[2]/nnf)
                 self.nf_err_pct = self.nf_err/self.nf_ref
-                self.tq_ctr = X2_Components[3]
+                self.tq_trm = X2_Components[3]
+                self.tq_ctr = X2_Components[3]*W_Components[3]
                 self.tq_ref = np.sqrt(X2_Normalize[3]/ntq)
                 self.tq_err = np.sqrt(X2_Physical[3]/ntq)
                 self.tq_err_pct = self.tq_err/self.tq_ref
+                if self.w_normalize:
+                    self.nf_ctr /= tw
+                    self.tq_ctr /= tw
+
             pvals = self.FF.make(mvals) # Write a force field that isn't perturbed by finite differences.
         Answer = {'X':X2, 'G':G, 'H':H}
         return Answer
@@ -1024,7 +1040,11 @@ class AbInitio(Target):
                 H += np.diag(flat(dqPdqM.T * col(ddR)))
 
         if not in_fd():
-            self.esp_ctr = X
+            self.esp_trm = X
+            self.esp_ctr = X*self.w_resp
+            if self.w_normalize:
+                tw = self.w_energy + self.w_force + self.w_netforce + self.w_torque + self.w_resp
+                self.esp_ctr /= tw
             
         Answer = {'X':X,'G':G,'H':H}
         return Answer

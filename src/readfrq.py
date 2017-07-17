@@ -2,7 +2,7 @@
 
 import os, sys, re
 import numpy as np
-from molecule import Molecule
+from molecule import Molecule, Elements
 from nifty import isint, isfloat
 
 np.set_printoptions(precision=4)
@@ -11,10 +11,34 @@ def print_mode(M, mode):
     print '\n'.join(['%-3s' % M.elem[ii] + ' '.join(['% 7.3f' % j for j in i]) for ii, i in enumerate(mode)])
 
 def read_frq_gau(gauout):
+    XMode = 0
+    xyz = []
+    elem = []
+    elemThis = []
     VMode = 0
     frqs = []
+    intens = []
     modes = []
     for line in open(gauout).readlines():
+        line = line.strip().expandtabs()
+        if XMode >= 1:
+            # Perfectionist here; matches integer, element, and three floating points
+            if re.match("^[0-9]+ +[0-9]+ +[0-9]+( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
+                XMode = 2
+                sline = line.split()
+                elemThis.append(Elements[int(sline[1])])
+                xyz.append([float(i) for i in sline[3:]])
+            elif XMode == 2: # Break out of the loop if we encounter anything other than atomic data
+                if elem == []:
+                    elem = elemThis
+                elif elem != elemThis:
+                    logger.error('Gaussian output parser will not work if successive calculations have different numbers of atoms!\n')
+                    raise RuntimeError
+                elemThis = []
+                xyz = np.array(xyz)
+                XMode = -1
+        elif XMode == 0 and "Coordinates (Angstroms)" in line:
+            XMode = 1
         VModeNxt = None
         if line.strip().startswith('Frequencies'):
             VMode = 2
@@ -26,6 +50,8 @@ def read_frq_gau(gauout):
             if re.match('^[ \t]*Atom', line):
                 VModeNxt = 3
                 readmodes = [[] for i in range(nfrq)]
+            if 'IR Inten' in line:
+                intens += [float(i) for i in s[3:]]
             if 'Imaginary Frequencies' in line:
                 VMode = 0
         if VMode == 3:
@@ -38,11 +64,40 @@ def read_frq_gau(gauout):
                     readmodes[i].append([float(s[j]) for j in range(2+3*i,5+3*i)])
         if VModeNxt is not None: VMode = VModeNxt
     unnorm = [np.array(i) for i in modes]
-    return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm]
+    return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm], np.array(intens), elem, xyz
 
-def read_frq_tc(tcout):
+def read_frq_tc(tcout, scrdir='scr'):
+    # Unfortunately, TeraChem's frequency data is scattered in the output file and scratch folder
     lineCounter = -100
-    for lineNumber, line in enumerate(open(tcout).readlines()):
+    xyzpath = os.path.join(os.path.split(os.path.abspath(tcout))[0], scrdir, 'CentralGeometry.initcond.xyz')
+    tcdat = os.path.join(os.path.split(os.path.abspath(tcout))[0], scrdir, 'Frequencies.dat')
+    if not os.path.exists(xyzpath):
+        raise RuntimeError("%s doesn't exist; please provide a scratch folder to this function" % xyzpath)
+    if not os.path.exists(tcdat):
+        raise RuntimeError("%s doesn't exist; please provide a scratch folder to this function" % tcdat)
+    Mxyz = Molecule(xyzpath)
+
+    # This piece of Yudong's code reads the intensities
+    found_vib = False
+    freqs = []
+    intensities = []
+    for line in open(tcout):
+        if 'Vibrational Frequencies/Thermochemical Analysis After Removing Rotation and Translation' in line:
+            found_vib = True
+        if found_vib:
+            ls = line.split()
+            if len(ls) == 8 and ls[0].isdigit():
+                freqs.append(float(ls[2]))
+                intensities.append(float(ls[3]))
+            elif len(ls) == 3 and ls[2].endswith('i'):
+                freqs.append(-1*float(ls[2][:-1]))
+                intensities.append(0.0)
+            if line.strip() == '':
+                break
+    if found_vib is False:
+        raise RuntimeError("No frequency data was found in file %s" % filename)
+        
+    for lineNumber, line in enumerate(open(tcdat).readlines()):
         s = line.split()
         if lineNumber == 0:
             numAtoms = int(s[-1])
@@ -75,13 +130,39 @@ def read_frq_tc(tcout):
             if idx == 3*numAtoms-1:
                 lineCounter = -100
         lineCounter += 1
-    return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm]
+    if np.max(np.abs(np.array(frqs)-np.array(freqs))) > 1.0:
+        raise RuntimeError("Inconsistent frequencies from TeraChem output and scratch")
+    return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm], np.array(intensities), Mxyz.elem, Mxyz.xyzs[0]
 
 def read_frq_qc(qcout):
+    XMode = 0
+    xyz = []
+    elem = []
+    elemThis = []
     VMode = 0
     frqs = []
     modes = []
+    intens = []
     for line in open(qcout).readlines():
+        line = line.strip().expandtabs()
+        if XMode >= 1:
+            # Perfectionist here; matches integer, element, and three floating points
+            if re.match("^[0-9]+ +[A-Z][A-Za-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
+                XMode = 2
+                sline = line.split()
+                elemThis.append(sline[1])
+                xyz.append([float(i) for i in sline[2:]])
+            elif XMode == 2: # Break out of the loop if we encounter anything other than atomic data
+                if elem == []:
+                    elem = elemThis
+                elif elem != elemThis:
+                    logger.error('Q-Chem output parser will not work if successive calculations have different numbers of atoms!\n')
+                    raise RuntimeError
+                elemThis = []
+                xyz = np.array(xyz)
+                XMode = -1
+        elif XMode == 0 and  re.match("Standard Nuclear Orientation".lower(), line.lower()):
+            XMode = 1
         VModeNxt = None
         if 'VIBRATIONAL ANALYSIS' in line:
             VMode = 1
@@ -92,9 +173,11 @@ def read_frq_qc(qcout):
             if 'Frequency:' in line:
                 nfrq = len(s) - 1
                 frqs += [float(i) for i in s[1:]]
-            if re.match('^ +X', line):
+            if re.match('^X +Y +Z', line):
                 VModeNxt = 3
                 readmodes = [[] for i in range(nfrq)]
+            if 'IR Intens:' in line:
+                intens += [float(i) for i in s[2:]]
             if 'Imaginary Frequencies' in line:
                 VMode = 0
         if VMode == 3:
@@ -107,7 +190,7 @@ def read_frq_qc(qcout):
                     readmodes[i].append([float(s[j]) for j in range(1+3*i,4+3*i)])
         if VModeNxt is not None: VMode = VModeNxt
     unnorm = [np.array(i) for i in modes]
-    return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm]
+    return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm], np.array(intens), elem, xyz
 
 def read_frq_psi(psiout):
     """ """
@@ -157,7 +240,7 @@ def read_frq_psi(psiout):
             XMode = 1
             EMode = len(elem) == 0
     unnorm = [np.array(i) for i in modes]
-    return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm], elem, np.array(xyzs[-1])
+    return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm], np.zeros_like(frqs), elem, np.array(xyzs[-1])
 
 def scale_freqs(arr):
     """ Apply harmonic vibrational scaling factors. """
@@ -177,17 +260,18 @@ def scale_freqs(arr):
         if frq > div:
             if hscal < 1.0:
                 # Amount that the frequency is above the dividing line
-                above = (frq-div)
+                # above = (frq-div)
                 # Maximum frequency shift
-                maxshf = (div/hscal-div)
+                # maxshf = (div/hscal-div)
                 # Close to the dividing line, the frequency should be
                 # scaled less because we don't want the orderings of
                 # the frequencies to switch.
                 # Far from the dividing line, we want the frequency shift
                 # to approach the uncorrected shift.
                 # 1.0/(1.0 + maxshf/above) is a scale of how far we are from the dividing line.
-                att = 1.0/(1.0 + maxshf/above)
+                # att = 1.0/(1.0 + maxshf/above)
                 # shift is the uncorrected shift.
+                att = (frq-div)/(frq-hscal*div)
                 shift = (hscal - 1.0) * frq
                 newshift = att*shift
                 print "%10.3f %10.3f  % 9.3f % 9.3f % 8.3f" % (frq, frq+newshift, shift, newshift, newshift-shift)
@@ -197,9 +281,10 @@ def scale_freqs(arr):
                 return frq*hscal
         elif frq <= div:
             if lscal > 1.0:
-                below = (div-frq)
-                maxshf = (div-div/lscal)
-                att = 1.0/(1.0 + maxshf/below)
+                # below = (div-frq)
+                # maxshf = (div-div/lscal)
+                # att = 1.0/(1.0 + maxshf/below)
+                att = (frq-div)/(frq-lscal*div)
                 shift = (lscal - 1.0) * frq
                 newshift = att*shift
                 print "%10.3f %10.3f  % 9.3f % 9.3f % 8.3f" % (frq, frq+newshift, shift, newshift, newshift-shift)
@@ -209,11 +294,25 @@ def scale_freqs(arr):
                 return frq*lscal
     return np.array([scale_one(i) for i in arr])
 
+def read_frq_gen(fout):
+    ln = 0
+    for line in open(fout):
+        if 'TeraChem' in line:
+            return read_frq_tc(fout)
+        elif 'Q-Chem' in line:
+            return read_frq_qc(fout)
+        elif 'PSI4' in line:
+            return read_frq_psi(fout)
+        elif 'Gaussian' in line:
+            return read_frq_gau(fout)
+        ln += 1
+    raise RuntimeError('Cannot determine format')
+
 def main():
     Mqc = Molecule(sys.argv[2])
-    psifrqs, psimodes, _, __ = read_frq_psi(sys.argv[1])
-    qcfrqs, qcmodes = read_frq_qc(sys.argv[2])
-    gaufrqs, gaumodes = read_frq_gau(sys.argv[3])
+    psifrqs, psimodes, _, __, ___ = read_frq_gen(sys.argv[1])
+    qcfrqs, qcmodes, _, __, ___ = read_frq_gen(sys.argv[2])
+    gaufrqs, gaumodes, _, __, ___ = read_frq_gen(sys.argv[3])
     for i, j, ii, jj, iii, jjj in zip(psifrqs, psimodes, qcfrqs, qcmodes, gaufrqs, gaumodes):
         print "PsiFreq:", i, "QCFreq", ii, "GauFreq", iii
         print "PsiMode:", np.linalg.norm(j)

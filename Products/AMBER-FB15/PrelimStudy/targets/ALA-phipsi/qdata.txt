@@ -1,0 +1,1 @@
+../../../Optimize/ScanData/ALA-phipsi/qdata.txt

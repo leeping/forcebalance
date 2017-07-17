@@ -690,7 +690,7 @@ class GMX(Engine):
                         print >> f, "#include \"%s\"" % itpfnm
                         print >> f
                         for line in topol:
-                            print >> f, line
+                            print >> f, line,
                     # warn_press_key("None of the force field files %s are referenced in the .top file. "
                     #                "Are you referencing the files through C preprocessor directives?" % self.FF.fnms)
 
