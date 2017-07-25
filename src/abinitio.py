@@ -794,7 +794,7 @@ class AbInitio(Target):
                                           col(M_all_print[:,0])-col(Q_all_print[:,0]),
                                           col(self.boltz_wts)))
             np.savetxt("EnergyCompare.txt", EnergyComparison, header="%11s  %12s  %12s  %12s" % ("QMEnergy", "MMEnergy", "Delta(MM-QM)", "Weight"), fmt="% 12.6e")
-            plot_mm_vs_qm(M_all_print[:,0], Q_all_print[:,0])
+            plot_mm_vs_qm(M_all_print[:,0], Q_all_print[:,0], title='Abinitio '+self.name)
         if self.force and self.writelevel > 1:
             # Write .xyz files which can be viewed in vmd.
             QMTraj = self.mol[:].atom_select(self.fitatoms)
@@ -1085,7 +1085,7 @@ def compute_objective_part(SPX,QQ0,Q0,Z,a,n,energy=False,subtract_mean=False,div
         raise RuntimeError('Please pass either 0, 1, 2 to divide')
     return X2
 
-def plot_mm_vs_qm(M, Q):
+def plot_mm_vs_qm(M, Q, title=''):
     import matplotlib.pyplot as plt
     qm_min_dx = np.argmin(Q)
     e_qm = Q - Q[qm_min_dx]
@@ -1100,5 +1100,6 @@ def plot_mm_vs_qm(M, Q):
         y2 = x2
     plt.axis((0,x2,0,y2))
     plt.plot([0,x2],[0,y2], '--' )
+    plt.title(title)
     plt.savefig('e_qm_vs_mm.pdf')
     plt.close()
