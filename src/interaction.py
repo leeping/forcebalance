@@ -195,7 +195,7 @@ class Interaction(Target):
             # Dump interaction energies to disk.
             np.savetxt('M.txt',emm)
             np.savetxt('Q.txt',self.eqm)
-            plot_interaction_qm_vs_mm(self.eqm, emm)
+            plot_interaction_qm_vs_mm(self.eqm, emm, title="Interaction Energy "+self.name)
 
         # Do the finite difference derivative.
         if AGrad or AHess:
@@ -225,12 +225,13 @@ class Interaction(Target):
 
         return Answer
 
-def plot_interaction_qm_vs_mm(eqm, emm):
+def plot_interaction_qm_vs_mm(eqm, emm, title=''):
     import matplotlib.pyplot as plt
-    plt.plot(eqm, label='QM')
-    plt.plot(emm, label='MM')
-    plt.legends()
+    plt.plot(eqm, label='QM Data', marker='^')
+    plt.plot(emm, label='MM Data', marker='o')
+    plt.legend()
     plt.xlabel('Snapshots')
     plt.ylabel('Interaction Energy (kcal/mol)')
+    plt.title(title)
     plt.savefig("e_qm_vs_mm.pdf")
     plt.close()
