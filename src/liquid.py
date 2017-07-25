@@ -460,7 +460,7 @@ class Liquid(Target):
         avgCalc = 0.0
         avgExp  = 0.0
         avgGrad = np.zeros(self.FF.np)
-        
+
         for PT in points:
             avgCalc += Weights[PT]*calc[PT]
             avgExp  += Weights[PT]*exp[PT]
@@ -1047,7 +1047,7 @@ class Liquid(Target):
 
         """
         if not self.pure_num_grad:
-            raise RuntimeError("Not running in pure numerical gradients mode. Please use self.get_normal()) instead!")
+            raise RuntimeError("Not running in pure numerical gradients mode. Please use self.get_normal() instead!")
 
         if not AGrad:
             return self.get_normal(mvals, AGrad=AGrad, AHess=AHess)
