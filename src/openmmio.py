@@ -667,7 +667,9 @@ class OpenMM(Engine):
             ## Here we will set the CutoffPeriodic so custom nonbonded forces may be used.
             ## However, we will turn PME on for AmoebaMultipoleForce and NonbondedForce after the system is created.
             self.SetPME = True
-            self.mmopts.setdefault('nonbondedMethod', CutoffPeriodic)
+            # LPW: THIS CAUSES ISSUES! (AMOEBA system refuses to be created)
+            # self.mmopts.setdefault('nonbondedMethod', CutoffPeriodic)
+            self.mmopts.setdefault('nonbondedMethod', PME)
             if self.AMOEBA:
                 nonbonded_cutoff = kwargs.get('nonbonded_cutoff', 7.0)
                 vdw_cutoff = kwargs.get('nonbonded_cutoff', 8.5)

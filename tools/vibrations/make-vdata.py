@@ -4,7 +4,7 @@ import os, sys, re
 import numpy as np
 import shutil
 from forcebalance.molecule import Molecule
-from forcebalance.readfrq import read_frq_psi, scale_freqs
+from forcebalance.readfrq import read_frq_gen, scale_freqs
 
 commblk = """#==========================================#
 #| File containing vibrational modes from |#
@@ -38,10 +38,10 @@ commblk = """#==========================================#
 #==========================================#
 """
 
-# Psi4 output file.
-psiout = sys.argv[1]
+# Quantum chemistry output file.
+fout = sys.argv[1]
 
-frqs, modes, elem, xyz = read_frq_psi(psiout)
+frqs, modes, intens, elem, xyz = read_frq_gen(fout)
 
 frqs1 = scale_freqs(frqs)
 
@@ -52,7 +52,7 @@ if list(frqs1) != sorted(list(frqs1)):
 with open('vdata.txt', 'w') as f:
     print >> f, commblk
     print >> f, len(elem)
-    print >> f, "Coordinates and vibrations calculated from %s" % psiout
+    print >> f, "Coordinates and vibrations calculated from %s" % fout
     for e, i in zip(elem, xyz):
         print >> f, "%2s % 8.3f % 8.3f % 8.3f" % (e, i[0], i[1], i[2])
     for frq, mode in zip(frqs1, modes):

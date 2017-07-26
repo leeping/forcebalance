@@ -1,0 +1,1 @@
+../../../Optimize/ScanData/ARG-chi1chi2/qdata.txt
