@@ -1,0 +1,23 @@
+**************************************************************************
+* AMBER-FB15 is an improved version of the AMBER force field with        *
+* reoptimized intramolecular parameters. Please cite our paper:          *
+* Lee-Ping Wang, Keri A. McKiernan, Joseph Gomes, Kyle A. Beauchamp,     *
+* Teresa Head-Gordon, Julia E. Rice, William C. Swope, Todd J. Martinez, *
+* and Vijay S. Pande. Building a More Predictive Protein Force Field:    *
+* A Systematic and Reproducible Route to AMBER-FB15. (2017)              *
+* J. Phys. Chem. B, DOI: 10.1021/acs.jpcb.7b02320                        *
+* The files in this folder were modified from amber99sb.ff.              *
+**************************************************************************
+
+#define _FF_AMBER
+#define _FF_FB15
+
+[ defaults ]
+; nbfunc        comb-rule       gen-pairs       fudgeLJ fudgeQQ
+1               2               yes             0.5     0.8333
+
+#include "ffnonbonded.itp"
+#include "ffbonded.itp"
+#include "gbsa.itp"
+
+

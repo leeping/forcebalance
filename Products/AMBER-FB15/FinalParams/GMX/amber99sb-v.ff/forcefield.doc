@@ -1,0 +1,12 @@
+AMBER99SB-V protein, nucleic AMBER94 (Wang et al., J. Phys. Chem. B, 2017)
+
+***********************************************************************
+* NOTE - this force field is not to be used for production runs,      *
+* as it is only provided as a comparison to AMBER-FB15 (see paper).   *
+* Lee-Ping Wang, Keri A. McKiernan, Joseph Gomes, Kyle A. Beauchamp,  *
+* Teresa Head-Gordon, Julia E. Rice, William C. Swope, Todd           *
+* J. Martinez, and Vijay S. Pande. Building a More Predictive Protein *
+* Force Field: A Systematic and Reproducible Route to                 *
+* AMBER-FB15. (2017) J. Phys. Chem. B, DOI: 10.1021/acs.jpcb.7b02320  *
+* The files in this folder were modified from amber99sb.ff.           *
+***********************************************************************

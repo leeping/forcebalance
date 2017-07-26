@@ -1,0 +1,7 @@
+tip3pfb  TIP3P-FB  TIP 3-point optimized with ForceBalance, recommended
+tip3p    TIP3P     TIP 3-point
+tip4p    TIP4P     TIP 4-point
+tip4pew  TIP4P-Ew  TIP 4-point optimized with Ewald
+tip4pfb  TIP4P-FB  TIP 4-point optimized with ForceBalance
+spc      SPC       simple point charge
+spce     SPC/E     extended simple point charge
