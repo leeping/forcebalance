@@ -188,11 +188,24 @@ the central ideas as well as financial support.
 - Jiahao Chen contributed the call graph generator, the QTPIE
 fluctuating-charge force field (which Lee-Ping implemented into
 GROMACS), the interface to the MOPAC semiempirical code, and many
-helpful discussions.
+helpful discussions. (Many of these are only in the older ForTune
+code)
 
 - Arthur Vigil contributed the unit testing framework and many unit tests,
 significant improvements to the automatic documentation generation, 
 logging of output, graphical user interface, and various code improvements.
+
+- Keri McKiernan contributed the lipid bilayer target, starting from
+multiple initial conditions at each thermodynamic phase point, and several
+other features.
+
+- Yudong Qiu contributed the surface tension target, pure finite-difference
+for thermodynamic property gradients, and various other improvements.
+
+- Erik Brandt contributed the general thermodynamic property "Thermo" target.
+
+- Johnny Israeli contributed the XmlScript functionality that allows
+adjustable parameters to be read from embedded scripts in OpenMM XML files.
 
 - Matt Welborn contributed the parallelization-over-snapshots
 functionality in the general force matching module.
