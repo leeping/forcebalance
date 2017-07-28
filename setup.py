@@ -2,7 +2,7 @@
 """
 setup.py: Install ForceBalance. 
 """
-__author__ = "Lee-Ping Wang, Arthur Vigil"
+__author__ = "Lee-Ping Wang"
 
 from setuptools import setup,Extension
 import os,sys,re

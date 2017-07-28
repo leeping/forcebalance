@@ -58,7 +58,7 @@ def process(word, color):
     return Answer
 
 def main():
-    printcool("Welcome to ForceBalance version 1.3! =D\nForce Field Optimization System\n\nAuthors:\nLee-Ping Wang\nArthur Vigil, Keri McKiernan,\nErik Brandt, Johnny Israeli", ansi="1", bold=True, minwidth=64)
+    printcool("Welcome to ForceBalance version 1.3! =D\nForce Field Optimization System\n\nAuthors:\nLee-Ping Wang\nKeri McKiernan, Yudong Qiu\nArthur Vigil, Erik Brandt, Johnny Israeli", ansi="1", bold=True, minwidth=64)
     logostr = """
                           ,'+++                                        
                        ,++++++.      .:,,.                              
