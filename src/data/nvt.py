@@ -329,6 +329,10 @@ def main():
     EngOpts["liquid"] = OrderedDict([("coords", liquid_fnm), ("mol", ML), ("pbc", True)])
     if "nonbonded_cutoff" in TgtOptions:
         EngOpts["liquid"]["nonbonded_cutoff"] = TgtOptions["nonbonded_cutoff"]
+    else:
+        largest_available_cutoff = min(ML.boxes[0][:3]) / 2 - 0.1
+        EngOpts["liquid"]["nonbonded_cutoff"] = largest_available_cutoff
+        logger.info("nonbonded_cutoff is by default set to the largest available value: %g Angstrom" %largest_available_cutoff)
     if "vdw_cutoff" in TgtOptions:
         EngOpts["liquid"]["vdw_cutoff"] = TgtOptions["vdw_cutoff"]
     # Hard Code nonbonded_cutoff to 13A for test
@@ -456,13 +460,13 @@ def main():
     if AGrad:
         beta = 1.0 / kT
         plus_denom = np.mean(np.exp(-beta*dE_plus))
-        minus_demon = np.mean(np.exp(-beta*dE_minus))
+        minus_denom = np.mean(np.exp(-beta*dE_minus))
         for param_i in xrange(n_params):
             plus_left = np.mean(-beta * G_plus[param_i] * np.exp(-beta*dE_plus))
             plus_right = np.mean(-beta * G[param_i]) * plus_denom
             minus_left = np.mean(-beta * G_minus[param_i] * np.exp(-beta*dE_minus))
-            minus_right = np.mean(-beta * G[param_i]) * minus_demon
-            G_surf_ten[param_i] = prefactor * (1.0/plus_denom*(plus_left-plus_right) - 1.0/minus_demon*(minus_left-minus_right))
+            minus_right = np.mean(-beta * G[param_i]) * minus_denom
+            G_surf_ten[param_i] = prefactor * (1.0/plus_denom*(plus_left-plus_right) - 1.0/minus_denom*(minus_left-minus_right))
         printcool("Analytic Derivatives:")
         FF.print_map(vals=G_surf_ten)
 
