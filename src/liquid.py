@@ -155,6 +155,8 @@ class Liquid(Target):
         self.set_option(tgt_opts,'nvt_interval', forceprint=True)
         # Switch for pure numerical gradients
         self.set_option(tgt_opts,'pure_num_grad', forceprint=True)
+        # Finite difference size for pure_num_grad
+        self.set_option(tgt_opts,'liquid_fdiff_h', forceprint=True)
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -556,7 +558,7 @@ class Liquid(Target):
         if AGrad and self.pure_num_grad:
             logger.info("Running in Pure Numerical Gradient Mode! Two additional simulation will be submitted for each parameter.\n")
             for i_m in range(len(mvals)):
-                for delta_m in [-self.h, +self.h]:
+                for delta_m in [-self.liquid_fdiff_h, +self.liquid_fdiff_h]:
                     pure_num_grad_label = 'mvals_%03d_%f' % (i_m, delta_m)
                     if not os.path.exists(pure_num_grad_label):
                         os.mkdir(pure_num_grad_label)
@@ -1059,7 +1061,7 @@ class Liquid(Target):
         # The folder structure should be consistent with self.submit_jobs()
         for i_m in range(len(mvals)):
             property_results_pm = dict()
-            for delta_m in [+self.h, -self.h]:
+            for delta_m in [+self.liquid_fdiff_h, -self.liquid_fdiff_h]:
                 pure_num_grad_label = 'mvals_%03d_%f' % (i_m, delta_m)
                 os.chdir(pure_num_grad_label)
                 # copy the original mvals and perturb
@@ -1071,7 +1073,7 @@ class Liquid(Target):
                 os.chdir('..')
             for key in property_results:
                 for PT in property_results[key][2].keys():
-                    property_results[key][2][PT][i_m] = (property_results_pm[+self.h][key][0][PT] - property_results_pm[-self.h][key][0][PT]) / (2.0*self.h)
+                    property_results[key][2][PT][i_m] = (property_results_pm[+self.liquid_fdiff_h][key][0][PT] - property_results_pm[-self.liquid_fdiff_h][key][0][PT]) / (2.0*self.liquid_fdiff_h)
 
         return property_results
 
