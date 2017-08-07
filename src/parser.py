@@ -259,6 +259,7 @@ tgt_opts_types = {
                  "energy_asymmetry": (1.0, -150, 'Snapshots with (E_MM - E_QM) < 0.0 will have their weights increased by this factor.', 'Ab initio targets'),
                  "nonbonded_cutoff"  : (None, -1, 'Cutoff for nonbonded interactions (passed to engines).', 'Condensed phase property targets', 'liquid'),
                  "vdw_cutoff"        : (None, -2, 'Cutoff for vdW interactions if different from other nonbonded interactions', 'Condensed phase property targets', 'liquid'),
+                 "liquid_fdiff_h" : (1e-2, 0, 'Step size for finite difference derivatives for liquid targets in pure_num_grad', 'Condensed phase property targets', 'liquid'),
                  },
     'sections': {}
     }
