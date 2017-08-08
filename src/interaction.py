@@ -195,7 +195,15 @@ class Interaction(Target):
             # Dump interaction energies to disk.
             np.savetxt('M.txt',emm)
             np.savetxt('Q.txt',self.eqm)
-            plot_interaction_qm_vs_mm(self.eqm, emm, title="Interaction Energy "+self.name)
+            import pickle
+            pickle.dump((self.name, self.label, self.prefactor, self.eqm, emm), open("qm_vs_mm.p",'w'))
+            # select the qm and mm data that has >0 weight to plot
+            qm_data, mm_data = [], []
+            for i in xrange(len(self.eqm)):
+                if self.prefactor[i] != 0:
+                    qm_data.append(self.eqm[i])
+                    mm_data.append(emm[i])
+            plot_interaction_qm_vs_mm(qm_data, mm_data, title="Interaction Energy "+self.name)
 
         # Do the finite difference derivative.
         if AGrad or AHess:
