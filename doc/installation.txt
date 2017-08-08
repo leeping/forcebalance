@@ -35,6 +35,7 @@ The following packages are required for certain functionality:
 
 @li <a href=http://lxml.de/>lxml</a> version 2.3.4 - Python interface to libxml2 for parsing OpenMM force field files
 @li <a href=http://nd.edu/~ccl/software/>cctools</a> version 3.4.1 - Cooperative Computing Tools from Notre Dame for distributed computing
+@li <a href=https://matplotlib.org>matplotlib</a> version 2.0.2 - Python plotting library which produces publication quality figures
 
 The following packages are used for documentation:
 
@@ -111,7 +112,12 @@ As with the installation of any software, there are potential issues with depend
 export PATH=/home/leeping/opt/epd-7.3.2/bin:$PATH
 export PYTHONUSERBASE=/home/leeping/opt/epd-7.3.2 @endverbatim
 
-Once you have done this, the Numpy, Scipy and lxml dependency issues should be resolved and %ForceBalance will run without any problems.
+An alternative option is to use Anaconda2, that can be downloaded <a href=https://www.continuum.io/downloads>the Continuum website</a>. It is also free for academic users.
+
+@verbatim
+export PATH=/home/leeping/opt/anaconda2/bin:$PATH
+
+Once you have done this, the Numpy, Scipy, Matplotlib and lxml dependency issues should be resolved and %ForceBalance will run without any problems.
 
 Here are a list of installation notes (not required if you install %ForceBalance into the Enthought Python Distribution).  These notes assume that Python and other packages are installed into $HOME/local.
 
