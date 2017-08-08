@@ -422,7 +422,7 @@ class Liquid(Target):
         print_item("Kappa", "Isothermal Compressibility", "10^-6 bar^-1")
         print_item("Cp", "Isobaric Heat Capacity", "cal mol^-1 K^-1")
         print_item("Eps0", "Dielectric Constant", None)
-        print_item("Surf_ten", "Surface Tension", "mJ m^-2")
+        print_item("Surf_ten", "Surface Tension", "mN m^-1")
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",self.Objective)
 
