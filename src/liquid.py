@@ -3,7 +3,7 @@
 author Lee-Ping Wang
 @date 04/2012
 """
-
+from simtk.unit import *
 import abc
 import os
 import shutil
@@ -86,6 +86,8 @@ class Liquid(Target):
     def __init__(self,options,tgt_opts,forcefield):
         # Initialize base class
         super(Liquid,self).__init__(options,tgt_opts,forcefield)
+	# Weight of the RDF
+	self.set_option(tgt_opts,'w_rdf',forceprint=True)
         # Weight of the density
         self.set_option(tgt_opts,'w_rho',forceprint=True)
         # Weight of the enthalpy of vaporization
@@ -224,7 +226,7 @@ class Liquid(Target):
         global_opts = OrderedDict()
         found_headings = False
         known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra',
-                      'cvib_inter','cni','devib_intra','devib_inter']
+                      'cvib_inter','cni','devib_intra','devib_inter','rdf']
         self.RefData = OrderedDict()
         for line in R:
             if line[0] == "global":
@@ -269,7 +271,6 @@ class Liquid(Target):
                             self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = False
                 except:
                     logger.error(line + '\n')
-                    logger.error('Encountered an error reading this line!\n')
                     raise RuntimeError
             else:
                 logger.error(line + '\n')
@@ -300,7 +301,7 @@ class Liquid(Target):
                     default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
             self.PhasePoints = self.RefData[head].keys()
             # This prints out all of the reference data.
-            # printcool_dictionary(self.RefData[head],head)
+            #printcool_dictionary(self.RefData[head],head)
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
         logger.debug("global_opts:\n%s\n" % str(global_opts))
@@ -335,6 +336,13 @@ class Liquid(Target):
             cmdstr = '%s python npt.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
             if wq is None:
                 logger.info("Running condensed phase simulation locally.\n")
+		print self.tgtdir
+		print 'ROOT'
+		print self.root
+		print 'RUN'		
+		print self.rundir
+		print 'OS'
+		print os.getcwd()
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
             else:
@@ -380,7 +388,7 @@ class Liquid(Target):
         print_item("Kappa", "Isothermal Compressibility", "10^-6 bar^-1")
         print_item("Cp", "Isobaric Heat Capacity", "cal mol^-1 K^-1")
         print_item("Eps0", "Dielectric Constant", None)
-
+	print_item("RDF", "Radial Distribution Function", None)
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",self.Objective)
 
         Title = "%s Condensed Phase Properties:\n %-20s %40s" % (self.name, "Property Name", "Residual x Weight = Contribution")
@@ -392,10 +400,14 @@ class Liquid(Target):
             exp = self.RefData[expname]
             Weights = self.RefData[expname+"_wt"]
             Denom = getattr(self,expname+"_denom")
-        else:
+	    
+        elif expname == 'rdf':
+		exp = OrderedDict([((298.15, 1.0, 'atm'), 0.0)])
+            	Weights = OrderedDict([((298.15, 1.0, 'atm'), 1.0)])
+            	Denom = 2.0
+	else:
             # If the reference data doesn't exist then return nothing.
             return 0.0, np.zeros(self.FF.np), np.zeros((self.FF.np,self.FF.np)), None
-            
         Sum = sum(Weights.values())
         for i in Weights:
             Weights[i] /= Sum
@@ -433,14 +445,15 @@ class Liquid(Target):
                 Delta = calc[PT] - exp[PT]
             if LeastSquares:
                 # Least-squares objective function.
-                ThisObj = Weights[PT] * Delta ** 2 / Denom**2
+                ThisObj = Weights[PT] * Delta ** 2 / Denom**2 #squared residual
                 Objs[PT] = ThisObj
-                ThisGrad = 2.0 * Weights[PT] * Delta * G / Denom**2
+                ThisGrad = 2.0 * Weights[PT] * Delta * G / Denom**2 #residual*partialA/partialLAMBDA
                 GradMap.append(G)
-                Objective += ThisObj
-                Gradient += ThisGrad
+                Objective += ThisObj #sum of squared residual
+                Gradient += ThisGrad 
                 # Gauss-Newton approximation to the Hessian.
-                Hessian += 2.0 * Weights[PT] * (np.outer(G, G)) / Denom**2
+		#print 'GAUSS'
+                Hessian += 2.0 * Weights[PT] * (np.outer(G, G)) / Denom**2 #first-order derivative terms of grad differentiated wrt paramters .aprox hessian
             else:
                 # L1-like objective function.
                 D = Denom
@@ -537,7 +550,8 @@ class Liquid(Target):
     
             # Assign variable names to all the stuff in npt_result.p
             Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
-                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(17))
+                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, RDF, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(18))
+	    
             # Determine the number of molecules
             if len(set(NMols)) != 1:
                 logger.error(str(NMols))
@@ -559,6 +573,7 @@ class Liquid(Target):
             self.AllResults[astrm]['E'].append(np.array(Energies))
             self.AllResults[astrm]['V'].append(np.array(Vols))
             self.AllResults[astrm]['R'].append(np.array(Rhos))
+	    self.AllResults[astrm]['RDF'].append(np.array(RDF))
             self.AllResults[astrm]['Dx'].append(np.array([d[:,0] for d in Dips]))
             self.AllResults[astrm]['Dy'].append(np.array([d[:,1] for d in Dips]))
             self.AllResults[astrm]['Dz'].append(np.array([d[:,2] for d in Dips]))
@@ -568,7 +583,6 @@ class Liquid(Target):
             self.AllResults[astrm]['GDz'].append(np.array([gd[2] for gd in GDips]))
             self.AllResults[astrm]['L'].append(len(Energies[0]))
             self.AllResults[astrm]['Steps'].append(self.liquid_md_steps)
-    
             if len(mPoints) > 0:
                 self.AllResults[astrm]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
                 self.AllResults[astrm]['mG'].append(np.array([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
@@ -654,7 +668,7 @@ class Liquid(Target):
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
-            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(17))
+            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, RDF, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(18))
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             logger.error(str(NMols))
@@ -675,6 +689,7 @@ class Liquid(Target):
         self.AllResults[astrm]['E'].append(np.array(Energies))
         self.AllResults[astrm]['V'].append(np.array(Vols))
         self.AllResults[astrm]['R'].append(np.array(Rhos))
+        self.AllResults[astrm]['RDF'].append(np.array(RDF))
         self.AllResults[astrm]['Dx'].append(np.array([d[:,0] for d in Dips]))
         self.AllResults[astrm]['Dy'].append(np.array([d[:,1] for d in Dips]))
         self.AllResults[astrm]['Dz'].append(np.array([d[:,2] for d in Dips]))
@@ -705,9 +720,9 @@ class Liquid(Target):
             self.gas_md_steps *= 2
 
         # Concatenate along the data-set axis (more than 1 element  if we've returned to these parameters.)
-        E, V, R, Dx, Dy, Dz = \
+        E, V, R, RDF, Dx, Dy, Dz = \
             (np.hstack(tuple(self.AllResults[astrm][i])) for i in \
-                 ['E', 'V', 'R', 'Dx', 'Dy', 'Dz'])
+                 ['E', 'V', 'R', 'RDF', 'Dx', 'Dy', 'Dz'])
 
         G, GDx, GDy, GDz = \
             (np.hstack((np.concatenate(tuple(self.AllResults[astrm][i]), axis=2))) for i in ['G', 'GDx', 'GDy', 'GDz'])
@@ -733,7 +748,9 @@ class Liquid(Target):
         Eps0_calc = OrderedDict([])
         Eps0_grad = OrderedDict([])
         Eps0_std  = OrderedDict([])
-
+	RDF_calc = OrderedDict([])
+        RDF_grad = OrderedDict([])
+        RDF_std  = OrderedDict([])
         # The unit that converts atmospheres * nm**3 into kj/mol :)
         pvkj=0.061019351687175
 
@@ -813,7 +830,40 @@ class Liquid(Target):
                 self.FF.print_map(vals=GEPol)
                 logger.info(bar)
 
+	# Determine spacing in RDF data file
+	RDFdata=[]
+	lines = open('%s/targets/WATER/OORDF.dat' %self.root)
+	first=-1
+	space =0
+	second =-1
+	for line in lines:
+			if line[0:1] != " " or '#':
+				string=line[0:15]
+				break
+  	for i in range(len(string)):
+		if string[i]== ' ' and second==-1:
+			space += 1
+		if space != 0 and string[i]!= ' ':
+			second += 1
+		if string[i]!= ' ':
+			first +=1
+	first = (first) - (second)
+
+	#Read RDF data file
+	Numberlines = 0
+	lines = open('%s/targets/WATER/OORDF.dat' %self.root)
+	for line in lines:
+			if line[0:1] != " " or '#':
+				Numberlines += 1
+				#rdat= line[0:first]
+				rrrdat= line[first+space:first+second+space]
+				#print rdat,rrrdat 
+				RDFdata.append(rrrdat)
+				
         # Arrays must be flattened now for calculation of properties.
+	RDFdata = np.array(RDFdata)
+	RDFdata = RDFdata.flatten()
+	RDF =RDF.flatten()
         E = E.flatten()
         V = V.flatten()
         R = R.flatten()
@@ -841,6 +891,28 @@ class Liquid(Target):
                 return flat(np.matrix(G)*col(W*vec)) - avg(vec)*Gbar
             def deprod(vec):
                 return flat(np.matrix(G)*col(W*vec))
+
+	    ## RDF MSD
+	    #print(len(RDF)/(Numberlines)) #should equal isteps
+	    RDFsum = []
+	    RDFsum1 = float(0.0)
+	    for j in range(0,(len(RDF)/(Numberlines))):
+		    for ii in range(Numberlines*j,Numberlines*(j+1)):
+			#print RDFdata[(ii-(Numberlines*j))],RDF[ii]
+			RDFdiff = float(RDFdata[(ii-(Numberlines*j))]) - float(RDF[ii])
+			RDFdiff = RDFdiff*RDFdiff
+			RDFsum1 = RDFsum1 + RDFdiff
+		    RDFsum1 = RDFsum1/(Numberlines)
+		    RDFsum.append(RDFsum1)
+		    RDFsum1=0
+	    RDFsum = np.array(RDFsum)
+	    RDF_sum = RDFsum.flatten()
+
+	    RDF_calc[PT] = np.dot(W,RDF_sum)
+	    RDF_grad[PT] = mBeta*(flat(np.matrix(G)*col(W*RDFsum)) - np.dot(W,RDFsum)*Gbar)#partialA/partialLAMBDA
+	    #print RDF_sum
+	    #print RDF_calc[PT]
+	    #print RDF_grad[PT]
             ## Density.
             Rho_calc[PT]   = np.dot(W,R)
             Rho_grad[PT]   = mBeta*(flat(np.matrix(G)*col(W*R)) - np.dot(W,R)*Gbar)
@@ -921,7 +993,7 @@ class Liquid(Target):
             Kappa_std[PT]   = np.sqrt(sum(C**2 * np.array(Kappa_errs)**2)) * 1e6
             Cp_std[PT]   = np.sqrt(sum(C**2 * np.array(Cp_errs)**2))
             Eps0_std[PT]   = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
-
+            RDF_std[PT]=0
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Points, 'rho', Rho_calc, Rho_std, Rho_grad, name="Density")
         X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Points, 'hvap', Hvap_calc, Hvap_std, Hvap_grad, name="H_vap", SubAverage=self.hvap_subaverage)
@@ -930,18 +1002,22 @@ class Liquid(Target):
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
 
+	################################################
+	# RDF
+	X_RDF, G_RDF, H_RDF, RDFPrint = self.objective_term(Points, 'rdf', RDF_calc, RDF_std, RDF_grad, name="Radial Distribution Function")
+	###############################################
+
         Gradient = np.zeros(self.FF.np)
         Hessian = np.zeros((self.FF.np,self.FF.np))
-
         if X_Rho == 0: self.w_rho = 0.0
         if X_Hvap == 0: self.w_hvap = 0.0
         if X_Alpha == 0: self.w_alpha = 0.0
         if X_Kappa == 0: self.w_kappa = 0.0
         if X_Cp == 0: self.w_cp = 0.0
         if X_Eps0 == 0: self.w_eps0 = 0.0
-
+	if X_RDF == 0: self.w_rdf = 0.0
         if self.w_normalize:
-            w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0
+            w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_rdf
         else:
             w_tot = 1.0
         w_1 = self.w_rho / w_tot
@@ -950,23 +1026,23 @@ class Liquid(Target):
         w_4 = self.w_kappa / w_tot
         w_5 = self.w_cp / w_tot
         w_6 = self.w_eps0 / w_tot
+	w_7 = 1 
 
-        Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0
+        Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7*X_RDF
         if AGrad:
-            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0
+            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0 + w_7*G_RDF
         if AHess:
-            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0
-
+            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0 + w_7*H_RDF
         if not in_fd():
             self.Xp = {"Rho" : X_Rho, "Hvap" : X_Hvap, "Alpha" : X_Alpha, 
-                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0}
+                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "RDF" : X_RDF}
             self.Wp = {"Rho" : w_1, "Hvap" : w_2, "Alpha" : w_3, 
-                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6}
+                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "RDF" : w_7}
             self.Pp = {"Rho" : RhoPrint, "Hvap" : HvapPrint, "Alpha" : AlphaPrint, 
-                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print}
+                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "RDF" : RDFPrint }
             if AGrad:
                 self.Gp = {"Rho" : G_Rho, "Hvap" : G_Hvap, "Alpha" : G_Alpha, 
-                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0}
+                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "RDF" : G_RDF}
             self.Objective = Objective
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}

@@ -5,6 +5,10 @@
 """
 
 import os
+#rdf
+import mdtraj as md
+from itertools import combinations
+#rdf
 from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
 from forcebalance.binding import BindingEnergy
@@ -14,6 +18,7 @@ from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
 import networkx as nx
 import numpy as np
+import math
 import sys
 from forcebalance.finite_difference import *
 import pickle
@@ -36,7 +41,7 @@ except:
     pass
 
 def get_mask(grps):
-    """ Given a list of booleans [1, 0, 1] return the bitmask that sets
+    """ Given a list of booleans [1, 0, 1] return the bitmask that sets 
     these force groups appropriately in Context.getState(). Any values
     not provided are defaulted to 1.  """
     mask = 0
@@ -256,7 +261,7 @@ def CopyAmoebaVdwParameters(src, dest):
 def CopyAmoebaMultipoleParameters(src, dest):
     for i in range(src.getNumMultipoles()):
         dest.setMultipoleParameters(i,*src.getMultipoleParameters(i))
-
+    
 def CopyHarmonicBondParameters(src, dest):
     for i in range(src.getNumBonds()):
         dest.setBondParameters(i,*src.getBondParameters(i))
@@ -365,7 +370,7 @@ def AddVirtualSiteBonds(mod, ff):
 def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps=4):
     """
     Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.
-
+    
     ARGUMENTS
 
     temperature (Quantity compatible with kelvin) - the temperature
@@ -379,21 +384,21 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
     integrator (openmm.CustomIntegrator) - a VVVR integrator
 
     NOTES
-
+    
     This integrator is equivalent to a Langevin integrator in the velocity Verlet discretization with a
     timestep correction to ensure that the field-free diffusion constant is timestep invariant.  The inner
     velocity Verlet discretization is transformed into a multiple timestep algorithm.
 
     REFERENCES
 
-    VVVR Langevin integrator:
+    VVVR Langevin integrator: 
     * http://arxiv.org/abs/1301.3800
-    * http://arxiv.org/abs/1107.2967 (to appear in PRX 2013)
-
+    * http://arxiv.org/abs/1107.2967 (to appear in PRX 2013)    
+    
     TODO
 
     Move initialization of 'sigma' to setting the per-particle variables.
-
+    
     """
     # Multiple timestep Langevin integrator.
     for i in system.getForces():
@@ -408,14 +413,14 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
 
     kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
     kT = kB * temperature
-
+    
     integrator = CustomIntegrator(timestep)
-
+    
     integrator.addGlobalVariable("dt_fast", timestep/float(ninnersteps)) # fast inner timestep
     integrator.addGlobalVariable("kT", kT) # thermal energy
     integrator.addGlobalVariable("a", np.exp(-collision_rate*timestep)) # velocity mixing parameter
     integrator.addGlobalVariable("b", np.sqrt((2/(collision_rate*timestep)) * np.tanh(collision_rate*timestep/2))) # timestep correction parameter
-    integrator.addPerDofVariable("sigma", 0)
+    integrator.addPerDofVariable("sigma", 0) 
     integrator.addPerDofVariable("x1", 0) # position before application of constraints
 
     #
@@ -425,23 +430,23 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
     #
     integrator.addComputePerDof("sigma", "sqrt(kT/m)")
 
-    #
+    # 
     # Velocity perturbation.
     #
     integrator.addComputePerDof("v", "sqrt(a)*v + sqrt(1-a)*sigma*gaussian")
     integrator.addConstrainVelocities();
-
+    
     #
     # Symplectic inner multiple timestep.
     #
-    integrator.addUpdateContextState();
+    integrator.addUpdateContextState(); 
     integrator.addComputePerDof("v", "v + 0.5*b*dt*f1/m")
     for innerstep in range(ninnersteps):
         # Fast inner symplectic timestep.
         integrator.addComputePerDof("v", "v + 0.5*b*dt_fast*f0/m")
         integrator.addComputePerDof("x", "x + v*b*dt_fast")
         integrator.addComputePerDof("x1", "x")
-        integrator.addConstrainPositions();
+        integrator.addConstrainPositions();        
         integrator.addComputePerDof("v", "v + 0.5*b*dt_fast*f0/m + (x-x1)/dt_fast")
     integrator.addComputePerDof("v", "v + 0.5*b*dt*f1/m") # TODO: Additional velocity constraint correction?
     integrator.addConstrainVelocities();
@@ -463,7 +468,6 @@ suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "HarmonicAngleForce" : {"Angle" : ["class1","class2","class3"],},
                 "PeriodicTorsionForce" : {"Proper" : ["class1","class2","class3","class4"],},
                 "NonbondedForce" : {"Atom": ["type"]},
-                "CustomNonbondedForce" : {"Atom": ["class"]},
                 "GBSAOBCForce" : {"Atom": ["type"]},
                 "AmoebaBondForce" : {"Bond" : ["class1","class2"]},
                 "AmoebaAngleForce" : {"Angle" : ["class1","class2","class3"]},
@@ -558,7 +562,7 @@ class OpenMM(Engine):
 
     def readsrc(self, **kwargs):
 
-        """ Called by __init__ ; read files from the source directory.
+        """ Called by __init__ ; read files from the source directory.  
         Provide a molecule object or a coordinate file.
         Add an optional PDB file for residues, atom names etc. """
 
@@ -567,7 +571,7 @@ class OpenMM(Engine):
         if 'pdb' in kwargs and os.path.exists(kwargs['pdb']):
             # Case 1. The PDB file name is provided explicitly
             pdbfnm = kwargs['pdb']
-            if not os.path.exists(pdbfnm):
+            if not os.path.exists(pdbfnm): 
                 logger.error("%s specified but doesn't exist\n" % pdbfnm)
                 raise RuntimeError
 
@@ -580,7 +584,7 @@ class OpenMM(Engine):
         else:
             logger.error('Must provide either a molecule object or coordinate file.\n')
             raise RuntimeError
-
+        
         # If the PDB file exists, then it is copied directly to create
         # the OpenMM pdb object rather than being written by the
         # Molecule class.
@@ -592,7 +596,7 @@ class OpenMM(Engine):
 
     def prepare(self, pbc=False, mmopts={}, **kwargs):
 
-        """
+        """ 
         Prepare the calculation.  Note that we don't create the
         Simulation object yet, because that may depend on MD
         integrator parameters, thermostat, barostat etc.
@@ -612,7 +616,7 @@ class OpenMM(Engine):
             self.mol[0].write(pdb1)
             self.pdb = PDBFile(pdb1)
             os.unlink(pdb1)
-
+        
         ## Create the OpenMM ForceField object.
         if hasattr(self, 'FF'):
             self.ffxml = [self.FF.openmmxml]
@@ -705,8 +709,8 @@ class OpenMM(Engine):
                 if self.mol.boxes[I].alpha != 90.0 or self.mol.boxes[I].beta != 90.0 or self.mol.boxes[I].gamma != 90.0:
                     logger.error('OpenMM cannot handle nonorthogonal boxes.\n')
                     raise RuntimeError
-                box_omm = [Vec3(self.mol.boxes[I].a, 0, 0)*angstrom,
-                           Vec3(0, self.mol.boxes[I].b, 0)*angstrom,
+                box_omm = [Vec3(self.mol.boxes[I].a, 0, 0)*angstrom, 
+                           Vec3(0, self.mol.boxes[I].b, 0)*angstrom, 
                            Vec3(0, 0, self.mol.boxes[I].c)*angstrom]
             else:
                 box_omm = None
@@ -790,10 +794,10 @@ class OpenMM(Engine):
 
         ## If virtual particles are used with AMOEBA...
         SetAmoebaVirtualExclusions(self.system)
-
+        
         ## Finally create the simulation object.
         self.simulation = Simulation(self.mod.topology, self.system, integrator, self.platform)
-
+        
         ## Print platform properties.
         # logger.info("I'm using the platform %s\n" % self.simulation.context.getPlatform().getName())
         # printcool_dictionary({i:self.simulation.context.getPlatform().getPropertyValue(self.simulation.context,i) \
@@ -802,7 +806,7 @@ class OpenMM(Engine):
 
     def update_simulation(self, **kwargs):
 
-        """
+        """ 
         Create the simulation object, or update the force field
         parameters in the existing simulation object.  This should be
         run when we write a new force field XML file.
@@ -812,7 +816,7 @@ class OpenMM(Engine):
         self.forcefield = ForceField(*self.ffxml)
         # OpenMM classes for force generators
         ismgens = [forcefield.AmoebaGeneralizedKirkwoodGenerator, forcefield.AmoebaWcaDispersionGenerator,
-                     forcefield.CustomGBGenerator, forcefield.GBSAOBCGenerator]
+                     forcefield.CustomGBGenerator, forcefield.GBSAOBCGenerator, forcefield.GBVIGenerator]
         if self.ism is not None:
             if self.ism == False:
                 self.forcefield._forces = [f for f in self.forcefield._forces if not any([isinstance(f, f_) for f_ in ismgens])]
@@ -830,7 +834,7 @@ class OpenMM(Engine):
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
-
+        
         for i in self.system.getForces():
             if isinstance(i, NonbondedForce):
                 self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
@@ -846,7 +850,7 @@ class OpenMM(Engine):
         #----
         vsprm = GetVirtualSiteParameters(self.system)
         if hasattr(self,'vsprm') and len(self.vsprm) > 0 and np.max(np.abs(vsprm - self.vsprm)) != 0.0:
-            if hasattr(self, 'simulation'):
+            if hasattr(self, 'simulation'): 
                 delattr(self, 'simulation')
         self.vsprm = vsprm.copy()
 
@@ -856,10 +860,10 @@ class OpenMM(Engine):
             self.create_simulation(**self.simkwargs)
 
     def set_positions(self, shot=0, traj=None):
-
+        
         """
         Set the positions and periodic box vectors to one of the
-        stored coordinates.
+        stored coordinates.  
 
         *** NOTE: If you run a MD simulation, then the coordinates are
         overwritten by the MD trajectory. ***
@@ -892,7 +896,7 @@ class OpenMM(Engine):
         # Compute volume of parallelepiped.
         volume = np.linalg.det(A) * a.unit**3
         return volume
-
+    
     def compute_mass(self, system):
         """ Compute the total mass of an OpenMM system. """
         mass = 0.0 * amu
@@ -902,11 +906,11 @@ class OpenMM(Engine):
 
     def evaluate_one_(self, force=False, dipole=False):
         """ Perform a single point calculation on the current geometry. """
-
+        
         State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
         Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
-        if force:
+        if force: 
             Force = list(np.array(State.getForces() / kilojoules_per_mole * nanometer).flatten())
             # Extract forces belonging to real atoms only
             Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]])))
@@ -915,9 +919,9 @@ class OpenMM(Engine):
 
     def evaluate_(self, force=False, dipole=False, traj=False):
 
-        """
-        Utility function for computing energy, and (optionally) forces and dipoles using OpenMM.
-
+        """ 
+        Utility function for computing energy, and (optionally) forces and dipoles using OpenMM. 
+        
         Inputs:
         force: Switch for calculating the force.
         dipole: Switch for calculating the dipole.
@@ -929,7 +933,7 @@ class OpenMM(Engine):
         """
 
         self.update_simulation()
-
+        
         # If trajectory flag set to False, perform a single-point calculation.
         if not traj: return evaluate_one_(force, dipole)
         Energies = []
@@ -943,7 +947,7 @@ class OpenMM(Engine):
             if dipole: Dipoles.append(R1["Dipole"])
         # Compile it all into the dictionary object
         Result = OrderedDict()
-
+        
         Result["Energy"] = np.array(Energies)
         if force: Result["Force"] = np.array(Forces)
         if dipole: Result["Dipole"] = np.array(Dipoles)
@@ -980,7 +984,7 @@ class OpenMM(Engine):
     def optimize(self, shot=0, crit=1e-4):
 
         """ Optimize the geometry and align the optimized geometry to the starting geometry, and return the RMSD. """
-
+        
         steps = int(max(1, -1*np.log10(crit)))
         self.update_simulation()
         self.set_positions(shot)
@@ -1025,7 +1029,7 @@ class OpenMM(Engine):
         else: self.set_positions(shot)
 
         moments = get_multipoles(self.simulation)
-
+        
         dipole_dict = OrderedDict(zip(['x','y','z'], moments[:3]))
         quadrupole_dict = OrderedDict(zip(['xx','xy','yy','xz','yz','zz'], moments[3:10]))
 
@@ -1045,7 +1049,7 @@ class OpenMM(Engine):
             crit = 1e-6
 
         rmsd = 0.0
-        if optimize:
+        if optimize: 
             E, rmsd = self.optimize(shot, crit=crit)
         else:
             self.set_positions(shot)
@@ -1054,7 +1058,7 @@ class OpenMM(Engine):
         return E, rmsd
 
     def interaction_energy(self, fraga, fragb):
-
+        
         """ Calculate the interaction energy for two fragments. """
 
         self.update_simulation()
@@ -1078,16 +1082,16 @@ class OpenMM(Engine):
                                     precision=self.precision, ffxml=self.ffxml, mmopts=self.mmopts)
 
         # Interaction energy needs to be in kcal/mol.
-        D = self.energy()
+        D = self.energy() 
         A = self.A.energy()
         B = self.B.energy()
 
         return (D - A - B) / 4.184
 
-    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, save_traj=False, verbose=False, **kwargs):
-
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=7, minimize=True, anisotropic=False, save_traj=False, verbose=False, **kwargs):
+        
         """
-        Method for running a molecular dynamics simulation.
+        Method for running a molecular dynamics simulation.  
 
         Required arguments:
         nsteps      = (int)   Number of total time steps
@@ -1127,10 +1131,10 @@ class OpenMM(Engine):
 
         # Minimize the energy.
         if minimize:
-            if verbose: logger.info("Minimizing the energy... (starting energy % .3f kJ/mol)" %
+            if verbose: logger.info("Minimizing the energy... (starting energy % .3f kJ/mol)" % 
                                     self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole))
             self.simulation.minimizeEnergy()
-            if verbose: logger.info("Done (final energy % .3f kJ/mol)\n" %
+            if verbose: logger.info("Done (final energy % .3f kJ/mol)\n" % 
                                     self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole))
 
         # Serialize the system if we want.
@@ -1141,7 +1145,7 @@ class OpenMM(Engine):
 
         # Determine number of degrees of freedom; the center of mass motion remover is also a constraint.
         kB = BOLTZMANN_CONSTANT_kB * AVOGADRO_CONSTANT_NA
-
+        
         # Compute total mass.
         self.mass = self.compute_mass(self.system).in_units_of(gram / mole) /  AVOGADRO_CONSTANT_NA
 
@@ -1159,14 +1163,53 @@ class OpenMM(Engine):
         Kinetics = []
         Volumes = []
         Dips = []
-        Temps = []
+       	Temps = []
+	RDF=[]
+	
+	#RDF
+	# Determine RDF file spacing
+	RDFdir='../../../../targets/WATER'
+	lines = open('%s/OORDF.dat'%RDFdir)
+	first=-1
+	space =0
+	second =-1
+	A=0
+	for line in lines:
+			if line[0:1] != " " or '#':
+				string=line[0:15]
+				break
+  	for i in range(len(string)):
+		if string[i]== ' ' and second==-1:
+			space += 1
+		if space != 0 and string[i]!= ' ':
+			second += 1
+		if string[i]!= ' ':
+			first +=1
+	first = (first) - (second)
+	#print first,space,second
+
+	#Read RDF data interval
+	lines = open('%s/OORDF.dat'%RDFdir)
+	for line in lines:
+			if line[0:1] != " " or '#':
+				rdat= line[0:first]
+			        A += 1
+				if A ==2:
+					dr=float(rdat)
+	r_range = dr*A
+	traj = md.load('liquid.pdb', top='liquid.pdb')#load topology to create pair list
+	oxygen= traj.topology.select('name O')# add reading for manual select
+	#print(oxygen)
+	oxygenP=list(combinations(oxygen,2))
+
+	print self.root
         #========================#
         # Now run the simulation #
         #========================#
         # Initialize velocities.
         self.simulation.context.setVelocitiesToTemperature(temperature*kelvin)
         # Equilibrate.
-        if iequil > 0:
+        if iequil > 0: 
             if verbose: logger.info("Equilibrating...\n")
             if self.pbc:
                 if verbose: logger.info("%6s %9s %9s %13s %10s %13s\n" % ("Iter.", "Time(ps)", "Temp(K)", "Epot(kJ/mol)", "Vol(nm^3)", "Rho(kg/m^3)"))
@@ -1203,6 +1246,7 @@ class OpenMM(Engine):
             self.simulation.reporters.append(PDBReporter('%s-md.pdb' % self.name, nsteps))
             self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsave))
         for iteration in range(-1, isteps):
+	    
             # Propagate dynamics.
             if iteration >= 0: self.simulation.step(nsave)
             # Compute properties.
@@ -1219,6 +1263,21 @@ class OpenMM(Engine):
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
             self.xyz_omms.append([state.getPositions(), box_vectors])
+	    #RDF make calculation with MDtraj
+	    if self.pbc:
+		    [a,b,c] = box_vectors#box size
+		    side=a[0]*nanometers ** -1 #box lenght, unitless for MDtraj
+		    r_range1=(-0.5*dr,r_range)
+		    #print(dr)
+		    Positions = state.getPositions() *nanometers ** -1
+		    traj1 = md.Trajectory(xyz=Positions, topology=None, time=None, unitcell_lengths=(side,side,side), unitcell_angles=(90,90,90))
+		    O_r, O_rdf = md.compute_rdf(traj1, pairs=oxygenP, r_range=r_range1, bin_width=dr, periodic=True, opt=True)
+		    
+	    	    for i in range(A): #A=r_range/dr
+			RDF.append((O_rdf[i]))
+		    	#if iteration == (isteps-1):
+				#print(O_r[i], O_rdf[i])
+
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
                 if comp in edecomp:
@@ -1238,6 +1297,9 @@ class OpenMM(Engine):
             Kinetics.append(kinetic / kilojoules_per_mole)
             Volumes.append(volume / nanometer**3)
             Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
+
+	
+	RDF = np.array(RDF)
         Rhos = np.array(Rhos)
         Potentials = np.array(Potentials)
         Kinetics = np.array(Kinetics)
@@ -1250,7 +1312,7 @@ class OpenMM(Engine):
         Ecomps["Total Energy"] = np.array(Potentials) + np.array(Kinetics)
         # Initialized property dictionary.
         prop_return = OrderedDict()
-        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
+        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps, 'RDF': RDF})
         return prop_return
 
 class Liquid_OpenMM(Liquid):
