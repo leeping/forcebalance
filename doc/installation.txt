@@ -42,6 +42,7 @@ The following packages are used for documentation:
 @li <a href=http://www.stack.nl/~dimitri/doxygen/>Doxygen</a> version 1.7.6.1
 @li <a href=http://code.foosel.org/doxypy>Doxypy</a> plugin for Doxygen
 @li LaTeX software such as <a href=http://www.tug.org/texlive/>TeXLive</a>
+@li The dot program from <a href=http://www.graphviz.org/> graphviz</a> software package
 
 @subsection installing_forcebalance_install Installing
 
@@ -115,7 +116,7 @@ export PYTHONUSERBASE=/home/leeping/opt/epd-7.3.2 @endverbatim
 An alternative option is to use Anaconda2, that can be downloaded <a href=https://www.continuum.io/downloads>the Continuum website</a>. It is also free for academic users.
 
 @verbatim
-export PATH=/home/leeping/opt/anaconda2/bin:$PATH
+export PATH=/home/leeping/opt/anaconda2/bin:$PATH @endverbatim
 
 Once you have done this, the Numpy, Scipy, Matplotlib and lxml dependency issues should be resolved and %ForceBalance will run without any problems.
 
