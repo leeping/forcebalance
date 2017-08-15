@@ -1063,6 +1063,7 @@ class Liquid(Target):
             property_results_pm = dict()
             for delta_m in [+self.liquid_fdiff_h, -self.liquid_fdiff_h]:
                 pure_num_grad_label = 'mvals_%03d_%f' % (i_m, delta_m)
+                logger.info("Reading from sub-directory %s\n" % pure_num_grad_label)
                 os.chdir(pure_num_grad_label)
                 # copy the original mvals and perturb
                 new_mvals = copy.copy(mvals)
