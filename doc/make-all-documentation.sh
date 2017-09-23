@@ -4,7 +4,7 @@
 ./make-option-index.py > option_index.txt
 
 cat <<EOF > mainpage.py
-""" 
+"""
 
 @mainpage
 
@@ -25,9 +25,6 @@ EOF
 
 echo \"\"\" >> mainpage.py
 
-# Copy over the logo to the latex page (doxygen doesn't automatically do this.)
-#cp Images/ForceBalance.pdf latex/
-
 # Actually generate the documentation.
 doxygen doxygen.cfg
 
@@ -35,10 +32,9 @@ doxygen doxygen.cfg
 ./add-tabs.py
 
 # Push the documentation to our website.
-rsync -auvz --delete html/ /home/leeping/Dropbox/Public/ForceBalance_Doc/
+#rsync -auvz --delete html/ /home/leeping/Dropbox/Public/ForceBalance_Doc/
 
 # Go into the latex directory and make the PDF manual.
 cd latex
 make
 cp refman.pdf ../ForceBalance-Manual.pdf
-cp refman.pdf /home/leeping/Dropbox/Public/ForceBalance_Doc/ForceBalance-Manual.pdf

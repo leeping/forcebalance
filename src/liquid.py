@@ -24,6 +24,7 @@ import itertools
 from forcebalance.optimizer import Counter
 from collections import defaultdict, namedtuple, OrderedDict
 import csv
+import copy
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -61,15 +62,15 @@ def weight_info(W, PT, N_k, verbose=True, PTS=None):
             else:
                 line2 += "%%%i.1f%%%% " % (fs-1) % (Ci*100)
             tfl += (fs+1)
-            if tfl >= 80: 
+            if tfl >= 80:
                 if len(line1) > 0:
                     if pl: logger.info(line1+"\n")
                 if pl: logger.info(line2+"\n")
                 line1 = ""
                 line2 = ""
                 tfl = 0
-                pl = 0 if PTS is not None else 1 
-        if tfl > 0 and pl: 
+                pl = 0 if PTS is not None else 1
+        if tfl > 0 and pl:
             if len(line1) > 0:
                 logger.info(line1+"\n")
             logger.info(line2+"\n")
@@ -80,7 +81,7 @@ def weight_info(W, PT, N_k, verbose=True, PTS=None):
 # NPT_Trajectory = namedtuple('NPT_Trajectory', ['fnm', 'Rhos', 'pVs', 'Energies', 'Grads', 'mEnergies', 'mGrads', 'Rho_errs', 'Hvap_errs'])
 
 class Liquid(Target):
-    
+
     """ Subclass of Target for liquid property matching."""
 
     def __init__(self,options,tgt_opts,forcefield):
@@ -142,15 +143,30 @@ class Liquid(Target):
         self.set_option(tgt_opts,'save_traj')
         # Set the number of molecules by hand (in case ForceBalance doesn't get the right number from the structure)
         self.set_option(tgt_opts,'n_molecules')
-
+        # Weight of surface tension
+        self.set_option(tgt_opts,'w_surf_ten',forceprint=True)
+        # Number of time steps in surface tension NVT "equilibration" run
+        self.set_option(tgt_opts,'nvt_eq_steps', forceprint=True)
+        # Number of time steps in surface tension NVT "production" run
+        self.set_option(tgt_opts,'nvt_md_steps', forceprint=True)
+        # Time step length (in fs) for the NVT production run
+        self.set_option(tgt_opts,'nvt_timestep', forceprint=True)
+        # Time interval (in ps) for writing coordinates
+        self.set_option(tgt_opts,'nvt_interval', forceprint=True)
+        # Switch for pure numerical gradients
+        self.set_option(tgt_opts,'pure_num_grad', forceprint=True)
+        # Finite difference size for pure_num_grad
+        self.set_option(tgt_opts,'liquid_fdiff_h', forceprint=True)
         #======================================#
         #     Variables which are set here     #
         #======================================#
         # Read in liquid starting coordinates.
-        if not os.path.exists(os.path.join(self.root, self.tgtdir, self.liquid_coords)): 
+        if not os.path.exists(os.path.join(self.root, self.tgtdir, self.liquid_coords)):
             logger.error("%s doesn't exist; please provide liquid_coords option\n" % self.liquid_coords)
             raise RuntimeError
         self.liquid_mol = Molecule(os.path.join(self.root, self.tgtdir, self.liquid_coords), toppbc=True)
+
+        # Manully set n_molecules if needed
         if self.n_molecules >= 0:
             if self.n_molecules == len(self.liquid_mol.molecules):
                 logger.info("User-provided number of molecules matches auto-detected value (%i)\n" % self.n_molecules)
@@ -162,9 +178,9 @@ class Liquid(Target):
                 warn_press_key("Possible issue because molecules are not all the same size! Sizes detected: %s" % str(set([len(m) for m in self.liquid_mol.molecules])), timeout=30)
             else:
                 logger.info("Autodetected %i molecules with %i atoms each in liquid coordinates\n" % (self.n_molecules, len(self.liquid_mol.molecules[0])))
-                
+
         # Read in gas starting coordinates.
-        if not os.path.exists(os.path.join(self.root, self.tgtdir, self.gas_coords)): 
+        if not os.path.exists(os.path.join(self.root, self.tgtdir, self.gas_coords)):
             logger.error("%s doesn't exist; please provide gas_coords option\n" % self.gas_coords)
             raise RuntimeError
         self.gas_mol = Molecule(os.path.join(self.root, self.tgtdir, self.gas_coords))
@@ -178,6 +194,16 @@ class Liquid(Target):
         self.nptfiles += [self.liquid_coords, self.gas_coords]
         # Scripts to be copied from the ForceBalance installation directory.
         self.scripts += ['npt.py']
+        #  NVT simulation parameters for computing Surface Tension
+        if 'surf_ten' in self.RefData:
+            # Check if nvt_coords exist
+            if not os.path.exists(os.path.join(self.root, self.tgtdir, self.nvt_coords)):
+                logger.error("Surface tension calculation requires %s, but it is not found."%self.nvt_coords)
+                raise RuntimeError
+            self.surf_ten_mol = Molecule(os.path.join(self.root, self.tgtdir, self.nvt_coords), toppbc=True)
+            # Extra files to be linked into the temp-directory.
+            self.nvtfiles += [self.nvt_coords]
+            self.scripts += ['nvt.py']
         # Prepare the temporary directory.
         self.prepare_temp_directory()
         # Build keyword dictionary to pass to engine.
@@ -192,6 +218,7 @@ class Liquid(Target):
         self.write_indicate = False
         # Don't read objective.p when calling meta_get()
         # self.read_objective = False
+
         #======================================#
         #          UNDER DEVELOPMENT           #
         #======================================#
@@ -209,7 +236,7 @@ class Liquid(Target):
     def prepare_temp_directory(self):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
-        for f in self.nptfiles:
+        for f in self.nptfiles + self.nvtfiles:
             LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
         for f in self.scripts:
             LinkFile(os.path.join(os.path.split(__file__)[0],"data",f),os.path.join(abstempdir,f))
@@ -224,7 +251,7 @@ class Liquid(Target):
         global_opts = OrderedDict()
         found_headings = False
         known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra',
-                      'cvib_inter','cni','devib_intra','devib_inter']
+                      'cvib_inter','cni','devib_intra','devib_inter', 'surf_ten']
         self.RefData = OrderedDict()
         for line in R:
             if line[0] == "global":
@@ -254,7 +281,7 @@ class Liquid(Target):
                     # For convenience, users may input the pressure in atmosphere or bar.
                     pval  = [float(val.split()[0]) for head, val in zip(headings,line) if head == 'p'][0]
                     punit = [val.split()[1] if len(val.split()) >= 1 else "atm" for head, val in zip(headings,line) if head == 'p'][0]
-                    unrec = set([punit]).difference(['atm','bar']) 
+                    unrec = set([punit]).difference(['atm','bar'])
                     if len(unrec) > 0:
                         logger.error('The pressure unit %s is not recognized, please use bar or atm\n' % unrec[0])
                         raise RuntimeError
@@ -338,9 +365,24 @@ class Liquid(Target):
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
             else:
-                queue_up(wq, command = cmdstr+' &> npt.out',
+                queue_up(wq, command = cmdstr+' > npt.out 2>&1 ',
                          input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
                          output_files = ['npt_result.p', 'npt.out'] + self.extra_output, tgt=self)
+
+    def nvt_simulation(self, temperature):
+        """ Submit a NVT simulation to the Work Queue. """
+        wq = getWorkQueue()
+        if not os.path.exists('nvt_result.p'):
+            link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+            cmdstr = '%s python nvt.py %s %.3f' % (self.nptpfx, self.engname, temperature)
+            if wq is None:
+                logger.info("Running condensed phase simulation locally.\n")
+                logger.info("You may tail -f %s/nvt.out in another terminal window\n" % os.getcwd())
+                _exec(cmdstr, copy_stderr=True, outfnm='nvt.out')
+            else:
+                queue_up(wq, command = cmdstr+' > nvt.out 2>&1 ',
+                         input_files = self.nvtfiles + self.scripts + ['forcebalance.p'],
+                         output_files = ['nvt_result.p', 'nvt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):
         self.FF.make(mvals)
@@ -361,12 +403,12 @@ class Liquid(Target):
         epol = 0.5*convert*dd2/self.self_pol_alpha
         return epol
 
-    def indicate(self): 
+    def indicate(self):
         AGrad = hasattr(self, 'Gp')
         PrintDict = OrderedDict()
         def print_item(key, heading, physunit):
             if self.Xp[key] > 0:
-                printcool_dictionary(self.Pp[key], title='%s %s%s\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % 
+                printcool_dictionary(self.Pp[key], title='%s %s%s\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' %
                                      (self.name, heading, " (%s) " % physunit if physunit else ""), bold=True, color=4, keywidth=15)
                 bar = printcool("%s objective function: % .3f%s" % (heading, self.Xp[key], ", Derivative:" if AGrad else ""))
                 if AGrad:
@@ -380,6 +422,7 @@ class Liquid(Target):
         print_item("Kappa", "Isothermal Compressibility", "10^-6 bar^-1")
         print_item("Cp", "Isobaric Heat Capacity", "cal mol^-1 K^-1")
         print_item("Eps0", "Dielectric Constant", None)
+        print_item("Surf_ten", "Surface Tension", "mN m^-1")
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",self.Objective)
 
@@ -391,11 +434,11 @@ class Liquid(Target):
         if expname in self.RefData:
             exp = self.RefData[expname]
             Weights = self.RefData[expname+"_wt"]
-            Denom = getattr(self,expname+"_denom")
+            Denom = getattr(self,expname+"_denom",1.0)
         else:
             # If the reference data doesn't exist then return nothing.
             return 0.0, np.zeros(self.FF.np), np.zeros((self.FF.np,self.FF.np)), None
-            
+
         Sum = sum(Weights.values())
         for i in Weights:
             Weights[i] /= Sum
@@ -406,11 +449,11 @@ class Liquid(Target):
         logger.info("Physical quantity %s uses denominator = % .4f\n" % (name, Denom))
         if not LeastSquares:
             # If using a hyperbolic functional form
-            # we still want the contribution to the 
+            # we still want the contribution to the
             # objective function to be the same when
             # Delta = Denom.
             Denom /= 3 ** 0.5
-        
+
         Objective = 0.0
         Gradient = np.zeros(self.FF.np)
         Hessian = np.zeros((self.FF.np,self.FF.np))
@@ -419,7 +462,8 @@ class Liquid(Target):
         avgCalc = 0.0
         avgExp  = 0.0
         avgGrad = np.zeros(self.FF.np)
-        for i, PT in enumerate(points):
+
+        for PT in points:
             avgCalc += Weights[PT]*calc[PT]
             avgExp  += Weights[PT]*exp[PT]
             avgGrad += Weights[PT]*grad[PT]
@@ -460,7 +504,7 @@ class Liquid(Target):
         for line in GradMapPrint:
             print >> o, ' '.join(line)
         o.close()
-            
+
         Delta = np.array([calc[PT] - exp[PT] for PT in points])
         delt = {PT : r for PT, r in zip(points,Delta)}
         print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT,"%9.3f    %9.3f +- %-7.3f % 7.3f % 9.5f % 9.5f" % (exp[PT],calc[PT],err[PT],delt[PT],Weights[PT],Objs[PT])) for PT in calc])
@@ -472,7 +516,13 @@ class Liquid(Target):
         #
         # First dump the force field to a pickle file
         printcool("Target: %s - launching MD simulations\nTime steps: %i (eq) + %i (md)" % (self.name, self.liquid_eq_steps, self.liquid_md_steps), color=0)
-        lp_dump((self.FF,mvals,self.OptionDict,AGrad),'forcebalance.p')
+        if 'surf_ten' in self.RefData:
+            logger.info("Launching additional NVT simulations for computing surface tension. Time steps: %i (eq) + %i (md)\n" % (self.nvt_eq_steps, self.nvt_md_steps))
+
+        if AGrad and self.pure_num_grad:
+            lp_dump((self.FF,mvals,self.OptionDict,False),'forcebalance.p')
+        else:
+            lp_dump((self.FF,mvals,self.OptionDict,AGrad),'forcebalance.p')
 
         # Give the user an opportunity to copy over data from a previous (perhaps failed) run.
         if (not self.evaluated) and self.manual:
@@ -485,23 +535,54 @@ class Liquid(Target):
                     os.remove(fn)
         self.last_traj = []
 
-        # Set up and run the NPT simulations.
-        snum = 0
-        for label, pt in zip(self.Labels, self.PhasePoints):
-            T = pt[0]
-            P = pt[1]
-            Punit = pt[2]
-            if Punit == 'bar':
-                P *= 1.0 / 1.01325
-            if not os.path.exists(label):
-                os.makedirs(label)
-            os.chdir(label)
-            self.npt_simulation(T,P,snum)
-            os.chdir('..')
-            snum += 1
+        def submit_one_setm():
+            snum = 0
+            for label, pt in zip(self.Labels, self.PhasePoints):
+                T = pt[0]
+                P = pt[1]
+                Punit = pt[2]
+                if Punit == 'bar':
+                    P *= 1.0 / 1.01325
+                if not os.path.exists(label):
+                    os.makedirs(label)
+                os.chdir(label)
+                self.npt_simulation(T,P,snum)
+                if 'surf_ten' in self.RefData and pt in self.RefData['surf_ten']:
+                    self.nvt_simulation(T)
+                os.chdir('..')
+                snum += 1
+
+        # Set up and run the simulations.
+        submit_one_setm()
+        # if pure_num_grad is set, submit additional simulations with AGrad=False
+        if AGrad and self.pure_num_grad:
+            logger.info("Running in Pure Numerical Gradient Mode! Two additional simulation will be submitted for each parameter.\n")
+            for i_m in range(len(mvals)):
+                for delta_m in [-self.liquid_fdiff_h, +self.liquid_fdiff_h]:
+                    pure_num_grad_label = 'mvals_%03d_%f' % (i_m, delta_m)
+                    if not os.path.exists(pure_num_grad_label):
+                        os.mkdir(pure_num_grad_label)
+                    os.chdir(pure_num_grad_label)
+                    # copy the original mvals and perturb
+                    new_mvals = copy.copy(mvals)
+                    new_mvals[i_m] += delta_m
+                    # create a new forcebalance.p, turn off gradient
+                    lp_dump((self.FF, new_mvals, self.OptionDict, False),'forcebalance.p')
+                    # link files from parent folder to here
+                    link_dir_contents(os.path.join(self.root,self.rundir),os.getcwd())
+                    # backup self.rundir
+                    rundir_backup = self.rundir
+                    # change the self.rundir temporarily so the new forcebalance.p will be used by npt_simulation() and nvt_simulation()
+                    self.rundir = os.getcwd()
+                    # submit simulations
+                    submit_one_setm()
+                    # change the self.rundir back
+                    self.rundir = rundir_backup
+                    os.chdir('..')
+
 
     def read(self, mvals, AGrad=True, AHess=True):
-        
+
         """
         Read in time series for all previous iterations.
         """
@@ -534,7 +615,7 @@ class Liquid(Target):
             if len(Points) == 0:
                 logger.error('The liquid simulations have terminated with \x1b[1;91mno readable data\x1b[0m - this is a problem!\n')
                 raise RuntimeError
-    
+
             # Assign variable names to all the stuff in npt_result.p
             Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
                 Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(17))
@@ -545,7 +626,7 @@ class Liquid(Target):
                 raise RuntimeError
             else:
                 NMol = list(set(NMols))[0]
-        
+
             if not self.adapt_errors:
                 self.AllResults = defaultdict(lambda:defaultdict(list))
 
@@ -553,7 +634,7 @@ class Liquid(Target):
             if len(Points) != len(self.Labels):
                 logger.info("Data sets is not full, will not use for concatenation.\n")
                 astrm += "_"*(dn+1)
-        
+
             self.AllResults[astrm]['Pts'].append(Points)
             self.AllResults[astrm]['mPts'].append(mPoints)
             self.AllResults[astrm]['E'].append(np.array(Energies))
@@ -568,7 +649,7 @@ class Liquid(Target):
             self.AllResults[astrm]['GDz'].append(np.array([gd[2] for gd in GDips]))
             self.AllResults[astrm]['L'].append(len(Energies[0]))
             self.AllResults[astrm]['Steps'].append(self.liquid_md_steps)
-    
+
             if len(mPoints) > 0:
                 self.AllResults[astrm]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
                 self.AllResults[astrm]['mG'].append(np.array([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
@@ -578,7 +659,15 @@ class Liquid(Target):
         return self.get(mvals, AGrad, AHess)
 
     def get(self, mvals, AGrad=True, AHess=True):
-        
+        """ Wrapper of self.get_normal() and self.get_pure_num_grad() """
+        if self.pure_num_grad:
+            property_results = self.get_pure_num_grad(mvals, AGrad=AGrad, AHess=AHess)
+        else:
+            property_results = self.get_normal(mvals, AGrad=AGrad, AHess=AHess)
+        return self.form_get_result(property_results, AGrad=AGrad, AHess=AHess)
+
+    def get_normal(self, mvals, AGrad=True, AHess=True):
+
         """
         Fitting of liquid bulk properties.  This is the current major
         direction of development for ForceBalance.  Basically, fitting
@@ -607,10 +696,10 @@ class Liquid(Target):
         @param[in] mvals Mathematical parameter values
         @param[in] AGrad Switch to turn on analytic gradient
         @param[in] AHess Switch to turn on analytic Hessian
-        @return Answer Contribution to the objective function
-        
+        @return property_results
+
         """
-        
+
         unpack = lp_load('forcebalance.p')
         mvals1 = unpack[1]
         if len(mvals) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
@@ -625,6 +714,7 @@ class Liquid(Target):
         BPoints = [] # These are the phase points for which we are doing MBAR for the condensed phase.
         mBPoints = [] # These are the phase points for which we are doing MBAR for the monomers.
         mPoints = [] # These are the phase points to use for enthalpy of vaporization; if we're scanning pressure then set hvap_wt for higher pressures to zero.
+        stResults = {} # Storing the results from the NVT run for surface tension
         tt = 0
         for label, PT in zip(self.Labels, self.PhasePoints):
             if os.path.exists('./%s/npt_result.p' % label):
@@ -637,6 +727,13 @@ class Liquid(Target):
                     BPoints.append(PT)
                     if 'hvap' in self.RefData and PT[0] not in [i[0] for i in mBPoints]:
                         mBPoints.append(PT)
+                if 'surf_ten' in self.RefData and PT in self.RefData['surf_ten']:
+                    if os.path.exists('./%s/nvt_result.p' % label):
+                        stResults[PT] = lp_load('./%s/nvt_result.p' % label)
+                    else:
+                        logger.warning('In %s :\n' % os.getcwd())
+                        logger.warning('The file ./%s/nvt_result.p does not exist so we cannot read it\n' % label)
+                        pass
                 tt += 1
             else:
                 logger.warning('In %s :\n' % os.getcwd())
@@ -662,7 +759,7 @@ class Liquid(Target):
             raise RuntimeError
         else:
             NMol = list(set(NMols))[0]
-    
+
         if not self.adapt_errors:
             self.AllResults = defaultdict(lambda:defaultdict(list))
 
@@ -733,6 +830,9 @@ class Liquid(Target):
         Eps0_calc = OrderedDict([])
         Eps0_grad = OrderedDict([])
         Eps0_std  = OrderedDict([])
+        Surf_ten_calc = OrderedDict([])
+        Surf_ten_grad = OrderedDict([])
+        Surf_ten_std = OrderedDict([])
 
         # The unit that converts atmospheres * nm**3 into kj/mol :)
         pvkj=0.061019351687175
@@ -740,7 +840,7 @@ class Liquid(Target):
         # Run MBAR using the total energies. Required for estimates that use the kinetic energy.
         BSims = len(BPoints)
         Shots = len(E[0])
-        N_k = np.ones(BSims)*Shots
+        N_k = np.ones(BSims, dtype=int)*Shots
         # Use the value of the energy for snapshot t from simulation k at potential m
         U_kln = np.zeros([BSims,BSims,Shots])
         for m, PT in enumerate(BPoints):
@@ -763,9 +863,9 @@ class Liquid(Target):
         elif len(BPoints) == 1:
             W1 = np.ones((Shots,1))
             W1 /= Shots
-        
+
         def fill_weights(weights, phase_points, mbar_points, snapshots):
-            """ Fill in the weight matrix with MBAR weights where MBAR was run, 
+            """ Fill in the weight matrix with MBAR weights where MBAR was run,
             and equal weights otherwise. """
             new_weights = np.zeros([len(phase_points)*snapshots,len(phase_points)])
             for m, PT in enumerate(phase_points):
@@ -779,7 +879,7 @@ class Liquid(Target):
                     logger.debug("Will fill W2[%i:%i,%i] with equal weights\n" % (m*snapshots,(m+1)*snapshots,m))
                     new_weights[m*snapshots:(m+1)*snapshots,m] = 1.0/snapshots
             return new_weights
-        
+
         W2 = fill_weights(W1, Points, BPoints, Shots)
 
         if len(mPoints) > 0:
@@ -788,7 +888,7 @@ class Liquid(Target):
             mShots = len(mE[0])
             if len(mBPoints) > 1:
                 mBSims = len(mBPoints)
-                mN_k = np.ones(mBSims)*mShots
+                mN_k = np.ones(mBSims, dtype=int)*mShots
                 mU_kln = np.zeros([mBSims,mBSims,mShots])
                 for m, PT in enumerate(mBPoints):
                     T = PT[0]
@@ -804,7 +904,7 @@ class Liquid(Target):
                 mW1 = np.ones((mShots,1))
                 mW1 /= mShots
             mW2 = fill_weights(mW1, mPoints, mBPoints, mShots)
-         
+
         if self.do_self_pol:
             EPol = self.polarization_correction(mvals)
             GEPol = np.array([(f12d3p(fdwrap(self.polarization_correction, mvals, p), h = self.h, f0 = EPol)[0] if p in self.pgrad else 0.0) for p in range(self.FF.np)])
@@ -821,7 +921,7 @@ class Liquid(Target):
         Dy = Dy.flatten()
         Dz = Dz.flatten()
         if len(mPoints) > 0: mE = mE.flatten()
-            
+
         for i, PT in enumerate(Points):
             T = PT[0]
             P = PT[1] / 1.01325 if PT[2] == 'bar' else PT[1]
@@ -829,7 +929,7 @@ class Liquid(Target):
             H = E + PV
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
-            C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=mbar_verbose)
+            C = weight_info(W, PT, np.ones(len(Points), dtype=int)*Shots, verbose=mbar_verbose)
             Gbar = flat(np.matrix(G)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
@@ -911,6 +1011,11 @@ class Liquid(Target):
             GD2 += 2*(flat(np.matrix(GDy)*col(W*Dy)) - avg(Dy)*flat(np.matrix(GDy)*col(W))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
             GD2 += 2*(flat(np.matrix(GDz)*col(W*Dz)) - avg(Dz)*flat(np.matrix(GDz)*col(W))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
             Eps0_grad[PT] = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
+            ## Surface Tension (Already computed in nvt.py)
+            if PT in stResults:
+                 Surf_ten_calc[PT] = stResults[PT]["surf_ten"]
+                 Surf_ten_grad[PT] = stResults[PT]["G_surf_ten"]
+                 Surf_ten_std[PT] = stResults[PT]["surf_ten_err"]
             ## Estimation of errors.
             Rho_std[PT]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
             if PT in mPoints:
@@ -922,6 +1027,77 @@ class Liquid(Target):
             Cp_std[PT]   = np.sqrt(sum(C**2 * np.array(Cp_errs)**2))
             Eps0_std[PT]   = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
 
+        property_results = dict()
+        property_results['rho'] = Rho_calc, Rho_std, Rho_grad
+        property_results['hvap'] = Hvap_calc, Hvap_std, Hvap_grad
+        property_results['alpha'] = Alpha_calc, Alpha_std, Alpha_grad
+        property_results['kappa'] = Kappa_calc, Kappa_std, Kappa_grad
+        property_results['cp'] = Cp_calc, Cp_std, Cp_grad
+        property_results['eps0'] = Eps0_calc, Eps0_std, Eps0_grad
+        property_results['surf_ten'] = Surf_ten_calc, Surf_ten_std, Surf_ten_grad
+        return property_results
+
+    def get_pure_num_grad(self, mvals, AGrad=True, AHess=True):
+        """
+        This function calls self.get_normal(AGrad=False) to get the property values and std_err,
+        but compute the property gradients using finite difference of the FF parameters.
+
+        @param[in] mvals Mathematical parameter values
+        @param[in] AGrad Switch to turn on analytic gradient
+        @param[in] AHess Switch to turn on analytic Hessian
+        @return property_results
+
+        """
+        if not self.pure_num_grad:
+            raise RuntimeError("Not running in pure numerical gradients mode. Please use self.get_normal() instead!")
+
+        if not AGrad:
+            return self.get_normal(mvals, AGrad=AGrad, AHess=AHess)
+
+        # Read the original property results
+        property_results = self.get_normal(mvals, AGrad=False, AHess=False)
+        # Update the gradients of each property with the finite differences from simulations
+        logger.info("Pure numerical gradient mode: loading property values from sub-directorys.\n")
+        # The folder structure should be consistent with self.submit_jobs()
+        for i_m in range(len(mvals)):
+            property_results_pm = dict()
+            for delta_m in [+self.liquid_fdiff_h, -self.liquid_fdiff_h]:
+                pure_num_grad_label = 'mvals_%03d_%f' % (i_m, delta_m)
+                logger.info("Reading from sub-directory %s\n" % pure_num_grad_label)
+                os.chdir(pure_num_grad_label)
+                # copy the original mvals and perturb
+                new_mvals = copy.copy(mvals)
+                new_mvals[i_m] += delta_m
+                # reset self.AllResults?
+                #self.AllResults = defaultdict(lambda:defaultdict(list))
+                property_results_pm[delta_m] = self.get_normal(new_mvals, AGrad=False, AHess=False)
+                os.chdir('..')
+            for key in property_results:
+                for PT in property_results[key][2].keys():
+                    property_results[key][2][PT][i_m] = (property_results_pm[+self.liquid_fdiff_h][key][0][PT] - property_results_pm[-self.liquid_fdiff_h][key][0][PT]) / (2.0*self.liquid_fdiff_h)
+
+        return property_results
+
+    def form_get_result(self, property_results, AGrad=True, AHess=True):
+        """
+        This function takes the property_results from get_normal() or get_pure_num_grad()
+        and form the answer for the return of the self.get() function
+
+        @in property_results
+        @return Answer Contribution to the objective function
+
+        """
+
+        Rho_calc, Rho_std, Rho_grad = property_results['rho']
+        Hvap_calc, Hvap_std, Hvap_grad = property_results['hvap']
+        Alpha_calc, Alpha_std, Alpha_grad = property_results['alpha']
+        Kappa_calc, Kappa_std, Kappa_grad = property_results['kappa']
+        Cp_calc, Cp_std, Cp_grad = property_results['cp']
+        Eps0_calc, Eps0_std, Eps0_grad = property_results['eps0']
+        Surf_ten_calc, Surf_ten_std, Surf_ten_grad = property_results['surf_ten']
+
+        Points = Rho_calc.keys()
+
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Points, 'rho', Rho_calc, Rho_std, Rho_grad, name="Density")
         X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Points, 'hvap', Hvap_calc, Hvap_std, Hvap_grad, name="H_vap", SubAverage=self.hvap_subaverage)
@@ -929,6 +1105,7 @@ class Liquid(Target):
         X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Points, 'kappa', Kappa_calc, Kappa_std, Kappa_grad, name="Compressibility")
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
+        X_Surf_ten, G_Surf_ten, H_Surf_ten, Surf_tenPrint = self.objective_term(Surf_ten_calc.keys(), 'surf_ten', Surf_ten_calc, Surf_ten_std, Surf_ten_grad, name="Surface Tension")
 
         Gradient = np.zeros(self.FF.np)
         Hessian = np.zeros((self.FF.np,self.FF.np))
@@ -939,9 +1116,10 @@ class Liquid(Target):
         if X_Kappa == 0: self.w_kappa = 0.0
         if X_Cp == 0: self.w_cp = 0.0
         if X_Eps0 == 0: self.w_eps0 = 0.0
+        if X_Surf_ten == 0: self.w_surf_ten = 0.0
 
         if self.w_normalize:
-            w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0
+            w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_surf_ten
         else:
             w_tot = 1.0
         w_1 = self.w_rho / w_tot
@@ -950,25 +1128,25 @@ class Liquid(Target):
         w_4 = self.w_kappa / w_tot
         w_5 = self.w_cp / w_tot
         w_6 = self.w_eps0 / w_tot
+        w_7 = self.w_surf_ten / w_tot
 
-        Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0
+        Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7 * X_Surf_ten
         if AGrad:
-            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0
+            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0 + w_7 * G_Surf_ten
         if AHess:
-            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0
+            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0 + w_7 * H_Surf_ten
 
         if not in_fd():
-            self.Xp = {"Rho" : X_Rho, "Hvap" : X_Hvap, "Alpha" : X_Alpha, 
-                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0}
-            self.Wp = {"Rho" : w_1, "Hvap" : w_2, "Alpha" : w_3, 
-                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6}
-            self.Pp = {"Rho" : RhoPrint, "Hvap" : HvapPrint, "Alpha" : AlphaPrint, 
-                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print}
+            self.Xp = {"Rho" : X_Rho, "Hvap" : X_Hvap, "Alpha" : X_Alpha,
+                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "Surf_ten": X_Surf_ten}
+            self.Wp = {"Rho" : w_1, "Hvap" : w_2, "Alpha" : w_3,
+                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "Surf_ten" : w_7}
+            self.Pp = {"Rho" : RhoPrint, "Hvap" : HvapPrint, "Alpha" : AlphaPrint,
+                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "Surf_ten": Surf_tenPrint}
             if AGrad:
-                self.Gp = {"Rho" : G_Rho, "Hvap" : G_Hvap, "Alpha" : G_Alpha, 
-                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0}
+                self.Gp = {"Rho" : G_Rho, "Hvap" : G_Hvap, "Alpha" : G_Alpha,
+                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "Surf_ten": G_Surf_ten}
             self.Objective = Objective
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
         return Answer
-

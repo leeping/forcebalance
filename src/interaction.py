@@ -67,6 +67,8 @@ class Interaction(Target):
             self.select2 = None
         ## Set upper cutoff energy
         self.set_option(tgt_opts,'energy_upper','energy_upper')
+        ## Option for how much data to write to disk.
+        self.set_option(tgt_opts,'writelevel','writelevel')
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -189,9 +191,19 @@ class Interaction(Target):
         D = emm - self.eqm
         dV = np.zeros((self.FF.np,len(emm)))
 
-        # Dump interaction energies to disk.
-        np.savetxt('M.txt',emm)
-        np.savetxt('Q.txt',self.eqm)
+        if self.writelevel > 0:
+            # Dump interaction energies to disk.
+            np.savetxt('M.txt',emm)
+            np.savetxt('Q.txt',self.eqm)
+            import pickle
+            pickle.dump((self.name, self.label, self.prefactor, self.eqm, emm), open("qm_vs_mm.p",'w'))
+            # select the qm and mm data that has >0 weight to plot
+            qm_data, mm_data = [], []
+            for i in xrange(len(self.eqm)):
+                if self.prefactor[i] != 0:
+                    qm_data.append(self.eqm[i])
+                    mm_data.append(emm[i])
+            plot_interaction_qm_vs_mm(qm_data, mm_data, title="Interaction Energy "+self.name)
 
         # Do the finite difference derivative.
         if AGrad or AHess:
@@ -220,3 +232,14 @@ class Interaction(Target):
             pass
 
         return Answer
+
+def plot_interaction_qm_vs_mm(eqm, emm, title=''):
+    import matplotlib.pyplot as plt
+    plt.plot(eqm, label='QM Data', marker='^')
+    plt.plot(emm, label='MM Data', marker='o')
+    plt.legend()
+    plt.xlabel('Snapshots')
+    plt.ylabel('Interaction Energy (kcal/mol)')
+    plt.title(title)
+    plt.savefig("e_qm_vs_mm.pdf")
+    plt.close()

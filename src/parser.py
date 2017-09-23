@@ -73,7 +73,7 @@ gen_opts_types = {
                  "amoeba_pol"   : (None, 0, 'The AMOEBA polarization type, either direct, mutual, or nonpolarizable.', 'Targets in OpenMM / TINKER that use the AMOEBA force field', ['OPENMM','TINKER']),
                  "amberhome"    : (None, -10, 'Path to AMBER installation directory (leave blank to use AMBERHOME environment variable.', 'Targets that use AMBER', 'AMBER'),
                  },
-    'allcaps' : {"jobtype"      : ("single", 200, 'The calculation type, defaults to a single-point evaluation of objective function.', 
+    'allcaps' : {"jobtype"      : ("single", 200, 'The calculation type, defaults to a single-point evaluation of objective function.',
                                    'All (important); choose "single", "gradient", "hessian", "newton" (Main Optimizer), "bfgs", "powell", "simplex", "anneal", "genetic", "conjugategradient", "scan_mvals", "scan_pvals", "fdcheck[gh]"'),
                  },
     'lists'   : {"forcefield"     : ([],  200, 'The names of force fields, corresponding to directory forcefields/file_name.(itp,xml,prm,frcmod,mol2)', 'All (important)'),
@@ -119,7 +119,7 @@ gen_opts_types = {
                  "finite_difference_factor" : (0.1, 40, 'Make sure that the finite difference step size does not exceed this multiple of the trust radius.', 'Main Optimizer'),
                  "penalty_additive"       : (0.0,   55, 'Factor for additive penalty function in objective function', 'Objective function, all penalty types'),
                  "penalty_multiplicative" : (0.0,   55, 'Factor for multiplicative penalty function in objective function', 'Objective function, all penalty types'),
-                 "penalty_alpha"          : (1e-3,  53, 'Extra parameter for fusion penalty function.  Dictates position of log barrier or L1-L0 switch distance', 
+                 "penalty_alpha"          : (1e-3,  53, 'Extra parameter for fusion penalty function.  Dictates position of log barrier or L1-L0 switch distance',
                                              'Objective function, FUSION_BARRIER or FUSION_L0 penalty type, advanced usage in basis set optimizations'),
                  "penalty_hyperbolic_b"   : (1e-6,  54, 'Cusp region for hyperbolic constraint; for x=0, the Hessian is a/2b', 'Penalty type L1'),
                  "adaptive_factor"        : (0.25,  10, 'The step size is increased / decreased by up to this much in the event of a good / bad step; increase for a more variable step size.', 'Main Optimizer'),
@@ -146,6 +146,7 @@ tgt_opts_types = {
                  "reassign_modes"        : (None, -180, 'Reassign modes before fitting frequencies, using either linear assignment "permute" or maximum overlap "overlap".', 'Vibrational frequency targets', 'vibration'),
                  "liquid_coords"         : (None, 0, 'Provide file name for condensed phase coordinates.', 'Condensed phase properties', 'Liquid'),
                  "gas_coords"            : (None, 0, 'Provide file name for gas phase coordinates.', 'Condensed phase properties', 'Liquid'),
+                 "nvt_coords"         : (None, 0, 'Provide file name for condensed phase NVT coordinates.', 'Condensed phase properties', 'Liquid'),
                  "lipid_coords"         : (None, 0, 'Provide file name for lipid coordinates.', 'Condensed phase properties', 'Lipid'),
                  "coords"                : (None, -10, 'Coordinates for single point evaluation; if not provided, will search for a default.', 'Energy/force matching, ESP evaluations, interaction energies'),
                  "pdb"                   : (None, -10, 'PDB file mainly used for building OpenMM systems but can also contain coordinates.', 'Targets that use OpenMM', 'OpenMM'),
@@ -181,6 +182,8 @@ tgt_opts_types = {
                  "n_mcbarostat"       : (25, 0, 'Number of steps in the liquid simulation between MC barostat volume adjustments.', 'Liquid properties in OpenMM', 'Liquid_OpenMM'),
                  "gas_md_steps"       : (100000, 0, 'Number of time steps for the gas production run, if different from default.', 'Condensed phase property targets', 'liquid'),
                  "gas_eq_steps"       : (10000, 0, 'Number of time steps for the gas equilibration run, if different from default.', 'Condensed phase property targets', 'liquid'),
+                 "nvt_md_steps"       : (100000, 0, 'Number of time steps for the liquid NVT production run.', 'Condensed phase property targets', 'liquid'),
+                 "nvt_eq_steps"       : (10000, 0, 'Number of time steps for the liquid NVT equilibration run.', 'Condensed phase property targets', 'liquid'),
                  "writelevel"         : (0, 0, 'Affects the amount of data being printed to the temp directory.', 'Energy + Force Matching', 'AbInitio'),
                  "md_threads"         : (1, 0, 'Set the number of threads used by Gromacs or TINKER processes in MD simulations', 'Condensed phase properties in GROMACS and TINKER', 'Liquid_GMX, Lipid_GMX, Liquid_TINKER'),
                  "save_traj"          : (0, -10, 'Whether to save trajectories.  0 = Never save; 1 = Delete if optimization step is good; 2 = Always save', 'Condensed phase properties', 'Liquid, Lipid'),
@@ -194,8 +197,8 @@ tgt_opts_types = {
                  "fdhessdiag"       : (0, -100, 'Finite difference Hessian diagonals w/r.t. specified parameters (costs 2np times a objective calculation)', 'Use together with fd_ptypes (advanced usage)'),
                  "all_at_once"      : (1, -50, 'Compute all energies and forces in one fell swoop where possible(as opposed to calling the simulation code once per snapshot)', 'Various QM targets and MD codes', 'AbInitio'),
                  "run_internal"     : (1, -50, 'For OpenMM or other codes with Python interface: Compute energies and forces internally', 'OpenMM interface', 'OpenMM'),
-                 "energy"           : (1, 0, 'Enable the energy objective function', 'All ab initio targets', 'AbInitio'), 
-                 "force"            : (1, 0, 'Enable the force objective function', 'All ab initio targets', 'AbInitio'), 
+                 "energy"           : (1, 0, 'Enable the energy objective function', 'All ab initio targets', 'AbInitio'),
+                 "force"            : (1, 0, 'Enable the force objective function', 'All ab initio targets', 'AbInitio'),
                  "resp"             : (0, -150, 'Enable the RESP objective function', 'Ab initio targets with RESP; experimental (remember to set espweight)'),
                  "do_cosmo"         : (0, -150, 'Call Q-Chem to do MM COSMO on MM snapshots.', 'Currently unused, but possible in AbInitio target'),
                  "optimize_geometry": (1, 0, 'Perform a geometry optimization before computing properties', 'Monomer properties', 'moments'),
@@ -214,6 +217,7 @@ tgt_opts_types = {
                  "adapt_errors"     : (0, 50, 'Adapt to simulation uncertainty by combining property estimations and adjusting simulation length.', 'Condensed phase property targets', 'liquid'),
                  "force_average"    : (0, -50, 'Average over all atoms when normalizing force errors.', 'Force matching', 'abinitio'),
                  "remote_backup"    : (0, -50, 'When running remote target, back up files at the remote location.', 'Liquid, lipid and remote targets', 'liquid, lipid, remote'),
+                 "pure_num_grad"    : (0, -50, 'Pure numerical gradients -- launch two additional simulations for each perturbed forcefield parameter, and compute derivatives using 3-point formula. (This is very expensive and should only serve as a sanity check)')
                  },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
                  "w_rho"        : (1.0, 0, 'Weight of experimental density', 'Condensed phase property targets', 'liquid, lipid'),
@@ -226,6 +230,7 @@ tgt_opts_types = {
                  "w_scd"        : (1.0, 0, 'Weight of deuterium order parameter', 'Lipid property targets', 'lipid'),
                  "w_energy"     : (1.0, 0, 'Weight of energy', 'Ab initio targets', 'liquid'),
                  "w_force"      : (1.0, 0, 'Weight of atomistic forces', 'Ab initio targets', 'liquid'),
+                 "w_surf_ten"   : (0.0, 0, 'Weight of surface tension', 'Condensed phase property targets', 'liquid'),
                  "w_netforce"   : (0.0, 0, 'Weight of net forces (condensed to molecules, residues, or charge groups)', 'Ab initio targets', 'abinitio'),
                  "w_torque"     : (0.0, 0, 'Weight of torques (condensed to molecules, residues, or charge groups)', 'Ab initio targets', 'abinitio'),
                  "w_resp"       : (0.0, -150, 'Weight of RESP', 'Ab initio targets with RESP (advanced usage)', 'abinitio'),
@@ -246,12 +251,15 @@ tgt_opts_types = {
                  "gas_interval"  : (0.1, 0, 'Time interval for saving coordinates for the gas production run (if zero, use default in external script.)', 'Condensed phase property targets', 'liquid'),
                  "lipid_timestep"  : (1.0, 0, 'Time step size for the lipid simulation.', 'Lipid property targets', 'lipid'),
                  "lipid_interval"  : (0.1, 0, 'Time interval for saving coordinates for the lipid production run.', 'Lipid property targets', 'lipid'),
+                 "nvt_timestep"  : (1.0, 0, 'Time step size for the NVT simulation.', 'Condensed phase property targets', 'liquid'),
+                 "nvt_interval"  : (0.1, 0, 'Time interval for saving coordinates for the NVT simulation production run.', 'Condensed phase property targets', 'liquid'),
                  "self_pol_mu0"  : (0.0, -150, 'Gas-phase dipole parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "self_pol_alpha"  : (0.0, -150, 'Polarizability parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "epsgrad"         : (0.0, -150, 'Gradient below this threshold will be set to zero.', 'All targets'),
                  "energy_asymmetry": (1.0, -150, 'Snapshots with (E_MM - E_QM) < 0.0 will have their weights increased by this factor.', 'Ab initio targets'),
                  "nonbonded_cutoff"  : (None, -1, 'Cutoff for nonbonded interactions (passed to engines).', 'Condensed phase property targets', 'liquid'),
                  "vdw_cutoff"        : (None, -2, 'Cutoff for vdW interactions if different from other nonbonded interactions', 'Condensed phase property targets', 'liquid'),
+                 "liquid_fdiff_h" : (1e-2, 0, 'Step size for finite difference derivatives for liquid targets in pure_num_grad', 'Condensed phase property targets', 'liquid'),
                  },
     'sections': {}
     }
@@ -287,8 +295,8 @@ for t in tgt_opts_types:
     tgt_opts_defaults.update(subdict)
 
 ## Option maps for maintaining backward compatibility.
-bkwd = {"simtype" : "type", 
-        "masterfile" : "inter_txt", 
+bkwd = {"simtype" : "type",
+        "masterfile" : "inter_txt",
         "openmm_cuda_precision" : "openmm_precision",
         "mdrun_threads" : "md_threads",
         "mts_vvvr" : "mts_integrator",
@@ -311,7 +319,7 @@ def read_mvals(fobj):
             break
         Answer.append(float(line.split('[')[-1].split(']')[0].split()[-1]))
     return Answer
-        
+
 def read_pvals(fobj):
     Answer = []
     for line in fobj:
@@ -353,7 +361,7 @@ def printsection(heading,optdict,typedict):
     @param[in] optdict Options dictionary or None.
     @param[in] typedict Option type dictionary, either gen_opts_types or tgt_opts_types specified in this file.
     @return Answer List of strings for the section that we are printing out.
-    
+
     """
     from forcebalance.objective import Implemented_Targets
     from forcebalance.optimizer import Optimizer
@@ -424,7 +432,7 @@ def printsection(heading,optdict,typedict):
     #         for o, r, t in zip(ogrp, rgrp, tgrp):
     #             if t == t0:
     #                 ogrp2.append(
-                
+
     Answer.append("$end")
     return Answer
 
@@ -441,17 +449,17 @@ def parse_inputs(input_file=None):
 
     There is only one set of general options, but multiple sets of target options.
     Each target has its own section delimited by the \em $target keyword,
-    and we build a list of target options.  
+    and we build a list of target options.
 
     @param[in]  input_file The name of the input file.
     @return     options    General options.
     @return     tgt_opts   List of fitting target options.
-    
+
     @todo Implement internal coordinates.
     @todo Implement sampling correction.
     @todo Implement charge groups.
     """
-    
+
     logger.info("Reading options from file: %s\n" % input_file)
     section = "NONE"
     # First load in all of the default options.
