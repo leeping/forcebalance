@@ -26,8 +26,8 @@ def norm2(arr, a=0, n=None, step=3):
     """
     Given a one-dimensional array, return the norm-squared of
     every "step" elements, starting at 'a' and computing 'n' total
-    elements (so arr[a:a+step*n] must be valid). 
-    
+    elements (so arr[a:a+step*n] must be valid).
+
     Parameters
     ----------
     arr : np.ndarray
@@ -76,7 +76,7 @@ class AbInitio(Target):
     function from any simulation software (a driver to run the program and
     read output is still required).  The 'get' method can be overridden
     by subclasses like AbInitio_GMX."""
-    
+
     def __init__(self,options,tgt_opts,forcefield):
         """
         Initialization; define a few core concepts.
@@ -87,11 +87,11 @@ class AbInitio(Target):
 
         ## Initialize the base class
         super(AbInitio,self).__init__(options,tgt_opts,forcefield)
-        
+
         #======================================#
         # Options that are given by the parser #
         #======================================#
-        
+
         ## Number of snapshots
         self.set_option(tgt_opts,'shots','ns')
         ## Whether to match Absolute Energies (make sure you know what you're doing)
@@ -169,7 +169,7 @@ class AbInitio(Target):
         ## Whether to compute net forces and torques, or not.
         self.use_nft       = self.w_netforce > 0 or self.w_torque > 0
         ## Read in the trajectory file
-        self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords), 
+        self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords),
                             top=(os.path.join(self.root,self.tgtdir,self.pdb) if hasattr(self, 'pdb') else None))
         ## Set the number of snapshots
         if self.ns != -1:
@@ -228,7 +228,7 @@ class AbInitio(Target):
         # to an array of (3 * (n_forces + n_torques)) net forces and torques.
         # This code is rather slow.  It requires the system to have a list
         # of masses and blocking numbers.
-       
+
         kwds = {"MoleculeNumber" : "molecule",
                 "ResidueNumber" : "residue",
                 "ChargeGroupNumber" : "chargegroup"}
@@ -253,7 +253,7 @@ class AbInitio(Target):
         nat = sum(self.AtomMask)
 
         mask = np.array([i for i in range(npr) if self.AtomMask[i]])
-        
+
         if nfp not in [npr, nat]:
             logger.error('Force contains %i particles but expected %i or %i\n' % (nfp, npr, nat))
             raise RuntimeError
@@ -298,12 +298,12 @@ class AbInitio(Target):
         return netfrc_torque
 
     def read_reference_data(self):
-        
+
         """ Read the reference ab initio data from a file such as qdata.txt.
 
         @todo Add an option for picking any slice out of
         qdata.txt, helpful for cross-validation
-        
+
         After reading in the information from qdata.txt, it is converted
         into the GROMACS energy units (kind of an arbitrary choice);
         forces (kind of a misnomer in qdata.txt) are multipled by -1
@@ -318,16 +318,16 @@ class AbInitio(Target):
         weights.  Please read more in LPW and Troy Van Voorhis, JCP
         Vol. 133, Pg. 231101 (2010), doi:10.1063/1.3519043.  In the
         updated version of the code (July 13 2016), this feature is
-        currently not implemented due to disuse, but it is easy to 
+        currently not implemented due to disuse, but it is easy to
         re-implement if desired.
-        
+
         Finally, note that using non-Boltzmann weights degrades the
         statistical information content of the snapshots.  This
         problem will generally become worse if the ensemble to which
         we're reweighting is dramatically different from the one we're
         sampling from.  We end up with a set of Boltzmann weights like
         [1e-9, 1e-9, 1.0, 1e-9, 1e-9 ... ] and this is essentially just
-        one snapshot.  
+        one snapshot.
 
         Here, we have a measure for the information content of our snapshots,
         which comes easily from the definition of information entropy:
@@ -351,7 +351,7 @@ class AbInitio(Target):
                 self.espxyz.append([float(i) for i in sline[1:]])
             elif sline[0] == 'ESPVAL':
                 self.espval.append([float(i) for i in sline[1:]])
-        
+
         # Ensure that all lists are of length self.ns
         self.eqm = self.eqm[:self.ns]
         self.fqm = self.fqm[:self.ns]
@@ -407,7 +407,7 @@ class AbInitio(Target):
             self.fitatoms = []
 
         self.nesp = len(self.espval[0]) if len(self.espval) > 0 else 0
-            
+
         if self.attenuate:
             # Attenuate energies by an amount proportional to their
             # value above the minimum.
@@ -424,7 +424,7 @@ class AbInitio(Target):
                     self.boltz_wts[i] = 1.0 / np.sqrt(denom**2 + (eqm1[i]-denom)**2)
         else:
             self.boltz_wts = np.ones(self.ns)
-        
+
         # At this point, self.fqm is a (number of snapshots) x (3 x number of atoms) array.
         # Now we can transform it into a (number of snapshots) x (3 x number of residues + 3 x number of residues) array.
         if self.use_nft:
@@ -480,7 +480,7 @@ class AbInitio(Target):
                                        "%8.4f" % self.esp_ctr]
         self.printcool_table(data=Data, headings=Headings, color=0)
         if self.force:
-            logger.info("Maximum force error on atom %i (%s), frame %i, %8.4f kJ/mol/A\n" % (self.maxfatom, self.mol.elem[self.fitatoms[self.maxfatom]], self.maxfshot, self.maxdf/10))
+            logger.info("Maximum force difference on atom %i (%s), frame %i, %8.4f kJ/mol/A\n" % (self.maxfatom, self.mol.elem[self.fitatoms[self.maxfatom]], self.maxfshot, self.maxdf/10))
 
     def energy_all(self):
         if hasattr(self, 'engine'):
@@ -495,7 +495,7 @@ class AbInitio(Target):
         else:
             logger.error("Target must contain an engine object\n")
             raise NotImplementedError
-        
+
     def energy_force_transform(self):
         if self.force:
             M = self.energy_force_all()
@@ -548,10 +548,10 @@ class AbInitio(Target):
 
         This code computes the least squares objective function for the energy and force.
         The most recent revision simplified the code to make it easier to maintain,
-        and to remove the covariance matrix and dual-weight features. 
+        and to remove the covariance matrix and dual-weight features.
 
-        The equations have also been simplified.  Previously I normalizing each force 
-        component (or triples of components belonging to an atom) separately.  
+        The equations have also been simplified.  Previously I normalizing each force
+        component (or triples of components belonging to an atom) separately.
         I was also computing the objective function separately from the "indicators",
         which led to confusion regarding why they resulted in different values.
         The code was structured around computing the objective function by multiplying
@@ -560,13 +560,13 @@ class AbInitio(Target):
         more complicated approach was not worth it, given the opacity that it introduced
         into how things were computed.
 
-        In the new code, the objective function is computed in a simple way.  
-        For the energies we compute a weighted sum of squared differences 
-        between E_MM and E_QM, minus (optionally) the mean energy gap, for the numerator.  
-        The weighted variance of the QM energies <E_QM^2>-<E_QM>^2 is the denominator.  
-        The user-supplied w_energy option is a prefactor that multiplies this term. 
-        If w_normalize is set to True (no longer the default), the prefactor is 
-        further divided by the sum of all of the weights. 
+        In the new code, the objective function is computed in a simple way.
+        For the energies we compute a weighted sum of squared differences
+        between E_MM and E_QM, minus (optionally) the mean energy gap, for the numerator.
+        The weighted variance of the QM energies <E_QM^2>-<E_QM>^2 is the denominator.
+        The user-supplied w_energy option is a prefactor that multiplies this term.
+        If w_normalize is set to True (no longer the default), the prefactor is
+        further divided by the sum of all of the weights.
         The indicators are set to the square roots of the numerator and denominator above.
 
         For the forces we compute the same weighted sum, where each term in the sum
@@ -574,24 +574,24 @@ class AbInitio(Target):
         The denominator is computed in an analogous way using the norm-squared F_QM,
         and the prefactor is w_force. The same approach is applied if the user asks
         for net forces and/or torques. The indicators are computed from the square
-        roots of the numerator and denominator, divided by the number of 
+        roots of the numerator and denominator, divided by the number of
         atoms (molecules) for forces (net forces / torques).
 
         In equation form, the objective function is given by:
-       
-        \[ = {W_E}\left[ {\frac{{\left( {\sum\limits_{i \in {N_s}} 
-        {{w_i}{{\left( {E_i^{MM} - E_i^{QM}} \right)}^2}} } \right) - 
+
+        \[ = {W_E}\left[ {\frac{{\left( {\sum\limits_{i \in {N_s}}
+        {{w_i}{{\left( {E_i^{MM} - E_i^{QM}} \right)}^2}} } \right) -
         {{\left( {{{\bar E}^{MM}} - {{\bar E}^{QM}}} \right)}^2}}}
-        {{\sum\limits_{i \in {N_s}} {{w_i}{{\left( 
-        {E_i^{QM} - {{\bar E}^{QM}}} \right)}^2}} }}} \right] + 
-        {W_F}\left[ {\frac{{\sum\limits_{i \in {N_s}} {{w_i}\sum\limits_{a \in {N_a}} 
+        {{\sum\limits_{i \in {N_s}} {{w_i}{{\left(
+        {E_i^{QM} - {{\bar E}^{QM}}} \right)}^2}} }}} \right] +
+        {W_F}\left[ {\frac{{\sum\limits_{i \in {N_s}} {{w_i}\sum\limits_{a \in {N_a}}
         {{{\left| {{\bf{F}}_{i,a}^{MM} - {\bf{F}}_{i,a}^{QM}} \right|}^2}} } }}
-        {{\sum\limits_{i \in {N_s}} {{w_i}\sum\limits_{a \in {N_a}} 
+        {{\sum\limits_{i \in {N_s}} {{w_i}\sum\limits_{a \in {N_a}}
         {{{\left| {{\bf{F}}_{i,a}^{QM}} \right|}^2}} } }}} \right]\]
 
-        In the previous code (ForTune, 2011 and previous) 
-        this subroutine used analytic first derivatives of the 
-        energy and force to build the derivatives of the objective function.  
+        In the previous code (ForTune, 2011 and previous)
+        this subroutine used analytic first derivatives of the
+        energy and force to build the derivatives of the objective function.
         Here I will take a simplified approach, because building the analytic
         derivatives require substantial modifications of the engine code,
         which is unsustainable. We use a finite different calculation
@@ -634,7 +634,7 @@ class AbInitio(Target):
         Z       = 0.0
         # All vectors with NCP1 elements are ordered as
         # [E F_1x F_1y F_1z F_2x ... NF_1x NF_1y ... TQ_1x TQ_1y ... ]
-        # Vector of QM-quantities 
+        # Vector of QM-quantities
         Q = np.zeros(NCP1)
         # Mean quantities over the trajectory
         M0    = np.zeros(NCP1)
@@ -732,7 +732,7 @@ class AbInitio(Target):
             # We store all elements of the mean-squared QM quantities.
             QQ0 += P*QQ
             # Increment the objective function.
-            Xi     = X**2                   
+            Xi     = X**2
             Xi[0] *= boost
             # SPX contains the sum over snapshots
             SPX += P * Xi
@@ -785,7 +785,7 @@ class AbInitio(Target):
         if self.savg:
             QEtmp = np.array(Q_all_print[:,0]).flatten()
             Q_all_print[:,0] -= np.average(QEtmp, weights=self.boltz_wts)
-        if self.attenuate: 
+        if self.attenuate:
             QEtmp = np.array(Q_all_print[:,0]).flatten()
             Q_all_print[:,0] -= np.min(QEtmp)
             MEtmp = np.array(M_all_print[:,0]).flatten()
@@ -799,6 +799,7 @@ class AbInitio(Target):
                                           col(M_all_print[:,0])-col(Q_all_print[:,0]),
                                           col(self.boltz_wts)))
             np.savetxt("EnergyCompare.txt", EnergyComparison, header="%11s  %12s  %12s  %12s" % ("QMEnergy", "MMEnergy", "Delta(MM-QM)", "Weight"), fmt="% 12.6e")
+            plot_mm_vs_qm(M_all_print[:,0], Q_all_print[:,0], title='Abinitio '+self.name)
         if self.force and self.writelevel > 1:
             # Write .xyz files which can be viewed in vmd.
             QMTraj = self.mol[:].atom_select(self.fitatoms)
@@ -953,7 +954,7 @@ class AbInitio(Target):
             logger.debug("\r")
             pvals = self.FF.make(mvals_)
             return self.engine.get_charges()
-            
+
             # Need to update the positions of atoms, if there are virtual sites.
             # qvals = [pvals[i] for i in self.FF.qmap]
             # # All of a sudden I need the number of virtual sites.
@@ -1022,7 +1023,7 @@ class AbInitio(Target):
             self.esp_err = np.sqrt(X)
             self.esp_ref = np.sqrt(Q)
             self.esp_err_pct = self.esp_err / self.esp_ref
-            
+
         # Following is the restraint part
         # RESP hyperbola "strength" parameter; 0.0005 is weak, 0.001 is strong
         # RESP hyperbola "tightness" parameter; don't need to change this
@@ -1045,7 +1046,6 @@ class AbInitio(Target):
             if self.w_normalize:
                 tw = self.w_energy + self.w_force + self.w_netforce + self.w_torque + self.w_resp
                 self.esp_ctr /= tw
-            
         Answer = {'X':X,'G':G,'H':H}
         return Answer
 
@@ -1104,3 +1104,21 @@ def compute_objective_part(SPX,QQ0,Q0,Z,a,n,energy=False,subtract_mean=False,div
         raise RuntimeError('Please pass either 0, 1, 2 to divide')
     return X2
 
+def plot_mm_vs_qm(M, Q, title=''):
+    import matplotlib.pyplot as plt
+    qm_min_dx = np.argmin(Q)
+    e_qm = Q - Q[qm_min_dx]
+    e_mm = M - M[qm_min_dx]
+    plt.plot(e_mm, e_qm, 'o')
+    plt.xlabel('QM Energies (kJ/mol)')
+    plt.ylabel('MM Energies (kJ/mol)')
+    x1,x2,y1,y2 = plt.axis()
+    if x2 < y2:
+        x2 = y2
+    else:
+        y2 = x2
+    plt.axis((0,x2,0,y2))
+    plt.plot([0,x2],[0,y2], '--' )
+    plt.title(title)
+    plt.savefig('e_qm_vs_mm.pdf')
+    plt.close()

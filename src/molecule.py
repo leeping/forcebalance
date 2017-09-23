@@ -111,7 +111,7 @@
 # qm_enthalpy= Enthalpic contribution at STP, excluding electronic energy and ZPE, kcal/mol (from a qchem freq calculation)
 FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_grads', 'qm_energies', 'qm_interaction',
                           'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins',
-                          'qm_zpe', 'qm_entropy', 'qm_enthalpy'])
+                          'qm_zpe', 'qm_entropy', 'qm_enthalpy', 'bond_orders'])
 #=========================================#
 #| Data attributes in AtomVariableNames  |#
 #| must be a list along the atom axis,   |#
@@ -820,7 +820,7 @@ def arc(Mol, begin=None, end=None, RMSD=True, align=True):
     Arc : np.ndarray
         Arc length between frames in Angstrom, length is n_frames - 1
     """
-    if align: 
+    if align:
         Mol.align()
     if begin is None:
         begin = 0
@@ -990,7 +990,7 @@ class Molecule(object):
         The Molecule class has list-like behavior, so we can get slices of it.
         If we say MyMolecule[0:10], then we'll return a copy of MyMolecule with frames 0 through 9.
         """
-        if isinstance(key, int) or isinstance(key, slice) or isinstance(key,np.ndarray):
+        if isinstance(key, int) or isinstance(key, slice) or isinstance(key,np.ndarray) or isinstance(key,list):
             if isinstance(key, int):
                 key = [key]
             New = Molecule()
@@ -1682,7 +1682,7 @@ class Molecule(object):
         else:
             for i in range(len(self)):
                 self.xyzs[i] -= self.xyzs[i].mean(0)
-            
+
     def build_bonds(self):
         """ Build the bond connectivity graph. """
         sn = self.top_settings['topframe']
@@ -2122,13 +2122,13 @@ class Molecule(object):
         Recursive function that orders atoms based on connectivity.
         To call the function, pass in the topology object (e.g. M.molecules[0])
         and the index of the atom assigned to be "first".
-        
+
         The neighbors of "i" are placed in decreasing order of the
         maximum length of the shortest path to all other atoms - i.e.
         an atom closer to the "edge" of the molecule has a longer
         shortest-path to atoms on the other "edge", and they should
         be added first.
-        
+
         Snippet:
 
         from forcebalance.molecule import *
@@ -2145,7 +2145,7 @@ class Molecule(object):
         # Write the new Molecule object
         newM = M.atom_select(newOrder)
         newM.write('reordered1.xyz')
-        
+
         Parameters
         ----------
         m : topology object (contained in Molecule)
@@ -2155,11 +2155,11 @@ class Molecule(object):
         currList : list
             Current list of new atom orderings
         max_min_path : dict
-            Dictionary mapping 
+            Dictionary mapping
         """
         if m not in self.molecules:
             raise RuntimeError("topology is not part of Molecule object")
-        if max_min_path is None: 
+        if max_min_path is None:
             spl = nx.shortest_path_length(m)
             # Dictionary mapping atom index to
             # maximum length of shortest path to all other atoms
@@ -2224,7 +2224,7 @@ class Molecule(object):
             xyzi = self.xyzs[i].copy()
             j=i+1
             xyzj = self.xyzs[j].copy()
-            if align: 
+            if align:
                 xyzi -= xyzi.mean(0)
                 xyzj -= xyzj.mean(0)
                 tr, rt = get_rotate_translate(xyzj, xyzi)
@@ -2895,7 +2895,7 @@ class Molecule(object):
             if "Z-matrix Print" in line:
                 zmatrix = True
             if re.match('^\$',line):
-                wrd = re.sub('\$','',line)
+                wrd = re.sub('\$','',line).lower()
                 if zmatrix:
                     if wrd == 'end':
                         zmatrix = False
@@ -3390,7 +3390,7 @@ class Molecule(object):
         elif len(Floats['energy_mp2']) > 0:
             Answer['qm_energies'] = Floats['energy_mp2']
         elif len(energy_scf) > 0:
-            if 'correlation' in Answer['qcrems'][0] and Answer['qcrems'][0]['correlation'].lower() in ['mp2', 'rimp2', 'ccsd', 'ccsd(t)']:
+            if len(Answer['qcrems']) > 0 and 'correlation' in Answer['qcrems'][0] and Answer['qcrems'][0]['correlation'].lower() in ['mp2', 'rimp2', 'ccsd', 'ccsd(t)']:
                 logger.error("Q-Chem was called with a post-HF theory but we only got the SCF energy\n")
                 raise RuntimeError
             Answer['qm_energies'] = energy_scf
