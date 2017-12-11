@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.3.2-py2.7-linux-x86_64.egg/EGG-INFO/scripts/ForceBalance.py", line 43, in Run_ForceBalance
+    optimizer.Run()
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.3.2-py2.7-linux-x86_64.egg/forcebalance/optimizer.py", line 305, in Run
+    xk = self.OptTab[self.jobtype]()
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.3.2-py2.7-linux-x86_64.egg/forcebalance/optimizer.py", line 887, in NewtonRaphson
+    return self.MainOptimizer(b_BFGS=0)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.3.2-py2.7-linux-x86_64.egg/forcebalance/optimizer.py", line 471, in MainOptimizer
+    data        = self.Objective.Full(xk,Ord,verbose=True)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.3.2-py2.7-linux-x86_64.egg/forcebalance/objective.py", line 271, in Full
+    Objective = self.Target_Terms(mvals, Order, verbose, customdir)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.3.2-py2.7-linux-x86_64.egg/forcebalance/objective.py", line 175, in Target_Terms
+    Tgt.stage(mvals, AGrad = Order >= 1, AHess = Order >= 2, customdir=customdir)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.3.2-py2.7-linux-x86_64.egg/forcebalance/target.py", line 618, in stage
+    self.submit_jobs(mvals, AGrad, AHess)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.3.2-py2.7-linux-x86_64.egg/forcebalance/liquid.py", line 517, in submit_jobs
+    self.npt_simulation(T,P,snum)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.3.2-py2.7-linux-x86_64.egg/forcebalance/liquid.py", line 342, in npt_simulation
+    _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.3.2-py2.7-linux-x86_64.egg/forcebalance/nifty.py", line 1379, in _exec
+    to_read, _, _ = select(streams, [], [])
+KeyboardInterrupt

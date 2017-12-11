@@ -1,0 +1,296 @@
+Executing process: bash runcuda.sh python npt.py openmm 298.150 1.000
+#=======================#
+# ENVIRONMENT VARIABLES #
+#=======================#
+
+XDG_VTNR=7
+MANPATH=/usr/local/gromacs/share/man:
+XDG_SESSION_ID=c2
+CLUTTER_IM_MODULE=xim
+VIRTUALENVWRAPPER_SCRIPT=/usr/share/virtualenvwrapper/virtualenvwrapper.sh
+XDG_GREETER_DATA_DIR=/var/lib/lightdm-data/cdt1605
+SELINUX_INIT=YES
+SESSION=ubuntu
+GPG_AGENT_INFO=/run/user/1000/keyring-SQMApt/gpg:0:1
+VTE_VERSION=3409
+SHELL=/bin/bash
+XDG_MENU_PREFIX=gnome-
+TERM=xterm
+PYTHONUNBUFFERED=y
+WINDOWID=50347562
+GMXMAN=/usr/local/gromacs/share/man
+UPSTART_SESSION=unix:abstract=/com/ubuntu/upstart-session/1000/3114
+GNOME_KEYRING_CONTROL=/run/user/1000/keyring-SQMApt
+GTK_MODULES=overlay-scrollbar:unity-gtk-module
+USER=cdt1605
+LS_COLORS=rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.axa=00;36:*.oga=00;36:*.spx=00;36:*.xspf=00;36:
+LD_LIBRARY_PATH=/opt/armadillo-7.200/lib:/opt/gcc-5.4/lib64:/opt/cuda-6.0/lib64:/usr/local/gromacs/lib/x86_64-linux-gnu:/opt/armadillo-7.200/lib:/opt/gcc-5.4/lib64:/opt/cuda-6.0/lib64
+XDG_SESSION_PATH=/org/freedesktop/DisplayManager/Session0
+XDG_SEAT_PATH=/org/freedesktop/DisplayManager/Seat0
+SSH_AUTH_SOCK=/run/user/1000/keyring-SQMApt/ssh
+SESSION_MANAGER=local/cdt16-laptop-05:@/tmp/.ICE-unix/3279,unix/cdt16-laptop-05:/tmp/.ICE-unix/3279
+DEFAULTS_PATH=/usr/share/gconf/ubuntu.default.path
+GMXDATA=/usr/local/gromacs/share/gromacs
+XDG_CONFIG_DIRS=/etc/xdg/xdg-ubuntu:/usr/share/upstart/xdg:/etc/xdg
+__KMP_REGISTERED_LIB_12461=0x7fb224a434d0-cafea2c7-libiomp5.so
+PATH=/opt/doxygen-1.8.11/bin:/opt/gnuplot-5.0/bin:/opt/gcc-5.4/bin:/opt/gdb-7.8/bin:/opt/NAMD_2.11_Linux-x86_64:/opt/VESTA:/opt/ONETEP:/opt/lammps/bin:/opt/vmd-1.9.2/bin:/opt/namd/:/opt/lammps/bin:/opt/vmd/bin:/opt/namd/:/opt/castep-16.1.1:/opt/vesta-3.3.8/:/opt/cuda-6.0/bin:/usr/local/gromacs/bin:/home/cdt1605/FB_PY/bin:/opt/vmd-1.9.2/lib/plugins/LINUXAMD64/bin/catdcd5.1:/home/cdt1605/anaconda3/bin:/opt/doxygen-1.8.11/bin:/opt/gnuplot-5.0/bin:/opt/gcc-5.4/bin:/opt/gdb-7.8/bin:/opt/NAMD_2.11_Linux-x86_64:/opt/VESTA:/opt/ONETEP:/opt/lammps/bin:/opt/vmd-1.9.2/bin:/opt/namd/:/opt/lammps/bin:/opt/vmd/bin:/opt/namd/:/opt/castep-16.1.1:/opt/vesta-3.3.8/:/opt/cuda-6.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/opt/puppetlabs/bin
+DESKTOP_SESSION=ubuntu
+GROMACS_DIR=/usr/local/gromacs
+runcuda.sh: line 139: /sbin/lspci: No such file or directory
+QT_IM_MODULE=ibus
+QT_QPA_PLATFORMTHEME=appmenu-qt5
+JOB=dbus
+PWD=/home/cdt1605/OpenMM/forcebalance-20b7a3a1cc6e50746373e011881616f7daccbed2/studies/TIP3P_BUCK_Multi_GEOM/TIP3P.tmp/WATER/iter_0000/298.15K-1.0atm
+XMODIFIERS=@im=ibus
+LANG=en_GB.UTF-8
+GNOME_KEYRING_PID=3112
+GDM_LANG=en_GB
+MANDATORY_PATH=/usr/share/gconf/ubuntu.mandatory.path
+IM_CONFIG_PHASE=1
+COMPIZ_CONFIG_PROFILE=ubuntu
+GDMSESSION=ubuntu
+SESSIONTYPE=gnome-session
+HOME=/home/cdt1605
+SHLVL=3
+XDG_SEAT=seat0
+BAK=/home/cdt1605/temp/runcuda-backups
+LANGUAGE=en_GB:
+_VIRTUALENVWRAPPER_API= mkvirtualenv rmvirtualenv lsvirtualenv showvirtualenv workon add2virtualenv cdsitepackages cdvirtualenv lssitepackages toggleglobalsitepackages cpvirtualenv setvirtualenvproject mkproject cdproject mktmpenv
+GNOME_DESKTOP_SESSION_ID=this-is-deprecated
+PYTHONPATH=/opt/cif2cell/lib/python2.7/site-packages/:/opt/scikit-learn/lib/python2.7/site-packages/:/opt/cif2cell/lib/python2.7/site-packages/:/opt/scikit-learn/lib/python2.7/site-packages/:
+GMXBIN=/usr/local/gromacs/bin
+LOGNAME=cdt1605
+COMPIZ_BIN_PATH=/usr/bin/
+XDG_DATA_DIRS=/usr/share/ubuntu:/usr/share/gnome:/usr/local/share/:/usr/share/
+GMXLDLIB=/usr/local/gromacs/lib/x86_64-linux-gnu
+DBUS_SESSION_BUS_ADDRESS=unix:abstract=/tmp/dbus-DkooSa1m8W
+QT4_IM_MODULE=ibus
+PKG_CONFIG_PATH=/usr/local/gromacs/lib/x86_64-linux-gnu/pkgconfig
+LESSOPEN=| /usr/bin/lesspipe %s
+INSTANCE=
+TEXTDOMAIN=im-config
+DISPLAY=:0
+XDG_RUNTIME_DIR=/run/user/1000
+XDG_CURRENT_DESKTOP=Unity
+GTK_IM_MODULE=ibus
+LESSCLOSE=/usr/bin/lesspipe %s %s
+TEXTDOMAINDIR=/usr/share/locale/
+XAUTHORITY=/home/cdt1605/.Xauthority
+COLORTERM=gnome-terminal
+_=/usr/bin/env
+
+#=======================#
+#   GPU CONFIGURATION   #
+#=======================#
+
+I'm using GPU number 
+nvidia-smi output:
+Sun Dec 10 18:46:10 2017       
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 384.90                 Driver Version: 384.90                    |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|===============================+======================+======================|
+|   0  Quadro M1000M       Off  | 00000000:01:00.0 Off |                  N/A |
+| N/A   40C    P8    N/A /  N/A |    261MiB /  2000MiB |      0%      Default |
++-------------------------------+----------------------+----------------------+
+                                                                               
++-----------------------------------------------------------------------------+
+| Processes:                                                       GPU Memory |
+|  GPU       PID   Type   Process name                             Usage      |
+|=============================================================================|
+|    0      2009      G   /usr/bin/X                                   224MiB |
+|    0      3387      G   compiz                                        29MiB |
+|    0     10141      G   /usr/lib/firefox/firefox                       1MiB |
+|    0     10174      G   /usr/lib/firefox/firefox                       1MiB |
+|    0     10336      G   /usr/lib/firefox/firefox                       1MiB |
++-----------------------------------------------------------------------------+
+lspci output (to see buses):
+
+#=======================#
+# STARTING CALCULATION! #
+#=======================#
+
+python npt.py openmm 298.150 1.000
+Work Queue library import fail (You can't queue up jobs using Work Queue)
+#==================================================================#
+#| [1;94m ForceBalance condensed phase simulation using engine: OPENMM [0m |#
+#==================================================================#
+#========================================================#
+#| [92m             Options from ForceBalance              [0m |#
+#========================================================#
+force_cuda                True 
+mts_integrator            0 
+rpmd_beads                0 
+precision                 mixed 
+platname                  CUDA 
+liquid_coords             liquid.pdb 
+gas_coords                gas.pdb 
+root                      /home/cdt1605/OpenMM/forcebalance-20b7a3a1cc6e50746373e011881616f7daccbed2/studies/TIP3P_BUCK_Multi_GEOM 
+name                      WATER 
+type                      LIQUID_OPENMM 
+weight                    1.0 
+fdgrad                    0 
+fdhess                    0 
+fdhessdiag                0 
+sleepy                    0 
+fd1_pids                  [] 
+fd2_pids                  [] 
+h                         0.001 
+backup                    1 
+zerograd                  -1 
+epsgrad                   0.0 
+pgrad                     [0, 1, 2] 
+tgtdir                    targets/WATER 
+w_rho                     1.0 
+w_hvap                    1.0 
+w_alpha                   1.0 
+w_kappa                   1.0 
+w_cp                      1.0 
+w_eps0                    1.0 
+w_normalize               0 
+manual                    0 
+hvap_subaverage           0 
+liquid_eq_steps           1000 
+liquid_md_steps           2000 
+gas_eq_steps              500 
+gas_md_steps              5000 
+nonbonded_cutoff          11.0 
+liquid_timestep           2.0 
+liquid_interval           2.0 
+gas_timestep              1.0 
+gas_interval              0.1 
+adapt_errors              0 
+minimize_energy           1 
+self_pol_mu0              1.855 
+self_pol_alpha            1.47 
+anisotropic_box           0 
+save_traj                 0 
+n_molecules               895 
+rho_denom                 40.0 
+hvap_denom                2.0 
+alpha_denom               1.0 
+kappa_denom               10.0 
+cp_denom                  2.0 
+eps0_denom                10.0 
+rdf_denom                 1.0 
+----------------------------------------------------------
+For the condensed phase system, I will collect 2 snapshots spaced apart by 1000 x 2.000 fs time steps
+For the gas phase system, I will collect 50 snapshots spaced apart by 100 x 1.000 fs time steps
+There are 895 molecules in the liquid
+#========================================================#
+#| [92m             Engine options for liquid              [0m |#
+#========================================================#
+coords                    liquid.pdb 
+mol                       <forcebalance.molecule.Molecule object at 0x7fe5d7d5ac10> 
+pbc                       True 
+nonbonded_cutoff          11.0 
+platname                  CUDA 
+FF                        <forcebalance.forcefield.FF object at 0x7fe5d7d5ad90> 
+----------------------------------------------------------
+#========================================================#
+#| [92m               Engine options for gas               [0m |#
+#========================================================#
+coords                    gas.pdb 
+mol                       <forcebalance.molecule.Molecule object at 0x7fe5faff2d90> 
+pbc                       False 
+platname                  Reference 
+FF                        <forcebalance.forcefield.FF object at 0x7fe5d7d5ad90> 
+----------------------------------------------------------
+Running without a target, using current directory.
+#========================================================#
+#| [1;94m         Condensed phase molecular dynamics         [0m |#
+#========================================================#
+Minimizing the energy... (starting energy -36029.039 kJ/mol)Done (final energy -45014.985 kJ/mol)
+Equilibrating...
+ Iter.  Time(ps)   Temp(K)  Epot(kJ/mol)  Vol(nm^3)   Rho(kg/m^3)
+     0     0.000   302.567    -45014.985    27.0000      991.6316
+     1     2.000   276.378    -37769.517    27.1684      985.4835
+Production...
+ Iter.  Time(ps)   Temp(K)  Epot(kJ/mol)  Vol(nm^3)   Rho(kg/m^3)
+     0     2.000   276.378    -37769.517    27.1684      985.4835
+     1     4.000   291.631    -36596.745    27.2808      981.4254
+     2     6.000   301.833    -35719.554    27.2502      982.5259
+Liquid phase MD simulation took 7.459 seconds
+#=======================================================================#
+#| [92m Energy Component Analysis, Mean +- Stderr [Per Molecule] (kJ/mol) [0m |#
+#=======================================================================#
+NonbondedForce             -36695.2722 +-   484.8523 [  -41.0003 +-  0.5417 ] 
+Potential Energy           -36695.2721 +-   484.8523 [  -41.0003 +-  0.5417 ] 
+Kinetic Energy               6469.2674 +-   134.7463 [    7.2282 +-  0.1506 ] 
+Temperature                   289.9471 +-     6.0392 [    0.3240 +-  0.0067 ] 
+Total Energy               -30226.0047 +-   619.5480 [  -33.7721 +-  0.6922 ] 
+-------------------------------------------------------------------------
+#========================================================#
+#| [1;94m            Gas phase molecular dynamics            [0m |#
+#========================================================#
+Gas phase MD simulation took 0.033 seconds
+#=======================================================================#
+#| [92m Energy Component Analysis, Mean +- Stderr [Per Molecule] (kJ/mol) [0m |#
+#=======================================================================#
+Kinetic Energy                 10.7864 +-     1.1346 [   10.7864 +-  1.1346 ] 
+Temperature                   432.4327 +-    45.4882 [  432.4327 +- 45.4882 ] 
+Total Energy                   10.7864 +-     1.1346 [   10.7864 +-  1.1346 ] 
+-------------------------------------------------------------------------
+Calculating potential energy derivatives with finite difference step size: 0.001000
+#========================================================#
+#| [1;94m   Condensed phase energy and dipole derivatives    [0m |#
+#| [1;94m           Initializing array to length 3           [0m |#
+#========================================================#
+0 Atom/charge/tip3p-O                              fdwrap: energy_driver [0] = -1.0e-03                                                   fdwrap: energy_driver [0] =  1.0e-03                                                   1 Atom/epsilon/tip3p-O                              fdwrap: energy_driver [1] = -1.0e-03                                                   fdwrap: energy_driver [1] =  1.0e-03                                                   2 Atom/sigma/tip3p-O                              fdwrap: energy_driver [2] = -1.0e-03                                                   fdwrap: energy_driver [2] =  1.0e-03                                                   Condensed phase energy derivatives took 3.266 seconds
+#========================================================#
+#| [1;94m            Gas phase energy derivatives            [0m |#
+#========================================================#
+0 Atom/charge/tip3p-O                              fdwrap: energy_driver [0] = -1.0e-03                                                   fdwrap: energy_driver [0] =  1.0e-03                                                   1 Atom/epsilon/tip3p-O                              fdwrap: energy_driver [1] = -1.0e-03                                                   fdwrap: energy_driver [1] =  1.0e-03                                                   2 Atom/sigma/tip3p-O                              fdwrap: energy_driver [2] = -1.0e-03                                                   fdwrap: energy_driver [2] =  1.0e-03                                                   Gas phase energy derivatives took 0.043 seconds
+#========================================================#
+#| [92m        Density:  983.1449 +-  0.9893 kg/m^3        [0m |#
+#| [92m                Analytic Derivative:                [0m |#
+#========================================================#
+   0 [ -1.2656e+03 ] : Atom/charge/tip3p-O
+   1 [ -1.9060e+02 ] : Atom/epsilon/tip3p-O
+   2 [ -2.6516e+03 ] : Atom/sigma/tip3p-O
+----------------------------------------------------------
+Liquid enthalpy: -30224.3430 kJ/mol, stdev  1073.0908 ; (-30226.0047 from energy,  1.6617 from pV)
+#=========================================================#
+#| [92m Enthalpy of Vaporization:  47.0355 +- 1.3291 kJ/mol [0m |#
+#| [92m                Analytic Derivative:                 [0m |#
+#=========================================================#
+   0 [ -1.1767e+03 ] : Atom/charge/tip3p-O
+   1 [ -1.4082e+02 ] : Atom/epsilon/tip3p-O
+   2 [ -2.0386e+03 ] : Atom/sigma/tip3p-O
+#===================================================================#
+#| [92m Thermal expansion coefficient:  1.9338e-03 +- 1.1323e-03 K^-1 [0m |#
+#| [92m                     Analytic Derivative:                      [0m |#
+#===================================================================#
+   0 [ -1.4123e+00 ] : Atom/charge/tip3p-O
+   1 [ -2.0626e-01 ] : Atom/epsilon/tip3p-O
+   2 [ -2.8707e+00 ] : Atom/sigma/tip3p-O
+#===================================================================#
+#| [92m Isothermal compressibility:   2.0063e-06 +- 9.4998e-07 bar^-1 [0m |#
+#| [92m                     Analytic Derivative:                      [0m |#
+#===================================================================#
+   0 [ -1.2664e-03 ] : Atom/charge/tip3p-O
+   1 [ -1.5326e-04 ] : Atom/epsilon/tip3p-O
+   2 [ -2.1394e-03 ] : Atom/sigma/tip3p-O
+#======================================================================#
+#| [92m Isobaric heat capacity:   4.1606e+02 +- 1.9212e+02 cal mol-1 K-1 [0m |#
+#| [92m                       Analytic Derivative:                       [0m |#
+#======================================================================#
+   0 [ -9.3451e+04 ] : Atom/charge/tip3p-O
+   1 [ -2.0177e+04 ] : Atom/epsilon/tip3p-O
+   2 [ -2.7950e+05 ] : Atom/sigma/tip3p-O
+#==============================================================#
+#| [92m Dielectric constant:            3.5187e+01 +- 1.5638e+01 [0m |#
+#| [92m                   Analytic Derivative:                   [0m |#
+#==============================================================#
+   0 [ -4.8772e+03 ] : Atom/charge/tip3p-O
+   1 [ -1.2805e+03 ] : Atom/epsilon/tip3p-O
+   2 [ -1.7704e+04 ] : Atom/sigma/tip3p-O
+Writing final force field.
+Writing all simulation data to disk.
+
+real	0m12.385s
+user	0m10.960s
+sys	0m0.860s
+find: ‘/home/cdt1605/temp/runcuda-backups’: No such file or directory
