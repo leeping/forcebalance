@@ -6,8 +6,10 @@
 
 import os
 #rdf
+import glob
 import mdtraj as md
 from itertools import combinations
+from scipy.ndimage.filters import gaussian_filter
 #rdf
 from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
@@ -18,7 +20,6 @@ from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
 import networkx as nx
 import numpy as np
-import math
 import sys
 from forcebalance.finite_difference import *
 import pickle
@@ -685,7 +686,7 @@ class OpenMM(Engine):
 
                 self.mmopts.setdefault('nonbondedCutoff', nonbonded_cutoff*nanometer)
                 self.mmopts.setdefault('useSwitchingFunction', True)
-                self.mmopts.setdefault('switchingDistance', (nonbonded_cutoff-0.1)*nanometer)
+                self.mmopts.setdefault('switchingDistance', (nonbonded_cutoff-0.2)*nanometer)
             self.mmopts.setdefault('useDispersionCorrection', True)
         else:
             if 'nonbonded_cutoff' in kwargs or 'vdw_cutoff' in kwargs:
@@ -814,7 +815,7 @@ class OpenMM(Engine):
         self.forcefield = ForceField(*self.ffxml)
         # OpenMM classes for force generators
         ismgens = [forcefield.AmoebaGeneralizedKirkwoodGenerator, forcefield.AmoebaWcaDispersionGenerator,
-                     forcefield.CustomGBGenerator, forcefield.GBSAOBCGenerator, forcefield.GBVIGenerator]
+                     forcefield.CustomGBGenerator, forcefield.GBSAOBCGenerator]
         if self.ism is not None:
             if self.ism == False:
                 self.forcefield._forces = [f for f in self.forcefield._forces if not any([isinstance(f, f_) for f_ in ismgens])]
@@ -1018,12 +1019,7 @@ class OpenMM(Engine):
             logger.error("Polarizability calculation is available in TINKER only.\n")
             raise NotImplementedError
 
-        if self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']:
-            crit = 1e-4
-        else:
-            crit = 1e-6
-
-        if optimize: self.optimize(shot, crit=crit)
+        if optimize: self.optimize(shot)
         else: self.set_positions(shot)
 
         moments = get_multipoles(self.simulation)
@@ -1086,7 +1082,7 @@ class OpenMM(Engine):
 
         return (D - A - B) / 4.184
 
-    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=7, minimize=True, anisotropic=False, save_traj=False, verbose=False, **kwargs):
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, save_traj=False, verbose=False, **kwargs):
         
         """
         Method for running a molecular dynamics simulation.  
@@ -1161,46 +1157,93 @@ class OpenMM(Engine):
         Kinetics = []
         Volumes = []
         Dips = []
-       	Temps = []
+        Temps = []
+
+	#Read RDFs and information which defines the RDF ie: name of RDF, weight which should be applied in fitting.
+        #RDF
+	NumberofRDFs =0
+	flag =0
+        path = '../../../../targets/WATER'
+	RDFdefine=[]
 	RDF=[]
+	try:
+		for filename in glob.glob(os.path.join(path, '*.dat')):
+			NumberofRDFs += 1
+			LineCount =0
+			lines = open(filename)
+			for line in lines:
+				#read name of RDF, Weight and filter flag(defines if rdf will be smoothed with gaussian filltering later), this all goes into RDFdefine
+				if line[0:1] == '#':
+					string=line[1:50]
+					string = string.rstrip('\n')
+					RDFdefine.append(string.split('&'))
+
+				#read first, second and last r values to determine rdf lenght and spacing, this all goes into RDFdefine
+				#read all of g(r) for later calculation of MSD, this goes into RDFdata
+				else:
+					LineCount += 1
+					if LineCount == 1:
+						string=line[0:30]
+						first = string.split()
+						first = float(first[0])
+						RDFdefine.append(first)
+					elif LineCount == 2:
+						string=line[0:30]
+						dr = string.split()
+						dr = float(dr[0])-first
+						dr =round(dr,6) #not very robust
+						RDFdefine.append(dr)
+					else:
+						string=line[0:30]
+						last = string.split()
+						last = float(last[0])
+			RDFdefine.append(last)
+	except: 
+		print 'Failed to read RDFs or RDF not present.... RDF will not be fit'
+		flag =1
+
+	# make calculation of RDF with MDtraj for each snapshot
+	def RDFCalc(RDFID, RDFdefine):
+
+		#organize information about system and rdf being calculated
+		RDFID = (RDFID*6)
+		name = RDFdefine[RDFID]
+		wt = RDFdefine[RDFID+1]
+		fillter_flag=(RDFdefine[RDFID+2])
+                fillter_flag = int(fillter_flag[0])
+		first = (RDFdefine[RDFID+3])/10
+		dr = (RDFdefine[RDFID+4])/10
+		last = (RDFdefine[RDFID+5])/10
+		[a,b,c] = box_vectors#box size
+		side=a[0]*nanometers ** -1 #box lenght must be unitless for MDtraj
+		r_range=((first-(0.5*dr)),last+(1*dr)) ##
+		
+		#calculate pairs of atoms for rdf calculation
+		traj = md.load('liquid.pdb') 
+		topology = traj.topology
+		sel1= topology.select(name[0])
+		sel2= topology.select(name[1])
+		Pairs = topology.select_pairs(sel1, sel2)
+
+		#make RDF calculation
+		Positions = state.getPositions() *nanometers ** -1
+		traj1 = md.Trajectory(xyz=Positions, topology=None, time=None, unitcell_lengths=(side,side,side), unitcell_angles=(90,90,90))
+		r, rdf = md.compute_rdf(traj1, pairs=Pairs, r_range=r_range, bin_width=dr, periodic=True, opt=True)
+
+		#RDF can be smoothed here
+		if fillter_flag != 0:
+                        #print 'FILLTERING'
+                        rdf = gaussian_filter(rdf, fillter_flag, order=0, output=None, mode='reflect', cval=0.0)
+
+		#makes print of simulated rdf
+		#for i in range(len(rdf)):
+                        #print r[i], rdf[i]
+		return rdf;
+		
+		
 	
-	#RDF
-	# Determine RDF file spacing
-	RDFdir='../../../../targets/WATER'
-	lines = open('%s/OORDF.dat'%RDFdir)
-	first=-1
-	space =0
-	second =-1
-	A=0
-	for line in lines:
-			if line[0:1] != " " or '#':
-				string=line[0:15]
-				break
-  	for i in range(len(string)):
-		if string[i]== ' ' and second==-1:
-			space += 1
-		if space != 0 and string[i]!= ' ':
-			second += 1
-		if string[i]!= ' ':
-			first +=1
-	first = (first) - (second)
-	#print first,space,second
-
-	#Read RDF data interval
-	lines = open('%s/OORDF.dat'%RDFdir)
-	for line in lines:
-			if line[0:1] != " " or '#':
-				rdat= line[0:first]
-			        A += 1
-				if A ==2:
-					dr=float(rdat)
-	r_range = dr*A
-	traj = md.load('liquid.pdb', top='liquid.pdb')#load topology to create pair list
-	oxygen= traj.topology.select('name O')# add reading for manual select
-	#print(oxygen)
-	oxygenP=list(combinations(oxygen,2))
-
-	print self.root
+	
+	
         #========================#
         # Now run the simulation #
         #========================#
@@ -1244,7 +1287,6 @@ class OpenMM(Engine):
             self.simulation.reporters.append(PDBReporter('%s-md.pdb' % self.name, nsteps))
             self.simulation.reporters.append(DCDReporter('%s-md.dcd' % self.name, nsave))
         for iteration in range(-1, isteps):
-	    
             # Propagate dynamics.
             if iteration >= 0: self.simulation.step(nsave)
             # Compute properties.
@@ -1261,21 +1303,17 @@ class OpenMM(Engine):
                 volume = 0.0 * nanometers ** 3
                 density = 0.0 * kilogram / meter ** 3
             self.xyz_omms.append([state.getPositions(), box_vectors])
-	    #RDF make calculation with MDtraj
-	    if self.pbc:
-		    [a,b,c] = box_vectors#box size
-		    side=a[0]*nanometers ** -1 #box lenght, unitless for MDtraj
-		    r_range1=(-0.5*dr,r_range)
-		    #print(dr)
-		    Positions = state.getPositions() *nanometers ** -1
-		    traj1 = md.Trajectory(xyz=Positions, topology=None, time=None, unitcell_lengths=(side,side,side), unitcell_angles=(90,90,90))
-		    O_r, O_rdf = md.compute_rdf(traj1, pairs=oxygenP, r_range=r_range1, bin_width=dr, periodic=True, opt=True)
-		    
-	    	    for i in range(A): #A=r_range/dr
-			RDF.append((O_rdf[i]))
-		    	#if iteration == (isteps-1):
-				#print(O_r[i], O_rdf[i])
-
+	
+	    
+            #RDFs make calculation with MDtraj
+	    if flag==0 and self.pbc:
+		    for i in range(0,NumberofRDFs):
+			    rdf=RDFCalc(i, RDFdefine)
+			    for j in range(len(rdf)):
+                            	RDF.append((rdf[j]))
+		   		
+	    
+	
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
                 if comp in edecomp:
@@ -1296,13 +1334,16 @@ class OpenMM(Engine):
             Volumes.append(volume / nanometer**3)
             Dips.append(get_dipole(self.simulation,positions=self.xyz_omms[-1][0]))
 
+	#check number of rdfs
+	#print len(RDF)
 	
-	RDF = np.array(RDF)
+
         Rhos = np.array(Rhos)
         Potentials = np.array(Potentials)
         Kinetics = np.array(Kinetics)
         Volumes = np.array(Volumes)
         Dips = np.array(Dips)
+        RDF = np.array(RDF)
         Ecomps = OrderedDict([(key, np.array(val)) for key, val in edecomp.items()])
         Ecomps["Potential Energy"] = np.array(Potentials)
         Ecomps["Kinetic Energy"] = np.array(Kinetics)

@@ -3,7 +3,7 @@
 author Lee-Ping Wang
 @date 04/2012
 """
-from simtk.unit import *
+import glob
 import abc
 import os
 import shutil
@@ -86,7 +86,7 @@ class Liquid(Target):
     def __init__(self,options,tgt_opts,forcefield):
         # Initialize base class
         super(Liquid,self).__init__(options,tgt_opts,forcefield)
-	# Weight of the RDF
+        # Weight of the RDF
 	self.set_option(tgt_opts,'w_rdf',forceprint=True)
         # Weight of the density
         self.set_option(tgt_opts,'w_rho',forceprint=True)
@@ -225,8 +225,9 @@ class Liquid(Target):
         R = [[wrd.lower() for wrd in line] for line in R1 if any([len(wrd) for wrd in line]) > 0]
         global_opts = OrderedDict()
         found_headings = False
+	#rdf
         known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra',
-                      'cvib_inter','cni','devib_intra','devib_inter','rdf']
+                      'cvib_inter','cni','devib_intra','devib_inter', 'rdf']
         self.RefData = OrderedDict()
         for line in R:
             if line[0] == "global":
@@ -271,6 +272,7 @@ class Liquid(Target):
                             self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = False
                 except:
                     logger.error(line + '\n')
+                    logger.error('Encountered an error reading this line!\n')
                     raise RuntimeError
             else:
                 logger.error(line + '\n')
@@ -301,7 +303,7 @@ class Liquid(Target):
                     default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
             self.PhasePoints = self.RefData[head].keys()
             # This prints out all of the reference data.
-            #printcool_dictionary(self.RefData[head],head)
+            printcool_dictionary(self.RefData[head],head)
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
         logger.debug("global_opts:\n%s\n" % str(global_opts))
@@ -336,13 +338,6 @@ class Liquid(Target):
             cmdstr = '%s python npt.py %s %.3f %.3f' % (self.nptpfx, self.engname, temperature, pressure)
             if wq is None:
                 logger.info("Running condensed phase simulation locally.\n")
-		print self.tgtdir
-		print 'ROOT'
-		print self.root
-		print 'RUN'		
-		print self.rundir
-		print 'OS'
-		print os.getcwd()
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
             else:
@@ -374,6 +369,7 @@ class Liquid(Target):
         PrintDict = OrderedDict()
         def print_item(key, heading, physunit):
             if self.Xp[key] > 0:
+		
                 printcool_dictionary(self.Pp[key], title='%s %s%s\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term   ' % 
                                      (self.name, heading, " (%s) " % physunit if physunit else ""), bold=True, color=4, keywidth=15)
                 bar = printcool("%s objective function: % .3f%s" % (heading, self.Xp[key], ", Derivative:" if AGrad else ""))
@@ -388,7 +384,12 @@ class Liquid(Target):
         print_item("Kappa", "Isothermal Compressibility", "10^-6 bar^-1")
         print_item("Cp", "Isobaric Heat Capacity", "cal mol^-1 K^-1")
         print_item("Eps0", "Dielectric Constant", None)
-	print_item("RDF", "Radial Distribution Function", None)
+	#Exstend for more RDFs
+        print_item("RDF_0", "Radial Distribution Function 0", None)
+	print_item("RDF_1", "Radial Distribution Function 1", None)
+	print_item("RDF_2", "Radial Distribution Function 2", None)
+	print_item("RDF_3", "Radial Distribution Function 3", None)
+	print_item("RDF_4", "Radial Distribution Function 4", None)
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",self.Objective)
 
         Title = "%s Condensed Phase Properties:\n %-20s %40s" % (self.name, "Property Name", "Residual x Weight = Contribution")
@@ -400,14 +401,15 @@ class Liquid(Target):
             exp = self.RefData[expname]
             Weights = self.RefData[expname+"_wt"]
             Denom = getattr(self,expname+"_denom")
-	    
-        elif expname == 'rdf':
-		exp = OrderedDict([((298.15, 1.0, 'atm'), 0.0)])
-            	Weights = OrderedDict([((298.15, 1.0, 'atm'), 1.0)])
-            	Denom = 2.0
-	else:
+	#rdf
+        #elif expname == 'rdf':
+		#exp = OrderedDict([((298.15, 1.0, 'atm'), 0.0)])
+            	#Weights = OrderedDict([((298.15, 1.0, 'atm'), 1.0)])
+            	#Denom = 2.0
+        else:
             # If the reference data doesn't exist then return nothing.
             return 0.0, np.zeros(self.FF.np), np.zeros((self.FF.np,self.FF.np)), None
+            
         Sum = sum(Weights.values())
         for i in Weights:
             Weights[i] /= Sum
@@ -432,6 +434,7 @@ class Liquid(Target):
         avgExp  = 0.0
         avgGrad = np.zeros(self.FF.np)
         for i, PT in enumerate(points):
+	    print(Weights[PT])
             avgCalc += Weights[PT]*calc[PT]
             avgExp  += Weights[PT]*exp[PT]
             avgGrad += Weights[PT]*grad[PT]
@@ -445,15 +448,14 @@ class Liquid(Target):
                 Delta = calc[PT] - exp[PT]
             if LeastSquares:
                 # Least-squares objective function.
-                ThisObj = Weights[PT] * Delta ** 2 / Denom**2 #squared residual
+                ThisObj = Weights[PT] * Delta ** 2 / Denom**2
                 Objs[PT] = ThisObj
-                ThisGrad = 2.0 * Weights[PT] * Delta * G / Denom**2 #residual*partialA/partialLAMBDA
+                ThisGrad = 2.0 * Weights[PT] * Delta * G / Denom**2
                 GradMap.append(G)
-                Objective += ThisObj #sum of squared residual
-                Gradient += ThisGrad 
+                Objective += ThisObj
+                Gradient += ThisGrad
                 # Gauss-Newton approximation to the Hessian.
-		#print 'GAUSS'
-                Hessian += 2.0 * Weights[PT] * (np.outer(G, G)) / Denom**2 #first-order derivative terms of grad differentiated wrt paramters .aprox hessian
+                Hessian += 2.0 * Weights[PT] * (np.outer(G, G)) / Denom**2
             else:
                 # L1-like objective function.
                 D = Denom
@@ -476,8 +478,11 @@ class Liquid(Target):
             
         Delta = np.array([calc[PT] - exp[PT] for PT in points])
         delt = {PT : r for PT, r in zip(points,Delta)}
-        print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT,"%9.3f    %9.3f +- %-7.3f % 7.3f % 9.5f % 9.5f" % (exp[PT],calc[PT],err[PT],delt[PT],Weights[PT],Objs[PT])) for PT in calc])
-        return Objective, Gradient, Hessian, print_out
+	#if expname == 'rdf':
+        	#print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT,"%9.3f    %9.3f +- %-7.3f % 7.3f % 9.5f % 9.5f %9s" % (exp[PT],calc[PT],err[PT],delt[PT],Weights[PT],Objs[PT],name)) for PT in calc])
+	#else:
+	print_out = OrderedDict([('    %8.2f %8.1f %3s' % PT,"%9.3f    %9.3f +- %-7.3f % 7.3f % 9.5f % 9.5f" % (exp[PT],calc[PT],err[PT],delt[PT],Weights[PT],Objs[PT])) for PT in calc])
+	return Objective, Gradient, Hessian, print_out
 
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
         # This routine is called by Objective.stage() will run before "get".
@@ -551,7 +556,6 @@ class Liquid(Target):
             # Assign variable names to all the stuff in npt_result.p
             Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
                 Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, RDF, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(18))
-	    
             # Determine the number of molecules
             if len(set(NMols)) != 1:
                 logger.error(str(NMols))
@@ -573,7 +577,7 @@ class Liquid(Target):
             self.AllResults[astrm]['E'].append(np.array(Energies))
             self.AllResults[astrm]['V'].append(np.array(Vols))
             self.AllResults[astrm]['R'].append(np.array(Rhos))
-	    self.AllResults[astrm]['RDF'].append(np.array(RDF))
+            self.AllResults[astrm]['RDF'].append(np.array(RDF))
             self.AllResults[astrm]['Dx'].append(np.array([d[:,0] for d in Dips]))
             self.AllResults[astrm]['Dy'].append(np.array([d[:,1] for d in Dips]))
             self.AllResults[astrm]['Dz'].append(np.array([d[:,2] for d in Dips]))
@@ -583,6 +587,7 @@ class Liquid(Target):
             self.AllResults[astrm]['GDz'].append(np.array([gd[2] for gd in GDips]))
             self.AllResults[astrm]['L'].append(len(Energies[0]))
             self.AllResults[astrm]['Steps'].append(self.liquid_md_steps)
+    
             if len(mPoints) > 0:
                 self.AllResults[astrm]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
                 self.AllResults[astrm]['mG'].append(np.array([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
@@ -748,9 +753,10 @@ class Liquid(Target):
         Eps0_calc = OrderedDict([])
         Eps0_grad = OrderedDict([])
         Eps0_std  = OrderedDict([])
-	RDF_calc = OrderedDict([])
+        RDF_calc = OrderedDict([])
         RDF_grad = OrderedDict([])
         RDF_std  = OrderedDict([])
+
         # The unit that converts atmospheres * nm**3 into kj/mol :)
         pvkj=0.061019351687175
 
@@ -830,56 +836,76 @@ class Liquid(Target):
                 self.FF.print_map(vals=GEPol)
                 logger.info(bar)
 
-	# Determine spacing in RDF data file
+	#Read RDFs and information which defines the RDF ie: name of RDF, weight which should be applied in fitting.
+	#this is also done in openmmio but found it simpler to re-read here than pass information 
+        #RDF
+	NumberofRDFs =0
+	flag =0
+	RDFdefine=[]
 	RDFdata=[]
-	lines = open('%s/targets/WATER/OORDF.dat' %self.root)
-	first=-1
-	space =0
-	second =-1
-	for line in lines:
-			if line[0:1] != " " or '#':
-				string=line[0:15]
-				break
-  	for i in range(len(string)):
-		if string[i]== ' ' and second==-1:
-			space += 1
-		if space != 0 and string[i]!= ' ':
-			second += 1
-		if string[i]!= ' ':
-			first +=1
-	first = (first) - (second)
+	try:
+		for filename in glob.glob(os.path.join('%s/targets/WATER' %self.root, '*.dat')):
+			NumberofRDFs += 1
+			LineCount =0
+			lines = open(filename)
+			for line in lines:
+				#read name of RDF, Weight and filter flag, this goes into RDFdefine
+				if line[0:1] == '#':
+					string=line[1:50]
+					string = string.rstrip('\n')
+					RDFdefine.append(string.split('&'))
 
-	#Read RDF data file
-	Numberlines = 0
-	lines = open('%s/targets/WATER/OORDF.dat' %self.root)
-	for line in lines:
-			if line[0:1] != " " or '#':
-				Numberlines += 1
-				#rdat= line[0:first]
-				rrrdat= line[first+space:first+second+space]
-				#print rdat,rrrdat 
-				RDFdata.append(rrrdat)
+				#read first, second and last r values to determine rdf lenght and spacing, this goes into RDFdefine
+				#read all of g(r) for later calculation of MSD, this goes into RDFdata
+				else:
+					LineCount += 1
+					if LineCount == 1:
+						string=line[0:30]
+						first = string.split()
+						RDFdata.append(float(first[1]))
+						first = float(first[0])
+						RDFdefine.append(first)
+					elif LineCount == 2:
+						string=line[0:30]
+						dr = string.split()
+						RDFdata.append(float(dr[1]))
+						dr = float(dr[0])
+						dr = dr-first
+						RDFdefine.append(dr)
+					else:
+						string=line[0:30]
+						last = string.split()
+						RDFdata.append(float(last[1]))
+						last = float(last[0])
 				
+			RDFdefine.append(last)
+	except: 
+		print 'Failed to read RDFs or RDF not present.... RDF will not be fit'
+		flag =1
+
+
+	
         # Arrays must be flattened now for calculation of properties.
-	RDFdata = np.array(RDFdata)
-	RDFdata = RDFdata.flatten()
-	RDF =RDF.flatten()
         E = E.flatten()
         V = V.flatten()
         R = R.flatten()
         Dx = Dx.flatten()
         Dy = Dy.flatten()
         Dz = Dz.flatten()
+	RDF = np.array(RDF)
+        RDF =RDF.flatten()
+
+
         if len(mPoints) > 0: mE = mE.flatten()
             
-        for i, PT in enumerate(Points):
+        for i, PT in enumerate(Points):  #need to inclued mbar for RDF.
             T = PT[0]
             P = PT[1] / 1.01325 if PT[2] == 'bar' else PT[1]
             PV = P*V*pvkj
             H = E + PV
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
-            C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=mbar_verbose)
+            C = weight_info(W, PT, np.ones(len(Points), dtype=int)*Shots, verbose=mbar_verbose)
             Gbar = flat(np.matrix(G)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
@@ -892,30 +918,118 @@ class Liquid(Target):
             def deprod(vec):
                 return flat(np.matrix(G)*col(W*vec))
 
-	    ## RDF MSD
-	    #print(len(RDF)/(Numberlines)) #should equal isteps
-	    RDFsum = []
-	    RDFsum1 = float(0.0)
-	    for j in range(0,(len(RDF)/(Numberlines))):
-		    for ii in range(Numberlines*j,Numberlines*(j+1)):
-			#print RDFdata[(ii-(Numberlines*j))],RDF[ii]
-			RDFdiff = float(RDFdata[(ii-(Numberlines*j))]) - float(RDF[ii])
+	    
+	    #Would like to handle all RDF simultaniously for now and split them up later 
+            ##RDF
+	    X_RDF_BIG=[]
+	    G_RDF_BIG=[]
+	    H_RDF_BIG=[]
+	    RDFPrint_BIG=[]
+
+
+	    #calculates MSD difference between a simulated and exsperimental rdf from a snapshot in trajectory
+	    def RDFdiff(b, c, NumberofLines, RDFdata, RDF, RDFdefine, PreviousRDFLenghts):
+		RDFsum1 = float(0.0)
+		RDFID = c
+		#print RDFdefine[(RDFID*5)+4], RDFdefine[(RDFID*5)+2], (RDFdefine[(RDFID*5)+3])
+		#print (RDFdefine[((RDFID)*5)+4]-RDFdefine[((RDFID)*5)+2])
+		#print (RDFdefine[((RDFID)*5)+3])
+		#print ((RDFdefine[((RDFID)*5)+4]-RDFdefine[((RDFID)*5)+2])/(RDFdefine[((RDFID)*5)+3])+1)
+		CurrentRDFLength = ((RDFdefine[((RDFID)*6)+5]-RDFdefine[((RDFID)*6)+3])/(RDFdefine[((RDFID)*6)+4]))
+		CurrentRDFLength = int(round(CurrentRDFLength))
+		CurrentRDFLength += 1
+		
+		
+		for a in range(NumberofLines*b+PreviousRDFLenghts, NumberofLines*b+PreviousRDFLenghts+CurrentRDFLength):
+			RDFdiff = float(RDFdata[a-(NumberofLines*b)]) - float(RDF[a])
+			#check alignment of simulated and exsperimental rdfs
+			#print a, float(RDFdata[a-(NumberofLines*b)]), float(RDF[a])
 			RDFdiff = RDFdiff*RDFdiff
 			RDFsum1 = RDFsum1 + RDFdiff
-		    RDFsum1 = RDFsum1/(Numberlines)
-		    RDFsum.append(RDFsum1)
-		    RDFsum1=0
-	    RDFsum = np.array(RDFsum)
-	    RDF_sum = RDFsum.flatten()
+		weight = (RDFdefine[((RDFID)*6)+1])
+                weight = float(weight[0])
+		RDFsum1 = RDFsum1 * weight 
+		RDFsum1 = RDFsum1/(CurrentRDFLength)
+		return RDFsum1, CurrentRDFLength;
+			       
+            #Extend for more RDFs                   
+	    NumberofRDFComputable=5
+	    RDF_0=[]
+	    RDF_1=[]
+	    RDF_2=[]
+	    RDF_3=[]
+	    RDF_4=[]
+	
+	    
+	    if flag ==0:
+		    NumberofLines= len(RDFdata) #number of lines in all exsperimental RDFs
+		    RDFsum = []
+		    RDFsum1 = float(0.0)
+		    #print (len(RDF))
+		    #print (len(RDFdata))
+		    #print int(len(RDF))/int(len(RDFdata))
 
-	    RDF_calc[PT] = np.dot(W,RDF_sum)
-	    RDF_grad[PT] = mBeta*(flat(np.matrix(G)*col(W*RDFsum)) - np.dot(W,RDFsum)*Gbar)#partialA/partialLAMBDA
-	    #print RDF_sum
-	    #print RDF_calc[PT]
-	    #print RDF_grad[PT]
+		    
+		    for i in range(int(len(RDF))/int(len(RDFdata))): #Numberofsnapshots
+			PreviousRDFLenghts = 0
+			for j in range(NumberofRDFs):
+				count =0
+				#calculate MSD for particular snapshot and RDF
+				RDFsum1, RDFLenght = RDFdiff(i, j, NumberofLines, RDFdata, RDF, RDFdefine, PreviousRDFLenghts)
+				#keep track of how many rdf lines have read so far such that we can match to correct line in RDFdata when caculating next MSD 
+				PreviousRDFLenghts += RDFLenght
+				#determines which rdf the MSD calulated belongs to 
+				#Exstend for more RDFs
+				if j%NumberofRDFs == 0:
+					#print 'RDF 0'
+					if count ==1:
+						#print 'Finish'
+						break
+					else: 
+						count += 1
+						RDF_0.append(RDFsum1)
+				if j%NumberofRDFs == 1: 
+					#print 'RDF 1'
+					
+					RDF_1.append(RDFsum1)
+				if j%NumberofRDFs == 2: 
+					#print 'RDF 2'
+					
+					RDF_2.append(RDFsum1)
+				if j%NumberofRDFs == 3: 
+					#print 'RDF 3'
+					
+					RDF_3.append(RDFsum1)
+				if j%NumberofRDFs == 4: 
+					#print 'RDF 4'
+					
+					RDF_4.append(RDFsum1)	
+				
+			    
+	    else :
+		  #fill RDF data structures with zeroes if they are not to be used.
+		  for i in range(NumberofRDFComputable):
+			X_RDF_BIG.append(Rho*0) #Rho times zero ensure this is the correct size to be used in later functions but will ultimatly not be used as full of zeroes.
+			G_RDF_BIG.append(0)
+			H_RDF_BIG.append(0)
+			RDFPrint_BIG.append(0)
+		
+	    
+	    #print RDF_0
+	    #print RDF_1
+	    #print RDF_2
+	    RDFsumbig=[]
+	    RDFsumbig.append(RDF_0)
+	    RDFsumbig.append(RDF_1)
+	    RDFsumbig.append(RDF_2)
+	    RDFsumbig.append(RDF_3)
+	    RDFsumbig.append(RDF_4)
+	    #print RDFsumbig[1]
+		 
             ## Density.
             Rho_calc[PT]   = np.dot(W,R)
             Rho_grad[PT]   = mBeta*(flat(np.matrix(G)*col(W*R)) - np.dot(W,R)*Gbar)
+	    #print Rho_grad[PT]
             ## Enthalpy of vaporization.
             if PT in mPoints:
                 ii = mPoints.index(PT)
@@ -993,7 +1107,8 @@ class Liquid(Target):
             Kappa_std[PT]   = np.sqrt(sum(C**2 * np.array(Kappa_errs)**2)) * 1e6
             Cp_std[PT]   = np.sqrt(sum(C**2 * np.array(Cp_errs)**2))
             Eps0_std[PT]   = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
-            RDF_std[PT]=0
+            RDF_std[PT]=0 #Need calculation of Error
+
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Points, 'rho', Rho_calc, Rho_std, Rho_grad, name="Density")
         X_Hvap, G_Hvap, H_Hvap, HvapPrint = self.objective_term(Points, 'hvap', Hvap_calc, Hvap_std, Hvap_grad, name="H_vap", SubAverage=self.hvap_subaverage)
@@ -1002,20 +1117,45 @@ class Liquid(Target):
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
 
-	################################################
-	# RDF
-	X_RDF, G_RDF, H_RDF, RDFPrint = self.objective_term(Points, 'rdf', RDF_calc, RDF_std, RDF_grad, name="Radial Distribution Function")
-	###############################################
+
+	# Get contribution to the objective function from RDF
+	for i in range(NumberofRDFs):
+		RDFname = str(RDFdefine[i*6]) #.rstrip('\n')
+		RDFsum = RDFsumbig[i]
+		#print RDFsum
+		#print W
+		RDF_calc[PT] = np.dot(W,RDFsum)
+		RDF_grad[PT] = mBeta*(flat(np.matrix(G)*col(W*RDFsum)) - np.dot(W,RDFsum)*Gbar)
+		X_RDF, G_RDF, H_RDF, RDFPrint = self.objective_term(Points, 'rdf' , RDF_calc, RDF_std, RDF_grad, name=RDFname)
+		#collect all RDF_calcs in one data structure which will be divided up later
+		X_RDF_BIG.append(X_RDF)
+		G_RDF_BIG.append(G_RDF)
+		H_RDF_BIG.append(H_RDF)
+		RDFPrint_BIG.append(RDFPrint)
+		
+
+	#deal with RDFs if less than 5 types are computed
+	for i in range(NumberofRDFComputable-NumberofRDFs):
+		X_RDF_BIG.append(0)
+		G_RDF_BIG.append(0)
+		H_RDF_BIG.append(0)
+		RDFPrint_BIG.append(0)
+
+
+
+	
 
         Gradient = np.zeros(self.FF.np)
         Hessian = np.zeros((self.FF.np,self.FF.np))
+
         if X_Rho == 0: self.w_rho = 0.0
         if X_Hvap == 0: self.w_hvap = 0.0
         if X_Alpha == 0: self.w_alpha = 0.0
         if X_Kappa == 0: self.w_kappa = 0.0
         if X_Cp == 0: self.w_cp = 0.0
         if X_Eps0 == 0: self.w_eps0 = 0.0
-	if X_RDF == 0: self.w_rdf = 0.0
+        if X_RDF == 0: self.w_rdf = 0.0
+    
         if self.w_normalize:
             w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_rdf
         else:
@@ -1026,25 +1166,41 @@ class Liquid(Target):
         w_4 = self.w_kappa / w_tot
         w_5 = self.w_cp / w_tot
         w_6 = self.w_eps0 / w_tot
-	w_7 = 1 
+        w_7 = 1.0 / w_tot #unsure where this comes from#self.w_rdf / w_tot
 
-        Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7*X_RDF
-        if AGrad:
-            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0 + w_7*G_RDF
-        if AHess:
-            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0 + w_7*H_RDF
-        if not in_fd():
+	
+	Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0
+	#add contrabution of RDFs to objective
+	for i in range(NumberofRDFs):
+        	Objective    = Objective + X_RDF_BIG[i] * w_7
+		
+        
+	
+	if AGrad:
+            Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0
+            for i in range(NumberofRDFs):
+        	Gradient    = Gradient + G_RDF_BIG[i] * w_7
+		
+
+	if AHess:
+
+            Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0
+	    for i in range(NumberofRDFs):
+        	Hessian    = Hessian + H_RDF_BIG[i] * w_7
+		
+        
+	#Exstend for more RDFs
+	if not in_fd():
             self.Xp = {"Rho" : X_Rho, "Hvap" : X_Hvap, "Alpha" : X_Alpha, 
-                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "RDF" : X_RDF}
+                           "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "RDF_0" : X_RDF_BIG[0], "RDF_1" : X_RDF_BIG[1], "RDF_2" : X_RDF_BIG[2], "RDF_3" : X_RDF_BIG[3], "RDF_4" : X_RDF_BIG[4]}
             self.Wp = {"Rho" : w_1, "Hvap" : w_2, "Alpha" : w_3, 
-                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "RDF" : w_7}
+                           "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "RDF_0" : w_7, "RDF_1" : w_7, "RDF_2" : 0, "RDF_3" : 0, "RDF_4" : 0}
             self.Pp = {"Rho" : RhoPrint, "Hvap" : HvapPrint, "Alpha" : AlphaPrint, 
-                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "RDF" : RDFPrint }
+                           "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "RDF_0" : RDFPrint_BIG[0], "RDF_1" : RDFPrint_BIG[1], "RDF_2" : RDFPrint_BIG[2], "RDF_3" : RDFPrint_BIG[3], "RDF_4" : RDFPrint_BIG[4]}
             if AGrad:
                 self.Gp = {"Rho" : G_Rho, "Hvap" : G_Hvap, "Alpha" : G_Alpha, 
-                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "RDF" : G_RDF}
+                               "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "RDF_0" : G_RDF_BIG[0], "RDF_1" : G_RDF_BIG[1], "RDF_2" : G_RDF_BIG[2], "RDF_3" : G_RDF_BIG[3], "RDF_4" : G_RDF_BIG[4]}
             self.Objective = Objective
-
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}
         return Answer
 
