@@ -58,7 +58,6 @@ pdict = {'VDW'          : {'Atom':[1], 2:'S',3:'T',4:'D'}, # Van der Waals dista
          'TORSION'      : ({'Atom':[1,2,3,4], 5:'1K', 6:'1B', 
                             8:'2K', 9:'2B', 11:'3K', 12:'3B'}), # Torsional force constants and equilibrium phi-angles
          'PITORS'       : {'Atom':[1,2], 3:'K'},           # Pi-torsion force constants (usually 6.85 ..)
-         'CHARGE'       : {'Atom':[1], 2:''},              # Atomic partial charge (OPLS style)
          # Note torsion-torsion (CMAP) not implemented at this time.
          'MCHARGE'      : {'Atom':[1,2,3], 4:''},          # Atomic charge
          'DIPOLE'       : {0:'X',1:'Y',2:'Z'},             # Dipole moment in local frame

@@ -38,7 +38,7 @@ GenOptionDoc = {"gmxpath" : {"scope" : "Targets that use GROMACS",
                                "required" : False,
                                "long" : """This specifies a range of parameter values to scan in a uniform grid.  scan_mvals works in
                                the mathematical parameter space while scan_pvals works in the physical parameter space.  The syntax
-                               is lower:upper:nsteps (just like numpy.linspace) .  Both lower and upper limits are included in the range.""",
+                               is lower:step:upper .  Both lower and upper limits are included in the range.""",
                                "recommend" : "For scan_mvals, a range of values between -1 and +1 is recommended; for scan_pvals, choose values close to the physical parameter value."
                                },
                 "scanindex_num" : {"scope" : "scan_mvals and scan_pvals job types",

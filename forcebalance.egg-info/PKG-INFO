@@ -1,0 +1,26 @@
+Metadata-Version: 1.1
+Name: forcebalance
+Version: 1.3.2
+Summary: Automated force field optimization.
+Home-page: https://simtk.org/home/forcebalance
+Author: Lee-Ping Wang, Arthur Vigil
+Author-email: leeping@stanford.edu
+License: GPL 3.0
+Download-URL: https://simtk.org/home/forcebalance
+Description-Content-Type: UNKNOWN
+Description: 
+        
+            ForceBalance (https://simtk.org/home/forcebalance) is a library
+            that provides tools for automated optimization of force fields and
+            empirical potentials.
+        
+            The philosophy of this program is to present force field
+            optimization in a unified and easily extensible framework.  Since
+            there are many different ways in theoretical chemistry to compute
+            the potential energy of a collection of atoms, and similarly many
+            types of reference data to fit these potentials to, we do our best
+            to provide an infrastructure which allows a user or a contributor
+            to fit any type of potential to any type of reference data.
+        
+            
+Platform: Linux
