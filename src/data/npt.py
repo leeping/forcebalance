@@ -428,8 +428,7 @@ def main():
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
     EDA = prop_return['Ecomps']
-    RDF=prop_return['RDF']
-        
+    RDF = prop_return['RDF']
 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol
@@ -454,7 +453,6 @@ def main():
     pV = atm_unit * pressure * Volumes
     pV_avg, pV_err = mean_stderr(pV)
     Rho_avg, Rho_err = mean_stderr(Rhos)
-    
     PrintEDA(EDA, NMol)
 
     #==============================================#
@@ -502,10 +500,7 @@ def main():
     #==============================================#
     #  Condensed phase properties and derivatives. #
     #==============================================#
-    #----
-    # RDF
-    #----
-   
+
     #----
     # Density
     #----
