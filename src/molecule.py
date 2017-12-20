@@ -1999,6 +1999,26 @@ class Molecule(object):
             #phis.append(phimod)
             #print phimod
         return phis
+    def measure_distances(self, i, j):
+        dist = []
+        for s in range(self.ns):
+            x1 = self.xyzs[s][i]
+            x2 = self.xyzs[s][j]
+            distance = np.linalg.norm(x1-x2)
+            dist.append(distance)
+        return dist
+    def measure_angles(self, i, j, k):
+        angles = []
+        for s in range(self.ns):
+            x1 = self.xyzs[s][i]
+            x2 = self.xyzs[s][j]
+            x3 = self.xyzs[s][k]
+            v1 = x1-x2
+            v2 = x3-x2
+            n = np.dot(v1,v2)/np.dot(np.linalg.norm(v1),np.linalg.norm(v2))
+            angle = np.arccos(n)
+            angles.append(angle * 180/ np.pi)
+        return angles
 
     def find_rings(self, max_size=6):
         """
