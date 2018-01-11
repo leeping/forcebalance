@@ -90,6 +90,12 @@ class TestAmber99SB(ForceBalanceTestCase):
     def test_energy_force(self):
         """ Test GMX, OpenMM, and TINKER energy and forces using AMBER force field """
         printcool("Test GMX, OpenMM, and TINKER energy and forces using AMBER force field")
+        missing_pkgs = []
+        for eng in ['TINKER', 'GMX', 'OpenMM']:
+            if eng not in self.engines:
+                missing_pkgs.append(eng)
+        if len(missing_pkgs) > 0:
+            self.skipTest("Missing packages: %s" % ', '.join(missing_pkgs))
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.energy_force()
@@ -109,6 +115,12 @@ class TestAmber99SB(ForceBalanceTestCase):
     def test_optimized_geometries(self):
         """ Test GMX, OpenMM, and TINKER optimized geometries and RMSD using AMBER force field """
         printcool("Test GMX, OpenMM, and TINKER optimized geometries and RMSD using AMBER force field")
+        missing_pkgs = []
+        for eng in ['TINKER', 'GMX', 'OpenMM']:
+            if eng not in self.engines:
+                missing_pkgs.append(eng)
+        if len(missing_pkgs) > 0:
+            self.skipTest("Missing packages: %s" % ', '.join(missing_pkgs))
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.energy_rmsd(5)
@@ -128,6 +140,12 @@ class TestAmber99SB(ForceBalanceTestCase):
     def test_interaction_energies(self):
         """ Test GMX, OpenMM, and TINKER interaction energies using AMBER force field """
         printcool("Test GMX, OpenMM, and TINKER interaction energies using AMBER force field")
+        missing_pkgs = []
+        for eng in ['TINKER', 'GMX', 'OpenMM']:
+            if eng not in self.engines:
+                missing_pkgs.append(eng)
+        if len(missing_pkgs) > 0:
+            self.skipTest("Missing packages: %s" % ', '.join(missing_pkgs))
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.interaction_energy(fraga=range(22), fragb=range(22, 49))
@@ -145,6 +163,12 @@ class TestAmber99SB(ForceBalanceTestCase):
     def test_multipole_moments(self):
         """ Test GMX, OpenMM, and TINKER multipole moments using AMBER force field """
         printcool("Test GMX, OpenMM, and TINKER multipole moments using AMBER force field")
+        missing_pkgs = []
+        for eng in ['TINKER', 'GMX', 'OpenMM']:
+            if eng not in self.engines:
+                missing_pkgs.append(eng)
+        if len(missing_pkgs) > 0:
+            self.skipTest("Missing packages: %s" % ', '.join(missing_pkgs))
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.multipole_moments(shot=5, optimize=False)
@@ -170,6 +194,12 @@ class TestAmber99SB(ForceBalanceTestCase):
         #| double precision in order to pass!             |#
         #==================================================#
         printcool("Test GMX, OpenMM, and TINKER multipole moments at optimized geometries")
+        missing_pkgs = []
+        for eng in ['TINKER', 'GMX', 'OpenMM']:
+            if eng not in self.engines:
+                missing_pkgs.append(eng)
+        if len(missing_pkgs) > 0:
+            self.skipTest("Missing packages: %s" % ', '.join(missing_pkgs))
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.multipole_moments(shot=5, optimize=True)
@@ -190,9 +220,13 @@ class TestAmber99SB(ForceBalanceTestCase):
         
     def test_normal_modes(self):
         """ Test GMX and TINKER normal modes """
-        if 'TINKER' not in self.engines or 'GMX' not in self.engines:
-            self.skipTest("Need TINKER and GMX engines")
         printcool("Test GMX and TINKER normal modes")
+        missing_pkgs = []
+        for eng in ['TINKER', 'GMX']:
+            if eng not in self.engines:
+                missing_pkgs.append(eng)
+        if len(missing_pkgs) > 0:
+            self.skipTest("Missing packages: %s" % ', '.join(missing_pkgs))
         FreqG, ModeG = self.engines['GMX'].normal_modes(shot=5, optimize=False)
         FreqT, ModeT = self.engines['TINKER'].normal_modes(shot=5, optimize=False)
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
@@ -218,9 +252,13 @@ class TestAmber99SB(ForceBalanceTestCase):
 
     def test_normal_modes_optimized(self):
         """ Test GMX and TINKER normal modes at optimized geometry """
-        if 'TINKER' not in self.engines or 'GMX' not in self.engines:
-            self.skipTest("Need TINKER and GMX engines")
         printcool("Test GMX and TINKER normal modes at optimized geometry")
+        missing_pkgs = []
+        for eng in ['TINKER', 'GMX']:
+            if eng not in self.engines:
+                missing_pkgs.append(eng)
+        if len(missing_pkgs) > 0:
+            self.skipTest("Missing packages: %s" % ', '.join(missing_pkgs))
         FreqG, ModeG = self.engines['GMX'].normal_modes(shot=5, optimize=True)
         FreqT, ModeT = self.engines['TINKER'].normal_modes(shot=5, optimize=True)
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)

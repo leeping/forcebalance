@@ -691,7 +691,7 @@ class Lipid(Target):
             H = E + PV
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
-            C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=mbar_verbose)
+            C = weight_info(W, PT, np.ones(len(Points), dtype=int)*Shots, verbose=mbar_verbose)
             Gbar = flat(np.mat(G)*col(W))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
