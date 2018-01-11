@@ -1,14 +1,17 @@
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
 import unittest
 import sys, os, re
 import forcebalance
 import abc
 import numpy
-from __init__ import ForceBalanceTestCase
+from .__init__ import ForceBalanceTestCase
 
 class TestImplemented(ForceBalanceTestCase):
     def test_implemented_targets_derived_from_target(self):
         """Check classes listed in Implemented_Targets are derived from Target"""
-        for key in forcebalance.objective.Implemented_Targets.iterkeys():
+        for key in forcebalance.objective.Implemented_Targets.keys():
             self.logger.debug("Assert %s is subclass of target\n" % str(forcebalance.objective.Implemented_Targets[key]))
             self.assertTrue(issubclass(forcebalance.objective.Implemented_Targets[key],forcebalance.target.Target))
     
@@ -30,7 +33,7 @@ class TestImplemented(ForceBalanceTestCase):
             for object in objects:
                 object = eval('m.'+module+'.'+object)
                 if type(object) == abc.ABCMeta:
-                    implemented = [i for i in forcebalance.objective.Implemented_Targets.itervalues()]
+                    implemented = [i for i in forcebalance.objective.Implemented_Targets.values()]
                     # list of documented exceptions
                     # Basically, platform-independent targets are excluded.
                     exclude = ['Target',
@@ -86,30 +89,30 @@ class ObjectiveTests(object):
         """Check zero order target terms"""
         obj = self.objective.Target_Terms(numpy.array([.5]*self.ff.np), Order=0)
         self.assertEqual(type(obj),dict)
-        self.assertTrue(obj.has_key("X"))
+        self.assertTrue("X" in obj)
         self.assertNotEqual(int(obj["X"]), 0)
         
-        self.assertTrue(obj.has_key("G"))
+        self.assertTrue("G" in obj)
         self.assertFalse(obj["G"].any())
         
-        self.assertTrue(obj.has_key("H"))
+        self.assertTrue("H" in obj)
         self.assertEqual(obj["H"], numpy.diag([1]*self.ff.np))
         
     def test_target_first_order_terms(self):
         """Check first order target terms"""
         obj = self.objective.Target_Terms(numpy.array([.5]*self.ff.np), Order=1)
         self.assertEqual(type(obj),dict)
-        self.assertTrue(obj.has_key("X"))
-        self.assertTrue(obj.has_key("G"))
-        self.assertTrue(obj.has_key("H"))
+        self.assertTrue("X" in obj)
+        self.assertTrue("G" in obj)
+        self.assertTrue("H" in obj)
         
     def test_target_second_order_terms(self):
         """Check second order target terms"""
         obj = self.objective.Target_Terms(numpy.array([.5]*self.ff.np), Order=2)
         self.assertEqual(type(obj),dict)
-        self.assertTrue(obj.has_key("X"))
-        self.assertTrue(obj.has_key("G"))
-        self.assertTrue(obj.has_key("H"))
+        self.assertTrue("X" in obj)
+        self.assertTrue("G" in obj)
+        self.assertTrue("H" in obj)
         
     def test_indicate(self):
         """Check objective.indicate() runs without errors"""

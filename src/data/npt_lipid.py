@@ -45,11 +45,14 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+from __future__ import division
 
 #==================#
 #| Global Imports |#
 #==================#
 
+from builtins import zip
+from builtins import range
 import os
 import sys
 import glob
@@ -314,13 +317,13 @@ def main():
 
     # Print all options.
     printcool_dictionary(TgtOptions, title="Options from ForceBalance")
-    lipid_snapshots = (lipid_nsteps * lipid_timestep / 1000) / lipid_intvl
-    lipid_iframes = 1000 * lipid_intvl / lipid_timestep
+    lipid_snapshots = int((lipid_nsteps * lipid_timestep / 1000) / lipid_intvl)
+    lipid_iframes = int(1000 * lipid_intvl / lipid_timestep)
     logger.info("For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps\n" \
         % (lipid_snapshots, lipid_iframes, lipid_timestep))
     if lipid_snapshots < 2:
         raise Exception('Please set the number of lipid time steps so that you collect at least two snapshots (minimum %i)' \
-                            % (2000 * (lipid_intvl/lipid_timestep)))
+                            % (2000 * int(lipid_intvl/lipid_timestep)))
 
     #----
     # Loading coordinates

@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from builtins import range
+from past.utils import old_div
 import sys
 from forcebalance.molecule import *
 
@@ -7,9 +11,9 @@ from forcebalance.molecule import *
 
 M = Molecule(sys.argv[1])
 if 'M' in M.elem:
-    print "Virtual sites already exist"
+    print("Virtual sites already exist")
     sys.exit()
-num_mol = M.na/3
+num_mol = int(M.na/3)
 
 for i in range(num_mol)[::-1]:
     v = i*3 + 3

@@ -3,7 +3,11 @@
 @author Lee-Ping Wang
 @date 05/2012
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import zip
+from builtins import range
 import os
 import shutil
 from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, warn_once, pvec1d, commadash, uncommadash, isint
@@ -161,7 +165,7 @@ class AbInitio(Target):
         ## The number of (atoms + drude particles + virtual sites)
         self.nparticles  = len(self.mol.elem)
         ## Build keyword dictionaries to pass to engine.
-        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del engine_args['name']
         ## Create engine object.
         self.engine = self.engine_(target=self, mol=self.mol, **engine_args)
@@ -260,7 +264,7 @@ class AbInitio(Target):
         Torques = []
         for b in sorted(set(Block)):
             AtomBlock = np.array([i for i in range(len(Block)) if Block[i] == b])
-            CrdBlock = np.array(list(itertools.chain(*[range(3*i, 3*i+3) for i in AtomBlock])))
+            CrdBlock = np.array(list(itertools.chain(*[list(range(3*i, 3*i+3)) for i in AtomBlock])))
             com = np.sum(xyz1[AtomBlock]*np.outer(Mass[AtomBlock],np.ones(3)), axis=0) / np.sum(Mass[AtomBlock])
             frc = frc1[CrdBlock].reshape(-1,3)
             NetForce = np.sum(frc, axis=0)
@@ -276,8 +280,8 @@ class AbInitio(Target):
             if len(xyzb) > 1:
                 Torques += [i for i in Torque]
         netfrc_torque = np.array(NetForces + Torques)
-        self.nnf = len(NetForces)/3
-        self.ntq = len(Torques)/3
+        self.nnf = int(len(NetForces)/3)
+        self.ntq = int(len(Torques)/3)
         return netfrc_torque
 
     def read_reference_data(self):
@@ -376,7 +380,7 @@ class AbInitio(Target):
         if len(self.fqm) > 0:
             self.fqm = np.array(self.fqm)
             self.fqm *= fqcgmx
-            self.qmatoms = range(self.fqm.shape[1]/3)
+            self.qmatoms = list(range(int(self.fqm.shape[1]/3)))
         else:
             logger.info("QM forces are not present, only fitting energies.\n")
             self.force = 0
@@ -390,7 +394,7 @@ class AbInitio(Target):
                     self.fitatoms = self.qmatoms
                 else:
                     warn_press_key("Provided an integer for fitatoms; will assume this means the first %i atoms" % int(self.fitatoms_in))
-                    self.fitatoms = range(int(self.fitatoms_in))
+                    self.fitatoms = list(range(int(self.fitatoms_in)))
             else:
                 # If provided a "comma and dash" list, then expand the list.
                 self.fitatoms = uncommadash(self.fitatoms_in)
@@ -944,8 +948,8 @@ class AbInitio(Target):
             #     Mforce_obj.xyzs[i] = np.vstack((Mforce_obj.xyzs[i], Fpad))
             #     Qforce_obj.xyzs[i] = np.vstack((Qforce_obj.xyzs[i], Fpad))
             if Mforce_obj.na != Mforce_obj.xyzs[0].shape[0]:
-                print Mforce_obj.na
-                print Mforce_obj.xyzs[0].shape[0]
+                print(Mforce_obj.na)
+                print(Mforce_obj.xyzs[0].shape[0])
                 warn_once('\x1b[91mThe printing of forces is not set up correctly.  Not printing forces.  Please report this issue.\x1b[0m')
             else:
                 if self.writelevel > 1:

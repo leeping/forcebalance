@@ -3,7 +3,9 @@
 @author Lee-Ping Wang
 @date 04/2012
 """
+from __future__ import division
 
+from builtins import range
 import os
 from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio

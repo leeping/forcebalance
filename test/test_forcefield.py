@@ -1,8 +1,11 @@
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
 import sys, os
 import forcebalance
 import forcebalance.forcefield as forcefield
 import unittest
-from __init__ import ForceBalanceTestCase
+from .__init__ import ForceBalanceTestCase
 import numpy as np
 from copy import deepcopy
 

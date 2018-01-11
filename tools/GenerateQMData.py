@@ -4,7 +4,12 @@
 
 Executable script for generating QM data for force, energy, electrostatic potential, and
 other ab initio-based targets. """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import input
+from builtins import str
+from builtins import range
 import os, sys, glob
 from forcebalance.forcefield import FF
 from forcebalance.parser import parse_inputs
@@ -33,12 +38,12 @@ def even_list(totlen, splitsize):
         joblens[i%splitsize] += 1
     jobnow = 0
     for i in range(splitsize):
-        subsets.append(range(jobnow, jobnow + joblens[i]))
+        subsets.append(list(range(jobnow, jobnow + joblens[i])))
         jobnow += joblens[i]
     return subsets
 
 def generate_snapshots():
-    print "I haven't implemented this yet"
+    print("I haven't implemented this yet")
     sys.exit(1)
 
 def drive_msms(xyz, radii, density):
@@ -55,7 +60,7 @@ def create_esp_surfaces(Molecule):
     # Pass 1: This will determine the number of ESP points.
     num_esp = []
     for i, xyz in enumerate(Molecule.xyzs):
-        print "Generating grid points for snapshot %i\r" % i
+        print("Generating grid points for snapshot %i\r" % i)
         num_esp_shell = []
         for j in [1.4, 1.6, 1.8, 2.0]:
             Radii = list(np.array(Rads)*j)
@@ -67,8 +72,8 @@ def create_esp_surfaces(Molecule):
 
     num_esp = np.array(num_esp)
     num_pts = np.amin(num_esp,axis=0) / 100
-    print "Number of points: ", num_pts
-    raw_input()
+    print("Number of points: ", num_pts)
+    input()
     # We do not store.
     # Pass 2: This will actually print out the ESP grids.
     Mol_ESP = []
@@ -85,7 +90,7 @@ def create_esp_surfaces(Molecule):
             # print "Getting triangles"
             # vfloat, vint, tri = MS.getTriangles()
             # #vfloat = vfloat_shell[sh]
-            a = range(len(vfloat))
+            a = list(range(len(vfloat)))
             random.shuffle(a)
             # We'll be careful and generate lots of ESP points, mm.
             # But we can't have a different number of points per snapshots, mm.
@@ -101,7 +106,7 @@ def create_esp_surfaces(Molecule):
                 Out.append(format_xyz_coord('He',esp_pt))
             fout = open('molecule_esp.xyz','w' if i == 0 else 'a')
             for line in Out:
-                print >> fout, line
+                print(line, file=fout)
             fout.close()
         Mol_ESP.append(esp_pts)
 
@@ -112,7 +117,7 @@ def do_quantum(wq_port):
     M.add_quantum('../settings/qchem.in')
     # Special hack to add TIP3P waters.
     if os.path.exists('waters.gro'):
-        print "Found waters.gro, loading as external waters and adding SPC charges."
+        print("Found waters.gro, loading as external waters and adding SPC charges.")
         Mext = Molecule('waters.gro')
         Q = col([-0.82 if (i%3==0) else 0.41 for i in range(Mext.na)])
         Qext = [np.hstack((xyz, Q)) for xyz in Mext.xyzs]
@@ -126,7 +131,7 @@ def do_quantum(wq_port):
         os.chdir('calcs')
         for i in range(M.ns):
             dnm = eval(formstr % i)
-            print "\rNow in directory %i" % i,
+            print("\rNow in directory %i" % i, end=' ')
             if os.path.exists(dnm):
                 os.chdir(dnm)
                 if os.path.exists('qchem.out'):
@@ -164,7 +169,7 @@ def do_quantum(wq_port):
             M.write("qchem.in", select=i)
             ESPBohr = np.array(ESP[i]) / bohrang
             np.savetxt('ESPGrid',ESPBohr)
-            print "Queueing up job", dnm
+            print("Queueing up job", dnm)
             queue_up(wq, command = 'qchem40 qchem.in qchem.out', 
                      input_files = ["qchem.in", "ESPGrid"],
                      output_files = ["qchem.out", "plot.esp", "efield.dat"], verbose=False)
@@ -173,14 +178,14 @@ def do_quantum(wq_port):
             wq_wait(wq)
         os.chdir('..')
     if os.path.exists('calcs'):
-        print "calcs directory exists.  Reading calculation results."
+        print("calcs directory exists.  Reading calculation results.")
         Result = read_quantum()
     else:
-        print "calcs directory doesn't exist.  Setting up and running calculations."
+        print("calcs directory doesn't exist.  Setting up and running calculations.")
         run_quantum()
-        print "Now reading calculation results."
+        print("Now reading calculation results.")
         Result = read_quantum()
-    print "Writing results to qdata.txt."
+    print("Writing results to qdata.txt.")
     Result.write('qdata.txt')
     return Result
 
@@ -205,7 +210,7 @@ def gather_generations():
     return All
 
 def Generate(tgt_opt):
-    print tgt_opt['name']
+    print(tgt_opt['name'])
     Port = tgt_opt['wq_port']
     cwd = os.getcwd()
     tgtdir = os.path.join('targets',tgt_opt['name'])
@@ -214,23 +219,23 @@ def Generate(tgt_opt):
     os.chdir(tgtdir)
     GDirs = glob.glob("gen_[0-9][0-9][0-9]")
     if len(GDirs) == 0:
-        print "No gens exist."
+        print("No gens exist.")
         sys.exit()
     WriteAll = False
     All = None # Heh
     for d in GDirs:
-        print "Now checking", d
+        print("Now checking", d)
         os.chdir(d)
         if os.path.exists('shots.gro') and os.path.exists('qdata.txt'):
-            print "Both shots.gro and qdata.txt exist"
+            print("Both shots.gro and qdata.txt exist")
         elif os.path.exists('shots.gro'):
-            print "shots.gro exists"
-            print "I need to GENERATE qdata.txt now."
+            print("shots.gro exists")
+            print("I need to GENERATE qdata.txt now.")
             do_quantum(Port)
         elif os.path.exists('qdata.txt'):
             warn_press_key('qdata.txt exists.')
         else:
-            print "I need to GENERATE shots.gro now."
+            print("I need to GENERATE shots.gro now.")
             generate_snapshots()
             do_quantum(Port)
         if All == None:
@@ -246,13 +251,13 @@ def main():
     options, tgt_opts = parse_inputs(sys.argv[1])
     
     """ Instantiate a ForceBalance project and call the optimizer. """
-    print "\x1b[1;97m Welcome to ForceBalance version 0.12! =D\x1b[0m"
+    print("\x1b[1;97m Welcome to ForceBalance version 0.12! =D\x1b[0m")
     if len(sys.argv) != 2:
-        print "Please call this program with only one argument - the name of the input file."
+        print("Please call this program with only one argument - the name of the input file.")
         sys.exit(1)
 
     for S in tgt_opts:
-        print os.getcwd()
+        print(os.getcwd())
         Generate(S)
     
     # P = Project(sys.argv[1])

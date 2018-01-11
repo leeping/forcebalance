@@ -1,6 +1,7 @@
+from __future__ import absolute_import
 import unittest, os, sys, re, shutil, time
 import forcebalance
-from __init__ import ForceBalanceTestRunner
+from .__init__ import ForceBalanceTestRunner
 import getopt
 import argparse
 
@@ -64,7 +65,7 @@ def runHeadless(options):
     runner=ForceBalanceTestRunner()
     results=runner.run(**options)
 
-    if headless_options.has_key('enable_smtp')\
+    if 'enable_smtp' in headless_options\
     and headless_options['enable_smtp'].lower() in ['true','error']:
         if headless_options['enable_smtp'].lower()=='true' or not results.wasSuccessful():
             import smtplib
@@ -74,7 +75,7 @@ def runHeadless(options):
             # establish connection with smtp server
             server = smtplib.SMTP(host = headless_options["smtp_server"],
                                   port = headless_options["smtp_port"])
-            if headless_options.has_key("smtp_tls") and headless_options["smtp_tls"].lower()=="true":
+            if "smtp_tls" in headless_options and headless_options["smtp_tls"].lower()=="true":
                 server.starttls()
             server.login(user = headless_options["smtp_user"],
                          password = headless_options["smtp_password"])
@@ -112,7 +113,7 @@ def runHeadless(options):
 
             # close connection
             server.quit()
-    if headless_options.has_key('log_location'):
+    if 'log_location' in headless_options:
         shutil.copy(logfile, headless_options['log_location'])
     shutil.rmtree('/tmp/forcebalance')
 

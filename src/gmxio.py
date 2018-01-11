@@ -5,7 +5,12 @@
 @author Lee-Ping Wang
 @date 12/2011
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import zip
+from builtins import str
+from builtins import range
 import os, sys
 import re
 from forcebalance.nifty import *
@@ -125,7 +130,7 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
     if fout != None:
        file_out = wopen(fout) 
        for line in out:
-           print >> file_out, line
+           print(line, file=file_out)
        file_out.close()
     if verbose:
         printcool_dictionary(options, title="%s -> %s with options:" % (fin, fout))
@@ -153,9 +158,9 @@ def write_ndx(fout, grps, fin=None):
     ndxgrps.update(grps)
     outf = wopen(fout)
     for name, nums in ndxgrps.items():
-        print >> outf, '[ %s ]' % name
+        print('[ %s ]' % name, file=outf)
         for subl in list(grouper(nums, 15)):
-            print >> outf, ' '.join(["%4i" % i for i in subl]) + ' '
+            print(' '.join(["%4i" % i for i in subl]) + ' ', file=outf)
     outf.close()
 
 ## VdW interaction function types
@@ -687,16 +692,16 @@ class GMX(Engine):
                             break
                     topol = open(self.top).readlines()
                     with wopen(self.top) as f:
-                        print >> f, "#include \"%s\"" % itpfnm
-                        print >> f
+                        print("#include \"%s\"" % itpfnm, file=f)
+                        print(file=f)
                         for line in topol:
-                            print >> f, line,
+                            print(line, end=' ', file=f)
                     # warn_press_key("None of the force field files %s are referenced in the .top file. "
                     #                "Are you referencing the files through C preprocessor directives?" % self.FF.fnms)
 
         ## Write out the trajectory coordinates to a .gro file.
         if hasattr(self, 'target') and hasattr(self.target,'shots'):
-            self.mol.write("%s-all.gro" % self.name, select=range(self.target.shots))
+            self.mol.write("%s-all.gro" % self.name, selection=range(self.target.shots))
         else:
             self.mol.write("%s-all.gro" % self.name)
         self.mol[0].write('%s.gro' % self.name)
@@ -934,7 +939,7 @@ class GMX(Engine):
         ## Calculate and record force
         if force:
             self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
-            Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[i/3]] \
+            Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[int(i/3)]] \
                                             for line in open("%s-f.xvg" % self.name).readlines()])
         ## Calculate and record dipole
         if dipole:

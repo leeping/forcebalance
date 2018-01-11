@@ -9,10 +9,14 @@ Code analysis utility to determine the global call graph. NOT really part of For
 @author Jiahao Chen
 @date 2010
 """
+from __future__ import print_function
 
-import glob, StringIO, sys, tokenize
+from future import standard_library
+standard_library.install_aliases()
+from builtins import object
+import glob, io, sys, tokenize
 
-class node:
+class node(object):
     """
     Data structure for holding information about python objects
     """
@@ -130,7 +134,7 @@ def main():
     
                 if not indeclar and t[0] not in knowntypeslist:
                     try:
-                        g = tokenize.generate_tokens(StringIO.StringIO(line).readline)
+                        g = tokenize.generate_tokens(io.StringIO(line).readline)
     
                         for _, token, _, _, _ in g:
                             matches = []
@@ -140,8 +144,8 @@ def main():
                                     matches.append(someobj)
                             
                             if len(matches)>1:
-                                print >> sys.stderr, "Multiple matches detected for", token
-                                print >> sys.stderr, "!!! Graph may contain errors !!!"
+                                print("Multiple matches detected for", token, file=sys.stderr)
+                                print("!!! Graph may contain errors !!!", file=sys.stderr)
                                 for obj in matches:
                                     if obj.parent == thisobj.oid:
                                         match = obj
@@ -162,16 +166,16 @@ def main():
     
     
     
-    print "digraph G {"
+    print("digraph G {")
     
     #Print modules
-    print 'subgraph {'
+    print('subgraph {')
     #print '    rank = same'
     for module in modulelist:
         thisid = [obj.oid for obj in globalobjectlist[module] if \
                 obj.name == module and obj.dtype == 'file'][0]
-        print '    ', thisid, '[ label="'+module+'", color = grey, style="rounded,filled", fillcolor = yellow]'
-    print '}'    
+        print('    ', thisid, '[ label="'+module+'", color = grey, style="rounded,filled", fillcolor = yellow]')
+    print('}')    
     
     #Print objects
     inherits = []
@@ -183,18 +187,18 @@ def main():
             elif obj.dtype == 'class':
                 shape = 'house'
             if shape != None:
-                print obj.oid, '[label = "'+obj.name+'", shape =', shape, ']'
+                print(obj.oid, '[label = "'+obj.name+'", shape =', shape, ']')
                 if (obj.oid, obj.parent) not in inherits:
                     inherits.append((obj.oid, obj.parent))
     
     for a, b in inherits:
-        print a, '->', b, '[style = dashed, arrowhead = none]'
+        print(a, '->', b, '[style = dashed, arrowhead = none]')
     
-    print "#Call graph"
+    print("#Call graph")
     
     for a, b in references:
-        print a.oid, '->', b.oid
-    print "}"
+        print(a.oid, '->', b.oid)
+    print("}")
     
     #List orphans
     #import sys

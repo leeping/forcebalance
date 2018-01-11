@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from builtins import range
 import os, sys, re
 import numpy as np
 from forcebalance.molecule import Molecule

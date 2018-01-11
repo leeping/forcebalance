@@ -1,3 +1,6 @@
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 #======================================================================#
 #|                                                                    |#
 #|              Chemical file format conversion module                |#
@@ -109,6 +112,11 @@
 # qm_zpe     = Zero point energy, kcal/mol (from a qchem freq calculation)
 # qm_entropy = Entropy contribution at STP, cal/mol.K (from a qchem freq calculation)
 # qm_enthalpy= Enthalpic contribution at STP, excluding electronic energy and ZPE, kcal/mol (from a qchem freq calculation)
+from builtins import input
+from builtins import zip
+from builtins import str
+from builtins import range
+from builtins import object
 FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_grads', 'qm_energies', 'qm_interaction',
                           'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins',
                           'qm_zpe', 'qm_entropy', 'qm_enthalpy', 'bond_orders'])
@@ -158,7 +166,7 @@ from warnings import warn
 #       Set up the logger        #
 #================================#
 try:
-    from output import *
+    from .output import *
 except:
     from logging import *
     class RawStreamHandler(StreamHandler):
@@ -242,14 +250,14 @@ if "forcebalance" in __name__:
     #============================#
     #| PDB read/write functions |#
     #============================#
-    try: from PDB import *
+    try: from .PDB import *
     except:
         warn('The pdb module cannot be miported (Cannot read/write PDB files)')
 
     #=============================#
     #| Mol2 read/write functions |#
     #=============================#
-    try: import Mol2
+    try: from . import Mol2
     except:
         warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
 
@@ -405,7 +413,7 @@ try:
             coors = nx.get_node_attributes(self,'x')
             return np.array([coors[i] for i in self.L()])
     try:
-        import contact
+        from . import contact
         have_contact = 1
     except:
         warn("'contact' cannot be imported (topology tools will be slow.)")
@@ -533,7 +541,7 @@ def pvec(vec):
 def grouper(n, iterable):
     """ Groups a big long iterable into groups of ten or what have you. """
     args = [iter(iterable)] * n
-    return list([e for e in t if e is not None] for t in itertools.izip_longest(*args))
+    return list([e for e in t if e is not None] for t in itertools.zip_longest(*args))
 
 def even_list(totlen, splitsize):
     """ Creates a list of number sequences divided as evenly as possible.  """
@@ -543,7 +551,7 @@ def even_list(totlen, splitsize):
         joblens[i%splitsize] += 1
     jobnow = 0
     for i in range(splitsize):
-        subsets.append(range(jobnow, jobnow + joblens[i]))
+        subsets.append(list(range(jobnow, jobnow + joblens[i])))
         jobnow += joblens[i]
     return subsets
 
@@ -643,7 +651,7 @@ def AlignToMoments(elem,xyz1,xyz2=None):
     Thresh = 1e-3
     if np.abs(determ - 1.0) > Thresh:
         if np.abs(determ + 1.0) > Thresh:
-            print "in AlignToMoments, determinant is % .3f" % determ
+            print("in AlignToMoments, determinant is % .3f" % determ)
         BB[:,2] *= -1
     xyzr = np.array(np.matrix(BB).T * np.matrix(xyz).T).T.copy()
     if xyz2 is not None:
@@ -773,7 +781,7 @@ def extract_pop(M, verbose=True):
     """
 
     # Read in the charge and spin on the whole system.
-    srch  = lambda s : np.array([float(re.search('(?<=%s )[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?' % s, c).group(0)) for c in M.comms if all([i in c for i in 'charge', 'sz'])])
+    srch  = lambda s : np.array([float(re.search('(?<=%s )[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?' % s, c).group(0)) for c in M.comms if all([i in c for i in ('charge', 'sz')])])
     Chgs  = srch('charge') # An array of the net charge.
     SpnZs = srch('sz')    # An array of the net Z-spin.
     Spn2s = srch('sz\^2') # An array of the sum of sz^2 by atom.
@@ -792,7 +800,7 @@ def extract_pop(M, verbose=True):
             spn = 1
 
     # The number of electrons should be odd iff the spin is odd.
-    if ((nelectron-spn)/2)*2 != (nelectron-spn):
+    if (int((nelectron-spn)/2))*2 != (nelectron-spn):
         if verbose: logger.info("\x1b[91mThe number of electrons (%i) is inconsistent with the spin-z (%i)\x1b[0m" % (nelectron, spn))
         return -999, -999
 
@@ -1043,7 +1051,7 @@ class Molecule(object):
                 Sum.Data[key] = self.Data[key]
             elif diff(self, other, key):
                 for i, j in zip(self.Data[key], other.Data[key]):
-                    print i, j, i==j
+                    print(i, j, i==j)
                 logger.error('The data member called %s is not the same for these two objects\n' % key)
                 raise RuntimeError
             elif key in self.Data:
@@ -1082,7 +1090,7 @@ class Molecule(object):
             if key in ['fnm', 'ftype', 'bonds', 'molecules', 'topology']: pass
             elif diff(self, other, key):
                 for i, j in zip(self.Data[key], other.Data[key]):
-                    print i, j, i==j
+                    print(i, j, i==j)
                 logger.error('The data member called %s is not the same for these two objects\n' % key)
                 raise RuntimeError
             # Information from the other class is added to this class (if said info doesn't exist.)
@@ -1282,7 +1290,7 @@ class Molecule(object):
                              'fragment' : kwargs.get('fragment', False),
                              'radii' : kwargs.get('radii', {})}
 
-        for i in set(self.Read_Tab.keys() + self.Write_Tab.keys()):
+        for i in set(list(self.Read_Tab.keys()) + list(self.Write_Tab.keys())):
             self.Funnel[i] = i
         # Data container.  All of the data is stored in here.
         self.Data = {}
@@ -1361,7 +1369,9 @@ class Molecule(object):
         if type(selection) in [int, np.int64, np.int32]:
             selection = [selection]
         if selection is None:
-            selection = range(len(self))
+            selection = list(range(len(self)))
+        else:
+            selection = list(selection)
         Answer = self.Write_Tab[self.Funnel[ftype.lower()]](selection,**kwargs)
         ## Any method that returns text will give us a list of lines, which we then write to the file.
         if Answer is not None:
@@ -1378,7 +1388,7 @@ class Molecule(object):
                     os.unlink(fnm)
                 outfile = open(fnm,'w')
             for line in Answer:
-                print >> outfile,line
+                print(line, file=outfile)
             outfile.close()
 
     #=====================================#
@@ -1705,7 +1715,7 @@ class Molecule(object):
             ymax = self.boxes[sn].b
             zmax = self.boxes[sn].c
             if any([i != 90.0 for i in [self.boxes[sn].alpha, self.boxes[sn].beta, self.boxes[sn].gamma]]):
-                print "Warning: Topology building will not work with broken molecules in nonorthogonal cells."
+                print("Warning: Topology building will not work with broken molecules in nonorthogonal cells.")
                 toppbc = False
         else:
             xmin = mins[0]
@@ -1866,7 +1876,7 @@ class Molecule(object):
         sn = kwargs.get('topframe', self.top_settings['topframe'])
         self.top_settings['topframe'] = sn
         if self.na > 100000:
-            print "Warning: Large number of atoms (%i), topology building may take a long time" % self.na
+            print("Warning: Large number of atoms (%i), topology building may take a long time" % self.na)
         # Build bonds from connectivity graph if not read from file.
         if (not self.top_settings['read_bonds']) or force_bonds:
             self.build_bonds()
@@ -1979,7 +1989,7 @@ class Molecule(object):
         phis = []
         if 'bonds' in self.Data:
             if any(p not in self.bonds for p in [(min(i,j),max(i,j)),(min(j,k),max(j,k)),(min(k,l),max(k,l))]):
-                print [(min(i,j),max(i,j)),(min(j,k),max(j,k)),(min(k,l),max(k,l))]
+                print([(min(i,j),max(i,j)),(min(j,k),max(j,k)),(min(k,l),max(k,l))])
                 warn("Measuring dihedral angle for four atoms that aren't bonded.  Hope you know what you're doing!")
         else:
             warn("This molecule object doesn't have bonds defined, sanity-checking is off.")
@@ -2518,7 +2528,7 @@ class Molecule(object):
         data = Mol2.mol2_set(fnm)
         if len(data.compounds) > 1:
             sys.stderr.write("Not sure what to do if the MOL2 file contains multiple compounds\n")
-        for i, atom in enumerate(data.compounds.items()[0][1].atoms):
+        for i, atom in enumerate(list(data.compounds.items())[0][1].atoms):
             xyz.append([atom.x, atom.y, atom.z])
             charge.append(atom.charge)
             atomname.append(atom.atom_name)
@@ -2528,7 +2538,7 @@ class Molecule(object):
                 thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
             elem.append(thiselem)
 
-        resname = [data.compounds.items()[0][0] for i in range(len(elem))]
+        resname = [list(data.compounds.items())[0][0] for i in range(len(elem))]
         resid = [1 for i in range(len(elem))]
 
         # Deprecated 'abonds' format.
@@ -2540,7 +2550,7 @@ class Molecule(object):
         #     bonds[aL].append(aH)
 
         bonds = []
-        for bond in data.compounds.items()[0][1].bonds:
+        for bond in list(data.compounds.items())[0][1].bonds:
             a1 = bond.origin_atom_id - 1
             a2 = bond.target_atom_id - 1
             aL, aH = (a1, a2) if a1 < a2 else (a2, a1)
@@ -3438,7 +3448,7 @@ class Molecule(object):
             if FDiff and (len(Answer['qm_energies']) == (len(Answer['xyzs'])+1)):
                 logger.info("Aligning energies because finite difference calculation prints one extra")
                 Answer['qm_energies'] = Answer['qm_energies'][:-1]
-            lens = [len(i) for i in Answer['qm_energies'], Answer['xyzs']]
+            lens = [len(i) for i in (Answer['qm_energies'], Answer['xyzs'])]
             if len(set(lens)) != 1:
                 logger.error('The number of energies and coordinates in %s are not the same : %s\n' % (fnm, str(lens)))
                 raise RuntimeError
@@ -3637,7 +3647,7 @@ class Molecule(object):
             # Third number is the atom type.
             # Fourth number is the charge (set to zero).
             # Fifth through seventh numbers are the positions
-            out.append("%4i 1 %2i 0.0 % 15.10f % 15.10f % 15.10f" % (i+1, atmap.keys().index(self.elem[i])+1, self.xyzs[I][i, 0], self.xyzs[I][i, 1], self.xyzs[I][i, 2]))
+            out.append("%4i 1 %2i 0.0 % 15.10f % 15.10f % 15.10f" % (i+1, list(atmap.keys()).index(self.elem[i])+1, self.xyzs[I][i, 0], self.xyzs[I][i, 1], self.xyzs[I][i, 2]))
         return out
 
     def write_molproq(self, selection, **kwargs):
@@ -3956,15 +3966,15 @@ class Molecule(object):
 
     def require_resid(self):
         if 'resid' not in self.Data:
-            na_res = int(raw_input("Enter how many atoms are in a residue, or zero as a single residue -> "))
+            na_res = int(input("Enter how many atoms are in a residue, or zero as a single residue -> "))
             if na_res == 0:
                 self.resid = [1 for i in range(self.na)]
             else:
-                self.resid = [1 + i/na_res for i in range(self.na)]
+                self.resid = [1 + int(i/na_res) for i in range(self.na)]
 
     def require_resname(self):
         if 'resname' not in self.Data:
-            resname = raw_input("Enter a residue name (3-letter like 'SOL') -> ")
+            resname = input("Enter a residue name (3-letter like 'SOL') -> ")
             self.resname = [resname for i in range(self.na)]
 
     def require_boxes(self):
@@ -4010,7 +4020,7 @@ class Molecule(object):
             sys.stderr.write("6 floats (triclinic lattice lengths and angles in degrees)\n")
             sys.stderr.write("9 floats (triclinic lattice vectors v1(x) v2(y) v3(z) v1(y) v1(z) v2(x) v2(z) v3(x) v3(y) in Angstrom)\n")
             sys.stderr.write("Or: Name of a file containing one of these lines for each frame in the trajectory\n")
-            boxstr = raw_input("Box Vector Input: -> ")
+            boxstr = input("Box Vector Input: -> ")
             if os.path.exists(boxstr):
                 boxfile = open(boxstr).readlines()
                 if len(boxfile) != len(self):
@@ -4023,8 +4033,8 @@ class Molecule(object):
                 self.boxes = [mybox for i in range(self.ns)]
 
 def main():
-    print "Basic usage as an executable: molecule.py input.format1 output.format2"
-    print "where format stands for xyz, pdb, gro, etc."
+    print("Basic usage as an executable: molecule.py input.format1 output.format2")
+    print("where format stands for xyz, pdb, gro, etc.")
     Mao = Molecule(sys.argv[1])
     Mao.write(sys.argv[2])
 

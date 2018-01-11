@@ -2,6 +2,7 @@
 """
 setup.py: Install ForceBalance. 
 """
+from __future__ import print_function
 __author__ = "Lee-Ping Wang"
 
 from setuptools import setup,Extension
@@ -15,8 +16,8 @@ try:
     import numpy
     import scipy
 except ImportError:
-    print "Error importing numpy and scipy but these are required to install ForceBalance"
-    print "Please make sure the numpy and scipy modules are installed and try again"
+    print("Error importing numpy and scipy but these are required to install ForceBalance")
+    print("Please make sure the numpy and scipy modules are installed and try again")
     exit()
     
 #===================================#
@@ -149,14 +150,14 @@ def doClean():
     try:
         forcebalance_dir=os.path.dirname(__import__('forcebalance').__file__)
     except ImportError:
-        print "Couldn't find existing forcebalance installation. Nothing to clean...\n"
+        print("Couldn't find existing forcebalance installation. Nothing to clean...\n")
         return
     except:
-        print "Couldn't read forcebalance location... Continuing with regular install"
+        print("Couldn't read forcebalance location... Continuing with regular install")
         return
 
     #raw_input("All files in %s will be deleted for clean\nPress <Enter> to continue, <Ctrl+C> to abort\n" % forcebalance_dir)
-    print "Removing the directory tree prior to install: %s" % forcebalance_dir
+    print("Removing the directory tree prior to install: %s" % forcebalance_dir)
     subprocess.call("rm -f %s/../forcebalance-*.egg-info" % forcebalance_dir, shell=True)
     if os.path.exists(forcebalance_dir):
         shutil.rmtree(forcebalance_dir, ignore_errors=True)
@@ -183,9 +184,9 @@ def main():
     try:
         import bz2
     except ImportError:
-        print "Error importing bz2, which is important for distributed calculations and remote targets"
-        print "Please either (1) make sure Python is built/installed with bz2 support"
-        print "or (2) proceed with inefficient reading/writing of files; remote targets won't work."
+        print("Error importing bz2, which is important for distributed calculations and remote targets")
+        print("Please either (1) make sure Python is built/installed with bz2 support")
+        print("or (2) proceed with inefficient reading/writing of files; remote targets won't work.")
 
 if __name__ == '__main__':
     main()

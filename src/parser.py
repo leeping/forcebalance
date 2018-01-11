@@ -45,13 +45,15 @@ If you add an entirely new type, make sure to implement the interpretation of th
 @author Lee-Ping Wang
 @date 11/2012
 """
+from __future__ import absolute_import
 
+from builtins import str
 import os
 import re
 import sys
 import itertools
 import traceback
-from nifty import printcool, printcool_dictionary, which, isfloat
+from .nifty import printcool, printcool_dictionary, which, isfloat
 from copy import deepcopy
 from collections import OrderedDict
 

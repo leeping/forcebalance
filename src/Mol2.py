@@ -12,7 +12,10 @@ mol2_set:
 mol2: 
   A class to manage simple mol2 data
 """
+from __future__ import print_function
 
+from builtins import range
+from builtins import object
 import sys
 import types
 from collections import OrderedDict
@@ -23,7 +26,7 @@ from collections import OrderedDict
 #
 #=====================================================================
 
-class mol2_atom:
+class mol2_atom(object):
     """
     This is to manage mol2 atomic lines on the form:
       1 C1          5.4790   42.2880   49.5910 C.ar    1  <1>         0.0424
@@ -151,7 +154,7 @@ class mol2_atom:
 #
 #=====================================================================
 
-class mol2_bond:
+class mol2_bond(object):
     """
     This is to manage mol2 bond lines on the form:
      1     1     2   ar
@@ -246,7 +249,7 @@ class mol2_bond:
 #
 #=====================================================================
 
-class mol2:
+class mol2(object):
     """
     This is to manage one mol2 series of lines on the form: @verbatim
 @<TRIPOS>MOLECULE
@@ -531,7 +534,7 @@ Energy = 0
                     self.atoms[i].set_atom_type("C.phb")
                     continue
                 
-class mol2_set:
+class mol2_set(object):
     def __init__(self, data = None, subset = None):
         """
         A collection is organized as a dictionnary of compounds
@@ -546,9 +549,9 @@ class mol2_set:
         
         # subset management
         if subset is not None:
-            if isinstance(subset,types.ListType):
+            if isinstance(subset,list):
                 pass
-            elif isinstance(subset,types.StringType):
+            elif isinstance(subset,bytes):
                 try:
                     f = open(subset)
                     lines = f.readlines()
@@ -565,7 +568,7 @@ class mol2_set:
                 self.num_compounds = data.num_compounds
                 self.compounds     = data.compounds
                 self.comments      = data.comments
-            elif isinstance(data,types.StringType):
+            elif isinstance(data,bytes):
                 try:
                     f = open(data)
                     lines = f.readlines()
@@ -574,7 +577,7 @@ class mol2_set:
                     self.parse(lines, subset)
                 except:
                     pass
-            elif isinstance(data,types.ListType):
+            elif isinstance(data,list):
                 self.parse(data, subset)
         # return self
 
@@ -619,5 +622,5 @@ if __name__ == "__main__":
     for cmpnd in data.compounds.keys():
         # print data.compounds[cmpnd],
         data.compounds[cmpnd].set_donnor_acceptor_atoms()
-        print data.compounds[cmpnd],
+        print(data.compounds[cmpnd], end=' ')
         break

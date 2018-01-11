@@ -13,7 +13,15 @@ Named after the mighty Sniffy Handy Nifty (King Sniffy)
 @author Lee-Ping Wang
 @date 12/2011
 """
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
+from builtins import zip
+from builtins import input
+from builtins import str
+from builtins import range
+from builtins import object
 from select import select
 import os, sys, re, shutil, errno
 import numpy as np
@@ -33,7 +41,7 @@ from collections import OrderedDict, defaultdict
 #       Set up the logger        #
 #================================#
 try:
-    from output import *
+    from .output import *
 except:
     from logging import *
     class RawStreamHandler(StreamHandler):
@@ -135,7 +143,7 @@ def grouper(iterable, n):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
     args = [iter(iterable)] * n
-    lzip = [[j for j in i if j is not None] for i in list(itertools.izip_longest(*args))]
+    lzip = [[j for j in i if j is not None] for i in list(itertools.zip_longest(*args))]
     return lzip
 
 def encode(l):
@@ -240,7 +248,7 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
         if type(center) is list: c1 = center[ln]
         else: c1 = center
         if c1:
-            padleft = ' ' * ((width - newlen(line)) / 2)
+            padleft = ' ' * (int((width - newlen(line))/2))
         else:
             padleft = ''
         padright = ' '* (width - newlen(line) - len(padleft))
@@ -467,16 +475,16 @@ def monotonic_decreasing(arr, start=None, end=None, verbose=False):
         end = len(arr) - 1
     a0 = arr[start]
     idx = [start]
-    if verbose: print "Starting @ %i : %.6f" % (start, arr[start])
+    if verbose: print("Starting @ %i : %.6f" % (start, arr[start]))
     if end > start:
         i = start+1
         while i < end:
             if arr[i] < a0:
                 a0 = arr[i]
                 idx.append(i)
-                if verbose: print "Including  %i : %.6f" % (i, arr[i])
+                if verbose: print("Including  %i : %.6f" % (i, arr[i]))
             else:
-                if verbose: print "Excluding  %i : %.6f" % (i, arr[i])
+                if verbose: print("Excluding  %i : %.6f" % (i, arr[i]))
             i += 1
     if end < start:
         i = start-1
@@ -484,9 +492,9 @@ def monotonic_decreasing(arr, start=None, end=None, verbose=False):
             if arr[i] < a0:
                 a0 = arr[i]
                 idx.append(i)
-                if verbose: print "Including  %i : %.6f" % (i, arr[i])
+                if verbose: print("Including  %i : %.6f" % (i, arr[i]))
             else:
-                if verbose: print "Excluding  %i : %.6f" % (i, arr[i])
+                if verbose: print("Excluding  %i : %.6f" % (i, arr[i]))
             i -= 1
     return np.array(idx)
 
@@ -720,7 +728,7 @@ class Pickler_LP(pickle.Pickler):
                 ## The rest is copied from the Pickler class
                 if self.bin:
                     logger.error("self.bin is True, not sure what to do with myself\n")
-                    raw_input()
+                    input()
                 else:
                     self.write(XMLFILE + repr(String) + '\n')
                 self.memoize(String)
@@ -929,7 +937,7 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
         wait_time = wait_intvl
         numwaits = 1
     else:
-        numwaits = wait_time / wait_intvl
+        numwaits = int(wait_time/wait_intvl)
     for sec in range(numwaits):
         task = wq.wait(wait_intvl)
         if task:
@@ -978,7 +986,7 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                 % (wq.stats.workers_init, wq.stats.workers_ready, nbusy, wq.stats.total_workers_joined, wq.stats.total_workers_removed))
             logger.info("Tasks: %i running, %i waiting, %i total dispatched, %i total complete\n" \
                 % (wq.stats.tasks_running,wq.stats.tasks_waiting,Total,Complete))
-            logger.info("Data: %i / %i kb sent/received\n" % (wq.stats.total_bytes_sent/1000, wq.stats.total_bytes_received/1024))
+            logger.info("Data: %i / %i kb sent/received\n" % (int(wq.stats.total_bytes_sent/1000), int(wq.stats.total_bytes_received/1024)))
         else:
             logger.info("\r%s : %i/%i workers busy; %i/%i jobs complete\r" %\
             (time.ctime(), nbusy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed), Complete, Total))
@@ -1466,7 +1474,7 @@ def concurrent_map(func, data):
     def task_wrapper(i):
         result[i] = func(data[i])
 
-    threads = [threading.Thread(target=task_wrapper, args=(i,)) for i in xrange(N)]
+    threads = [threading.Thread(target=task_wrapper, args=(i,)) for i in range(N)]
     for t in threads:
         t.start()
     for t in threads:

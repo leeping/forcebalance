@@ -3,7 +3,9 @@
 @author Lee-Ping Wang
 @date 05/2012
 """
+from __future__ import division
 
+from builtins import range
 import os
 import shutil
 import numpy as np

@@ -18,6 +18,8 @@ histogram analysis method for the analysis of simulated and parallel tempering s
 JCTC 3(1):26-41, 2007.
 
 """
+from __future__ import division
+from __future__ import print_function
 
 #=============================================================================================
 # COPYRIGHT NOTICE
@@ -51,6 +53,8 @@ JCTC 3(1):26-41, 2007.
 # VERSION CONTROL INFORMATION
 #=============================================================================================
 
+from builtins import range
+from past.utils import old_div
 __version__ = "$Revision: 87 $ $Date: 2009-11-03 21:43:35 -0600 (Tue, 03 Nov 2009) $"
 # $Date: 2009-11-03 21:43:35 -0600 (Tue, 03 Nov 2009) $
 # $Revision: 87 $
@@ -618,18 +622,18 @@ def subsampleCorrelatedData(A_t, g=None, fast=False, conservative=False, verbose
 
   # Compute the statistical inefficiency for the timeseries.
   if not g:
-    if verbose: print "Computing statistical inefficiency..."
+    if verbose: print("Computing statistical inefficiency...")
     g = statisticalInefficiency(A_t, A_t, fast = fast)
-    if verbose: print "g = %f" % g
+    if verbose: print("g = %f" % g)
 
   if conservative:
     # Round g up to determine the stride we can use to pick out regularly-spaced uncorrelated samples.
     import math
     stride = int(math.ceil(g))
-    if verbose: print "conservative subsampling: using stride of %d" % stride
+    if verbose: print("conservative subsampling: using stride of %d" % stride)
     
     # Assemble list of indices of uncorrelated snapshots.
-    indices = range(0, T, stride)
+    indices = list(range(0, T, stride))
   else:
     # Choose indices as floor(n*g), with n = 0,1,2,..., until we run out of data.
     import math
@@ -641,12 +645,12 @@ def subsampleCorrelatedData(A_t, g=None, fast=False, conservative=False, verbose
       if (n == 0) or (t != indices[n-1]):
         indices.append(t)
       n += 1
-    if verbose: print "standard subsampling: using average stride of %f" % g
+    if verbose: print("standard subsampling: using average stride of %f" % g)
 
   # Number of samples in subsampled timeseries.
   N = len(indices)
   
-  if verbose: print "The resulting subsampled set has %d samples (original timeseries had %d)." % (N, T)
+  if verbose: print("The resulting subsampled set has %d samples (original timeseries had %d)." % (N, T))
 
   # Return the list of indices of uncorrelated snapshots.
   return indices
