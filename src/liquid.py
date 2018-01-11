@@ -236,7 +236,7 @@ class Liquid(Target):
     def prepare_temp_directory(self):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
-        for f in self.nptfiles + self.nvtfiles:
+        for f in self.nptfiles + (self.nvtfiles if hasattr(self, 'nvtfiles') else []):
             LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
         for f in self.scripts:
             LinkFile(os.path.join(os.path.split(__file__)[0],"data",f),os.path.join(abstempdir,f))

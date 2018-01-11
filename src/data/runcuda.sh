@@ -17,10 +17,12 @@ done
 COMMAND=$@
 
 # Load my environment variables. :)
-if [ -f /etc/profile ] ; then . /etc/profile ; fi
-if [ -f /etc/bashrc ] ; then . /etc/bashrc ; fi
-if [ -f ~/.bash_profile ] ; then . ~/.bash_profile ; fi
-if [ -f ~/.bashrc ] ; then . ~/.bashrc ; fi
+# Commented out because this overwrites the Conda environment
+# from source activate py27 (for example)
+# if [ -f /etc/profile ] ; then . /etc/profile ; fi
+# if [ -f /etc/bashrc ] ; then . /etc/bashrc ; fi
+# if [ -f ~/.bash_profile ] ; then . ~/.bash_profile ; fi
+# if [ -f ~/.bashrc ] ; then . ~/.bashrc ; fi
 
 # Make sure the Cuda environment is turned on
 # module load cuda

@@ -20,7 +20,7 @@ echo $@
 # Remove the result file (so the result from a previous calculation
 # doesn't get accidentally sent back)
 rm -f md_result.p
-export PYTHONPATH=~/research/forcebalance/lib/python2.7/site-packages/
+# export PYTHONPATH=~/research/forcebalance/lib/python2.7/site-packages/
 time $COMMAND
 exitstat=$?
 # Delete backup files that are older than one week.
