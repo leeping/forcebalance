@@ -1,5 +1,7 @@
 """ @package forcebalance.qchemio Q-Chem input file parser. """
 
+from builtins import str
+from builtins import range
 import os
 from re import match, sub
 from forcebalance import BaseReader
@@ -80,7 +82,7 @@ def QChem_Dielectric_Energy(fnm,wq):
     for i in range(QCIn.ns):
         sdir = "%%0%ii" % digits % i
         GoInto(sdir)
-        QCIn.write("qchem.in",select=i)
+        QCIn.write("qchem.in",selection=i)
         queue_up(wq,"qchem40 qchem.in qchem.out",input_files=["qchem.in"],output_files=["qchem.out"],verbose=False)
         Leave(sdir)
     wq_wait(wq,verbose=False)

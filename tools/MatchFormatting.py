@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+from builtins import zip
 import os, sys
 
 fin = open(sys.argv[1]).readlines()
@@ -25,5 +27,5 @@ for line_temp, line_data in zip(template, fin):
     for wt, wd in zip(stemp, sdata):
         if wt != wd:
             line_out = line_out.replace(wt, determine_format_string(wt) % float(wd), 1)
-    print line_out,
+    print(line_out, end=' ')
 

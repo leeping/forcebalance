@@ -1,3 +1,4 @@
+from __future__ import print_function
 import forcebalance
 import forcebalance.objective
 import forcebalance.nifty
@@ -15,7 +16,7 @@ else:
     forcefield, mvals = forcebalance.nifty.lp_load('forcefield.p')
     AGrad, AHess, id_string, options, tgt_opts, pgrad = forcebalance.nifty.lp_load('options.p')
 
-print "Evaluating remote target ID: %s" % id_string
+print("Evaluating remote target ID: %s" % id_string)
 
 options['root'] = os.getcwd()
 forcefield.root = os.getcwd()
@@ -49,4 +50,4 @@ logger = forcebalance.output.getLogger("forcebalance")
 logger.addHandler(forcebalance.output.RawFileHandler('indicate.log'))
 Tgt.indicate()
 
-print "\n"
+print("\n")

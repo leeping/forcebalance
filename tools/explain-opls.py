@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import os
 from sys import argv
 import forcebalance
@@ -28,4 +29,4 @@ OPLSChoices = list(os.popen("awk '$2 ~ /%s/' %s | awk '(($4 - %.3f) < 0.1 && ($4
 for line in OPLSChoices:
     sline = line.split()
     atomname = sline[0]
-    print "%10s%5s%10.5f%10.3f%15.5e%15.5e  " % (atomname,sline[1],float(sline[3]),float(sline[4]),float(sline[6]),float(sline[7])), OPLSExplanations[atomname]
+    print("%10s%5s%10.5f%10.3f%15.5e%15.5e  " % (atomname,sline[1],float(sline[3]),float(sline[4]),float(sline[6]),float(sline[7])), OPLSExplanations[atomname])

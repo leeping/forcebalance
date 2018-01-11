@@ -51,11 +51,16 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+from __future__ import division
+from __future__ import print_function
 
 #================#
 # Global Imports #
 #================#
 
+from builtins import zip
+from builtins import range
+from past.utils import old_div
 import os
 import sys
 import numpy as np
@@ -97,22 +102,22 @@ args = parser.parse_args()
 timestep         = args.liquid_timestep * femtosecond                          # timestep for integration in femtosecond
 faststep         = 0.25 * femtosecond                                          # "fast" timestep (for MTS integrator, if used)
 nsteps           = int(1000 * args.liquid_interval / args.liquid_timestep)     # Number of time steps per interval (or "iteration") for saving coordinates (in steps)
-nequiliterations = args.liquid_equ_steps / nsteps                              # Number of iterations set aside for equilibration
-niterations      = args.liquid_prod_steps / nsteps                             # Number of production iterations
+nequiliterations = int(args.liquid_equ_steps/nsteps)                              # Number of iterations set aside for equilibration
+niterations      = int(args.liquid_prod_steps/nsteps)                             # Number of production iterations
 
-print timestep
-print faststep
-print nsteps
-print nequiliterations
-print niterations
+print(timestep)
+print(faststep)
+print(nsteps)
+print(nequiliterations)
+print(niterations)
 
-print "I will perform %i iterations of %i x %.3f fs time steps each" % (niterations, nsteps, args.liquid_timestep)
+print("I will perform %i iterations of %i x %.3f fs time steps each" % (niterations, nsteps, args.liquid_timestep))
 
 # Simulation settings for the monomer.
 m_timestep         = args.gas_timestep * femtosecond
 m_nsteps           = int(1000 * args.gas_interval / args.gas_timestep)
-m_nequiliterations = args.gas_equ_steps / m_nsteps
-m_niterations      = args.gas_prod_steps / m_nsteps
+m_nequiliterations = int(args.gas_equ_steps/m_nsteps)
+m_niterations      = int(args.gas_prod_steps/m_nsteps)
 
 temperature = args.temperature * kelvin                            # temperature in kelvin
 pressure    = args.pressure * atmospheres                          # pressure in atmospheres
@@ -238,7 +243,7 @@ def statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3):
     sigma2_AB = (dA_n * dB_n).mean() # standard estimator to ensure C(0) = 1
     # Trap the case where this covariance is zero, and we cannot proceed.
     if(sigma2_AB == 0):
-        print 'Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency'
+        print('Sample covariance sigma_AB^2 = 0 -- cannot compute statistical inefficiency')
         return 1.0
     # Accumulate the integrated correlation time by computing the normalized correlation time at
     # increasing values of t.  Stop accumulating if the correlation function goes negative, since
@@ -345,10 +350,10 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
     for i in system.getForces():
         if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce"]:
             # Slow force.
-            print i.__class__.__name__, "is a Slow Force"
+            print(i.__class__.__name__, "is a Slow Force")
             i.setForceGroup(1)
         else:
-            print i.__class__.__name__, "is a Fast Force"
+            print(i.__class__.__name__, "is a Fast Force")
             # Fast force.
             i.setForceGroup(0)
 
@@ -408,11 +413,11 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
     # Name of the simulation platform (Reference, Cuda, OpenCL)
     try:
         PlatName = 'CUDA'
-        print "Setting Platform to", PlatName
+        print("Setting Platform to", PlatName)
         platform = Platform.getPlatformByName(PlatName)
         # Set the device to the environment variable or zero otherwise
         device = os.environ.get('CUDA_DEVICE',"0")
-        print "Setting Device to", device
+        print("Setting Device to", device)
         platform.setPropertyDefaultValue("CudaDeviceIndex", device)
         # Setting CUDA precision to double appears to improve performance of derivatives.
         platform.setPropertyDefaultValue("CudaPrecision", precision)
@@ -421,7 +426,7 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
         if args.force_cuda:
             raise Exception('Force CUDA option is enabled but CUDA platform not available')
         PlatName = "Reference"
-        print "Setting Platform to", PlatName
+        print("Setting Platform to", PlatName)
         platform = Platform.getPlatformByName(PlatName)
     # Create the test system.
     forcefield = ForceField(sys.argv[2])
@@ -435,16 +440,16 @@ def create_simulation_object(pdb, settings, pbc=True, precision="single"):
     if not NewIntegrator:
         integrator = LangevinIntegrator(temperature, collision_frequency, timestep)
     else:
-        print "Using new multiple-timestep velocity-verlet with velocity randomization (MTS-VVVR) integrator."
+        print("Using new multiple-timestep velocity-verlet with velocity randomization (MTS-VVVR) integrator.")
         integrator = MTSVVVRIntegrator(temperature, collision_frequency, timestep, system, ninnersteps=int(timestep/faststep))
 
     # Stuff for figuring out the ewald error tolerance.
-    print "There are %i forces" % system.getNumForces()
+    print("There are %i forces" % system.getNumForces())
     for i in range(system.getNumForces()):
         Frc = system.getForce(i)
-        print Frc.__class__.__name__
+        print(Frc.__class__.__name__)
         if Frc.__class__.__name__ == 'AmoebaMultipoleForce':
-            print "The Ewald error tolerance is:", Frc.getEwaldErrorTolerance()
+            print("The Ewald error tolerance is:", Frc.getEwaldErrorTolerance())
     
     # Create simulation object.
     simulation = Simulation(pdb.topology, system, integrator, platform)
@@ -455,15 +460,15 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     simulation, system = create_simulation_object(pdb, settings, pbc, "single")
     # Set initial positions.
     simulation.context.setPositions(pdb.positions)
-    print "Minimizing the energy... (starting energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole),
+    print("Minimizing the energy... (starting energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole), end=' ')
     simulation.minimizeEnergy()
-    print "Done (final energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
+    print("Done (final energy % .3f kJ/mol)" % simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole))
     # Assign velocities.
     velocities = generateMaxwellBoltzmannVelocities(system, temperature)
     simulation.context.setVelocities(velocities)
     if verbose:
         # Print out the platform used by the context
-        print "I'm using the platform", simulation.context.getPlatform().getName()
+        print("I'm using the platform", simulation.context.getPlatform().getName())
         # Print out the properties of the platform
         printcool_dictionary({i:simulation.context.getPlatform().getPropertyValue(simulation.context,i) for i in simulation.context.getPlatform().getPropertyNames()},title="Platform %s has properties:" % simulation.context.getPlatform().getName())
     # Serialize the system if we want.
@@ -504,9 +509,9 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
     # Now run the simulation #
     #========================#
     # Equilibrate.
-    if verbose: print "Using timestep", timestep, "and %i steps per data record" % nsteps
-    if verbose: print "Special note: getVelocities and getForces has been turned off."
-    if verbose: print "Equilibrating..."
+    if verbose: print("Using timestep", timestep, "and %i steps per data record" % nsteps)
+    if verbose: print("Special note: getVelocities and getForces has been turned off.")
+    if verbose: print("Equilibrating...")
     for iteration in range(nequiliterations):
         simulation.step(nsteps)
         state = simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
@@ -525,7 +530,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
                                                              kinetic_temperature / kelvin, potential / kilojoules_per_mole,
                                                              volume / nanometers**3, density / (kilogram / meter**3))
     # Collect production data.
-    if verbose: print "Production..."
+    if verbose: print("Production...")
     if Trajectory:
         simulation.reporters.append(DCDReporter('dynamics.dcd', nsteps))
     for iteration in range(niterations):
@@ -544,7 +549,7 @@ def run_simulation(pdb,settings,pbc=True,Trajectory=True):
             density = 0.0 * kilogram / meter ** 3
         kinetic_temperature = 2.0 * kinetic / kB / ndof
         if verbose:
-            print "%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / picoseconds, kinetic_temperature / kelvin, potential / kilojoules_per_mole, volume / nanometers**3, density / (kilogram / meter**3))
+            print("%6d %9.3f %9.3f % 13.3f %10.4f %13.4f" % (iteration, state.getTime() / picoseconds, kinetic_temperature / kelvin, potential / kilojoules_per_mole, volume / nanometers**3, density / (kilogram / meter**3)))
         # Store properties.
         data['time'][iteration] = state.getTime()
         data['potential'][iteration] = potential
@@ -606,21 +611,21 @@ def analyze(data):
     #==========================#
     # Print summary statistics #
     #==========================#
-    print "Summary statistics (%.3f ns equil, %.3f ns production)" % (nequiliterations * nsteps * timestep / nanoseconds, niterations * nsteps * timestep / nanoseconds)
-    print
+    print("Summary statistics (%.3f ns equil, %.3f ns production)" % (nequiliterations * nsteps * timestep / nanoseconds, niterations * nsteps * timestep / nanoseconds))
+    print()
     # Kinetic energies
-    print "Average kinetic energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['KE'] / kilojoules_per_mole, statistics['dKE'] / kilojoules_per_mole, statistics['g_KE'] / picoseconds)
+    print("Average kinetic energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['KE'] / kilojoules_per_mole, statistics['dKE'] / kilojoules_per_mole, statistics['g_KE'] / picoseconds))
     # Potential energies
-    print "Average potential energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['PE'] / kilojoules_per_mole, statistics['dPE'] / kilojoules_per_mole, statistics['g_PE'] / picoseconds)
+    print("Average potential energy: %11.6f +- %11.6f  kj/mol  (g = %11.6f ps)" % (statistics['PE'] / kilojoules_per_mole, statistics['dPE'] / kilojoules_per_mole, statistics['g_PE'] / picoseconds))
     # Kinetic temperature
     unit = kelvin
-    print "Average kinetic temperature: %11.6f +- %11.6f  K         (g = %11.6f ps)" % (statistics['kinetic_temperature'] / unit, statistics['dkinetic_temperature'] / unit, statistics['g_kinetic_temperature'] / picoseconds)
+    print("Average kinetic temperature: %11.6f +- %11.6f  K         (g = %11.6f ps)" % (statistics['kinetic_temperature'] / unit, statistics['dkinetic_temperature'] / unit, statistics['g_kinetic_temperature'] / picoseconds))
     unit = (nanometer**3)
-    print "Volume: mean %11.6f +- %11.6f  nm^3" % (statistics['volume'] / unit, statistics['dvolume'] / unit),
-    print "g = %11.6f ps" % (statistics['g_volume'] / picoseconds)
+    print("Volume: mean %11.6f +- %11.6f  nm^3" % (statistics['volume'] / unit, statistics['dvolume'] / unit), end=' ')
+    print("g = %11.6f ps" % (statistics['g_volume'] / picoseconds))
     unit = (kilogram / meter**3)
-    print "Density: mean %11.6f +- %11.6f  nm^3" % (statistics['density'] / unit, statistics['ddensity'] / unit),
-    print "g = %11.6f ps" % (statistics['g_density'] / picoseconds)
+    print("Density: mean %11.6f +- %11.6f  nm^3" % (statistics['density'] / unit, statistics['ddensity'] / unit), end=' ')
+    print("g = %11.6f ps" % (statistics['g_density'] / picoseconds))
     unit_rho = (kilogram / meter**3)
     unit_ene = kilojoules_per_mole
 
@@ -683,8 +688,8 @@ def energy_driver(mvals,pdb,FF,xyzs,settings,simulation,boxes=None,verbose=False
             E.append(Energy)
             if dipole:
                 D.append(get_dipole(simulation,q=q,positions=xyz))
-    print "\r",
-    if verbose: print E
+    print("\r", end=' ')
+    if verbose: print(E)
     if dipole:
         # Return a Nx4 array with energies in the first column and dipole in columns 2-4.
         return np.hstack((np.array(E).reshape(-1,1), np.array(D).reshape(-1,3)))
@@ -723,7 +728,7 @@ def energy_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,boxes=None,AGrad=
             G1 = f1d7p(fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes),h)
             dG = G1 - G[i,:]
             dGfrac = (G1 - G[i,:]) / G[i,:]
-            print "Parameter %3i 7-pt vs. central derivative : RMS, Max error (fractional) = % .4e % .4e (% .4e % .4e)" % (i, np.sqrt(np.mean(dG**2)), max(np.abs(dG)), np.sqrt(np.mean(dGfrac**2)), max(np.abs(dGfrac)))
+            print("Parameter %3i 7-pt vs. central derivative : RMS, Max error (fractional) = % .4e % .4e (% .4e % .4e)" % (i, np.sqrt(np.mean(dG**2)), max(np.abs(dG)), np.sqrt(np.mean(dGfrac**2)), max(np.abs(dGfrac))))
     return G
 
 def energy_dipole_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,boxes=None,AGrad=True):
@@ -801,7 +806,7 @@ def property_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,kT,property_dri
         S = -1*np.dot(b,np.log(b))
         InfoContent = np.exp(S)
         if InfoContent / len(E0) < 0.1:
-            print "Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0))
+            print("Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0)))
         P1 = property_driver(b=b,**property_kwargs)
 
         EDM1 = fdwrap(energy_driver,mvals,i,key=None,pdb=pdb,FF=FF,xyzs=xyzs,settings=settings,simulation=simulation,boxes=boxes,dipole=True)(-h)
@@ -816,7 +821,7 @@ def property_derivatives(mvals,h,pdb,FF,xyzs,settings,simulation,kT,property_dri
         S = -1*np.dot(b,np.log(b))
         InfoContent = np.exp(S)
         if InfoContent / len(E0) < 0.1:
-            print "Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0))
+            print("Warning: Effective number of snapshots: % .1f (out of %i)" % (InfoContent, len(E0)))
         PM1 = property_driver(b=b,**property_kwargs)
 
         G[i] = (P1-PM1)/(2*h)
@@ -864,17 +869,17 @@ def main():
     forcefield = ForceField(sys.argv[2])
     # Try to detect if we're using an AMOEBA system.
     if any(['Amoeba' in i.__class__.__name__ for i in forcefield._forces]):
-        print "Detected AMOEBA system!"
+        print("Detected AMOEBA system!")
         if FF.amoeba_pol == "mutual":
-            print "Setting mutual polarization"
+            print("Setting mutual polarization")
             Settings = amoeba_mutual_kwargs
             mSettings = mono_mutual_kwargs
         elif FF.amoeba_pol == "direct":
-            print "Setting direct polarization"
+            print("Setting direct polarization")
             Settings = amoeba_direct_kwargs
             mSettings = mono_direct_kwargs
         else:
-            print "No polarization"
+            print("No polarization")
             Settings = amoeba_nonpol_kwargs
             mSettings = mono_nonpol_kwargs
     else:
@@ -900,7 +905,7 @@ def main():
     # First create a double-precision simulation object.
     DoublePrecisionDerivatives = True
     if DoublePrecisionDerivatives and AGrad:
-        print "Creating Double Precision Simulation for parameter derivatives"
+        print("Creating Double Precision Simulation for parameter derivatives")
         Sim, _ = create_simulation_object(pdb, Settings, pbc=True, precision="double")
     G, GDx, GDy, GDz = energy_dipole_derivatives(mvals, h, pdb, FF, Xyzs, Settings, Sim, Boxes, AGrad)
     # The density derivative can be computed using the energy derivative.
@@ -927,7 +932,7 @@ def main():
     _trash, _crap, mPot_avg, mPot_err, __trash, __crap = analyze(mData)
     # Now that we have the coordinates, we can compute the energy derivatives.
     if DoublePrecisionDerivatives and AGrad:
-        print "Creating Double Precision Simulation for parameter derivatives"
+        print("Creating Double Precision Simulation for parameter derivatives")
         mSim, _ = create_simulation_object(mpdb, mSettings, pbc=False, precision="double")
     mG = energy_derivatives(mvals, h, mpdb, FF, mXyzs, mSettings, mSim, None, AGrad)
 
@@ -949,11 +954,11 @@ def main():
     GHvap *= -1
     GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / N - np.mean(pV) * np.mean(G, axis=1)) / NMol
 
-    print "The finite difference step size is:",h
+    print("The finite difference step size is:",h)
 
     Sep = printcool("Density: % .4f +- % .4f kg/m^3, Analytic Derivative" % (Rho_avg, Rho_err))
     FF.print_map(vals=GRho)
-    print Sep
+    print(Sep)
 
     H = Energies + pV
     V = np.array(Volumes)
@@ -981,11 +986,11 @@ def main():
         absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GRho, GRho1)]
         FF.print_map(vals=absfrac)
 
-    print "Box energy:", np.mean(Energies)
-    print "Monomer energy:", np.mean(mEnergies)
+    print("Box energy:", np.mean(Energies))
+    print("Monomer energy:", np.mean(mEnergies))
     Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol, Derivatives below" % (Hvap_avg, Hvap_err))
     FF.print_map(vals=GHvap)
-    print Sep
+    print(Sep)
 
     # Define some things to make the analytic derivatives easier.
     Gbar = np.mean(G,axis=1)
@@ -1015,9 +1020,9 @@ def main():
     ## Thermal expansion coefficient analytic derivative
     GAlpha1 = -1 * Beta * deprod(H*V) * avg(V) / avg(V)**2
     GAlpha2 = +1 * Beta * avg(H*V) * deprod(V) / avg(V)**2
-    GAlpha3 = deprod(V)/avg(V) - Gbar
+    GAlpha3 = old_div(deprod(V),avg(V)) - Gbar
     GAlpha4 = Beta * covde(H)
-    GAlpha  = (GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4)/(kT*T)
+    GAlpha  = old_div((GAlpha1 + GAlpha2 + GAlpha3 + GAlpha4),(kT*T))
     Sep = printcool("Thermal expansion coefficient: % .4e +- %.4e K^-1\nAnalytic Derivative:" % (Alpha, Alpha_err))
     FF.print_map(vals=GAlpha)
     if FDCheck:
@@ -1025,7 +1030,7 @@ def main():
         Sep = printcool("Numerical Derivative:")
         FF.print_map(vals=GAlpha_fd)
         Sep = printcool("Difference (Absolute, Fractional):")
-        absfrac = ["% .4e  % .4e" % (i-j, (i-j)/j) for i,j in zip(GAlpha, GAlpha_fd)]
+        absfrac = ["% .4e  % .4e" % (i-j, old_div((i-j),j)) for i,j in zip(GAlpha, GAlpha_fd)]
         FF.print_map(vals=absfrac)
 
     ## Isothermal compressibility

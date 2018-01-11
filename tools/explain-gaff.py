@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+from builtins import zip
 import numpy as np
 import sys
 import os
@@ -71,8 +73,8 @@ Descriptions = []
 XYZs = []
 
 if len(sys.argv) != 2:
-    print "Usage: %s molecule.mol2" % __file__
-    print "Exiting..."
+    print("Usage: %s molecule.mol2" % __file__)
+    print("Exiting...")
     sys.exit()
 
 for line in os.popen("awk '/ATOM/,/BOND/' %s" % sys.argv[1]):
@@ -107,10 +109,10 @@ mol new {xyzname} type mol2 waitfor all
 mol modstyle 0 0 CPK 1.000000 0.300000 25.000000 25.000000
 """
 
-print >> OutVMD, header.format(xyzname=sys.argv[1])
+print(header.format(xyzname=sys.argv[1]), file=OutVMD)
 
 for xyz, desc in zip(XYZs, Descriptions):
-    print >> OutVMD, "graphics top text {% .3f % .3f % .3f} %s size 0.4" % (xyz[0],xyz[1],xyz[2],desc)
+    print("graphics top text {% .3f % .3f % .3f} %s size 0.4" % (xyz[0],xyz[1],xyz[2],desc), file=OutVMD)
 
 OutVMD.close()
 
@@ -119,4 +121,4 @@ RunVMD = False
 if RunVMD:
     os.system('vmd -e %s' % vmdfnm)
 else:
-    print "Finished analyzing mol2 file.  Now run vmd with the following command: vmd -e %s" % vmdfnm
+    print("Finished analyzing mol2 file.  Now run vmd with the following command: vmd -e %s" % vmdfnm)

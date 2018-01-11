@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from builtins import map
+from builtins import input
+from builtins import range
 from numpy import *
 import os
 from sys import argv,exit
@@ -19,16 +24,16 @@ for o,a in opts:
 Alphabet = list(map(chr, range(65, 91)))
 
 printcool(" Welcome to Lee-Ping's Force Field Generator --- ")
-print " This script attempts to generate an OPLS force field "
-print " from any Gaussian input file.  Here's how it works.  "
-print " 1.  Define your atom types.                          "
-print " 2.  Define corresponding OPLS atom types.            "
-print "     If there is no corresponding OPLS type, then you "
-print "     must define your own."
-print " 3.  Select or input bonding parameters.              "
-print "     If you selected OPLS atom types, then the program"
-print "     will attempt to recommend parameters for you.    "
-print " 4.  Finished: GRO and ITP files will be generated.   "
+print(" This script attempts to generate an OPLS force field ")
+print(" from any Gaussian input file.  Here's how it works.  ")
+print(" 1.  Define your atom types.                          ")
+print(" 2.  Define corresponding OPLS atom types.            ")
+print("     If there is no corresponding OPLS type, then you ")
+print("     must define your own.")
+print(" 3.  Select or input bonding parameters.              ")
+print("     If you selected OPLS atom types, then the program")
+print("     will attempt to recommend parameters for you.    ")
+print(" 4.  Finished: GRO and ITP files will be generated.   ")
 
 """
 gauss2gro-OPLS.py is an automatic force field maker, which builds a
@@ -167,11 +172,11 @@ this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Gets the molecule name
 molname = argv[1][:3].upper()
-molnametemp = raw_input("Enter molecule name (three letters, default %s) >> " % molname)
+molnametemp = input("Enter molecule name (three letters, default %s) >> " % molname)
 if len(molnametemp) == 3:
     molname = molnametemp
 else:
-    print "Going with the default name (%s)" % molname
+    print("Going with the default name (%s)" % molname)
 
 # ENHANCED, SUPER-SPECIFIC FILTERS!!!
 awkx = "awk -F '!' '{print $1}' %s | awk \'(NF==4 && $1*1!=$1 && $2*1==$2 && $3*1==$3 && $4*1==$4){print}\' " % argv[1]
@@ -318,7 +323,7 @@ def BuildAKey(i):
 # This simply prints out the atom number, element, neighbors, and base type of a given atom.
 def PrintInfo(i):
     AllNeighbors,AKey = BuildAKey(i)
-    print "%9i%10s%16s%15s" % (i+1,E[i]," ".join(AllNeighbors),T[i])
+    print("%9i%10s%16s%15s" % (i+1,E[i]," ".join(AllNeighbors),T[i]))
 
 # NOTE: This function is only called by DefineParameters
 # Input: Section name ('bondtypes','angletypes','dihedraltypes'), interaction type ('CA.CB.CT')
@@ -482,7 +487,7 @@ def PrintItemSection(SectionName,SectionDict,SectionList,PrintBaseVals,Sub180):
                 line += "% 14.4e" % altangles[Order(".".join([BAT[T[j]] for j in i]))][1][-2]
                 line += "% 14.4e" % altangles[Order(".".join([BAT[T[j]] for j in i]))][1][-1]
             except:
-                print "Sub180 has failed for angle %s" % (".".join(["%i" % j for j in i]))
+                print("Sub180 has failed for angle %s" % (".".join(["%i" % j for j in i])))
         elif PrintBaseVals:
             line += GetBaseVals(SectionName,i)
             line += "% 14.4e" % SectionDict[Order(".".join([BAT[T[j]] for j in i]))][1][-1]
@@ -502,9 +507,9 @@ def PrintItemSection(SectionName,SectionDict,SectionList,PrintBaseVals,Sub180):
 # When we are all done, give back a dictionary with InteractionTypes:Parameters
 def DefineParameters(InteractionList,TypeList,InteractionName,SectionName,InteractionClass,Positions):
     SectionDict = {}
-    choice = raw_input("%i '%s' interactions of %i types have been found.  Enter 'Yes' to perform automatic parameterization. --> " % (len(InteractionList),InteractionName,len(TypeList)))
+    choice = input("%i '%s' interactions of %i types have been found.  Enter 'Yes' to perform automatic parameterization. --> " % (len(InteractionList),InteractionName,len(TypeList)))
     if InteractionName == 'bonds' or InteractionName == 'angles':
-        ReadBaseVals = raw_input("Enter 'Yes' to get equilibrium values from source coordinate file (Useful if you did a geometry optimization!) -->") + " "
+        ReadBaseVals = input("Enter 'Yes' to get equilibrium values from source coordinate file (Useful if you did a geometry optimization!) -->") + " "
     if len(choice) > 0:
         if 'y' == choice[0] or 'Y' == choice[0]:
             Manual,ManualNow = 0,0
@@ -536,7 +541,7 @@ def DefineParameters(InteractionList,TypeList,InteractionName,SectionName,Intera
         ManualNow, Good = recommend(OPLSChoices,Manual)
         if not Manual:
             if ManualNow:
-                print "Automatic parameterization failed (but don't worry), going to Manual Selection"
+                print("Automatic parameterization failed (but don't worry), going to Manual Selection")
         if not ManualNow:
             Selection = Good[0]
             Parameters = [float(OPLSChoices[Selection].split()[i]) for i in Positions]
@@ -544,11 +549,11 @@ def DefineParameters(InteractionList,TypeList,InteractionName,SectionName,Intera
                 DefaultComment = "OPLS " + RawLines[Selection].split(';')[1].strip()
             if ReadBaseVals:
                 Parameters[0] = mean(BaseVals)
-                print "Automatic parameterization of %s %s using base geometry, std deviation is %.6f" % (Type,InteractionName,std(BaseVals))
+                print("Automatic parameterization of %s %s using base geometry, std deviation is %.6f" % (Type,InteractionName,std(BaseVals)))
                 DefaultComment += ', geom from xyz'
-            print "We got these parameters:",
-            print "".join(["%-6s" % i for i in Type.split(".")]), "%5i" % InteractionClass, "".join(["% 10.5f" % i for i in Parameters])
-            print
+            print("We got these parameters:", end=' ')
+            print("".join(["%-6s" % i for i in Type.split(".")]), "%5i" % InteractionClass, "".join(["% 10.5f" % i for i in Parameters]))
+            print()
         else:
             DefaultParams, DefaultComment = getdefaults(Type,InteractionName,Positions) # getdefaults code returns zeros most of the time.
             try:
@@ -566,44 +571,44 @@ def DefineParameters(InteractionList,TypeList,InteractionName,SectionName,Intera
                 DefaultParams[0] = mean(BaseVals)
                 DefaultComment += ', geom from xyz'
             for line in OPLSChoices:
-                print "%5i" % OPLSChoices.index(line),line,
+                print("%5i" % OPLSChoices.index(line),line, end=' ')
             if len(Good) == 0:
-                print " No recommended choices! "
+                print(" No recommended choices! ")
             else:
-                print " --- RECOMMENDED CHOICES --- "
+                print(" --- RECOMMENDED CHOICES --- ")
                 for item in Good:
-                    print item, OPLSChoices[item],
-            print " --- DEFAULT PARAMETERS  ---"
-            print "".join(["%-6s" % i for i in Type.split(".")]), "%5i" % InteractionClass, "".join(["% 10.5f" % i for i in DefaultParams])
+                    print(item, OPLSChoices[item], end=' ')
+            print(" --- DEFAULT PARAMETERS  ---")
+            print("".join(["%-6s" % i for i in Type.split(".")]), "%5i" % InteractionClass, "".join(["% 10.5f" % i for i in DefaultParams]))
             if ReadBaseVals:
-                print "Standard deviation of all equilibrium %s of this type is %.6f" % (InteractionName,std(BaseVals))
-            line = raw_input("\nFor a '%s' interaction involving %s (OPLS types %s), \nselect line number from above, type your own parameters, \nor hit Enter to accept default. (# of \x1b[91m^\x1b[0m symbols indicate score) --> " % (InteractionName,"-".join(Type.split(".")),"-".join([OPLSNicks[i] for i in Type.split(".")])))
+                print("Standard deviation of all equilibrium %s of this type is %.6f" % (InteractionName,std(BaseVals)))
+            line = input("\nFor a '%s' interaction involving %s (OPLS types %s), \nselect line number from above, type your own parameters, \nor hit Enter to accept default. (# of \x1b[91m^\x1b[0m symbols indicate score) --> " % (InteractionName,"-".join(Type.split(".")),"-".join([OPLSNicks[i] for i in Type.split(".")])))
             try:
                 Selection = int(line.strip())
                 Parameters = [float(OPLSChoices[Selection].split()[i]) for i in Positions]
-                print "Going with the following parameter selection: "
-                print Selection, OPLSChoices[Selection]
+                print("Going with the following parameter selection: ")
+                print(Selection, OPLSChoices[Selection])
                 if len(RawLines[Selection].split(';')) > 1:
                     Comment = "OPLS " + RawLines[Selection].split(';')[1].strip()
             except:
                 try:
                     if len(line.split()) == len(Positions):
-                        print "Going with user-specified parameters."
+                        print("Going with user-specified parameters.")
                         Parameters = [float(i) for i in line.split()]
                         Comment = 'User Specified Parameter'
                     else:
-                        print "No selection or user-specified parameters given, going with the default parameters."
+                        print("No selection or user-specified parameters given, going with the default parameters.")
                         Parameters = DefaultParams
                         Comment = DefaultComment
                 except:
-                    print "No selection or user-specified parameters given, going with the default parameters."
+                    print("No selection or user-specified parameters given, going with the default parameters.")
                     Parameters = DefaultParams
                     Comment = DefaultComment
-            print
+            print()
         SectionDict[Type] = [InteractionClass,Parameters,Comment]
-    print "--- Finished Selecting %s Parameters ---" % InteractionName
+    print("--- Finished Selecting %s Parameters ---" % InteractionName)
     for line in PrintTypeSection(SectionName,SectionDict):
-        print line
+        print(line)
     return SectionDict
 
 ### END FUNCTION DEFINITIONS ###
@@ -620,12 +625,12 @@ for i in range(na):
 ### DEFINING ATOM TYPES ###
 
 if len(preatom) == len(sbonds):
-    print "Using pre-defined atom types in Gaussian .com file (syntax Element X Y Z ! AtomType)"
+    print("Using pre-defined atom types in Gaussian .com file (syntax Element X Y Z ! AtomType)")
     AtomTypeSwitch = 1
 else:
-    AtomTypeSwitch = raw_input("Enter '1' for neighbor-based atom type generation or '0' for simple element-based atom types. -->")[0] == '1'
+    AtomTypeSwitch = input("Enter '1' for neighbor-based atom type generation or '0' for simple element-based atom types. -->")[0] == '1'
 
-print "\n--- Number --- Element --- Neighbors --- Assigned Type ---\n"
+print("\n--- Number --- Element --- Neighbors --- Assigned Type ---\n")
 for i in range(len(sbonds)): # [ELEMENT NEIGHBOR1 NEIGHBOR2...]
     AllNeighbors,AKey = BuildAKey(i)
     if len(preatom) == len(sbonds):
@@ -644,49 +649,49 @@ for i in range(len(sbonds)): # [ELEMENT NEIGHBOR1 NEIGHBOR2...]
     PrintInfo(i)
     TEDict[AtomType] = E[i]
 
-choice = raw_input("Modify the list? (Enter for no) --> ") + " "
-print
+choice = input("Modify the list? (Enter for no) --> ") + " "
+print()
 while 'y' == choice[0] or 'Y' == choice[0]:
-    print "\n--- Number --- Element --- Neighbors --- Assigned Type ---\n"
+    print("\n--- Number --- Element --- Neighbors --- Assigned Type ---\n")
     for i in range(len(T)):
         PrintInfo(i)
-    line = raw_input("Enter the index of the atom you wish to change, or enter Q to quit. -->")
-    print
+    line = input("Enter the index of the atom you wish to change, or enter Q to quit. -->")
+    print()
     if line == "Q" or line == 'q':
         break
     Index = int(line.strip())
-    line = raw_input("Enter the new type of atom %i. --> " % Index)
-    print
+    line = input("Enter the new type of atom %i. --> " % Index)
+    print()
     Type = line.strip()
     try:
         T[Index-1] = Type
         TEDict[Type] = E[Index-1]
     except:
-        choice = raw_input("There was an error.  Do you want to continue? --> ")
-        print
+        choice = input("There was an error.  Do you want to continue? --> ")
+        print()
 
-raw_input("\nAtom Types Saved. Press Enter")
+input("\nAtom Types Saved. Press Enter")
 
 ### SEARCHING FOR RINGS ###
 
 ring.ratoms = []
 ring.rsort = []
 
-print "\nFinding Rings...",
+print("\nFinding Rings...", end=' ')
 for i in range(na):
     ring(6,0,i,[])
     ring(5,0,i,[])
 for i in ring.ratoms:
-    print "Ring found at",i
-print "...Done"
+    print("Ring found at",i)
+print("...Done")
 
 ### SELECTING NONBONDED PARAMETERS ###
 
 # This section should probably be its own function, but it's only called once.
 # This loop goes through the base atom types and selects the bonded types and OPLS nicknames.
 # If the types are not chosen automatically, then the user gets to pick from a list.
-print "%i atoms of %i distinct types have been found.  Press Enter." % (len(T),len(set(T)))
-raw_input()
+print("%i atoms of %i distinct types have been found.  Press Enter." % (len(T),len(set(T))))
+input()
 for i in sorted(list(set(T))):
     Element = TEDict[i]
     OPLSChoices = list(os.popen("awk '$2 ~ /%s/' %s | awk '(($4 - %.3f) < 0.1 && ($4 - %.3f) > -0.1)'" % (Element,oplsnb,PeriodicTable[Element],PeriodicTable[Element])).readlines())
@@ -697,12 +702,12 @@ for i in sorted(list(set(T))):
         # The contents of this if statement are invoked only if a valid OPLS type is indicated in the Gaussian .com file
         # using either ! ATYPE custom_type opls_xxx or Element x y z ! opls_xxx
         if predict[i] in ChoicesByName:
-            print "ATYPE definition found for %s!" % i
+            print("ATYPE definition found for %s!" % i)
             Selection = predict[i]
             SelectedLine = ChoicesByName[Selection]
             sline = SelectedLine.split()
-            print "%s -> %10s%5s%5i%10.5f%10.3f%15.5e%15.5e  " % (i, sline[0],sline[1],int(sline[2]),float(sline[3]),float(sline[4]),float(sline[6]),float(sline[7])), OPLSExplanations[sline[0]]
-            print
+            print("%s -> %10s%5s%5i%10.5f%10.3f%15.5e%15.5e  " % (i, sline[0],sline[1],int(sline[2]),float(sline[3]),float(sline[4]),float(sline[6]),float(sline[7])), OPLSExplanations[sline[0]])
+            print()
             ANum,Q,SIG,EPS = int(SelectedLine.split()[2]),float(SelectedLine.split()[4]),float(SelectedLine.split()[6]),float(SelectedLine.split()[7])
             COM = "OPLS " + OPLSExplanations[sline[0]]
             # "Orthodox" OPLS; base types are opls_xxx.  In this case, go to new bonded atom types.
@@ -720,9 +725,9 @@ for i in sorted(list(set(T))):
     except: pass
     for line in OPLSChoices:
         sline = line.split()
-        print "-> %5i <- %10s%5s%5i%10.5f%10.3f%15.5e%15.5e  " % (OPLSChoices.index(line),sline[0],sline[1],int(sline[2]),float(sline[3]),float(sline[4]),float(sline[6]),float(sline[7])), OPLSExplanations[line.split()[0]]
-    line = raw_input("For Atomtype %s, please select the corresponding OPLS atomtype from above by NUMBER (sequential) or NAME (opls_xxx), or enter three parameters of your own: Q SIG EPS --> " % i)
-    print
+        print("-> %5i <- %10s%5s%5i%10.5f%10.3f%15.5e%15.5e  " % (OPLSChoices.index(line),sline[0],sline[1],int(sline[2]),float(sline[3]),float(sline[4]),float(sline[6]),float(sline[7])), OPLSExplanations[line.split()[0]])
+    line = input("For Atomtype %s, please select the corresponding OPLS atomtype from above by NUMBER (sequential) or NAME (opls_xxx), or enter three parameters of your own: Q SIG EPS --> " % i)
+    print()
     if len(line.split()) == 3:
         try:
             # If the user enters custom parameters, then there is no corresponding OPLS atomtype.
@@ -733,7 +738,7 @@ for i in sorted(list(set(T))):
             OPLSNicks[BAT[i]] = i
             TEDict[BAT[i]] = Element
         except:
-            print "An error has occurred in getting nonbonded parameters."
+            print("An error has occurred in getting nonbonded parameters.")
     else:
         try:
             try:
@@ -743,8 +748,8 @@ for i in sorted(list(set(T))):
                 Selection = line.strip()
                 SelectedLine = ChoicesByName[Selection]
         except:
-            print "An error has occurred in getting nonbonded parameters."
-        print Selection,SelectedLine
+            print("An error has occurred in getting nonbonded parameters.")
+        print(Selection,SelectedLine)
         ANum,Q,SIG,EPS = int(SelectedLine.split()[2]),float(SelectedLine.split()[4]),float(SelectedLine.split()[6]),float(SelectedLine.split()[7])
         COM = "OPLS " + OPLSExplanations[sline[0]]
         BAT[i] = i
@@ -755,11 +760,11 @@ for i in sorted(list(set(T))):
 
 # Try to zero out the atomic charge.
 
-print "The following code aims to get an integer-charge molecule using precision 4 floating points."
+print("The following code aims to get an integer-charge molecule using precision 4 floating points.")
 TQ = sum([QDict[T[i]] for i in range(na)])
-print "All atom types have been selected; molecule has a net charge of %.4f" % TQ
+print("All atom types have been selected; molecule has a net charge of %.4f" % TQ)
 Corr1 = (float("%.4f" % (-1*TQ/na)))
-choice = raw_input("Create overall integer charge (enter integer), enter your own (enter float), or skip this step (hit Enter)? --> ") + " "
+choice = input("Create overall integer charge (enter integer), enter your own (enter float), or skip this step (hit Enter)? --> ") + " "
 #if 'y' == choice[0] or 'Y' == choice[0]:
 if isint(choice.strip()):
     WantQ = int(choice)
@@ -767,40 +772,40 @@ if isint(choice.strip()):
     for i in QDict:
         QDict[i] += Corr1
     TQ = sum([QDict[T[i]] for i in range(na)])
-    print "Adding a charge of %.4f to each atom" % Corr1
-    print "Now all atom types have been selected; molecule has a net charge of %.4f" % TQ
+    print("Adding a charge of %.4f to each atom" % Corr1)
+    print("Now all atom types have been selected; molecule has a net charge of %.4f" % TQ)
 else:
     try:
         Corr1 = float(choice)
         for i in QDict:
             QDict[i] += Corr1
         TQ = sum([QDict[T[i]] for i in range(na)])
-        print "Now all atom types have been selected; molecule has a net charge of %.4f" % TQ
-    except: print "You didn't enter a number, exiting this section"
+        print("Now all atom types have been selected; molecule has a net charge of %.4f" % TQ)
+    except: print("You didn't enter a number, exiting this section")
                 
 for i in QDict:
     AtomTypeCount[i] = sum(i == array(T))
 
 PrintSwitch = 0
 while abs(TQ - int(TQ)) > 1e-5:
-    print
-    print "Atom Counts:", AtomTypeCount
-    print "Total charge: % .4f" %  TQ
-    choice = raw_input("Manually add charge to an atom type using: Atype dQ (Q or Enter quits) ? --> ") + " "
+    print()
+    print("Atom Counts:", AtomTypeCount)
+    print("Total charge: % .4f" %  TQ)
+    choice = input("Manually add charge to an atom type using: Atype dQ (Q or Enter quits) ? --> ") + " "
     if 'q' == choice[0] or 'Q' == choice[0] or choice == " ": break
     else:
         try:
             QDict[choice.split()[0]] += float(choice.split()[1])
-        except: print "The input cannot be parsed"
+        except: print("The input cannot be parsed")
     TQ = sum([QDict[T[i]] for i in range(na)])
 
-print
-print "Charges are GOOD, molecule has a net charge of %.4f" % TQ
-print
+print()
+print("Charges are GOOD, molecule has a net charge of %.4f" % TQ)
+print()
 
-print "--- FINISHED SELECTING NONBONDED PARAMETERS ---"
+print("--- FINISHED SELECTING NONBONDED PARAMETERS ---")
 for i in M:
-    print i, ": ANum = %5i M = %.4f Q = % .3f SIG = %.4f EPS = %.4f" % (M[i][0],M[i][1],QDict[i],M[i][2],M[i][3])
+    print(i, ": ANum = %5i M = %.4f Q = % .3f SIG = %.4f EPS = %.4f" % (M[i][0],M[i][1],QDict[i],M[i][2],M[i][3]))
 
 ### DETECTION AND PARAMETERIZATION OF BONDS ###
 
@@ -853,99 +858,99 @@ DihedralTypes = DefineParameters(DList,DTypeList,'dihedral','dihedraltypes',3,[5
 def printitp():
     itpfile = open(argv[1].replace('.com','.itp'),'w')
     # Prints some header stuff.
-    print >> itpfile, '[ defaults ]'
-    print >> itpfile, '%-5i%-5i%-10s%5.1f%5.1f' % (1,2,'yes',0.5,0.5) # Defaults
+    print('[ defaults ]', file=itpfile)
+    print('%-5i%-5i%-10s%5.1f%5.1f' % (1,2,'yes',0.5,0.5), file=itpfile) # Defaults
     # Prints atom types and VdW parameters.
-    print >> itpfile
-    print >> itpfile, '[ atomtypes ]'
+    print(file=itpfile)
+    print('[ atomtypes ]', file=itpfile)
     for i in sorted([j for j in M]):
         if i == BAT[i]:
-            print >> itpfile, '%-10s%5i%10.4f%10.4f%5s%14.4e%14.4e ; %s' % (i,M[i][0],M[i][1],0.0,'A',M[i][2],M[i][3],M[i][4])
+            print('%-10s%5i%10.4f%10.4f%5s%14.4e%14.4e ; %s' % (i,M[i][0],M[i][1],0.0,'A',M[i][2],M[i][3],M[i][4]), file=itpfile)
         else:
             Orthodox = 1
-            print >> itpfile, '%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; %s' % (i,BAT[i],M[i][0],M[i][1],0.0,'A',M[i][2],M[i][3],M[i][4])
-    choice = raw_input("Do you want to add atomtypes for a water model?? 0 for SPC(/E), 1 for TIP4P, anything else for No: -->")
+            print('%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; %s' % (i,BAT[i],M[i][0],M[i][1],0.0,'A',M[i][2],M[i][3],M[i][4]), file=itpfile)
+    choice = input("Do you want to add atomtypes for a water model?? 0 for SPC(/E), 1 for TIP4P, anything else for No: -->")
     try:
         choice = int(choice)
         if choice == 0:
-            print >> itpfile, '%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; SPC/E Oxygen' % ("opls_116","OW",8,15.99940,-0.820,"A",3.16557e-01,6.50194e-01)
-            print >> itpfile, '%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; SPC/E Hydrogen' % ("opls_117","HW",1,1.00800,0.410,"A",0.00000e+00,0.00000e+00)
+            print('%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; SPC/E Oxygen' % ("opls_116","OW",8,15.99940,-0.820,"A",3.16557e-01,6.50194e-01), file=itpfile)
+            print('%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; SPC/E Hydrogen' % ("opls_117","HW",1,1.00800,0.410,"A",0.00000e+00,0.00000e+00), file=itpfile)
         elif choice == 1:
-            print >> itpfile, '%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; TIP4P Oxygen' % ("opls_113","OW",8,15.99940,0.000,"A",3.15365e-01,6.48520e-01)
-            print >> itpfile, '%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; TIP4P Hydrogen' % ("opls_114","HW",1,1.00800,0.520,"A",0.00000e+00,0.00000e+00)
-            print >> itpfile, '%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; TIP4P Virtual Site' % ("opls_115","MW",0,0.00000,-1.040,"D",0.00000e+00,0.00000e+00)
+            print('%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; TIP4P Oxygen' % ("opls_113","OW",8,15.99940,0.000,"A",3.15365e-01,6.48520e-01), file=itpfile)
+            print('%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; TIP4P Hydrogen' % ("opls_114","HW",1,1.00800,0.520,"A",0.00000e+00,0.00000e+00), file=itpfile)
+            print('%-10s%5s%5i%10.4f%10.4f%5s%14.4e%14.4e ; TIP4P Virtual Site' % ("opls_115","MW",0,0.00000,-1.040,"D",0.00000e+00,0.00000e+00), file=itpfile)
         else:
             pass
     except: pass
-    print >> itpfile
+    print(file=itpfile)
     # Prints parameter type definitions for bonds, angles, dihedrals.
     for line in PrintTypeSection("bondtypes",BondTypes):
-        print >> itpfile, line
+        print(line, file=itpfile)
     for line in PrintTypeSection("angletypes",AngleTypes):
-        print >> itpfile, line
+        print(line, file=itpfile)
     for line in PrintTypeSection("dihedraltypes",DihedralTypes):
-        print >> itpfile, line
+        print(line, file=itpfile)
     # Prints moleculetype.
-    print >> itpfile
-    print >> itpfile, '[ moleculetype ]'
-    print >> itpfile, '%-10s%5i' % (molname,3) # Number of exclusions
-    print >> itpfile
+    print(file=itpfile)
+    print('[ moleculetype ]', file=itpfile)
+    print('%-10s%5i' % (molname,3), file=itpfile) # Number of exclusions
+    print(file=itpfile)
     # Prints atoms.
-    print >> itpfile, '[ atoms ]'
+    print('[ atoms ]', file=itpfile)
     SumCharges = 0.0
     for i in range(na):
         # atom = BAT[T[i]] + "%i" % (i+1)
         atom = E[i] + "%i" % (i+1)
-        print >> itpfile, '%5i%10s%5i%10s%7s%5i%10.4f%10.4f' % (i+1,T[i],1,molname,atom,i+1,QDict[T[i]],M[T[i]][1])
+        print('%5i%10s%5i%10s%7s%5i%10.4f%10.4f' % (i+1,T[i],1,molname,atom,i+1,QDict[T[i]],M[T[i]][1]), file=itpfile)
         SumCharges += QDict[T[i]]
     if abs(SumCharges) > 1e-6:
-        print >> itpfile, "; The total charge of the generated FF is %.4f." % SumCharges
-    print >> itpfile
+        print("; The total charge of the generated FF is %.4f." % SumCharges, file=itpfile)
+    print(file=itpfile)
     # Prints atom lists for bonds, angles, dihedrals.
-    choice = raw_input("Print structural bond lengths into force field file? -->") + " "
+    choice = input("Print structural bond lengths into force field file? -->") + " "
     if 'y' == choice[0] or 'Y' == choice[0]:
         PrintBaseVals = 1
     else:
         PrintBaseVals = 0
     for line in PrintItemSection("bonds",BondTypes,BList,PrintBaseVals,0):
-        print >> itpfile, line
-    choice = raw_input("Print structural angles into force field file? (Enter no for sub180.) -->") + " "
+        print(line, file=itpfile)
+    choice = input("Print structural angles into force field file? (Enter no for sub180.) -->") + " "
     Sub180 = 0
     if 'y' == choice[0] or 'Y' == choice[0]:
         PrintBaseVals = 1
     else:
         PrintBaseVals = 0
-        choice = raw_input("Try to substitute alternate parameters for linear angles (threshold is 150 degrees)? -->") + " "
+        choice = input("Try to substitute alternate parameters for linear angles (threshold is 150 degrees)? -->") + " "
         if 'y' == choice[0] or 'Y' == choice[0]:
             Sub180 = 1
     for line in PrintItemSection("angles",AngleTypes,AList,PrintBaseVals,Sub180):
-        print >> itpfile, line
+        print(line, file=itpfile)
     PrintBaseVals = 0
     for line in PrintItemSection("dihedrals",DihedralTypes,DList,0,0):
-        print >> itpfile, line
-    choice = raw_input("Print 1-4 pairs into force field file? (Seems the only way to make 1-4 interactions work.) -->") + " "
+        print(line, file=itpfile)
+    choice = input("Print 1-4 pairs into force field file? (Seems the only way to make 1-4 interactions work.) -->") + " "
     if 'y' == choice[0] or 'Y' == choice[0]:
         for line in PrintPairs(BList,DList):
-            print >> itpfile,line
-    print "Parameter file written to %s" % (argv[1].replace('.com','.itp'))
+            print(line, file=itpfile)
+    print("Parameter file written to %s" % (argv[1].replace('.com','.itp')))
     itpfile.close()
 
 def printgro():
     grofile = open(argv[1].replace('.com','.gro'),'w')
-    print >> grofile, 'Generated by gauss2gro: %s' % molname
-    print >> grofile, na
+    print('Generated by gauss2gro: %s' % molname, file=grofile)
+    print(na, file=grofile)
     res = "1"+molname
     for i in range(na):
         #atom = BAT[T[i]] + "%i" % (i+1)
         atom = E[i] + "%i" % (i+1)
-        print >> grofile, "%8s%7s%5i%12.7f%12.7f%12.7f" % (res,atom,i+1,R[i][0],R[i][1],R[i][2])
-    print >> grofile, "   3.00000   3.00000   3.00000"
-    print "Coordinate file written to %s" % (argv[1].replace('.com','.gro'))
+        print("%8s%7s%5i%12.7f%12.7f%12.7f" % (res,atom,i+1,R[i][0],R[i][1],R[i][2]), file=grofile)
+    print("   3.00000   3.00000   3.00000", file=grofile)
+    print("Coordinate file written to %s" % (argv[1].replace('.com','.gro')))
     grofile.close()
     
 def main():
     printitp()
     printgro()
-    print "Program Finished Successfully.  Have fun!"
+    print("Program Finished Successfully.  Have fun!")
 
 main()

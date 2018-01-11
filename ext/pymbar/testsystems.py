@@ -4,6 +4,9 @@
 Test systems for pymbar.
 
 """
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
 
 #=============================================================================================
 # COPYRIGHT NOTICE
@@ -34,6 +37,8 @@ Test systems for pymbar.
 # VERSION CONTROL INFORMATION
 #=============================================================================================
 
+from builtins import range
+from past.utils import old_div
 __version__ = "$Revision: $ $Date: $"
 # $Date: 2009-11-03 21:43:35 -0600 (Tue, 03 Nov 2009) $
 # $Revision: 87 $
@@ -303,7 +308,7 @@ if __name__ == "__main__":
 
   # Test computeMultipleExpectations.
   [x_kn, u_kln, N_k] = HarmonicOscillatorsSample(N_k=[100, 100, 100, 100, 100], O_k = [0, 1, 2, 3, 4], K_k = [1,1,1,1,1] )
-  import pymbar
+  from . import pymbar
   K = len(N_k)
   mbar = pymbar.MBAR(u_kln, N_k)
   A_ikn = numpy.zeros([2, K, N_k.max()], numpy.float64)
@@ -311,7 +316,7 @@ if __name__ == "__main__":
   A_ikn[1,:,:] = x_kn[:,:]**2
   for i in range(K):
     [A_i, d2A_ij] = mbar.computeMultipleExpectations(A_ikn, u_kln[:,i,:])
-    print (i, A_i)
+    print((i, A_i))
 
 
 

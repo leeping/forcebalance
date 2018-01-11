@@ -1,4 +1,10 @@
-import os, sys, glob, commands
+from __future__ import division
+from __future__ import print_function
+from future import standard_library
+standard_library.install_aliases()
+from builtins import range
+from past.utils import old_div
+import os, sys, glob, subprocess
 import numpy as np
 from scipy import loadtxt 
 from matplotlib import pyplot
@@ -13,7 +19,7 @@ def get_mm_energies(topfile, name, Testing=False):
     return get_energies_from_xvg('energy.xvg')/4.184 # convert from kJ to kcal
  
 def run_cmd(cmd, Testing=False):
-    print '>>>', cmd
+    print('>>>', cmd)
     if not Testing:
         os.system(cmd)
 
@@ -47,7 +53,7 @@ def gridplot2(X, Y, Z):
 
 # get the chi, omega angles and QM energies for each all.gro frame
 chis, omegas, qm_energies = [], [], []
-lines = commands.getoutput('cat all.gro | grep Energy').split('\n')
+lines = subprocess.getoutput('cat all.gro | grep Energy').split('\n')
 for line in lines:
     qm_energies.append(float(line.split()[-1]))
     chis.append( int( [s for s in line.split() if s.count('min.')][0].split('.')[4] ))
@@ -56,24 +62,24 @@ for line in lines:
 # Process qm_energies 
 qm_energies = np.array(qm_energies)
 qm_energies = qm_energies - qm_energies.min()  # normalize 
-print 'len(qm_energies)', len(qm_energies)
+print('len(qm_energies)', len(qm_energies))
 
 # Process chi and omega
 chis = (np.array(chis)+185)%360-185
 omegas = (np.array(omegas)+185)%360-185
 
-print 'chis', chis
-print 'omegas', omegas
+print('chis', chis)
+print('omegas', omegas)
 
 # calculate MM energies before the optimization
 before_top = '../Setup/LIG_GMX.top'
 before_mm_energies = get_mm_energies(before_top, 'before')
-print 'before_mm_energies', before_mm_energies
+print('before_mm_energies', before_mm_energies)
 
 # Calculate MM energies after the optimization
 after_top = 'after.top'
 after_mm_energies = get_mm_energies(after_top, 'after')
-print 'after_mm_energies', after_mm_energies
+print('after_mm_energies', after_mm_energies)
 
 # arrange all the energies in 2D grids
 #bg = -1.
@@ -82,14 +88,14 @@ mm_before_grid = np.zeros( (24,24), np.float)
 mm_after_grid = np.zeros( (24,24), np.float)
 
 nbins = len(chis) 
-X, Y = range(-180, 180, 15), range(-180, 180, 15)
-print 'X, Y', X, Y, len(X)
-print 'nbins', nbins
+X, Y = list(range(-180, 180, 15)), list(range(-180, 180, 15))
+print('X, Y', X, Y, len(X))
+print('nbins', nbins)
 for k in range(nbins):
-    print 'chis[k]', chis[k], 'omegas[k]', omegas[k]
+    print('chis[k]', chis[k], 'omegas[k]', omegas[k])
     i = X.index( ((chis[k]+185)%360-185))
     j = Y.index( ((omegas[k]+185)%360-185))
-    print 'i,j', i,j
+    print('i,j', i,j)
     qm_grid[i,j] = qm_energies[k]
     mm_before_grid[i,j] = before_mm_energies[k]
     mm_after_grid[i,j] = after_mm_energies[k]

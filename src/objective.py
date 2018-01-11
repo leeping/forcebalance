@@ -1,7 +1,10 @@
 """@package forcebalance.objective
 
 ForceBalance objective function."""
+from __future__ import division
 
+from builtins import range
+from builtins import object
 import sys
 import inspect
 #from implemented import Implemented_Targets
@@ -285,7 +288,7 @@ class Objective(forcebalance.BaseClass):
             Objective[Letters[i]] += Extra[i]
         return Objective
 
-class Penalty:
+class Penalty(object):
     """ Penalty functions for regularizing the force field optimizer.
 
     The purpose for this module is to improve the behavior of our optimizer;

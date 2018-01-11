@@ -45,11 +45,14 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+from __future__ import division
 
 #==================#
 #| Global Imports |#
 #==================#
 
+from builtins import zip
+from builtins import range
 import os
 import sys
 import glob
@@ -320,20 +323,20 @@ def main():
 
     # Print all options.
     printcool_dictionary(TgtOptions, title="Options from ForceBalance")
-    liquid_snapshots = (liquid_nsteps * liquid_timestep / 1000) / liquid_intvl
-    liquid_iframes = 1000 * liquid_intvl / liquid_timestep
-    gas_snapshots = (gas_nsteps * gas_timestep / 1000) / gas_intvl
-    gas_iframes = 1000 * gas_intvl / gas_timestep
+    liquid_snapshots = int((liquid_nsteps * liquid_timestep / 1000) / liquid_intvl)
+    liquid_iframes = int(1000 * liquid_intvl / liquid_timestep)
+    gas_snapshots = int((gas_nsteps * gas_timestep / 1000) / gas_intvl)
+    gas_iframes = int(1000 * gas_intvl / gas_timestep)
     logger.info("For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps\n" \
         % (liquid_snapshots, liquid_iframes, liquid_timestep))
     if liquid_snapshots < 2:
         raise Exception('Please set the number of liquid time steps so that you collect at least two snapshots (minimum %i)' \
-                            % (2000 * (liquid_intvl/liquid_timestep)))
+                            % (2000 * int(liquid_intvl/liquid_timestep)))
     logger.info("For the gas phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps\n" \
         % (gas_snapshots, gas_iframes, gas_timestep))
     if gas_snapshots < 2:
         raise Exception('Please set the number of gas time steps so that you collect at least two snapshots (minimum %i)' \
-                            % (2000 * (gas_intvl/gas_timestep)))
+                            % (2000 * int(gas_intvl/gas_timestep)))
 
     #----
     # Loading coordinates

@@ -3,7 +3,10 @@
 @author Lee-Ping Wang
 @date 08/2012
 """
+from __future__ import division
 
+from builtins import zip
+from builtins import range
 import os
 import shutil
 from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, pvec1d, pmat2d
@@ -55,7 +58,7 @@ class Vibration(Target):
         ## Read in the reference data
         self.read_reference_data()
         ## Build keyword dictionaries to pass to engine.
-        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del engine_args['name']
         ## Create engine object.
         self.engine = self.engine_(target=self, **engine_args)

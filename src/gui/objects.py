@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 import forcebalance
 from uuid import uuid1 as uuid
 import os
@@ -30,7 +32,7 @@ class ForceBalanceObject(object):
 
     def display(self, verbose = False):
         s = ''
-        for key in self.properties.iterkeys():
+        for key in self.properties.keys():
             s+= "%s : %s\n" % (key, str(self.properties[key]))
         return s
 
@@ -68,7 +70,7 @@ class CalculationObject(ForceBalanceObject):
     def writeOptions(self, filename):
         with open('~' + filename,'w') as f:
             f.write("$options\n")
-            for option in self.properties['options'].opts.iterkeys():
+            for option in self.properties['options'].opts.keys():
                 f.write("%s %s\n" % (option, self.properties['options'].opts[option]))
             f.write("$end\n")
             
@@ -130,7 +132,7 @@ class OptionObject(ForceBalanceObject):
     def display(self, verbose = False):
         options = dict()
         default_options = dict()
-        for key in self.opts.iterkeys():
+        for key in self.opts.keys():
             if not self.isDefault(key):
                 options[key]=self.opts[key]
             else: default_options[key]=self.opts[key]
@@ -169,7 +171,7 @@ class TargetObject(ForceBalanceObject):
     def display(self, verbose=0):
         options = dict()
         default_options = dict()
-        for key in self.opts.iterkeys():
+        for key in self.opts.keys():
             if not self.isDefault(key):
                 options[key]=self.opts[key]
             else: default_options[key]=self.opts[key]

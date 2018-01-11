@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from builtins import range
 import numpy as np
 import os, sys
 from forcebalance.nifty import isfloat

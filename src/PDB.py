@@ -45,6 +45,9 @@
     Adapted by Lee-Ping Wang for inclusion in ForceBalance.
 """
 
+from builtins import hex
+from builtins import range
+from builtins import object
 __date__ = "4 August 2008"
 __author__ = "Todd Dolinsky, Yong Huang"
 
@@ -59,7 +62,7 @@ try:
 except:
     import logging as logger
 
-class END:
+class END(object):
     """ END class
 
         The END records are paired with MODEL records to group individual
@@ -82,7 +85,7 @@ def toInt(strin):
 #     if intin >= 100000:
 #         return
 
-class MASTER:
+class MASTER(object):
     """ MASTER class
 
         The MASTER record is a control record for bookkeeping. It lists the
@@ -126,7 +129,7 @@ class MASTER:
         else:  logger.error(record+'\n') ; raise ValueError
 
 
-class CONECT:
+class CONECT(object):
     """ CONECT class
 
         The CONECT records specify connectivity between atoms for which
@@ -181,7 +184,7 @@ class CONECT:
             except ValueError:  self.serial10 = None
         else:  logger.error(record+'\n') ; raise ValueError
 
-class ENDMDL:
+class ENDMDL(object):
     """ ENDMDL class
 
         The ENDMDL records are paired with MODEL records to group individual
@@ -194,7 +197,7 @@ class ENDMDL:
         """
         pass
 
-class TER:
+class TER(object):
     """ TER class
 
         The TER record indicates the end of a list of ATOM/HETATM records for a
@@ -228,7 +231,7 @@ class TER:
                 self.iCode = None
         else:  logger.error(record+'\n') ; raise ValueError
 
-class SIGUIJ:
+class SIGUIJ(object):
     """ SIGUIJ class
 
         The SIGUIJ records present the anisotropic temperature factors.
@@ -278,7 +281,7 @@ class SIGUIJ:
         else: logger.error(record+'\n') ; raise ValueError
 
 
-class ANISOU:
+class ANISOU(object):
     """ ANISOU class
 
         The ANISOU records present the anisotropic temperature factors.
@@ -327,7 +330,7 @@ class ANISOU:
             self.charge = string.strip(line[78:80])
         else: logger.error(record+'\n') ; raise ValueError
 
-class SIGATM:
+class SIGATM(object):
     """ SIGATM class
 
         The SIGATM records present the standard deviation of atomic parameters
@@ -378,7 +381,7 @@ class SIGATM:
             self.charge = string.strip(line[78:80])
         else: logger.error(record+'\n') ; raise ValueError
 
-class HETATM:
+class HETATM(object):
     """ HETATM class
 
         The HETATM records present the atomic coordinate records for atoms
@@ -422,7 +425,7 @@ class HETATM:
                 self.resSeq = toInt(string.strip(line[22:26]))
                 self.iCode = string.strip(line[26])
             except:
-                raise ValueError, 'Residue name must be less than 4 characters!'
+                raise ValueError('Residue name must be less than 4 characters!')
             self.x = float(string.strip(line[30:38]))
             self.y = float(string.strip(line[38:46]))
             self.z = float(string.strip(line[46:54]))
@@ -439,7 +442,7 @@ class HETATM:
                 self.segID = string.strip(line[72:76])
                 self.element = string.strip(line[76:78])
                 self.charge = string.strip(line[78:80])
-            except ValueError, IndexError:
+            except ValueError as IndexError:
                 self.occupancy = 0.00
                 self.tempFactor = 0.00
                 self.segID = ""
@@ -527,7 +530,7 @@ class HETATM:
 #         - readlines instead of read -> blanks are avoided (you get a list)
 #         - (maybe) flag for parsing each RTI
 
-class MOL2BOND:
+class MOL2BOND(object):
     """
     Bonding of MOL2 files
     """
@@ -537,7 +540,7 @@ class MOL2BOND:
         self.type = type   # 1=single, 2=double, ar=aromatic
         self.id   = id     # bond_id
 
-class MOL2MOLECULE:
+class MOL2MOLECULE(object):
     """
     Tripos MOL2 molecule
     For further information look at (web page exists: 25 August 2005):
@@ -668,7 +671,7 @@ class MOL2MOLECULE:
                  self.x,self.y, self.z))
 ### PC
 
-class ATOM:
+class ATOM(object):
     """ ATOM class
 
         The ATOM records present the atomic coordinates for standard residues.
@@ -720,7 +723,7 @@ class ATOM:
                 self.tempFactor = float(string.strip(line[60:66]))
                 self.segID = string.strip(line[72:76])
                 self.charge = string.strip(line[78:80])
-            except ValueError, IndexError:
+            except ValueError as IndexError:
                 self.occupancy = 0.00
                 self.tempFactor = 0.00
                 self.segID = ""
@@ -728,7 +731,7 @@ class ATOM:
             # QYD: separate trial on reading element
             try:
                 self.element = string.strip(line[76:78])
-            except ValueError, IndexError:
+            except ValueError as IndexError:
                 self.element = ""
         else:
             logger.error(record+'\n') ; raise ValueError
@@ -805,7 +808,7 @@ class ATOM:
         str = str + string.ljust(tstr, 2)[:2]
         return str
 
-class MODEL:
+class MODEL(object):
     """ MODEL class
 
         The MODEL record specifies the model serial number when multiple
@@ -826,7 +829,7 @@ class MODEL:
             self.serial = toInt(string.strip(line[10:14]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class TVECT:
+class TVECT(object):
     """ TVECT class
 
         The TVECT records present the translation vector for infinite
@@ -854,7 +857,7 @@ class TVECT:
             self.text = string.strip(line[40:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class MTRIX3:
+class MTRIX3(object):
     """ MTRIX3 class
 
         The MTRIX3 (n = 1, 2, or 3) records present transformations expressing
@@ -887,7 +890,7 @@ class MTRIX3:
             self.iGiven = toInt(string.strip(line[59]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class MTRIX2:
+class MTRIX2(object):
     """ MTRIX2 class
 
         The MTRIXn (n = 1, 2, or 3) records present transformations expressing
@@ -920,7 +923,7 @@ class MTRIX2:
             self.iGiven = toInt(string.strip(line[59]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class MTRIX1:
+class MTRIX1(object):
     """ MTRIX1 class
 
         The MTRIXn (n = 1, 2, or 3) records present transformations expressing
@@ -955,7 +958,7 @@ class MTRIX1:
             except IndexError:  self.iGiven = None
         else:  logger.error(record+'\n') ; raise ValueError
 
-class SCALE3:
+class SCALE3(object):
     """ SCALE3 class
 
         The SCALEn (n = 1, 2, or 3) records present the transformation from the
@@ -983,7 +986,7 @@ class SCALE3:
             self.un = float(string.strip(line[45:55]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class SCALE2:
+class SCALE2(object):
     """ SCALE2 class
 
         The SCALEn (n = 1, 2, or 3) records present the transformation from the
@@ -1011,7 +1014,7 @@ class SCALE2:
             self.un = float(string.strip(line[45:55]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class SCALE1:
+class SCALE1(object):
     """ SCALE1 class
 
         The SCALEn (n = 1, 2, or 3) records present the transformation from the
@@ -1039,7 +1042,7 @@ class SCALE1:
             self.un = float(string.strip(line[45:55]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class ORIGX2:
+class ORIGX2(object):
     """ ORIGX2 class
 
         The ORIGXn (n = 1, 2, or 3) records present the transformation from the
@@ -1066,7 +1069,7 @@ class ORIGX2:
             self.tn = float(string.strip(line[45:55]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class ORIGX3:
+class ORIGX3(object):
     """ ORIGX3 class
 
         The ORIGXn (n = 1, 2, or 3) records present the transformation from the
@@ -1093,7 +1096,7 @@ class ORIGX3:
             self.tn = float(string.strip(line[45:55]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class ORIGX1:
+class ORIGX1(object):
     """ ORIGX1 class
 
         The ORIGXn (n = 1, 2, or 3) records present the transformation from the
@@ -1120,7 +1123,7 @@ class ORIGX1:
             self.tn = float(string.strip(line[45:55]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class CRYST1:
+class CRYST1(object):
     """ CRYST1 class
 
         The CRYST1 record presents the unit cell parameters, space group, and Z
@@ -1156,7 +1159,7 @@ class CRYST1:
         else:  logger.error(record+'\n') ; raise ValueError
 
 
-class SITE:
+class SITE(object):
     """ SITE class
 
         The SITE records supply the identification of groups comprising
@@ -1229,7 +1232,7 @@ class SITE:
             except IndexError:  self.iCode4 = None
         else:  logger.error(record+'\n') ; raise ValueError
 
-class CISPEP:
+class CISPEP(object):
     """ CISPEP field
 
         CISPEP records specify the prolines and other peptides found to be in
@@ -1270,7 +1273,7 @@ class CISPEP:
             self.measure = float(string.strip(line[53:59]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class SLTBRG:
+class SLTBRG(object):
     """ SLTBRG field
 
         The SLTBRG records specify salt bridges in the entry.
@@ -1316,7 +1319,7 @@ class SLTBRG:
             self.sym2 = string.strip(line[66:72])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class HYDBND:
+class HYDBND(object):
     """ HYDBND field
 
         The HYDBND records specify hydrogen bonds in the entry.
@@ -1373,7 +1376,7 @@ class HYDBND:
             self.sym2 = string.strip(line[66:72])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class LINK:
+class LINK(object):
     """ LINK field
 
         The LINK records specify connectivity between residues that is not
@@ -1422,7 +1425,7 @@ class LINK:
         else:  logger.error(record+'\n') ; raise ValueError
 
 
-class SSBOND:
+class SSBOND(object):
     """ SSBOND field
 
         The SSBOND record identifies each disulfide bond in protein and
@@ -1459,7 +1462,7 @@ class SSBOND:
             self.sym2 = string.strip(line[66:72])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class TURN:
+class TURN(object):
     """ TURN field
 
         The TURN records identify turns and other short loop turns which
@@ -1508,7 +1511,7 @@ class TURN:
             self.comment = string.strip(line[40:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class SHEET:
+class SHEET(object):
     """ SHEET field
 
         SHEET records are used to identify the position of sheets in the
@@ -1603,7 +1606,7 @@ class SHEET:
                 self.prevICode = None
         else:  logger.error(record+'\n') ; raise ValueError
 
-class HELIX:
+class HELIX(object):
     """ HELIX field
 
         HELIX records are used to identify the position of helices in the
@@ -1657,7 +1660,7 @@ class HELIX:
             except ValueError:  self.length = None
         else:  logger.error(record+'\n') ; raise ValueError
 
-class FORMUL:
+class FORMUL(object):
     """ FORMUL field
 
         The FORMUL record presents the chemical formula and charge of a
@@ -1683,7 +1686,7 @@ class FORMUL:
             self.text = string.strip(line[19:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class HETSYN:
+class HETSYN(object):
     """ HETSYN field
 
         This record provides synonyms, if any, for the compound in the
@@ -1706,7 +1709,7 @@ class HETSYN:
             self.hetSynonyms = string.strip(line[15:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class HETNAM:
+class HETNAM(object):
     """ HETNAM field
 
         This record gives the chemical name of the compound with the given
@@ -1728,7 +1731,7 @@ class HETNAM:
             self.text = string.strip(line[15:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class HET:
+class HET(object):
     """ HET field
 
         HET records are used to describe non-standard residues, such as
@@ -1768,7 +1771,7 @@ class HET:
             self.text = string.strip(line[30:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class MODRES:
+class MODRES(object):
     """ MODRES field
 
         The MODRES record provides descriptions of modifications (e.g.,
@@ -1802,7 +1805,7 @@ class MODRES:
             string.comment = string.strip(line[29:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class SEQRES:
+class SEQRES(object):
     """ SEQRES field
 
         SEQRES records contain the amino acid or nucleic acid sequence of
@@ -1859,7 +1862,7 @@ class SEQRES:
             self.resName.append(string.strip(line[67:70]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class SEQADV:
+class SEQADV(object):
     """ SEQADV field
 
         The SEQADV record identifies conflicts between sequence information in
@@ -1905,7 +1908,7 @@ class SEQADV:
             self.conflict = string.strip(line[49:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class DBREF:
+class DBREF(object):
     """ DBREF field
 
         The DBREF record provides cross-reference links between PDB sequences
@@ -1970,7 +1973,7 @@ class DBREF:
             except IndexError:  self.dbinsEnd = None
         else:  logger.error(record+'\n') ; raise ValueError
 
-class REMARK:
+class REMARK(object):
     """ REMARK field
 
         REMARK records present experimental details, annotations, comments, and
@@ -2018,7 +2021,7 @@ class REMARK:
                 self.remarkDict["text"] = string.strip(line[11:70])
 
 
-class JRNL:
+class JRNL(object):
     """ JRNL field
 
         The JRNL record contains the primary literature citation that describes
@@ -2041,7 +2044,7 @@ class JRNL:
             self.text = string.strip(line[12:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class SPRSDE:
+class SPRSDE(object):
     """ SPRSDE field
 
         The SPRSDE records contain a list of the ID codes of entries that were
@@ -2083,7 +2086,7 @@ class SPRSDE:
             self.sIdCodes.append(string.strip(line[66:70]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class REVDAT:
+class REVDAT(object):
     """ REVDAT field
 
         REVDAT records contain a history of the modifications made to an entry
@@ -2125,7 +2128,7 @@ class REVDAT:
             self.records.append(string.strip(line[60:66]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class AUTHOR:
+class AUTHOR(object):
     """ AUTHOR field
 
         The AUTHOR record contains the names of the people responsible for the
@@ -2146,7 +2149,7 @@ class AUTHOR:
             self.authorList = string.strip(line[10:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class EXPDTA:
+class EXPDTA(object):
     """ EXPDTA field
 
         The EXPDTA record identifies the experimental technique used. This may
@@ -2177,7 +2180,7 @@ class EXPDTA:
             self.technique = string.strip(line[10:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class KEYWDS:
+class KEYWDS(object):
     """ KEYWDS field
 
         The KEYWDS record contains a set of terms relevant to the entry. Terms
@@ -2202,7 +2205,7 @@ class KEYWDS:
             self.keywds = string.strip(line[10:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class SOURCE:
+class SOURCE(object):
     """ SOURCE field
 
         The SOURCE record specifies the biological and/or chemical source of
@@ -2227,7 +2230,7 @@ class SOURCE:
         else:  logger.error(record+'\n') ; raise ValueError
 
 
-class COMPND:
+class COMPND(object):
     """ COMPND field
 
         The COMPND record describes the macromolecular contents of an entry.
@@ -2256,7 +2259,7 @@ class COMPND:
             self.compound = string.strip(line[10:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class CAVEAT:
+class CAVEAT(object):
     """ CAVEAT field
 
         CAVEAT warns of severe errors in an entry. Use caution when using an
@@ -2279,7 +2282,7 @@ class CAVEAT:
             self.comment = string.strip(line[19:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class TITLE:
+class TITLE(object):
     """ TITLE field
 
         The TITLE record contains a title for the experiment or analysis that
@@ -2300,7 +2303,7 @@ class TITLE:
             self.title = string.strip(line[10:70])
         else:  logger.error(record+'\n') ; raise ValueError
 
-class OBSLTE:
+class OBSLTE(object):
     """ OBSLTE field
 
         This record acts as a flag in an entry which has been withdrawn from
@@ -2351,7 +2354,7 @@ class OBSLTE:
             self.rIdCodes.append(string.strip(line[67:70]))
         else:  logger.error(record+'\n') ; raise ValueError
 
-class HEADER:
+class HEADER(object):
     """ HEADER field
 
         The HEADER record uniquely identifies a PDB entry through the idCode
@@ -2463,14 +2466,14 @@ def readPDB(file):
                 cmdstr = "%s(line)" % record
                 obj = eval(cmdstr)
                 pdblist.append(obj)
-        except NameError, details:
+        except NameError as details:
             errlist.append(record)
-        except StandardError, details:
+        except Exception as details:
             if record == "ATOM" or record == "HETATM":
                try:
                    obj = readAtom(line)
                    pdblist.append(obj)
-               except StandardError, details:
+               except Exception as details:
                    sys.stderr.write("Error parsing line: %s\n" % details)
                    sys.stderr.write("<%s>\n" % string.strip(line))
             elif record == "SITE" or record == "TURN":

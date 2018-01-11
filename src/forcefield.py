@@ -92,7 +92,11 @@ we need more modules!
 @date 04/2012
 
 """
+from __future__ import division
 
+from builtins import zip
+from builtins import str
+from builtins import range
 import os
 import sys
 import numpy as np
@@ -766,7 +770,7 @@ class FF(forcebalance.BaseClass):
             if cmd is not None:
                 try:
                     # Bobby Tables, anyone?
-                    if any([x in cmd for x in "system", "subprocess", "import"]):
+                    if any([x in cmd for x in ("system", "subprocess", "import")]):
                         warn_press_key("The command %s (written in the force field file) appears to be unsafe!" % cmd)
                     wval = eval(cmd.replace("PARM","PRM"))
                     # Attempt to allow evaluated parameters to be functions of each other.
