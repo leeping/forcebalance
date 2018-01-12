@@ -5,7 +5,7 @@ import sys, os
 import forcebalance
 import forcebalance.forcefield as forcefield
 import unittest
-from .__init__ import ForceBalanceTestCase
+from __init__ import ForceBalanceTestCase
 import numpy as np
 from copy import deepcopy
 

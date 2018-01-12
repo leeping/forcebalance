@@ -4,8 +4,8 @@ import sys, os, re
 import forcebalance
 import abc
 import numpy
-from .__init__ import ForceBalanceTestCase
-from .test_target import TargetTests # general targets tests defined in test_target.py
+from __init__ import ForceBalanceTestCase
+from test_target import TargetTests # general targets tests defined in test_target.py
 
 class TestAbInitio_GMX(ForceBalanceTestCase, TargetTests):
     def setUp(self):

@@ -106,7 +106,7 @@ import forcebalance
 from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io
 from forcebalance.finite_difference import in_fd
 from forcebalance.nifty import *
-from string import count
+# from string import count
 from copy import deepcopy
 try:
     from lxml import etree
@@ -1278,7 +1278,7 @@ class FF(forcebalance.BaseClass):
                     self.qmap.append(i)
                     if 'Multipole/c0' in self.plist[i] or 'Atom/charge' in self.plist[i]:
                         AType = self.plist[i].split('/')[-1].split('.')[0]
-                        nq = count(ListOfAtoms,AType)
+                        nq = ListOfAtoms.count(AType)
                     else:
                         thisq = []
                         for k in self.plist[i].split():
@@ -1289,7 +1289,7 @@ class FF(forcebalance.BaseClass):
                         try:
                             self.qid2.append(np.array([self.atomnames.index(k) for k in thisq]))
                         except: pass
-                        nq = sum(np.array([count(self.plist[i], j) for j in concern]))
+                        nq = sum(np.array([self.plist[i].count(j) for j in concern]))
                     self.qid.append(qnr+np.arange(nq))
                     qnr += nq
             if len(self.qid2) == 0:

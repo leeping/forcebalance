@@ -9,7 +9,7 @@ import sys, os, re
 import forcebalance
 import abc
 import numpy
-from .__init__ import ForceBalanceTestCase
+from __init__ import ForceBalanceTestCase
 
 class TargetTests(object):
     def setUp(self):

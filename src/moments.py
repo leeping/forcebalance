@@ -44,7 +44,7 @@ class Moments(Target):
         self.set_option(tgt_opts, 'polarizability_denom')
         self.set_option(tgt_opts, 'optimize_geometry')
 
-	self.denoms = {}
+        self.denoms = {}
         self.denoms['dipole'] = self.dipole_denom
         self.denoms['quadrupole'] = self.quadrupole_denom
         self.denoms['polarizability'] = self.polarizability_denom

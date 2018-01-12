@@ -4,9 +4,9 @@ import sys, os, re
 import forcebalance
 import abc
 import numpy
-from .__init__ import ForceBalanceTestCase
+from __init__ import ForceBalanceTestCase
 from forcebalance.nifty import *
-from .test_target import TargetTests # general targets tests defined in test_target.py
+from test_target import TargetTests # general targets tests defined in test_target.py
 
 class TestInteraction_TINKER(ForceBalanceTestCase, TargetTests):
     def setUp(self):

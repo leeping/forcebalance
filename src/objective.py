@@ -242,9 +242,10 @@ class Objective(forcebalance.BaseClass):
             color = "\x1b[94m"
             if key in self.ObjDict_Last:
                 Change = True
-                if self.ObjDict[key] <= self.ObjDict_Last[key]:
+                # print(self.ObjDict[key], self.ObjDict_Last[key])
+                if self.ObjDict[key]['x'] <= self.ObjDict_Last[key]['x']:
                     color = "\x1b[92m"
-                elif self.ObjDict[key] > self.ObjDict_Last[key]:
+                elif self.ObjDict[key]['x'] > self.ObjDict_Last[key]['x']:
                     color = "\x1b[91m"
             PrintDict[key] = "% 12.5f % 10.3f %s% 16.5e%s" % (val['x'],val['w'],color,val['x']*val['w'],"\x1b[0m")
             if Change:
