@@ -940,7 +940,7 @@ class GMX(Engine):
         if force:
             self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
             Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[int(i/3)]] \
-                                            for line in open("%s-f.xvg" % self.name).readlines()])
+                                        for line in open("%s-f.xvg" % self.name).readlines()])
         ## Calculate and record dipole
         if dipole:
             self.callgmx("g_dipoles -s %s.tpr -f %s -o %s-d.xvg -xvg no" % (self.name, traj if traj else '%s.gro' % self.name, self.name), stdin="System\n")
@@ -1552,7 +1552,7 @@ class Lipid_GMX(Lipid):
             """ Submit a NPT simulation to the Work Queue. """
             if "n_ic" in self.RefData:
                 # Get PT state information.
-                phase_reorder = zip(*self.PhasePoints)
+                phase_reorder = list(zip(*self.PhasePoints))
                 t_index = [i for i, x in enumerate(phase_reorder[0]) if x == temperature] 
                 p_index = [i for i, x in enumerate(phase_reorder[1]) if x == pressure] 
                 p_u = phase_reorder[-1][list(set(t_index) & set(p_index))[0]]

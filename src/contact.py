@@ -4,7 +4,7 @@ a trajectory
 '''
 from builtins import range
 import numpy as np
-import _contact_wrap
+from . import _contact_wrap
 import warnings
 
 def atom_distances(xyzlist, atom_contacts, box=None):

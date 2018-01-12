@@ -161,6 +161,7 @@ import itertools
 from collections import OrderedDict, namedtuple, Counter
 from ctypes import *
 from warnings import warn
+import sysconfig
 
 #================================#
 #       Set up the logger        #
@@ -241,11 +242,16 @@ if "forcebalance" in __name__:
     #============================#
     # Try to load _dcdlib.so either from a directory in the LD_LIBRARY_PATH
     # or from the same directory as this module.
-    try: _dcdlib = CDLL("_dcdlib.so")
-    except:
-        try: _dcdlib = CDLL(os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"))
-        except:
-            warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
+    have_dcdlib = False
+    for fnm in ["_dcdlib.so",
+                os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"),
+                os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib"+str(sysconfig.get_config_var('EXT_SUFFIX')))]:
+        if os.path.exists(fnm):
+            _dcdlib = CDLL(fnm)
+            have_dcdlib = True
+            break
+    if not have_dcdlib:
+        warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
 
     #============================#
     #| PDB read/write functions |#

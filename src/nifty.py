@@ -27,12 +27,18 @@ import os, sys, re, shutil, errno
 import numpy as np
 import filecmp
 import itertools
+# For Python 3 compatibility
+try:
+    from itertools import zip_longest as zip_longest
+except:
+    from itertools import izip_longest as zip_longest
 import threading
 import pickle
 import tarfile
 import time
 import subprocess
 import math
+import six # For six.string_types
 from shutil import copyfileobj
 from subprocess import PIPE, STDOUT
 from collections import OrderedDict, defaultdict
@@ -143,7 +149,7 @@ def grouper(iterable, n):
     "Collect data into fixed-length chunks or blocks"
     # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
     args = [iter(iterable)] * n
-    lzip = [[j for j in i if j is not None] for i in list(itertools.zip_longest(*args))]
+    lzip = [[j for j in i if j is not None] for i in list(zip_longest(*args))]
     return lzip
 
 def encode(l):
@@ -237,7 +243,7 @@ def printcool(text,sym="#",bold=False,color=2,ansi=None,bottom='-',minwidth=50,c
     @return bar The bottom bar is returned for the user to print later, e.g. to mark off a 'section'
     """
     def newlen(l):
-        return len(re.sub("\x1b\[[0-9;]*m","",line))
+        return len(re.sub("\x1b\[[0-9;]*m","",l))
     text = text.split('\n')
     width = max(minwidth,max([newlen(line) for line in text]))
     bar = ''.join([sym2 for i in range(width + 6)])
@@ -1098,12 +1104,13 @@ def listfiles(fnms=None, ext=None, err=False):
                 logger.error('Specified %s but it does not exist' % i)
                 raise RuntimeError
             answer.append(i)
-    elif isinstance(fnms, str):
+    elif isinstance(fnms, six.string_types):
         if not os.path.exists(fnms):
             logger.error('Specified %s but it does not exist' % fnms)
             raise RuntimeError
         answer = [fnms]
     elif fnms is not None:
+        print(fnms)
         logger.error('First argument to listfiles must be a list, a string, or None')
         raise RuntimeError
     if answer == [] and ext is not None:
@@ -1155,7 +1162,7 @@ def extract_tar(tarfnm, fnms, force=False):
     if not os.path.exists(tarfnm): return
     if not tarfile.is_tarfile(tarfnm): return
     # Check type of fnms argument.
-    if isinstance(fnms, str): fnms = [fnms]
+    if isinstance(fnms, six.string_types): fnms = [fnms]
     # Load the tar file.
     arch = tarfile.open(tarfnm, 'r')
     # Extract only the files we have (to avoid an exception).
@@ -1282,7 +1289,11 @@ class LineChunker(object):
         self.buf = ""
 
     def push(self, data):
-        self.buf += data
+        # Added by LPW during Py3 compatibility; ran into some trouble decoding strings such as
+        # "a" with umlaut on top.  I guess we can ignore these for now.  For some reason,
+        # Py2 never required decoding of data, I can simply add it to the wtring.
+        # self.buf += data # Old Py2 code...
+        self.buf += data.decode(errors='ignore')
         self.nomnom()
 
     def close(self):
@@ -1319,7 +1330,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     """
 
     # Dictionary of options to be passed to the Popen object.
-    cmd_options={'shell':(type(command) is str), 'stdin':PIPE, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr, 'cwd':cwd}
+    cmd_options={'shell':isinstance(command, six.string_types), 'stdin':PIPE, 'stdout':PIPE, 'stderr':PIPE, 'universal_newlines':expand_cr, 'cwd':cwd}
 
     # If the current working directory is provided, the outputs will be written to there as well.
     if cwd is not None:
@@ -1355,7 +1366,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     p = subprocess.Popen(command, **cmd_options)
 
     # Write the stdin stream to the process.
-    p.stdin.write(stdin)
+    p.stdin.write(stdin.encode('ascii'))
     p.stdin.close()
 
     #===============================================================#

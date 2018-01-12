@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import unittest, os, sys, re, shutil, time
 import forcebalance
-from .__init__ import ForceBalanceTestRunner
+from __init__ import ForceBalanceTestRunner
 import getopt
 import argparse
 

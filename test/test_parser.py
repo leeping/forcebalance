@@ -2,7 +2,7 @@ from __future__ import absolute_import
 import sys, os, shutil
 import forcebalance.parser
 import unittest
-from .__init__ import ForceBalanceTestCase
+from __init__ import ForceBalanceTestCase
 
 class TestParser(ForceBalanceTestCase):
     def test_parse_inputs_returns_tuple(self):

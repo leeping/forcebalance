@@ -3,7 +3,7 @@ from builtins import str
 import unittest
 import sys, os, re
 import forcebalance.molecule
-from .__init__ import ForceBalanceTestCase
+from __init__ import ForceBalanceTestCase
 import numpy as np
 
 class TestPDBMolecule(ForceBalanceTestCase):

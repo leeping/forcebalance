@@ -141,8 +141,29 @@ static PyMethodDef _contactWrapMethods[] = {
   {NULL, NULL}     /* Sentinel - marks the end of this structure */
 };
 
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,
+    "_contact_wrap",     /* m_name */
+    "Close contacts",    /* m_doc */
+    -1,                  /* m_size */
+    _contactWrapMethods, /* m_methods */
+    NULL,                /* m_reload */
+    NULL,                /* m_traverse */
+    NULL,                /* m_clear */
+    NULL,                /* m_free */
+};
+#endif
+
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit__contact_wrap(void) {
+    PyObject *m = PyModule_Create(&moduledef);
+    import_array();
+    return m;
+}
+#else
 DL_EXPORT(void) init_contact_wrap(void) {
   Py_InitModule3("_contact_wrap", _contactWrapMethods, "Wrappers for contact map calculation.");
   import_array();
 }
-
+#endif

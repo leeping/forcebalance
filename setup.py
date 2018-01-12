@@ -57,13 +57,6 @@ DCD = Extension('forcebalance/_dcdlib',
                 include_dirs = ["ext/molfile_plugin/include/","ext/molfile_plugin"] 
                 )
 
-# Multistate Bennett acceptance ratios
-CMBAR = Extension('forcebalance/pymbar/_pymbar',
-                  sources = ["ext/pymbar/_pymbar.c"],
-                  extra_compile_args=["-std=c99","-O2","-shared","-msse2","-msse3"],
-                  include_dirs = [numpy.get_include(),numpy.get_include()+"/numpy/"]
-                  )
-
 # Hungarian algorithm for permutations
 # Used for identifying normal modes
 PERMUTE = Extension('forcebalance/_assign',
@@ -102,15 +95,14 @@ def buildKeywordDictionary(args):
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
     setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/*.bash") + glob.glob("bin/ForceBalance") + glob.glob("bin/TidyOutput")
-    setupKeywords["packages"]          = ["forcebalance","forcebalance/pymbar"]
+    setupKeywords["packages"]          = ["forcebalance"]
     setupKeywords["package_dir"]       = {"forcebalance"         : "src",
-                                          "forcebalance/pymbar"  : "ext/pymbar"
                                           }
     setupKeywords["package_data"]      = {
         "forcebalance"                   : ["AUTHORS","LICENSE.txt","data/*.py","data/*.sh","data/*.bash","data/uffparms.in","data/oplsaa.ff/*"]
                                          }
     setupKeywords["data_files"]        = []
-    setupKeywords["ext_modules"]       = [CMBAR, DCD, PERMUTE, CONTACT]
+    setupKeywords["ext_modules"]       = [DCD, PERMUTE, CONTACT]
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
     setupKeywords["install_requires"]  = ['networkx>=1.9,<2.0', 'decorator>=3.4.0']

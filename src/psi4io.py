@@ -17,7 +17,7 @@ from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_
 import numpy as np
 from forcebalance.leastsq import LeastSquares, CheckBasis
 from forcebalance import BaseReader
-from string import capitalize
+# from string import capitalize
 from forcebalance.finite_difference import in_fd, f1d2p, f12d3p, fdwrap
 from collections import defaultdict, OrderedDict
 import itertools
@@ -75,7 +75,7 @@ class GBS_Reader(BaseReader):
         # Now go through all the cases.
         if match('^[A-Za-z][A-Za-z]? +[0-9]$',line):
             # This is supposed to match the element line. For example 'Li 0'
-            self.element = capitalize(s[0])
+            self.element = s[0].capitalize()
             self.isdata = False
             self.destroy = False
         elif len(s) == 3 and match('[SPDFGH]+',s[0]) and isint(s[1]) and isfloat(s[2]):
@@ -114,7 +114,7 @@ class THCDF_Psi4(LeastSquares):
             elif len(s) >= 1 and s[0] == '}':
                 MolSection = False
             elif MolSection and len(s) >= 4 and match("^[A-Za-z]+$",s[0]) and isfloat(s[1]) and isfloat(s[2]) and isfloat(s[3]):
-                ElemList.append(capitalize(s[0]))
+                ElemList.append(s[0].capitalize())
         self.Elements = set(ElemList)
         xgrad = []
         for p in self.pgrad:
@@ -278,7 +278,7 @@ class Grid_Reader(BaseReader):
         # Now go through all the cases.
         if match('^[A-Za-z][A-Za-z]? +[0-9]$',line):
             # This is supposed to match the element line. For example 'Li 0'
-            self.element = capitalize(s[0])
+            self.element = s[0].capitalize()
             self.radii[self.element] = float(s[1])
             self.isdata = False
             self.point = 0
@@ -325,7 +325,7 @@ class RDVR3_Psi4(Target):
                     elif len(s) >= 1 and s[0] == '}':
                         MolSection = False
                     elif MolSection and len(s) >= 4 and match("^[A-Za-z]+$",s[0]) and isfloat(s[1]) and isfloat(s[2]) and isfloat(s[3]):
-                        ElemList.append(capitalize(s[0]))
+                        ElemList.append(s[0].capitalize())
                 self.elements[d] = set(ElemList)
                 self.molecules[d] = Molecules
                 for p in range(self.FF.np):
@@ -436,7 +436,7 @@ class RDVR3_Psi4(Target):
         return answer
 
     def get(self, mvals, AGrad=False, AHess=False):
-	"""
+        """
         LPW 04-17-2013
         
         This subroutine builds the objective function from Psi4.

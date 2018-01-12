@@ -44,7 +44,7 @@ class LeastSquares(Target):
         return
 
     def get(self, mvals, AGrad=False, AHess=False):
-	"""
+        """
         LPW 05-30-2012
         
         This subroutine builds the objective function (and optionally
@@ -92,7 +92,7 @@ class LeastSquares(Target):
             Ans2 = self.driver()
             M_ = Ans2[:,1]
             D_ = M_ - Q
-	    return Ans2[:,1]
+            return Ans2[:,1]
         if AGrad:
             # Leaving comment here if we want to reintroduce second deriv someday.
             #     dM[p,:], ddM[p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M)
@@ -106,7 +106,7 @@ class LeastSquares(Target):
                     dM[p] = dM_arr.copy()
             for p in xgrad:
                 self.pgrad.remove(p)
-	Objective = np.dot(W, D**2) * Fac
+        Objective = np.dot(W, D**2) * Fac
         if AGrad:
             for p in self.pgrad:
                 G[p] = 2 * np.dot(W, D*dM[p])

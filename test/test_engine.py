@@ -6,7 +6,7 @@ import sys, os, re
 import forcebalance
 import abc
 import numpy as np
-from .__init__ import ForceBalanceTestCase
+from __init__ import ForceBalanceTestCase
 from forcebalance.nifty import *
 from forcebalance.gmxio import GMX
 from forcebalance.tinkerio import TINKER

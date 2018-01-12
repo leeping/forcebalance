@@ -64,8 +64,30 @@ static PyMethodDef _assign_methods[] = {
   {NULL, NULL, 0, NULL}
 };
 
+#if PY_MAJOR_VERSION >= 3
+static struct PyModuleDef moduledef = {
+    PyModuleDef_HEAD_INIT,
+    "_assign",           /* m_name */
+    "Assignment problem",/* m_doc */
+    -1,                  /* m_size */
+    _assign_methods,     /* m_methods */
+    NULL,                /* m_reload */
+    NULL,                /* m_traverse */
+    NULL,                /* m_clear */
+    NULL,                /* m_free */
+};
+#endif
+
+#if PY_MAJOR_VERSION >= 3
+PyMODINIT_FUNC PyInit__assign(void) {
+    PyObject *m = PyModule_Create(&moduledef);
+    import_array();
+    return m;
+}
+#else
 DL_EXPORT(void) init_assign(void)
 {
   Py_InitModule3("_assign", _assign_methods, "Numpy wrapper for linear assignment problem.");
   import_array();
 }
+#endif
