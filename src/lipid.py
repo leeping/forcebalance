@@ -29,6 +29,7 @@ from pymbar import pymbar
 import itertools
 from collections import defaultdict, namedtuple, OrderedDict
 import csv
+import copy
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -252,6 +253,7 @@ class Lipid(Target):
         # Check the reference data table for validity.
         default_denoms = defaultdict(int)
         PhasePoints = None
+        RefData_copy = copy.deepcopy(self.RefData)
         for head in self.RefData:
             if head == 'n_ic':
                 continue
@@ -262,8 +264,8 @@ class Lipid(Target):
             if head in known_vars:
                 if head+"_wt" not in self.RefData:
                     # If the phase-point weights are not specified in the reference data file, initialize them all to one.
-                    self.RefData[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
-                wts = np.array(list(self.RefData[head+"_wt"].values()))
+                    RefData_copy[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
+                wts = np.array(list(RefData_copy[head+"_wt"].values()))
                 dat = np.array(list(self.RefData[head].values()))
                 # S_cd specifies an array of averages (one for each tail node).  Find avg over axis 0.
                 avg = np.average(dat, weights=wts, axis=0)
@@ -284,6 +286,7 @@ class Lipid(Target):
             self.PhasePoints = list(self.RefData[head].keys())
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
+        self.RefData = RefData_copy
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
         logger.debug("global_opts:\n%s\n" % str(global_opts))

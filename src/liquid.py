@@ -310,6 +310,7 @@ class Liquid(Target):
         # Check the reference data table for validity.
         default_denoms = defaultdict(int)
         PhasePoints = None
+        RefData_copy = copy.deepcopy(self.RefData)
         for head in self.RefData:
             if head not in known_vars+[i+"_wt" for i in known_vars]:
                 # Only hard-coded properties may be recognized.
@@ -318,8 +319,8 @@ class Liquid(Target):
             if head in known_vars:
                 if head+"_wt" not in self.RefData:
                     # If the phase-point weights are not specified in the reference data file, initialize them all to one.
-                    self.RefData[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
-                wts = np.array(list(self.RefData[head+"_wt"].values()))
+                    RefData_copy[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
+                wts = np.array(list(RefData_copy[head+"_wt"].values()))
                 dat = np.array(list(self.RefData[head].values()))
                 avg = np.average(dat, weights=wts)
                 if len(wts) > 1:
@@ -333,6 +334,7 @@ class Liquid(Target):
             self.PhasePoints = list(self.RefData[head].keys())
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
+        self.RefData = RefData_copy
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
         logger.debug("global_opts:\n%s\n" % str(global_opts))
