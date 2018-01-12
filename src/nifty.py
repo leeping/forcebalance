@@ -1293,7 +1293,7 @@ class LineChunker(object):
         # "a" with umlaut on top.  I guess we can ignore these for now.  For some reason,
         # Py2 never required decoding of data, I can simply add it to the wtring.
         # self.buf += data # Old Py2 code...
-        self.buf += data.decode(errors='ignore')
+        self.buf += data.decode('utf-8')#errors='ignore')
         self.nomnom()
 
     def close(self):
@@ -1343,11 +1343,11 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     def wtf(out):
         if logfnm is not None:
             with open(logfnm,'a+') as f:
-                f.write(out)
+                f.write(out.encode('utf-8'))
                 f.flush()
         if outfnm is not None:
             with open(outfnm,'w+' if wtf.first else 'a+') as f:
-                f.write(out)
+                f.write(out.encode('utf-8'))
                 f.flush()
         wtf.first = False
     wtf.first = True
@@ -1379,14 +1379,14 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     streams = [p.stdout, p.stderr]
     # These are functions that take chunks of lines (read) as inputs.
     def process_out(read):
-        if print_to_screen: sys.stdout.write(read)
+        if print_to_screen: sys.stdout.write(read.encode('utf-8'))
         if copy_stdout:
             process_out.stdout.append(read)
             wtf(read)
     process_out.stdout = []
 
     def process_err(read):
-        if print_to_screen: sys.stderr.write(read)
+        if print_to_screen: sys.stderr.write(read.encode('utf-8'))
         process_err.stderr.append(read)
         if copy_stderr:
             process_out.stdout.append(read)
@@ -1400,17 +1400,41 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
             to_read, _, _ = select(streams, [], [])
             for fh in to_read:
                 if fh is p.stdout:
-                    read = fh.read(rbytes)
-                    if not read:
-                        streams.remove(p.stdout)
-                        p.stdout.close()
-                    else: out_chunker.push(read)
+                    read_nbytes = 0
+                    read = ''.encode('utf-8')
+                    while True:
+                        read += fh.read(rbytes)
+                        read_nbytes += rbytes
+                        if read_nbytes > 10*rbytes:
+                            raise RuntimeError("Failed to decode stdout from external process.")
+                        if not read:
+                            streams.remove(p.stdout)
+                            p.stdout.close()
+                            break
+                        else:
+                            try:
+                                out_chunker.push(read)
+                                break
+                            except UnicodeDecodeError:
+                                pass
                 elif fh is p.stderr:
-                    read = fh.read(rbytes)
-                    if not read:
-                        streams.remove(p.stderr)
-                        p.stderr.close()
-                    else: err_chunker.push(read)
+                    read_nbytes = 0
+                    read = ''.encode('utf-8')
+                    while True:
+                        read += fh.read(rbytes)
+                        read_nbytes += rbytes
+                        if read_nbytes > 10*rbytes:
+                            raise RuntimeError("Failed to decode stderr from external process.")
+                        if not read:
+                            streams.remove(p.stderr)
+                            p.stderr.close()
+                            break
+                        else:
+                            try:
+                                err_chunker.push(read)
+                                break
+                            except UnicodeDecodeError:
+                                pass
                 else:
                     raise RuntimeError
             if len(streams) == 0: break
