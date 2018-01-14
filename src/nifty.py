@@ -747,8 +747,8 @@ class Pickler_LP(pickle.Pickler):
 
 class Unpickler_LP(pickle.Unpickler):
     """ A subclass of the python Unpickler that implements unpickling of _ElementTree types. """
-    def __init__(self, file):
-        pickle.Unpickler.__init__(self, file)
+    def __init__(self, filename, **kwargs):
+        pickle.Unpickler.__init__(self, filename, **kwargs)
         def load_etree(self):
             try:
                 ## This stuff is copied from the Unpickler class
@@ -799,19 +799,28 @@ def lp_load(fnm):
     def load_uncompress():
         logger.warning("Compressed file loader failed, attempting to read as uncompressed file\n")
         f = open(fnm, 'rb')
-        answer = Unpickler_LP(f).load()
+        try:
+            answer = Unpickler_LP(f).load()
+        except UnicodeDecodeError:
+            answer = Unpickler_LP(f, encoding='latin1').load()
         f.close()
         return answer
 
     def load_bz2():
         f = bz2.BZ2File(fnm, 'rb')
-        answer = Unpickler_LP(f).load()
+        try:
+            answer = Unpickler_LP(f).load()
+        except UnicodeDecodeError:
+            answer = Unpickler_LP(f, encoding='latin1').load()
         f.close()
         return answer
 
     def load_gz():
         f = gzip.GzipFile(fnm, 'rb')
-        answer = Unpickler_LP(f).load()
+        try:
+            answer = Unpickler_LP(f).load()
+        except UnicodeDecodeError:
+            answer = Unpickler_LP(f, encoding='latin1').load()
         f.close()
         return answer
 
@@ -1220,12 +1229,15 @@ def MissingFileInspection(fnm):
             answer += "%s\n" % specific_dct[key]
     return answer
 
-def wopen(dest):
+def wopen(dest, binary=False):
     """ If trying to write to a symbolic link, remove it first. """
     if os.path.islink(dest):
         logger.warn("Trying to write to a symbolic link %s, removing it first\n" % dest)
         os.unlink(dest)
-    return open(dest,'w')
+    if binary:
+        return open(dest,'wb')
+    else:
+        return open(dest,'w')
 
 def LinkFile(src, dest, nosrcok = False):
     if os.path.abspath(src) == os.path.abspath(dest): return

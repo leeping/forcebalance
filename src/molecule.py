@@ -3010,7 +3010,7 @@ class Molecule(object):
     def read_pdb(self, fnm, **kwargs):
         """ Loads a PDB and returns a dictionary containing its data. """
 
-        F1=file(fnm,'r')
+        F1=open(fnm,'r')
         ParsedPDB=readPDB(F1)
 
         Box = None

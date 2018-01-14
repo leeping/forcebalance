@@ -829,7 +829,7 @@ class FF(forcebalance.BaseClass):
 
         for fnm in newffdata:
             if self.ffdata_isxml[fnm]:
-                with wopen(os.path.join(absprintdir,fnm)) as f: newffdata[fnm].write(f)
+                with wopen(os.path.join(absprintdir,fnm), binary=True) as f: newffdata[fnm].write(f)
             elif 'Script.txt' in fnm:
                 # if the xml file contains a script, ForceBalance will generate
                 # a temporary .txt file containing the script and any updates.
@@ -849,7 +849,7 @@ class FF(forcebalance.BaseClass):
                 raise RuntimeError
                 else:
                 '''
-                with wopen(os.path.join(absprintdir,fnmXml)) as f: newffdata[fnmXml].write(f)
+                with wopen(os.path.join(absprintdir,fnmXml), binary=True) as f: newffdata[fnmXml].write(f)
             else:
                 with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
 
