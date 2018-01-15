@@ -119,7 +119,7 @@ from builtins import range
 from builtins import object
 FrameVariableNames = set(['xyzs', 'comms', 'boxes', 'qm_hessians', 'qm_grads', 'qm_energies', 'qm_interaction',
                           'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins',
-                          'qm_zpe', 'qm_entropy', 'qm_enthalpy', 'bond_orders'])
+                          'qm_zpe', 'qm_entropy', 'qm_enthalpy', 'qm_bondorder'])
 #=========================================#
 #| Data attributes in AtomVariableNames  |#
 #| must be a list along the atom axis,   |#
@@ -1000,6 +1000,58 @@ class Molecule(object):
             self.Data[key] = value
         return super(Molecule,self).__setattr__(key, value)
 
+    def __deepcopy__(self, memo):
+        """ Custom deepcopy method because Python 3.6 appears to have changed its behavior """
+        print("LPW: DEEP COPYING")
+        New = Molecule()
+        # Copy over variables that are not contained in self.Data
+        New.positive_resid = self.positive_resid
+        New.built_bonds = self.built_bonds
+        New.top_settings = copy.deepcopy(self.top_settings)
+
+        for key in self.Data:
+            if key in ['xyzs', 'qm_grads', 'qm_hessians', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins', 'molecules', 'qm_bondorder']:
+                # These variables are lists of NumPy arrays, NetworkX graph objects, or others with
+                # explicitly defined copy() methods.
+                New.Data[key] = []
+                for i in range(len(self.Data[key])):
+                    New.Data[key].append(self.Data[key][i].copy())
+            elif key in ['topology']:
+                # These are NetworkX graph objects or other variables with explicitly defined copy() methods.
+                New.Data[key] = self.Data[key].copy()
+            elif key in ['boxes', 'qcrems']:
+                # We'll use the default deepcopy method for these:
+                # boxes is a list of named tuples.
+                # qcrems is a list of OrderedDicts.
+                New.Data[key] = []
+                for i in range(len(self.Data[key])):
+                    New.Data[key].append(copy.deepcopy(self.Data[key]))
+            elif key in ['comms', 'qm_energies', 'qm_interaction', 'qm_zpe', 'qm_entropy', 'qm_enthalpy', 'elem', 'partial_charge',
+                         'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost', 'chain', 'altloc', 'icode',
+                         'terminal']:
+                if not isinstance(self.Data[key], list):
+                    raise RuntimeError('Expected data attribute %s to be a list, but it is %s' % (key, str(type(self.Data[key]))))
+                # Lists of strings or floats.
+                New.Data[key] = self.Data[key][:]
+            elif key in ['fnm', 'ftype', 'charge', 'mult', 'qcerr']:
+                # These are strings, ints, or floats.
+                New.Data[key] = self.Data[key]
+            elif key in ['bonds']:
+                # List of lists of 2 integers.
+                New.Data[key] = []
+                for i in range(len(self.Data[key])):
+                    New.Data[key].append(self.Data[key][i][:])
+            elif key in ['qctemplate']:
+                # List of 2-tuples where the first element is a string
+                # (Q-Chem input section name) and the second element
+                # is a list (Q-Chem input section data).
+                New.Data[key] = []
+                for SectName, SectData in self.Data[key]:
+                    New.Data[key].append((SectName, SectData[:]))
+            else:
+                raise RuntimeError("Failed to copy key %s" % key)
+        return New
+
     def __getitem__(self, key):
         """
         The Molecule class has list-like behavior, so we can get slices of it.
@@ -1591,7 +1643,7 @@ class Molecule(object):
         def FrameStack(k):
             if k in self.Data and k in other.Data:
                 New.Data[k] = [np.vstack((s, o)) for s, o in zip(self.Data[k], other.Data[k])]
-        for i in ['xyzs', 'qm_grads', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins']:
+        for i in ['xyzs', 'qm_grads', 'qm_hessians', 'qm_espxyzs', 'qm_espvals', 'qm_extchgs', 'qm_mulliken_charges', 'qm_mulliken_spins']:
             FrameStack(i)
 
         # Now build the new atom keys.
@@ -3091,10 +3143,9 @@ class Molecule(object):
                 for conect_B in conect_B_list:
                     bonds.append([conect_A, conect_B])
 
-        Answer={"xyzs":XYZList, "chain":ChainID, "altloc":AltLoc, "icode":ICode, "atomname":[str(i) for i in AtomNames],
-                "resid":ResidueID, "resname":ResidueNames, "elem":elem,
-                "comms":['' for i in range(len(XYZList))],
-                "terminal" : PDBTerms}
+        Answer={"xyzs":XYZList, "chain":list(ChainID), "altloc":list(AltLoc), "icode":list(ICode),
+                "atomname":[str(i) for i in AtomNames], "resid":list(ResidueID), "resname":list(ResidueNames),
+                "elem":elem, "comms":['' for i in range(len(XYZList))], "terminal" : PDBTerms}
 
         if len(bonds) > 0:
             self.top_settings["read_bonds"] = True
@@ -3848,7 +3899,7 @@ class Molecule(object):
             # LPW: Put in a dummy space group, we never use it.
             line[55:66]=np.array(list(str("P 21 21 21").rjust(11)))
             line[66:70]=np.array(list(str(4).rjust(4)))
-            out.append(line.tostring())
+            out.append(''.join(line.tolist()))
 
         for I in selection:
             XYZ = self.xyzs[I]
@@ -3923,7 +3974,7 @@ class Molecule(object):
                     line[76:78]=np.array(list("%2s" % self.elem[i]))
 
                 if Serial!=-1:
-                    out.append(line.tostring())
+                    out.append(''.join(line.tolist()))
                 Serial += 1
 
                 if 'terminal' in self.Data and self.terminal[i]:
@@ -3947,7 +3998,7 @@ class Molecule(object):
                         line[17:21]=np.array(list(str(RESNAMES[i]).ljust(4)))
                     line[21]=str(CHAIN[i]).rjust(1)
                     line[22:26]=np.array(list(str(RESNUMS[i]%10000).rjust(4)))
-                    out.append(line.tostring())
+                    out.append(''.join(line.tolist()))
                     Serial += 1
             out.append('ENDMDL')
         if 'bonds' in self.Data and write_conect:

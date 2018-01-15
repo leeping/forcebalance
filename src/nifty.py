@@ -593,7 +593,7 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     yfit = flat(Hat * Y)
     # Return three things: the least-squares coefficients, the hat matrix (turns y into yfit), and yfit
     # We could get these all from MPPI, but I might get confused later on, so might as well do it here :P
-    return Beta, Hat, yfit, MPPI
+    return np.array(Beta).flatten(), np.array(Hat), np.array(yfit).flatten(), np.array(MPPI)
 
 #===========================================#
 #| John's statisticalInefficiency function |#
@@ -1354,11 +1354,11 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     # "write to file" : Function for writing some characters to the log and/or output files.
     def wtf(out):
         if logfnm is not None:
-            with open(logfnm,'a+') as f:
+            with open(logfnm,'ab+') as f:
                 f.write(out.encode('utf-8'))
                 f.flush()
         if outfnm is not None:
-            with open(outfnm,'w+' if wtf.first else 'a+') as f:
+            with open(outfnm,'wb+' if wtf.first else 'ab+') as f:
                 f.write(out.encode('utf-8'))
                 f.flush()
         wtf.first = False
@@ -1391,14 +1391,14 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     streams = [p.stdout, p.stderr]
     # These are functions that take chunks of lines (read) as inputs.
     def process_out(read):
-        if print_to_screen: sys.stdout.write(read.encode('utf-8'))
+        if print_to_screen: sys.stdout.write(read)
         if copy_stdout:
             process_out.stdout.append(read)
             wtf(read)
     process_out.stdout = []
 
     def process_err(read):
-        if print_to_screen: sys.stderr.write(read.encode('utf-8'))
+        if print_to_screen: sys.stderr.write(read)
         process_err.stderr.append(read)
         if copy_stderr:
             process_out.stdout.append(read)
