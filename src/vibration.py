@@ -17,7 +17,7 @@ from re import match, sub
 import subprocess
 from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
-from ._assign import Assign
+# from ._assign import Assign
 from scipy import optimize
 from collections import OrderedDict
 #from _increment import Vibration_Build
@@ -173,8 +173,9 @@ class Vibration(Target):
                 # that are mapped to the row numbers (calculated mode numbers)
                 if self.reassign == 'permute':
                     a = np.array([[int(1e6*(1.0-np.dot(v1.flatten(),v2.flatten())**2)) for v2 in self.ref_eigvecs_nrm] for v1 in eigvecs_nrm_mw])
-                    # row, c2r = optimize.linear_sum_assignment(a)
-                    c2r = Assign(a)
+                    row, c2r = optimize.linear_sum_assignment(a)
+                    # Commented out dependency on assignment code
+                    # c2r = Assign(a)
                     eigvals = eigvals[c2r]
                 elif self.reassign == 'overlap':
                     a = np.array([[(1.0-np.dot(v1.flatten(),v2.flatten())**2) for v2 in self.ref_eigvecs_nrm] for v1 in eigvecs_nrm_mw])

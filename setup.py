@@ -59,29 +59,29 @@ DCD = Extension('forcebalance/_dcdlib',
 
 # Hungarian algorithm for permutations
 # Used for identifying normal modes
-PERMUTE = Extension('forcebalance/_assign',
-                    sources = ['ext/permute/apc.c', 'ext/permute/assign.c'],
-                    include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')]
-                    )
+# PERMUTE = Extension('forcebalance/_assign',
+#                     sources = ['ext/permute/apc.c', 'ext/permute/assign.c'],
+#                     include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')]
+#                     )
 
 # 'contact' library from MSMBuilder for rapidly computing interatomic distances.
 # If we're on Mac OS, it can't find the OpenMP libraries
-import platform
-if platform.system() == 'Darwin':
-    CONTACT = Extension('forcebalance/_contact_wrap',
-                        sources = ["ext/contact/contact.c",
-                                   "ext/contact/contact_wrap.c"],
-                        extra_compile_args=["-std=c99","-O3","-shared",
-                                            "-Wall"],
-                        include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
-else:
-    CONTACT = Extension('forcebalance/_contact_wrap',
-                        sources = ["ext/contact/contact.c",
-                                   "ext/contact/contact_wrap.c"],
-                        extra_compile_args=["-std=c99","-O3","-shared",
-                                            "-fopenmp", "-Wall"],
-                        extra_link_args=['-lgomp'],
-                        include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
+# import platform
+# if platform.system() == 'Darwin':
+#     CONTACT = Extension('forcebalance/_contact_wrap',
+#                         sources = ["ext/contact/contact.c",
+#                                    "ext/contact/contact_wrap.c"],
+#                         extra_compile_args=["-std=c99","-O3","-shared",
+#                                             "-Wall"],
+#                         include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
+# else:
+#     CONTACT = Extension('forcebalance/_contact_wrap',
+#                         sources = ["ext/contact/contact.c",
+#                                    "ext/contact/contact_wrap.c"],
+#                         extra_compile_args=["-std=c99","-O3","-shared",
+#                                             "-fopenmp", "-Wall"],
+#                         extra_link_args=['-lgomp'],
+#                         include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
     
 
 def buildKeywordDictionary(args):
@@ -102,7 +102,7 @@ def buildKeywordDictionary(args):
         "forcebalance"                   : ["AUTHORS","LICENSE.txt","data/*.py","data/*.sh","data/*.bash","data/uffparms.in","data/oplsaa.ff/*"]
                                          }
     setupKeywords["data_files"]        = []
-    setupKeywords["ext_modules"]       = [DCD, PERMUTE, CONTACT]
+    setupKeywords["ext_modules"]       = [DCD]
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
     setupKeywords["install_requires"]  = ['networkx>=1.9,<2.0', 'decorator>=3.4.0']
