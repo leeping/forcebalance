@@ -22,6 +22,7 @@ from builtins import input
 from builtins import str
 from builtins import range
 from builtins import object
+import traceback
 from select import select
 import os, sys, re, shutil, errno
 import numpy as np
@@ -33,7 +34,7 @@ try:
 except:
     from itertools import izip_longest as zip_longest
 import threading
-import pickle
+from pickle import Pickler, Unpickler
 import tarfile
 import time
 import subprocess
@@ -711,66 +712,9 @@ def multiD_statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=Tr
             multiD_sI[:,col] = statisticalInefficiency(A_n[:,col], B_n[:,col], fast, mintime, warn)
     return multiD_sI
 
-#==============================#
-#|      XML Pickle stuff      |#
-#==============================#
-try:
-    from lxml import etree
-except:
-    logger.warning("lxml module import failed (You can't use OpenMM or XML force fields)\n")
-## Pickle uses 'flags' to pickle and unpickle different variable types.
-## Here we use the letter 'x' to signify that the variable type is an XML file.
-XMLFILE='x'
-
-class Pickler_LP(pickle.Pickler):
-    """ A subclass of the python Pickler that implements pickling of _ElementTree types. """
-    def __init__(self, file, protocol=None):
-        pickle.Pickler.__init__(self, file, protocol)
-        ## The element tree is saved as a string.
-        def save_etree(self, obj):
-            try:
-                ## Convert the element tree to string.
-                String = etree.tostring(obj)
-                ## The rest is copied from the Pickler class
-                if self.bin:
-                    logger.error("self.bin is True, not sure what to do with myself\n")
-                    input()
-                else:
-                    self.write(XMLFILE + repr(String) + '\n')
-                self.memoize(String)
-            except:
-                warn_once("Cannot save XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
-        try:
-            self.dispatch[etree._ElementTree] = save_etree
-        except:
-            warn_once("Cannot save XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
-
-class Unpickler_LP(pickle.Unpickler):
-    """ A subclass of the python Unpickler that implements unpickling of _ElementTree types. """
-    def __init__(self, filename, **kwargs):
-        pickle.Unpickler.__init__(self, filename, **kwargs)
-        def load_etree(self):
-            try:
-                ## This stuff is copied from the Unpickler class
-                rep = self.readline()[:-1]
-                for q in "\"'": # double or single quote
-                    if rep.startswith(q):
-                        if not rep.endswith(q):
-                            logger.error("insecure string pickle\n")
-                            raise ValueError
-                        rep = rep[len(q):-len(q)]
-                        break
-                else:
-                    logger.error("insecure string pickle\n")
-                    raise ValueError
-                ## The string is converted to an _ElementTree type before it is finally loaded.
-                self.append(etree.ElementTree(etree.fromstring(rep.decode("string-escape"))))
-            except:
-                warn_once("Cannot load XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
-        try:
-            self.dispatch[XMLFILE] = load_etree
-        except:
-            warn_once("Cannot load XML files; if using OpenMM install libxml2+libxslt+lxml.  Otherwise don't worry.")
+#========================================#
+#|      Loading compressed pickles      |#
+#========================================#
 
 def lp_dump(obj, fnm, protocol=0):
     """ Write an object to a zipped pickle file specified by the path. """
@@ -787,7 +731,7 @@ def lp_dump(obj, fnm, protocol=0):
         f = bz2.BZ2File(fnm, 'wb')
     else:
         f = open(fnm, 'wb')
-    Pickler_LP(f, protocol).dump(obj)
+    Pickler(f, protocol).dump(obj)
     f.close()
 
 def lp_load(fnm):
@@ -800,27 +744,27 @@ def lp_load(fnm):
         logger.warning("Compressed file loader failed, attempting to read as uncompressed file\n")
         f = open(fnm, 'rb')
         try:
-            answer = Unpickler_LP(f).load()
+            answer = Unpickler(f).load()
         except UnicodeDecodeError:
-            answer = Unpickler_LP(f, encoding='latin1').load()
+            answer = Unpickler(f, encoding='latin1').load()
         f.close()
         return answer
 
     def load_bz2():
         f = bz2.BZ2File(fnm, 'rb')
         try:
-            answer = Unpickler_LP(f).load()
+            answer = Unpickler(f).load()
         except UnicodeDecodeError:
-            answer = Unpickler_LP(f, encoding='latin1').load()
+            answer = Unpickler(f, encoding='latin1').load()
         f.close()
         return answer
 
     def load_gz():
         f = gzip.GzipFile(fnm, 'rb')
         try:
-            answer = Unpickler_LP(f).load()
+            answer = Unpickler(f).load()
         except UnicodeDecodeError:
-            answer = Unpickler_LP(f, encoding='latin1').load()
+            answer = Unpickler(f, encoding='latin1').load()
         f.close()
         return answer
 
@@ -1391,14 +1335,14 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     streams = [p.stdout, p.stderr]
     # These are functions that take chunks of lines (read) as inputs.
     def process_out(read):
-        if print_to_screen: sys.stdout.write(read)
+        if print_to_screen: sys.stdout.write(str(read.encode('utf-8')))
         if copy_stdout:
             process_out.stdout.append(read)
             wtf(read)
     process_out.stdout = []
 
     def process_err(read):
-        if print_to_screen: sys.stderr.write(read)
+        if print_to_screen: sys.stderr.write(str(read.encode('utf-8')))
         process_err.stderr.append(read)
         if copy_stderr:
             process_out.stdout.append(read)

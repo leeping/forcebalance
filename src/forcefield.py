@@ -333,6 +333,22 @@ class FF(forcebalance.BaseClass):
         options = {'forcefield' : [fnm], 'ffdir' : ffdir, 'duplicate_pnames' : True}
         return cls(options, verbose=False, printopt=False)
 
+    def __getstate__(self):
+        state = deepcopy(self.__dict__)
+        for ffname in self.ffdata:
+            if self.ffdata_isxml[ffname]:
+                temp = etree.tostring(self.ffdata[ffname])
+                del state['ffdata'][ffname]
+                state['ffdata'][ffname] = temp
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        for ffname in self.ffdata:
+            if self.ffdata_isxml[ffname]:
+                temp = etree.ElementTree(etree.fromstring(self.ffdata[ffname]))
+                self.ffdata[ffname] = temp
+
     def addff(self,ffname,xmlScript=False):
         """ Parse a force field file and add it to the class.
 

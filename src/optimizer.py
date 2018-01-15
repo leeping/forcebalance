@@ -1529,5 +1529,5 @@ class Optimizer(forcebalance.BaseClass):
         """ Write the checkpoint file for the main optimizer. """
         if self.wchk_fnm is not None:
             logger.info("Writing the checkpoint file %s\n" % self.wchk_fnm)
-            with wopen(os.path.join(self.root,self.wchk_fnm)) as f: pickle.dump(self.chk,f)
+            with wopen(os.path.join(self.root,self.wchk_fnm), binary=True) as f: pickle.dump(self.chk, f)
         
