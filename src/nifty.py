@@ -1359,9 +1359,13 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
                     read_nbytes = 0
                     read = ''.encode('utf-8')
                     while True:
-                        read += fh.read(rbytes)
-                        read_nbytes += rbytes
-                        if read_nbytes > 10*rbytes:
+                        if read_nbytes == 0:
+                            read += fh.read(rbytes)
+                            read_nbytes += rbytes
+                        else:
+                            read += fh.read(1)
+                            read_nbytes += 1
+                        if read_nbytes > 10+rbytes:
                             raise RuntimeError("Failed to decode stdout from external process.")
                         if not read:
                             streams.remove(p.stdout)
@@ -1377,9 +1381,13 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
                     read_nbytes = 0
                     read = ''.encode('utf-8')
                     while True:
-                        read += fh.read(rbytes)
-                        read_nbytes += rbytes
-                        if read_nbytes > 10*rbytes:
+                        if read_nbytes == 0:
+                            read += fh.read(rbytes)
+                            read_nbytes += rbytes
+                        else:
+                            read += fh.read(1)
+                            read_nbytes += 1
+                        if read_nbytes > 10+rbytes:
                             raise RuntimeError("Failed to decode stderr from external process.")
                         if not read:
                             streams.remove(p.stderr)
