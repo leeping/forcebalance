@@ -1002,7 +1002,6 @@ class Molecule(object):
 
     def __deepcopy__(self, memo):
         """ Custom deepcopy method because Python 3.6 appears to have changed its behavior """
-        print("LPW: DEEP COPYING")
         New = Molecule()
         # Copy over variables that are not contained in self.Data
         New.positive_resid = self.positive_resid
