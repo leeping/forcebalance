@@ -153,7 +153,7 @@ QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', '
 AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames | FrameVariableNames
 
 # OrderedDict requires Python 2.7 or higher
-import os, sys, re, copy
+import os, sys, re, copy, time
 import numpy as np
 from numpy import sin, cos, arcsin, arccos
 import imp
@@ -384,7 +384,6 @@ def BuildLatticeFromVectors(v1, v2, v3):
 #|  Good for doing simple  |#
 #|     topology tricks     |#
 #===========================#
-have_contact = 0
 try:
     import networkx as nx
     class MyG(nx.Graph):
@@ -419,11 +418,6 @@ try:
             ''' Get a list of the coordinates. '''
             coors = nx.get_node_attributes(self,'x')
             return np.array([coors[i] for i in self.L()])
-    try:
-        from . import contact
-        have_contact = 1
-    except:
-        warn("'contact' cannot be imported (topology tools will be slow.)")
 except:
     warn("NetworkX cannot be imported (topology tools won't work).  Most functionality should still work though.")
 
@@ -897,6 +891,70 @@ def EqualSpacing(Mol, frames=0, dx=0, RMSD=True, align=True):
         Mol1 = Mol[np.array([int(round(i)) for i in np.linspace(0, len(xyzold)-1, len(xyznew))])]
     Mol1.xyzs = list(xyznew)
     return Mol1
+
+def AtomContact(xyz, pairs, box=None, displace=False):
+    """
+    Compute distances between pairs of atoms.
+    
+    Parameters
+    ----------
+    xyz : np.ndarray
+        Nx3 array of atom positions
+    pairs : list
+        List of 2-tuples of atom indices
+    box : np.ndarray, optional
+        An array of three numbers (xyz box vectors).
+
+    Returns
+    -------
+    np.ndarray
+        A Npairs-length array of minimum image convention distances
+    np.ndarray (optional)
+        if displace=True, return a Npairsx3 array of displacement vectors
+    """
+    # Obtain atom selections for atom pairs
+    parray = np.array(pairs)
+    sel1 = parray[:,0]
+    sel2 = parray[:,1]
+    xyzpbc = xyz.copy()
+    # Minimum image convention: Place all atoms in the box
+    # [-xbox/2, +xbox/2); [-ybox/2, +ybox/2); [-zbox/2, +zbox/2)
+    if box is not None:
+        xbox = box[0]
+        ybox = box[1]
+        zbox = box[2]
+        while any(xyzpbc[:,0] < -0.5*xbox):
+            xyzpbc[:,0] += (xyzpbc[:,0] < -0.5*xbox)*xbox
+        while any(xyzpbc[:,1] < -0.5*ybox):
+            xyzpbc[:,1] += (xyzpbc[:,1] < -0.5*ybox)*ybox
+        while any(xyzpbc[:,2] < -0.5*zbox):
+            xyzpbc[:,2] += (xyzpbc[:,2] < -0.5*zbox)*zbox
+        while any(xyzpbc[:,0] >= 0.5*xbox):
+            xyzpbc[:,0] -= (xyzpbc[:,0] >= 0.5*xbox)*xbox
+        while any(xyzpbc[:,1] >= 0.5*ybox):
+            xyzpbc[:,1] -= (xyzpbc[:,1] >= 0.5*ybox)*ybox
+        while any(xyzpbc[:,2] >= 0.5*zbox):
+            xyzpbc[:,2] -= (xyzpbc[:,2] >= 0.5*zbox)*zbox
+    # Obtain atom selections for the pairs to be computed
+    # These are typically longer than N but shorter than N^2.
+    xyzsel1 = xyzpbc[sel1]
+    xyzsel2 = xyzpbc[sel2]
+    # Calculate xyz displacement
+    dxyz = xyzsel2-xyzsel1
+    # Apply minimum image convention to displacements
+    if box is not None:
+        dxyz[:,0] += (dxyz[:,0] < -0.5*xbox)*xbox
+        dxyz[:,1] += (dxyz[:,1] < -0.5*ybox)*ybox
+        dxyz[:,2] += (dxyz[:,2] < -0.5*zbox)*zbox
+        dxyz[:,0] -= (dxyz[:,0] >= 0.5*xbox)*xbox
+        dxyz[:,1] -= (dxyz[:,1] >= 0.5*ybox)*ybox
+        dxyz[:,2] -= (dxyz[:,2] >= 0.5*zbox)*zbox
+    dr2 = np.sum(dxyz**2,axis=1)
+    dr = np.sqrt(dr2)
+    if displace:
+        return dr, dxyz
+    else:
+        return dr
 
 class Molecule(object):
     """ Lee-Ping's general file format conversion class.
@@ -1868,29 +1926,23 @@ class Molecule(object):
             # Create a list of 2-tuples corresponding to combinations of atomic indices.
             # This is much faster than using itertools.combinations.
             AtomIterator = np.ascontiguousarray(np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=np.int32), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=np.int32))).T)
+        
         # Create a list of thresholds for determining whether a certain interatomic distance is considered to be a bond.
         BT0 = R[AtomIterator[:,0]]
         BT1 = R[AtomIterator[:,1]]
         BondThresh = (BT0+BT1) * Fac
         BondThresh = (BondThresh > mindist) * BondThresh + (BondThresh < mindist) * mindist
-        if ('%s.contact' % module_name) in sys.modules:
-            if hasattr(self, 'boxes') and toppbc:
-                dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
-            else:
-                dxij = contact.atom_distances(np.array([self.xyzs[sn]]),AtomIterator)
+        if hasattr(self, 'boxes') and toppbc:
+            dxij = AtomContact(self.xyzs[sn], AtomIterator, box=np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
         else:
-            # Inefficient implementation if importing contact doesn't work.
-            if hasattr(self, 'boxes') and toppbc:
-                logger.error("No minimum image convention available (import '%s.contact' if you need it)." % module_name)
-                raise RuntimeError
-            dxij = [np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator])]
+            dxij = AtomContact(self.xyzs[sn], AtomIterator)
 
         # Update topology settings with what we learned
         self.top_settings['toppbc'] = toppbc
 
         # Create a list of atoms that each atom is bonded to.
         atom_bonds = [[] for i in range(self.na)]
-        bond_bool = dxij[0] < BondThresh
+        bond_bool = dxij < BondThresh
         for i, a in enumerate(bond_bool):
             if not a: continue
             (ii, jj) = AtomIterator[i]
@@ -1907,6 +1959,7 @@ class Molecule(object):
                     bondlist.append((i, j))
                 else:
                     bondlist.append((j, i))
+        bondlist = sorted(list(set(bondlist)))
         self.Data['bonds'] = sorted(list(set(bondlist)))
         self.built_bonds = True
 
@@ -1960,41 +2013,28 @@ class Molecule(object):
         self.molecules = list(nx.connected_component_subgraphs(G))
 
     def distance_matrix(self, pbc=True):
-        ''' Build a distance matrix between atoms. '''
+        ''' Obtain distance matrix between all pairs of atoms. '''
         AtomIterator = np.ascontiguousarray(np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=np.int32), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=np.int32))).T)
-        dxij = []
-        if 'nanoreactor.contact' in sys.modules:
+        drij = []
+        for sn in range(len(self)):
             if hasattr(self, 'boxes') and pbc:
-                dxij = contact.atom_distances(np.array(self.xyzs),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
+                drij.append(AtomContact(self.xyzs[sn],AtomIterator,box=np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c])))
             else:
-                dxij = contact.atom_distances(np.array(self.xyzs),AtomIterator)
-        else:
-            # Inefficient implementation if importing contact doesn't work.
-            if hasattr(self, 'boxes') and pbc:
-                logger.error("No minimum image convention available (import 'nanoreactor.contact' if you need it).")
-                raise RuntimeError
-            for sn in range(len(self)):
-                dxij.append(np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator]))
-        return AtomIterator, dxij
+                drij.append(AtomContact(self.xyzs[sn],AtomIterator))
+        return AtomIterator, drij
 
     def distance_displacement(self):
-        ''' Build a distance matrix between atoms. '''
+        ''' Obtain distance matrix and displacement vectors between all pairs of atoms. '''
         AtomIterator = np.ascontiguousarray(np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=np.int32), np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=np.int32))).T)
         drij = []
         dxij = []
-        if 'nanoreactor.contact' in sys.modules:
-            if hasattr(self, 'boxes'):
-                drij, dxij = contact.atom_displacements(np.array(self.xyzs),AtomIterator,np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]))
+        for sn in range(len(self)):
+            if hasattr(self, 'boxes') and pbc:
+                drij_i, dxij_i = AtomContact(self.xyzs[sn],AtomIterator,box=np.array([self.boxes[sn].a, self.boxes[sn].b, self.boxes[sn].c]),displace=True)
             else:
-                drij, dxij = contact.atom_displacements(np.array(self.xyzs),AtomIterator)
-        else:
-            # Inefficient implementation if importing contact doesn't work.
-            if hasattr(self, 'boxes'):
-                logger.error("No minimum image convention available (import 'nanoreactor.contact' if you need it).")
-                raise RuntimeError
-            for sn in range(len(self)):
-                drij.append(np.array([np.linalg.norm(self.xyzs[sn][i]-self.xyzs[sn][j]) for i, j in AtomIterator]))
-                dxij.append(np.array([self.xyzs[sn][i]-self.xyzs[sn][j] for i, j in AtomIterator]))
+                drij_i, dxij_i = AtomContact(self.xyzs[sn],AtomIterator,box=None,displace=True)
+            drij.append(drij_i)
+            dxij.append(dxij_i)
         return AtomIterator, drij, dxij
 
     def find_angles(self):
