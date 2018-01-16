@@ -153,7 +153,8 @@ QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', '
 AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames | FrameVariableNames
 
 # OrderedDict requires Python 2.7 or higher
-import os, sys, re, copy, time
+import os, sys, re, copy
+from datetime import date
 import numpy as np
 from numpy import sin, cos, arcsin, arccos
 import imp
@@ -450,6 +451,18 @@ def format_xyz_coord(element,xyz,tinker=False):
         return "%-3s % 13.8f % 13.8f % 13.8f" % (element,xyz[0],xyz[1],xyz[2])
     else:
         return "%-5s % 15.10f % 15.10f % 15.10f" % (element,xyz[0],xyz[1],xyz[2])
+
+def _format_83(f):
+    """Format a single float into a string of width 8, with ideally 3 decimal
+    places of precision. If the number is a little too large, we can
+    gracefully degrade the precision by lopping off some of the decimal
+    places. If it's much too large, we throw a ValueError"""
+    if -999.999 < f < 9999.999:
+        return '%8.3f' % f
+    if -9999999 < f < 99999999:
+        return ('%8.3f' % f)[:8]
+    raise ValueError('coordinate "%s" could not be represented '
+                     'in a width-8 field' % f)
 
 def format_gro_coord(resid, resname, aname, seqno, xyz):
     """ Print a line in accordance with .gro file format, with six decimal points of precision
@@ -3872,52 +3885,74 @@ class Molecule(object):
         dcd = None
 
     def write_pdb(self, selection, **kwargs):
-        """Save to a PDB. Copied wholesale from MSMBuilder. """
-
+        standardResidues = ['ALA', 'ASN', 'CYS', 'GLU', 'HIS', 'LEU', 'MET', 'PRO', 'THR', 'TYR', # Standard amino acids
+                            'ARG', 'ASP', 'GLN', 'GLY', 'ILE', 'LYS', 'PHE', 'SER', 'TRP', 'VAL', # Standard amino acids
+                            'HID', 'HIE', 'HIP', 'ASH', 'GLH', 'TYD', 'CYM', 'CYX', 'LYN', # Some alternate protonation states
+                            'PTR', 'SEP', 'TPO', 'Y1P', 'S1P', 'T1P', # Phosphorylated amino acids
+                            'HOH', 'SOL', 'WAT', # Common residue names for water
+                            'A', 'G', 'C', 'U', 'I', 'DA', 'DG', 'DC', 'DT', 'DI']
+        # When converting from pdb to xyz in interactive prompt,
+        # ask user for some PDB-specific info.
         if sys.stdin.isatty():
             self.require('xyzs')
             self.require_resname()
             self.require_resid()
         else:
             self.require('xyzs','resname','resid')
-
         write_conect = kwargs.pop('write_conect', 1)
-
+        # Create automatic atom names if not present
+        # in data structure: these are just placeholders.
         if 'atomname' not in self.Data:
             count = 0
             resid = -1
-            ATOMS = []
+            atomnames = []
             for i in range(self.na):
                 if self.resid[i] != resid:
                     count = 0
                 count += 1
                 resid = self.resid[i]
-                ATOMS.append("%s%i" % (self.elem[i], count))
+                atomnames.append("%s%i" % (self.elem[i], count))
+            self.atomname = atomnames
+        # Standardize formatting of atom names.
+        atomNames = []
+        for i, atomname in enumerate(self.atomname):
+            if len(atomname) < 4 and atomname[:1].isalpha() and len(self.elem[i]) < 2:
+                atomName = ' '+atomname
+            elif len(atomname) > 4:
+                atomName = atomname[:4]
+            else:
+                atomName = atomname
+            atomNames.append(atomName)
+        # Chain names. Default to 'A' for everything
+        if 'chain' not in self.Data:
+            chainNames = ['A' for i in range(self.na)]
         else:
-            ATOMS = self.atomname
-
-        CHAIN = self.chain if 'chain' in self.Data else [1 for i in range(self.na)]
-        RESNAMES = self.resname
-        RESNUMS = self.resid
-
+            chainNames = [i[0] if len(i)>0 else ' ' for i in self.chain]
+        # Standardize formatting of residue names.
+        resNames = []
+        for resname in self.resname:
+            if len(resname) > 3:
+                resName = resname[:3]
+            else:
+                resName = resname
+            resNames.append(resName)
+        # Standardize formatting of residue IDs.
+        resIds = []
+        for resid in self.resid:
+            resIds.append("%4d" % (resid%10000))
+        # Standardize record names.
+        records = []
+        for resname in resNames:
+            if resname in ['HOH', 'SOL', 'WAT']:
+                records.append("HETATM")
+            elif resname in standardResidues:
+                records.append("ATOM  ")
+            else:
+                records.append("HETATM")
+                
         out = []
-        if min(RESNUMS) == 0:
-            RESNUMS = [i+1 for i in RESNUMS]
-
-        """
-        CRYST1 line, added by Lee-Ping
-        COLUMNS  TYPE   FIELD  DEFINITION
-        ---------------------------------------
-         7-15    float  a      a (Angstroms).
-        16-24    float  b      b (Angstroms).
-        25-33    float  c      c (Angstroms).
-        34-40    float  alpha  alpha (degrees).
-        41-47    float  beta   beta (degrees).
-        48-54    float  gamma  gamma (degrees).
-        56-66    string sGroup Space group.
-        67-70    int    z      Z value.
-        """
-
+        # Create the PDB header.
+        out.append("REMARK   1 CREATED WITH FORCEBALANCE %s" % (str(date.today())))
         if 'boxes' in self.Data:
             a = self.boxes[0].a
             b = self.boxes[0].b
@@ -3925,126 +3960,68 @@ class Molecule(object):
             alpha = self.boxes[0].alpha
             beta = self.boxes[0].beta
             gamma = self.boxes[0].gamma
-            line=np.chararray(80)
-            line[:] = ' '
-            line[0:6]=np.array(list("CRYST1"))
-            line=np.array(line,'str')
-            line[6:15] =np.array(list(("%9.3f"%(a))))
-            line[15:24]=np.array(list(("%9.3f"%(b))))
-            line[24:33]=np.array(list(("%9.3f"%(c))))
-            line[33:40]=np.array(list(("%7.2f"%(alpha))))
-            line[40:47]=np.array(list(("%7.2f"%(beta))))
-            line[47:54]=np.array(list(("%7.2f"%(gamma))))
-            # LPW: Put in a dummy space group, we never use it.
-            line[55:66]=np.array(list(str("P 21 21 21").rjust(11)))
-            line[66:70]=np.array(list(str(4).rjust(4)))
-            out.append(''.join(line.tolist()))
-
-        for I in selection:
-            XYZ = self.xyzs[I]
-            Serial = 1
+            out.append("CRYST1%9.3f%9.3f%9.3f%7.2f%7.2f%7.2f P 1           1 " % (a, b, c, alpha, beta, gamma))
+        # Write the structures as models.
+        atomIndices = {}
+        for sn in range(len(self)):
+            modelIndex = sn
+            if len(self) > 1:
+                out.append("MODEL     %4d" % modelIndex)
+            atomIndex = 1
             for i in range(self.na):
-                """
-                ATOM line.
-                COLUMNS  TYPE   FIELD  DEFINITION
-                ---------------------------------------------
-                7-11      int   serial        Atom serial number.
-                13-16     string name          Atom name.
-                17        string altLoc        Alternate location indicator.
-                18-20 (17-21 KAB)    string resName       Residue name.
-                22        string chainID       Chain identifier.
-                23-26     int    resSeq        Residue sequence number.
-                27        string iCode         Code for insertion of residues.
-                31-38     float  x             Orthogonal coordinates for X in
-                Angstroms.
-                39-46     float  y             Orthogonal coordinates for Y in
-                Angstroms.
-                47-54     float  z             Orthogonal coordinates for Z in
-                Angstroms.
-                55-60     float  occupancy     Occupancy.
-                61-66     float  tempFactor    Temperature factor.
-                73-76     string segID         Segment identifier, left-justified.
-                77-78     string element       Element symbol, right-justified.
-                79-80     string charge        Charge on the atom.
-                """
-                line=np.chararray(80)
-                line[:]=' '
-                line[0:4]=np.array(list("ATOM"))
-                line=np.array(line,'str')
-                line[6:11]=np.array(list(str(Serial%100000).rjust(5)))
-                # if Serial < 100000:
-                #     line[6:11]=np.array(list(str(Serial%100000).rjust(5)))
-                # else:
-                #     line[6:11]=np.array(list(hex(Serial)[2:].rjust(5)))
-                #Molprobity is picky about atom name centering
-                if len(str(ATOMS[i]))==3:
-                    line[12:16]=np.array(list(str(ATOMS[i]).rjust(4)))
-                elif len(str(ATOMS[i]))==2:
-                    line[12:16]=np.array(list(" "+str(ATOMS[i])+" "))
-                elif len(str(ATOMS[i]))==1:
-                    line[12:16]=np.array(list(" "+str(ATOMS[i])+"  "))
-                elif len(str(ATOMS[i]))==4:
-                    line[12:16]=np.array(list(str(ATOMS[i]).center(4)))
-                else: # QYD: if > 4, reduse atomname to 4 letters
-                    line[12:16]=np.array(list(str(ATOMS[i])[0]+str(ATOMS[i])[-3:]))
-                if len(str(RESNAMES[i]))==3:
-                    line[17:20]=np.array(list(str(RESNAMES[i])))
-                else:
-                    line[17:21]=np.array(list(str(RESNAMES[i]).ljust(4)))
+                recordName = records[i]
+                atomName = atomNames[i]
+                resName = resNames[i]
+                chainName = chainNames[i]
+                resId = resIds[i]
+                coords = self.xyzs[sn][i]
+                symbol = self.elem[i]
+                atomIndices[i] = atomIndex
+                line = "%s%5d %-4s %3s %s%4s    %s%s%s  1.00  0.00          %2s  " % (
+                    recordName, atomIndex%100000, atomName, resName, chainName, resId, _format_83(coords[0]),
+                    _format_83(coords[1]), _format_83(coords[2]), symbol)
+                assert len(line) == 80, 'Fixed width overflow detected'
+                out.append(line)
+                atomIndex += 1
+                if i < (self.na-1) and chainName != chainNames[i+1]:
+                    out.append("TER   %5d      %3s %s%4s" % (atomIndex, resName, chainName, resId))
+                    atomIndex += 1
+            out.append("TER   %5d      %3s %s%4s" % (atomIndex, resName, chainName, resId))
+            if len(self) > 1:
+                out.append("ENDMDL")
+        conectBonds = []
+        if 'bonds' in self.Data:
+            for i, j in self.bonds:
+                if i > j: continue
+                if self.resname[i] not in standardResidues or self.resname[j] not in standardResidues:
+                    conectBonds.append((i, j))
+                elif self.atomname[i] == 'SG' and self.atomname[j] == 'SG' and self.resname[i] == 'CYS' and self.resname[j] == 'CYS':
+                    conectBonds.append((i, j))
+                elif self.atomname[i] == 'SG' and self.atomname[j] == 'SG' and self.resname[i] == 'CYX' and self.resname[j] == 'CYX':
+                    conectBonds.append((i, j))
 
-                line[21]=str(CHAIN[i]).rjust(1)
-                line[22:26]=np.array(list(str(RESNUMS[i]%10000).rjust(4)))
-                # if RESNUMS[i] < 100000:
-                #     line[22:26]=np.array(list(str(RESNUMS[i]).rjust(4)))
-                # else:
-                #     line[22:26]=np.array(list(hex(RESNUMS[i])[2:].rjust(4)))
-
-                x=XYZ[i][0]
-                y=XYZ[i][1]
-                z=XYZ[i][2]
-                sx=np.sign(x)
-                sy=np.sign(y)
-                sz=np.sign(z)
-
-                line[30:38]=np.array(list(("%8.3f"%(x))))
-                line[38:46]=np.array(list(("%8.3f"%(y))))
-                line[46:54]=np.array(list(("%8.3f"%(z))))
-                if hasattr(self, 'elem'):
-                    line[76:78]=np.array(list("%2s" % self.elem[i]))
-
-                if Serial!=-1:
-                    out.append(''.join(line.tolist()))
-                Serial += 1
-
-                if 'terminal' in self.Data and self.terminal[i]:
-                    """
-                    TER line, added by Lee-Ping
-                    COLUMNS  TYPE   FIELD   DEFINITION
-                    -------------------------------------------
-                    7-11    int    serial  Serial number.
-                    18-20    string resName Residue name.
-                    22       string chainID Chain identifier.
-                    23-26    int    resSeq  Residue sequence number.
-                    27       string iCode   Insertion code.
-                    """
-                    line=np.chararray(27)
-                    line[:] = ' '
-                    line[0:3]=np.array(list("TER"))
-                    line[6:11]=np.array(list(str(Serial%100000).rjust(5)))
-                    if len(str(RESNAMES[i]))==3:
-                        line[17:20]=np.array(list(str(RESNAMES[i])))
-                    else:
-                        line[17:21]=np.array(list(str(RESNAMES[i]).ljust(4)))
-                    line[21]=str(CHAIN[i]).rjust(1)
-                    line[22:26]=np.array(list(str(RESNUMS[i]%10000).rjust(4)))
-                    out.append(''.join(line.tolist()))
-                    Serial += 1
-            out.append('ENDMDL')
-        if 'bonds' in self.Data and write_conect:
-            connects = ["CONECT%5i" % (b0+1) + "".join(["%5i" % (b[1]+1) for b in self.bonds if b[0] == b0]) for b0 in sorted(list(set(b[0] for b in self.bonds)))]
-            out += connects
-        return out
-
+        atomBonds = {}
+        for atom1, atom2 in conectBonds:
+            index1 = atomIndices[atom1]
+            index2 = atomIndices[atom2]
+            if index1 not in atomBonds:
+                atomBonds[index1] = []
+            if index2 not in atomBonds:
+                atomBonds[index2] = []
+            atomBonds[index1].append(index2)
+            atomBonds[index2].append(index1)
+            
+        for index1 in sorted(atomBonds):
+            bonded = atomBonds[index1]
+            while len(bonded) > 4:
+                out.append("CONECT%5d%5d%5d%5d" % (index1, bonded[0], bonded[1], bonded[2]))
+                del bonded[:4]
+            line = "CONECT%5d" % index1
+            for index2 in bonded:
+                line = "%s%5d" % (line, index2)
+            out.append(line)
+        return(out)
+                    
     def write_qdata(self, selection, **kwargs):
         """ Text quantum data format. """
         #self.require('xyzs','qm_energies','qm_grads')
