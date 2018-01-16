@@ -89,9 +89,9 @@ def buildKeywordDictionary(args):
     setupKeywords["name"]              = "forcebalance"
     # Don't create a separate installed version number for every commit
     setupKeywords["version"]           = re.sub('-[0-9]*$','',__version__)
-    setupKeywords["author"]            = "Lee-Ping Wang, Arthur Vigil"
-    setupKeywords["author_email"]      = "leeping@stanford.edu"
-    setupKeywords["license"]           = "GPL 3.0"
+    setupKeywords["author"]            = "Lee-Ping Wang"
+    setupKeywords["author_email"]      = "leeping@ucdavis.edu"
+    # setupKeywords["license"]           = "GPL 3.0"
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
     setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/*.bash") + glob.glob("bin/ForceBalance") + glob.glob("bin/TidyOutput")
@@ -105,7 +105,7 @@ def buildKeywordDictionary(args):
     setupKeywords["ext_modules"]       = [DCD]
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
-    setupKeywords["install_requires"]  = ['networkx>=1.9,<2.0', 'decorator>=3.4.0']
+    # setupKeywords["install_requires"]  = ['networkx>=1.9,<2.0', 'decorator>=3.4.0']
     setupKeywords["long_description"]  = """
 
     ForceBalance (https://simtk.org/home/forcebalance) is a library
