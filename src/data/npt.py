@@ -7,43 +7,8 @@ Runs a simulation to compute condensed phase properties (for example, the densit
 or the enthalpy of vaporization) and compute the derivative with respect 
 to changing the force field parameters.  This script is a part of ForceBalance.
 
-The basic idea is this: First we run a density simulation to determine
-the average density.  This quantity of course has some uncertainty,
-and in general we want to avoid evaluating finite-difference
-derivatives of noisy quantities.  The key is to realize that the
-densities are sampled from a Boltzmann distribution, so the analytic
-derivative can be computed if the potential energy derivative is
-accessible.  We compute the potential energy derivative using
-finite-difference of snapshot energies and apply a simple formula to
-compute the density derivative.
-
-References
-
-[1] Shirts MR, Mobley DL, Chodera JD, and Pande VS. Accurate and efficient corrections for
-missing dispersion interactions in molecular simulations. JPC B 111:13052, 2007.
-
-[2] Ahn S and Fessler JA. Standard errors of mean, variance, and standard deviation estimators.
-Technical Report, EECS Department, The University of Michigan, 2003.
-
-Copyright And License
-
-@author Lee-Ping Wang <leeping@stanford.edu>
-@author John D. Chodera <jchodera@gmail.com> (Wrote statisticalInefficiency and MTS-VVVR)
-
-All code in this repository is released under the GNU General Public License.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-This program is distributed in the hope that it will be useful, but without any
-warranty; without even the implied warranty of merchantability or fitness for a
-particular purpose.  See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see <http://www.gnu.org/licenses/>.
-
+All code in this repository is released under the BSD 3-Clause License (aka BSD 2.0).
+Please see github.com/leeping/forcebalance for more details.
 """
 from __future__ import division
 

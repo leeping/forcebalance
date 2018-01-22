@@ -27,9 +27,9 @@ except ImportError:
 #|                                 |#
 #| doc/header.tex                  |#
 #| doc/api_header.tex              |#
-#| src/__init__.py                 |#
+#| bin/ForceBalance.py             |#
 #===================================#
-__version__ = "v1.3.2"
+__version__ = "v1.5.0"
 try:
     # use git to find current version
     git_describe = subprocess.check_output(["git", "describe"]).strip()
@@ -91,7 +91,7 @@ def buildKeywordDictionary(args):
     setupKeywords["version"]           = re.sub('-[0-9]*$','',__version__)
     setupKeywords["author"]            = "Lee-Ping Wang"
     setupKeywords["author_email"]      = "leeping@ucdavis.edu"
-    # setupKeywords["license"]           = "GPL 3.0"
+    setupKeywords["license"]           = "BSD 2.0"
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
     setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/*.bash") + glob.glob("bin/ForceBalance") + glob.glob("bin/TidyOutput")

@@ -4,9 +4,9 @@
 """
 @package nvt
 
-Runs a simulation to compute condensed phase properties in NVT ensemble
-(for example, the surface tension) and compute the derivative with respect
-to changing the force field parameters. This script is a part of ForceBalance.
+Runs a simulation to compute condensed phase properties (for example, the density 
+or the enthalpy of vaporization) and compute the derivative with respect 
+to changing the force field parameters.  This script is a part of ForceBalance.
 
 The algorithm used to compute the surface tension is the test-area method.
 We run a NVT simulation on a film of water in a long PBC box. For each frame, we
@@ -34,20 +34,8 @@ Copyright And License
 
 Note: Many parts of this script is directly copied from npt.py
 
-All code in this repository is released under the GNU General Public License.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-This program is distributed in the hope that it will be useful, but without any
-warranty; without even the implied warranty of merchantability or fitness for a
-particular purpose.  See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see <http://www.gnu.org/licenses/>.
-
+All code in this repository is released under the BSD 3-Clause License (aka BSD 2.0).
+Please see github.com/leeping/forcebalance for more details.
 """
 from __future__ import division
 
