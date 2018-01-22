@@ -2,8 +2,9 @@
 Wrappers to C functions for computing the geometry at each frame of
 a trajectory
 '''
+from builtins import range
 import numpy as np
-import _contact_wrap
+from . import _contact_wrap
 import warnings
 
 def atom_distances(xyzlist, atom_contacts, box=None):
@@ -128,7 +129,7 @@ def residue_distances(xyzlist, residue_membership, residue_contacts):
     residue_widths = np.array([len(r) for r in residue_membership], dtype=np.int32)
     max_residue_width = max(residue_widths)
     residue_membership_array = -1 * np.ones((num_residues, max_residue_width), dtype=np.int32)
-    for i in xrange(num_residues):
+    for i in range(num_residues):
         residue_membership_array[i, 0:residue_widths[i]] = np.array(residue_membership[i], dtype=np.int32)
     
     results = np.zeros((traj_length, num_contacts), np.float32)

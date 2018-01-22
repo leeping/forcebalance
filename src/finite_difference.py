@@ -1,4 +1,5 @@
 """ Finite difference module. """
+from __future__ import division
 
 import traceback
 from numpy import dot

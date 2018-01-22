@@ -1,7 +1,10 @@
 """@package forcebalance.objective
 
 ForceBalance objective function."""
+from __future__ import division
 
+from builtins import range
+from builtins import object
 import sys
 import inspect
 #from implemented import Implemented_Targets
@@ -239,9 +242,10 @@ class Objective(forcebalance.BaseClass):
             color = "\x1b[94m"
             if key in self.ObjDict_Last:
                 Change = True
-                if self.ObjDict[key] <= self.ObjDict_Last[key]:
+                # print(self.ObjDict[key], self.ObjDict_Last[key])
+                if self.ObjDict[key]['x'] <= self.ObjDict_Last[key]['x']:
                     color = "\x1b[92m"
-                elif self.ObjDict[key] > self.ObjDict_Last[key]:
+                elif self.ObjDict[key]['x'] > self.ObjDict_Last[key]['x']:
                     color = "\x1b[91m"
             PrintDict[key] = "% 12.5f % 10.3f %s% 16.5e%s" % (val['x'],val['w'],color,val['x']*val['w'],"\x1b[0m")
             if Change:
@@ -285,7 +289,7 @@ class Objective(forcebalance.BaseClass):
             Objective[Letters[i]] += Extra[i]
         return Objective
 
-class Penalty:
+class Penalty(object):
     """ Penalty functions for regularizing the force field optimizer.
 
     The purpose for this module is to improve the behavior of our optimizer;

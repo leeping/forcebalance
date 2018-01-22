@@ -3,7 +3,9 @@
 @author Lee-Ping Wang
 @date 05/2012
 """
+from __future__ import division
 
+from builtins import str
 import os
 import shutil
 import numpy as np
@@ -158,7 +160,7 @@ class BindingEnergy(Target):
         elif self.attenuate:
             logger.info("Repulsive interactions beyond energy_denom will be scaled by 1.0 / ( denom**2 + (reference-denom)**2 )\n")
         ## Build keyword dictionaries to pass to engine.
-        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del engine_args['name']
         ## Create engine objects.
         self.engines = OrderedDict()
@@ -193,7 +195,7 @@ class BindingEnergy(Target):
             for sys_ in self.sys_opts:
                 Energy_, RMSD_ = self.system_driver(sys_)
                 #print "Setting %s to" % sys_, Energy_
-                exec("%s = Energy_" % sys_) in locals()
+                exec(("%s = Energy_" % sys_), locals())
                 RMSDNrm_ = RMSD_ / self.rmsd_denom
                 w_ = self.sys_opts[sys_]['rmsd_weight'] if 'rmsd_weight' in self.sys_opts[sys_] else 1.0
                 VectorD_.append(np.sqrt(w_)*RMSDNrm_)

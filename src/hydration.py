@@ -3,7 +3,9 @@
 @author Lee-Ping Wang
 @date 09/2014
 """
+from __future__ import division
 
+from builtins import range
 import os
 import shutil
 import numpy as np
@@ -79,7 +81,7 @@ class Hydration(Target):
         ## This is far from an ideal solution...
         self.OptionDict['engname'] = self.engname
         ## Copy target options into engine options.
-        self.engine_opts = OrderedDict(self.OptionDict.items() + options.items())
+        self.engine_opts = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del self.engine_opts['name']
         ## Carry out necessary operations for specific modes.
         if self.hfemode.lower() in ['sp', 'single']:
@@ -306,9 +308,9 @@ class Hydration(Target):
         def get_hfe(mvals_):
             self.FF.make(mvals_)
             self.hfe_dict = self.hydration_driver_sp()
-            return np.array(self.hfe_dict.values())
+            return np.array(list(self.hfe_dict.values()))
         calc_hfe = get_hfe(mvals)
-        D = calc_hfe - np.array(self.expval.values())
+        D = calc_hfe - np.array(list(self.expval.values()))
         dD = np.zeros((self.FF.np,len(self.IDs)))
         if AGrad or AHess:
             for p in self.pgrad:
@@ -378,8 +380,8 @@ class Hydration(Target):
                 elif self.hfemode == 'exp_both':
                     dD[:, ilabel] = 0.5*self.whfe[ilabel]*(data['liq']['dHyd']+data['gas']['dHyd']) / 4.184
             os.chdir('..')
-        calc_hfe = np.array(self.hfe_dict.values())
-        D = self.whfe*(calc_hfe - np.array(self.expval.values()))
+        calc_hfe = np.array(list(self.hfe_dict.values()))
+        D = self.whfe*(calc_hfe - np.array(list(self.expval.values())))
         return D, dD
 
     def get_ti2(self, mvals, AGrad=False, AHess=False):
@@ -412,8 +414,8 @@ class Hydration(Target):
                 # Calculate the derivative of the hydration free energy.
                 dD[:, ilabel] = 0.5*self.whfe[ilabel]*(data['liq']['dHyd']+data['gas']['dHyd']) / 4.184
             os.chdir('..')
-        calc_hfe = np.array(self.hfe_dict.values())
-        D = self.whfe*(calc_hfe - np.array(self.expval.values()))
+        calc_hfe = np.array(list(self.hfe_dict.values()))
+        D = self.whfe*(calc_hfe - np.array(list(self.expval.values())))
         return D, dD
 
     def get(self, mvals, AGrad=False, AHess=False):

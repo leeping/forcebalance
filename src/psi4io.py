@@ -6,14 +6,18 @@ modules for other programs because it's so simple.
 @author Lee-Ping Wang
 @date 01/2012
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import range
 import os, sys, glob, shutil
 from re import match, sub, split, findall
 from forcebalance.nifty import isint, isfloat, _exec, warn_press_key, printcool_dictionary, wopen
 import numpy as np
 from forcebalance.leastsq import LeastSquares, CheckBasis
 from forcebalance import BaseReader
-from string import capitalize
+# from string import capitalize
 from forcebalance.finite_difference import in_fd, f1d2p, f12d3p, fdwrap
 from collections import defaultdict, OrderedDict
 import itertools
@@ -71,7 +75,7 @@ class GBS_Reader(BaseReader):
         # Now go through all the cases.
         if match('^[A-Za-z][A-Za-z]? +[0-9]$',line):
             # This is supposed to match the element line. For example 'Li 0'
-            self.element = capitalize(s[0])
+            self.element = s[0].capitalize()
             self.isdata = False
             self.destroy = False
         elif len(s) == 3 and match('[SPDFGH]+',s[0]) and isint(s[1]) and isfloat(s[2]):
@@ -110,7 +114,7 @@ class THCDF_Psi4(LeastSquares):
             elif len(s) >= 1 and s[0] == '}':
                 MolSection = False
             elif MolSection and len(s) >= 4 and match("^[A-Za-z]+$",s[0]) and isfloat(s[1]) and isfloat(s[2]) and isfloat(s[3]):
-                ElemList.append(capitalize(s[0]))
+                ElemList.append(s[0].capitalize())
         self.Elements = set(ElemList)
         xgrad = []
         for p in self.pgrad:
@@ -144,9 +148,9 @@ class THCDF_Psi4(LeastSquares):
         for line in open(os.path.join(self.root,self.tgtdir,"input.dat")).readlines():
             s = line.split("#")[0].split()
             if len(s) == 3 and s[0].lower() == 'basis' and s[1].lower() == 'file':
-                print >> o, "basis file %s" % self.GBSfnm
+                print("basis file %s" % self.GBSfnm, file=o)
             else:
-                print >> o, line,
+                print(line, end=' ', file=o)
         o.close()
 
     def indicate(self):
@@ -155,14 +159,14 @@ class THCDF_Psi4(LeastSquares):
         return
 
     def write_nested_destroy(self, fnm, linedestroy):
-        ln0 = range(len(open(fnm).readlines()))
+        ln0 = list(range(len(open(fnm).readlines())))
         for layer in linedestroy:
             f = open(fnm).readlines()
             o = wopen('.tmp.gbs')
             newln = []
             for ln, line in enumerate(f):
                 if ln not in layer:
-                    print >> o, line,
+                    print(line, end=' ', file=o)
                     newln.append(ln0[ln])
             ln0 = newln[:]
             _exec("mv .tmp.gbs %s" % fnm, print_command=False)
@@ -179,9 +183,9 @@ class THCDF_Psi4(LeastSquares):
             for line in open(self.DATfnm).readlines():
                 s = line.split("#")[0].split()
                 if len(s) == 3 and s[0].lower() == 'basis' and s[1].lower() == 'file':
-                    print >> o, "basis file %s" % self.GBSfnm
+                    print("basis file %s" % self.GBSfnm, file=o)
                 else:
-                    print >> o, line,
+                    print(line, end=' ', file=o)
             o.close()
             _exec("mv .lindep.dat %s" % self.DATfnm, print_command=False)
             _exec("psi4 %s" % self.DATfnm, print_command=False)
@@ -190,7 +194,7 @@ class THCDF_Psi4(LeastSquares):
             ## Read in the commented linindep.gbs file and ensure that these same lines are commented in the new .gbs file
             for line in open('linindep.gbs'):
                 LI.feed(line,linindep=True)
-                key = '.'.join([str(i) for i in LI.element,LI.amom,LI.basis_number[LI.element],LI.contraction_number])
+                key = '.'.join([str(i) for i in (LI.element,LI.amom,LI.basis_number[LI.element],LI.contraction_number)])
                 if LI.isdata:
                     if key in LI_lines:
                         logger.info("Duplicate key found:\n")
@@ -206,7 +210,7 @@ class THCDF_Psi4(LeastSquares):
             self.FF.prmdestroy_this = []
             for ln, line in enumerate(open(self.GBSfnm).readlines()):
                 FK.feed(line)
-                key = '.'.join([str(i) for i in FK.element,FK.amom,FK.basis_number[FK.element],FK.contraction_number])
+                key = '.'.join([str(i) for i in (FK.element,FK.amom,FK.basis_number[FK.element],FK.contraction_number)])
                 if FK.isdata and key in LI_lines:
                     if LI_lines[key][1]:
                         logger.info("Destroying line %i (originally %i): " % (ln, ln0[ln]))
@@ -220,7 +224,7 @@ class THCDF_Psi4(LeastSquares):
                     FK_lines.append(line)
             o = wopen('franken.gbs')
             for line in FK_lines:
-                print >> o, line,
+                print(line, end=' ', file=o)
             o.close()
             _exec("cp %s.bak %s" % (self.GBSfnm, self.GBSfnm), print_command=False)
             
@@ -274,7 +278,7 @@ class Grid_Reader(BaseReader):
         # Now go through all the cases.
         if match('^[A-Za-z][A-Za-z]? +[0-9]$',line):
             # This is supposed to match the element line. For example 'Li 0'
-            self.element = capitalize(s[0])
+            self.element = s[0].capitalize()
             self.radii[self.element] = float(s[1])
             self.isdata = False
             self.point = 0
@@ -321,7 +325,7 @@ class RDVR3_Psi4(Target):
                     elif len(s) >= 1 and s[0] == '}':
                         MolSection = False
                     elif MolSection and len(s) >= 4 and match("^[A-Za-z]+$",s[0]) and isfloat(s[1]) and isfloat(s[2]) and isfloat(s[3]):
-                        ElemList.append(capitalize(s[0]))
+                        ElemList.append(s[0].capitalize())
                 self.elements[d] = set(ElemList)
                 self.molecules[d] = Molecules
                 for p in range(self.FF.np):
@@ -361,12 +365,12 @@ class RDVR3_Psi4(Target):
             for line in self.objfiles[d]:
                 s = line.split()
                 if len(s) > 2 and s[0] == 'path' and s[1] == '=':
-                    print >> o, "path = '%s'" % os.getcwd()
+                    print("path = '%s'" % os.getcwd(), file=o)
                 elif len(s) > 2 and s[0] == 'set' and s[1] == 'objective_path':
-                    print >> o, "opath = '%s'" % os.getcwd()
-                    print >> o, "set objective_path $opath"
+                    print("opath = '%s'" % os.getcwd(), file=o)
+                    print("set objective_path $opath", file=o)
                 else:
-                    print >> o, line,
+                    print(line, end=' ', file=o)
             o.close()
             os.system("rm -f objective.out")
             if wq is None:
@@ -418,12 +422,12 @@ class RDVR3_Psi4(Target):
         for line in self.objfiles[d]:
             s = line.split()
             if len(s) > 2 and s[0] == 'path' and s[1] == '=':
-                print >> o, "path = '%s'" % self.tdir
+                print("path = '%s'" % self.tdir, file=o)
             elif len(s) > 2 and s[0] == 'set' and s[1] == 'objective_path':
-                print >> o, "opath = '%s'" % os.getcwd()
-                print >> o, "set objective_path $opath"
+                print("opath = '%s'" % os.getcwd(), file=o)
+                print("set objective_path $opath", file=o)
             else:
-                print >> o, line,
+                print(line, end=' ', file=o)
         o.close()
         os.system("rm -f objective.out")
         _exec("psi4 objective.dat", print_command=False)
@@ -432,7 +436,7 @@ class RDVR3_Psi4(Target):
         return answer
 
     def get(self, mvals, AGrad=False, AHess=False):
-	"""
+        """
         LPW 04-17-2013
         
         This subroutine builds the objective function from Psi4.

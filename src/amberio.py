@@ -6,7 +6,13 @@ modules for other programs because it's so simple.
 @author Lee-Ping Wang
 @date 01/2012
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import zip
+from builtins import range
+from builtins import object
 import os, sys, re
 import copy
 from re import match, sub, split, findall
@@ -108,7 +114,7 @@ def write_leap(fnm, mol2=[], frcmod=[], pdb=None, prefix='amber', spath = [], de
     fout = fnm+'_'
     line_out.append('saveamberparm %s %s.prmtop %s.inpcrd\n' % (ambername, prefix, prefix))
     line_out.append('quit\n')
-    with wopen(fout) as f: print >> f, ''.join(line_out)
+    with wopen(fout) as f: print(''.join(line_out), file=f)
 
 class Mol2_Reader(BaseReader):
     """Finite state machine for parsing Mol2 force field file. (just for parameterizing the charges)"""
@@ -515,8 +521,8 @@ class PrmtopLoader(object):
                                  % ((bondPointers[ii],
                                      bondPointers[ii+1]),))
              iType=int(bondPointers[ii+2])-1
-             returnList.append((int(bondPointers[ii])/3,
-                                int(bondPointers[ii+1])/3,
+             returnList.append((int(int(bondPointers[ii])/3),
+                                int(int(bondPointers[ii+1])/3),
                                 float(forceConstant[iType])*forceConstConversionFactor,
                                 float(bondEquil[iType])*lengthConversionFactor))
         return returnList
@@ -563,9 +569,9 @@ class PrmtopLoader(object):
                                      anglePointers[ii+1],
                                      anglePointers[ii+2]),))
              iType=int(anglePointers[ii+3])-1
-             self._angleList.append((int(anglePointers[ii])/3,
-                                int(anglePointers[ii+1])/3,
-                                int(anglePointers[ii+2])/3,
+             self._angleList.append((int(int(anglePointers[ii])/3),
+                                int(int(anglePointers[ii+1])/3),
+                                int(int(anglePointers[ii+2])/3),
                                 float(forceConstant[iType])*forceConstConversionFactor,
                                 float(angleEquil[iType])))
         return self._angleList
@@ -591,10 +597,10 @@ class PrmtopLoader(object):
                                     dihedralPointers[ii+2],
                                     dihedralPointers[ii+3]),))
              iType=int(dihedralPointers[ii+4])-1
-             self._dihedralList.append((int(dihedralPointers[ii])/3,
-                                int(dihedralPointers[ii+1])/3,
-                                abs(int(dihedralPointers[ii+2]))/3,
-                                abs(int(dihedralPointers[ii+3]))/3,
+             self._dihedralList.append((int(int(dihedralPointers[ii])/3),
+                                int(int(dihedralPointers[ii+1])/3),
+                                int(abs(int(dihedralPointers[ii+2]))/3),
+                                int(abs(int(dihedralPointers[ii+3]))/3),
                                 float(forceConstant[iType])*forceConstConversionFactor,
                                 float(phase[iType]),
                                 int(0.5+float(periodicity[iType]))))
@@ -609,8 +615,8 @@ class PrmtopLoader(object):
         nonbondTerms = self.getNonbondTerms()
         for ii in range(0,len(dihedralPointers),5):
              if int(dihedralPointers[ii+2])>0 and int(dihedralPointers[ii+3])>0:
-                 iAtom = int(dihedralPointers[ii])/3
-                 lAtom = int(dihedralPointers[ii+3])/3
+                 iAtom = int(int(dihedralPointers[ii])/3)
+                 lAtom = int(int(dihedralPointers[ii+3])/3)
                  chargeProd = charges[iAtom]*charges[lAtom]
                  (rVdwI, epsilonI) = nonbondTerms[iAtom]
                  (rVdwL, epsilonL) = nonbondTerms[lAtom]
@@ -704,7 +710,7 @@ class AMBER(Engine):
             self.amberhome = os.path.split(which('sander'))[0]
         
         with wopen('.quit.leap') as f:
-            print >> f, 'quit'
+            print('quit', file=f)
 
         self.nbcut = kwargs.get('nbcut', 9999)
 
@@ -893,7 +899,7 @@ class AMBER(Engine):
 
         if hasattr(self, 'target') and hasattr(self.target,'shots'):
             self.qmatoms = target.qmatoms
-            self.mol.write("%s-all.crd" % self.name, select=range(self.target.shots), ftype="mdcrd")
+            self.mol.write("%s-all.crd" % self.name, selection=range(self.target.shots), ftype="mdcrd")
         else:
             self.qmatoms = self.mol.na
             self.mol.write("%s-all.crd" % self.name, ftype="mdcrd")
@@ -924,7 +930,7 @@ do_debugf = 1, dumpfrc = 1
 /
 """
         with wopen("%s-force.mdin" % self.name) as f:
-            print >> f, force_mdin.format(cut="%i" % int(self.nbcut))
+            print(force_mdin.format(cut="%i" % int(self.nbcut)), file=f)
 
         ## This line actually runs AMBER.
         self.leap(delcheck=True)
@@ -1058,7 +1064,7 @@ do_debugf = 1, dumpfrc = 1
      scnb=2.0, scee=1.2, idiel=1,
  /
 """
-            with wopen("%s-nr.in" % self.name) as f: print >> f, opt_temp.format(cut="%i" % self.nbcut)
+            with wopen("%s-nr.in" % self.name) as f: print(opt_temp.format(cut="%i" % self.nbcut), file=f)
             self.callamber("nmode -O -i %s-nr.in -c %s.inpcrd -p %s.prmtop -r %s.rst -o %s-nr.out" % (self.name, self.name, self.name, self.name, self.name))
         nmode_temp = """  normal modes
  &data
@@ -1069,7 +1075,7 @@ do_debugf = 1, dumpfrc = 1
      nvect={nvect}, eta=0.9, ivform=2,
  /
 """
-        with wopen("%s-nmode.in" % self.name) as f: print >> f, nmode_temp.format(cut="%i" % self.nbcut, nvect=3*self.mol.na)
+        with wopen("%s-nmode.in" % self.name) as f: print(nmode_temp.format(cut="%i" % self.nbcut, nvect=3*self.mol.na), file=f)
         self.callamber("nmode -O -i %s-nmode.in -c %s.rst -p %s.prmtop -v %s-vecs.out -o %s-vibs.out" % (self.name, self.name, self.name, self.name, self.name))
         # My attempt at parsing AMBER frequency output.
         vmode = 0

@@ -7,6 +7,7 @@ At the current stage, this script simply prints out all of the default options, 
 future we may want to autogenerate the input file.  This would make everyone's lives much
 easier, don't you think? :)
 """
+from __future__ import print_function
 
 import sys
 import re
@@ -34,7 +35,7 @@ def main():
         out.append("\n")
         out += parser.printsection("$target",tgt_opt,parser.tgt_opts_types)
     for line in out:
-        print line
+        print(line)
 
 if __name__ == "__main__":
     main()

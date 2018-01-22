@@ -3,7 +3,10 @@
 @author Lee-Ping Wang
 @date 08/2012
 """
+from __future__ import division
 
+from builtins import zip
+from builtins import range
 import os
 import shutil
 from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, pvec1d, pmat2d
@@ -14,7 +17,8 @@ from re import match, sub
 import subprocess
 from subprocess import PIPE
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
-from _assign import Assign
+# from ._assign import Assign
+from scipy import optimize
 from collections import OrderedDict
 #from _increment import Vibration_Build
 
@@ -55,7 +59,7 @@ class Vibration(Target):
         ## Read in the reference data
         self.read_reference_data()
         ## Build keyword dictionaries to pass to engine.
-        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del engine_args['name']
         ## Create engine object.
         self.engine = self.engine_(target=self, **engine_args)
@@ -169,7 +173,9 @@ class Vibration(Target):
                 # that are mapped to the row numbers (calculated mode numbers)
                 if self.reassign == 'permute':
                     a = np.array([[int(1e6*(1.0-np.dot(v1.flatten(),v2.flatten())**2)) for v2 in self.ref_eigvecs_nrm] for v1 in eigvecs_nrm_mw])
-                    c2r = Assign(a)
+                    row, c2r = optimize.linear_sum_assignment(a)
+                    # Commented out dependency on assignment code
+                    # c2r = Assign(a)
                     eigvals = eigvals[c2r]
                 elif self.reassign == 'overlap':
                     a = np.array([[(1.0-np.dot(v1.flatten(),v2.flatten())**2) for v2 in self.ref_eigvecs_nrm] for v1 in eigvecs_nrm_mw])

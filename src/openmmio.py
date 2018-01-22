@@ -3,7 +3,10 @@
 @author Lee-Ping Wang
 @date 04/2012
 """
+from __future__ import division
 
+from builtins import zip
+from builtins import range
 import os
 from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
@@ -928,7 +931,7 @@ class OpenMM(Engine):
         if force:
             Force = list(np.array(State.getForces() / kilojoules_per_mole * nanometer).flatten())
             # Extract forces belonging to real atoms only
-            Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]])))
+            Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(int(len(Force)/3)) if self.AtomMask[i]])))
         if dipole: Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
         return Result
 
@@ -1288,7 +1291,7 @@ class OpenMM(Engine):
             self.residues_idxs = np.array([[a.index for a in r.atoms()] for r in self.simulation.topology.residues()])
         scale_xyz = np.array([x,y,z])
         # loop over each frame and replace items
-        for i in xrange(len(self.xyz_omms)):
+        for i in range(len(self.xyz_omms)):
             pos, box = self.xyz_omms[i]
             # scale the box vectors
             new_box = np.array(box/nanometer) * scale_xyz

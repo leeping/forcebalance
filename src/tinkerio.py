@@ -6,7 +6,12 @@ modules for other programs because it's so simple.
 @author Lee-Ping Wang
 @date 01/2012
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import zip
+from builtins import range
 import os, shutil
 from re import match, sub
 from forcebalance.nifty import *
@@ -294,7 +299,7 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
     # Finally write the key file.
     file_out = wopen(fout) 
     for line in out:
-        print >> file_out, line
+        print(line, file=file_out)
     if verbose:
         printcool_dictionary(options, title="%s -> %s with options:" % (fin, fout))
     file_out.close()

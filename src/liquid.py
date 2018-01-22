@@ -3,7 +3,12 @@
 author Lee-Ping Wang
 @date 04/2012
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import zip
+from builtins import range
 import abc
 import os
 import shutil
@@ -305,6 +310,7 @@ class Liquid(Target):
         # Check the reference data table for validity.
         default_denoms = defaultdict(int)
         PhasePoints = None
+        RefData_copy = copy.deepcopy(self.RefData)
         for head in self.RefData:
             if head not in known_vars+[i+"_wt" for i in known_vars]:
                 # Only hard-coded properties may be recognized.
@@ -313,9 +319,9 @@ class Liquid(Target):
             if head in known_vars:
                 if head+"_wt" not in self.RefData:
                     # If the phase-point weights are not specified in the reference data file, initialize them all to one.
-                    self.RefData[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
-                wts = np.array(self.RefData[head+"_wt"].values())
-                dat = np.array(self.RefData[head].values())
+                    RefData_copy[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
+                wts = np.array(list(RefData_copy[head+"_wt"].values()))
+                dat = np.array(list(self.RefData[head].values()))
                 avg = np.average(dat, weights=wts)
                 if len(wts) > 1:
                     # If there is more than one data point, then the default denominator is the
@@ -325,9 +331,10 @@ class Liquid(Target):
                     # If there is only one data point, then the denominator is just the single
                     # data point itself.
                     default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
-            self.PhasePoints = self.RefData[head].keys()
+            self.PhasePoints = list(self.RefData[head].keys())
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
+        self.RefData = RefData_copy
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
         logger.debug("global_opts:\n%s\n" % str(global_opts))
@@ -388,7 +395,7 @@ class Liquid(Target):
         self.FF.make(mvals)
         # print mvals
         ddict = self.gas_engine.multipole_moments(optimize=True)['dipole']
-        d = np.array(ddict.values())
+        d = np.array(list(ddict.values()))
         if not in_fd():
             logger.info("The molecular dipole moment is % .3f debye\n" % np.linalg.norm(d))
         # Taken from the original OpenMM interface code, this is how we calculate the conversion factor.
@@ -502,7 +509,7 @@ class Liquid(Target):
             GradMapPrint.append([' %8.2f %8.1f %3s' % PT] + ["% 9.3e" % i for i in g])
         o = wopen('gradient_%s.dat' % name)
         for line in GradMapPrint:
-            print >> o, ' '.join(line)
+            print(' '.join(line), file=o)
         o.close()
 
         Delta = np.array([calc[PT] - exp[PT] for PT in points])
@@ -1096,7 +1103,7 @@ class Liquid(Target):
         Eps0_calc, Eps0_std, Eps0_grad = property_results['eps0']
         Surf_ten_calc, Surf_ten_std, Surf_ten_grad = property_results['surf_ten']
 
-        Points = Rho_calc.keys()
+        Points = list(Rho_calc.keys())
 
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Points, 'rho', Rho_calc, Rho_std, Rho_grad, name="Density")
@@ -1105,7 +1112,7 @@ class Liquid(Target):
         X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Points, 'kappa', Kappa_calc, Kappa_std, Kappa_grad, name="Compressibility")
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
-        X_Surf_ten, G_Surf_ten, H_Surf_ten, Surf_tenPrint = self.objective_term(Surf_ten_calc.keys(), 'surf_ten', Surf_ten_calc, Surf_ten_std, Surf_ten_grad, name="Surface Tension")
+        X_Surf_ten, G_Surf_ten, H_Surf_ten, Surf_tenPrint = self.objective_term(list(Surf_ten_calc.keys()), 'surf_ten', Surf_ten_calc, Surf_ten_std, Surf_ten_grad, name="Surface Tension")
 
         Gradient = np.zeros(self.FF.np)
         Hessian = np.zeros((self.FF.np,self.FF.np))

@@ -3,7 +3,10 @@
 @author Lee-Ping Wang
 @date 05/2012
 """
+from __future__ import division
 
+from builtins import str
+from builtins import range
 import os
 import shutil
 import numpy as np
@@ -90,7 +93,7 @@ class Interaction(Target):
             self.select2 = [i for i in range(self.mol.na) if i not in self.select1]
             logger.info('Fragment 2 is the complement of fragment 1 : %s\n' % (commadash(self.select2)))
         ## Build keyword dictionaries to pass to engine.
-        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del engine_args['name']
         self.engine = self.engine_(target=self, mol=self.mol, **engine_args)
         ## Read in the reference data
@@ -199,7 +202,7 @@ class Interaction(Target):
             pickle.dump((self.name, self.label, self.prefactor, self.eqm, emm), open("qm_vs_mm.p",'w'))
             # select the qm and mm data that has >0 weight to plot
             qm_data, mm_data = [], []
-            for i in xrange(len(self.eqm)):
+            for i in range(len(self.eqm)):
                 if self.prefactor[i] != 0:
                     qm_data.append(self.eqm[i])
                     mm_data.append(emm[i])

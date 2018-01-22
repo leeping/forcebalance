@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 import unittest
 import os, sys, time, re
 import traceback

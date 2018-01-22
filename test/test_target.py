@@ -1,3 +1,9 @@
+from __future__ import division
+from __future__ import absolute_import
+from builtins import str
+from builtins import range
+from builtins import object
+from past.utils import old_div
 import unittest
 import sys, os, re
 import forcebalance
@@ -28,9 +34,9 @@ class TargetTests(object):
         # check objective dictionary keys
         self.logger.debug("\n>ASSERT objective dictionary has X, G, H keys\n")
         self.assertEqual(dict,type(objective))
-        self.assertTrue(objective.has_key('X'))
-        self.assertTrue(objective.has_key('G'))
-        self.assertTrue(objective.has_key('H'))
+        self.assertTrue('X' in objective)
+        self.assertTrue('G' in objective)
+        self.assertTrue('H' in objective)
 
         # check objective value types
         self.logger.debug(">ASSERT objective['X'] is a float\n")

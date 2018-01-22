@@ -3,7 +3,13 @@
 author Lee-Ping Wang
 @date 04/2012
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import zip
+from builtins import map
+from builtins import range
 import abc
 import os
 import shutil
@@ -23,6 +29,7 @@ from pymbar import pymbar
 import itertools
 from collections import defaultdict, namedtuple, OrderedDict
 import csv
+import copy
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -234,7 +241,7 @@ class Lipid(Target):
                         elif val.lower() == 'false':
                             self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = False
                         elif head == 'scd':
-                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = np.array(map(float, val.split()))
+                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = np.array(list(map(float, val.split())))
                 except:
                     logger.error(line + '\n')
                     logger.error('Encountered an error reading this line!\n')
@@ -246,6 +253,7 @@ class Lipid(Target):
         # Check the reference data table for validity.
         default_denoms = defaultdict(int)
         PhasePoints = None
+        RefData_copy = copy.deepcopy(self.RefData)
         for head in self.RefData:
             if head == 'n_ic':
                 continue
@@ -256,9 +264,9 @@ class Lipid(Target):
             if head in known_vars:
                 if head+"_wt" not in self.RefData:
                     # If the phase-point weights are not specified in the reference data file, initialize them all to one.
-                    self.RefData[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
-                wts = np.array(self.RefData[head+"_wt"].values())
-                dat = np.array(self.RefData[head].values())
+                    RefData_copy[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
+                wts = np.array(list(RefData_copy[head+"_wt"].values()))
+                dat = np.array(list(self.RefData[head].values()))
                 # S_cd specifies an array of averages (one for each tail node).  Find avg over axis 0.
                 avg = np.average(dat, weights=wts, axis=0)
                 if len(wts) > 1:
@@ -275,9 +283,10 @@ class Lipid(Target):
                         default_denoms[head+"_denom"] = np.average(np.sqrt(np.abs(dat[0])))
                     else:
                         default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
-            self.PhasePoints = self.RefData[head].keys()
+            self.PhasePoints = list(self.RefData[head].keys())
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
+        self.RefData = RefData_copy
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
         logger.debug("global_opts:\n%s\n" % str(global_opts))
@@ -434,7 +443,7 @@ class Lipid(Target):
             GradMapPrint.append([' %8.2f %8.1f %3s' % PT] + ["% 9.3e" % i for i in g])
         o = wopen('gradient_%s.dat' % name)
         for line in GradMapPrint:
-            print >> o, ' '.join(line)
+            print(' '.join(line), file=o)
         o.close()
             
         Delta = np.array([calc[PT] - exp[PT] for PT in points])
