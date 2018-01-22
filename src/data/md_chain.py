@@ -15,6 +15,8 @@ This script is meant to be launched automatically by ForceBalance.
 #| Global Imports |#
 #==================#
 
+from builtins import str
+from builtins import range
 import os
 import argparse
 import numpy as np

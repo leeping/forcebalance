@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os, sys, glob, string
 import numpy as np
 import matplotlib.pyplot as plt
@@ -28,7 +29,7 @@ def parse_dihedraltypes(text):
             key = string.joinfields(fields[0:4],' ')
             dihtype  = int(fields[4])
             phi, k, n = float(fields[5]), float(fields[6]), float(fields[7])
-            if not parms.has_key(key):
+            if key not in parms:
                 parms[key] = []
             parms[key].append( (dihtype, phi, k, n) )
      
@@ -75,11 +76,11 @@ dihedraltypes = """[ dihedraltypes ]
 dihangles = np.arange(-270,270)
 parms = parse_dihedraltypes(dihedraltypes)
 
-print 'number of dihedral types:', len(parms.keys())
+print('number of dihedral types:', len(list(parms.keys())))
 
 plt.figure()
 panel = 1
-for key in parms.keys():
+for key in list(parms.keys()):
 
     potential = np.zeros( dihangles.shape )
 

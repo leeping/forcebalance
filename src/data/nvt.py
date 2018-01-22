@@ -49,11 +49,13 @@ You should have received a copy of the GNU General Public License along with
 this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
+from __future__ import division
 
 #==================#
 #| Global Imports |#
 #==================#
 
+from builtins import range
 import os
 import sys
 import glob
@@ -305,13 +307,13 @@ def main():
 
     # Print all options.
     printcool_dictionary(TgtOptions, title="Options from ForceBalance")
-    nvt_snapshots = (nvt_timestep * nvt_md_steps / 1000) / nvt_interval
-    nvt_iframes = 1000 * nvt_interval / nvt_timestep
+    nvt_snapshots = int((nvt_timestep * nvt_md_steps / 1000) / nvt_interval)
+    nvt_iframes = int(1000 * nvt_interval / nvt_timestep)
     logger.info("For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps\n" \
         % (nvt_snapshots, nvt_iframes, nvt_timestep))
     if nvt_snapshots < 2:
         raise Exception('Please set the number of liquid time steps so that you collect at least two snapshots (minimum %i)' \
-                            % (2000 * (nvt_interval/nvt_timestep)))
+                            % (2000 * int(nvt_interval,nvt_timestep)))
 
     #----
     # Loading coordinates
@@ -443,7 +445,7 @@ def main():
     num_frames = len(exp_dE_plus)
     numboots = 1000
     surf_ten_boots = np.zeros(numboots)
-    for i in xrange(numboots):
+    for i in range(numboots):
         boots_ordering = np.random.randint(num_frames, size=num_frames)
         boots_exp_dE_plus = np.take(exp_dE_plus, boots_ordering)
         boots_exp_dE_minus = np.take(exp_dE_minus, boots_ordering)
@@ -461,7 +463,7 @@ def main():
         beta = 1.0 / kT
         plus_denom = np.mean(np.exp(-beta*dE_plus))
         minus_denom = np.mean(np.exp(-beta*dE_minus))
-        for param_i in xrange(n_params):
+        for param_i in range(n_params):
             plus_left = np.mean(-beta * G_plus[param_i] * np.exp(-beta*dE_plus))
             plus_right = np.mean(-beta * G[param_i]) * plus_denom
             minus_left = np.mean(-beta * G_minus[param_i] * np.exp(-beta*dE_minus))

@@ -1,3 +1,6 @@
+from __future__ import absolute_import
+from builtins import str
+from builtins import object
 import sys, os
 import forcebalance
 import forcebalance.forcefield as forcefield

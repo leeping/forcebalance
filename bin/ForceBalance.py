@@ -3,7 +3,9 @@
 """ @package ForceBalance
 
 Executable  script for starting ForceBalance. """
+from __future__ import print_function
 
+from builtins import range
 import os, sys, re
 import argparse
 from forcebalance.parser import parse_inputs
@@ -141,7 +143,7 @@ def main():
                     newline += whites[i]
                 except: pass
                 i += 1
-        print newline
+        print(newline)
 
     parser = argparse.ArgumentParser(description="Force Field Optimization System")
     parser.add_argument("-c", "--continue", action="store_true", help="Continue from a previous run")

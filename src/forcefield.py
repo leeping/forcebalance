@@ -92,7 +92,11 @@ we need more modules!
 @date 04/2012
 
 """
+from __future__ import division
 
+from builtins import zip
+from builtins import str
+from builtins import range
 import os
 import sys
 import numpy as np
@@ -102,7 +106,7 @@ import forcebalance
 from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io
 from forcebalance.finite_difference import in_fd
 from forcebalance.nifty import *
-from string import count
+# from string import count
 from copy import deepcopy
 try:
     from lxml import etree
@@ -328,6 +332,22 @@ class FF(forcebalance.BaseClass):
         fnm = os.path.split(fnm)[1]
         options = {'forcefield' : [fnm], 'ffdir' : ffdir, 'duplicate_pnames' : True}
         return cls(options, verbose=False, printopt=False)
+
+    def __getstate__(self):
+        state = deepcopy(self.__dict__)
+        for ffname in self.ffdata:
+            if self.ffdata_isxml[ffname]:
+                temp = etree.tostring(self.ffdata[ffname])
+                del state['ffdata'][ffname]
+                state['ffdata'][ffname] = temp
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        for ffname in self.ffdata:
+            if self.ffdata_isxml[ffname]:
+                temp = etree.ElementTree(etree.fromstring(self.ffdata[ffname]))
+                self.ffdata[ffname] = temp
 
     def addff(self,ffname,xmlScript=False):
         """ Parse a force field file and add it to the class.
@@ -766,7 +786,7 @@ class FF(forcebalance.BaseClass):
             if cmd is not None:
                 try:
                     # Bobby Tables, anyone?
-                    if any([x in cmd for x in "system", "subprocess", "import"]):
+                    if any([x in cmd for x in ("system", "subprocess", "import")]):
                         warn_press_key("The command %s (written in the force field file) appears to be unsafe!" % cmd)
                     wval = eval(cmd.replace("PARM","PRM"))
                     # Attempt to allow evaluated parameters to be functions of each other.
@@ -825,7 +845,7 @@ class FF(forcebalance.BaseClass):
 
         for fnm in newffdata:
             if self.ffdata_isxml[fnm]:
-                with wopen(os.path.join(absprintdir,fnm)) as f: newffdata[fnm].write(f)
+                with wopen(os.path.join(absprintdir,fnm), binary=True) as f: newffdata[fnm].write(f)
             elif 'Script.txt' in fnm:
                 # if the xml file contains a script, ForceBalance will generate
                 # a temporary .txt file containing the script and any updates.
@@ -845,7 +865,7 @@ class FF(forcebalance.BaseClass):
                 raise RuntimeError
                 else:
                 '''
-                with wopen(os.path.join(absprintdir,fnmXml)) as f: newffdata[fnmXml].write(f)
+                with wopen(os.path.join(absprintdir,fnmXml), binary=True) as f: newffdata[fnmXml].write(f)
             else:
                 with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
 
@@ -1274,7 +1294,7 @@ class FF(forcebalance.BaseClass):
                     self.qmap.append(i)
                     if 'Multipole/c0' in self.plist[i] or 'Atom/charge' in self.plist[i]:
                         AType = self.plist[i].split('/')[-1].split('.')[0]
-                        nq = count(ListOfAtoms,AType)
+                        nq = ListOfAtoms.count(AType)
                     else:
                         thisq = []
                         for k in self.plist[i].split():
@@ -1285,7 +1305,7 @@ class FF(forcebalance.BaseClass):
                         try:
                             self.qid2.append(np.array([self.atomnames.index(k) for k in thisq]))
                         except: pass
-                        nq = sum(np.array([count(self.plist[i], j) for j in concern]))
+                        nq = sum(np.array([self.plist[i].count(j) for j in concern]))
                     self.qid.append(qnr+np.arange(nq))
                     qnr += nq
             if len(self.qid2) == 0:

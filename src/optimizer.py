@@ -7,7 +7,12 @@ contained inside.
 @date 12/2011
 
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import range
+from builtins import object
 import os, pickle, re, sys
 # import cProfile
 import numpy as np
@@ -267,18 +272,18 @@ class Optimizer(forcebalance.BaseClass):
                     in_options = 1
                 if in_options and line1.startswith("$end"):
                     if not have_mvals:
-                        print >> fout, "read_mvals"
-                        print >> fout, self.FF.sprint_map(mvals, precision=8)
-                        print >> fout, "/read_mvals"
+                        print("read_mvals", file=fout)
+                        print(self.FF.sprint_map(mvals, precision=8), file=fout)
+                        print("/read_mvals", file=fout)
                         have_mvals = 1
                     if not have_priors and priors is not None:
-                        print >> fout, "priors"
-                        print >> fout, '\n'.join(["   %-35s  : %.1e" % (k, priors[k]) for k in priors.keys()])
-                        print >> fout, "/priors"
+                        print("priors", file=fout)
+                        print('\n'.join(["   %-35s  : %.1e" % (k, priors[k]) for k in list(priors.keys())]), file=fout)
+                        print("/priors", file=fout)
                         have_priors = 1
                     in_options = 0
                 elif in_options and line1.startswith('jobtype') and jobtype is not None:
-                        print >> fout, "jobtype %s" % jobtype
+                        print("jobtype %s" % jobtype, file=fout)
                         continue
                 if line1.startswith("/read_mvals"):
                     in_mvals = 0
@@ -286,21 +291,21 @@ class Optimizer(forcebalance.BaseClass):
                     in_priors = 0
                 if in_mvals: continue
                 if in_priors: continue
-                print >> fout, line,
+                print(line, end=' ', file=fout)
                 if line1.startswith("read_mvals"):
                     if have_mvals: 
                         logger.error("Encountered more than one read_mvals section\n")
                         raise RuntimeError
                     have_mvals = 1
                     in_mvals = 1
-                    print >> fout, self.FF.sprint_map(mvals, precision=8)
+                    print(self.FF.sprint_map(mvals, precision=8), file=fout)
                 if line1.startswith("priors") and priors is not None:
                     if have_priors: 
                         logger.error("Encountered more than one priors section\n")
                         raise RuntimeError
                     have_priors = 1
                     in_priors = 1
-                    print >> fout, '\n'.join(["   %-35s  : %.1e" % (k, priors[k]) for k in priors.keys()])
+                    print('\n'.join(["   %-35s  : %.1e" % (k, priors[k]) for k in list(priors.keys())]), file=fout)
         return outfnm
             
     def Run(self):
@@ -1076,13 +1081,13 @@ class Optimizer(forcebalance.BaseClass):
         def generate_new_population(sorted, pop):
             newpop = pop[sorted[1]]
             # Individuals in this range are kept
-            a = range(KeepNum)
+            a = list(range(KeepNum))
             logger.info("Keeping: " + str(a) + '\n')
             random.shuffle(a)
             for i in range(0, KeepNum, 2):
                 logger.info("%i and %i reproducing to replace %i and %i\n" % (a[i],a[i+1],len(newpop)-i-2,len(newpop)-i-1))
                 newpop[-i-1], newpop[-i-2] = cross_over(newpop[a[i]],newpop[a[i+1]])
-            b = range(KeepNum, len(newpop))
+            b = list(range(KeepNum, len(newpop)))
             random.shuffle(b)
             for i in b[:MutNum]:
                 logger.info("Randomly mutating %i\n" % i)
@@ -1335,12 +1340,12 @@ class Optimizer(forcebalance.BaseClass):
             Reg = newcond.regularize * np.sum(logrskeys ** 2) / len(logrskeys)
             Obj = np.log(Cond_a) + Reg
             if newcond.verbose and newcond.step_n % 1000 == 0: 
-                logger.info("\rEval# %%6i: Step: %%9.3f Along: %%%is Condition: %%10.3e Regularize: %%8.3f Objective: %%8.3f\n" % max([len(k) for k in self.FF.rs_ord.keys()]) %
-                            (newcond.step_n, nlog, new_rsord.keys()[np.argmax(np.abs(dlog))], Cond_a, Reg, np.log(Cond_a) + Reg))
+                logger.info("\rEval# %%6i: Step: %%9.3f Along: %%%is Condition: %%10.3e Regularize: %%8.3f Objective: %%8.3f\n" % max([len(k) for k in list(self.FF.rs_ord.keys())]) %
+                            (newcond.step_n, nlog, list(new_rsord.keys())[np.argmax(np.abs(dlog))], Cond_a, Reg, np.log(Cond_a) + Reg))
                 # printcool_dictionary(answer['rs_ord'])
             elif newcond.verbose and Obj < newcond.best: 
-                logger.info("\rEval# %%6i: Step: %%9.3f Along: %%%is Condition: %%10.3e Regularize: %%8.3f Objective: %%8.3f (new minimum)\n" % max([len(k) for k in self.FF.rs_ord.keys()]) %
-                            (newcond.step_n, nlog, new_rsord.keys()[np.argmax(np.abs(dlog))], Cond_a, Reg, np.log(Cond_a) + Reg))
+                logger.info("\rEval# %%6i: Step: %%9.3f Along: %%%is Condition: %%10.3e Regularize: %%8.3f Objective: %%8.3f (new minimum)\n" % max([len(k) for k in list(self.FF.rs_ord.keys())]) %
+                            (newcond.step_n, nlog, list(new_rsord.keys())[np.argmax(np.abs(dlog))], Cond_a, Reg, np.log(Cond_a) + Reg))
                 # logger.info("New multipliers:" + ' '.join(['% .3f' % np.exp(s) for s in logrskeys])+'\n')
                 newcond.best = Obj
             newcond.prev_step = logrskeys
@@ -1419,7 +1424,7 @@ class Optimizer(forcebalance.BaseClass):
                 rezero.append(i)
             else:
                 nonzeros.append(optresult[i])
-                printkeys.append(self.FF.rs_ord.keys()[i])
+                printkeys.append(list(self.FF.rs_ord.keys())[i])
         # Now we make sure that the scale factors average to 1.0 in the log space. Otherwise they all grow larger / smaller.
         optresult -= np.mean(nonzeros)
         for i in rezero:
@@ -1429,7 +1434,7 @@ class Optimizer(forcebalance.BaseClass):
         opt_rsord = OrderedDict([(k, est124(np.exp(optresult[i])*self.FF.rs_ord[k])) for i, k in enumerate(self.FF.rs_ord.keys())])
         # Print the final answer
         answer = self.FF.make_rescale(opt_rsord, mvals=self.mvals0, H=H.copy(), multiply=False)
-        logger.info("Condition Number after Rounding Factors -> %.3f\n" % (np.exp(newcond(np.log(opt_rsord.values()), multiply=False))))
+        logger.info("Condition Number after Rounding Factors -> %.3f\n" % (np.exp(newcond(np.log(list(opt_rsord.values())), multiply=False))))
         bar = printcool("Previous values of the rescaling factors / prior widths:")
         logger.info(''.join(["   %-35s  : %.5e\n" % (i, self.FF.rs_ord[i]) for i in self.FF.rs_ord.keys()]))
         logger.info(bar)
@@ -1524,5 +1529,5 @@ class Optimizer(forcebalance.BaseClass):
         """ Write the checkpoint file for the main optimizer. """
         if self.wchk_fnm is not None:
             logger.info("Writing the checkpoint file %s\n" % self.wchk_fnm)
-            with wopen(os.path.join(self.root,self.wchk_fnm)) as f: pickle.dump(self.chk,f)
+            with wopen(os.path.join(self.root,self.wchk_fnm), binary=True) as f: pickle.dump(self.chk, f)
         

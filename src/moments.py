@@ -3,7 +3,9 @@
 @author Lee-Ping Wang
 @date 09/2012
 """
+from __future__ import division
 
+from builtins import zip
 import os
 import shutil
 import numpy as np
@@ -42,7 +44,7 @@ class Moments(Target):
         self.set_option(tgt_opts, 'polarizability_denom')
         self.set_option(tgt_opts, 'optimize_geometry')
 
-	self.denoms = {}
+        self.denoms = {}
         self.denoms['dipole'] = self.dipole_denom
         self.denoms['quadrupole'] = self.quadrupole_denom
         self.denoms['polarizability'] = self.polarizability_denom
@@ -57,7 +59,7 @@ class Moments(Target):
         ## Read in the reference data
         self.read_reference_data()
         ## Build keyword dictionaries to pass to engine.
-        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del engine_args['name']
         ## Create engine object.
         self.engine = self.engine_(target=self, **engine_args)

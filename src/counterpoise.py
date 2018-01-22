@@ -18,12 +18,14 @@ This subclass of Target implements the 'get' method.
 @author Lee-Ping Wang
 @date 12/2011
 """
+from __future__ import absolute_import
 
+from builtins import range
 import os
 import sys
 from re import match
 from forcebalance.target import Target
-from nifty import *
+from .nifty import *
 import numpy as np
 from forcebalance.output import getLogger
 logger = getLogger(__name__)

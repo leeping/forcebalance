@@ -1,5 +1,8 @@
 """ Target base class from which all ForceBalance fitting targets are derived. """
+from __future__ import print_function
 
+from builtins import str
+from builtins import range
 import abc
 import os
 import subprocess
@@ -13,9 +16,10 @@ from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p, in_fd
 from forcebalance.optimizer import Counter
 from forcebalance.output import getLogger
+from future.utils import with_metaclass
 logger = getLogger(__name__)
 
-class Target(forcebalance.BaseClass):
+class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
     
     """
     Base class for all fitting targets.
@@ -72,8 +76,6 @@ class Target(forcebalance.BaseClass):
     parameters need to be computed by finite difference.  Not a bad idea. :)
 
     """
-
-    __metaclass__ = abc.ABCMeta
     
     def __init__(self,options,tgt_opts,forcefield):
         """
@@ -126,7 +128,7 @@ class Target(forcebalance.BaseClass):
         ## Gradient norm below which we skip.
         self.set_option(tgt_opts, 'epsgrad')
         ## Dictionary of whether to call the derivatives.
-        self.pgrad = range(forcefield.np)
+        self.pgrad = list(range(forcefield.np))
         self.OptionDict['pgrad'] = self.pgrad
 
         #======================================#
@@ -216,7 +218,7 @@ class Target(forcebalance.BaseClass):
         # If the 'zero parameters' text file exists, then we load
         # the parameter names from the file for exclusion.
         pgrad0 = self.pgrad[:]
-        self.pgrad = range(self.FF.np)
+        self.pgrad = list(range(self.FF.np))
         if os.path.exists(zero_prm):
             for ln, line in enumerate(open(zero_prm).readlines()):
                 pid = line.strip()
@@ -263,7 +265,7 @@ class Target(forcebalance.BaseClass):
         if len(zero_pids) > 0:
             fout = open(zero_prm, 'w')
             for pid in zero_pids:
-                print >> fout, pid
+                print(pid, file=fout)
             fout.close()
 
     def get_G(self,mvals=None,customdir=None):

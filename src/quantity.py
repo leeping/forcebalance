@@ -1,3 +1,5 @@
+from __future__ import division
+from builtins import object
 import os
 import numpy as np
 
@@ -154,7 +156,7 @@ class Quantity_Density(Quantity):
             ekeep += ['Volume', 'Density']
 
             ekeep_order = [key for (key, value) in
-                           sorted(energyterms.items(), key=lambda (k, v) : v)
+                           sorted(energyterms.items(), key=lambda k_v : k_v[1])
                            if key in ekeep]
 
             # Perform energy component analysis and return properties.
@@ -233,10 +235,10 @@ class Quantity_H_vap(Quantity):
             ekeep2  = ['Total-Energy', 'Potential', 'Kinetic-En.', 'Temperature']
 
             ekeep_order1 = [key for (key, value)
-                            in sorted(energyterms1.items(), key=lambda (k, v) : v)
+                            in sorted(energyterms1.items(), key=lambda k_v1 : k_v1[1])
                             if key in ekeep1]
             ekeep_order2 = [key for (key, value)
-                            in sorted(energyterms2.items(), key=lambda (k, v) : v)
+                            in sorted(energyterms2.items(), key=lambda k_v2 : k_v2[1])
                             if key in ekeep2]
 
             # Perform energy component analysis and return properties.

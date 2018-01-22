@@ -31,11 +31,12 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from __future__ import division
+from __future__ import absolute_import
 
 __author__ = "Christopher M. Bruns"
 __version__ = "0.5"
 
-from unit_definitions import *
+from .unit_definitions import *
 
 #################
 ### CONSTANTS ###
