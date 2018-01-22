@@ -6,16 +6,11 @@ from __future__ import absolute_import
 #|              Chemical file format conversion module                |#
 #|                                                                    |#
 #|                Lee-Ping Wang (leeping@stanford.edu)                |#
-#|                    Last updated July 5, 2016                       |#
+#|                    Last updated January 22, 2018                   |#
 #|                                                                    |#
-#|   This is free software released under version 2 of the GNU GPL,   |#
-#|   please use or redistribute as you see fit under the terms of     |#
-#|   this license. (http://www.gnu.org/licenses/gpl-2.0.html)         |#
-#|                                                                    |#
-#|   This program is distributed in the hope that it will be useful,  |#
-#|   but without any warranty; without even the implied warranty of   |#
-#|   merchantability or fitness for a particular purpose.  See the    |#
-#|   GNU General Public License for more details.                     |#
+#|   This code is part of ForceBalance and is covered under the       |#
+#|   ForceBalance copyright notice and BSD 3-clause license.          |#
+#|   Please see https://github.com/leeping/forcebalance for details.  |#
 #|                                                                    |#
 #|   Feedback and suggestions are encouraged.                         |#
 #|                                                                    |#
@@ -65,7 +60,9 @@ from __future__ import absolute_import
 #|                f) Extra stuff                                      |#
 #|              4) "main" function (if executed)                      |#
 #|                                                                    |#
-#|                   Required: Python 2.7, Numpy 1.6                  |#
+#|                   Required: Python 2.7 or 3.6                      |#
+#|                             (2.6, 3.5 and earlier untested)        |#
+#|                             NumPy 1.6                              |#
 #|                   Optional: Mol2, PDB, DCD readers                 |#
 #|                    (can be found in ForceBalance)                  |#
 #|                    NetworkX package (for topologies)               |#
