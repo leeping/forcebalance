@@ -186,6 +186,7 @@ class BindingEnergy(Target):
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         self.PrintDict = OrderedDict()
         self.RMSDDict = OrderedDict()
+        EnergyDict = OrderedDict()
         #pool = Pool(processes=4)
         def compute(mvals_):
             # This function has automatically assigned variable names from the interaction master file
@@ -194,8 +195,8 @@ class BindingEnergy(Target):
             VectorD_ = []
             for sys_ in self.sys_opts:
                 Energy_, RMSD_ = self.system_driver(sys_)
-                #print "Setting %s to" % sys_, Energy_
-                exec(("%s = Energy_" % sys_), locals())
+                # Energies are stored in a dictionary.
+                EnergyDict[sys_] = Energy_
                 RMSDNrm_ = RMSD_ / self.rmsd_denom
                 w_ = self.sys_opts[sys_]['rmsd_weight'] if 'rmsd_weight' in self.sys_opts[sys_] else 1.0
                 VectorD_.append(np.sqrt(w_)*RMSDNrm_)
@@ -203,7 +204,12 @@ class BindingEnergy(Target):
                     self.RMSDDict[sys_] = "% 9.3f % 12.5f" % (RMSD_, w_*RMSDNrm_**2)
             VectorE_ = []
             for inter_ in self.inter_opts:
-                Calculated_ = eval(self.inter_opts[inter_]['equation'])
+                def encloseInDictionary(matchobj):
+                    return 'EnergyDict["' + matchobj.group(0)+'"]'
+                # Here we need to evaluate a mathematical expression of the stored variables in EnergyDict.
+                # We start by enclosing every variable in EnergyDict[""] and then calling eval on it.
+                evalExpr = re.sub('[A-Za-z_][A-Za-z0-9_]*', encloseInDictionary, self.inter_opts[inter_]['equation'])
+                Calculated_ = eval(evalExpr)
                 Reference_ = self.inter_opts[inter_]['reference_physical']
                 Delta_ = Calculated_ - Reference_
                 Denom_ = self.energy_denom
