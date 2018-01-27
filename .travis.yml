@@ -47,20 +47,16 @@ install:
   - conda install -c omnia pymbar openmm
 
     # Gromacs (from Bioconda)
-  - conda install -c bioconda gromacs
   - env
-  - find . -name mdrun
-  - find $HOME -name mdrun
-  - ls $(dirname $(dirname $(which python)))/pkgs
-  - . $(dirname $(dirname $(which python)))/pkgs/gromacs-4.6.5-0/bin/GMXRC.bash
+  - conda install -c bioconda gromacs
+  - . $HOME/miniconda/pkgs/gromacs-4.6.5-0/bin/GMXRC.bash
   
     # Tinker binaries
   - wget https://dasher.wustl.edu/tinker/downloads/bin-linux64-8.2.1.tar.gz -O tinker.tar.gz
   - tar xvzf tinker.tar.gz
-  - mkdir tinker
-  - mv bin-linux64 tinker/bin
-  - ls $PWD/tinker/bin
-  - export PATH="$PWD/tinker/bin:$PATH"
+  - mkdir -p $HOME/opt/tinker
+  - mv bin-linux64 $HOME/opt/tinker/bin
+  - export PATH="$HOME/opt/tinker/bin:$PATH"
 
     # Amber
   - conda install -c ambermd ambertools
