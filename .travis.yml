@@ -81,14 +81,14 @@ before_script:
   # - pip install -e .
 
 script:
-  # - python test
-  - cd studies/001_water_tutorial
-  - tar xvjf targets.tar.bz2
-  - ForceBalance very_simple.in
+  - python test/test_continue.py
+  # - cd studies/001_water_tutorial
+  # - tar xvjf targets.tar.bz2
+  # - ForceBalance very_simple.in
   # - py.test -v --cov=eex/ --durations=5
 
 notifications:
   email: false
 
 after_success:
-  - codecov
+  # - codecov
