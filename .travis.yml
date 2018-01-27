@@ -13,6 +13,7 @@ python:
 
 before_install:
   - ls
+  - pwd
   - uname -a
   - free -m
   - df -h
@@ -30,10 +31,24 @@ install:
   - conda update -q conda
   - conda info -a
   - conda create -q -n forcebalance_env python=$TRAVIS_PYTHON_VERSION numpy scipy lxml networkx
-  - conda install -c omnia pymbar openmm
-  
   - source activate forcebalance_env
 
+    # Omnia packages
+  - conda install -c omnia pymbar openmm
+
+    # Gromacs (from Beckstein lab)
+  - conda install -c becksteinlab gromacs-2016
+  
+    # Tinker binaries
+  - wget https://dasher.wustl.edu/tinker/downloads/bin-linux64-8.2.1.tar.gz -O tinker.tar.gz
+  - tar xvzf tinker.tar.gz
+  - ls $PWD/tinker/bin
+  - export PATH="$PWD/tinker/bin:$PATH"
+
+    # Amber
+  - conda install -c ambermd ambertools
+
+  - python setup.py install
     # Install anything not in conda
   # - pip install pint
   # - pip install codecov
