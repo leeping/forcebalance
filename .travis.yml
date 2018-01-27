@@ -42,6 +42,8 @@ install:
     # Tinker binaries
   - wget https://dasher.wustl.edu/tinker/downloads/bin-linux64-8.2.1.tar.gz -O tinker.tar.gz
   - tar xvzf tinker.tar.gz
+  - mkdir tinker
+  - mv bin-linux64 tinker/bin
   - ls $PWD/tinker/bin
   - export PATH="$PWD/tinker/bin:$PATH"
 
