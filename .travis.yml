@@ -30,8 +30,18 @@ install:
   - conda config --set always_yes yes --set changeps1 no
   - conda update -q conda
   - conda info -a
-  - conda create -q -n forcebalance_env python=$TRAVIS_PYTHON_VERSION numpy scipy lxml networkx
+
+    # swig: for building CCTools
+    # future: for builtins
+    
+  - conda create -q -n forcebalance_env python=$TRAVIS_PYTHON_VERSION numpy scipy lxml networkx swig future
   - source activate forcebalance_env
+
+    # Add conda-forge and omnia to your channel list
+  - conda config --add channels omnia --add channels conda-forge --add-channels
+  
+    # Update to conda-forge versions of packages
+  - conda update --yes --all
 
     # Omnia packages
   - conda install -c omnia pymbar openmm
@@ -50,12 +60,14 @@ install:
     # Amber
   - conda install -c ambermd ambertools
 
-  - python setup.py install
     # Install anything not in conda
   # - pip install pint
-  # - pip install codecov
+  - pip install codecov
   # - pip install pytest-cov
   # - conda list
+
+    # Install ForceBalance
+  - python setup.py install
 
 before_script:
   - python -V
