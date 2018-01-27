@@ -51,6 +51,10 @@ install:
   - conda install -c bioconda gromacs
   - . $HOME/miniconda/pkgs/gromacs-4.6.5-0/bin/GMXRC.bash
   - which mdrun
+  - cd $(dirname $(which mdrun))
+    # Spoof double-precision versions
+  - for i in $(find . -maxdepth 1 -type f) ; do ln -s $i ${i}_d ; done
+  - cd -
   
     # Tinker binaries
   - wget https://dasher.wustl.edu/tinker/downloads/bin-linux64-8.2.1.tar.gz -O tinker.tar.gz
