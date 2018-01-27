@@ -38,7 +38,7 @@ install:
   - source activate forcebalance_env
 
     # Add conda-forge and omnia to your channel list
-  - conda config --add channels omnia --add channels conda-forge --add-channels
+  - conda config --add channels omnia --add channels conda-forge
   
     # Update to conda-forge versions of packages
   - conda update --yes --all
