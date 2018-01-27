@@ -46,8 +46,10 @@ install:
     # Omnia packages
   - conda install -c omnia pymbar openmm
 
-    # Gromacs (from Beckstein lab)
-  - conda install -c becksteinlab gromacs-2016
+    # Gromacs (from Bioconda)
+  - conda install -c bioconda gromacs
+  - ls $(dirname $(dirname $(which python)))/pkgs
+  - . $(dirname $(dirname $(which python)))/pkgs/gromacs-4.6.5-0/bin/GMXRC.bash
   
     # Tinker binaries
   - wget https://dasher.wustl.edu/tinker/downloads/bin-linux64-8.2.1.tar.gz -O tinker.tar.gz
