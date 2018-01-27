@@ -48,6 +48,7 @@ install:
 
     # Gromacs (from Bioconda)
   - conda install -c bioconda gromacs
+  - env
   - ls $(dirname $(dirname $(which python)))/pkgs
   - . $(dirname $(dirname $(which python)))/pkgs/gromacs-4.6.5-0/bin/GMXRC.bash
   
