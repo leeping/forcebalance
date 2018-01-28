@@ -47,21 +47,29 @@ install:
   - conda install -c omnia pymbar openmm
 
     # Gromacs (from Bioconda)
-  - env
-  - conda install -c bioconda gromacs
-  - . $HOME/miniconda/pkgs/gromacs-4.6.5-0/bin/GMXRC.bash
-  - which mdrun
-  - cd $(dirname $(which mdrun))
-    # Spoof double-precision versions
-  - for i in $(find . -maxdepth 1 -type f) ; do ln -s $i ${i}_d ; done
-  - cd -
+  - wget ftp://ftp.gromacs.org/pub/gromacs/gromacs-4.6.7.tar.gz
+  - tar xvzf gromacs-4.6.7.tar.gz
+  - cd gromacs-4.6.7
+  - mkdir build_d
+  - cd build_d
+    # Build double precision version
+  - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=ON -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON
+  - make && make install
+  - cd ..
+  - mkdir build_s
+  - cd build_s
+    # Build double precision version
+  - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=OFF -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON
+  - make && make install
+  - cd ../..
+  - . /home/travis/opt/gromacs/4.6.7/bin/GMXRC.bash
   
     # Tinker binaries
   - wget https://dasher.wustl.edu/tinker/downloads/bin-linux64-8.2.1.tar.gz -O tinker.tar.gz
   - tar xvzf tinker.tar.gz
-  - mkdir -p $HOME/opt/tinker
-  - mv bin-linux64 $HOME/opt/tinker/bin
-  - export PATH="$HOME/opt/tinker/bin:$PATH"
+  - mkdir -p $HOME/opt/tinker/8.2.1
+  - mv bin-linux64 $HOME/opt/tinker/8.2.1/bin
+  - export PATH="$HOME/opt/tinker/8.2.1/bin:$PATH"
 
     # Amber
   - conda install -c ambermd ambertools
