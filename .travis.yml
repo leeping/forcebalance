@@ -49,29 +49,30 @@ install:
 
     # Gromacs (from Bioconda)
   - wget ftp://ftp.gromacs.org/pub/gromacs/gromacs-4.6.7.tar.gz
-  - tar xvzf gromacs-4.6.7.tar.gz
+  - echo "Extracting Gromacs - log suppressed.."
+  - tar xvzf gromacs-4.6.7.tar.gz &> untar.log
   - cd gromacs-4.6.7
   - mkdir build_d
   - cd build_d
     # Build double precision version
-  - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=ON -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON
-  - echo "Building Gromacs double precision - log suppressed.."
+  - echo "Building Gromacs double precision - logs suppressed..."
+  - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=ON -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
   - make -j 2 &> make.log
-  - make install
+  - make install &> install.log
   - cd ..
   - mkdir build_s
   - cd build_s
     # Build double precision version
-  - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=OFF -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON
   - echo "Building Gromacs single precision - log suppressed.."
+  - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=OFF -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
   - make -j 2 &> make.log
-  - make install
+  - make install &> install.log
   - cd ../..
   - . /home/travis/opt/gromacs/4.6.7/bin/GMXRC.bash
   
     # Tinker binaries
   - wget https://dasher.wustl.edu/tinker/downloads/bin-linux64-8.2.1.tar.gz -O tinker.tar.gz
-  - tar xvzf tinker.tar.gz
+  - tar xvzf tinker.tar.gz &> untar.log
   - mkdir -p $HOME/opt/tinker/8.2.1
   - mv bin-linux64 $HOME/opt/tinker/8.2.1/bin
   - export PATH="$HOME/opt/tinker/8.2.1/bin:$PATH"
