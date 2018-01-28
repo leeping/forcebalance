@@ -5,6 +5,7 @@ language: python
 
 # Run jobs on container-based infrastructure, can be overridden per job
 sudo: false
+dist: trusty
 
 python:
     - 2.7
@@ -54,13 +55,17 @@ install:
   - cd build_d
     # Build double precision version
   - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=ON -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON
-  - make && make install
+  - echo "Building Gromacs double precision - log suppressed.."
+  - make -j 2 &> make.log
+  - make install
   - cd ..
   - mkdir build_s
   - cd build_s
     # Build double precision version
   - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=OFF -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON
-  - make && make install
+  - echo "Building Gromacs single precision - log suppressed.."
+  - make -j 2 &> make.log
+  - make install
   - cd ../..
   - . /home/travis/opt/gromacs/4.6.7/bin/GMXRC.bash
   
