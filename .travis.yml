@@ -44,6 +44,26 @@ install:
     # Update to conda-forge versions of packages
   - conda update --yes --all
 
+    # Install Work Queue
+  # - conda install swig
+  # - cctools_src="cctools-4.3.2-source"
+  # - cctools_pfx="$HOME/opt/cctools/4.3.2"
+  # - wget http://www3.nd.edu/~ccl/software/files/$cctools_src.tar.gz
+  # - tar xzf $cctools_src.tar.gz
+  # - cd $cctools_src
+  # - sed -i s/"config_perl_path=auto"/"config_perl_path=no"/g configure
+  # - sed -i s/"config_globus_path=auto"/"config_globus_path=no"/g configure
+  # - pypath=$(dirname $(dirname $(which python)))
+  # - echo $pypath; ls $pypath
+  # - swgpath=$(dirname $(dirname $(which swig)))
+  # - ./configure --prefix $cctools_pfx --with-python-path $pypath --with-swig-path $swgpath
+  # - make -j 2 &> make.log
+  # - make install &> install.log
+  # - cd work_queue
+  # - make install
+  # - cd ../..
+  # - cp -r $cctools_pfx/
+
     # Omnia packages
   - conda install -c omnia pymbar openmm
 
@@ -85,6 +105,7 @@ install:
   - pip install codecov
   # - pip install pytest-cov
   # - conda list
+
 
     # Extract data archives
   - cd studies/001_water_tutorial
