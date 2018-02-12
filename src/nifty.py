@@ -1408,6 +1408,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     process_out.stdout = ''.join(process_out.stdout)
     process_err.stderr = ''.join(process_err.stderr)
 
+    _exec.returncode = p.returncode
     if p.returncode != 0:
         if process_err.stderr and print_error:
             logger.warning("Received an error message:\n")
@@ -1429,6 +1430,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     if Out[-1] == '':
         Out = Out[:-1]
     return Out
+_exec.returncode = None
 
 def warn_press_key(warning, timeout=10):
     logger.warning(warning + '\n')

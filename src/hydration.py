@@ -71,6 +71,9 @@ class Hydration(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
         ## The vdata.txt file that contains the hydrations.
         self.datafile = os.path.join(self.tgtdir,self.datafile)
         ## Scripts to be copied from the ForceBalance installation directory.

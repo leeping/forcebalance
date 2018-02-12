@@ -52,6 +52,9 @@ class Moments(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
         ## The mdata.txt file that contains the moments.
         self.mfnm = os.path.join(self.tgtdir,"mdata.txt")
         ## Dictionary of reference multipole moments.

@@ -116,6 +116,9 @@ class Lipid(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
         # List of trajectory files that may be deleted if self.save_traj == 1.
         self.last_traj = []
         # Extra files to be copied back at the end of a run.
