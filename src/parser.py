@@ -88,7 +88,6 @@ gen_opts_types = {
                  "criteria"   : (1, 160, 'The number of convergence criteria that must be met for main optimizer to converge', 'Main Optimizer'),
                  "rpmd_beads"       : (0, -160, 'Number of beads in ring polymer MD (zero to disable)', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  "zerograd"         : (-1, 0, 'Set to a nonnegative number to turn on zero gradient skipping at that optimization step.', 'All'),
-                 "amber_nbcut"            : (9999, -20, 'Specify the nonbonded cutoff for AMBER engine in Angstrom (I should port this to other engines too.)', 'AMBER targets, especially large nonperiodic systems', ['AMBER'])
                  },
     'bools'   : {"backup"           : (1,  10,  'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, -50,  'Write the checkpoint file at every optimization step'),
@@ -158,6 +157,7 @@ tgt_opts_types = {
                  "amber_mol2"            : (None, -10, 'Name of mol2 file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
                  "amber_frcmod"          : (None, -10, 'Name of frcmod file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
                  "amber_leapcmd"         : (None, -10, 'File containing commands for "tleap" when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
+                 "amber_mdin"            : (None, -10, 'Name of mdin file containing custom simulation settings.', 'AMBER molecular dynamics targets', 'AMBER'),
                  "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
                  "expdata_txt"           : ('expset.txt', 0, 'Text file containing experimental data.', 'Thermodynamic properties target', 'thermo'),
                  "hfedata_txt"           : ('hfedata.txt', 0, 'Text file containing experimental data.', 'Hydration free energy target', 'hydration'),

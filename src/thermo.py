@@ -91,6 +91,9 @@ class Thermo(Target):
         self.set_option(tgt_opts, "md_steps", forceprint=True)
 
         ## Variables
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
         # Prefix names for simulation data
         self.simpfx    = "sim"
         # Data points for quantities

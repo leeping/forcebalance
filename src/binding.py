@@ -148,6 +148,9 @@ class BindingEnergy(Target):
 
         self.set_option(tgt_opts,'cauchy')
         self.set_option(tgt_opts,'attenuate')
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
 
         logger.info("The energy denominator is: %s\n" % str(self.energy_denom)) 
         logger.info("The RMSD denominator is: %s\n" % str(self.rmsd_denom))

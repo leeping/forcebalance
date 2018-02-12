@@ -165,6 +165,9 @@ class Liquid(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
         # Read in liquid starting coordinates.
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.liquid_coords)):
             logger.error("%s doesn't exist; please provide liquid_coords option\n" % self.liquid_coords)
