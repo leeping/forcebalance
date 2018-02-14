@@ -27,9 +27,19 @@ from forcebalance.interaction import Interaction
 from forcebalance.vibration import Vibration
 from forcebalance.molecule import Molecule
 from collections import OrderedDict, defaultdict, namedtuple
+# Rudimentary NetCDF file usage
+from scipy.io.netcdf import netcdf_file
+try:
+    # Some functions require the Python API to sander "pysander"
+    import sander
+except:
+    pass
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
+
+# Boltzmann's constant
+kb_kcal = 0.0019872041
 
 mol2_pdict = {'COUL':{'Atom':[1], 8:''}}
 
@@ -246,39 +256,169 @@ def parse_amber_namelist(fin):
                 
     return comments, names, block_dicts, suffixes
 
-def write_mdin(fb_cntrl_vars, calctype, fout, mdin_orig=None):
+def write_mdin(calctype, fout=None, nsteps=None, timestep=None, nsave=None, pbc=False, temperature=None, pressure=None, mdin_orig=None):
     """
-    Write an AMBER .mdin file for use with the AMBER.molecular_dynamics() method.
+    Write an AMBER .mdin file to carry out a calculation using sander or pmemd.cuda.
     
     Parameters
     ----------
-    fb_cntrl_vars : OrderedDict of namedtuples
-        Keys are variable names to be printed to mdin_orig. 
-        Values are namedtuples representing values, their properties are:
-        1) Name of the variable
-        2) Value of the variable, should be a dictionary with three keys 'min', 'eq', 'md'.
-           When writing the variable for a run type, it will only be printed if the value exists in the dictionary.
-           (e.g. 'maxcyc' should only be printed out for minimization jobs.)
-           If the value looked up is equal to None, it will throw an error.
-        3) Comment to be printed out with the variable
-        4) Priority level of the variable
-           1: The variable will always be set in the ForceBalance code at runtime (The highest)
-           2: The variable is set by the user in the ForceBalance input file
-           3: User may provide variable in custom mdin file (in target folder); if not provided, default value will be used
-           4: User may provide variable in custom mdin file (in target folder); if not provided, it will not be printed
-
+    calctype : str
+        The type of calculation being performed
+        'min' : minimization
+        'eq' : equilibration
+        'md' : (production) MD
+        'sp' : Single-point calculation
+    
     fout : str
-        File name that the .mdin file should be written to.
+        If provided, file name that the .mdin file should be written to.
         Each variable within a namelist will occupy one line.
         Comments within namelist are not written to output.
+
+    timestep : float
+        Time step in picoseconds. For minimizations or 
+        single-point calculations, this is not needed
+
+    nsteps : int
+        How many MD or minimization steps to take
+        For single-point calculations, this is not needed
+
+    nsave : int
+        How often to write trajectory and velocity frames
+        (only production MD writes velocities)
+        For single-point calculations, this is not needed
+
+    pbc : bool
+        Whether to use periodic boundary conditions
+    
+    temperature : float
+        If not None, the simulation temperature
+
+    pressure : float
+        If not None, the simulation pressure
 
     mdin_orig : str, optional
         Custom mdin file provided by the user. 
         Non-&cntrl blocks will be written to output.
         Top-of-file comments will be written to output. 
+
+    Returns
+    -------
+    OrderedDict
+        key : value pairs in the &cntrl namelist,
+        useful for passing to cpptraj or sander/cpptraj
+        Python APIs in the future.
     """
-    if calctype not in ['min', 'eq', 'md']:
+    if calctype not in ['min', 'eq', 'md', 'sp']:
         raise RuntimeError("Invalid calctype")
+    if calctype in ['eq', 'md']:
+        if timestep is None:
+            raise RuntimeError("eq and md requires timestep")
+        if nsteps is None:
+            raise RuntimeError("eq and md requires nsteps")
+        if nsave is None:
+            raise RuntimeError("eq and md requires nsave")
+    if calctype == 'min':
+        # This value is never used but needed
+        # to prevent an error in string formatting
+        timestep = 0.0
+        if nsteps is None:
+            nsteps = 500
+        if nsave is None:
+            nsave = 10
+    if calctype == 'sp':
+        # This value is never used but needed
+        # to prevent an error in string formatting
+        nsteps = 0
+        timestep = 0.0
+        nsave = 0
+
+    # cntrl_vars is an OrderedDict of namedtuples.
+    #     Keys are variable names to be printed to mdin_orig. 
+    #     Values are namedtuples representing values, their properties are:
+    #     1) Name of the variable
+    #     2) Value of the variable, should be a dictionary with three keys 'min', 'eq', 'md'.
+    #        When writing the variable for a run type, it will only be printed if the value exists in the dictionary.
+    #        (e.g. 'maxcyc' should only be printed out for minimization jobs.)
+    #        If the value looked up is equal to None, it will throw an error.
+    #     3) Comment to be printed out with the variable
+    #     4) Priority level of the variable
+    #        1: The variable will always be set in the ForceBalance code at runtime (The highest)
+    #        2: The variable is set by the user in the ForceBalance input file
+    #        3: User may provide variable in custom mdin_orig; if not provided, default value will be used
+    #        4: User may provide variable in custom mdin_orig; if not provided, it will not be printed
+    cntrl_vars = OrderedDict()
+    cntrl_var = namedtuple("cntrl_var", ["name", "value", "comment", "priority"])
+    cntrl_vars["imin"]    = cntrl_var(name="imin", value={"min":"1","eq":"0","md":"0","sp":"5"}, comment="0 = MD; 1 = Minimize; 5 = Trajectory analysis", priority=1)
+    # Options pertaining to minimization
+    cntrl_vars["ntmin"]   = cntrl_var(name="ntmin", value={"min":"2"}, comment="Minimization algorithm; 2 = Steepest descent", priority=3)
+    cntrl_vars["dx0"]     = cntrl_var(name="dx0", value={"min":"0.1"}, comment="Minimizer step length", priority=3)
+    cntrl_vars["maxcyc"]  = cntrl_var(name="maxcyc", value={"min":"%i" % nsteps, "sp":"1"}, comment="Number of minimization steps", priority=3)
+    # MD options - time step and number of steps
+    cntrl_vars["dt"] = cntrl_var(name="dt", value={"eq":"%.8f" % timestep, "md":"%.8f" % timestep}, comment="Time step (ps)", priority=2)
+    cntrl_vars["nstlim"] = cntrl_var(name="nstlim", value={"eq":"%i" % nsteps, "md":"%i" % nsteps}, comment="Number of MD steps", priority=2)
+    # ntpr, ntwx and ntwr for eq and md runs should be set by this function.
+    cntrl_vars["ntpr"] = cntrl_var(name="ntpr", value={"min":"%i" % nsave,"eq":"%i" % nsave,"md":"%i" % nsave}, comment="Interval for printing output", priority={"min":1,"eq":2,"md":2,"sp":1})
+    cntrl_vars["ntwx"] = cntrl_var(name="ntwx", value={"min":"%i" % nsave,"eq":"%i" % nsave,"md":"%i" % nsave}, comment="Interval for writing trajectory", priority={"min":1,"eq":2,"md":2,"sp":1})
+    cntrl_vars["ntwr"] = cntrl_var(name="ntwr", value={"min":"%i" % nsave,"eq":"%i" % nsteps,"md":"%i" % nsteps}, comment="Interval for writing restart", priority={"min":1,"eq":1,"md":1,"sp":1})
+    cntrl_vars["ntwv"] = cntrl_var(name="ntwv", value={"md":"-1"}, comment="Interval for writing velocities", priority={"min":1,"eq":1,"md":2,"sp":1})
+    cntrl_vars["ntwe"] = cntrl_var(name="ntwe", value={"md":"%i" % nsave}, comment="Interval for writing energies (disabled)", priority=1)
+    cntrl_vars["nscm"] = cntrl_var(name="nscm", value={"eq":"1000","md":"1000"}, comment="Interval for removing COM translation/rotation", priority=3)
+    # Insist on NetCDF trajectories for ntxo, ioutfm 
+    cntrl_vars["ntxo"]   = cntrl_var(name="ntxo",   value={"min":"2","eq":"2","md":"2"}, comment="Restart output format; 1 = ASCII, 2 = NetCDF", priority=1)
+    cntrl_vars["ioutfm"] = cntrl_var(name="ioutfm", value={"min":"1","eq":"1","md":"1"}, comment="Trajectory format; 0 = ASCII, 1 = NetCDF", priority=1)
+    # min and eq read coors only; md is a full restart
+    cntrl_vars["ntx"]    = cntrl_var(name="ntx",    value={"min":"1","eq":"1","md":"5"}, comment="1 = Read coors only; 5 = Full restart", priority=1)
+    cntrl_vars["irest"]  = cntrl_var(name="irest",  value={"min":"0","eq":"0","md":"1"}, comment="0 = Do not restart ; 1 = Restart", priority=1)
+    # Use AMBER's default nonbonded cutoff if the user does not provide
+    # Set the PBC and pressure variables: ntb, ntp, barostat, mcbarint
+    if pbc:
+        ntb_eqmd = "2" if pressure is not None else "1"
+        ntp_eqmd = "1" if pressure is not None else "0"
+        cntrl_vars["cut"] = cntrl_var(name="cut", value={"min":"8.0","eq":"8.0","md":"8.0","sp":"8.0"}, comment="Nonbonded cutoff", priority=3)
+        cntrl_vars["ntb"] = cntrl_var(name="ntb", value={"min":"1","eq":ntb_eqmd,"md":ntb_eqmd,"sp":ntb_eqmd}, comment="0 = no PBC ; 1 = constant V ; 2 = constant P", priority=1)
+        cntrl_vars["ntp"] = cntrl_var(name="ntp", value={"min":"0","eq":ntp_eqmd,"md":ntp_eqmd,"sp":ntp_eqmd}, comment="0 = constant V ; 1 = isotropic scaling", priority=1)
+        cntrl_vars["iwrap"]  = cntrl_var(name="iwrap",  value={"min":"1","eq":"1","md":"1"}, comment="Wrap molecules back into box", priority=3)
+        cntrl_vars["igb"]    = cntrl_var(name="igb",    value={"min":"0","eq":"0","md":"0","sp":"0"}, comment="0 = No generalized Born model", priority=3)
+        if pressure is not None:
+            # We should use Berendsen for equilibration and MC for production.
+            cntrl_vars["barostat"] = cntrl_var(name="barostat", value={"eq":"1","md":"2"}, comment="1 = Berendsen; 2 = Monte Carlo", priority=1)
+            cntrl_vars["mcbarint"] = cntrl_var(name="mcbarint", value={"md":"25"}, comment="MC barostat rescaling interval", priority=3)
+        else:
+            # If there is no pressure, these variables should not be printed.
+            cntrl_vars["barostat"] = cntrl_var(name="barostat", value={}, comment="1 = Berendsen; 2 = Monte Carlo", priority=1)
+            cntrl_vars["mcbarint"] = cntrl_var(name="mcbarint", value={}, comment="MC barostat rescaling interval", priority=1)
+    else:
+        cntrl_vars["cut"] = cntrl_var(name="cut", value={"min":"9999.0","eq":"9999.0","md":"9999.0","sp":"9999.0"}, comment="Nonbonded cutoff", priority=1)
+        cntrl_vars["ntb"] = cntrl_var(name="ntb", value={"min":"0","eq":"0","md":"0","sp":"0"}, comment="0 = no PBC ; 1 = constant V ; 2 = constant P", priority=1)
+        cntrl_vars["ntp"] = cntrl_var(name="ntp", value={}, comment="0 = constant V ; 1 = isotropic scaling", priority=1)
+        cntrl_vars["igb"]    = cntrl_var(name="igb",    value={"min":"6","eq":"6","md":"6","sp":"6"}, comment="6 = Vacuum phase simulation", priority=1)
+        cntrl_vars["iwrap"]  = cntrl_var(name="iwrap",  value={}, comment="Wrap molecules back into box", priority=1)
+        cntrl_vars["barostat"] = cntrl_var(name="barostat", value={}, comment="1 = Berendsen; 2 = Monte Carlo", priority=1)
+        cntrl_vars["mcbarint"] = cntrl_var(name="mcbarint", value={}, comment="MC barostat rescaling interval", priority=1)
+    # Set the temperature variables tempi, temp0, ntt, gamma_ln
+    if temperature is not None:
+        cntrl_vars["tempi"] = cntrl_var(name="tempi", value={"eq":"%i" % temperature,"md":"%i" % temperature}, comment="Initial temperature", priority=1)
+        cntrl_vars["temp0"] = cntrl_var(name="temp0", value={"eq":"%i" % temperature,"md":"%i" % temperature}, comment="Reference temperature", priority=1)
+        cntrl_vars["ntt"] = cntrl_var(name="ntt", value={"eq":"3","md":"3"}, comment="Thermostat ; 3 = Langevin", priority=1)
+        cntrl_vars["gamma_ln"] = cntrl_var(name="gamma_ln", value={"eq":"1.0","md":"1.0"}, comment="Langevin collision frequency (ps^-1)", priority=3)
+    else:
+        cntrl_vars["tempi"] = cntrl_var(name="tempi", value={}, comment="Initial temperature", priority=1)
+        cntrl_vars["temp0"] = cntrl_var(name="temp0", value={}, comment="Reference temperature", priority=1)
+        cntrl_vars["ntt"] = cntrl_var(name="ntt", value={}, comment="Thermostat ; 3 = Langevin", priority=1)
+        cntrl_vars["gamma_ln"] = cntrl_var(name="gamma_ln", value={}, comment="Langevin collision frequency (ps^-1)", priority=1)
+    # Options having to do with constraints; these should be set by the user if SHAKE is desired.
+    # SHAKE is always turned off for minimization and for single-point properties.
+    cntrl_vars["ntc"] = cntrl_var(name="ntc", value={"min":"1","eq":"1","md":"1","sp":"1"}, comment="SHAKE; 1 = none, 2 = H-bonds, 3 = All-bonds", priority={"min":1,"eq":3,"md":3,"sp":1})
+    cntrl_vars["ntf"] = cntrl_var(name="ntf", value={"min":"1","eq":"1","md":"1","sp":"1"}, comment="No bonds involving H-atoms (use with NTC=2)", priority={"min":1,"eq":3,"md":3,"sp":1})
+    cntrl_vars["tol"] = cntrl_var(name="tol", value={}, comment="SHAKE tolerance,", priority=4)
+    # Random number seed for equilibration and dynamics
+    cntrl_vars["ig"] = cntrl_var(name="ig", value={"eq":"-1","md":"-1"}, comment="Random number seed; -1 based on date/time", priority=3)
+
+    def get_priority(prio_in):
+        if type(prio_in) is int:
+            return prio_in
+        elif type(prio_in) is dict:
+            return prio_in[calctype]
     
     if mdin_orig is not None:
         comments, names, block_dicts, suffixes = parse_amber_namelist(mdin_orig)
@@ -298,15 +438,18 @@ def write_mdin(fb_cntrl_vars, calctype, fout, mdin_orig=None):
     cntrl_comm = OrderedDict()
     
     # Fill in the "high priority" options set by ForceBalance
+    # Note that if value[calctype] is not set for a high-priority option,
+    # that means the variable is erased from the output namelist
     checked_list = []
-    for name, var in fb_cntrl_vars.items():
-        if var.priority in [1, 2]:
+    for name, var in cntrl_vars.items():
+        priority = get_priority(var.priority)
+        if priority in [1, 2]:
             checked_list.append(name)
             if calctype in var.value:
                 cntrl_out[name] = var.value[calctype]
-                if var.priority == 1:
+                if priority == 1:
                     cntrl_comm[name] = "Set by FB at runtime : %s" % var.comment
-                elif var.priority == 2:
+                elif priority == 2:
                     cntrl_comm[name] = "From FB input file   : %s" % var.comment
 
     # Fill in the other options set by the user
@@ -317,30 +460,33 @@ def write_mdin(fb_cntrl_vars, calctype, fout, mdin_orig=None):
             cntrl_comm[name] = "Set via mdin file"
 
     # Fill in default options not set by the user
-    for name, var in fb_cntrl_vars.items():
-        if name not in checked_list and var.priority in [3]:
+    for name, var in cntrl_vars.items():
+        if name not in checked_list and get_priority(var.priority) == 3:
             checked_list.append(name)
             if calctype in var.value:
                 cntrl_out[name] = var.value[calctype]
                 cntrl_comm[name] = "FB set by default    : %s" % var.comment
         
-    # Note: priority-4 options from fb_cntrl_vars
-    # are not used at all. 
+    # Note: priority-4 options from cntrl_vars
+    # are not used at all in this function
 
     for iname, name, in enumerate(names):
         if name == 'cntrl':
             block_dicts[iname] = cntrl_out
 
-    with open(fout, 'w') as f:
-        for line in comments:
-            print(line, file=f)
-        for name, block_dict, suffix in zip(names, block_dicts, suffixes):
-            print("&%s" % name, file=f)
-            for key, val in block_dict.items():
-                print("%-20s ! %s" % ("%s=%s," % (key, val), cntrl_comm[key]), file=f)
-            print("/", file=f)
-            for line in suffix:
-                print("%s" % line, file=f)
+    if fout is not None:
+        with open(fout, 'w') as f:
+            for line in comments:
+                print(line, file=f)
+            for name, block_dict, suffix in zip(names, block_dicts, suffixes):
+                print("&%s" % name, file=f)
+                for key, val in block_dict.items():
+                    print("%-20s ! %s" % ("%s=%s," % (key, val), cntrl_comm[key]), file=f)
+                print("/", file=f)
+                for line in suffix:
+                    print("%s" % line, file=f)
+
+    return cntrl_out
 
 class Mol2_Reader(BaseReader):
     """Finite state machine for parsing Mol2 force field file. (just for parameterizing the charges)"""
@@ -1058,11 +1204,10 @@ class AMBER(Engine):
                 self.qmatoms = self.target.qmatoms
             else:
                 self.qmatoms = list(range(self.mol.na))
-            # LPW 2018-02-11 TODO: Use NetCDF format
-            if hasattr(self.target, 'shots'):
-                self.mol.write("%s-all.crd" % self.name, selection=range(self.target.shots), ftype="mdcrd")
-            else:
-                self.mol.write("%s-all.crd" % self.name, ftype="mdcrd")
+            # if hasattr(self.target, 'shots'):
+            #     self.mol.write("%s-all.crd" % self.name, selection=range(self.target.shots), ftype="mdcrd")
+            # else:
+            #     self.mol.write("%s-all.crd" % self.name, ftype="mdcrd")
 
         if prmtmp:
             for f in self.FF.fnms: 
@@ -1080,6 +1225,7 @@ class AMBER(Engine):
         if read_prmtop:
             prmtop = PrmtopLoader('%s.prmtop' % name)
             na = prmtop.getNumAtoms()
+            self.natoms = na
             self.AtomLists['Charge'] = prmtop.getCharges()
             self.AtomLists['Name'] = prmtop.getAtomNames()
             self.AtomLists['Mass'] = prmtop.getMasses()
@@ -1109,150 +1255,279 @@ class AMBER(Engine):
         self.leap(read_prmtop=True, count_mols=False)
         return np.array(self.AtomLists['Charge'])
 
-    def evaluate_(self, crdin, force=False):
-
+    def evaluate_sander(self, leap=True, traj_fnm=None, snapshots=None):
         """ 
         Utility function for computing energy and forces using AMBER. 
+        Coordinates (and boxes, if pbc) are obtained from the 
+        Molecule object stored internally
+
+        Parameters
+        ----------
+        snapshots : None or list
+            If a list is provided, only compute energies / forces for snapshots listed.
         
-        Inputs:
-        crdin: AMBER .mdcrd file name.
-        force: Switch for parsing the force. (Currently it always calculates the forces.)
-
         Outputs:
-        Result: Dictionary containing energies (and optionally) forces.
+        Result: Dictionary containing energies and forces.
         """
+        # Figure out where the trajectory information is coming from
+        # First priority: Passed as input to trajfnm
+        # Second priority: Using self.trajectory filename attribute
+        # Third priority: Using internal Molecule object
+        # 0 = using internal Molecule object
+        # 1 = using NetCDF trajectory format
+        mode = 0
+        if traj_fnm is None and hasattr(self, 'trajectory'):
+            traj_fnm = self.trajectory
+        if traj_fnm is not None:
+            try:
+                nc = netcdf_file(traj_fnm, 'r')
+                mode = 1
+            except TypeError:
+                print("Failed to load traj as netcdf, trying to load as Molecule object")
+                mol = Molecule(traj_fnm)
+        else:
+            mol = self.mol
 
-        force_mdin="""Loop over conformations and compute energy and force (use ioutfnm=1 for netcdf, ntb=0 for no box)
-&cntrl
-imin = 5, ntb = 0, nstlim = 0, nsnb = 0
-/
-&debugf
-do_debugf = 1, dumpfrc = 1
-/
-"""
-        with wopen("%s-force.mdin" % self.name) as f:
-            print(force_mdin.format(), file=f)
-
-        ## This line actually runs AMBER.
+        def get_coord_box(i):
+            box = None
+            if mode == 0:
+                coords = mol.xyzs[i]
+                if self.pbc:
+                    box = [mol.boxes[i].a, mol.boxes[i].b, mol.boxes[i].c,
+                           mol.boxes[i].alpha, mol.boxes[i].beta, mol.boxes[i].gamma]
+            elif mode == 1:
+                coords = nc.variables['coordinates'].data[i].copy()
+                if self.pbc:
+                    cl = nc.variables['cell_lengths'].data[i].copy()
+                    ca = nc.variables['cell_angles'].data[i].copy()
+                    box = [cl[0], cl[1], cl[2], ca[0], ca[1], ca[2]]
+            return coords, box
+        
         self.leap(read_prmtop=False, count_mols=False, delcheck=True)
-        self.callamber("sander -i %s-force.mdin -o %s-force.mdout -p %s.prmtop -c %s.inpcrd -y %s -O" % 
-                       (self.name, self.name, self.name, self.name, crdin))
-        ParseMode = 0
-        Result = {}
+        cntrl_vars = write_mdin('sp', pbc=self.pbc, mdin_orig=self.mdin)
+        if self.pbc:
+            inp = sander.pme_input()
+        else:
+            inp = sander.gas_input()
+        if 'ntc' in cntrl_vars: inp.ntc = int(cntrl_vars['ntc'])
+        if 'ntf' in cntrl_vars: inp.ntf = int(cntrl_vars['ntf'])
+        if 'cut' in cntrl_vars: inp.cut = float(cntrl_vars['cut'])
+
+        coord, box = get_coord_box(0)
+        sander.setup("%s.prmtop" % self.name, coord, box, inp)
+
         Energies = []
         Forces = []
-        Force = []
-        for line in open('forcedump.dat'):
-            line = line.strip()
-            sline = line.split()
-            if ParseMode == 1:
-                if len(sline) == 1 and isfloat(sline[0]):
-                    Energies.append(float(sline[0]) * 4.184)
-                    ParseMode = 0
-            if ParseMode == 2:
-                if len(sline) == 3 and all(isfloat(sline[i]) for i in range(3)):
-                    Force += [float(sline[i]) * 4.184 * 10 for i in range(3)]
-                if len(Force) == 3*self.qmatoms:
-                    Forces.append(np.array(Force))
-                    Force = []
-                    ParseMode = 0
-            if line == '0 START of Energies':
-                ParseMode = 1
-            elif line == '1 Total Force':
-                ParseMode = 2
-
-        Result["Energy"] = np.array(Energies[1:])
-        Result["Force"] = np.array(Forces[1:])
+        if snapshots == None:
+            if mode == 0:
+                snapshots = range(len(self.mol))
+            elif mode == 1:
+                snapshots = range(nc.variables['coordinates'].shape[0])
+        atomsel = np.where(self.AtomMask)
+        
+        for i in snapshots:
+            coord, box = get_coord_box(i)
+            if self.pbc:
+                sander.set_box(*box)
+            sander.set_positions(coord)
+            e, f = sander.energy_forces()
+            Energies.append(e.tot * 4.184)
+            Forces.append(np.array(f).flatten()[atomsel] * 4.184 * 10)
+        sander.cleanup()
+        if mode == 1:
+            nc.close()
+        Result = OrderedDict()
+        Result["Energy"] = np.array(Energies)
+        Result["Forces"] = np.array(Forces)
         return Result
-
+    
     def energy_force_one(self, shot):
-        
         """ Computes the energy and force using AMBER for one snapshot. """
-        
-        self.mol[shot].write("%s.mdcrd" % self.name, ftype="mdcrd")
-        Result = self.evaluate_("%s.mdcrd" % self.name, force=True)
+        Result = self.evaluate_sander(snapshots=[shot])
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
 
     def energy(self):
-
         """ Computes the energy using AMBER over a trajectory. """
-
-        if hasattr(self, 'md_trajectory'): 
-            x = self.md_trajectory
-        else:
-            x = "%s-all.crd" % self.name
-            self.mol.write(x, ftype="mdcrd")
-        return self.evaluate_(x)["Energy"]
+        return self.evaluate_sander["Energy"]
 
     def energy_force(self):
-
         """ Computes the energy and force using AMBER over a trajectory. """
-
-        if hasattr(self, 'md_trajectory') : 
-            x = self.md_trajectory
-        else:
-            x = "%s-all.crd" % self.name
-        Result = self.evaluate_(x, force=True)
+        Result = self.evaluate_sander()
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
+    
+    def evaluate_cpptraj(self, leap=True, traj_fnm=None, potential=False):
+        """ Use cpptraj to evaluate properties over a trajectory file. """
+        # Figure out where the trajectory information is coming from
+        # First priority: Passed as input to trajfnm
+        # Second priority: Using self.trajectory filename attribute
+        if traj_fnm is None:
+            if hasattr(self, 'trajectory'):
+                traj_fnm = self.trajectory
+            else:
+                raise RuntimeError("evaluate_cpptraj needs a trajectory file name")
+        if leap:
+            self.leap(read_prmtop=False, count_mols=False, delcheck=True)
+        cpptraj_in=['parm %s.prmtop' % self.name]
+        cpptraj_in.append("trajin %s" % traj_fnm)
+        precision_lines = []
+        if potential:
+            cntrl_vars = write_mdin('sp', pbc=self.pbc, mdin_orig=self.mdin)
+            for key in ['igb', 'ntb', 'cut', 'ntc', 'ntf']:
+                if key not in cntrl_vars:
+                    raise RuntimeError("Cannot use sander API because key %s not set" % key)
+            cpptraj_in.append("esander POTENTIAL out esander.txt ntb %s igb %s cut %s ntc %s ntf %s" %
+                                    (cntrl_vars['ntb'], cntrl_vars['igb'], cntrl_vars['cut'], cntrl_vars['ntc'], cntrl_vars['ntf']))
+            precision_lines.append("precision esander.txt 18 8")
+        cpptraj_in.append("vector DIPOLE dipole out dipoles.txt")
+        precision_lines.append("precision dipoles.txt 18 8")
+        if self.pbc:
+            cpptraj_in.append("volume VOLUME out volume.txt")
+            precision_lines.append("precision volume.txt 18 8")
+        cpptraj_in += precision_lines
+        with open('%s-cpptraj.in' % self.name, 'w') as f:
+            print('\n'.join(cpptraj_in), file=f)
+        self.callamber("cpptraj -i %s-cpptraj.in" % self.name)
+        # Gather the results
+        Result = OrderedDict()
+        if potential:
+            esander_lines = list(open('esander.txt').readlines())
+            ie = 0
+            for iw, w in enumerate(esander_lines[0].split()):
+                if w == "POTENTIAL[total]":
+                    ie = iw
+            if ie == 0:
+                raise RuntimeError("Cannot find field corresponding to total energies")
+            potentials = np.array([float(line.split()[ie]) for line in esander_lines[1:]])*4.184
+            Result["Potentials"] = potentials
+        # Convert e*Angstrom to debye
+        dipoles = np.array([[float(w) for w in line.split()[1:4]] for line in list(open("dipoles.txt").readlines())[1:]]) / 0.20819434
+        Result["Dips"] = dipoles
+        # Volume of simulation boxes in cubic nanometers
+        # Conversion factor derived from the following:
+        # In [22]: 1.0 * gram / mole / (1.0 * nanometer)**3 / AVOGADRO_CONSTANT_NA / (kilogram/meter**3)
+        # Out[22]: 1.6605387831627252
+        conv = 1.6605387831627252
+        if self.pbc:
+            volumes = np.array([float(line.split()[1]) for line in list(open("volumes.txt").readlines())[1:]])/1000
+            densities = conv * np.sum(self.AtomLists['Mass']) / volumes
+            Result["Volumes"] = volumes
+            Result["Rhos"] = densities
+        return Result
+
+    def kineticE_cpptraj(self, leap=False, traj_fnm=None):
+        """
+        Evaluate the kinetic energy of each frame in a trajectory using cpptraj.
+        This requires a netcdf-formatted trajectory containing velocities, which
+        is generated using ntwv=-1 and ioutfm=1.
+        """
+        # Figure out where the trajectory information is coming from
+        # First priority: Passed as input to trajfnm
+        # Second priority: Using self.trajectory filename attribute
+        if traj_fnm is None:
+            if hasattr(self, 'trajectory'):
+                traj_fnm = self.trajectory
+            else:
+                raise RuntimeError("evaluate_cpptraj needs a trajectory file name")
+        if leap:
+            self.leap(read_prmtop=False, count_mols=False, delcheck=True)
+        cpptraj_in=['parm %s.prmtop' % self.name]
+        cpptraj_in.append("trajin %s" % traj_fnm)
+        cpptraj_in.append("temperature TEMPERATURE out temperature.txt")
+        cpptraj_in.append("precision temperature.txt 18 8")
+        with open('%s-cpptraj-temp.in' % self.name, 'w') as f:
+            print('\n'.join(cpptraj_in), file=f)
+        self.callamber("cpptraj -i %s-cpptraj-temp.in" % self.name)
+        temps = np.array([float(line.split()[1]) for line in list(open("temperature.txt").readlines())[1:]])
+        dof = 3*self.natoms
+        kinetics = 4.184 * kb_kcal * dof * temps / 2.0
+        print("Average temperature is %.2f, kinetic energy %.2f" % (np.mean(temps), np.mean(kinetics)))
+        # os.unlink("temperature.txt")
+        return kinetics
 
     def energy_dipole(self):
-
         """ Computes the energy and dipole using AMBER over a trajectory. """
-
-        logger.error('Dipole moments are not yet implemented in AMBER interface')
-        raise NotImplementedError
-
-        if hasattr(self, 'md_trajectory') : 
-            x = self.md_trajectory
-        else:
-            x = "%s.xyz" % self.name
-            self.mol.write(x, ftype="tinker")
-        Result = self.evaluate_(x, dipole=True)
+        Result = self.evaluate_cpptraj()
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
-    def optimize(self, shot=0, method="newton", crit=1e-4):
+    def interaction_energy(self, fraga, fragb):
+        
+        """ Calculate the interaction energy for two fragments. """
 
-        """ Optimize the geometry and align the optimized geometry to the starting geometry. """
+        self.A = AMBER(name="A", mol=self.mol.atom_select(fraga), amberhome=self.amberhome, leapcmd=self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, reqpdb=False)
+        self.B = AMBER(name="B", mol=self.mol.atom_select(fragb), amberhome=self.amberhome, leapcmd=self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, reqpdb=False)
 
-        logger.error('Geometry optimizations are not yet implemented in AMBER interface')
-        raise NotImplementedError
+        # Interaction energy needs to be in kcal/mol.
+        return (self.energy() - self.A.energy() - self.B.energy()) / 4.184
+
+    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, threads=1, verbose=False, **kwargs):
+        
+        """
+        Method for running a molecular dynamics simulation.  
+
+        Required arguments:
+        nsteps      = (int)   Number of total time steps
+        timestep    = (float) Time step in FEMTOSECONDS
+        temperature = (float) Temperature control (Kelvin)
+        pressure    = (float) Pressure control (atmospheres)
+        nequil      = (int)   Number of additional time steps at the beginning for equilibration
+        nsave       = (int)   Step interval for saving and printing data
+        minimize    = (bool)  Perform an energy minimization prior to dynamics
+        threads     = (int)   Specify how many OpenMP threads to use
+
+        Returns simulation data:
+        Rhos        = (array)     Density in kilogram m^-3
+        Potentials  = (array)     Potential energies
+        Kinetics    = (array)     Kinetic energies
+        Volumes     = (array)     Box volumes
+        Dips        = (3xN array) Dipole moments
+        EComps      = (dict)      Energy components
+        """
+
+        if anisotropic:
+            raise RuntimeError("Anisotropic barostat not implemented in AMBER")
+        if threads>1:
+            raise RuntimeError("Multiple threads not implemented in AMBER - for fast runs, use pmemd.cuda")
+        
+        md_command = "pmemd.cuda" if (self.have_pmemd_cuda and self.pbc) else "sander"
+        
+        if minimize:
+            # LPW 2018-02-11 Todo: Implement a separate function for minimization that works for
+            # RMSD / vibrations as well.
+            if verbose: printcool("Minimizing the energy", color=0)
+            write_mdin('min', '%s-min.mdin' % self.name, pbc=self.pbc, mdin_orig=self.mdin)
+            self.leap(read_prmtop=False, count_mols=False, delcheck=True)
+            self.callamber("sander -i %s-min.mdin -o %s-min.mdout -p %s.prmtop -c %s.inpcrd -r %s-min.restrt -x %s-min.netcdf -inf %s-min.mdinfo -O" % 
+                           (self.name, self.name, self.name, self.name, self.name, self.name, self.name), print_command=True)
+            nextrst = "%s-min.restrt" % self.name
+            
+        else:
+            self.leap(read_prmtop=False, count_mols=False, delcheck=True)
+            nextrst = "%s.inpcrd" % self.name
+            
+        # Run equilibration.
+        if nequil > 0:
+            write_mdin('eq', '%s-eq.mdin' % self.name, nsteps=nequil, timestep=timestep/1000, nsave=nsave, pbc=self.pbc,
+                       temperature=temperature, pressure=pressure, mdin_orig=self.mdin)
+            if verbose: printcool("Running equilibration dynamics", color=0)
+            self.callamber("%s -i %s-eq.mdin -o %s-eq.mdout -p %s.prmtop -c %s -r %s-eq.restrt -x %s-eq.netcdf -inf %s-eq.mdinfo -O" % 
+                           (md_command, self.name, self.name, self.name, nextrst, self.name, self.name, self.name), print_command=True)
+            nextrst = "%s-eq.restrt" % self.name
+            
+            
+        # Run production.
+        if verbose: printcool("Running production dynamics", color=0)
+        write_mdin('md', '%s-md.mdin' % self.name, nsteps=nsteps, timestep=timestep/1000, nsave=nsave, pbc=self.pbc,
+                   temperature=temperature, pressure=pressure, mdin_orig=self.mdin)
+        self.callamber("%s -i %s-md.mdin -o %s-md.mdout -p %s.prmtop -c %s -r %s-md.restrt -x %s-md.netcdf -inf %s-md.mdinfo -O" % 
+                       (md_command, self.name, self.name, self.name, nextrst, self.name, self.name, self.name), print_command=True)
+        nextrst = "%s-md.restrt" % self.name
+        self.trajectory = '%s-md.netcdf' % self.name
+        
+        prop_return = self.evaluate_cpptraj(leap=False, potential=True)
+        prop_return["Kinetics"] = self.kineticE_cpptraj()
+        return prop_return
+        
     
-        # Code from tinkerio.py, reference for later implementation.
-        if os.path.exists('%s.xyz_2' % self.name):
-            os.unlink('%s.xyz_2' % self.name)
-        self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
-        if method == "newton":
-            if self.rigid: optprog = "optrigid"
-            else: optprog = "optimize"
-        elif method == "bfgs":
-            if self.rigid: optprog = "minrigid"
-            else: optprog = "minimize"
-        o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, crit))
-        # Silently align the optimized geometry.
-        M12 = Molecule("%s.xyz" % self.name, ftype="tinker") + Molecule("%s.xyz_2" % self.name, ftype="tinker")
-        if not self.pbc:
-            M12.align(center=False)
-        M12[1].write("%s.xyz_2" % self.name, ftype="tinker")
-        rmsd = M12.ref_rmsd(0)[1]
-        cnvgd = 0
-        mode = 0
-        for line in o:
-            s = line.split()
-            if len(s) == 0: continue
-            if "Optimally Conditioned Variable Metric Optimization" in line: mode = 1
-            if "Limited Memory BFGS Quasi-Newton Optimization" in line: mode = 1
-            if mode == 1 and isint(s[0]): mode = 2
-            if mode == 2:
-                if isint(s[0]): E = float(s[1])
-                else: mode = 0
-            if "Normal Termination" in line:
-                cnvgd = 1
-        if not cnvgd:
-            for line in o:
-                logger.info(str(line) + '\n')
-            logger.info("The minimization did not converge in the geometry optimization - printout is above.\n")
-        return E, rmsd
-
     def normal_modes(self, shot=0, optimize=True):
         self.leap(read_prmtop=False, count_mols=False, delcheck=True)
         if optimize:
@@ -1330,61 +1605,104 @@ do_debugf = 1, dumpfrc = 1
         # Below is copied from tinkerio.py
         #=================
         # This line actually runs TINKER
-        if optimize:
-            self.optimize(shot, crit=1e-6)
-            o = self.calltinker("analyze %s.xyz_2 M" % (self.name))
-        else:
-            self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
-            o = self.calltinker("analyze %s.xyz M" % (self.name))
-        # Read the TINKER output.
-        qn = -1
-        ln = 0
-        for line in o:
-            s = line.split()
-            if "Dipole X,Y,Z-Components" in line:
-                dipole_dict = OrderedDict(zip(['x','y','z'], [float(i) for i in s[-3:]]))
-            elif "Quadrupole Moment Tensor" in line:
-                qn = ln
-                quadrupole_dict = OrderedDict([('xx',float(s[-3]))])
-            elif qn > 0 and ln == qn + 1:
-                quadrupole_dict['xy'] = float(s[-3])
-                quadrupole_dict['yy'] = float(s[-2])
-            elif qn > 0 and ln == qn + 2:
-                quadrupole_dict['xz'] = float(s[-3])
-                quadrupole_dict['yz'] = float(s[-2])
-                quadrupole_dict['zz'] = float(s[-1])
-            ln += 1
-        calc_moments = OrderedDict([('dipole', dipole_dict), ('quadrupole', quadrupole_dict)])
-        if polarizability:
-            if optimize:
-                o = self.calltinker("polarize %s.xyz_2" % (self.name))
-            else:
-                o = self.calltinker("polarize %s.xyz" % (self.name))
-            # Read the TINKER output.
-            pn = -1
-            ln = 0
-            polarizability_dict = OrderedDict()
-            for line in o:
-                s = line.split()
-                if "Total Polarizability Tensor" in line:
-                    pn = ln
-                elif pn > 0 and ln == pn + 2:
-                    polarizability_dict['xx'] = float(s[-3])
-                    polarizability_dict['yx'] = float(s[-2])
-                    polarizability_dict['zx'] = float(s[-1])
-                elif pn > 0 and ln == pn + 3:
-                    polarizability_dict['xy'] = float(s[-3])
-                    polarizability_dict['yy'] = float(s[-2])
-                    polarizability_dict['zy'] = float(s[-1])
-                elif pn > 0 and ln == pn + 4:
-                    polarizability_dict['xz'] = float(s[-3])
-                    polarizability_dict['yz'] = float(s[-2])
-                    polarizability_dict['zz'] = float(s[-1])
-                ln += 1
-            calc_moments['polarizability'] = polarizability_dict
-        os.system("rm -rf *.xyz_* *.[0-9][0-9][0-9]")
-        return calc_moments
+        # if optimize:
+        #     self.optimize(shot, crit=1e-6)
+        #     o = self.calltinker("analyze %s.xyz_2 M" % (self.name))
+        # else:
+        #     self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
+        #     o = self.calltinker("analyze %s.xyz M" % (self.name))
+        # # Read the TINKER output.
+        # qn = -1
+        # ln = 0
+        # for line in o:
+        #     s = line.split()
+        #     if "Dipole X,Y,Z-Components" in line:
+        #         dipole_dict = OrderedDict(zip(['x','y','z'], [float(i) for i in s[-3:]]))
+        #     elif "Quadrupole Moment Tensor" in line:
+        #         qn = ln
+        #         quadrupole_dict = OrderedDict([('xx',float(s[-3]))])
+        #     elif qn > 0 and ln == qn + 1:
+        #         quadrupole_dict['xy'] = float(s[-3])
+        #         quadrupole_dict['yy'] = float(s[-2])
+        #     elif qn > 0 and ln == qn + 2:
+        #         quadrupole_dict['xz'] = float(s[-3])
+        #         quadrupole_dict['yz'] = float(s[-2])
+        #         quadrupole_dict['zz'] = float(s[-1])
+        #     ln += 1
+        # calc_moments = OrderedDict([('dipole', dipole_dict), ('quadrupole', quadrupole_dict)])
+        # if polarizability:
+        #     if optimize:
+        #         o = self.calltinker("polarize %s.xyz_2" % (self.name))
+        #     else:
+        #         o = self.calltinker("polarize %s.xyz" % (self.name))
+        #     # Read the TINKER output.
+        #     pn = -1
+        #     ln = 0
+        #     polarizability_dict = OrderedDict()
+        #     for line in o:
+        #         s = line.split()
+        #         if "Total Polarizability Tensor" in line:
+        #             pn = ln
+        #         elif pn > 0 and ln == pn + 2:
+        #             polarizability_dict['xx'] = float(s[-3])
+        #             polarizability_dict['yx'] = float(s[-2])
+        #             polarizability_dict['zx'] = float(s[-1])
+        #         elif pn > 0 and ln == pn + 3:
+        #             polarizability_dict['xy'] = float(s[-3])
+        #             polarizability_dict['yy'] = float(s[-2])
+        #             polarizability_dict['zy'] = float(s[-1])
+        #         elif pn > 0 and ln == pn + 4:
+        #             polarizability_dict['xz'] = float(s[-3])
+        #             polarizability_dict['yz'] = float(s[-2])
+        #             polarizability_dict['zz'] = float(s[-1])
+        #         ln += 1
+        #     calc_moments['polarizability'] = polarizability_dict
+        # os.system("rm -rf *.xyz_* *.[0-9][0-9][0-9]")
+        # return calc_moments
 
+    def optimize(self, shot=0, method="newton", crit=1e-4):
+
+        """ Optimize the geometry and align the optimized geometry to the starting geometry. """
+
+        logger.error('Geometry optimizations are not yet implemented in AMBER interface')
+        raise NotImplementedError
+    
+        # # Code from tinkerio.py, reference for later implementation.
+        # if os.path.exists('%s.xyz_2' % self.name):
+        #     os.unlink('%s.xyz_2' % self.name)
+        # self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
+        # if method == "newton":
+        #     if self.rigid: optprog = "optrigid"
+        #     else: optprog = "optimize"
+        # elif method == "bfgs":
+        #     if self.rigid: optprog = "minrigid"
+        #     else: optprog = "minimize"
+        # o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, crit))
+        # # Silently align the optimized geometry.
+        # M12 = Molecule("%s.xyz" % self.name, ftype="tinker") + Molecule("%s.xyz_2" % self.name, ftype="tinker")
+        # if not self.pbc:
+        #     M12.align(center=False)
+        # M12[1].write("%s.xyz_2" % self.name, ftype="tinker")
+        # rmsd = M12.ref_rmsd(0)[1]
+        # cnvgd = 0
+        # mode = 0
+        # for line in o:
+        #     s = line.split()
+        #     if len(s) == 0: continue
+        #     if "Optimally Conditioned Variable Metric Optimization" in line: mode = 1
+        #     if "Limited Memory BFGS Quasi-Newton Optimization" in line: mode = 1
+        #     if mode == 1 and isint(s[0]): mode = 2
+        #     if mode == 2:
+        #         if isint(s[0]): E = float(s[1])
+        #         else: mode = 0
+        #     if "Normal Termination" in line:
+        #         cnvgd = 1
+        # if not cnvgd:
+        #     for line in o:
+        #         logger.info(str(line) + '\n')
+        #     logger.info("The minimization did not converge in the geometry optimization - printout is above.\n")
+        # return E, rmsd
+        
     def energy_rmsd(self, shot=0, optimize=True):
 
         """ Calculate energy of the selected structure (optionally minimize and return the minimized energy and RMSD). In kcal/mol. """
@@ -1392,311 +1710,40 @@ do_debugf = 1, dumpfrc = 1
         logger.error('Geometry optimization is not yet implemented in AMBER interface')
         raise NotImplementedError
 
-        # Below is TINKER code as reference for later implementation.
-        rmsd = 0.0
-        # This line actually runs TINKER
-        # xyzfnm = sysname+".xyz"
-        if optimize:
-            E_, rmsd = self.optimize(shot)
-            o = self.calltinker("analyze %s.xyz_2 E" % self.name)
-            #----
-            # Two equivalent ways to get the RMSD, here for reference.
-            #----
-            # M1 = Molecule("%s.xyz" % self.name, ftype="tinker")
-            # M2 = Molecule("%s.xyz_2" % self.name, ftype="tinker")
-            # M1 += M2
-            # rmsd = M1.ref_rmsd(0)[1]
-            #----
-            # oo = self.calltinker("superpose %s.xyz %s.xyz_2 1 y u n 0" % (self.name, self.name))
-            # for line in oo:
-            #     if "Root Mean Square Distance" in line:
-            #         rmsd = float(line.split()[-1])
-            #----
-            os.system("rm %s.xyz_2" % self.name)
-        else:
-            o = self.calltinker("analyze %s.xyz E" % self.name)
-        # Read the TINKER output. 
-        E = None
-        for line in o:
-            if "Total Potential Energy" in line:
-                E = float(line.split()[-2].replace('D','e'))
-        if E is None:
-            logger.error("Total potential energy wasn't encountered when calling analyze!\n")
-            raise RuntimeError
-        if optimize and abs(E-E_) > 0.1:
-            warn_press_key("Energy from optimize and analyze aren't the same (%.3f vs. %.3f)" % (E, E_))
-        return E, rmsd
-
-    def interaction_energy(self, fraga, fragb):
-        
-        """ Calculate the interaction energy for two fragments. """
-
-        self.A = AMBER(name="A", mol=self.mol.atom_select(fraga), amberhome=self.amberhome, leapcmd=self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, reqpdb=False)
-        self.B = AMBER(name="B", mol=self.mol.atom_select(fragb), amberhome=self.amberhome, leapcmd=self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, reqpdb=False)
-
-        # Interaction energy needs to be in kcal/mol.
-        return (self.energy() - self.A.energy() - self.B.energy()) / 4.184
-
-    def molecular_dynamics(self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, threads=1, verbose=False, **kwargs):
-        
-        """
-        Method for running a molecular dynamics simulation.  
-
-        Required arguments:
-        nsteps      = (int)   Number of total time steps
-        timestep    = (float) Time step in FEMTOSECONDS
-        temperature = (float) Temperature control (Kelvin)
-        pressure    = (float) Pressure control (atmospheres)
-        nequil      = (int)   Number of additional time steps at the beginning for equilibration
-        nsave       = (int)   Step interval for saving and printing data
-        minimize    = (bool)  Perform an energy minimization prior to dynamics
-        threads     = (int)   Specify how many OpenMP threads to use
-
-        Returns simulation data:
-        Rhos        = (array)     Density in kilogram m^-3
-        Potentials  = (array)     Potential energies
-        Kinetics    = (array)     Kinetic energies
-        Volumes     = (array)     Box volumes
-        Dips        = (3xN array) Dipole moments
-        EComps      = (dict)      Energy components
-        """
-
-        # workflow should be:
-        # 1) minimize
-        # >  imin=1,           ! 0 = MD; 1 = Minimize; 5 = Trajectory analysis
-        # >  ntpr=100,         ! Interval for printing output
-        # >  ntwx=100,         ! Interval for writing trajectory
-        # >  ntwr=100,         ! Interval for writing restart
-        # 2) equilibrate
-        # Relevant parameters:
-        # >  imin=0,           ! 0 = MD; 1 = Minimize; 5 = Trajectory analysis
-        # >  ntx=1,            ! 1 = Read coors only; 5 = Full restart
-        # >  irest=0,          ! 0 = Do not restart ; 1 = Restart
-        # This option should be controlled by FB itself.
-        # >  ntb=2,            ! 0 = no PBC ; 1 = constant V ; 2 = constant P
-        # >  ntp=1,            ! 0 = constant V ; 1 = isotropic position scaling
-        # >  ntpr=5000,        ! Interval for printing output
-        # >  ntwx=50000,       ! Interval for writing trajectory
-        # >  ntwr=50000,       ! Interval for writing restart
-        # >  nstlim=5000000,   ! Number of MD steps
-        # 3) production
-        # >  imin=0,           ! 0 = MD; 1 = Minimize; 5 = Trajectory analysis
-        # >  ntx=5,            ! 1 = Read coors only; 5 = Full restart
-        # >  irest=1,          ! 0 = Do not restart ; 1 = Restart
-        # This option should be controlled by FB itself.
-        # >  ntb=2,            ! 0 = no PBC ; 1 = constant V ; 2 = constant P
-        # >  ntp=1,            ! 0 = constant V ; 1 = isotropic position scaling
-        # >  ntpr=5000,        ! Interval for printing output
-        # >  ntwx=50000,       ! Interval for writing trajectory
-        # >  ntwr=50000,       ! Interval for writing restart
-        # >  nstlim=5000000,   ! Number of MD steps
-
-        #logger.error('Molecular dynamics not yet implemented in AMBER interface')
-        #raise NotImplementedError
-        
-        # System for dealing with sander namelist.
-        # A mdin variable has five associated fields:
-        # 1) Name of the variable
-        # 2) Value of the variable, should be a dictionary with three keys 'min', 'eq', 'md'.
-        #    When writing the variable for a run type, it will only be printed if the value exists in the dictionary.
-        #    (e.g. 'maxcyc' should only be printed out for minimization jobs.)
-        #    If the value looked up is equal to None, it will throw an error.
-        # 3) Comment to be printed out with the variable
-        # 4) Priority level of the variable
-        #    1: The variable will always be set in the ForceBalance code at runtime (The highest)
-        #    2: The variable is set by the user in the ForceBalance input file
-        #    3: User may provide variable in custom mdin file (in target folder); if not provided, default value will be used
-        #    4: User may provide variable in custom mdin file (in target folder); if not provided, it will not be printed
-        cntrl_vars = OrderedDict()
-        cntrl_var = namedtuple("cntrl_var", ["name", "value", "comment", "priority"])
-        cntrl_vars["imin"]    = cntrl_var(name="imin", value={"min":"1","eq":"0","md":"0"}, comment="0 = MD; 1 = Minimize; 5 = Trajectory analysis", priority=1)
-        # Options pertaining to minimization
-        cntrl_vars["ntmin"]   = cntrl_var(name="ntmin", value={"min":"2"}, comment="Minimization algorithm; 2 = Steepest descent", priority=3)
-        cntrl_vars["dx0"]     = cntrl_var(name="dx0", value={"min":"0.1"}, comment="Minimizer step length", priority=3)
-        cntrl_vars["maxcyc"]  = cntrl_var(name="maxcyc", value={"min":"500"}, comment="Number of minimization steps", priority=3)
-        # MD options - time step and number of steps
-        cntrl_vars["dt"] = cntrl_var(name="dt", value={"eq":"%.8f" % (timestep/1000), "md":"%.8f" % (timestep/1000)}, comment="Time step (ps)", priority=2)
-        cntrl_vars["nstlim"] = cntrl_var(name="nstlim", value={"eq":"%i" % nequil, "md":"%i" % nsteps}, comment="Number of MD steps", priority=2)
-        # ntpr, ntwx and ntwr for eq and md runs should be set by this function.
-        cntrl_vars["ntpr"] = cntrl_var(name="ntpr", value={"min":"10","eq":"%i" % nsave,"md":"%i" % nsave}, comment="Interval for printing output", priority=2)
-        cntrl_vars["ntwx"] = cntrl_var(name="ntwx", value={"min":"10","eq":"%i" % nsave,"md":"%i" % nsave}, comment="Interval for writing trajectory", priority=2)
-        cntrl_vars["ntwr"] = cntrl_var(name="ntwr", value={"min":"10","eq":"%i" % nsave,"md":"%i" % nsave}, comment="Interval for writing restart", priority=2)
-        cntrl_vars["nscm"] = cntrl_var(name="nscm", value={"eq":"1000","md":"1000"}, comment="Interval for removing COM translation/rotation", priority=3)
-        # Insist on NetCDF trajectories for ntxo, ioutfm 
-        cntrl_vars["ntxo"]   = cntrl_var(name="ntxo",   value={"min":"2","eq":"2","md":"2"}, comment="Restart output format; 1 = ASCII, 2 = NetCDF", priority=1)
-        cntrl_vars["ioutfm"] = cntrl_var(name="ioutfm", value={"min":"1","eq":"1","md":"1"}, comment="Trajectory format; 0 = ASCII, 1 = NetCDF", priority=1)
-        cntrl_vars["iwrap"]  = cntrl_var(name="iwrap",  value={"min":"1","eq":"1","md":"1"}, comment="Wrap molecules back into box", priority=3)
-        # min and eq read coors only; md is a full restart
-        cntrl_vars["ntx"]    = cntrl_var(name="ntx",    value={"min":"1","eq":"1","md":"5"}, comment="1 = Read coors only; 5 = Full restart", priority=1)
-        cntrl_vars["irest"]  = cntrl_var(name="irest",  value={"min":"0","eq":"0","md":"1"}, comment="0 = Do not restart ; 1 = Restart", priority=1)
-        # Use AMBER's default nonbonded cutoff if the user does not provide
-        cntrl_vars["cut"] = cntrl_var(name="cut", value={}, comment="Nonbonded cutoff", priority=4)
-        # Set the PBC and pressure variables: ntb, ntp, barostat, mcbarint
-        if self.pbc:
-            ntb_eqmd = "2" if pressure is not None else "1"
-            ntp_eqmd = "1" if pressure is not None else "0"
-            cntrl_vars["ntb"] = cntrl_var(name="ntb", value={"min":"1","eq":ntb_eqmd,"md":ntb_eqmd}, comment="0 = no PBC ; 1 = constant V ; 2 = constant P", priority=1)
-            cntrl_vars["ntp"] = cntrl_var(name="ntp", value={"min":"0","eq":ntp_eqmd,"md":ntp_eqmd}, comment="0 = constant V ; 1 = isotropic scaling", priority=1)
-            if pressure is not None:
-                # We should use Berendsen for equilibration and MC for production.
-                cntrl_vars["barostat"] = cntrl_var(name="barostat", value={"eq":"1","md":"2"}, comment="1 = Berendsen; 2 = Monte Carlo", priority=1)
-                cntrl_vars["mcbarint"] = cntrl_var(name="mcbarint", value={"md":"25"}, comment="MC barostat rescaling interval", priority=3)
-            else:
-                # If there is no pressure, these variables should not be printed.
-                cntrl_vars["barostat"] = cntrl_var(name="barostat", value={}, comment="1 = Berendsen; 2 = Monte Carlo", priority=1)
-                cntrl_vars["mcbarint"] = cntrl_var(name="mcbarint", value={}, comment="MC barostat rescaling interval", priority=1)
-        else:
-            # This forces the variable to not be printed at all
-            cntrl_vars["ntb"] = cntrl_var(name="ntp", value={}, comment="0 = constant V ; 1 = isotropic scaling", priority=1)
-            cntrl_vars["ntp"] = cntrl_var(name="ntp", value={}, comment="0 = constant V ; 1 = isotropic scaling", priority=1)
-            cntrl_vars["barostat"] = cntrl_var(name="barostat", value={}, comment="1 = Berendsen; 2 = Monte Carlo", priority=1)
-            cntrl_vars["mcbarint"] = cntrl_var(name="mcbarint", value={}, comment="MC barostat rescaling interval", priority=1)
-        # Set the temperature variables tempi, temp0, ntt, gamma_ln
-        if temperature is not None:
-            cntrl_vars["tempi"] = cntrl_var(name="tempi", value={"eq":"%i" % temperature,"md":"%i" % temperature}, comment="Initial temperature", priority=1)
-            cntrl_vars["temp0"] = cntrl_var(name="temp0", value={"eq":"%i" % temperature,"md":"%i" % temperature}, comment="Reference temperature", priority=1)
-            cntrl_vars["ntt"] = cntrl_var(name="ntt", value={"eq":"3","md":"3"}, comment="Thermostat ; 3 = Langevin", priority=1)
-            cntrl_vars["gamma_ln"] = cntrl_var(name="gamma_ln", value={"eq":"1.0","md":"1.0"}, comment="Langevin collision frequency (ps^-1)", priority=3)
-        else:
-            cntrl_vars["tempi"] = cntrl_var(name="tempi", value={}, comment="Initial temperature", priority=1)
-            cntrl_vars["temp0"] = cntrl_var(name="temp0", value={}, comment="Reference temperature", priority=1)
-            cntrl_vars["ntt"] = cntrl_var(name="ntt", value={}, comment="Thermostat ; 3 = Langevin", priority=1)
-            cntrl_vars["gamma_ln"] = cntrl_var(name="gamma_ln", value={}, comment="Langevin collision frequency (ps^-1)", priority=1)
-        # Options having to do with constraints; these should be set by the user, or not set at all.
-        cntrl_vars["ntc"] = cntrl_var(name="ntc", value={}, comment="SHAKE; 1 = none, 2 = H-bonds, 3 = All-bonds", priority=4)
-        cntrl_vars["ntf"] = cntrl_var(name="ntf", value={}, comment="No bonds involving H-atoms (use with NTC=2)", priority=4)
-        cntrl_vars["tol"] = cntrl_var(name="tol", value={}, comment="SHAKE tolerance,", priority=4)
-        # Random number seed for equilibration and dynamics
-        cntrl_vars["ig"] = cntrl_var(name="ig", value={"eq":"-1","md":"-1"}, comment="Random number seed; -1 based on date/time", priority=3)
-
-        md_command = "pmemd.cuda" if (self.have_pmemd_cuda and self.pbc) else "sander"
-        
-        if minimize:
-            # LPW 2018-02-11 Todo: Implement a separate function for minimization that works for
-            # RMSD / vibrations as well.
-            if verbose: printcool("Minimizing the energy", color=0)
-            write_mdin(cntrl_vars, 'min', '%s-min.mdin' % self.name, mdin_orig=self.mdin)
-            self.leap(read_prmtop=False, count_mols=False, delcheck=True)
-            self.callamber("sander -i %s-min.mdin -o %s-min.mdout -p %s.prmtop -c %s.inpcrd -r %s-min.restrt -x %s-min.netcdf -inf %s-min.mdinfo -O" % 
-                           (self.name, self.name, self.name, self.name, self.name, self.name, self.name), print_command=True)
-            nextrst = "%s-min.restrt" % self.name
-            
-        else:
-            self.leap(read_prmtop=False, count_mols=False, delcheck=True)
-            nextrst = "%s.inpcrd" % self.name
-            
-        # Run equilibration.
-        if nequil > 0:
-            write_mdin(cntrl_vars, 'eq', '%s-eq.mdin' % self.name, mdin_orig=self.mdin)
-            if verbose: printcool("Running equilibration dynamics", color=0)
-            self.callamber("%s -i %s-eq.mdin -o %s-eq.mdout -p %s.prmtop -c %s -r %s-eq.restrt -x %s-eq.netcdf -inf %s-eq.mdinfo -O" % 
-                           (md_command, self.name, self.name, self.name, nextrst, self.name, self.name, self.name), print_command=True)
-            nextrst = "%s-eq.restrt" % self.name
-            
-            
-        # Run production.
-        if verbose: printcool("Running production dynamics", color=0)
-        write_mdin(cntrl_vars, 'md', '%s-md.mdin' % self.name, mdin_orig=self.mdin)
-        self.callamber("%s -i %s-md.mdin -o %s-md.mdout -p %s.prmtop -c %s -r %s-md.restrt -x %s-md.netcdf -inf %s-md.mdinfo -O" % 
-                       (md_command, self.name, self.name, self.name, nextrst, self.name, self.name, self.name), print_command=True)
-        nextrst = "%s-md.restrt" % self.name
-
-        
-        
-        # sys.exit()
-        
-        # write_key("%s-md.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
-        # if self.pbc and pressure is not None:
-        #     odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 4 %f %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
-        #                                                                      temperature, pressure), print_to_screen=verbose)
+        # # Below is TINKER code as reference for later implementation.
+        # rmsd = 0.0
+        # # This line actually runs TINKER
+        # # xyzfnm = sysname+".xyz"
+        # if optimize:
+        #     E_, rmsd = self.optimize(shot)
+        #     o = self.calltinker("analyze %s.xyz_2 E" % self.name)
+        #     #----
+        #     # Two equivalent ways to get the RMSD, here for reference.
+        #     #----
+        #     # M1 = Molecule("%s.xyz" % self.name, ftype="tinker")
+        #     # M2 = Molecule("%s.xyz_2" % self.name, ftype="tinker")
+        #     # M1 += M2
+        #     # rmsd = M1.ref_rmsd(0)[1]
+        #     #----
+        #     # oo = self.calltinker("superpose %s.xyz %s.xyz_2 1 y u n 0" % (self.name, self.name))
+        #     # for line in oo:
+        #     #     if "Root Mean Square Distance" in line:
+        #     #         rmsd = float(line.split()[-1])
+        #     #----
+        #     os.system("rm %s.xyz_2" % self.name)
         # else:
-        #     odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 2 %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
-        #                                                                   temperature), print_to_screen=verbose)
-            
-        # Gather information.
-        os.system("mv %s.arc %s-md.arc" % (self.name, self.name))
-        self.md_trajectory = "%s-md.arc" % self.name
-        edyn = []
-        kdyn = []
-        temps = []
-        for line in odyn:
-            s = line.split()
-            if 'Current Potential' in line:
-                edyn.append(float(s[2]))
-            if 'Current Kinetic' in line:
-                kdyn.append(float(s[2]))
-            if len(s) > 0 and s[0] == 'Temperature' and s[2] == 'Kelvin':
-                temps.append(float(s[1]))
-
-        # Potential and kinetic energies converted to kJ/mol.
-        edyn = np.array(edyn) * 4.184
-        kdyn = np.array(kdyn) * 4.184
-        temps = np.array(temps)
-    
-        if verbose: logger.info("Post-processing to get the dipole moments\n")
-        oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="G,E,M", print_to_screen=False)
-
-        # Read potential energy and dipole from file.
-        eanl = []
-        dip = []
-        mass = 0.0
-        ecomp = OrderedDict()
-        havekeys = set()
-        first_shot = True
-        for ln, line in enumerate(oanl):
-            strip = line.strip()
-            s = line.split()
-            if 'Total System Mass' in line:
-                mass = float(s[-1])
-            if 'Total Potential Energy : ' in line:
-                eanl.append(float(s[4]))
-            if 'Dipole X,Y,Z-Components :' in line:
-                dip.append([float(s[i]) for i in range(-3,0)])
-            if first_shot:
-                for key in eckeys:
-                    if strip.startswith(key):
-                        if key in ecomp:
-                            ecomp[key].append(float(s[-2])*4.184)
-                        else:
-                            ecomp[key] = [float(s[-2])*4.184]
-                        if key in havekeys:
-                            first_shot = False
-                        havekeys.add(key)
-            else:
-                for key in havekeys:
-                    if strip.startswith(key):
-                        if key in ecomp:
-                            ecomp[key].append(float(s[-2])*4.184)
-                        else:
-                            ecomp[key] = [float(s[-2])*4.184]
-        for key in ecomp:
-            ecomp[key] = np.array(ecomp[key])
-        ecomp["Potential Energy"] = edyn
-        ecomp["Kinetic Energy"] = kdyn
-        ecomp["Temperature"] = temps
-        ecomp["Total Energy"] = edyn+kdyn
-
-        # Energies in kilojoules per mole
-        eanl = np.array(eanl) * 4.184
-        # Dipole moments in debye
-        dip = np.array(dip)
-        # Volume of simulation boxes in cubic nanometers
-        # Conversion factor derived from the following:
-        # In [22]: 1.0 * gram / mole / (1.0 * nanometer)**3 / AVOGADRO_CONSTANT_NA / (kilogram/meter**3)
-        # Out[22]: 1.6605387831627252
-        conv = 1.6605387831627252
-        if self.pbc:
-            vol = np.array([BuildLatticeFromLengthsAngles(*[float(j) for j in line.split()]).V \
-                                for line in open("%s-md.arc" % self.name).readlines() \
-                                if (len(line.split()) == 6 and isfloat(line.split()[1]) \
-                                        and all([isfloat(i) for i in line.split()[:6]]))]) / 1000
-            rho = conv * mass / vol
-        else:
-            vol = None
-            rho = None
-        prop_return = OrderedDict()
-        prop_return.update({'Rhos': rho, 'Potentials': edyn, 'Kinetics': kdyn, 'Volumes': vol, 'Dips': dip, 'Ecomps': ecomp})
-        return prop_return
+        #     o = self.calltinker("analyze %s.xyz E" % self.name)
+        # # Read the TINKER output. 
+        # E = None
+        # for line in o:
+        #     if "Total Potential Energy" in line:
+        #         E = float(line.split()[-2].replace('D','e'))
+        # if E is None:
+        #     logger.error("Total potential energy wasn't encountered when calling analyze!\n")
+        #     raise RuntimeError
+        # if optimize and abs(E-E_) > 0.1:
+        #     warn_press_key("Energy from optimize and analyze aren't the same (%.3f vs. %.3f)" % (E, E_))
+        # return E, rmsd
 
 class AbInitio_AMBER(AbInitio):
 
