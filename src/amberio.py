@@ -1338,7 +1338,7 @@ class AMBER(Engine):
             nc.close()
         Result = OrderedDict()
         Result["Energy"] = np.array(Energies)
-        Result["Forces"] = np.array(Forces)
+        Result["Force"] = np.array(Forces)
         return Result
     
     def energy_force_one(self, shot):
