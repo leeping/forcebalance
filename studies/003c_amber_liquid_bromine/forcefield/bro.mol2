@@ -1,0 +1,14 @@
+@<TRIPOS>MOLECULE
+BRO
+    2     1     1     0     0
+SMALL
+bcc
+
+
+@<TRIPOS>ATOM
+      1 Br1          1.2830    17.9980     5.2150 br         1 BRO       0.000000
+      2 Br2         -0.7360    19.3010     4.8470 br         1 BRO      -0.000000
+@<TRIPOS>BOND
+     1     1     2 1   
+@<TRIPOS>SUBSTRUCTURE
+     1 BRO         1 TEMP              0 ****  ****    0 ROOT
