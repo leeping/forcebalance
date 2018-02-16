@@ -1,0 +1,37 @@
+2018-02-16
+
+This folder contains an example run for force matching in AMBER.
+Calculation inputs are ported from 001_water_tutorial which
+uses Gromacs as an engine.
+
+Instructions for setting up target:
+1) A .mol2 and .frcmod file for the molecule are created.
+   These need to be given to "forcefield" in FB input file.
+   The files need to be placed in the "forcefield" folder.
+   These files are basically created by hand.
+   
+2) In each target, all.gro is converted to all.mdcrd and conf.pdb.
+   The virtual site is deleted because the sander API doesn't
+   support virtual site calculations with igb>0.
+   (Although igb 6 should be fine in principle...
+    sent email to AMBER mailing list)
+   all.mdcrd contains all of the coordinates in text .mdcrd format,
+   but any format readable by forcebalance.Molecule is usable.
+   (Need to support netcdf in single point energy / force because
+    Molecule does not read netcdf yet.)
+   conf.pdb should contain just one frame and is used to
+   provide topology information.
+   A python script convert.py is used to do the conversion.
+
+3) Each target also contains qdata.txt (copied straight from
+   001_water_tutorial) and setup.leap.  I've found that the
+   most onerous step is actually getting tleap to assign the
+   structures in the pdb to the residue template.  Lessons:
+   - When loading the mol2 file as a molecule, the molecule
+     name must match the residue name in the PDB (case sensitive)
+   - When editing the mol2 atoms and bonds by hand, make sure
+     the Natoms/Nbonds record numbers are changed as well.
+     Otherwise leap will fail to read the mol2 file and there
+     will be a "residue not recognized" error.
+
+

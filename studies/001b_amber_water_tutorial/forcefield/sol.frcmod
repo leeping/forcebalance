@@ -1,0 +1,15 @@
+This is the additional/replacement parameter set for TIP4PEW
+MASS
+OW    16.0
+HW     1.008   0.000
+ 
+BOND
+OW-HW   553.0     0.9572  # PRM 1 2
+ 
+ANGLE
+HW-OW-HW    100.      104.52  # PRM 1 2
+
+NONBON
+  OW       1.775931  0.16275  # PRM 1 2
+  HW          0.0000  0.0000
+

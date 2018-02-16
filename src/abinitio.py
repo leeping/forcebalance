@@ -176,8 +176,11 @@ class AbInitio(Target):
         ## Whether to compute net forces and torques, or not.
         self.use_nft       = self.w_netforce > 0 or self.w_torque > 0
         ## Read in the trajectory file
-        self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords),
-                            top=(os.path.join(self.root,self.tgtdir,self.pdb) if hasattr(self, 'pdb') else None))
+        if hasattr(self, 'pdb') and self.pdb is not None:
+            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords),
+                                top=(os.path.join(self.root,self.tgtdir,self.pdb)))
+        else:
+            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))
         ## Set the number of snapshots
         if self.ns != -1:
             self.mol = self.mol[:self.ns]

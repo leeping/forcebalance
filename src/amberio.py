@@ -1315,7 +1315,6 @@ class AMBER(Engine):
         if 'ntc' in cntrl_vars: inp.ntc = int(cntrl_vars['ntc'])
         if 'ntf' in cntrl_vars: inp.ntf = int(cntrl_vars['ntf'])
         if 'cut' in cntrl_vars: inp.cut = float(cntrl_vars['cut'])
-
         coord, box = get_coord_box(0)
         sander.setup("%s.prmtop" % self.name, coord, box, inp)
 
@@ -1326,7 +1325,11 @@ class AMBER(Engine):
                 snapshots = range(len(self.mol))
             elif mode == 1:
                 snapshots = range(nc.variables['coordinates'].shape[0])
-        atomsel = np.where(self.AtomMask)
+        # Keep real atoms in mask.
+        # sander API cannot handle virtual sites when igb > 0
+        # so these codes are not needed.
+        # atomsel = np.where(self.AtomMask)
+        # coordsel = sum([i, i+1, i+2] for i in atomsel)
         
         for i in snapshots:
             coord, box = get_coord_box(i)
@@ -1335,7 +1338,8 @@ class AMBER(Engine):
             sander.set_positions(coord)
             e, f = sander.energy_forces()
             Energies.append(e.tot * 4.184)
-            Forces.append(np.array(f).flatten()[atomsel] * 4.184 * 10)
+            frc = np.array(f).flatten() * 4.184 * 10
+            Forces.append(frc)
         sander.cleanup()
         if mode == 1:
             nc.close()
@@ -1761,9 +1765,9 @@ class AbInitio_AMBER(AbInitio):
 
     def __init__(self,options,tgt_opts,forcefield):
         ## Coordinate file.
-        self.set_option(tgt_opts, 'coords')
+        self.set_option(tgt_opts,'coords',default="all.mdcrd")
         ## PDB file for topology (if different from coordinate file.)
-        self.set_option(tgt_opts, 'pdb')
+        self.set_option(tgt_opts,'pdb',default="conf.pdb")
         ## AMBER home directory.
         self.set_option(options, 'amberhome')
         ## AMBER home directory.

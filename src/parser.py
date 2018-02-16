@@ -150,7 +150,7 @@ tgt_opts_types = {
                  "nvt_coords"         : (None, 0, 'Provide file name for condensed phase NVT coordinates.', 'Condensed phase properties', 'Liquid'),
                  "lipid_coords"         : (None, 0, 'Provide file name for lipid coordinates.', 'Condensed phase properties', 'Lipid'),
                  "coords"                : (None, -10, 'Coordinates for single point evaluation; if not provided, will search for a default.', 'Energy/force matching, ESP evaluations, interaction energies'),
-                 "pdb"                   : (None, -10, 'PDB file mainly used for building OpenMM systems but can also contain coordinates.', 'Targets that use OpenMM', 'OpenMM'),
+                 "pdb"                   : (None, -10, 'PDB file mainly used for building OpenMM and AMBER systems.', 'Targets that use AMBER and OpenMM', 'AMBER, OpenMM'),
                  "gmx_mdp"               : (None, -10, 'Gromacs .mdp files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_ndx"               : (None, -10, 'Gromacs .ndx files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),

@@ -7,11 +7,11 @@ backup false                     # Don't back up any files.
 $end
 
 $target
-simtype abinitio_gmx             # The target type; fitting ab initio data using GROMACS
+type abinitio_gmx             # The target type; fitting ab initio data using GROMACS
 name cluster-06                  # Also the subdirectory containing data within "targets"
 $end
 
 $target                          # ForceBalance supports multiple targets
-simtype abinitio_gmx
+type abinitio_gmx
 name cluster-12
 $end
