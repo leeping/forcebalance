@@ -39,7 +39,7 @@ logger = getLogger(__name__)
 #========================================================#
 
 parser = argparse.ArgumentParser()
-parser.add_argument('engine', help='MD program that we are using; choose "openmm", "tinker" or "gromacs"')
+parser.add_argument('engine', help='MD program that we are using; choose "openmm", "tinker", "amber" or "gromacs"')
 parser.add_argument('temperature',type=float, help='Temperature (K)')
 parser.add_argument('pressure',type=float, help='Pressure (Atm)')
 
@@ -66,8 +66,11 @@ elif engname == "gromacs" or engname == "gmx":
 elif engname == "tinker":
     from forcebalance.tinkerio import *
     Engine = TINKER
+elif engname == "amber":
+    from forcebalance.amberio import *
+    Engine = AMBER
 else:
-    raise Exception('OpenMM, GROMACS, and TINKER are supported at this time.')
+    raise Exception('OpenMM, GROMACS, TINKER, and AMBER are supported at this time.')
 
 #==================#
 #|   Subroutines  |#
@@ -224,7 +227,7 @@ def property_derivatives(engine, FF, mvals, h, pgrad, kT, property_driver, prope
 def main():
 
     """
-    Usage: (runcuda.sh) npt.py <openmm|gromacs|tinker> <liquid_nsteps> <liquid_timestep (fs)> <liquid_intvl (ps> <temperature> <pressure>
+    Usage: (runcuda.sh) npt.py <openmm|gromacs|tinker|amber> <liquid_nsteps> <liquid_timestep (fs)> <liquid_intvl (ps> <temperature> <pressure>
 
     This program is meant to be called automatically by ForceBalance on
     a GPU cluster (specifically, subroutines in openmmio.py).  It is
@@ -354,6 +357,20 @@ def main():
         if force_cuda: logger.warn("force_cuda option has no effect on Tinker engine.")
         if rpmd_beads > 0: raise RuntimeError("TINKER cannot handle RPMD.")
         if mts: logger.warn("Tinker not configured for multiple timestep integrator.")
+    elif engname == "amber":
+        # AMBER-specific options
+        GenOpts["amberhome"] = TgtOptions["amberhome"]
+        if os.path.exists(os.path.splitext(liquid_fnm)[0] + ".mdin"):
+            EngOpts["liquid"]["mdin"] = os.path.splitext(liquid_fnm)[0] + ".mdin"
+        if os.path.exists(os.path.splitext(gas_fnm)[0] + ".mdin"):
+            EngOpts["gas"]["mdin"] = os.path.splitext(gas_fnm)[0] + ".mdin"
+        EngOpts["liquid"]["leapcmd"] = os.path.splitext(liquid_fnm)[0] + ".leap"
+        EngOpts["gas"]["leapcmd"] = os.path.splitext(gas_fnm)[0] + ".leap"
+        EngOpts["liquid"]["pdb"] = liquid_fnm
+        EngOpts["gas"]["pdb"] = gas_fnm
+        if force_cuda: logger.warn("force_cuda option has no effect on Amber engine.")
+        if rpmd_beads > 0: raise RuntimeError("AMBER cannot handle RPMD.")
+        if mts: logger.warn("Amber not configured for multiple timestep integrator.")
     EngOpts["liquid"].update(GenOpts)
     EngOpts["gas"].update(GenOpts)
     for i in EngOpts:

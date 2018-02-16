@@ -1,0 +1,10 @@
+loadamberparams bro.frcmod
+BRO = loadmol2 bro.mol2
+
+model = loadpdb liquid.pdb
+
+set model box {20.556 20.556 20.556}
+
+saveamberparm model liquid.prmtop liquid.inpcrd
+
+quit

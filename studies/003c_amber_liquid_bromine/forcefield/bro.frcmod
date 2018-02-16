@@ -1,0 +1,17 @@
+Example parameter file for bromine
+MASS
+br     79.9040   0.0000   # Br
+
+BOND
+br-br    330.0000      2.28000
+
+ANGLE
+
+DIHE
+
+IMPROPER
+
+NONBON
+  br     2.05971     0.58950 ; PRM 1 2
+
+
