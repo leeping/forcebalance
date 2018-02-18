@@ -212,18 +212,6 @@ class Liquid(Target):
             # Extra files to be linked into the temp-directory.
             self.nvtfiles += [self.nvt_coords]
             self.scripts += ['nvt.py']
-        # Prepare the temporary directory.
-        self.prepare_temp_directory()
-        # Build keyword dictionary to pass to engine.
-        if self.do_self_pol:
-            self.gas_engine_args.update(self.OptionDict)
-            self.gas_engine_args.update(options)
-            del self.gas_engine_args['name']
-            # Create engine object for gas molecule to do the polarization correction.
-            self.gas_engine = self.engine_(target=self, mol=self.gas_mol, name="selfpol", **self.gas_engine_args)
-        # Don't read indicate.log when calling meta_indicate()
-        self.read_indicate = False
-        self.write_indicate = False
         # Don't read objective.p when calling meta_get()
         # self.read_objective = False
 
@@ -241,6 +229,20 @@ class Liquid(Target):
         # self.SavedMVals = []
         self.AllResults = defaultdict(lambda:defaultdict(list))
 
+    def post_init(self, options):
+        # Prepare the temporary directory.
+        self.prepare_temp_directory()
+        # Build keyword dictionary to pass to engine.
+        if self.do_self_pol:
+            self.gas_engine_args.update(self.OptionDict)
+            self.gas_engine_args.update(options)
+            del self.gas_engine_args['name']
+            # Create engine object for gas molecule to do the polarization correction.
+            self.gas_engine = self.engine_(target=self, mol=self.gas_mol, name="selfpol", **self.gas_engine_args)
+        # Don't read indicate.log when calling meta_indicate()
+        self.read_indicate = False
+        self.write_indicate = False
+        
     def prepare_temp_directory(self):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)

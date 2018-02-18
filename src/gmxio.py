@@ -1492,6 +1492,8 @@ class Liquid_GMX(Liquid):
         # Dictionary of last frames.
         self.LfDict = OrderedDict()
         self.LfDict_New = OrderedDict()
+        # These functions need to be called after self.nptfiles is populated
+        self.post_init(options)
 
     def npt_simulation(self, temperature, pressure, simnum):
             """ Submit a NPT simulation to the Work Queue. """

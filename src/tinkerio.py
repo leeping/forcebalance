@@ -1054,6 +1054,8 @@ class Liquid_TINKER(Liquid):
         # Dictionary of .dyn files used to restart simulations.
         self.DynDict = OrderedDict()
         self.DynDict_New = OrderedDict()
+        # These functions need to be called after self.nptfiles is populated
+        self.post_init(options)
 
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """

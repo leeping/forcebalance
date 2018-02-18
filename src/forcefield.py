@@ -438,17 +438,13 @@ class FF(forcebalance.BaseClass):
             else:
                 self.openmmxml = ffname
 
+        self.amber_mol2 = []
         if fftype == "mol2":
-            if hasattr(self, "amber_mol2"):
-                warn_press_key("There should only be one .mol2 file - confused!!")
-            else:
-                self.amber_mol2 = ffname
+            self.amber_mol2.append(ffname)
 
+        self.amber_frcmod = []
         if fftype == "frcmod":
-            if hasattr(self, "amber_frcmod"):
-                warn_press_key("There should only be one .frcmod file - confused!!")
-            else:
-                self.amber_frcmod = ffname
+            self.amber_frcmod.append(ffname)
 
         # Determine the appropriate parser from the FF_IOModules dictionary.
         # If we can't figure it out, then use the base reader, it ain't so bad. :)

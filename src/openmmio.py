@@ -1349,6 +1349,8 @@ class Liquid_OpenMM(Liquid):
         # Send back the trajectory file.
         if self.save_traj > 0:
             self.extra_output = ['liquid-md.pdb', 'liquid-md.dcd']
+        # These functions need to be called after self.nptfiles is populated
+        self.post_init(options)
 
 class AbInitio_OpenMM(AbInitio):
     """ Force and energy matching using OpenMM. """

@@ -154,8 +154,6 @@ tgt_opts_types = {
                  "gmx_mdp"               : (None, -10, 'Gromacs .mdp files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_ndx"               : (None, -10, 'Gromacs .ndx files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
-                 "amber_mol2"            : (None, -10, 'Name of mol2 file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
-                 "amber_frcmod"          : (None, -10, 'Name of frcmod file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
                  "amber_leapcmd"         : (None, -10, 'File containing commands for "tleap" when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
                  "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
                  "expdata_txt"           : ('expset.txt', 0, 'Text file containing experimental data.', 'Thermodynamic properties target', 'thermo'),

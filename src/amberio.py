@@ -457,7 +457,7 @@ def write_mdin(calctype, fout=None, nsteps=None, timestep=None, nsave=None, pbc=
         if name not in checked_list:
             checked_list.append(name)
             cntrl_out[name] = value
-            cntrl_comm[name] = "Set via mdin file"
+            cntrl_comm[name] = "Set via user-provided mdin file"
 
     # Fill in default options not set by the user
     for name, var in cntrl_vars.items():
@@ -1172,28 +1172,48 @@ class AMBER(Engine):
         self.AtomLists = defaultdict(list)
         self.pbc = pbc
 
+        self.mol2 = []
+        self.frcmod = []
+        # if 'mol2' in kwargs:
+        #     self.mol2 = kwargs['mol2'][:]
+        # if 'frcmod' in kwargs:
+        #     self.frcmod = kwargs['frcmod'][:]
+
         if hasattr(self,'FF'):
-            if not (os.path.exists(self.FF.amber_frcmod) and os.path.exists(self.FF.amber_mol2)):
-                # If the parameter files don't already exist, create them for the purpose of
-                # preparing the engine, but then delete them afterward.
-                prmtmp = True
-                self.FF.make(np.zeros(self.FF.np))
-            else:
-                prmtmp = False
+            # If the parameter files don't already exist, create them for the purpose of
+            # preparing the engine, but then delete them afterward.
+            prmtmp = False
+            for fnm in self.FF.amber_frcmod + self.FF.amber_mol2:
+                if not os.path.exists(fnm):
+                    self.FF.make(np.zeros(self.FF.np))
+                    prmtmp = True
             # Currently force field object only allows one mol2 and frcmod file although this can be lifted.
-            self.mol2 = [self.FF.amber_mol2]
-            self.frcmod = [self.FF.amber_frcmod]
-            if 'mol2' in kwargs:
-                logger.error("FF object is provided, which overrides mol2 keyword argument")
-                raise RuntimeError
-            if 'frcmod' in kwargs:
-                logger.error("FF object is provided, which overrides frcmod keyword argument")
-                raise RuntimeError
+            for mol2 in self.FF.amber_mol2:
+                self.mol2.append(mol2)
+            for frcmod in self.FF.amber_frcmod:
+                self.frcmod.append(frcmod)
+            # self.mol2 = [self.FF.amber_mol2]
+            # self.frcmod = [self.FF.amber_frcmod]
+            # if 'mol2' in kwargs:
+            #     logger.error("FF object is provided, which overrides mol2 keyword argument")
+            #     raise RuntimeError
+            # if 'frcmod' in kwargs:
+            #     logger.error("FF object is provided, which overrides frcmod keyword argument")
+            #     raise RuntimeError
         else:
             prmtmp = False
-            self.mol2 = listfiles(kwargs.get('mol2'), 'mol2', err=False)
-            self.frcmod = listfiles(kwargs.get('frcmod'), 'frcmod', err=False)
-        
+        # mol2 and frcmod files in the target folder should also be included
+        self.absmol2 = []
+        for mol2 in listfiles(kwargs.get('mol2'), 'mol2', err=False):
+            if mol2 not in self.mol2:
+                self.mol2.append(mol2)
+                self.absmol2.append(os.path.abspath(mol2))
+        self.absfrcmod = []
+        for frcmod in listfiles(kwargs.get('frcmod'), 'frcmod', err=False):
+            if frcmod not in self.frcmod:
+                self.frcmod.append(frcmod)
+                self.absfrcmod.append(os.path.abspath(frcmod))
+
         # Figure out the topology information.
         self.leap(read_prmtop=True, count_mols=True)
 
@@ -1222,6 +1242,14 @@ class AMBER(Engine):
         pdb = os.path.basename(self.abspdb)
         if not os.path.exists(pdb):
             LinkFile(self.abspdb, pdb)
+        # Link over "static" mol2 and frcmod files from target folder
+        print(self.absmol2, self.absfrcmod)
+        for mol2 in self.absmol2:
+            if not os.path.exists(os.path.split(mol2)[-1]):
+                LinkFile(mol2, os.path.split(mol2)[-1])
+        for frcmod in self.absfrcmod:
+            if not os.path.exists(os.path.split(frcmod)[-1]):
+                LinkFile(frcmod, os.path.split(frcmod)[-1])
         if name is None: name = self.name
         write_leap(self.leapcmd, mol2=self.mol2, frcmod=self.frcmod, pdb=pdb, prefix=name, spath=self.spath, delcheck=delcheck)
         self.callamber("tleap -f %s_" % self.leapcmd)
@@ -1848,6 +1876,10 @@ class Liquid_AMBER(Liquid):
                 self.nptfiles.append('%s.mdin' % os.path.splitext(f)[0])
                 if f == self.gas_coords:
                     self.gas_engine_args['mdin'] = os.path.splitext(f)[0]
+        for mol2 in listfiles(None, 'mol2', err=False, dnm=os.path.join(self.root, self.tgtdir)):
+            self.nptfiles.append(mol2)
+        for frcmod in listfiles(None, 'frcmod', err=False, dnm=os.path.join(self.root, self.tgtdir)):
+            self.nptfiles.append(frcmod)
         for i in self.nptfiles:
             if not os.path.exists(os.path.join(self.root, self.tgtdir, i)):
                 logger.error('Please provide %s; it is needed to proceed.\n' % i)
@@ -1855,3 +1887,5 @@ class Liquid_AMBER(Liquid):
         # Send back the trajectory file.
         if self.save_traj > 0:
             self.extra_output += ['liquid-md.netcdf']
+        # These functions need to be called after self.nptfiles is populated
+        self.post_init(options)

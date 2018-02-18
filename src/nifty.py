@@ -1049,8 +1049,11 @@ def onefile(fnm=None, ext=None, err=False):
 # 3) If list is empty but extension is provided, check for files that
 # match the extension.  If so, append them to the list.
 # 4) If list is still empty and err==True, then crash with an error.
-def listfiles(fnms=None, ext=None, err=False):
+def listfiles(fnms=None, ext=None, err=False, dnm=None):
     answer = []
+    cwd = os.path.abspath(os.getcwd())
+    if dnm is not None:
+        os.chdir(dnm)
     if isinstance(fnms, list):
         for i in fnms:
             if not os.path.exists(i):
@@ -1091,6 +1094,7 @@ def listfiles(fnms=None, ext=None, err=False):
                 logger.info("\x1b[93monefile() will copy %s to %s\x1b[0m\n" % (os.path.abspath(fnm), os.getcwd()))
                 shutil.copy2(fsrc, fdest)
                 answer[ifnm] = os.path.basename(fnm)
+    os.chdir(cwd)
     return answer
 
 def extract_tar(tarfnm, fnms, force=False):
