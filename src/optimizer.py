@@ -564,6 +564,17 @@ class Optimizer(forcebalance.BaseClass):
                         trust += self.adapt_fac*trust*np.exp(-1*self.adapt_damp*(trust/self.trust0 - 1))
                         trustprint = "Increasing trust radius to % .4e\n" % trust
                     color = "\x1b[92m" if Best_Step else "\x1b[0m"
+                    if Best_Step:
+                        if self.backup:
+                            for fnm in self.FF.fnms:
+                                if os.path.exists(os.path.join(self.resdir, fnm)):
+                                    bak(os.path.join(self.resdir, fnm))
+                        self.FF.make(xk,printdir=self.resdir)
+                        # logger.info("The force field has been written to the '%s' directory.\n" % self.resdir)
+                        outfnm = self.save_mvals_to_input(xk)
+                        # logger.info("Input file with optimization parameters saved to %s.\n" % outfnm)
+                        printcool("The force field has been written to the %s directory.\n"
+                                  "Input file with optimization parameters saved to %s." % (self.resdir, outfnm), color=0)
                     #================================#
                     #|  Hessian update for BFGS.    |#
                     #================================#
