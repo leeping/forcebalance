@@ -257,7 +257,7 @@ if "forcebalance" in __name__:
     #============================#
     try: from .PDB import *
     except:
-        warn('The pdb module cannot be miported (Cannot read/write PDB files)')
+        warn('The pdb module cannot be imported (Cannot read/write PDB files)')
 
     #=============================#
     #| Mol2 read/write functions |#
@@ -1092,7 +1092,7 @@ class Molecule(object):
                 # qcrems is a list of OrderedDicts.
                 New.Data[key] = []
                 for i in range(len(self.Data[key])):
-                    New.Data[key].append(copy.deepcopy(self.Data[key]))
+                    New.Data[key].append(copy.deepcopy(self.Data[key][i]))
             elif key in ['comms', 'qm_energies', 'qm_interaction', 'qm_zpe', 'qm_entropy', 'qm_enthalpy', 'elem', 'partial_charge',
                          'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost', 'chain', 'altloc', 'icode',
                          'terminal']:
