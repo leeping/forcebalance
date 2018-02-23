@@ -161,6 +161,11 @@ from ctypes import *
 from warnings import warn
 import sysconfig
 from pkg_resources import parse_version
+# For Python 3 compatibility
+try:
+    from itertools import zip_longest as zip_longest
+except:
+    from itertools import izip_longest as zip_longest
 
 #================================#
 #       Set up the logger        #
@@ -554,7 +559,7 @@ def pvec(vec):
 def grouper(n, iterable):
     """ Groups a big long iterable into groups of ten or what have you. """
     args = [iter(iterable)] * n
-    return list([e for e in t if e is not None] for t in itertools.zip_longest(*args))
+    return list([e for e in t if e is not None] for t in zip_longest(*args))
 
 def even_list(totlen, splitsize):
     """ Creates a list of number sequences divided as evenly as possible.  """
