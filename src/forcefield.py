@@ -110,7 +110,8 @@ from forcebalance.nifty import *
 from copy import deepcopy
 try:
     from lxml import etree
-except: pass
+except:
+    print("Failed to import lxml module, needed by OpenMM engine")
 import traceback
 import itertools
 from collections import OrderedDict, defaultdict
