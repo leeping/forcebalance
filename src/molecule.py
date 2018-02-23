@@ -244,7 +244,9 @@ if "forcebalance" in __name__:
     have_dcdlib = False
     for fnm in ["_dcdlib.so",
                 os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"),
-                os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib"+str(sysconfig.get_config_var('EXT_SUFFIX')))]:
+                os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib"+str(sysconfig.get_config_var('EXT_SUFFIX'))),
+                os.path.join(os.path.dirname(__file__),"_dcdlib.so"),
+                os.path.join(os.path.dirname(__file__),"_dcdlib"+str(sysconfig.get_config_var('EXT_SUFFIX')))]:
         if os.path.exists(fnm):
             _dcdlib = CDLL(fnm)
             have_dcdlib = True
