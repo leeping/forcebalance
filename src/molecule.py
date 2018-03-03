@@ -1089,7 +1089,7 @@ class Molecule(object):
                 # explicitly defined copy() methods.
                 New.Data[key] = []
                 for i in range(len(self.Data[key])):
-                    New.Data[key].append(self.Data[key][i].copy())
+                    New.Data[key].append(copy.copy(self.Data[key][i]))
             elif key in ['topology']:
                 # These are NetworkX graph objects or other variables with explicitly defined copy() methods.
                 New.Data[key] = self.Data[key].copy()
