@@ -540,7 +540,9 @@ class TINKER(Engine):
         # Use networkx to figure out a list of molecule numbers.
         if len(list(G.nodes())) > 0:
             # The following code only works in TINKER 6.2
-            gs = list(nx.connected_component_subgraphs(G))
+            gs = [G.subgraph(c).copy() for c in nx.connected_components(G)]
+            # Deprecated in networkx 2.2
+            # gs = list(nx.connected_component_subgraphs(G))
             tmols = [gs[i] for i in np.argsort(np.array([min(list(g.nodes())) for g in gs]))]
             mnodes = [list(m.nodes()) for m in tmols]
             self.AtomLists['MoleculeNumber'] = [[i+1 in m for m in mnodes].index(1) for i in range(self.mol.na)]
