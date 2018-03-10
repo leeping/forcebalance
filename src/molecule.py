@@ -2027,7 +2027,9 @@ class Molecule(object):
         # The Topology is simply the NetworkX graph object.
         self.topology = G
         # LPW: Molecule.molecules is a funny misnomer... it should be fragments or substructures or something
-        self.molecules = list(nx.connected_component_subgraphs(G))
+        self.molecules = [G.subgraph(c).copy() for c in nx.connected_components(G)]
+        # Deprecated in networkx 2.2
+        # self.molecules = list(nx.connected_component_subgraphs(G))
 
     def distance_matrix(self, pbc=True):
         ''' Obtain distance matrix between all pairs of atoms. '''
