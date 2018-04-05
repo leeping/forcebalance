@@ -12,6 +12,7 @@ from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
 from forcebalance.binding import BindingEnergy
 from forcebalance.liquid import Liquid
+from forcebalance.liquid import RDF
 from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
@@ -37,6 +38,9 @@ try:
     import simtk.openmm._openmm as _openmm
 except:
     pass
+try:
+    import mdtraj as md
+except: pass
 
 def get_mask(grps):
     """ Given a list of booleans [1, 0, 1] return the bitmask that sets
@@ -521,6 +525,7 @@ class OpenMM_Reader(BaseReader):
         except:
             logger.info("Minor warning: Parameter ID %s doesn't contain any atom types, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
             return "/".join([InteractionType, parameter])
+
 
 class OpenMM(Engine):
 
@@ -1182,6 +1187,44 @@ class OpenMM(Engine):
         Volumes = []
         Dips = []
         Temps = []
+
+        #Below lines needed if user suppiled liquid.pdb does not match internal openmm coord i.e. virtual sites have been added
+        if self.pbc:   
+                f = open('pairs.pdb', 'w')	
+                app.PDBFile.writeFile(self.mod.topology, self.mod.positions, f)
+                f.close()
+
+        ##Build RDFs 
+        RDFs = []
+        try:	
+                lines = open('rdf.dat')
+                try:
+                        for line in lines:
+                                # Read in exsperimental RDFs name and range
+                                if line[0:3] == 'RDF':
+                                        name = line[4:50]
+                                        name = name.rstrip('\n')
+                                elif line[0:1] == '@':
+                                        r = []
+                                elif line[0:6] == 'ENDRDF':
+                                        RDFs.append(RDF(r = r, name = name))
+                                elif line[0:5] == 'ENDPT':
+                                        pass
+                                elif line[0:1] == '#':
+                                        pass
+                                else:	
+                                        exp_data = line[0:30]
+                                        exp_data = exp_data.split()
+                                        r.append(float(exp_data[0]))
+                        
+                except:
+                        logger.error("rdf.dat could not be read please check format\n")
+                        raise RuntimeError
+        except:
+                pass
+        for rdf in RDFs:
+                #Make list of atom pairs for RDF.Calc
+                RDF.Pairs(rdf)
         #========================#
         # Now run the simulation #
         #========================#
@@ -1214,7 +1257,7 @@ class OpenMM(Engine):
                                                                                      volume / nanometers**3, density / (kilogram / meter**3)))
             else:
                 if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration+1, state.getTime() / picoseconds,
-                                                                       kinetic_temperature / kelvin, potential / kilojoules_per_mole))
+                                                               kinetic_temperature / kelvin, potential / kilojoules_per_mole))
         # Collect production data.
         if verbose: logger.info("Production...\n")
         if self.pbc:
@@ -1228,6 +1271,14 @@ class OpenMM(Engine):
         for iteration in range(-1, isteps):
             # Propagate dynamics.
             if iteration >= 0: self.simulation.step(nsave)
+            ##Calculate RDFs
+            if self.pbc:
+                [a,b,c] = box_vectors#box size
+                side=a[0]*nanometers ** -1 #box lenght must be unitless for MDtraj
+                Positions = state.getPositions() *nanometers ** -1
+                traj = md.Trajectory(xyz=Positions, topology=None, time=None, unitcell_lengths=(side,side,side), unitcell_angles=(90,90,90))
+                for rdf in RDFs:
+                    RDF.Calc(rdf, traj)
             # Compute properties.
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
             kinetic = state.getKineticEnergy()/self.tdiv
@@ -1272,9 +1323,14 @@ class OpenMM(Engine):
         Ecomps["Kinetic Energy"] = Kinetics
         Ecomps["Temperature"] = Temps
         Ecomps["Total Energy"] = Potentials + Kinetics
+
+        ##Return RDFs
+        RDF_data = []
+        for rdf in RDFs:
+            RDF_data.append(rdf.data)
         # Initialized property dictionary.
         prop_return = OrderedDict()
-        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
+        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps, 'RDF_data': RDF_data})
         return prop_return
 
     def scale_box(self, x=1.0, y=1.0, z=1.0):
