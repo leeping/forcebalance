@@ -1188,13 +1188,14 @@ class OpenMM(Engine):
         Dips = []
         Temps = []
 
-        #needed if user suppiled liquid.pdb does not match internal openmm coord i.e. virtual sites 		have been added
+        #Below lines needed if user suppiled liquid.pdb does not match internal openmm coord i.e. virtual sites have been added
         if self.pbc:   
                 f = open('pairs.pdb', 'w')	
                 app.PDBFile.writeFile(self.mod.topology, self.mod.positions, f)
                 f.close()
-        # Build RDFs ############################################
-	RDFs = []
+
+        ##Build RDFs 
+        RDFs = []
         try:	
                 lines = open('rdf.dat')
                 try:
@@ -1209,7 +1210,7 @@ class OpenMM(Engine):
                                         RDFs.append(RDF(r = r, name = name))
                                 elif line[0:5] == 'ENDPT':
                                         pass
-				elif line[0:1] == '#':
+                                elif line[0:1] == '#':
                                         pass
                                 else:	
                                         exp_data = line[0:30]
@@ -1221,13 +1222,9 @@ class OpenMM(Engine):
                         raise RuntimeError
         except:
                 pass
-
-	for rdf in RDFs:
-                                #Make list of atom pairs for RDF.Calc
-                                RDF.Pairs(rdf)
-        #####################################################
-
-
+        for rdf in RDFs:
+                #Make list of atom pairs for RDF.Calc
+                RDF.Pairs(rdf)
         #========================#
         # Now run the simulation #
         #========================#
@@ -1274,18 +1271,15 @@ class OpenMM(Engine):
         for iteration in range(-1, isteps):
             # Propagate dynamics.
             if iteration >= 0: self.simulation.step(nsave)
-            # Compute properties.
-
-            # Calculate RDFs ######################################
+            ##Calculate RDFs
             if self.pbc:
                 [a,b,c] = box_vectors#box size
-		side=a[0]*nanometers ** -1 #box lenght must be unitless for MDtraj
+                side=a[0]*nanometers ** -1 #box lenght must be unitless for MDtraj
                 Positions = state.getPositions() *nanometers ** -1
                 traj = md.Trajectory(xyz=Positions, topology=None, time=None, unitcell_lengths=(side,side,side), unitcell_angles=(90,90,90))
                 for rdf in RDFs:
                     RDF.Calc(rdf, traj)
-            #########################################################
-	    
+            # Compute properties.
             state = self.simulation.context.getState(getEnergy=True,getPositions=True,getVelocities=False,getForces=False)
             kinetic = state.getKineticEnergy()/self.tdiv
             potential = state.getPotentialEnergy()
@@ -1329,14 +1323,12 @@ class OpenMM(Engine):
         Ecomps["Kinetic Energy"] = Kinetics
         Ecomps["Temperature"] = Temps
         Ecomps["Total Energy"] = Potentials + Kinetics
-        # Initialized property dictionary.
-	
-	# Return RDFs ########################################
+
+        ##Return RDFs
         RDF_data = []
         for rdf in RDFs:
-            RDF_data.append(rdf.data)	
-	######################################################
-
+            RDF_data.append(rdf.data)
+        # Initialized property dictionary.
         prop_return = OrderedDict()
         prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps, 'RDF_data': RDF_data})
         return prop_return
