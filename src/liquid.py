@@ -5,10 +5,6 @@ author Lee-Ping Wang
 """
 from __future__ import division
 from __future__ import print_function
-
-import time
-
-
 from builtins import str
 from builtins import zip
 from builtins import range

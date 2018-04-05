@@ -8,12 +8,6 @@ from __future__ import division
 from builtins import zip
 from builtins import range
 import os
-#rdf
-import glob
-import mdtraj as md
-from itertools import combinations
-from scipy.ndimage.filters import gaussian_filter
-#rdf
 from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
 from forcebalance.binding import BindingEnergy
@@ -44,6 +38,9 @@ try:
     import simtk.openmm._openmm as _openmm
 except:
     pass
+try:
+    import mdtraj as md
+except: pass
 
 def get_mask(grps):
     """ Given a list of booleans [1, 0, 1] return the bitmask that sets
@@ -1263,7 +1260,6 @@ class OpenMM(Engine):
                                                                                      volume / nanometers**3, density / (kilogram / meter**3)))
             else:
                 if verbose: logger.info("%6d %9.3f %9.3f % 13.3f\n" % (iteration+1, state.getTime() / picoseconds,
-        
                                                                kinetic_temperature / kelvin, potential / kilojoules_per_mole))
         # Collect production data.
         if verbose: logger.info("Production...\n")
