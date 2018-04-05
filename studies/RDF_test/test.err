@@ -1,0 +1,24 @@
+Traceback (most recent call last):
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/EGG-INFO/scripts/ForceBalance.py", line 45, in Run_ForceBalance
+    optimizer.Run()
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/forcebalance/optimizer.py", line 314, in Run
+    xk = self.OptTab[self.jobtype]()
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/forcebalance/optimizer.py", line 913, in NewtonRaphson
+    return self.MainOptimizer(b_BFGS=0)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/forcebalance/optimizer.py", line 486, in MainOptimizer
+    data        = self.Objective.Full(xk,Ord,verbose=True)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/forcebalance/objective.py", line 276, in Full
+    Objective = self.Target_Terms(vals, Order, verbose, customdir)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/forcebalance/objective.py", line 179, in Target_Terms
+    Tgt.stage(mvals, AGrad = Order >= 1, AHess = Order >= 2, customdir=customdir)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/forcebalance/target.py", line 620, in stage
+    self.submit_jobs(mvals, AGrad, AHess)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/forcebalance/liquid.py", line 651, in submit_jobs
+    submit_one_setm()
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/forcebalance/liquid.py", line 644, in submit_one_setm
+    self.npt_simulation(T,P,snum)
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/forcebalance/liquid.py", line 455, in npt_simulation
+    _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
+  File "/home/cdt1605/FB_PY/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/forcebalance/nifty.py", line 1360, in _exec
+    to_read, _, _ = select(streams, [], [])
+KeyboardInterrupt

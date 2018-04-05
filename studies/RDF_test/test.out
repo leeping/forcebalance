@@ -1,0 +1,335 @@
+#======================================================================#
+#| [1m            Welcome to ForceBalance version 1.5.1! =D             [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Keri A. McKiernan, Yudong Qiu                   [0m |#
+#| [1m           Arthur Vigil, Erik G. Brandt, Johnny Israeli           [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: test.in
+Reading force field from file: tip4pfb.xml
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  0.0000e+00 ] : Atom/charge/tip4p-fb-O
+   1 [  7.4928e-01 ] : Atom/epsilon/tip4p-fb-O
+   2 [  3.1656e-01 ] : Atom/sigma/tip4p-fb-O
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   Atom/sigma                           : 3.16555e-01
+   Atom/epsilon                         : 7.49279e-01
+   Atom/charge                          : 1.00000e+00
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    Atom/charge                   : 1.00000e+00 ] : Atom/charge/tip4p-fb-O
+   1 [    Atom/epsilon                  : 7.49279e-01 ] : Atom/epsilon/tip4p-fb-O
+   2 [    Atom/sigma                    : 3.16555e-01 ] : Atom/sigma/tip4p-fb-O
+----------------------------------------------------------
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['tip4pfb.xml'] 
+ffdir                     forcefield 
+priors                    OrderedDict() 
+constrain_charge          0 
+logarithmic_map           0 
+rigid_water               True 
+use_pvals                 0 
+duplicate_pnames          0 
+----------------------------------------------------------
+Autodetected 895 molecules with 3 atoms each in liquid coordinates
+No periodic boundary conditions, your provided nonbonded_cutoff and vdw_cutoff will not be used
+[1;91mPress Enter or wait 10 seconds (I assume no responsibility for what happens after this!)[0m
+#========================================================#
+#| [92m              Setup for target WATER :              [0m |#
+#========================================================#
+force_cuda                True 
+mts_integrator            0 
+rpmd_beads                0 
+liquid_coords             liquid.pdb 
+gas_coords                gas.pdb 
+nvt_coords                surf.pdb 
+name                      WATER 
+type                      LIQUID_OPENMM 
+weight                    1.0 
+fdgrad                    0 
+fdhess                    0 
+fdhessdiag                0 
+sleepy                    0 
+fd1_pids                  [] 
+fd2_pids                  [] 
+h                         0.001 
+backup                    1 
+zerograd                  -1 
+epsgrad                   0.0 
+tgtdir                    targets/WATER 
+w_rho                     1.0 
+w_hvap                    1.0 
+w_alpha                   1.0 
+w_kappa                   1.0 
+w_cp                      1.0 
+w_eps0                    1.0 
+w_rdf                     1.0 
+w_normalize               0 
+manual                    0 
+hvap_subaverage           0 
+liquid_eq_steps           1000 
+liquid_md_steps           6000 
+gas_eq_steps              500 
+gas_md_steps              5000 
+nonbonded_cutoff          11.0 
+liquid_timestep           2.0 
+liquid_interval           2.0 
+gas_timestep              1.0 
+gas_interval              0.1 
+adapt_errors              0 
+minimize_energy           1 
+self_pol_mu0              1.855 
+self_pol_alpha            1.47 
+anisotropic_box           0 
+save_traj                 2 
+n_molecules               -1 
+w_surf_ten                0.0 
+nvt_eq_steps              10000 
+nvt_md_steps              100000 
+nvt_timestep              1.0 
+nvt_interval              0.1 
+pure_num_grad             0 
+liquid_fdiff_h            0.01 
+rho_denom                 40.0 
+hvap_denom                2.0 
+alpha_denom               1.0 
+kappa_denom               10.0 
+cp_denom                  2.0 
+eps0_denom                10.0 
+rdf_denom                 0.01 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 0.0e+00 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_type              L2 
+penalty_additive          0.0 
+penalty_multiplicative    0.0 
+penalty_hyperbolic_b      1e-06 
+penalty_alpha             0.001 
+normalize_weights         1 
+wq_port                   0 
+asynchronous              0 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   NEWTON 
+trust0                    0.15 
+mintrust                  0.0 
+eps                       0.0001 
+step_lowerbound           1e-06 
+lmg                       1.0 
+h                         0.001 
+h0                        0.001 
+fdf                       0.1 
+hist                      2 
+convergence_objective     0.01 
+convergence_step          0.0001 
+convergence_gradient      0.001 
+maxstep                   100 
+idxnum                    [] 
+idxname                   [] 
+wchk_step                 1 
+adapt_fac                 0.25 
+adapt_damp                0.5 
+print_grad                1 
+print_hess                0 
+print_vals                1 
+err_tol                   0.0 
+search_tol                0.0001 
+backup                    1 
+input_file                test.in 
+criteria                  1 
+----------------------------------------------------------
+#========================================================#
+#| [1m                  Main Optimizer                    [0m |#
+#| [1m   Newton-Raphson Method (Adaptive Trust Radius)    [0m |#
+#| [1m                                                    [0m |#
+#| [1m       [0mConvergence criteria (1 of 3 needed):        [0m |#
+#| [1m          [0mObjective Function  : 1.000e-02           [0m |#
+#| [1m          [0mNorm of Gradient    : 1.000e-03           [0m |#
+#| [1m          [0mParameter step size : 1.000e-04           [0m |#
+#========================================================#
+#========================================================================#
+#|               Color Key for Objective Function -=X2=-                |#
+#|  [1mBold[0m = Initial step                                                 |#
+#|  [92mGreen = Current lowest value of objective function (best estimate)[0m  |#
+#|  [91mRed = Objective function rises, step rejected[0m                       |#
+#|  [0mNo color = Not at the lowest value                                  |#
+#========================================================================#
+#========================================================#
+#| [94m     Iteration 0: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+#========================================================#
+#|       Target: WATER - launching MD simulations       |#
+#|          Time steps: 1000 (eq) + 6000 (md)           |#
+#========================================================#
+Running condensed phase simulation locally.
+You may tail -f /home/cdt1605/OpenMM/obj_fb/studies/RDF_TEST/test.tmp/WATER/iter_0000/298.15K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py openmm 298.150 1.000[0m Output: npt.out
+Running condensed phase simulation locally.
+You may tail -f /home/cdt1605/OpenMM/obj_fb/studies/RDF_TEST/test.tmp/WATER/iter_0000/600.00K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py openmm 600.000 1.000[0m Output: npt.out
+Reading information from ./298.15K-1.0atm/npt_result.p
+Reading information from ./600.00K-1.0atm/npt_result.p
+The molecular dipole moment is  2.428 debye
+#============================================================#
+#| [92m            Self-polarization correction to             [0m |#
+#| [92m enthalpy of vaporization is  6.725 kJ/mol, Derivative: [0m |#
+#============================================================#
+   0 [ -7.3928e+00 ] : Atom/charge/tip4p-fb-O
+   1 [  0.0000e+00 ] : Atom/epsilon/tip4p-fb-O
+   2 [  0.0000e+00 ] : Atom/sigma/tip4p-fb-O
+--------------------------------------------------------------
+Weights have been renormalized to 1.0
+Physical quantity Density uses denominator =  40.0000
+Weights have been renormalized to 1.0
+Physical quantity H_vap uses denominator =  2.0000
+Weights have been renormalized to 1.0
+Physical quantity type O&type O uses denominator =  0.0100
+Weights have been renormalized to 1.0
+Physical quantity type H&type H uses denominator =  0.0100
+Weights have been renormalized to 1.0
+Physical quantity type O&type H uses denominator =  0.0100
+#==========================================================================================#
+#| [1;94m                               WATER Density (kg m^-3)                                [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm   997.045      992.868 +- 1.490    -4.177   0.50000   0.00545 
+      600.00      1.0 atm   997.045      763.299 +- 36.731  -233.746   0.50000  17.07412 
+--------------------------------------------------------------------------------------------
+#========================================================#
+#| [92m  Density objective function:  17.080, Derivative:  [0m |#
+#========================================================#
+   0 [  1.4767e+04 ] : Atom/charge/tip4p-fb-O
+   1 [  1.2801e+03 ] : Atom/epsilon/tip4p-fb-O
+   2 [  2.9306e+04 ] : Atom/sigma/tip4p-fb-O
+----------------------------------------------------------
+#==========================================================================================#
+#| [1;94m                     WATER Enthalpy of Vaporization (kJ mol^-1)                       [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm    43.989       44.048 +- 0.852     0.059   0.50000   0.00043 
+      600.00      1.0 atm    43.989       31.864 +- 2.200   -12.125   0.50000  18.37780 
+--------------------------------------------------------------------------------------------
+#=======================================================================#
+#| [92m Enthalpy of Vaporization objective function:  18.378, Derivative: [0m |#
+#=======================================================================#
+   0 [  1.1964e+04 ] : Atom/charge/tip4p-fb-O
+   1 [  1.0258e+03 ] : Atom/epsilon/tip4p-fb-O
+   2 [  2.3655e+04 ] : Atom/sigma/tip4p-fb-O
+-------------------------------------------------------------------------
+#==========================================================================================#
+#| [1;94m                               WATER RDF type O&type O                                [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm     0.000        0.028 +- 0.002     0.028   0.50000   4.02888 
+      600.00      1.0 atm     0.000        0.066 +- 0.003     0.066   0.50000  22.02548 
+--------------------------------------------------------------------------------------------
+#================================================================#
+#| [92m RDF type O&type O objective function:  26.054, Derivative: [0m |#
+#================================================================#
+   0 [  3.9700e+03 ] : Atom/charge/tip4p-fb-O
+   1 [  2.3586e+02 ] : Atom/epsilon/tip4p-fb-O
+   2 [  6.6386e+03 ] : Atom/sigma/tip4p-fb-O
+------------------------------------------------------------------
+#==========================================================================================#
+#| [1;94m                               WATER RDF type O&type H                                [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm     0.000        0.021 +- 0.001     0.021   0.50000   2.30160 
+      600.00      1.0 atm     0.000        0.025 +- 0.002     0.025   0.50000   3.22519 
+--------------------------------------------------------------------------------------------
+#===============================================================#
+#| [92m RDF type O&type H objective function:  5.527, Derivative: [0m |#
+#===============================================================#
+   0 [  8.6055e+02 ] : Atom/charge/tip4p-fb-O
+   1 [  5.6650e+01 ] : Atom/epsilon/tip4p-fb-O
+   2 [  1.5583e+03 ] : Atom/sigma/tip4p-fb-O
+-----------------------------------------------------------------
+#==========================================================================================#
+#| [1;94m                               WATER RDF type H&type H                                [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm     0.000        0.004 +- 0.000     0.004   0.50000   0.07992 
+      600.00      1.0 atm     0.000        0.016 +- 0.001     0.016   0.50000   1.27158 
+--------------------------------------------------------------------------------------------
+#===============================================================#
+#| [92m RDF type H&type H objective function:  1.352, Derivative: [0m |#
+#===============================================================#
+   0 [  5.4600e+02 ] : Atom/charge/tip4p-fb-O
+   1 [  3.8295e+01 ] : Atom/epsilon/tip4p-fb-O
+   2 [  9.3726e+02 ] : Atom/sigma/tip4p-fb-O
+-----------------------------------------------------------------
+#====================================================================#
+#| [94m               WATER Condensed Phase Properties:                [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+Density                           17.07957    1.000    1.70796e+01 
+Enthalpy of Vaporization          18.37824    1.000    1.83782e+01 
+RDF type O&type O                 26.05436    1.000    2.60544e+01 
+RDF type O&type H                  5.52680    1.000    5.52680e+00 
+RDF type H&type H                  1.35150    1.000    1.35150e+00 
+Total                                                  6.83905e+01 
+----------------------------------------------------------------------
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual 

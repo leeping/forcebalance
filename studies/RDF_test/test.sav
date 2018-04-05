@@ -1,0 +1,37 @@
+#Simplest possible ForceBalance input file with two targets.
+ 
+ $options
+ verbose_options True
+ forcefield tip4pfb.xml
+ jobtype newton
+ convergence_objective 0.01
+ #CONSTRAIN_CHARGE 1
+ rigid_water true
+ TRUST0 0.15
+  
+ $target
+ save_traj 2
+ Force_CUDA 1
+ openmm_platform CUDA
+ 
+ type Liquid_OpenMM
+ name WATER
+ liquid_eq_steps 1000
+ liquid_md_steps 6000
+ gas_eq_steps 500
+ gas_md_steps 5000
+ liquid_timestep 2.0
+ liquid_interval 2
+ nonbonded_cutoff 11.0
+ 
+ # Parameters for self-polarization correction of nonpolarizable water
+ self_pol_mu0 1.855
+ self_pol_alpha 1.47
+ read_mvals
+   0 [ -3.65327816e-02 ] : Atom/charge/tip4p-fb-O
+   1 [  1.45084923e-01 ] : Atom/epsilon/tip4p-fb-O
+   2 [  1.07573738e-02 ] : Atom/sigma/tip4p-fb-O
+/read_mvals
+$end
+ 
+ 
