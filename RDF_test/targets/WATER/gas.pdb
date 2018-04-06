@@ -1,8 +1,0 @@
-HEADER    Water Cubic Box (24.859 Ang, 512 TIP3P)
-COMPND
-SOURCE
-CRYST1   24.859   24.859   24.859  90.00  90.00  90.00 P 1           1
-HETATM    1  O   HOH     1      -7.336   0.430   6.058
-HETATM    2  H1  HOH     1      -7.789  -0.296   5.586
-HETATM    3  H2  HOH     1      -6.850  -0.048   6.757
-END
