@@ -24,6 +24,9 @@ from subprocess import PIPE
 try:
     from lxml import etree
 except: pass
+try:
+    import mdtraj as md
+except: pass
 from pymbar import pymbar
 import itertools
 from forcebalance.optimizer import Counter
@@ -85,6 +88,66 @@ def weight_info(W, PT, N_k, verbose=True, PTS=None):
 
 # NPT_Trajectory = namedtuple('NPT_Trajectory', ['fnm', 'Rhos', 'pVs', 'Energies', 'Grads', 'mEnergies', 'mGrads', 'Rho_errs', 'Hvap_errs'])
 
+class RDF(object):
+    def  __init__(self, r = None, exp = None, data = None, name= None):
+        
+        if exp == None:
+            exp = OrderedDict([])
+        if data == None:
+            data = []
+        if r == None:
+            r = []
+        
+        #Accept units of Angstrom so now convert to nm to match traj in Calc(self, traj)
+        self.dr =  (r[1] - r[0])/10
+        start = r[0]/10
+        end = r[-1]/10
+        self.r_range=((start-(0.5*self.dr)), end+(1*self.dr))
+        self.lenght = int((end - start)/self.dr)+1
+        self.name = name
+        self.data = data
+        self.exp = exp
+        
+        self.RDF_calc = OrderedDict([])
+        self.msd      = OrderedDict([])
+        self.MSD      = []
+        self.RDF_grad = OrderedDict([])
+        self.RDF_errs = []
+        self.RDF_std  = OrderedDict([])
+        
+        self.X_RDF = 0.0
+        self.G_RDF = 0.0
+        self.H_RDF = 0.0
+        self.RDFPrint = None
+        
+    def Pairs(self):
+        #calculate pairs of atoms for rdf calculation
+        selection = self.name.split('&')
+        traj = md.load('pairs.pdb') 
+        topology = traj.topology
+        sel1= topology.select(selection[0])
+        sel2= topology.select(selection[1])
+        pairs = topology.select_pairs(sel1, sel2)
+        self.pairs = pairs
+    
+    def Calc(self, traj):
+        # make calculation of RDF with MDtraj for each snapshot
+        #print('pairs', self.pairs, 'r_range', self.r_range, 'bin_width', self.dr)
+        r, gr = md.compute_rdf(traj, pairs=self.pairs, r_range=self.r_range, bin_width=self.dr, periodic=True, opt=True)
+        self.data.append(gr)
+      
+    def MSD(self, data, PT):
+        msd = []
+        for snapshot_rdf in data:
+            tmp = []
+            tmp = np.subtract(self.exp[PT], snapshot_rdf) 
+            tmp = np.square(tmp)
+            tmp = np.sum(tmp)
+            msd.append(tmp/self.lenght)
+        self.msd[PT] = msd
+        self.MSD += msd #concatanation of all PTs used in later caculation
+        self.RDF_errs.append(np.std(msd)*np.sqrt(statisticalInefficiency(msd, warn=False)/len(msd)))
+
 class Liquid(Target):
 
     """ Subclass of Target for liquid property matching."""
@@ -104,6 +167,8 @@ class Liquid(Target):
         self.set_option(tgt_opts,'w_cp',forceprint=True)
         # Weight of the dielectric constant
         self.set_option(tgt_opts,'w_eps0',forceprint=True)
+        # Weight of the RDF
+        self.set_option(tgt_opts,'w_rdf',forceprint=True)
         # Normalize the contributions to the objective function
         self.set_option(tgt_opts,'w_normalize',forceprint=True)
         # Optionally pause on the zeroth step
@@ -202,6 +267,12 @@ class Liquid(Target):
         self.nptfiles += [self.liquid_coords, self.gas_coords]
         # Scripts to be copied from the ForceBalance installation directory.
         self.scripts += ['npt.py']
+        if 'rdf' in self.RefData:
+            # Check if rdf.dat
+            if not os.path.exists(os.path.join(self.root, self.tgtdir, 'rdf.dat')):
+                logger.error("RDF calculation requires rdf.dat, but it is not found.")
+                raise RuntimeError
+            self.nptfiles += ['rdf.dat']
         #  NVT simulation parameters for computing Surface Tension
         if 'surf_ten' in self.RefData:
             # Check if nvt_coords exist
@@ -261,7 +332,7 @@ class Liquid(Target):
         global_opts = OrderedDict()
         found_headings = False
         known_vars = ['mbar','rho','hvap','alpha','kappa','cp','eps0','cvib_intra',
-                      'cvib_inter','cni','devib_intra','devib_inter', 'surf_ten']
+                      'cvib_inter','cni','devib_intra','devib_inter', 'surf_ten' , 'rdf']
         self.RefData = OrderedDict()
         for line in R:
             if line[0] == "global":
@@ -435,6 +506,11 @@ class Liquid(Target):
         print_item("Cp", "Isobaric Heat Capacity", "cal mol^-1 K^-1")
         print_item("Eps0", "Dielectric Constant", None)
         print_item("Surf_ten", "Surface Tension", "mN m^-1")
+        NonRDF = ("Rho", "Hvap", "Alpha", "Kappa", "Cp", "Eps0", "Surf_ten")
+        Xp_rdf = list(self.Xp.keys())
+        Xp_rdf = [x for x in Xp_rdf if x not in NonRDF]
+        for rdf in Xp_rdf:
+            print_item(rdf, 'RDF %s' % (rdf), None)
 
         PrintDict['Total'] = "% 10s % 8s % 14.5e" % ("","",self.Objective)
 
@@ -630,7 +706,7 @@ class Liquid(Target):
 
             # Assign variable names to all the stuff in npt_result.p
             Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
-                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(17))
+                Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, RDF_data = ([Results[t][i] for t in range(len(Points))] for i in range(18))
             # Determine the number of molecules
             if len(set(NMols)) != 1:
                 logger.error(str(NMols))
@@ -763,7 +839,7 @@ class Liquid(Target):
 
         # Assign variable names to all the stuff in npt_result.p
         Rhos, Vols, Potentials, Energies, Dips, Grads, GDips, mPotentials, mEnergies, mGrads, \
-            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols = ([Results[t][i] for t in range(len(Points))] for i in range(17))
+            Rho_errs, Hvap_errs, Alpha_errs, Kappa_errs, Cp_errs, Eps0_errs, NMols, RDF_data = ([Results[t][i] for t in range(len(Points))] for i in range(18))
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             logger.error(str(NMols))
@@ -845,7 +921,7 @@ class Liquid(Target):
         Surf_ten_calc = OrderedDict([])
         Surf_ten_grad = OrderedDict([])
         Surf_ten_std = OrderedDict([])
-
+        
         # The unit that converts atmospheres * nm**3 into kj/mol :)
         pvkj=0.061019351687175
 
@@ -933,6 +1009,42 @@ class Liquid(Target):
         Dy = Dy.flatten()
         Dz = Dz.flatten()
         if len(mPoints) > 0: mE = mE.flatten()
+        
+        ##Build RDFs
+        RDFs = []
+        if 'rdf' in self.RefData:
+                exp = OrderedDict([])
+                lines = open('%s/%s/rdf.dat' % (self.root, self.tgtdir, ))
+                for line in lines:
+                        # read name of RDFs r and g(r)
+                        if line[0:3] == 'RDF':
+                                name = line[4:50]
+                                name = name.rstrip('\n')
+                        elif line[0:1] == '@':
+                                PT = line[1:50]
+                                PT = PT.rstrip('\n')
+                                PT = Points[int(PT.split()[1])] #use user given indicies in rdf.dat to attribute phase point to read exsperimental rdf
+                                gr = []
+                                r = []
+                        elif line[0:6] == 'ENDRDF':
+                                RDFs.append(RDF(r = r, exp = exp, name = name))
+                                exp = OrderedDict([])
+                        elif line[0:5] == 'ENDPT':
+                                exp[PT] = gr
+                        elif line[0:1] == '#':
+                                pass
+                        else:
+                                exp_data = line[0:30]
+                                exp_data = exp_data.split()
+                                gr.append(float(exp_data[1]))
+                                r.append(float(exp_data[0]))
+
+                ##Calculate MSD
+                for i, PT in enumerate(Points):
+                        for j, rdf in enumerate(RDFs):
+                                RDF.MSD(rdf, RDF_data[i][j], PT) 
+        else:
+                pass
 
         for i, PT in enumerate(Points):
             T = PT[0]
@@ -953,6 +1065,11 @@ class Liquid(Target):
                 return flat(np.matrix(G)*col(W*vec)) - avg(vec)*Gbar
             def deprod(vec):
                 return flat(np.matrix(G)*col(W*vec))
+
+            ##RDF
+            for rdf in RDFs:
+                rdf.RDF_calc[PT] = np.dot(W,rdf.MSD)
+                rdf.RDF_grad[PT] = mBeta*(flat(np.matrix(G)*col(W*rdf.MSD)) - np.dot(W,rdf.MSD)*Gbar)
             ## Density.
             Rho_calc[PT]   = np.dot(W,R)
             Rho_grad[PT]   = mBeta*(flat(np.matrix(G)*col(W*R)) - np.dot(W,R)*Gbar)
@@ -1029,7 +1146,9 @@ class Liquid(Target):
                  Surf_ten_grad[PT] = stResults[PT]["G_surf_ten"]
                  Surf_ten_std[PT] = stResults[PT]["surf_ten_err"]
             ## Estimation of errors.
-            Rho_std[PT]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
+            Rho_std[PT] = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
+            for rdf in RDFs:
+                rdf.RDF_std[PT] = np.sqrt(sum(C**2 * np.array(rdf.RDF_errs)**2))
             if PT in mPoints:
                 Hvap_std[PT]   = np.sqrt(sum(C**2 * np.array(Hvap_errs)**2))
             else:
@@ -1047,6 +1166,7 @@ class Liquid(Target):
         property_results['cp'] = Cp_calc, Cp_std, Cp_grad
         property_results['eps0'] = Eps0_calc, Eps0_std, Eps0_grad
         property_results['surf_ten'] = Surf_ten_calc, Surf_ten_std, Surf_ten_grad
+        property_results['RDF'] = RDFs
         return property_results
 
     def get_pure_num_grad(self, mvals, AGrad=True, AHess=True):
@@ -1107,7 +1227,7 @@ class Liquid(Target):
         Cp_calc, Cp_std, Cp_grad = property_results['cp']
         Eps0_calc, Eps0_std, Eps0_grad = property_results['eps0']
         Surf_ten_calc, Surf_ten_std, Surf_ten_grad = property_results['surf_ten']
-
+        RDFs = property_results['RDF']
         Points = list(Rho_calc.keys())
 
         # Get contributions to the objective function
@@ -1118,6 +1238,8 @@ class Liquid(Target):
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
         X_Surf_ten, G_Surf_ten, H_Surf_ten, Surf_tenPrint = self.objective_term(list(Surf_ten_calc.keys()), 'surf_ten', Surf_ten_calc, Surf_ten_std, Surf_ten_grad, name="Surface Tension")
+        for rdf in RDFs:
+            rdf.X_RDF, rdf.G_RDF, rdf.H_RDF, rdf.RDFPrint = self.objective_term(Points, 'rdf', rdf.RDF_calc, rdf.RDF_std, rdf.RDF_grad, name= rdf.name)
 
         Gradient = np.zeros(self.FF.np)
         Hessian = np.zeros((self.FF.np,self.FF.np))
@@ -1129,9 +1251,12 @@ class Liquid(Target):
         if X_Cp == 0: self.w_cp = 0.0
         if X_Eps0 == 0: self.w_eps0 = 0.0
         if X_Surf_ten == 0: self.w_surf_ten = 0.0
+        for rdf in RDFs:
+            if rdf.X_RDF == 0: self.w_rdf = 0.0 
+        
 
         if self.w_normalize:
-            w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_surf_ten
+            w_tot = self.w_rho + self.w_hvap + self.w_alpha + self.w_kappa + self.w_cp + self.w_eps0 + self.w_surf_ten + self.w_rdf
         else:
             w_tot = 1.0
         w_1 = self.w_rho / w_tot
@@ -1141,23 +1266,40 @@ class Liquid(Target):
         w_5 = self.w_cp / w_tot
         w_6 = self.w_eps0 / w_tot
         w_7 = self.w_surf_ten / w_tot
+        w_8 = self.w_rdf / w_tot
 
         Objective    = w_1 * X_Rho + w_2 * X_Hvap + w_3 * X_Alpha + w_4 * X_Kappa + w_5 * X_Cp + w_6 * X_Eps0 + w_7 * X_Surf_ten
+        for rdf in RDFs:
+            Objective += w_8 * rdf.X_RDF
         if AGrad:
             Gradient = w_1 * G_Rho + w_2 * G_Hvap + w_3 * G_Alpha + w_4 * G_Kappa + w_5 * G_Cp + w_6 * G_Eps0 + w_7 * G_Surf_ten
+        for rdf in RDFs:
+            Gradient += w_8 * rdf.G_RDF
         if AHess:
             Hessian  = w_1 * H_Rho + w_2 * H_Hvap + w_3 * H_Alpha + w_4 * H_Kappa + w_5 * H_Cp + w_6 * H_Eps0 + w_7 * H_Surf_ten
+        for rdf in RDFs:
+            Hessian += w_8 * rdf.H_RDF
 
         if not in_fd():
             self.Xp = {"Rho" : X_Rho, "Hvap" : X_Hvap, "Alpha" : X_Alpha,
                            "Kappa" : X_Kappa, "Cp" : X_Cp, "Eps0" : X_Eps0, "Surf_ten": X_Surf_ten}
+            for rdf in RDFs:
+                self.Xp.update({rdf.name:rdf.X_RDF})
+
             self.Wp = {"Rho" : w_1, "Hvap" : w_2, "Alpha" : w_3,
                            "Kappa" : w_4, "Cp" : w_5, "Eps0" : w_6, "Surf_ten" : w_7}
+            for rdf in RDFs:
+                self.Wp.update({rdf.name:w_8})
+
             self.Pp = {"Rho" : RhoPrint, "Hvap" : HvapPrint, "Alpha" : AlphaPrint,
                            "Kappa" : KappaPrint, "Cp" : CpPrint, "Eps0" : Eps0Print, "Surf_ten": Surf_tenPrint}
+            for rdf in RDFs:
+                self.Pp.update({rdf.name:rdf.RDFPrint})
             if AGrad:
                 self.Gp = {"Rho" : G_Rho, "Hvap" : G_Hvap, "Alpha" : G_Alpha,
                                "Kappa" : G_Kappa, "Cp" : G_Cp, "Eps0" : G_Eps0, "Surf_ten": G_Surf_ten}
+            for rdf in  RDFs:
+                self.Gp.update({rdf.name:rdf.G_RDF})
             self.Objective = Objective
 
         Answer = {'X':Objective, 'G':Gradient, 'H':Hessian}

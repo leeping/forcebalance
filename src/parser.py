@@ -230,6 +230,7 @@ tgt_opts_types = {
                  "w_energy"     : (1.0, 0, 'Weight of energy', 'Ab initio targets', 'liquid'),
                  "w_force"      : (1.0, 0, 'Weight of atomistic forces', 'Ab initio targets', 'liquid'),
                  "w_surf_ten"   : (0.0, 0, 'Weight of surface tension', 'Condensed phase property targets', 'liquid'),
+                 "w_rdf"        : (1.0, 0, 'Weight of RDF', 'Condensed phase property targets', 'liquid'),
                  "w_netforce"   : (0.0, 0, 'Weight of net forces (condensed to molecules, residues, or charge groups)', 'Ab initio targets', 'abinitio'),
                  "w_torque"     : (0.0, 0, 'Weight of torques (condensed to molecules, residues, or charge groups)', 'Ab initio targets', 'abinitio'),
                  "w_resp"       : (0.0, -150, 'Weight of RESP', 'Ab initio targets with RESP (advanced usage)', 'abinitio'),
