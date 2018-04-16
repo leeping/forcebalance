@@ -179,7 +179,7 @@ AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames 
 #================================#
 try:
     from .output import *
-except ImportError:
+except (ImportError, ValueError):
     from logging import *
     class RawStreamHandler(StreamHandler):
         """Exactly like output.StreamHandler except it does no extra formatting
