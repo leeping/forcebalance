@@ -2,7 +2,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-# OrderedDict requires Python 2.7 or higher
 import copy
 import imp
 import itertools
@@ -30,7 +29,7 @@ except ImportError:
 # |              Chemical file format conversion module                |#
 # |                                                                    |#
 # |                Lee-Ping Wang (leeping@ucdavis.edu)                 |#
-# |                   Last updated March 11, 2018                      |#
+# |                   Last updated April 19, 2018                      |#
 # |                                                                    |#
 # |   This code is part of ForceBalance and is covered under the       |#
 # |   ForceBalance copyright notice and 3-clause BSD license.          |#
