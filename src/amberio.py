@@ -1276,7 +1276,9 @@ class AMBER(Engine):
                     G.add_edge(b[0], b[1])
                 for b in prmtop.getBondsWithH():
                     G.add_edge(b[0], b[1])
-                gs = list(nx.connected_component_subgraphs(G))
+                gs = [G.subgraph(c).copy() for c in nx.connected_components(G)]
+                # Deprecated in networkx 2.2
+                # gs = list(nx.connected_component_subgraphs(G))
                 self.AtomLists['MoleculeNumber'] = [None for i in range(na)]
                 for ig, g in enumerate(gs):
                     for i in g.nodes():
