@@ -108,14 +108,16 @@ from forcebalance.finite_difference import in_fd
 from forcebalance.nifty import *
 # from string import count
 from copy import deepcopy
-try:
-    from lxml import etree
-except: pass
 import traceback
 import itertools
 from collections import OrderedDict, defaultdict
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
+
+try:
+    from lxml import etree
+except:
+    logger.warning("Failed to import lxml module, needed by OpenMM engine")
 
 FF_Extensions = {"itp" : "gmx",
                  "top" : "gmx",
@@ -459,7 +461,11 @@ class FF(forcebalance.BaseClass):
         self.Readers[ffname] = Reader(ffname)
         if fftype == "openmm":
             ## Read in an XML force field file as an _ElementTree object
-            self.ffdata[ffname] = etree.parse(absff)
+            try:
+                self.ffdata[ffname] = etree.parse(absff)
+            except NameError:
+                logger.error("If etree not defined, please check if lxml module has been installed")
+                raise
             self.ffdata_isxml[ffname] = True
             # Process the file
             self.addff_xml(ffname)
