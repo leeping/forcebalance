@@ -242,7 +242,7 @@ class Liquid(Target):
         # Don't read indicate.log when calling meta_indicate()
         self.read_indicate = False
         self.write_indicate = False
-        
+
     def prepare_temp_directory(self):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
@@ -314,7 +314,7 @@ class Liquid(Target):
                 raise RuntimeError
         # Check the reference data table for validity.
         default_denoms = defaultdict(int)
-        PhasePoints = None
+        PhasePoints = set()
         RefData_copy = copy.deepcopy(self.RefData)
         for head in self.RefData:
             if head not in known_vars+[i+"_wt" for i in known_vars]:
@@ -336,11 +336,12 @@ class Liquid(Target):
                     # If there is only one data point, then the denominator is just the single
                     # data point itself.
                     default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
-            self.PhasePoints = list(self.RefData[head].keys())
+            PhasePoints |= set(self.RefData[head].keys())
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
         self.RefData = RefData_copy
         # Create labels for the directories.
+        self.PhasePoints = sorted(list(PhasePoints))
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
         logger.debug("global_opts:\n%s\n" % str(global_opts))
         logger.debug("default_denoms:\n%s\n" % str(default_denoms))
