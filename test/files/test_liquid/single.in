@@ -44,20 +44,20 @@ w_surf_ten 1.0
 self_pol_mu0 1.855
 self_pol_alpha 1.470
 
-liquid_equ_steps 1000000
-liquid_prod_steps 8000000
+liquid_equ_steps 10000
+liquid_prod_steps 80000
 liquid_timestep 1.0
 liquid_interval 0.1
 liquid_coords liquid.pdb
 
-gas_equ_steps 1000000
-gas_prod_steps 10000000
+gas_equ_steps 10000
+gas_prod_steps 100000
 gas_timestep 0.5
 gas_interval 0.1
 gas_coords mono.pdb
 
-nvt_eq_steps 1000000
-nvt_md_steps 8000000
+nvt_eq_steps 10000
+nvt_md_steps 30000
 nvt_timestep 1.0
 nvt_interval 0.1
 nvt_coords surf.pdb
