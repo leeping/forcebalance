@@ -7,13 +7,13 @@ from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer
+from forcebalance import optimizer as fbopt
 
 class TestWaterTutorial(ForceBalanceTestCase):
     def setUp(self):
         super(ForceBalanceTestCase,self).setUp()
         os.system('rm -rf test/files/test_liquid.run')
-        os.makedirs('test/files/test_liquid.run')
-        os.system('cp -r test/files/test_liquid/* test/files/test_liquid.run/')
+        os.system('cp -r test/files/test_liquid/ test/files/test_liquid.run/')
         os.chdir('test/files/test_liquid.run')
 
     def tearDown(self):
@@ -22,7 +22,7 @@ class TestWaterTutorial(ForceBalanceTestCase):
         super(ForceBalanceTestCase,self).tearDown()
 
     def runTest(self):
-        """Check continuation from a previous run"""
+        """Check liquid target with existing simulation data"""
         self.logger.debug("\nSetting input file to 'single.in'\n")
         input_file='single.in'
 
