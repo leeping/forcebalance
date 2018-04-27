@@ -1359,7 +1359,7 @@ class AbInitio_OpenMM(AbInitio):
         self.set_option(tgt_opts,'pdb',default="conf.pdb")
         self.set_option(tgt_opts,'coords',default="all.gro")
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
-        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
         self.engine_ = OpenMM
         ## Initialize base class.
         super(AbInitio_OpenMM,self).__init__(options,tgt_opts,forcefield)
@@ -1403,7 +1403,7 @@ class Hydration_OpenMM(Hydration):
         ## Default file names for coordinates and key file.
         # self.set_option(tgt_opts,'coords',default="input.pdb")
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
-        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
         self.engine_ = OpenMM
         self.engname = "openmm"
         ## Scripts to be copied from the ForceBalance installation directory.
