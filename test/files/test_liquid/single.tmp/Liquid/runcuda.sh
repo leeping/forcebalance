@@ -1,1 +1,0 @@
-/home/qyd/codes/anaconda3/envs/forcebalance/lib/python2.7/site-packages/forcebalance-1.5.1-py2.7-linux-x86_64.egg/forcebalance/data/runcuda.sh
