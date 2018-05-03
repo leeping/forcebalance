@@ -1370,7 +1370,7 @@ class BindingEnergy_OpenMM(BindingEnergy):
     def __init__(self,options,tgt_opts,forcefield):
         self.engine_ = OpenMM
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
-        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
         ## Initialize base class.
         super(BindingEnergy_OpenMM,self).__init__(options,tgt_opts,forcefield)
 
@@ -1380,7 +1380,7 @@ class Interaction_OpenMM(Interaction):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="all.pdb")
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
-        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
         self.engine_ = OpenMM
         ## Initialize base class.
         super(Interaction_OpenMM,self).__init__(options,tgt_opts,forcefield)
@@ -1391,7 +1391,7 @@ class Moments_OpenMM(Moments):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="input.pdb")
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
-        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
         self.engine_ = OpenMM
         ## Initialize base class.
         super(Moments_OpenMM,self).__init__(options,tgt_opts,forcefield)
