@@ -242,7 +242,7 @@ class Liquid(Target):
         # Don't read indicate.log when calling meta_indicate()
         self.read_indicate = False
         self.write_indicate = False
-        
+
     def prepare_temp_directory(self):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
@@ -314,7 +314,7 @@ class Liquid(Target):
                 raise RuntimeError
         # Check the reference data table for validity.
         default_denoms = defaultdict(int)
-        PhasePoints = None
+        PhasePoints = set()
         RefData_copy = copy.deepcopy(self.RefData)
         for head in self.RefData:
             if head not in known_vars+[i+"_wt" for i in known_vars]:
@@ -336,10 +336,12 @@ class Liquid(Target):
                     # If there is only one data point, then the denominator is just the single
                     # data point itself.
                     default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
-            self.PhasePoints = list(self.RefData[head].keys())
+            PhasePoints |= set(self.RefData[head].keys())
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
         self.RefData = RefData_copy
+        # Here we sort all available PhasePoints by pressure then temperature
+        self.PhasePoints = sorted(list(PhasePoints), key=lambda x: (x[1], x[0]))
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
         logger.debug("global_opts:\n%s\n" % str(global_opts))
@@ -795,8 +797,18 @@ class Liquid(Target):
         self.AllResults[astrm]['Steps'].append(self.liquid_md_steps)
 
         if len(mPoints) > 0:
-            self.AllResults[astrm]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
-            self.AllResults[astrm]['mG'].append(np.array([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
+            mE_idx = 0
+            # QYD: here we use a dictionary to store the index in mE/mG, which is different with the index in Points
+            mE_idx_dict = dict()
+            all_mEs, all_mGs = [], []
+            for pt, mEs, mGs in zip(Points, mEnergies, mGrads):
+                if pt in mPoints:
+                    all_mEs.append(mEs)
+                    all_mGs.append(mGs)
+                    mE_idx_dict[pt] = mE_idx
+                    mE_idx += 1
+            self.AllResults[astrm]['mE'].append(np.array(all_mEs))
+            self.AllResults[astrm]['mG'].append(np.array(all_mGs))
 
         # Number of data sets belonging to this value of the parameters.
         Nrpt = len(self.AllResults[astrm]['R'])
@@ -906,8 +918,8 @@ class Liquid(Target):
                     T = PT[0]
                     beta = 1. / (kb * T)
                     for k in range(mBSims):
-                        kk = Points.index(mBPoints[k])
-                        mU_kln[k, m, :]  = mE[kk]
+                        mE_idx = mE_idx_dict[mBPoints[k]]
+                        mU_kln[k, m, :]  = mE[mE_idx]
                         mU_kln[k, m, :] *= beta
                 if np.abs(np.std(mE)) > 1e-6 and mBSims > 1:
                     mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')

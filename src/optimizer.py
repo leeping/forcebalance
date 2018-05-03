@@ -160,7 +160,9 @@ class Optimizer(forcebalance.BaseClass):
         self.iterinit = 0
         ## The current iteration number
         self.iteration = 0
-
+        ## reset the global variable
+        global ITERATION
+        ITERATION = 0
         #======================================#
         #     Variables which are set here     #
         #======================================#
