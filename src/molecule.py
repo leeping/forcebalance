@@ -172,7 +172,6 @@ QuantumVariableNames = set(['qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', '
 AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames | FrameVariableNames
 
 
-
 #================================#
 #       Set up the logger        #
 #================================#
