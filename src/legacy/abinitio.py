@@ -10,7 +10,7 @@ from builtins import zip
 from builtins import range
 import os
 import shutil
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, warn_once, pvec1d, commadash, uncommadash, isint
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohr2ang, warn_press_key, warn_once, pvec1d, commadash, uncommadash, isint
 import numpy as np
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
@@ -202,7 +202,7 @@ class AbInitio(Target):
                 esparr = np.array(espset).reshape(-1,3)
                 # Create a matrix with Nesp rows and Natoms columns.
                 DistMat = np.array([[np.linalg.norm(i - j) for j in xyz] for i in esparr])
-                invdists.append(1. / (DistMat / bohrang))
+                invdists.append(1. / (DistMat / bohr2ang))
                 sn += 1
         for i in self.pgrad:
             if 'VSITE' in self.FF.plist[i]:

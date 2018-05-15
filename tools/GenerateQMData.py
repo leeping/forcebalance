@@ -167,7 +167,7 @@ def do_quantum(wq_port):
             os.chdir(dnm)
             M.edit_qcrems({'igdesp':len(ESP[i])})
             M.write("qchem.in", select=i)
-            ESPBohr = np.array(ESP[i]) / bohrang
+            ESPBohr = np.array(ESP[i]) / bohr2ang
             np.savetxt('ESPGrid',ESPBohr)
             print("Queueing up job", dnm)
             queue_up(wq, command = 'qchem40 qchem.in qchem.out', 
