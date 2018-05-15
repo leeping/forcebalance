@@ -9,7 +9,7 @@ from builtins import range
 import os
 import shutil
 import numpy as np
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohr2ang
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
 from re import match, sub
