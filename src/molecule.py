@@ -25,23 +25,17 @@ try:
     from itertools import zip_longest as zip_longest
 except ImportError:
     from itertools import izip_longest as zip_longest
-    
+
 # ======================================================================#
 # |                                                                    |#
 # |              Chemical file format conversion module                |#
 # |                                                                    |#
 # |                Lee-Ping Wang (leeping@ucdavis.edu)                 |#
-# |                   Last updated April 19, 2018                      |#
+# |                     Last updated May 22, 2018                      |#
 # |                                                                    |#
 # |   This code is part of ForceBalance and is covered under the       |#
 # |   ForceBalance copyright notice and 3-clause BSD license.          |#
 # |   Please see https://github.com/leeping/forcebalance for details.  |#
-# |                                                                    |#
-# |   Special note:                                                    |#
-# |   This file was copied over to the geomeTRIC package               |#
-# |   in order to lighten the dependencies of the latter.              |#
-# |   Please make sure this file is up-to-date in                      |#
-# |   both the 'geomeTRIC' and 'forcebalance' modules.                 |#
 # |                                                                    |#
 # |   Feedback and suggestions are encouraged.                         |#
 # |                                                                    |#
@@ -2041,6 +2035,7 @@ class Molecule(object):
         self.topology = G
         # LPW: Molecule.molecules is a funny misnomer... it should be fragments or substructures or something
         self.molecules = [G.subgraph(c).copy() for c in nx.connected_components(G)]
+        for g in self.molecules: g.__class__ = MyG
         # Deprecated in networkx 2.2
         # self.molecules = list(nx.connected_component_subgraphs(G))
 
