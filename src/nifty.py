@@ -931,8 +931,8 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                         WQIDS[tnm].remove(task.id)
                 del task
         nbusy = wq.stats.workers_busy
-        Complete = wq.stats.tasks_complete
-        Total = wq.stats.tasks_submitted - wq.stats.tasks_failed
+        Complete = wq.stats.total_tasks_complete - wq.stats.total_tasks_failed
+        Total = wq.stats.tasks_submitted - wq.stats.total_tasks_failed
         if verbose:
             logger.info("Workers: %i init, %i ready, %i busy, %i total joined, %i total removed\n" \
                 % (wq.stats.workers_init, wq.stats.workers_ready, nbusy, wq.stats.total_workers_joined, wq.stats.total_workers_removed))
