@@ -2678,6 +2678,8 @@ class Molecule(object):
         atomname = []
         atomtype = []
         elem     = []
+        resname  = []
+        resid    = []
         data = Mol2.mol2_set(fnm)
         if len(data.compounds) > 1:
             sys.stderr.write("Not sure what to do if the MOL2 file contains multiple compounds\n")
@@ -2686,13 +2688,15 @@ class Molecule(object):
             charge.append(atom.charge)
             atomname.append(atom.atom_name)
             atomtype.append(atom.atom_type)
+            resname.append(atom.subst_name)
+            resid.append(atom.subst_id)
             thiselem = atom.atom_name
             if len(thiselem) > 1:
                 thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
             elem.append(thiselem)
 
-        resname = [list(data.compounds.items())[0][0] for i in range(len(elem))]
-        resid = [1 for i in range(len(elem))]
+        # resname = [list(data.compounds.items())[0][0] for i in range(len(elem))]
+        # resid = [1 for i in range(len(elem))]
 
         # Deprecated 'abonds' format.
         # bonds    = [[] for i in range(len(elem))]
