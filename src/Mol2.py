@@ -551,7 +551,7 @@ class mol2_set(object):
         if subset is not None:
             if isinstance(subset,list):
                 pass
-            elif isinstance(subset,bytes):
+            elif isinstance(subset,str):
                 try:
                     f = open(subset)
                     lines = f.readlines()
@@ -568,7 +568,7 @@ class mol2_set(object):
                 self.num_compounds = data.num_compounds
                 self.compounds     = data.compounds
                 self.comments      = data.comments
-            elif isinstance(data,bytes):
+            elif isinstance(data,str):
                 try:
                     f = open(data)
                     lines = f.readlines()
