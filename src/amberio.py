@@ -51,7 +51,7 @@ frcmod_pdict = {'BONDS': {'Atom':[0], 1:'K', 2:'B'},
                 'PDIHS4':{'Atom':[0], 2:'K', 3:'B'},
                 'PDIHS5':{'Atom':[0], 2:'K', 3:'B'},
                 'PDIHS6':{'Atom':[0], 2:'K', 3:'B'},
-                'IDIHS' :{'Atom':[0], 1:'K', 3:'B'},
+                'IDIHS' :{'Atom':[0], 1:'K', 2:'B'},
                 'VDW':{'Atom':[0], 1:'S', 2:'T'}
                 }
 
@@ -1243,7 +1243,7 @@ class AMBER(Engine):
         if not os.path.exists(pdb):
             LinkFile(self.abspdb, pdb)
         # Link over "static" mol2 and frcmod files from target folder
-        print(self.absmol2, self.absfrcmod)
+        # print(self.absmol2, self.absfrcmod)
         for mol2 in self.absmol2:
             if not os.path.exists(os.path.split(mol2)[-1]):
                 LinkFile(mol2, os.path.split(mol2)[-1])
