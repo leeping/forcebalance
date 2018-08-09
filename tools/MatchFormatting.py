@@ -26,6 +26,7 @@ for line_temp, line_data in zip(template, fin):
     line_out = line_temp
     for wt, wd in zip(stemp, sdata):
         if wt != wd:
+            print(wt, wd)
             line_out = line_out.replace(wt, determine_format_string(wt) % float(wd), 1)
     print(line_out, end=' ')
 
