@@ -10,7 +10,7 @@ from builtins import zip
 from builtins import range
 import os
 import shutil
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, warn_once, pvec1d, commadash, uncommadash, isint
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohr2ang, warn_press_key, warn_once, pvec1d, commadash, uncommadash, isint
 import numpy as np
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
@@ -203,6 +203,7 @@ class AbInitio(Target):
         ## Save the mvals from the last time we updated the vsites.
         self.save_vmvals = {}
         self.set_option(None, 'shots', val=self.ns)
+        self.M_orig = None
 
     def build_invdist(self, mvals):
         for i in self.pgrad:
@@ -225,7 +226,7 @@ class AbInitio(Target):
                 esparr = np.array(espset).reshape(-1,3)
                 # Create a matrix with Nesp rows and Natoms columns.
                 DistMat = np.array([[np.linalg.norm(i - j) for j in xyz] for i in esparr])
-                invdists.append(1. / (DistMat / bohrang))
+                invdists.append(1. / (DistMat / bohr2ang))
                 sn += 1
         for i in self.pgrad:
             if 'VSITE' in self.FF.plist[i]:
@@ -809,7 +810,11 @@ class AbInitio(Target):
                                           col(M_all_print[:,0])-col(Q_all_print[:,0]),
                                           col(self.boltz_wts)))
             np.savetxt("EnergyCompare.txt", EnergyComparison, header="%11s  %12s  %12s  %12s" % ("QMEnergy", "MMEnergy", "Delta(MM-QM)", "Weight"), fmt="% 12.6e")
-            plot_mm_vs_qm(M_all_print[:,0], Q_all_print[:,0], title='Abinitio '+self.name)
+            plot_qm_vs_mm(Q_all_print[:,0], M_all_print[:,0],
+                          M_orig=self.M_orig[:,0] if self.M_orig is not None else None,
+                          title='Abinitio '+self.name)
+            if self.M_orig is None:
+                self.M_orig = M_all_print.copy()
         if self.force and self.writelevel > 1:
             # Write .xyz files which can be viewed in vmd.
             QMTraj = self.mol[:].atom_select(self.fitatoms)
@@ -1114,21 +1119,29 @@ def compute_objective_part(SPX,QQ0,Q0,Z,a,n,energy=False,subtract_mean=False,div
         raise RuntimeError('Please pass either 0, 1, 2 to divide')
     return X2
 
-def plot_mm_vs_qm(M, Q, title=''):
+def plot_qm_vs_mm(Q, M, M_orig=None, title=''):
     import matplotlib.pyplot as plt
     qm_min_dx = np.argmin(Q)
     e_qm = Q - Q[qm_min_dx]
     e_mm = M - M[qm_min_dx]
-    plt.plot(e_mm, e_qm, 'o')
+    if M_orig is not None:
+        e_mm_orig = M_orig - M_orig[qm_min_dx]
+        plt.plot(e_qm, e_mm_orig, 'x', markersize=5, label='Orig.')
+    plt.plot(e_qm, e_mm, '.', markersize=10, label='Current')
     plt.xlabel('QM Energies (kJ/mol)')
     plt.ylabel('MM Energies (kJ/mol)')
     x1,x2,y1,y2 = plt.axis()
-    if x2 < y2:
-        x2 = y2
-    else:
-        y2 = x2
-    plt.axis((0,x2,0,y2))
-    plt.plot([0,x2],[0,y2], '--' )
+    x1 = min(x1, y1)
+    y1 = x1
+    x2 = max(x2, y2)
+    y2 = x2
+    rng = x2-x1
+    plt.axis('equal')
+    plt.axis([x1-0.05*rng, x2+0.05*rng, y1-0.05*rng, y2+0.05*rng])
+    plt.plot([x1,x2],[y1,y2], '--' )
+    plt.legend(loc='lower right')
     plt.title(title)
-    plt.savefig('e_qm_vs_mm.pdf')
+    fig = plt.gcf()
+    fig.set_size_inches(5,5)
+    fig.savefig('e_qm_vs_mm.pdf')
     plt.close()
