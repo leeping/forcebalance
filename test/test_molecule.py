@@ -167,7 +167,7 @@ class TestGalbPNPMol2(ForceBalanceTestCase):
     def test_read_galb(self):
         """Check for the correct number of bonds in a simple molecule"""
         self.logger.debug("\nTrying to read alanine dipeptide conformation... ")
-        self.logger.info("%s\n" % str(self.molecule.resname))
+        #self.logger.info("%s\n" % str(self.molecule.resname))
         self.assertEqual(self.molecule.resname, 14*['PNP']+22*['0LB'], msg="\nIncorrect residue names")
         self.assertEqual(self.molecule.elem, ['O', 'N', 'O', 'C', 'C', 'C', 'H', 'H', 'C', 'H', 'C', 'H', 'C', 'O', 'C', 'H', 'O', 'C', 'H', 'C', 'H', 'H', 'O', 'H', 'C', 'H', 'O', 'H', 'C', 'H', 'O', 'H', 'C', 'H', 'O', 'H'], msg="\nIncorrect atomic symbols")
         self.assertEqual(len(self.molecule.bonds), 37, msg="\nIncorrect number of bonds for pNP-0LB structure")
