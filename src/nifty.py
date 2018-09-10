@@ -941,24 +941,18 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                     if task.id in WQIDS[tnm]:
                         WQIDS[tnm].remove(task.id)
                 del task
-        # if hasattr(wq.stats, 'workers_full'):
-        #     # Full workers statistic was added with CCTools 4.0
-        #     # But deprecated with CCTools 4.1 (so if they're equal we don't add them.)
-        #     nbusy = wq.stats.workers_busy + wq.stats.workers_full
-        # else:
-        nbusy = wq.stats.workers_busy
-        Complete = wq.stats.total_tasks_complete
-        Total = wq.stats.total_tasks_dispatched
 
+        # LPW 2018-09-10 Updated to use stats fields from CCTools 6.2.10
+        # Please upgrade CCTools version if errors are encountered during runtime.
         if verbose:
-            logger.info("Workers: %i init, %i ready, %i busy, %i total joined, %i total removed\n" \
-                % (wq.stats.workers_init, wq.stats.workers_ready, nbusy, wq.stats.total_workers_joined, wq.stats.total_workers_removed))
-            logger.info("Tasks: %i running, %i waiting, %i total dispatched, %i total complete\n" \
-                % (wq.stats.tasks_running,wq.stats.tasks_waiting,Total,Complete))
-            logger.info("Data: %i / %i kb sent/received\n" % (int(wq.stats.total_bytes_sent/1000), int(wq.stats.total_bytes_received/1024)))
+            logger.info("Workers: %i init, %i idle, %i busy, %i total joined, %i total removed\n" \
+                % (wq.stats.workers_init, wq.stats.workers_idle, wq.stats.workers_busy, wq.stats.workers_joined, wq.stats.workers_removed))
+            logger.info("Tasks: %i running, %i waiting, %i dispatched, %i submitted, %i total complete\n" \
+                % (wq.stats.tasks_running, wq.stats.tasks_waiting, wq.stats.tasks_dispatched, wq.stats.tasks_submitted, wq.stats.tasks_done))
+            logger.info("Data: %i / %i kb sent/received\n" % (int(wq.stats.bytes_sent/1024), int(wq.stats.bytes_received/1024)))
         else:
             logger.info("\r%s : %i/%i workers busy; %i/%i jobs complete  \r" %\
-            (time.ctime(), nbusy, (wq.stats.total_workers_joined - wq.stats.total_workers_removed), Complete, Total))
+            (time.ctime(), wq.stats.workers_busy, wq.stats.workers_connected, wq.stats.tasks_done, wq.stats.tasks_submitted))
             if time.time() - wq_wait1.t0 > 900:
                 wq_wait1.t0 = time.time()
                 logger.info('\n')
