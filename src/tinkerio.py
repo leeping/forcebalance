@@ -515,6 +515,7 @@ class TINKER(Engine):
                 if isint(s[0]): mode = 2
             if mode == 2:
                 if isint(s[0]):
+                    G.add_node(int(s[0]))
                     mass = float(s[5])
                     self.AtomLists['Mass'].append(mass)
                     if mass < 1.0:
@@ -533,8 +534,6 @@ class TINKER(Engine):
                 if isint(s[0]):
                     a = int(s[0])
                     b = int(s[1])
-                    G.add_node(a)
-                    G.add_node(b)
                     G.add_edge(a, b)
                 else: mode = 0
         # Use networkx to figure out a list of molecule numbers.
