@@ -1127,7 +1127,7 @@ def plot_qm_vs_mm(Q, M, M_orig=None, title=''):
     if M_orig is not None:
         e_mm_orig = M_orig - M_orig[qm_min_dx]
         plt.plot(e_qm, e_mm_orig, 'x', markersize=5, label='Orig.')
-    plt.plot(e_qm, e_mm, '.', markersize=10, label='Current')
+    plt.plot(e_qm, e_mm, '.', markersize=5, label='Current')
     plt.xlabel('QM Energies (kJ/mol)')
     plt.ylabel('MM Energies (kJ/mol)')
     x1,x2,y1,y2 = plt.axis()
