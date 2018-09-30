@@ -3909,7 +3909,8 @@ class Molecule(object):
             logger.error("Unable to init DCD plugin\n")
             raise IOError
         natoms    = c_int(self.na)
-        dcd       = _dcdlib.open_dcd_write(self.fout, "dcd", natoms)
+        fname     = self.fout.encode('ascii')
+        dcd       = _dcdlib.open_dcd_write(create_string_buffer(fname), "dcd", natoms)
         ts        = MolfileTimestep()
         _xyz      = c_float * (natoms.value * 3)
         for I in selection:
