@@ -3916,9 +3916,12 @@ class Molecule(object):
         for I in selection:
             xyz = self.xyzs[I]
             ts.coords = _xyz(*list(xyz.flatten()))
-            ts.A      = self.boxes[I].a if 'boxes' in self.Data else 1.0
-            ts.B      = self.boxes[I].b if 'boxes' in self.Data else 1.0
-            ts.C      = self.boxes[I].c if 'boxes' in self.Data else 1.0
+            ts.A      = c_float(self.boxes[I].a if 'boxes' in self.Data else 1.0)
+            ts.B      = c_float(self.boxes[I].b if 'boxes' in self.Data else 1.0)
+            ts.C      = c_float(self.boxes[I].c if 'boxes' in self.Data else 1.0)
+            ts.alpha  = c_float(self.boxes[I].alpha  if 'boxes' in self.Data else 90.0)
+            ts.beta   = c_float(self.boxes[I].beta   if 'boxes' in self.Data else 90.0)
+            ts.gamma  = c_float(self.boxes[I].gamma  if 'boxes' in self.Data else 90.0)
             result    = _dcdlib.write_timestep(dcd, byref(ts))
             if result != 0:
                 logger.error("Error encountered when writing DCD\n")
