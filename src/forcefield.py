@@ -688,6 +688,7 @@ class FF(forcebalance.BaseClass):
                 self.assign_p0(self.np,float(e.get(p)))
                 self.assign_field(self.np,pid,ffname,fflist.index(e),p,1)
                 self.np += 1
+                self.patoms.append([])
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_repeat/..'):
             for field in e.get('parameter_repeat').split(','):
@@ -1021,12 +1022,23 @@ class FF(forcebalance.BaseClass):
         rsfac_list = []
         ## Takes the dictionary 'BONDS':{3:'B', 4:'K'}, 'VDW':{4:'S', 5:'T'},
         ## and turns it into a list of term types ['BONDSB','BONDSK','VDWS','VDWT']
-
-        if any([self.Readers[i].pdict == "XML_Override" for i in self.fnms]):
-            termtypelist = ['/'.join([i.split('/')[0],i.split('/')[1]]) for i in self.map]
-        else:
-            termtypelist = itertools.chain(*sum([[[i+self.Readers[f].pdict[i][j] for j in self.Readers[f].pdict[i] if isint(str(j))] for i in self.Readers[f].pdict] for f in self.fnms],[]))
-            #termtypelist = sum([[i+self.Readers.pdict[i][j] for j in self.Readers.pdict[i] if isint(str(j))] for i in self.Readers.pdict],[])
+        termtypelist = []
+        for f in self.fnms:
+            if self.Readers[f].pdict == "XML_Override":
+                for i, pName in enumerate(self.map):
+                    pfield = self.pfields[i]
+                    pid,fnm,ln,fld,mult,cmd = pfield
+                    if fnm == f:
+                        ttstr = '/'.join([pName.split('/')[0],pName.split('/')[1]])
+                        if ttstr not in termtypelist:
+                            termtypelist.append(ttstr)
+            else:
+                for i in self.Readers[f].pdict:
+                    for j in self.Readers[f].pdict[i]:
+                        if isint(str(j)):
+                            ttstr = i+self.Readers[f].pdict[i][j]
+                            if ttstr not in termtypelist:
+                                termtypelist.append(ttstr)
         for termtype in termtypelist:
             for pid in self.map:
                 if termtype in pid:
@@ -1261,6 +1273,7 @@ class FF(forcebalance.BaseClass):
                 for i in range(self.np):
                     qct = 0
                     qidx = []
+                    pfnm = self.pfields[i][1]
                     for imol, iatoms in self.patoms[i]:
                         for iatom in iatoms:
                             if imol == molname and iatom in molatoms:
