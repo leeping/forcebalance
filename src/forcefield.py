@@ -1026,9 +1026,12 @@ class FF(forcebalance.BaseClass):
         for f in self.fnms:
             if self.Readers[f].pdict == "XML_Override":
                 for i, pName in enumerate(self.map):
-                    pfield = self.pfields[i]
-                    pid,fnm,ln,fld,mult,cmd = pfield
-                    if fnm == f:
+                    for p in self.pfields:
+                        if p[0] == pName:
+                            fnm = p[1]
+                            break
+                    ffnameScript = f.split('.')[0]+'Script.txt'
+                    if fnm == f or fnm == ffnameScript:
                         ttstr = '/'.join([pName.split('/')[0],pName.split('/')[1]])
                         if ttstr not in termtypelist:
                             termtypelist.append(ttstr)
