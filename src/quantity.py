@@ -190,7 +190,7 @@ class Quantity_Density(Quantity):
         # Average and error.
         Rho_avg, Rho_err = mean_stderr(Density)
         # Analytic first derivative.
-        Rho_grad = mBeta * (flat(np.mat(G) * col(Density)) / len(Density) \
+        Rho_grad = mBeta * (flat(np.dot(G, col(Density))) / len(Density) \
                             - np.mean(Density) * np.mean(G, axis=1))
             
         return Rho_avg, Rho_err, Rho_grad
@@ -289,13 +289,13 @@ class Quantity_H_vap(Quantity):
                            + (self.pressure**2) * (Vol_err**2)/(float(nmol)**2)/(pconv**2))
         # Analytic first derivative.
         Hvap_grad  = np.mean(Gm, axis=1)
-        Hvap_grad += mBeta * (flat(np.mat(Gm) * col(mEnergy)) / len(mEnergy) \
+        Hvap_grad += mBeta * (flat(np.dot(Gm, col(mEnergy))) / len(mEnergy) \
                                - np.mean(mEnergy) * np.mean(Gm, axis=1))
         Hvap_grad -= np.mean(G, axis=1)/nmol
-        Hvap_grad += Beta * (flat(np.mat(G) * col(Energy)) / len(Energy) \
+        Hvap_grad += Beta * (flat(np.dot(G, col(Energy))) / len(Energy) \
                                - np.mean(Energy) * np.mean(G, axis=1))/nmol
         Hvap_grad += (Beta*self.pressure/nmol/pconv) * \
-          (flat(np.mat(G) * col(Volume)) / len(Volume) \
+          (flat(np.dot(G, col(Volume))) / len(Volume) \
            - np.mean(Volume) * np.mean(G, axis=1))
 
         return Hvap_avg, Hvap_err, Hvap_grad

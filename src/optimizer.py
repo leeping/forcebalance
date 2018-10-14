@@ -16,6 +16,7 @@ from builtins import object
 import os, pickle, re, sys
 # import cProfile
 import numpy as np
+from numpy.linalg import multi_dot as mdot
 from copy import deepcopy
 import forcebalance
 from forcebalance.parser import parse_inputs
@@ -742,7 +743,6 @@ class Optimizer(forcebalance.BaseClass):
                     self.iter = 0
                 def _compute(self, dx):
                     self.dx = dx.copy()
-                    #Tmp = np.matrix(self.H)*col(dx)
                     Tmp = np.dot(self.H, dx)
                     Reg_Term   = self.Penalty.compute(xkd+flat(dx), Obj0)
                     self.Val   = (X + np.dot(dx, G) + 0.5*np.dot(dx,Tmp) + Reg_Term[0] - data['X'])
@@ -805,7 +805,7 @@ class Optimizer(forcebalance.BaseClass):
             logger.debug(" H:\n")
             pmat2d(H,precision=5, loglevel=DEBUG)
             
-            Hi = invert_svd(np.matrix(H))
+            Hi = invert_svd(H)
             dx = flat(-1 * Hi * col(G))
             
             logger.debug(" dx:\n")
@@ -824,11 +824,11 @@ class Optimizer(forcebalance.BaseClass):
                 pvec1d(G,precision=5, loglevel=DEBUG)
                 logger.debug(" HT: (Scal = %.4f)\n" % (1+(L-1)**2))
                 pmat2d(HT,precision=5, loglevel=DEBUG)
-                Hi = invert_svd(np.matrix(HT))
+                Hi = invert_svd(HT)
                 dx = flat(-1 * Hi * col(G))
                 logger.debug(" dx:\n")
                 pvec1d(dx,precision=5, loglevel=DEBUG)
-                sol = flat(0.5*row(dx)*np.matrix(H)*col(dx))[0] + np.dot(dx,G)
+                sol = flat(0.5*mdot([row(dx), H, col(dx)]))[0] + np.dot(dx,G)
                 for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                     dx = np.insert(dx, i, 0)
                 return dx, sol
