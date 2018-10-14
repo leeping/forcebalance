@@ -343,7 +343,7 @@ def main():
                                     ("temperature", "%s %s" % (temperature, temperature)), ("pressure", "%s %s" % (pressure, pressure)),
                                     ("nequil", lipid_nequil), ("minimize", minimize),
                                     ("nsave", int(1000 * lipid_intvl / lipid_timestep)),
-                                    ("verbose", True), ('save_traj', TgtOptions['save_traj']), 
+                                    ("verbose", False), ('save_traj', TgtOptions['save_traj']), 
                                     ("threads", threads), ("anisotropic", anisotropic), 
                                     ("mts", mts), ("faststep", faststep), ("bilayer", True)])
 
@@ -457,9 +457,9 @@ def main():
     # Define some things to make the analytic derivatives easier.
     Gbar = np.mean(G,axis=1)
     def deprod(vec):
-        return flat(np.dot(G),col(vec))/L
+        return flat(np.dot(G,col(vec)))/L
     def covde(vec):
-        return flat(np.dot(G),col(vec))/L - Gbar*np.mean(vec)
+        return flat(np.dot(G,col(vec)))/L - Gbar*np.mean(vec)
     def avg(vec):
         return np.mean(vec)
 
@@ -676,7 +676,7 @@ def main():
     Scd_err = flat(Scd_e)
     # In case I did the conversion incorrectly, this is the code that was here previously:
     # GScd = mBeta * (((np.mat(G) * Scds) / L) - (np.mat(np.average(G, axis = 1)).T * np.average(Scds, axis = 0)))
-    GScd = mBeta * (((np.dot(G, Scds)) / L) - np.dot(np.average(G, axis = 1).T, np.average(Scds, axis = 0)))
+    GScd = mBeta * (((np.dot(G, Scds)) / L) - np.dot(col(np.average(G, axis = 1)), row(np.average(Scds, axis = 0))))
     # Print out S_cd and its derivative.
     scd_avgerr = ' '.join('%.4f +- %.4f \n' % F for F in zip(Scd_avg, Scd_err))
     Sep = printcool("Deuterium order parameter: %s \nAnalytic Derivative:" % scd_avgerr)

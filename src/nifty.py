@@ -26,7 +26,7 @@ import sys
 from select import select
 
 import numpy as np
-import numpy.linalg.multi_dot as mdot
+from numpy.linalg import multi_dot
 
 # For Python 3 compatibility
 try:
@@ -552,7 +552,7 @@ def invert_svd(X,thresh=1e-12):
         else:
             si[i] = 0.0
     si     = np.diag(si)
-    Xt     = mdot([v, si, uh])
+    Xt     = multi_dot([v, si, uh])
     return Xt
 
 #==============================#
@@ -582,6 +582,8 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     """
     # X is a 'tall' matrix.
     X = np.array(x)
+    if len(X.shape) == 1:
+        X = X[:,np.newaxis]
     Y = col(y)
     n_x = X.shape[0]
     n_fit = X.shape[1]
@@ -600,10 +602,10 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     #     MPPI = np.linalg.inv(WH*X)
     # else:
     # This resembles the formula (X'WX)^-1 X' W^1/2
-    MPPI = np.linalg.pinv(WH*X)
-    Beta = mdot(MPPI, WH, Y)
-    Hat = mdot(WH, X, MPPI)
-    yfit = flat(mdot(Hat, Y))
+    MPPI = np.linalg.pinv(np.dot(WH, X))
+    Beta = multi_dot([MPPI, WH, Y])
+    Hat = multi_dot([WH, X, MPPI])
+    yfit = flat(np.dot(Hat, Y))
     # Return three things: the least-squares coefficients, the hat matrix (turns y into yfit), and yfit
     # We could get these all from MPPI, but I might get confused later on, so might as well do it here :P
     return np.array(Beta).flatten(), np.array(Hat), np.array(yfit).flatten(), np.array(MPPI)

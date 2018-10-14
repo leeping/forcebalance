@@ -975,7 +975,7 @@ class Liquid(Target):
                 mGbar = flat(np.dot(mG, col(mW)))
                 Hvap_calc[PT]  = np.dot(mW,mE) - np.dot(W,E)/NMol + kb*T - np.dot(W, PV)/NMol
                 Hvap_grad[PT]  = mGbar + mBeta*(flat(np.dot(mG,col(mW*mE))) - np.dot(mW,mE)*mGbar)
-                Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.dot(G),col(W*E))) - np.dot(W,E)*Gbar)) / NMol
+                Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.dot(G,col(W*E))) - np.dot(W,E)*Gbar)) / NMol
                 Hvap_grad[PT] -= (mBeta*(flat(np.dot(G,col(W*PV))) - np.dot(W,PV)*Gbar)) / NMol
                 if self.do_self_pol:
                     Hvap_calc[PT] -= EPol
