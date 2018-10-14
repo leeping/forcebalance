@@ -1276,7 +1276,6 @@ class FF(forcebalance.BaseClass):
                 for i in range(self.np):
                     qct = 0
                     qidx = []
-                    pfnm = self.pfields[i][1]
                     for imol, iatoms in self.patoms[i]:
                         for iatom in iatoms:
                             if imol == molname and iatom in molatoms:
