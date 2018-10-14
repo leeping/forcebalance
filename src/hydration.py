@@ -348,7 +348,7 @@ class Hydration(Target):
                     if AGrad: 
                         dEg = results['Potential_Derivatives']
                         dEaq = results['Potential_Derivatives'] + results['Hydration_Derivatives']
-                        data[p]['dHyd'] = (flat(np.matrix(dEaq)*col(expmbH)/L)-np.mean(dEg,axis=1)*np.mean(expmbH)) / np.mean(expmbH)
+                        data[p]['dHyd'] = (flat(np.dot(dEaq,col(expmbH))/L)-np.mean(dEg,axis=1)*np.mean(expmbH)) / np.mean(expmbH)
                 elif p == "liq":
                     Eg = results['Potentials'] - results['Hydration']
                     Eaq = results['Potentials']
@@ -361,7 +361,7 @@ class Hydration(Target):
                     if AGrad: 
                         dEg = results['Potential_Derivatives'] - results['Hydration_Derivatives']
                         dEaq = results['Potential_Derivatives']
-                        data[p]['dHyd'] = -(flat(np.matrix(dEg)*col(exppbH)/L)-np.mean(dEaq,axis=1)*np.mean(exppbH)) / np.mean(exppbH)
+                        data[p]['dHyd'] = -(flat(np.dot(dEg, col(exppbH))/L)-np.mean(dEaq,axis=1)*np.mean(exppbH)) / np.mean(exppbH)
                 os.chdir('..')
             # Calculate the hydration free energy using gas phase, liquid phase or the average of both.
             # Note that the molecular dynamics methods return energies in kJ/mol.
@@ -408,7 +408,7 @@ class Hydration(Target):
                     dE = results['Potential_Derivatives']
                     dH = results['Hydration_Derivatives']
                     # Calculate the parametric derivative of the average hydration energy.
-                    data[p]['dHyd'] = np.mean(dH,axis=1)-beta*(flat(np.matrix(dE)*col(H)/len(H))-np.mean(dE,axis=1)*np.mean(H))
+                    data[p]['dHyd'] = np.mean(dH,axis=1)-beta*(flat(np.dot(dE, col(H))/len(H))-np.mean(dE,axis=1)*np.mean(H))
                 os.chdir('..')
             # Calculate the hydration free energy as the average of liquid and gas hydration energies.
             # Note that the molecular dynamics methods return energies in kJ/mol.

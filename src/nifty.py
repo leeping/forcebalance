@@ -26,6 +26,7 @@ import sys
 from select import select
 
 import numpy as np
+import numpy.linalg.multi_dot as mdot
 
 # For Python 3 compatibility
 try:
@@ -145,9 +146,9 @@ def astr(vec1d, precision=4):
     return ' '.join([("%% .%ie " % precision % i) for i in vec1d])
 
 def pmat2d(mat2d, precision=1, format="e", loglevel=INFO):
-    """Printout of a 2-D matrix.
+    """Printout of a 2-D array.
 
-    @param[in] mat2d a 2-D matrix
+    @param[in] mat2d a 2-D array
     """
     m2a = np.array(mat2d)
     for i in range(m2a.shape[0]):
@@ -365,24 +366,24 @@ def floatornan(word):
 
 def col(vec):
     """
-    Given any list, array, or matrix, return a 1-column matrix.
+    Given any list, array, or matrix, return a 1-column 2D array.
 
     Input:
     vec  = The input vector that is to be made into a column
 
     Output:
-    A column matrix
+    A 1-column 2D array
     """
-    return np.matrix(np.array(vec).reshape(-1, 1))
+    return np.array(vec).reshape(-1, 1)
 
 def row(vec):
-    """Given any list, array, or matrix, return a 1-row matrix.
+    """Given any list, array, or matrix, return a 1-row 2D array.
 
     @param[in] vec The input vector that is to be made into a row
 
-    @return answer A row matrix
+    @return answer A 1-row 2D array
     """
-    return np.matrix(np.array(vec).reshape(1, -1))
+    return np.array(vec).reshape(1, -1)
 
 def flat(vec):
     """Given any list, array, or matrix, return a single-index array.
@@ -535,23 +536,23 @@ def invert_svd(X,thresh=1e-12):
     """
 
     Invert a matrix using singular value decomposition.
-    @param[in] X The matrix to be inverted
+    @param[in] X The 2-D NumPy array containing the matrix to be inverted
     @param[in] thresh The SVD threshold; eigenvalues below this are not inverted but set to zero
-    @return Xt The inverted matrix
+    @return Xt The 2-D NumPy array containing the inverted matrix
 
     """
 
     u,s,vh = np.linalg.svd(X, full_matrices=0)
-    uh     = np.matrix(np.transpose(u))
-    v      = np.matrix(np.transpose(vh))
+    uh     = np.transpose(u)
+    v      = np.transpose(vh)
     si     = s.copy()
     for i in range(s.shape[0]):
         if abs(s[i]) > thresh:
             si[i] = 1./s[i]
         else:
             si[i] = 0.0
-    si     = np.matrix(np.diag(si))
-    Xt     = v*si*uh
+    si     = np.diag(si)
+    Xt     = mdot([v, si, uh])
     return Xt
 
 #==============================#
@@ -580,7 +581,7 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
     @param[out] MPPI The Moore-Penrose pseudoinverse (multiply by Y to get least-squares coefficients, multiply by dY/dk to get derivatives of least-squares coefficients)
     """
     # X is a 'tall' matrix.
-    X = np.matrix(x)
+    X = np.array(x)
     Y = col(y)
     n_x = X.shape[0]
     n_fit = X.shape[1]
@@ -591,18 +592,18 @@ def get_least_squares(x, y, w = None, thresh=1e-12):
         if len(w) != n_x:
             warn_press_key("The weight array length (%i) must be the same as the number of 'X' data points (%i)!" % len(w), n_x)
         w /= np.mean(w)
-        WH = np.matrix(np.diag(w**0.5))
+        WH = np.diag(w**0.5)
     else:
-        WH = np.matrix(np.eye(n_x))
+        WH = np.eye(n_x)
     # Make the Moore-Penrose Pseudoinverse.
     # if n_fit == n_x:
     #     MPPI = np.linalg.inv(WH*X)
     # else:
     # This resembles the formula (X'WX)^-1 X' W^1/2
     MPPI = np.linalg.pinv(WH*X)
-    Beta = MPPI * WH * Y
-    Hat = WH * X * MPPI
-    yfit = flat(Hat * Y)
+    Beta = mdot(MPPI, WH, Y)
+    Hat = mdot(WH, X, MPPI)
+    yfit = flat(mdot(Hat, Y))
     # Return three things: the least-squares coefficients, the hat matrix (turns y into yfit), and yfit
     # We could get these all from MPPI, but I might get confused later on, so might as well do it here :P
     return np.array(Beta).flatten(), np.array(Hat), np.array(yfit).flatten(), np.array(MPPI)

@@ -420,7 +420,7 @@ def main():
     # Density
     #----
     # Build the first density derivative.
-    GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / L - np.mean(Rhos) * np.mean(G, axis=1))
+    GRho = mBeta * (flat(np.dot(G, col(Rhos))) / L - np.mean(Rhos) * np.mean(G, axis=1))
     # Print out the density and its derivative.
     Sep = printcool("Density: % .4f +- % .4f kg/m^3\nAnalytic Derivative:" % (Rho_avg, Rho_err))
     FF.print_map(vals=GRho)
@@ -457,9 +457,9 @@ def main():
     # Define some things to make the analytic derivatives easier.
     Gbar = np.mean(G,axis=1)
     def deprod(vec):
-        return flat(np.mat(G)*col(vec))/L
+        return flat(np.dot(G),col(vec))/L
     def covde(vec):
-        return flat(np.mat(G)*col(vec))/L - Gbar*np.mean(vec)
+        return flat(np.dot(G),col(vec))/L - Gbar*np.mean(vec)
     def avg(vec):
         return np.mean(vec)
 
@@ -592,9 +592,9 @@ def main():
     Dy = Dips[:,1]
     Dz = Dips[:,2]
     D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
-    GD2  = 2*(flat(np.mat(GDx)*col(Dx))/L - avg(Dx)*(np.mean(GDx,axis=1))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
-    GD2 += 2*(flat(np.mat(GDy)*col(Dy))/L - avg(Dy)*(np.mean(GDy,axis=1))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
-    GD2 += 2*(flat(np.mat(GDz)*col(Dz))/L - avg(Dz)*(np.mean(GDz,axis=1))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
+    GD2  = 2*(flat(np.dot(GDx,col(Dx)))/L - avg(Dx)*(np.mean(GDx,axis=1))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
+    GD2 += 2*(flat(np.dot(GDy,col(Dy)))/L - avg(Dy)*(np.mean(GDy,axis=1))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
+    GD2 += 2*(flat(np.dot(GDz,col(Dz)))/L - avg(Dz)*(np.mean(GDz,axis=1))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
     GEps0 = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
     Sep = printcool("Dielectric constant:           % .4e +- %.4e\nAnalytic Derivative:" % (Eps0, Eps0_err))
     FF.print_map(vals=GEps0)
@@ -611,7 +611,7 @@ def main():
     #----
     Al_avg, Al_err = mean_stderr(Als)
     # Build the first A_l derivative.
-    GAl = mBeta * (flat(np.mat(G) * col(Als)) / L - np.mean(Als) * np.mean(G, axis=1))
+    GAl = mBeta * (flat(np.dot(G, col(Als))) / L - np.mean(Als) * np.mean(G, axis=1))
     # Print out A_l and its derivative.
     Sep = printcool("Average Area per Lipid: % .4f +- % .4f nm^2\nAnalytic Derivative:" % (Al_avg, Al_err))
     FF.print_map(vals=GAl)
@@ -674,7 +674,9 @@ def main():
     #----
     Scd_avg, Scd_e = mean_stderr(Scds)
     Scd_err = flat(Scd_e)
-    GScd = mBeta * (((np.mat(G) * Scds) / L) - (np.mat(np.average(G, axis = 1)).T * np.average(Scds, axis = 0)))
+    # In case I did the conversion incorrectly, this is the code that was here previously:
+    # GScd = mBeta * (((np.mat(G) * Scds) / L) - (np.mat(np.average(G, axis = 1)).T * np.average(Scds, axis = 0)))
+    GScd = mBeta * (((np.dot(G, Scds)) / L) - np.dot(np.average(G, axis = 1).T, np.average(Scds, axis = 0)))
     # Print out S_cd and its derivative.
     scd_avgerr = ' '.join('%.4f +- %.4f \n' % F for F in zip(Scd_avg, Scd_err))
     Sep = printcool("Deuterium order parameter: %s \nAnalytic Derivative:" % scd_avgerr)

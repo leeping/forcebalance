@@ -489,7 +489,7 @@ def main():
     # Density
     #----
     # Build the first density derivative.
-    GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / L - np.mean(Rhos) * np.mean(G, axis=1))
+    GRho = mBeta * (flat(np.dot(G, col(Rhos))) / L - np.mean(Rhos) * np.mean(G, axis=1))
     # Print out the density and its derivative.
     Sep = printcool("Density: % .4f +- % .4f kg/m^3\nAnalytic Derivative:" % (Rho_avg, Rho_err))
     FF.print_map(vals=GRho)
@@ -534,12 +534,12 @@ def main():
 
     # Build the first Hvap derivative.
     GHvap = np.mean(G,axis=1)
-    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
+    GHvap += mBeta * (flat(np.dot(G, col(Energies))) / L - Ene_avg * np.mean(G, axis=1))
     GHvap /= NMol
     GHvap -= np.mean(mG,axis=1)
-    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
+    GHvap -= mBeta * (flat(np.dot(mG, col(mEnergies))) / L - mEne_avg * np.mean(mG, axis=1))
     GHvap *= -1
-    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
+    GHvap -= mBeta * (flat(np.dot(G, col(pV))) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
 
     Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol\nAnalytic Derivative:" % (Hvap_avg, Hvap_err))
     FF.print_map(vals=GHvap)
@@ -547,9 +547,9 @@ def main():
     # Define some things to make the analytic derivatives easier.
     Gbar = np.mean(G,axis=1)
     def deprod(vec):
-        return flat(np.mat(G)*col(vec))/L
+        return flat(np.dot(G,col(vec)))/L
     def covde(vec):
-        return flat(np.mat(G)*col(vec))/L - Gbar*np.mean(vec)
+        return flat(np.dot(G,col(vec)))/L - Gbar*np.mean(vec)
     def avg(vec):
         return np.mean(vec)
 
@@ -681,9 +681,9 @@ def main():
     Dy = Dips[:,1]
     Dz = Dips[:,2]
     D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
-    GD2  = 2*(flat(np.mat(GDx)*col(Dx))/L - avg(Dx)*(np.mean(GDx,axis=1))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
-    GD2 += 2*(flat(np.mat(GDy)*col(Dy))/L - avg(Dy)*(np.mean(GDy,axis=1))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
-    GD2 += 2*(flat(np.mat(GDz)*col(Dz))/L - avg(Dz)*(np.mean(GDz,axis=1))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
+    GD2  = 2*(flat(np.dot(GDx,col(Dx)))/L - avg(Dx)*(np.mean(GDx,axis=1))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
+    GD2 += 2*(flat(np.dot(GDy,col(Dy)))/L - avg(Dy)*(np.mean(GDy,axis=1))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
+    GD2 += 2*(flat(np.dot(GDz,col(Dz)))/L - avg(Dz)*(np.mean(GDz,axis=1))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
     GEps0 = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
     Sep = printcool("Dielectric constant:           % .4e +- %.4e\nAnalytic Derivative:" % (Eps0, Eps0_err))
     FF.print_map(vals=GEps0)
