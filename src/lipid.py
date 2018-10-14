@@ -771,7 +771,7 @@ class Lipid(Target):
             Scd_calc[PT]   = np.dot(W,S)
             # LPW: In case I did not do the conversion correctly, the line of code previously here was:
             # Scd_grad[PT]   = mBeta * (flat(np.average(np.mat(G) * (S * W[:, np.newaxis]), axis = 1)) - np.average(np.average(S * W[:, np.newaxis], axis = 0), axis = 0) * Gbar) 
-            Scd_grad[PT]   = mBeta * (flat(np.average(np.dot(G, (S * W[:, np.newaxis]), axis = 1))) - np.average(np.average(S * W[:, np.newaxis], axis = 0), axis = 0) * Gbar) 
+            Scd_grad[PT]   = mBeta * (flat(np.average(np.dot(G, (S * W[:, np.newaxis])), axis = 1)) - np.average(np.average(S * W[:, np.newaxis], axis = 0), axis = 0) * Gbar) 
             ## Estimation of errors.
             Rho_std[PT]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
             Alpha_std[PT]   = np.sqrt(sum(C**2 * np.array(Alpha_errs)**2)) * 1e4
@@ -781,7 +781,7 @@ class Lipid(Target):
             Al_std[PT]    = np.sqrt(sum(C**2 * np.array(Al_errs)**2))
             # LPW: In case I did not do the conversion correctly, the line of code previously here was:
             # Scd_std[PT]    = np.sqrt(sum(np.mat(C**2) * np.array(Scd_errs)**2))
-            Scd_std[PT]    = np.sqrt(sum(np.dot(C**2, np.array(Scd_errs)**2)))
+            Scd_std[PT]    = np.sqrt(sum(np.dot(row(C**2), np.array(Scd_errs)**2)))
             LKappa_std[PT]   = np.sqrt(sum(C**2 * np.array(LKappa_errs)**2)) * 1e6
 
         # Get contributions to the objective function

@@ -1051,9 +1051,9 @@ class AbInitio(Target):
         self.respterm = R
         X += R
         if AGrad:
-            G += flat(dqPdqM.T * col(dR))
+            G += flat(np.dot(dqPdqM.T, col(dR)))
             if AHess:
-                H += np.diag(flat(dqPdqM.T * col(ddR)))
+                H += np.diag(flat(np.dot(dqPdqM.T, col(ddR))))
 
         if not in_fd():
             self.esp_trm = X

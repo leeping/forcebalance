@@ -17,6 +17,7 @@ from warnings import warn
 
 import numpy as np
 from numpy import sin, cos, arccos
+from numpy.linalg import multi_dot
 from pkg_resources import parse_version
 
 # For Python 3 compatibility
@@ -630,7 +631,7 @@ def EulerMatrix(T1,T2,T3):
     BMat[1,0] = -np.sin(T3)
     BMat[1,1] = np.cos(T3)
     BMat[2,2] = 1
-    EMat = m_dot(BMat, CMat, DMat)
+    EMat = multi_dot([BMat, CMat, DMat])
     return EMat
 
 def ComputeOverlap(theta,elem,xyz1,xyz2):
@@ -718,7 +719,7 @@ def get_rotate_translate(matrix1,matrix2):
     if np.linalg.det(wvt) < 0:
         d[2,2] = -1.0
 
-    rot_matrix = m_dot(wt.T,d,v.T).T
+    rot_matrix = multi_dot([wt.T,d,v.T]).T
     trans_matrix = avg_pos2-np.dot(avg_pos1,rot_matrix)
     return trans_matrix, rot_matrix
 
