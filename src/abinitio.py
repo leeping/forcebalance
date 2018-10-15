@@ -986,8 +986,8 @@ class AbInitio(Target):
             # for i in range(NP):
             #     print "Now working on parameter number", i
             #     dqPdqM.append(f12d3p(fdwrap(new_charges,mvals,i), h = self.h)[0])
-            # dqPdqM = mat(dqPdqM).T
-            dqPdqM = np.matrix([(f12d3p(fdwrap(new_charges,mvals,i), h = self.h, f0 = charge0)[0] if i in self.pgrad else np.zeros_like(charge0)) for i in range(NP)]).T
+            # dqPdqM = np.matrix(dqPdqM).T
+            dqPdqM = np.array([(f12d3p(fdwrap(new_charges,mvals,i), h = self.h, f0 = charge0)[0] if i in self.pgrad else np.zeros_like(charge0)) for i in range(NP)]).T
         xyzs = np.array(self.mol.xyzs)
         espqvals = np.array(self.espval)
         espxyz   = np.array(self.espxyz)
@@ -1007,23 +1007,23 @@ class AbInitio(Target):
         for i in range(self.ns):
             P   = self.boltz_wts[i]
             Z  += P
-            dVdqP   = np.matrix(self.invdists[i])
+            dVdqP   = np.array(self.invdists[i])
             espqval = espqvals[i]
-            espmval = dVdqP * col(new_charges(mvals))
+            espmval = np.dot(dVdqP, col(new_charges(mvals)))
             desp    = flat(espmval) - espqval
             X      += P * np.dot(desp, desp) / self.nesp
             Q      += P * np.dot(espqval, espqval) / self.nesp
             D      += P * (np.dot(espqval, espqval) / self.nesp - (np.sum(espqval) / self.nesp)**2)
             if AGrad:
-                dVdqM   = (dVdqP * dqPdqM).T
+                dVdqM   = np.dot(dVdqP, dqPdqM).T
                 for p, vsd in ddVdqPdVS.items():
-                    dVdqM[p,:] += flat(vsd[i] * col(new_charges(mvals)))
-                G      += flat(P * 2 * dVdqM * col(desp)) / self.nesp
+                    dVdqM[p,:] += flat(np.dot(vsd[i], col(new_charges(mvals))))
+                G      += flat(P * 2 * np.dot(dVdqM, col(desp))) / self.nesp
                 if AHess:
                     d2VdqM2 = np.zeros(dVdqM.shape)
                     for p, vsd in dddVdqPdVS2.items():
-                        d2VdqM2[p,:] += flat(vsd[i] * col(new_charges(mvals)))
-                    H      += np.array(P * 2 * (dVdqM * dVdqM.T + d2VdqM2 * col(desp))) / self.nesp
+                        d2VdqM2[p,:] += flat(np.dot(vsd[i], col(new_charges(mvals))))
+                    H      += np.array(P * 2 * (np.dot(dVdqM, dVdqM.T) + np.dot(d2VdqM2, col(desp)))) / self.nesp
         # Redundant but we keep it anyway
         D /= Z
         X /= Z
@@ -1051,9 +1051,9 @@ class AbInitio(Target):
         self.respterm = R
         X += R
         if AGrad:
-            G += flat(dqPdqM.T * col(dR))
+            G += flat(np.dot(dqPdqM.T, col(dR)))
             if AHess:
-                H += np.diag(flat(dqPdqM.T * col(ddR)))
+                H += np.diag(flat(np.dot(dqPdqM.T, col(ddR))))
 
         if not in_fd():
             self.esp_trm = X

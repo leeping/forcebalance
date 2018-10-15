@@ -1197,7 +1197,7 @@ class AbInitio(Target):
             # for i in range(NP):
             #     print "Now working on parameter number", i
             #     dqPdqM.append(f12d3p(fdwrap(new_charges,mvals,i), h = self.h)[0])
-            # dqPdqM = mat(dqPdqM).T
+            # dqPdqM = np.matrix(dqPdqM).T
             dqPdqM = np.matrix([(f12d3p(fdwrap(new_charges,mvals,i), h = self.h, f0 = charge0)[0] if i in self.pgrad else np.zeros_like(charge0)) for i in range(NP)]).T
         xyzs = np.array(self.mol.xyzs)
         espqvals = np.array(self.espval)

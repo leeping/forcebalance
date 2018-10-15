@@ -78,11 +78,11 @@ class MolG(nx.Graph):
 
 def col(vec):
     """Given any list, array, or matrix, return a 1-column matrix."""
-    return np.mat(np.array(vec).reshape(-1, 1))
+    return np.array(vec).reshape(-1, 1)
 
 def row(vec):
     """Given any list, array, or matrix, return a 1-row matrix."""
-    return np.mat(np.array(vec).reshape(1, -1))
+    return np.array(vec).reshape(1, -1)
 
 def flat(vec):
     """Given any list, array, or matrix, return a single-index array."""
@@ -153,7 +153,7 @@ def get_equivalent_atoms(MyG):
 def charge_as_array(M2Mol, QMat):
     oldq = np.array([atom.charge for atom in M2Mol.atoms])
     def get_symq(q):
-        return np.array([float("% .6f" % i) for i in flat(np.mat(QMat) * col(oldq))])
+        return np.array([float("% .6f" % i) for i in flat(np.dot(QMat, col(oldq)))])
     J = 0
     M = 0
     oldq  = get_symq(oldq)

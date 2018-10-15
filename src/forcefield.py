@@ -972,7 +972,7 @@ class FF(forcebalance.BaseClass):
                 logger.error('What the hell did you do?\n')
                 raise RuntimeError
         else:
-            pvals = flat(np.matrix(self.tmI)*col(mvals)) + self.pvals0
+            pvals = flat(np.dot(self.tmI,col(mvals))) + self.pvals0
         concern= ['polarizability','epsilon','VDWT']
         # Guard against certain types of parameters changing sign.
 
@@ -1002,7 +1002,7 @@ class FF(forcebalance.BaseClass):
         if self.logarithmic_map:
             logger.error('create_mvals has not been implemented for logarithmic_map\n')
             raise RuntimeError
-        mvals = flat(invert_svd(self.tmI) * col(pvals - self.pvals0))
+        mvals = flat(np.dot(invert_svd(self.tmI), col(pvals-self.pvals0)))
 
         return mvals
 
@@ -1362,7 +1362,7 @@ class FF(forcebalance.BaseClass):
         # There is a bad bug here .. this matrix multiplication operation doesn't work!!
         # I will proceed using loops. This is unsettling.
         # Input matrices are qmat2 and self.rs (diagonal)
-        transmat = np.matrix(qmat2) * np.matrix(np.diag(self.rs))
+        transmat = np.dot(qmat2, np.diag(self.rs))
         transmat1 = np.zeros((self.np, self.np))
         for i in range(self.np):
             for k in range(self.np):
