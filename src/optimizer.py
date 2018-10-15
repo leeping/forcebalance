@@ -16,6 +16,7 @@ from builtins import object
 import os, pickle, re, sys
 # import cProfile
 import numpy as np
+from numpy.linalg import multi_dot
 from copy import deepcopy
 import forcebalance
 from forcebalance.parser import parse_inputs
@@ -584,8 +585,8 @@ class Optimizer(forcebalance.BaseClass):
                         Hnew = H_stor.copy()
                         Dx   = col(xk - xk_prev)
                         Dy   = col(G  - G_prev)
-                        Mat1 = (Dy*Dy.T)/(Dy.T*Dx)[0,0]
-                        Mat2 = ((Hnew*Dx)*(Hnew*Dx).T)/(Dx.T*Hnew*Dx)[0,0]
+                        Mat1 = (np.dot(Dy,Dy.T))/(np.dot(Dy.T,Dx))[0,0]
+                        Mat2 = (np.dot(np.dot(Hnew,Dx),np.dot(Hnew,Dx).T))/(multi_dot([Dx.T,Hnew,Dx]))[0,0]
                         Hnew += Mat1-Mat2
                         H = Hnew.copy()
                         data['H'] = H.copy()
@@ -742,7 +743,6 @@ class Optimizer(forcebalance.BaseClass):
                     self.iter = 0
                 def _compute(self, dx):
                     self.dx = dx.copy()
-                    #Tmp = np.matrix(self.H)*col(dx)
                     Tmp = np.dot(self.H, dx)
                     Reg_Term   = self.Penalty.compute(xkd+flat(dx), Obj0)
                     self.Val   = (X + np.dot(dx, G) + 0.5*np.dot(dx,Tmp) + Reg_Term[0] - data['X'])
@@ -805,8 +805,8 @@ class Optimizer(forcebalance.BaseClass):
             logger.debug(" H:\n")
             pmat2d(H,precision=5, loglevel=DEBUG)
             
-            Hi = invert_svd(np.matrix(H))
-            dx = flat(-1 * Hi * col(G))
+            Hi = invert_svd(H)
+            dx = flat(-1 * np.dot(Hi, col(G)))
             
             logger.debug(" dx:\n")
             pvec1d(dx,precision=5, loglevel=DEBUG)
@@ -824,11 +824,11 @@ class Optimizer(forcebalance.BaseClass):
                 pvec1d(G,precision=5, loglevel=DEBUG)
                 logger.debug(" HT: (Scal = %.4f)\n" % (1+(L-1)**2))
                 pmat2d(HT,precision=5, loglevel=DEBUG)
-                Hi = invert_svd(np.matrix(HT))
-                dx = flat(-1 * Hi * col(G))
+                Hi = invert_svd(HT)
+                dx = flat(-1 * np.dot(Hi, col(G)))
                 logger.debug(" dx:\n")
                 pvec1d(dx,precision=5, loglevel=DEBUG)
-                sol = flat(0.5*row(dx)*np.matrix(H)*col(dx))[0] + np.dot(dx,G)
+                sol = flat(0.5*multi_dot([row(dx), H, col(dx)]))[0] + np.dot(dx,G)
                 for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                     dx = np.insert(dx, i, 0)
                 return dx, sol
