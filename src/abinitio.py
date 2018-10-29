@@ -810,9 +810,10 @@ class AbInitio(Target):
                                           col(M_all_print[:,0])-col(Q_all_print[:,0]),
                                           col(self.boltz_wts)))
             np.savetxt("EnergyCompare.txt", EnergyComparison, header="%11s  %12s  %12s  %12s" % ("QMEnergy", "MMEnergy", "Delta(MM-QM)", "Weight"), fmt="% 12.6e")
-            plot_qm_vs_mm(Q_all_print[:,0], M_all_print[:,0],
-                          M_orig=self.M_orig[:,0] if self.M_orig is not None else None,
-                          title='Abinitio '+self.name)
+            if self.writelevel > 1:
+                plot_qm_vs_mm(Q_all_print[:,0], M_all_print[:,0],
+                              M_orig=self.M_orig[:,0] if self.M_orig is not None else None,
+                              title='Abinitio '+self.name)
             if self.M_orig is None:
                 self.M_orig = M_all_print.copy()
         if self.force and self.writelevel > 1:
