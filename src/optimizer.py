@@ -294,7 +294,7 @@ class Optimizer(forcebalance.BaseClass):
                     in_priors = 0
                 if in_mvals: continue
                 if in_priors: continue
-                print(line, end=' ', file=fout)
+                print(line, end='', file=fout)
                 if line1.startswith("read_mvals"):
                     if have_mvals: 
                         logger.error("Encountered more than one read_mvals section\n")
