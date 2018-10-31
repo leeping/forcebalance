@@ -17,7 +17,7 @@ import os, sys, re
 import copy
 from re import match, sub, split, findall
 import networkx as nx
-from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile, listfiles, warn_press_key, wopen, printcool
+from forcebalance.nifty import isint, isfloat, _exec, LinkFile, warn_once, which, onefile, listfiles, warn_press_key, wopen, printcool, printcool_dictionary
 import numpy as np
 from forcebalance import BaseReader
 from forcebalance.engine import Engine
@@ -125,6 +125,7 @@ def write_leap(fnm, mol2=[], frcmod=[], pdb=None, prefix='amber', spath = [], de
     fout = fnm+'_'
     line_out.append('saveamberparm %s %s.prmtop %s.inpcrd\n' % (ambername, prefix, prefix))
     line_out.append('quit\n')
+    if os.path.exists(fout): os.remove(fout)
     with wopen(fout) as f: print(''.join(line_out), file=f)
 
 def splitComment(mystr, debug=False):
@@ -565,6 +566,32 @@ class FrcMod_Reader(BaseReader):
     def Whites(self, line):
         return findall(' +(?!-(?![0-9.]))', line.replace('\n',''))
 
+    def build_pid(self, pfld):
+        """ Returns the parameter type (e.g. K in BONDSK) based on the
+        current interaction type.
+
+        Both the 'pdict' dictionary (see gmxio.pdict) and the
+        interaction type 'state' (here, BONDS) are needed to get the
+        parameter type.
+
+        If, however, 'pdict' does not contain the ptype value, a suitable
+        substitute is simply the field number.
+
+        Note that if the interaction type state is not set, then it
+        defaults to the file name, so a generic parameter ID is
+        'filename.line_num.field_num'
+        
+        """
+        if self.dihe and not self.haveAtomLine:
+            pfld += 1
+        if hasattr(self, 'overpfx'): 
+            return self.overpfx + ':%i:' % pfld + self.oversfx
+        ptype = self.pdict.get(self.itype,{}).get(pfld,':%i.%i' % (self.ln,pfld))
+        answer = self.itype
+        answer += ptype
+        answer += '/'+self.suffix
+        return answer
+
     def feed(self, line):
         s          = self.Split(line)
         self.ln   += 1
@@ -599,15 +626,19 @@ class FrcMod_Reader(BaseReader):
             return
 
         if self.dihe:
-            try:
+            if '-' in s[0]:
+                self.haveAtomLine = True
                 self.itype = 'PDIHS%i' % int(np.abs(float(s[4])))
-            except:
-                self.itype = 'None'
+            else:
+                self.haveAtomLine = False
+                self.itype = 'PDIHS%i' % int(np.abs(float(s[3])))
 
         if self.itype in self.pdict:
             if 'Atom' in self.pdict[self.itype]:
-                # List the atoms in the interaction.
-                self.atom = [s[i].replace(" -","-") for i in self.pdict[self.itype]['Atom']]
+                # Use the previously stored atoms if not on this line.
+                if '-' in s[0]:
+                    # List the atoms in the interaction.
+                    self.atom = [s[i].replace(" -","-") for i in self.pdict[self.itype]['Atom']]
 
             # The suffix of the parameter ID is built from the atom    #
             # types/classes involved in the interaction.
