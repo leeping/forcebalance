@@ -115,6 +115,7 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'w_force','w_force')
         if not self.force:
             self.w_force = 0.0
+        self.set_option(tgt_opts,'energy_rms_override','energy_rms_override')
         self.set_option(tgt_opts,'force_map','force_map')
         self.set_option(tgt_opts,'w_netforce','w_netforce')
         self.set_option(tgt_opts,'w_torque','w_torque')
@@ -860,6 +861,10 @@ class AbInitio(Target):
         if np.sum(W_Components) > 0 and self.w_normalize:
             W_Components /= np.sum(W_Components)
 
+        if self.energy_rms_override != 0.0:
+            QQ0[0] = self.energy_rms_override ** 2
+            Q0[0] = 0.0
+            
         def compute_objective(SPX_like,divide=1,L=None,R=None,L2=None,R2=None):
             a = 0
             n = 1
