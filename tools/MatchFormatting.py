@@ -13,10 +13,11 @@ def determine_format_string(numstr): # Returns something like "% 8.3f"
         return Exception("There should be exactly one decimal place in the word %s" % numstr)
     decims = len(spl[1])
     strlen = len(spl[0]) + decims + 1
-    formstr = "%"
+    formstr = "% "
     if numstr[0] == "-":
         strlen -= 1
-        formstr += " "
+        formstr = " " + formstr
+        # formstr += " "
     formstr += "%i.%if" % (strlen, decims)
     return formstr
 
@@ -27,6 +28,6 @@ for line_temp, line_data in zip(template, fin):
     for wt, wd in zip(stemp, sdata):
         if wt != wd:
             #print(wt, wd)
-            line_out = line_out.replace(wt, determine_format_string(wt) % float(wd), 1)
+            line_out = line_out.replace(" " + wt, determine_format_string(wt) % float(wd), 1)
     print(line_out, end=' ')
 
