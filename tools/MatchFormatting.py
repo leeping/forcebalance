@@ -18,7 +18,12 @@ def determine_format_string(numstr): # Returns something like "% 8.3f"
         strlen -= 1
         formstr = " " + formstr
         # formstr += " "
-    formstr += "%i.%if" % (strlen, decims)
+    if 'e' in numstr:
+        strlen -= 4
+        decims -= 4
+        formstr += "%i.%ie" % (strlen, decims)
+    else:
+        formstr += "%i.%if" % (strlen, decims)
     return formstr
 
 for line_temp, line_data in zip(template, fin):
@@ -29,5 +34,5 @@ for line_temp, line_data in zip(template, fin):
         if wt != wd:
             #print(wt, wd)
             line_out = line_out.replace(" " + wt, determine_format_string(wt) % float(wd), 1)
-    print(line_out, end=' ')
+    print(line_out, end='')
 
