@@ -993,7 +993,8 @@ def form_rot(q):
     Parameters
     ----------
     q : numpy.ndarray
-        4 elements, represents quaternion
+        1D array with 3 elements representing the rotation quaterion.
+        Elements of quaternion are : [cos(a/2), sin(a/2)*axis[0..2]]
     
     Returns
     -------
@@ -1026,7 +1027,21 @@ def axis_angle(axis, angle):
     Given a rotation axis and angle, return the corresponding
     3x3 rotation matrix, which will rotate a (Nx3) array of
     xyz coordinates as x0_rot = np.dot(R, x0.T).T
+
+    Parameters
+    ----------
+    axis : numpy.ndarray
+        1D array with 3 elements representing the rotation axis
+    angle : float
+        The angle of the rotation
+    
+    Returns
+    -------
+    numpy.array
+        3x3 rotation matrix
     """
+    assert axis.ndim == 1
+    assert axis.shape[0] == 3
     axis /= np.linalg.norm(axis)
     # Make quaternion
     ct2 = np.cos(angle/2)
@@ -2123,9 +2138,26 @@ class Molecule(object):
         return AtomIterator, drij, dxij
 
     def rotate_bond(self, frame, aj, ak, increment=15):
-        """ Returning a new Molecule object containing the selected frame
+        """ 
+        Return a new Molecule object containing the selected frame
         plus a number of frames where the selected dihedral angle is rotated
         in steps of 'increment' given in degrees.
+        
+        This function is designed to be called by Molecule.rotate_check_clash().
+
+        Parameters
+        ----------
+        frame : int
+            Structure number of the current Molecule to be rotated
+        aj, ak : int
+            Atom numbers of the bond to be rotated
+        increment : float
+            Degrees of the rotation increment
+        
+        Returns
+        -------
+        Molecule
+            New Molecule object containing the rotated structures
         """
         # Select the single frame containing the structure to be rotated.
         M = self[frame]
@@ -2192,7 +2224,8 @@ class Molecule(object):
         return M, (gAtoms, oAtoms)
 
     def find_clashes(self, thre=0.0, pbc=True, groups=None):
-        """ Obtain a list of atoms that 'clash' (i.e. are more than
+        """ 
+        Obtain a list of atoms that 'clash' (i.e. are more than
         3 bonds apart and are closer than the provided threshold.)
 
         Parameters
@@ -2253,13 +2286,42 @@ class Molecule(object):
             clashDists_frames.append(clashDists.copy())
         return minPair_frames, minDist_frames, clashPairs_frames, clashDists_frames
 
-    def rotate_check_clash(self, rotate_index, thresh_hyd=1.4, thresh_hvy=1.8, printLevel=1):
+    def rotate_check_clash(self, frame, rotate_index, thresh_hyd=1.4, thresh_hvy=1.8, printLevel=1):
+        """ 
+        Return a new Molecule object containing the selected frame 
+        plus a number of frames where the selected dihedral angle is rotated
+        in steps of 'increment' given in degrees.  Additionally, check for
+        if pairs of non-bonded atoms "clash" i.e. approach below the specified
+        thresholds.
+
+        Parameters
+        ----------
+        frame : int
+            Structure number of the current Molecule to be rotated
+            (if only a single frame, this number should be 0)
+        rotate_index : tuple
+            4 atom indices (ai, aj, ak, al) representing the dihedral angle to be rotated.
+            The first and last indices are used to measure the dihedral angle.
+        thresh_hyd : float
+            Clash threshold for hydrogen atoms.  Reasonable values are in between 1.3 and 2.0.
+        thresh_hvy : float
+            Clash threshold for heavy atoms.  Reasonable values are in between 1.7 and 2.5.
+        printLevel: int
+            Sets the amount of printout (larger = more printout)
+        
+        Returns
+        -------
+        Molecule
+            New Molecule object containing the rotated structures
+        Success : bool
+            True if no clashes
+        """
         if not hasattr(self, 'atomname'):
             raise RuntimeError("Please add atom names before calling rotate_check_clash().")
         ai, aj, ak, al = rotate_index
         Success = False
         # Create grid of rotated structures
-        M_rot_H, frags = self.rotate_bond(0, aj, ak, 15)
+        M_rot_H, frags = self.rotate_bond(frame, aj, ak, 15)
         phis = M_rot_H.measure_dihedrals(*rotate_index)
         for i in range(len(M_rot_H)):
             M_rot_H.comms[i] = ('Rigid scan: atomname %s, serial %s, dihedral %.3f' 
