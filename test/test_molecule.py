@@ -40,6 +40,30 @@ class TestPDBMolecule(ForceBalanceTestCase):
         msg = "\nConversion from pdb to xyz yields different xyz coordinates\npdb:\n%s\n\ngro:\n%s\n" %\
         (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0])))
 
+    def test_measure_distances(self):
+        """Check measure distance functions"""
+        result = np.array(self.molecule.measure_distances(1701, 1706))
+        EXPECTED_DISTANCE_RESULTS = np.array([1.80])
+        self.assertNdArrayEqual(EXPECTED_DISTANCE_RESULTS,result,delta=0.01,
+                                msg="\nMeasured distance has changed from previously calculated values.\n"
+                                "If this seems reasonable, update EXPECTED_DISTANCE_RESULTS in test_molecule.py with these values")
+
+    def test_measure_angles(self):
+        """Check measure angle functions"""
+        result = np.array(self.molecule.measure_angles(1771, 1769, 1772))
+        EXPECTED_ANGLE_RESULTS = np.array([114.11])
+        self.assertNdArrayEqual(EXPECTED_ANGLE_RESULTS,result,delta=0.01,
+                                msg="\nMeasured angle has changed from previously calculated values.\n"
+                                "If this seems reasonable, update EXPECTED_ANGLE_RESULTS in test_molecule.py with these values")
+
+    def test_measure_dihedrals(self):
+        """Check measure dihedral functions"""
+        result = np.array(self.molecule.measure_dihedrals(1709, 1706, 1701, 1702))
+        EXPECTED_DIHEDRAL_RESULTS = np.array([176.54])
+        self.assertNdArrayEqual(EXPECTED_DIHEDRAL_RESULTS,result,delta=0.01,
+                                msg="\nMeasured dihedral angle has changed from previously calculated values.\n"
+                                "If this seems reasonable, update EXPECTED_DIHEDRAL_RESULTS in test_molecule.py with these values")
+
     def test_gro_conversion(self):
         """Check molecule conversion from pdb to gro format"""
         self.logger.debug("\nCreating gro file from pdb... ")
@@ -106,6 +130,14 @@ class TestLipidGRO(ForceBalanceTestCase):
             self.skipTest("Input pdb file test/files/%s doesn't exist" % self.source)
         except:
             self.fail("\nUnable to open gro file")
+            
+    def test_measure_dihedrals(self):
+        """Check measure dihedral functions"""
+        result = np.array(self.molecule.measure_dihedrals(1131, 1112, 1113, 1114))
+        EXPECTED_DIHEDRAL_RESULTS = np.array([-157.223])
+        self.assertNdArrayEqual(EXPECTED_DIHEDRAL_RESULTS,result,delta=0.001,
+                                msg="\nMeasured dihedral angle has changed from previously calculated values.\n"
+                                "If this seems reasonable, update EXPECTED_DIHEDRAL_RESULTS in test_molecule.py with these values")
 
     def test_lipid_molecules(self):
         """Check for the correct number of molecules in a rectangular cell with broken molecules"""
