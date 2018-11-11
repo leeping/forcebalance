@@ -115,6 +115,7 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'w_force','w_force')
         if not self.force:
             self.w_force = 0.0
+        self.set_option(tgt_opts,'energy_rms_override','energy_rms_override')
         self.set_option(tgt_opts,'force_map','force_map')
         self.set_option(tgt_opts,'w_netforce','w_netforce')
         self.set_option(tgt_opts,'w_torque','w_torque')
@@ -810,9 +811,10 @@ class AbInitio(Target):
                                           col(M_all_print[:,0])-col(Q_all_print[:,0]),
                                           col(self.boltz_wts)))
             np.savetxt("EnergyCompare.txt", EnergyComparison, header="%11s  %12s  %12s  %12s" % ("QMEnergy", "MMEnergy", "Delta(MM-QM)", "Weight"), fmt="% 12.6e")
-            plot_qm_vs_mm(Q_all_print[:,0], M_all_print[:,0],
-                          M_orig=self.M_orig[:,0] if self.M_orig is not None else None,
-                          title='Abinitio '+self.name)
+            if self.writelevel > 1:
+                plot_qm_vs_mm(Q_all_print[:,0], M_all_print[:,0],
+                              M_orig=self.M_orig[:,0] if self.M_orig is not None else None,
+                              title='Abinitio '+self.name)
             if self.M_orig is None:
                 self.M_orig = M_all_print.copy()
         if self.force and self.writelevel > 1:
@@ -859,6 +861,10 @@ class AbInitio(Target):
         if np.sum(W_Components) > 0 and self.w_normalize:
             W_Components /= np.sum(W_Components)
 
+        if self.energy_rms_override != 0.0:
+            QQ0[0] = self.energy_rms_override ** 2
+            Q0[0] = 0.0
+            
         def compute_objective(SPX_like,divide=1,L=None,R=None,L2=None,R2=None):
             a = 0
             n = 1
