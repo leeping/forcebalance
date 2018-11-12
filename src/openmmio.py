@@ -516,7 +516,13 @@ class OpenMM_Reader(BaseReader):
                 pfx = list(element.iterancestors())[0].attrib["name"]
                 Involved = '.'.join([pfx+"-"+element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
             else:
-                Involved = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType] if i in element.attrib])
+                Involved1 = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType] if i in element.attrib])
+                suffix2 = [i.replace('class','type') for i in suffix_dict[ParentType][InteractionType]]
+                suffix3 = [i.replace('type','class') for i in suffix_dict[ParentType][InteractionType]]
+                Involved2 = '.'.join([element.attrib[i] for i in suffix2 if i in element.attrib])
+                Involved3 = '.'.join([element.attrib[i] for i in suffix3 if i in element.attrib])
+                # Keep the Involved string that is the longest (assuming that is the one that properly matched)
+                Involved = [Involved1, Involved2, Involved3][np.argmax(np.array([len(Involved1),len(Involved2),len(Involved3)]))]
             return "/".join([InteractionType, parameter, Involved])
         except:
             logger.info("Minor warning: Parameter ID %s doesn't contain any atom types, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
