@@ -29,7 +29,7 @@ from forcebalance.nifty import *
 from forcebalance.nifty import _exec
 from collections import OrderedDict
 from forcebalance.output import getLogger
-from forcebalance.openmmio import OpenMM
+from forcebalance.openmmio import OpenMM, UpdateSimulationParameters
 
 logger = getLogger(__name__)
 try:
