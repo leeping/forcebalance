@@ -163,6 +163,12 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         self.rundir      = self.tempdir
         ## Need the forcefield (here for now)
         self.FF          = forcefield
+        ## mol2 files that are stored in the forcefield folder
+        ## need to be included in the list of mol2 files for the target
+        if hasattr(self, 'mol2'):
+            for fnm in self.FF.fnms:
+                if fnm.endswith('.mol2'):
+                    self.mol2.append[fnm]
         ## Counts how often the objective function was computed
         self.xct         = 0
         ## Counts how often the gradient was computed
