@@ -79,7 +79,7 @@ class SMIRNOFF_Reader(BaseReader):
     """ Class for parsing OpenMM force field files. """
     def __init__(self,fnm):
         ## Initialize the superclass. :)
-        super(OpenMM_Reader,self).__init__(fnm)
+        super(SMIRNOFF_Reader,self).__init__(fnm)
         ## The parameter dictionary (defined in this file)
         self.pdict  = pdict
 
@@ -90,10 +90,10 @@ class SMIRNOFF_Reader(BaseReader):
         InteractionType = element.tag
         try:
             Involved = element.attrib["smirks"]
-            return "/".join([InteractionType, parameter, Involved])
+            return "/".join([ParentType, InteractionType, parameter, Involved])
         except:
             logger.info("Minor warning: Parameter ID %s doesn't contain any SMIRKS patterns, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
-            return "/".join([InteractionType, parameter])
+            return "/".join([ParentType, InteractionType, parameter])
 
 class SMIRNOFF(OpenMM):
 
@@ -144,7 +144,7 @@ class SMIRNOFF(OpenMM):
         # Here we cannot distinguish the .mol2 files linked by the target 
         # vs. the .mol2 files to be provided by the force field.
         # But we can assume that these files should exist when this function is called.
-        self.mol2_files = kwargs.get['mol2']
+        self.mol2_files = kwargs.get('mol2')
         if self.mol2_files:
             for fnm in self.mol2_files:
                 if not os.path.exists(fnm):
@@ -264,13 +264,14 @@ class SMIRNOFF(OpenMM):
         if len(kwargs) > 0:
             self.simkwargs = kwargs
 
+        self.mod = Modeller(self.pdb.topology, self.pdb.positions)
         self.forcefield = ForceField(*self.offxml)
         # This part requires the OpenEye tools but may be replaced
         # by RDKit when that support comes online.
         oemols = []
         for fnm in self.mol2_files:
             mol = oechem.OEGraphMol()
-            ifs = oechem.oemolistream(mol_filename)
+            ifs = oechem.oemolistream(fnm)
             oechem.OEReadMolecule(ifs, mol)
             oechem.OETriposAtomNames(mol)
             oemols.append(mol)
