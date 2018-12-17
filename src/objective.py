@@ -37,6 +37,12 @@ except:
     logger.warning("OpenMM module import failed; check OpenMM package\n")
 
 try:
+    from forcebalance.smirnoffio import AbInitio_SMIRNOFF, Liquid_SMIRNOFF
+except:
+    logger.warning(traceback.format_exc())
+    logger.warning("SMIRNOFF module import failed; check SMIRNOFF package\n")
+    
+try:
     from forcebalance.abinitio_internal import AbInitio_Internal
 except:
     logger.warning(traceback.format_exc())
@@ -71,6 +77,7 @@ Implemented_Targets = {
     'ABINITIO_GMX':AbInitio_GMX,
     'ABINITIO_TINKER':AbInitio_TINKER,
     'ABINITIO_OPENMM':AbInitio_OpenMM,
+    'ABINITIO_SMIRNOFF':AbInitio_SMIRNOFF,
     'ABINITIO_AMBER':AbInitio_AMBER,
     'ABINITIO_INTERNAL':AbInitio_Internal,
     'VIBRATION_TINKER':Vibration_TINKER,
@@ -78,6 +85,7 @@ Implemented_Targets = {
     'VIBRATION_AMBER':Vibration_AMBER,
     'THERMO_GMX':Thermo_GMX,
     'LIQUID_OPENMM':Liquid_OpenMM,
+    'LIQUID_SMIRNOFF':Liquid_SMIRNOFF,
     'LIQUID_TINKER':Liquid_TINKER, 
     'LIQUID_GMX':Liquid_GMX, 
     'LIQUID_AMBER':Liquid_AMBER, 

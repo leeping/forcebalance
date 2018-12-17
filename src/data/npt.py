@@ -69,8 +69,11 @@ elif engname == "tinker":
 elif engname == "amber":
     from forcebalance.amberio import *
     Engine = AMBER
+elif engname == "smirnoff":
+    from forcebalance.smirnoffio import *
+    Engine = SMIRNOFF
 else:
-    raise Exception('OpenMM, GROMACS, TINKER, and AMBER are supported at this time.')
+    raise Exception('OpenMM, SMIRNOFF/OpenMM, GROMACS, TINKER, and AMBER are supported at this time.')
 
 #==================#
 #|   Subroutines  |#
@@ -326,7 +329,7 @@ def main():
         EngOpts["liquid"]["vdw_cutoff"] = TgtOptions["vdw_cutoff"]
     EngOpts["gas"] = OrderedDict([("coords", gas_fnm), ("mol", MG), ("pbc", False)])
     GenOpts = OrderedDict([('FF', FF)])
-    if engname == "openmm":
+    if engname in ["openmm", "smirnoff"]:
         # OpenMM-specific options
         EngOpts["liquid"]["platname"] = TgtOptions.get("platname", 'CUDA')
         # For now, always run gas phase calculations on the reference platform
@@ -336,6 +339,17 @@ def main():
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
             EngOpts["liquid"]["platname"] = 'CUDA'
         if threads > 1: logger.warn("Setting the number of threads will have no effect on OpenMM engine.\n")
+        if engname == "smirnoff":
+            if not TgtOptions['liquid_coords'].endswith('.pdb'):
+                logger.error("With SMIRNOFF engine, please pass a .pdb file to liquid_coords.")
+                raise RuntimeError
+            EngOpts["liquid"]["pdb"] = TgtOptions['liquid_coords']
+            EngOpts["liquid"]["mol2"] = TgtOptions["mol2"]
+            if not TgtOptions['gas_coords'].endswith('.pdb'):
+                logger.error("With SMIRNOFF engine, please pass a .pdb file to gas_coords.")
+                raise RuntimeError
+            EngOpts["gas"]["pdb"] = TgtOptions['gas_coords']
+            EngOpts["gas"]["mol2"] = TgtOptions["mol2"]
     elif engname == "gromacs":
         # Gromacs-specific options
         GenOpts["gmxpath"] = TgtOptions["gmxpath"]

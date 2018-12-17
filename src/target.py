@@ -12,7 +12,7 @@ import time
 from collections import OrderedDict
 import tarfile
 import forcebalance
-from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key, _exec, lp_load
+from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key, _exec, lp_load, LinkFile
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p, in_fd
 from forcebalance.optimizer import Counter
 from forcebalance.output import getLogger
@@ -169,6 +169,7 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
             for fnm in self.FF.fnms:
                 if fnm.endswith('.mol2'):
                     self.mol2.append[fnm]
+
         ## Counts how often the objective function was computed
         self.xct         = 0
         ## Counts how often the gradient was computed
@@ -364,6 +365,9 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         shutil.rmtree(abstempdir,ignore_errors=True)
         # Create a new temporary directory from scratch
         os.makedirs(abstempdir)
+        for f in self.mol2:
+            print(os.path.join(self.root, self.tgtdir, f), "->", os.path.join(abstempdir, f))
+            LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
 
     @abc.abstractmethod
     def get(self,mvals,AGrad=False,AHess=False):
