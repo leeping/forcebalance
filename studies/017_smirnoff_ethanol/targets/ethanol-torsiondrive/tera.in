@@ -1,0 +1,7 @@
+coordinates start.xyz
+run minimize
+method wb97x-d3
+basis tzvp
+dispersion yes
+charge 0
+spinmult 1
