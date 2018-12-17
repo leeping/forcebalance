@@ -1,0 +1,357 @@
+#======================================================================#
+#| [1m            Welcome to ForceBalance version 1.5.5! =D             [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Keri A. McKiernan, Yudong Qiu                   [0m |#
+#| [1m           Arthur Vigil, Erik G. Brandt, Johnny Israeli           [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: optimize.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: smirnoff99Frosst.offxml
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  1.0950e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   1 [  1.4000e+02 ] : HarmonicAngleForce/Angle/k/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   2 [  1.0950e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   3 [  1.0000e+02 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   HarmonicAngleForce/Angle             : 1.40000e+02
+   HarmonicBondForce/Bond/length        : 1.00000e+00
+   HarmonicBondForce/Bond/k             : 1.00000e+03
+   HarmonicAngleForce/Angle/angle       : 1.00000e+02
+   HarmonicAngleForce/Angle/k           : 1.00000e+02
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    HarmonicAngleForce/Angle/angle  : 1.00000e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   1 [    HarmonicAngleForce/Angle/k    : 1.00000e+02 ] : HarmonicAngleForce/Angle/k/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   2 [    HarmonicAngleForce/Angle/angle  : 1.00000e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   3 [    HarmonicAngleForce/Angle/k    : 1.00000e+02 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+----------------------------------------------------------
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['smirnoff99Frosst.offxml'] 
+priors                    OrderedDict([('HarmonicBondForce/Bond/length', 1.0), ('HarmonicBondForce/Bond/k', 1000.0), ('HarmonicAngleForce/Angle/angle', 100.0), ('HarmonicAngleForce/Angle/k', 100.0)]) 
+----------------------------------------------------------
+/home/leeping/src/forcebalance/studies/018_improper_angle/targets/dimethylamine.2D-scan/mol1.mol2 -> /home/leeping/src/forcebalance/studies/018_improper_angle/optimize.tmp/dimethylamine.2D-scan/mol1.mol2
+QM forces are not present, only fitting energies.
+#========================================================#
+#| [92m      Setup for target dimethylamine.2D-scan :      [0m |#
+#========================================================#
+pdb                       mol1.pdb 
+mol2                      ['mol1.mol2'] 
+coords                    all.xyz 
+precision                 double 
+platname                  CUDA 
+name                      dimethylamine.2D-scan 
+type                      ABINITIO_SMIRNOFF 
+backup                    False 
+tgtdir                    targets/dimethylamine.2D-scan 
+writelevel                2 
+attenuate                 True 
+shots                     88 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          1.0 
+normalize_weights         False 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   OPTIMIZE 
+trust0                    -1.0 
+mintrust                  0.05 
+convergence_objective     0.01 
+convergence_step          0.01 
+convergence_gradient      0.01 
+maxstep                   1000 
+backup                    False 
+input_file                optimize.in 
+----------------------------------------------------------
+#========================================================#
+#| [1m                  Main Optimizer                    [0m |#
+#| [1m  Newton-Raphson Method (Hessian Diagonal Search)   [0m |#
+#| [1m                                                    [0m |#
+#| [1m       [0mConvergence criteria (1 of 3 needed):        [0m |#
+#| [1m          [0mObjective Function  : 1.000e-02           [0m |#
+#| [1m          [0mNorm of Gradient    : 1.000e-02           [0m |#
+#| [1m          [0mParameter step size : 1.000e-02           [0m |#
+#========================================================#
+#========================================================#
+#|       Color Key for Objective Function -=X2=-        |#
+#|  [1mBold[0m = Initial step                                 |#
+#|  [92mGreen = Current lowest value of objective function[0m  |#
+#|  [91mRed = Objective function rises, step rejected[0m       |#
+#|  [0mNo color = Not at the lowest value                  |#
+#========================================================#
+#========================================================#
+#| [94m     Iteration 0: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#============================================================================================#
+#|     Target: dimethylamine.2D-scan  Type: AbInitio_SMIRNOFF  Objective = 3.52048e-01      |#
+#|                    Difference   Denominator     Percent                                  |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#============================================================================================#
+    Energy (kJ/mol)      14.4569       24.3655     59.3336%     0.3520    1.000     0.3520 
+----------------------------------------------------------------------------------------------
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+dimethylamine.2D-scan          0.35205      1.000 [94m     3.52048e-01[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     3.52048e-01[0m 
+----------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     0   0.000e+00   0.000e+00   8.342e+00[1m   3.52048e-01[0m  -0.000e+00      0.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -8.18887427e+00 ] : HarmonicAngleForce/Angle/angle/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   1 [  8.90325654e-01 ] : HarmonicAngleForce/Angle/k/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   2 [ -1.31909777e+00 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   3 [ -6.80982082e-02 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Starting Hessian diagonal search with step size 1.0035e-01
+Hessian diagonal search: H+0.0000*I, length 1.0035e-01, result -2.9715e-01
+Hessian diagonal search: H+9.0000*I, length 6.7859e-02, result -2.9225e-01
+Hessian diagonal search: H+23.5623*I, length 5.9442e-02, result -2.8397e-01
+Hessian diagonal search: H+0.0000*I, length 1.0035e-01, result -2.9715e-01
+Hessian diagonal search: H+3.4377*I, length 7.5224e-02, result -2.9521e-01
+Hessian diagonal search: H+1.3131*I, length 8.4101e-02, result -2.9663e-01
+Hessian diagonal search: H+0.0151*I, length 1.0003e-01, result -2.9715e-01
+Hessian diagonal search: H+0.0113*I, length 1.0011e-01, result -2.9715e-01
+Hessian diagonal search: H+0.2637*I, length 9.5473e-02, result -2.9717e-01
+Hessian diagonal search: H+0.6074*I, length 9.0660e-02, result -2.9706e-01
+Hessian diagonal search: H+0.1327*I, length 9.7739e-02, result -2.9718e-01
+Hessian diagonal search: H+0.1597*I, length 9.7248e-02, result -2.9718e-01
+Hessian diagonal search: H+0.1749*I, length 9.6977e-02, result -2.9718e-01
+Hessian diagonal search: H+0.1843*I, length 9.6813e-02, result -2.9718e-01
+Hessian diagonal search: H+0.1793*I, length 9.6900e-02, result -2.9718e-01
+Hessian diagonal search: H+0.1794*I, length 9.6898e-02, result -2.9718e-01
+Hessian diagonal search: H+0.1792*I, length 9.6902e-02, result -2.9718e-01
+Optimization step found (length 9.6900e-02)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  0.0000e+00 + 6.1202e-02 =  6.1202e-02 ] : HarmonicAngleForce/Angle/angle/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   1 [  0.0000e+00 - 6.7733e-02 = -6.7733e-02 ] : HarmonicAngleForce/Angle/k/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   2 [  0.0000e+00 + 2.6122e-02 =  2.6122e-02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   3 [  0.0000e+00 - 1.9333e-02 = -1.9333e-02 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  1.0950e+02 + 6.1202e+00 =  1.1562e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   1 [  1.4000e+02 - 6.7733e+00 =  1.3323e+02 ] : HarmonicAngleForce/Angle/k/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   2 [  1.0950e+02 + 2.6122e+00 =  1.1211e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   3 [  1.0000e+02 - 1.9333e+00 =  9.8067e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+----------------------------------------------------------
+Backing up optimize.sav -> optimize.bak/optimize_4.sav
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 1: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#============================================================================================#
+#|     Target: dimethylamine.2D-scan  Type: AbInitio_SMIRNOFF  Objective = 4.54801e-02      |#
+#|                    Difference   Denominator     Percent                                  |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#============================================================================================#
+    Energy (kJ/mol)       5.1962       24.3655     21.3261%     0.0455    1.000     0.0455 
+----------------------------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+dimethylamine.2D-scan          0.04548      1.000 [92m     4.54801e-02[0m ( -3.066e-01 ) 
+Regularization                 0.00939      1.000 [91m     9.38961e-03[0m ( +9.390e-03 ) 
+Total                                             [92m     5.48697e-02[0m ( -2.972e-01 ) 
+-------------------------------------------------------------------------------------
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     1   9.690e-02   9.690e-02   3.660e-01[92m   5.48697e-02[0m  -2.972e-01      1.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -3.64100564e-01 ] : HarmonicAngleForce/Angle/angle/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   1 [  2.39463326e-02 ] : HarmonicAngleForce/Angle/k/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   2 [  2.86509879e-02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   3 [ -1.64218400e-03 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Starting Hessian diagonal search with step size 4.1347e-03
+Hessian diagonal search: H+0.0000*I, length 4.1347e-03, result -5.6579e-04
+Hessian diagonal search: H+9.0000*I, length 2.9579e-03, result -5.5783e-04
+Hessian diagonal search: H+23.5623*I, length 2.5962e-03, result -5.4232e-04
+Hessian diagonal search: H+0.0000*I, length 4.1347e-03, result -5.6579e-04
+Hessian diagonal search: H+3.4377*I, length 3.2421e-03, result -5.6271e-04
+Hessian diagonal search: H+1.3131*I, length 3.5594e-03, result -5.6488e-04
+Hessian diagonal search: H+0.0079*I, length 4.1288e-03, result -5.6578e-04
+Hessian diagonal search: H+0.0000*I, length 4.1347e-03, result -5.6579e-04
+Hessian diagonal search: H+0.0017*I, length 4.1334e-03, result -5.6578e-04
+Hessian diagonal search: H+0.0003*I, length 4.1344e-03, result -5.6578e-04
+Hessian diagonal search: H+0.0001*I, length 4.1346e-03, result -5.6578e-04
+Hessian diagonal search: H+0.0000*I, length 4.1347e-03, result -5.6577e-04
+Hessian diagonal search: H+0.0000*I, length 4.1347e-03, result -5.6579e-04
+Hessian diagonal search: H+0.0000*I, length 4.1347e-03, result -5.6577e-04
+Hessian diagonal search: H+0.0000*I, length 4.1347e-03, result -5.6579e-04
+Hessian diagonal search: H+0.0000*I, length 4.1347e-03, result -5.6577e-04
+Hessian diagonal search: H+0.0000*I, length 4.1347e-03, result -5.6579e-04
+Hessian diagonal search: H+0.0000*I, length 4.1347e-03, result -5.6579e-04
+Optimization step found (length 4.1347e-03)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  6.1202e-02 + 2.9843e-03 =  6.4186e-02 ] : HarmonicAngleForce/Angle/angle/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   1 [ -6.7733e-02 - 2.6932e-03 = -7.0426e-02 ] : HarmonicAngleForce/Angle/k/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   2 [  2.6122e-02 + 5.7779e-04 =  2.6700e-02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   3 [ -1.9333e-02 - 7.7603e-04 = -2.0109e-02 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  1.1562e+02 + 2.9843e-01 =  1.1592e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   1 [  1.3323e+02 - 2.6932e-01 =  1.3296e+02 ] : HarmonicAngleForce/Angle/k/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   2 [  1.1211e+02 + 5.7779e-02 =  1.1217e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   3 [  9.8067e+01 - 7.7603e-02 =  9.7989e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+Setting finite difference step to 4.1347e-04
+#========================================================#
+#| [94m     Iteration 2: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#============================================================================================#
+#|     Target: dimethylamine.2D-scan  Type: AbInitio_SMIRNOFF  Objective = 4.41068e-02      |#
+#|                    Difference   Denominator     Percent                                  |#
+#|  Observable        (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#============================================================================================#
+    Energy (kJ/mol)       5.1172       24.3655     21.0016%     0.0441    1.000     0.0441 
+----------------------------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+dimethylamine.2D-scan          0.04411      1.000 [92m     4.41068e-02[0m ( -1.373e-03 ) 
+Regularization                 0.01020      1.000 [91m     1.01970e-02[0m ( +8.074e-04 ) 
+Total                                             [92m     5.43039e-02[0m ( -5.658e-04 ) 
+-------------------------------------------------------------------------------------
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     2   1.010e-01   4.135e-03   5.681e-04[92m   5.43039e-02[0m  -5.658e-04      1.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -4.74277850e-04 ] : HarmonicAngleForce/Angle/angle/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   1 [ -2.54158274e-04 ] : HarmonicAngleForce/Angle/k/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   2 [  1.78405100e-04 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   3 [ -3.67164660e-05 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+----------------------------------------------------------
+Convergence criterion reached for gradient norm (1.00e-02)
+Convergence criterion reached in step size (1.00e-02)
+Convergence criterion reached for objective function (1.00e-02)
+#========================================================#
+#| [92m               [0m[1mOptimization Converged[0m               [0m |#
+#| [92m           Final objective function value           [0m |#
+#| [92m  Full:  5.430388e-02  Un-penalized:  4.410685e-02  [0m |#
+#========================================================#
+#========================================================#
+#| [94m           Final optimization parameters:           [0m |#
+#========================================================#
+   0 [  6.4186e-02 ] : HarmonicAngleForce/Angle/angle/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   1 [ -7.0426e-02 ] : HarmonicAngleForce/Angle/k/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   2 [  2.6700e-02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   3 [ -2.0109e-02 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+#========================================================#
+#| [94m             Final physical parameters:             [0m |#
+#========================================================#
+   0 [  1.1592e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   1 [  1.3296e+02 ] : HarmonicAngleForce/Angle/k/[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   2 [  1.1217e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+   3 [  9.7989e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]
+----------------------------------------------------------
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#
