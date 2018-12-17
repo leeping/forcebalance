@@ -365,9 +365,10 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         shutil.rmtree(abstempdir,ignore_errors=True)
         # Create a new temporary directory from scratch
         os.makedirs(abstempdir)
-        for f in self.mol2:
-            print(os.path.join(self.root, self.tgtdir, f), "->", os.path.join(abstempdir, f))
-            LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
+        if hasattr(self, 'mol2'):
+            for f in self.mol2:
+                print(os.path.join(self.root, self.tgtdir, f), "->", os.path.join(abstempdir, f))
+                LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
 
     @abc.abstractmethod
     def get(self,mvals,AGrad=False,AHess=False):
