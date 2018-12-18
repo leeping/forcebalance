@@ -103,7 +103,7 @@ import numpy as np
 from numpy import sin, cos, tan, exp, log, sqrt, pi
 from re import match, sub, split
 import forcebalance
-from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io
+from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io, smirnoffio
 from forcebalance.finite_difference import in_fd
 from forcebalance.nifty import *
 # from string import count
@@ -125,6 +125,7 @@ FF_Extensions = {"itp" : "gmx",
                  "prm" : "tinker",
                  "gen" : "custom",
                  "xml" : "openmm",
+                 "offxml" : "smirnoff",
                  "frcmod" : "frcmod",
                  "mol2" : "mol2",
                  "gbs"  : "gbs",
@@ -137,6 +138,7 @@ FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 "tinker": tinkerio.Tinker_Reader ,
                 "custom": custom_io.Gen_Reader ,
                 "openmm" : openmmio.OpenMM_Reader,
+                "smirnoff" : smirnoffio.SMIRNOFF_Reader,
                 "frcmod" : amberio.FrcMod_Reader,
                 "mol2" : amberio.Mol2_Reader,
                 "gbs" : psi4io.GBS_Reader,
@@ -440,6 +442,12 @@ class FF(forcebalance.BaseClass):
             else:
                 self.openmmxml = ffname
 
+        if fftype == "smirnoff":
+            if hasattr(self, "offxml"):
+                warn_press_key("There should only be one SMIRNOFF XML file - confused!!")
+            else:
+                self.offxml = ffname
+
         self.amber_mol2 = []
         if fftype == "mol2":
             self.amber_mol2.append(ffname)
@@ -459,7 +467,7 @@ class FF(forcebalance.BaseClass):
         # The reader is essentially a finite state machine that allows us to
         # build the pid.
         self.Readers[ffname] = Reader(ffname)
-        if fftype == "openmm":
+        if fftype in ["openmm", "smirnoff"]:
             ## Read in an XML force field file as an _ElementTree object
             try:
                 self.ffdata[ffname] = etree.parse(absff)
