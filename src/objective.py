@@ -369,7 +369,6 @@ class Penalty(object):
         elif self.ptyp == 3:
             if Power == 2.0:
                 logger.info("Using box-style regularization with exponent %.1f, strength %.1e (+), %.1e (x): same as L2\n" % (Power, Factor_Add, Factor_Mult))
-                warn_press_key("Are you sure this is what you want to do? (To use flat-bottom restraints, set penalty_power to a value like 12.0)")
             elif Power > 2.0:
                 logger.info("Using box-style regularization with exponent %.1f, strength %.1e (+), %.1e (x)\n" % (Power, Factor_Add, Factor_Mult))
             else:
