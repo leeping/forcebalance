@@ -12,10 +12,10 @@ $options
 forcefield smirnoff99Frosst.offxml
 jobtype optimize
 criteria 1
-verbose_options 0
 convergence_gradient 0.01
 convergence_objective 0.01
 convergence_step 0.01
+verbose_options 0
 maxstep 1000
 penalty_type L2
 trust0 -1
@@ -43,7 +43,7 @@ type AbInitio_SMIRNOFF
 coords all.xyz
 pdb mol1.pdb
 mol2 mol1.mol2
-attenuate
+# attenuate
 # energy_denom 2.0
 # energy_upper 10.0
 writelevel 2

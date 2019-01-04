@@ -134,6 +134,7 @@ class Objective(forcebalance.BaseClass):
         self.set_option(options, 'penalty_multiplicative')
         self.set_option(options, 'penalty_hyperbolic_b')
         self.set_option(options, 'penalty_alpha')
+        self.set_option(options, 'penalty_power')
         self.set_option(options, 'normalize_weights')
         ## Work Queue Port (The specific target itself may or may not actually use this.)
         self.set_option(options, 'wq_port')
@@ -162,7 +163,7 @@ class Objective(forcebalance.BaseClass):
         ## Initialize the penalty function.
         self.Penalty = Penalty(self.penalty_type,forcefield,self.penalty_additive,
                                self.penalty_multiplicative,self.penalty_hyperbolic_b,
-                               self.penalty_alpha)
+                               self.penalty_alpha,self.penalty_power)
         ## Obtain the denominator.
         if self.normalize_weights:
             self.WTot = np.sum([i.weight for i in self.Targets])
@@ -341,33 +342,50 @@ class Penalty(object):
 
     """
     Pen_Names = {'HYP' : 1, 'HYPER' : 1, 'HYPERBOLIC' : 1, 'L1' : 1, 'HYPERBOLA' : 1,
-                      'PARA' : 2, 'PARABOLA' : 2, 'PARABOLIC' : 2, 'L2': 2, 'QUADRATIC' : 2,
-                      'FUSE' : 3, 'FUSION' : 3, 'FUSE_L0' : 4, 'FUSION_L0' : 4, 'FUSION-L0' : 4,
-                      'FUSE-BARRIER' : 5, 'FUSE-BARRIER' : 5, 'FUSE_BARRIER' : 5, 'FUSION_BARRIER' : 5}
+                 'PARA' : 2, 'PARABOLA' : 2, 'PARABOLIC' : 2, 'L2': 2, 'QUADRATIC' : 2,
+                 'BOX' : 3, 'FUSE' : 4, 'FUSE-L0' : 5, 'FUSE-BARRIER' : 6}
 
-    def __init__(self, User_Option, ForceField, Factor_Add=0.0, Factor_Mult=0.0, Factor_B=0.1, Alpha=1.0):
+    def __init__(self, User_Option, ForceField, Factor_Add=0.0, Factor_Mult=0.0, Factor_B=0.1, Alpha=1.0, Power=2.0):
         self.fadd = Factor_Add
         self.fmul = Factor_Mult
         self.a    = Alpha
         self.b    = Factor_B
+        self.p    = Power
         self.FF   = ForceField
         self.ptyp = self.Pen_Names[User_Option.upper()]
-        self.Pen_Tab = {1 : self.HYP, 2: self.L2_norm, 3: self.FUSE, 4:self.FUSE_L0, 5: self.FUSE_BARRIER}
+        self.Pen_Tab = {1 : self.HYP, 2: self.L2_norm, 3: self.BOX, 4: self.FUSE, 5:self.FUSE_L0, 6: self.FUSE_BARRIER}
         if User_Option.upper() == 'L1':
             logger.info("L1 norm uses the hyperbolic penalty, make sure penalty_hyperbolic_b is set sufficiently small\n")
         elif self.ptyp == 1:
             logger.info("Using hyperbolic regularization (Laplacian prior) with strength %.1e (+), %.1e (x) and tightness %.1e\n" % (Factor_Add, Factor_Mult, Factor_B))
         elif self.ptyp == 2:
-            logger.info("Using parabolic regularization (Gaussian prior) with strength %.1e (+), %.1e (x)\n" % (Factor_Add, Factor_Mult))
+            if Power == 2.0:
+                logger.info("Using parabolic regularization (Gaussian prior) with strength %.1e (+), %.1e (x)\n" % (Factor_Add, Factor_Mult))
+            elif Power > 2.0:
+                logger.info("Using customized L2-regularization with exponent %.1f, strength %.1e (+), %.1e (x)\n" % (Power, Factor_Add, Factor_Mult))
+            else:
+                logger.error("In L2-regularization, penalty_power must be >= 2.0 (currently %.1f)\n" % (Power))
+                raise RuntimeError
         elif self.ptyp == 3:
-            logger.info("Using L1 Fusion Penalty (only relevant for basis set optimizations at the moment) with strength %.1e\n" % Factor_Add)
+            if Power == 2.0:
+                logger.info("Using box-style regularization with exponent %.1f, strength %.1e (+), %.1e (x): same as L2\n" % (Power, Factor_Add, Factor_Mult))
+            elif Power > 2.0:
+                logger.info("Using box-style regularization with exponent %.1f, strength %.1e (+), %.1e (x)\n" % (Power, Factor_Add, Factor_Mult))
+            else:
+                logger.error("In box-style regularization, penalty_power must be >= 2.0 (currently %.1f)\n" % (Power))
+                raise RuntimeError
         elif self.ptyp == 4:
-            logger.info("Using L0-L1 Fusion Penalty (only relevant for basis set optimizations at the moment) with strength %.1e and switching distance %.1e\n" % (Factor_Add, Alpha))
+            logger.info("Using L1 Fusion Penalty (only relevant for basis set optimizations at the moment) with strength %.1e\n" % Factor_Add)
         elif self.ptyp == 5:
+            logger.info("Using L0-L1 Fusion Penalty (only relevant for basis set optimizations at the moment) with strength %.1e and switching distance %.1e\n" % (Factor_Add, Alpha))
+        elif self.ptyp == 6:
             logger.info("Using L1 Fusion Penalty with Log Barrier (only relevant for basis set optimizations at the moment) with strength %.1e and barrier distance %.1e\n" % (Factor_Add, Alpha))
+        if self.ptyp not in (2, 3) and Power != 2.0:
+            logger.error("Custom power %.2f is only supported with L2 or box-style regularization (penalty_type L2 or box)\n" % Power)
+            raise RuntimeError
 
         ## Find exponential spacings.
-        if self.ptyp in [3,4,5]:
+        if self.ptyp in [4,5,6]:
             self.spacings = self.FF.find_spacings()
             printcool_dictionary(self.spacings, title="Starting zeta spacings\n(Pay attention to these)")
 
@@ -404,11 +422,44 @@ class Penalty(object):
         @return DC2 The Hessian (just a constant)
 
         """
-        mvals = np.array(mvals)
-        DC0 = np.dot(mvals, mvals)
-        DC1 = 2*np.array(mvals)
-        DC2 = 2*np.eye(len(mvals))
+        if self.p == 2.0:
+            mvals = np.array(mvals)
+            DC0 = np.dot(mvals, mvals)
+            DC1 = 2*np.array(mvals)
+            DC2 = 2*np.eye(len(mvals))
+        else:
+            mvals = np.array(mvals)
+            m2 = np.dot(mvals, mvals)
+            p = float(self.p)
+            DC0 = m2**(p/2)
+            DC1 = p*(m2**(p/2-1))*mvals
+            DC2 = p*(m2**(p/2-1))*np.eye(len(mvals))
+            DC2 += p*(p-2)*(m2**(p/2-2))*np.outer(mvals, mvals)
         return DC0, DC1, DC2
+            
+    def BOX(self, mvals):
+        """
+        Box-style constraints.  A penalty term of mvals[i]^Power is added for each parameter.
+        
+        If Power = 2.0 (default value of penalty_power) then this is the same as L2 regularization.
+        If set to a larger number such as 12.0, then this corresponds to adding a flat-bottomed
+        restraint to each parameter separately.
+
+        @param[in] mvals The parameter vector
+        @return DC0 The norm squared of the vector
+        @return DC1 The gradient of DC0
+        @return DC2 The Hessian (just a constant)
+        """
+        
+        if self.p == 2.0:
+            return self.L2_norm(mvals)
+        else:
+            mvals = np.array(mvals)
+            p = float(self.p)
+            DC0 = np.sum(mvals**self.p)
+            DC1 = self.p*(mvals**(self.p-1))
+            DC2 = np.diag(self.p*(self.p-1)*(mvals**(self.p-2)))
+            return DC0, DC1, DC2
 
     def HYP(self, mvals):
         """
