@@ -170,7 +170,7 @@ class Optimizer(forcebalance.BaseClass):
         ## The objective function (needs to pass in when I instantiate)
         self.Objective = Objective
         ## Whether the penalty function is hyperbolic
-        self.bhyp      = Objective.Penalty.ptyp != 2
+        self.bhyp      = Objective.Penalty.ptyp not in (2, 3)
         ## The force field itself
         self.FF        = FF
         ## Target types which introduce uncertainty into the objective function.
@@ -564,8 +564,10 @@ class Optimizer(forcebalance.BaseClass):
                         trust = max(ndx*(1./(1+self.adapt_fac)), self.mintrust)
                         trustprint = "Low quality step, reducing trust radius to % .4e\n" % trust
                     elif Quality >= ThreHQ and bump and self.trust0 > 0:
+                        curr_trust = trust
                         trust += self.adapt_fac*trust*np.exp(-1*self.adapt_damp*(trust/self.trust0 - 1))
-                        trustprint = "Increasing trust radius to % .4e\n" % trust
+                        if trust > curr_trust:
+                            trustprint = "Increasing trust radius to % .4e\n" % trust
                     color = "\x1b[92m" if Best_Step else "\x1b[0m"
                     if Best_Step:
                         if self.backup:
@@ -905,7 +907,7 @@ class Optimizer(forcebalance.BaseClass):
 
         ## Decide which parameters to redirect.
         ## Currently not used.
-        if self.Objective.Penalty.ptyp in [3,4,5]:
+        if self.Objective.Penalty.ptyp in [4,5,6]:
             self.FF.make_redirect(dx+xk)
 
         return dx, expect, bump
