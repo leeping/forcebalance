@@ -1,0 +1,480 @@
+#======================================================================#
+#| [1m            Welcome to ForceBalance version 1.5.5! =D             [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Keri A. McKiernan, Yudong Qiu                   [0m |#
+#| [1m           Arthur Vigil, Erik G. Brandt, Johnny Israeli           [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: 6.L2_power12.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: water.itp
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  3.1537e-01 ] : VDWS:OW
+   1 [  6.4852e-01 ] : VDWT:OW
+   2 [  9.5720e-02 ] : BONDSB:HWOW
+   3 [  5.0242e+05 ] : BONDSK:HWOW
+   4 [  1.0452e+02 ] : ANGLESB:HWOWHW
+   5 [  6.2802e+02 ] : ANGLESK:HWOWHW
+   6 [  5.2000e-01 ] : COUL:SOL-2
+   7 [ -1.0400e+00 ] : COUL:SOL-4
+   8 [  1.2800e-01 ] : VSITE3A:SOL-4
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   BONDSB                               : 1.00000e-02
+   BONDSK                               : 1.00000e+02
+   ANGLESB                              : 1.00000e+01
+   ANGLESK                              : 1.00000e+02
+   VDWS                                 : 1.00000e-02
+   VDWT                                 : 1.00000e-01
+   COUL                                 : 1.00000e-01
+   VSITE3A                              : 1.00000e-02
+   VSITE3B                              : 1.00000e-02
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    VDWS                          : 1.00000e-02 ] : VDWS:OW
+   1 [    VDWT                          : 1.00000e-01 ] : VDWT:OW
+   2 [    BONDSB                        : 1.00000e-02 ] : BONDSB:HWOW
+   3 [    BONDSK                        : 1.00000e+02 ] : BONDSK:HWOW
+   4 [    ANGLESB                       : 1.00000e+01 ] : ANGLESB:HWOWHW
+   5 [    ANGLESK                       : 1.00000e+02 ] : ANGLESK:HWOWHW
+   6 [    COUL                          : 1.00000e-01 ] : COUL:SOL-2
+   7 [    COUL                          : 1.00000e-01 ] : COUL:SOL-4
+   8 [    VSITE3A                       : 1.00000e-02 ] : VSITE3A:SOL-4
+----------------------------------------------------------
+Building charge constraints...
+Parameter 6 occurs 2 times in molecule SOL in locations [1, 2] (COUL:SOL-2 COUL:SOL-3)
+Parameter 7 occurs 1 times in molecule SOL in locations [3] (COUL:SOL-4)
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['water.itp'] 
+priors                    OrderedDict([('BONDSB', 0.01), ('BONDSK', 100.0), ('ANGLESB', 10.0), ('ANGLESK', 100.0), ('VDWS', 0.01), ('VDWT', 0.1), ('COUL', 0.1), ('VSITE3A', 0.01), ('VSITE3B', 0.01)]) 
+----------------------------------------------------------
+The 'gmxpath' option was not specified; using default.
+Fitting the forces on all atoms
+#========================================================#
+#| [92m           Setup for target cluster-06 :            [0m |#
+#========================================================#
+name                      cluster-06 
+type                      ABINITIO_GMX 
+backup                    False 
+tgtdir                    targets/cluster-06 
+shots                     1208 
+----------------------------------------------------------
+Fitting the forces on all atoms
+#========================================================#
+#| [92m           Setup for target cluster-12 :            [0m |#
+#========================================================#
+name                      cluster-12 
+type                      ABINITIO_GMX 
+backup                    False 
+tgtdir                    targets/cluster-12 
+shots                     1201 
+----------------------------------------------------------
+Using customized L2-regularization with exponent 12.0, strength 1.0e-03 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          0.001 
+penalty_power             12.0 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   NEWTON 
+trust0                    -1.0 
+backup                    False 
+input_file                6.L2_power12.in 
+----------------------------------------------------------
+#========================================================#
+#| [1m                  Main Optimizer                    [0m |#
+#| [1m  Newton-Raphson Method (Hessian Diagonal Search)   [0m |#
+#| [1m                                                    [0m |#
+#| [1m       [0mConvergence criteria (1 of 3 needed):        [0m |#
+#| [1m          [0mObjective Function  : 1.000e-04           [0m |#
+#| [1m          [0mNorm of Gradient    : 1.000e-03           [0m |#
+#| [1m          [0mParameter step size : 1.000e-04           [0m |#
+#========================================================#
+#========================================================#
+#|       Color Key for Objective Function -=X2=-        |#
+#|  [1mBold[0m = Initial step                                 |#
+#|  [92mGreen = Current lowest value of objective function[0m  |#
+#|  [91mRed = Objective function rises, step rejected[0m       |#
+#|  [0mNo color = Not at the lowest value                  |#
+#========================================================#
+#========================================================#
+#| [94m     Iteration 0: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#================================================================================================#
+#|               Target: cluster-06  Type: AbInitio_GMX  Objective = 2.29475e-01                |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)           9.4124       27.3135     34.4605%     0.1188    1.000     0.1188 
+    Gradient (kJ/mol/A)      46.4302      139.5348     33.2750%     0.1107    1.000     0.1107 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 5 (H), frame 1207,  27.6656 kJ/mol/A
+
+#================================================================================================#
+#|               Target: cluster-12  Type: AbInitio_GMX  Objective = 2.13018e-01                |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)          15.2291       47.3455     32.1658%     0.1035    1.000     0.1035 
+    Gradient (kJ/mol/A)      45.7106      138.1028     33.0989%     0.1096    1.000     0.1096 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 19 (M), frame 1200,  46.3943 kJ/mol/A
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+cluster-06                     0.22948      0.500 [94m     1.14738e-01[0m 
+cluster-12                     0.21302      0.500 [94m     1.06509e-01[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     2.21247e-01[0m 
+----------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     0   0.000e+00   0.000e+00   1.130e+00[1m   2.21247e-01[0m  -0.000e+00      0.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -5.15056030e-02 ] : VDWS:OW
+   1 [ -1.80412926e-02 ] : VDWT:OW
+   2 [ -1.12517554e+00 ] : BONDSB:HWOW
+   3 [  7.14110757e-05 ] : BONDSK:HWOW
+   4 [ -7.13804492e-02 ] : ANGLESB:HWOWHW
+   5 [  3.27233923e-02 ] : ANGLESK:HWOWHW
+   6 [ -5.71538974e-03 ] : COUL:SOL-2
+   7 [ -4.52212356e-02 ] : COUL:SOL-4
+   8 [ -8.59679736e-03 ] : VSITE3A:SOL-4
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Hessian has a small or negative eigenvalue (9.1e-08), mixing in some steepest descent (1.0e-04) to correct this.
+Eigenvalues are:
+ 3.6e+01  2.9e+00  1.9e+00  1.2e-01  3.0e-02  1.2e-02  4.6e-04  1.2e-04  9.1e-08 
+Finding trust radius: H+0.0000*I, length 3.8793e+00 (target 1.0000e+00)
+Finding trust radius: H+9.0000*I, length 3.2581e-02 (target 1.0000e+00)
+Finding trust radius: H+61.6869*I, length 1.1943e-02 (target 1.0000e+00)
+Finding trust radius: H+9.0000*I, length 3.2581e-02 (target 1.0000e+00)
+Finding trust radius: H+23.5623*I, length 2.0819e-02 (target 1.0000e+00)
+Finding trust radius: H+3.4377*I, length 5.1273e-02 (target 1.0000e+00)
+Finding trust radius: H+1.3131*I, length 8.3947e-02 (target 1.0000e+00)
+Finding trust radius: H+0.5016*I, length 1.5138e-01 (target 1.0000e+00)
+Finding trust radius: H+0.1916*I, length 2.8972e-01 (target 1.0000e+00)
+Finding trust radius: H+0.0732*I, length 5.2996e-01 (target 1.0000e+00)
+Finding trust radius: H+0.0280*I, length 9.2852e-01 (target 1.0000e+00)
+Finding trust radius: H+0.0107*I, length 1.5028e+00 (target 1.0000e+00)
+Finding trust radius: H+0.0359*I, length 8.0511e-01 (target 1.0000e+00)
+Finding trust radius: H+0.0204*I, length 1.1022e+00 (target 1.0000e+00)
+Finding trust radius: H+0.0250*I, length 9.8831e-01 (target 1.0000e+00)
+Finding trust radius: H+0.0247*I, length 9.9415e-01 (target 1.0000e+00)
+Finding trust radius: H+0.0244*I, length 1.0012e+00 (target 1.0000e+00)
+Finding trust radius: H+0.0244*I, length 1.0000e+00 (target 1.0000e+00)
+Finding trust radius: H+0.0245*I, length 9.9923e-01 (target 1.0000e+00)
+Starting Hessian diagonal search with step size 1.0000e+00
+Hessian diagonal search: H+0.0244*I, length 1.0000e+00, result -6.9064e-02
+Hessian diagonal search: H+13.1429*I, length 2.7435e-02, result -1.9296e-02
+Hessian diagonal search: H+29.7745*I, length 1.8453e-02, result -1.5281e-02
+Hessian diagonal search: H+0.0244*I, length 1.0000e+00, result -6.9064e-02
+Hessian diagonal search: H+3.9506*I, length 4.7927e-02, result -2.4544e-02
+Hessian diagonal search: H+2.1944*I, length 6.4061e-02, result -2.7161e-02
+Hessian diagonal search: H+0.0521*I, length 6.4893e-01, result -6.0125e-02
+Hessian diagonal search: H+0.1064*I, length 4.2182e-01, result -5.1313e-02
+Hessian diagonal search: H+0.0002*I, length 3.3284e+00, result  1.8488e+03
+Hessian diagonal search: H+0.0489*I, length 6.7290e-01, result -6.0916e-02
+Hessian diagonal search: H+0.0104*I, length 1.5172e+00, result  6.8713e-02
+Hessian diagonal search: H+0.0328*I, length 8.4836e-01, result -6.6035e-02
+Hessian diagonal search: H+0.0184*I, length 1.1627e+00, result -6.7604e-02
+Hessian diagonal search: H+0.0238*I, length 1.0143e+00, result -6.9218e-02
+Hessian diagonal search: H+0.0226*I, length 1.0424e+00, result -6.9416e-02
+Hessian diagonal search: H+0.0210*I, length 1.0860e+00, result -6.9360e-02
+Hessian diagonal search: H+0.0220*I, length 1.0580e+00, result -6.9453e-02
+Hessian diagonal search: H+0.0220*I, length 1.0590e+00, result -6.9453e-02
+Hessian diagonal search: H+0.0219*I, length 1.0599e+00, result -6.9453e-02
+Hessian diagonal search: H+0.0216*I, length 1.0698e+00, result -6.9441e-02
+Hessian diagonal search: H+0.0219*I, length 1.0609e+00, result -6.9453e-02
+Hessian diagonal search: H+0.0219*I, length 1.0617e+00, result -6.9453e-02
+Optimization step found (length 1.0609e+00)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  0.0000e+00 + 3.6713e-01 =  3.6713e-01 ] : VDWS:OW
+   1 [  0.0000e+00 + 1.2892e-01 =  1.2892e-01 ] : VDWT:OW
+   2 [  0.0000e+00 + 4.3532e-02 =  4.3532e-02 ] : BONDSB:HWOW
+   3 [  0.0000e+00 - 1.6205e-03 = -1.6205e-03 ] : BONDSK:HWOW
+   4 [  0.0000e+00 + 5.7235e-02 =  5.7235e-02 ] : ANGLESB:HWOWHW
+   5 [  0.0000e+00 - 9.3369e-01 = -9.3369e-01 ] : ANGLESK:HWOWHW
+   6 [  0.0000e+00 - 7.2499e-02 = -7.2499e-02 ] : COUL:SOL-2
+   7 [  0.0000e+00 + 2.8173e-01 =  2.8173e-01 ] : COUL:SOL-4
+   8 [  0.0000e+00 + 1.1157e-01 =  1.1157e-01 ] : VSITE3A:SOL-4
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  3.1537e-01 + 3.6713e-03 =  3.1904e-01 ] : VDWS:OW
+   1 [  6.4852e-01 + 1.2892e-02 =  6.6141e-01 ] : VDWT:OW
+   2 [  9.5720e-02 + 4.3532e-04 =  9.6155e-02 ] : BONDSB:HWOW
+   3 [  5.0242e+05 - 1.6205e-01 =  5.0242e+05 ] : BONDSK:HWOW
+   4 [  1.0452e+02 + 5.7235e-01 =  1.0509e+02 ] : ANGLESB:HWOWHW
+   5 [  6.2802e+02 - 9.3369e+01 =  5.3465e+02 ] : ANGLESK:HWOWHW
+   6 [  5.2000e-01 - 7.2499e-03 =  5.1275e-01 ] : COUL:SOL-2
+   7 [ -1.0400e+00 + 2.8173e-02 = -1.0118e+00 ] : COUL:SOL-4
+   8 [  1.2800e-01 + 1.1157e-03 =  1.2912e-01 ] : VSITE3A:SOL-4
+----------------------------------------------------------
+Input file with saved parameters: 6.L2_power12.sav
+#========================================================#
+#| [94m     Iteration 1: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#================================================================================================#
+#|               Target: cluster-06  Type: AbInitio_GMX  Objective = 1.53103e-01                |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)           8.0737       27.3135     29.5592%     0.0874    1.000     0.0874 
+    Gradient (kJ/mol/A)      35.7733      139.5348     25.6376%     0.0657    1.000     0.0657 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 6 (H), frame 1207,  26.8808 kJ/mol/A
+
+#================================================================================================#
+#|               Target: cluster-12  Type: AbInitio_GMX  Objective = 1.46419e-01                |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)          13.2148       47.3455     27.9113%     0.0779    1.000     0.0779 
+    Gradient (kJ/mol/A)      36.1488      138.1028     26.1753%     0.0685    1.000     0.0685 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 18 (H), frame 1200,  38.8458 kJ/mol/A
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+cluster-06                     0.15310      0.500 [92m     7.65517e-02[0m ( -3.819e-02 ) 
+cluster-12                     0.14642      0.500 [92m     7.32095e-02[0m ( -3.330e-02 ) 
+Regularization                 0.00203      1.000 [91m     2.03190e-03[0m ( +2.032e-03 ) 
+Total                                             [92m     1.51793e-01[0m ( -6.945e-02 ) 
+-------------------------------------------------------------------------------------
+Creating the directory /home/leeping/src/forcebalance/studies/001_water_tutorial/result/6.L2_power12 to print the force field
+#============================================================================#
+#|  The force field has been written to the result/6.L2_power12 directory.  |#
+#|    Input file with optimization parameters saved to 6.L2_power12.sav.    |#
+#============================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     1   1.061e+00   1.061e+00   4.705e-02[92m   1.51793e-01[0m  -6.945e-02      1.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  1.26965258e-03 ] : VDWS:OW
+   1 [  3.43947142e-04 ] : VDWT:OW
+   2 [  3.96926220e-02 ] : BONDSB:HWOW
+   3 [  2.90676459e-08 ] : BONDSK:HWOW
+   4 [ -2.49065205e-02 ] : ANGLESB:HWOWHW
+   5 [ -1.18799351e-04 ] : ANGLESK:HWOWHW
+   6 [ -3.69534825e-03 ] : COUL:SOL-2
+   7 [ -1.56719617e-03 ] : COUL:SOL-4
+   8 [  6.23536761e-05 ] : VSITE3A:SOL-4
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Starting Hessian diagonal search with step size 1.9309e-02
+Hessian diagonal search: H+0.0000*I, length 1.9309e-02, result -1.4343e-04
+Hessian diagonal search: H+9.0000*I, length 2.0999e-03, result -5.9096e-05
+Hessian diagonal search: H+23.5623*I, length 1.0785e-03, result -3.7009e-05
+Hessian diagonal search: H+0.0000*I, length 1.9309e-02, result -1.4343e-04
+Hessian diagonal search: H+3.4377*I, length 3.9369e-03, result -8.8496e-05
+Hessian diagonal search: H+1.3131*I, length 6.3688e-03, result -1.1498e-04
+Hessian diagonal search: H+0.0123*I, length 1.7643e-02, result -1.4341e-04
+Hessian diagonal search: H+0.0026*I, length 1.8892e-02, result -1.4345e-04
+Hessian diagonal search: H+0.0019*I, length 1.8990e-02, result -1.4332e-04
+Hessian diagonal search: H+0.0026*I, length 1.8890e-02, result -1.4345e-04
+Hessian diagonal search: H+0.0054*I, length 1.8477e-02, result -1.4342e-04
+Hessian diagonal search: H+0.0035*I, length 1.8745e-02, result -1.4332e-04
+Hessian diagonal search: H+0.0029*I, length 1.8837e-02, result -1.4338e-04
+Hessian diagonal search: H+0.0027*I, length 1.8870e-02, result -1.4344e-04
+Hessian diagonal search: H+0.0026*I, length 1.8882e-02, result -1.4349e-04
+Hessian diagonal search: H+0.0026*I, length 1.8877e-02, result -1.4347e-04
+Hessian diagonal search: H+0.0026*I, length 1.8884e-02, result -1.4345e-04
+Hessian diagonal search: H+0.0026*I, length 1.8881e-02, result -1.4342e-04
+Optimization step found (length 1.8882e-02)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  3.6713e-01 - 7.6856e-03 =  3.5944e-01 ] : VDWS:OW
+   1 [  1.2892e-01 - 1.0836e-04 =  1.2881e-01 ] : VDWT:OW
+   2 [  4.3532e-02 - 2.2653e-04 =  4.3306e-02 ] : BONDSB:HWOW
+   3 [ -1.6205e-03 - 2.7163e-05 = -1.6477e-03 ] : BONDSK:HWOW
+   4 [  5.7235e-02 + 1.0434e-02 =  6.7668e-02 ] : ANGLESB:HWOWHW
+   5 [ -9.3369e-01 - 6.6553e-03 = -9.4034e-01 ] : ANGLESK:HWOWHW
+   6 [ -7.2499e-02 + 6.0340e-03 = -6.6465e-02 ] : COUL:SOL-2
+   7 [  2.8173e-01 - 8.9391e-03 =  2.7279e-01 ] : COUL:SOL-4
+   8 [  1.1157e-01 - 5.2850e-03 =  1.0629e-01 ] : VSITE3A:SOL-4
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  3.1904e-01 - 7.6856e-05 =  3.1896e-01 ] : VDWS:OW
+   1 [  6.6141e-01 - 1.0836e-05 =  6.6140e-01 ] : VDWT:OW
+   2 [  9.6155e-02 - 2.2653e-06 =  9.6153e-02 ] : BONDSB:HWOW
+   3 [  5.0242e+05 - 2.7163e-03 =  5.0242e+05 ] : BONDSK:HWOW
+   4 [  1.0509e+02 + 1.0434e-01 =  1.0520e+02 ] : ANGLESB:HWOWHW
+   5 [  5.3465e+02 - 6.6553e-01 =  5.3399e+02 ] : ANGLESK:HWOWHW
+   6 [  5.1275e-01 + 6.0340e-04 =  5.1335e-01 ] : COUL:SOL-2
+   7 [ -1.0118e+00 - 8.9391e-04 = -1.0127e+00 ] : COUL:SOL-4
+   8 [  1.2912e-01 - 5.2850e-05 =  1.2906e-01 ] : VSITE3A:SOL-4
+----------------------------------------------------------
+Input file with saved parameters: 6.L2_power12.sav
+#========================================================#
+#| [94m     Iteration 2: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#================================================================================================#
+#|               Target: cluster-06  Type: AbInitio_GMX  Objective = 1.53401e-01                |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)           8.0667       27.3135     29.5336%     0.0872    1.000     0.0872 
+    Gradient (kJ/mol/A)      35.8954      139.5348     25.7250%     0.0662    1.000     0.0662 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 9 (H), frame 1207,  25.4899 kJ/mol/A
+
+#================================================================================================#
+#|               Target: cluster-12  Type: AbInitio_GMX  Objective = 1.45808e-01                |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)          13.1608       47.3455     27.7973%     0.0773    1.000     0.0773 
+    Gradient (kJ/mol/A)      36.1554      138.1028     26.1801%     0.0685    1.000     0.0685 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 18 (H), frame 1200,  37.6580 kJ/mol/A
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+cluster-06                     0.15340      0.500 [91m     7.67005e-02[0m ( +1.488e-04 ) 
+cluster-12                     0.14581      0.500 [92m     7.29042e-02[0m ( -3.053e-04 ) 
+Regularization                 0.00204      1.000 [91m     2.04490e-03[0m ( +1.300e-05 ) 
+Total                                             [92m     1.51650e-01[0m ( -1.435e-04 ) 
+-------------------------------------------------------------------------------------
+#============================================================================#
+#|  The force field has been written to the result/6.L2_power12 directory.  |#
+#|    Input file with optimization parameters saved to 6.L2_power12.sav.    |#
+#============================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     2   1.061e+00   1.888e-02   1.057e-04[92m   1.51650e-01[0m  -1.435e-04      1.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  5.34052908e-05 ] : VDWS:OW
+   1 [  1.52296229e-05 ] : VDWT:OW
+   2 [  4.75016827e-05 ] : BONDSB:HWOW
+   3 [  3.16085683e-07 ] : BONDSK:HWOW
+   4 [ -5.17809779e-05 ] : ANGLESB:HWOWHW
+   5 [ -2.04632712e-05 ] : ANGLESK:HWOWHW
+   6 [  2.85436647e-05 ] : COUL:SOL-2
+   7 [  4.17277201e-05 ] : COUL:SOL-4
+   8 [  1.36462478e-05 ] : VSITE3A:SOL-4
+----------------------------------------------------------
+Convergence criterion reached for gradient norm (1.00e-03)
+#========================================================#
+#| [92m               [0m[1mOptimization Converged[0m               [0m |#
+#| [92m           Final objective function value           [0m |#
+#| [92m  Full:  1.516496e-01  Un-penalized:  1.496047e-01  [0m |#
+#========================================================#
+#========================================================#
+#| [94m           Final optimization parameters:           [0m |#
+#========================================================#
+   0 [  3.5944e-01 ] : VDWS:OW
+   1 [  1.2881e-01 ] : VDWT:OW
+   2 [  4.3306e-02 ] : BONDSB:HWOW
+   3 [ -1.6477e-03 ] : BONDSK:HWOW
+   4 [  6.7668e-02 ] : ANGLESB:HWOWHW
+   5 [ -9.4034e-01 ] : ANGLESK:HWOWHW
+   6 [ -6.6465e-02 ] : COUL:SOL-2
+   7 [  2.7279e-01 ] : COUL:SOL-4
+   8 [  1.0629e-01 ] : VSITE3A:SOL-4
+#========================================================#
+#| [94m             Final physical parameters:             [0m |#
+#========================================================#
+   0 [  3.1896e-01 ] : VDWS:OW
+   1 [  6.6140e-01 ] : VDWT:OW
+   2 [  9.6153e-02 ] : BONDSB:HWOW
+   3 [  5.0242e+05 ] : BONDSK:HWOW
+   4 [  1.0520e+02 ] : ANGLESB:HWOWHW
+   5 [  5.3399e+02 ] : ANGLESK:HWOWHW
+   6 [  5.1335e-01 ] : COUL:SOL-2
+   7 [ -1.0127e+00 ] : COUL:SOL-4
+   8 [  1.2906e-01 ] : VSITE3A:SOL-4
+----------------------------------------------------------
+#============================================================================#
+#|  The force field has been written to the result/6.L2_power12 directory.  |#
+#|    Input file with optimization parameters saved to 6.L2_power12.sav.    |#
+#============================================================================#
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#
