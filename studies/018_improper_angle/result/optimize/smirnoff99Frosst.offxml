@@ -111,8 +111,8 @@
     <Angle smirks="[*:1]~;!@[*;r5:2]~;@[*;r5:3]" angle="125." id="a14" k="140.0"/>
     <Angle smirks="[#8X1:1]~[#6X3:2]~[#8:3]" angle="126.00" id="a15" k="160.0"/>
     <Angle smirks="[*:1]~[#6X2:2]~[*:3]" angle="180.0" id="a16" k="160.0"/>
-    <Angle smirks="[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]" angle="1.159186380629e+02" id="a17" k="1.329573636400e+02" parameterize="angle, k"/>
-    <Angle smirks="[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]" angle="1.121700199824e+02" id="a18" k="9.798912301700e+01" parameterize="angle, k"/>
+    <Angle smirks="[*:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]" angle="1.151432412656e+02" id="a17" k="1.366199981942e+02" parameterize="angle, k"/>
+    <Angle smirks="[#1:1]-[#7X4,#7X3,#7X2-1:2]-[*:3]" angle="1.118206485382e+02" id="a18" k="9.900107068068e+01" parameterize="angle, k"/>
     <Angle smirks="[*:1]~[#7X3$(*~[#6X3,#6X2,#7X2+0]):2]~[*:3]" angle="120." id="a19" k="140.0"/>
     <Angle smirks="[#1:1]-[#7X3$(*~[#6X3,#6X2,#7X2+0]):2]-[*:3]" angle="120." id="a20" k="100.0"/>
     <Angle smirks="[*:1]~[#7X2:2]~[*:3]" angle="180." id="a21" k="140.0"/>
