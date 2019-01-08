@@ -168,7 +168,7 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         if hasattr(self, 'mol2'):
             for fnm in self.FF.fnms:
                 if fnm.endswith('.mol2'):
-                    self.mol2.append[fnm]
+                    self.mol2.append(fnm)
 
         ## Counts how often the objective function was computed
         self.xct         = 0
@@ -368,7 +368,12 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         if hasattr(self, 'mol2'):
             for f in self.mol2:
                 print(os.path.join(self.root, self.tgtdir, f), "->", os.path.join(abstempdir, f))
-                LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
+                if os.path.exists(os.path.join(self.root, self.tgtdir, f)):
+                    LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
+                elif f not in self.FF.fnms:
+                    logger.error("%s doesn't exist and it's not in the force field directory either")
+                    raise RuntimeError
+
 
     @abc.abstractmethod
     def get(self,mvals,AGrad=False,AHess=False):
