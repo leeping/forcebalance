@@ -1,0 +1,3 @@
+Test calculation with expected result
+parameters.txt contains an overall scaling of all charges, initially to a factor of 1.25
+Optimization is expected to lead to the result of ~1.0 overall scaling.

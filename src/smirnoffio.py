@@ -144,10 +144,12 @@ class SMIRNOFF(OpenMM):
         # Here we cannot distinguish the .mol2 files linked by the target 
         # vs. the .mol2 files to be provided by the force field.
         # But we can assume that these files should exist when this function is called.
+
         self.mol2_files = kwargs.get('mol2')
         if self.mol2_files:
             for fnm in self.mol2_files:
                 if not os.path.exists(fnm):
+                    if hasattr(self, 'FF') and fnm in self.FF.fnms: continue
                     logger.error("%s doesn't exist" % fnm)
                     raise RuntimeError
         else:
