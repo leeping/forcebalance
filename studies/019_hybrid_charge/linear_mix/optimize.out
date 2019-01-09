@@ -57,42 +57,45 @@ Reading options from file: optimize.in
 #| [95m  Options at their default values are not printed   [0m |#
 #| [95m        Use 'verbose_options True' to Enable        [0m |#
 #========================================================#
-Reading force field from file: bro.itp
+Reading force field from file: parameters.txt
+Reading force field from file: ETH.mol2
+Reading force field from file: smirnoff99Frosst.offxml
 #=========================================================#
 #| [92m Starting parameter indices, physical values and IDs [0m |#
 #=========================================================#
-   0 [  3.6700e-01 ] : VDWS:opls_730
-   1 [  2.4665e+00 ] : VDWT:opls_730
+   0 [  1.0000e+00 ] : parameters.txt:1.0
 -----------------------------------------------------------
 #=========================================================#
 #| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
 #=========================================================#
-   VDWS                                 : 5.29177e-02
-   VDWT                                 : 2.47894e+00
+   parameters.txt                       : 1.00000e+00
 -----------------------------------------------------------
 #========================================================#
 #| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
 #========================================================#
-   0 [    VDWS                          : 5.29177e-02 ] : VDWS:opls_730
-   1 [    VDWT                          : 2.47894e+00 ] : VDWT:opls_730
+   0 [    parameters.txt                : 1.00000e+00 ] : parameters.txt:1.0
 ----------------------------------------------------------
 Building charge constraints...
 #========================================================#
 #| [92m               Setup for force field                [0m |#
 #========================================================#
-fnms                      ['bro.itp'] 
+fnms                      ['parameters.txt', 'ETH.mol2', 'smirnoff99Frosst.offxml'] 
+priors                    OrderedDict([('parameters.txt', 1.0)]) 
 ----------------------------------------------------------
-Autodetected 100 molecules with 2 atoms each in liquid coordinates
+Autodetected 256 molecules with 9 atoms each in liquid coordinates
 #========================================================#
-#| [92m          Setup for target LiquidBromine :          [0m |#
+#| [92m         Setup for target ethanol-liquid :          [0m |#
 #========================================================#
-liquid_coords             liquid.gro 
-gas_coords                gas.gro 
-gmx_eq_barostat           berendsen 
-name                      LiquidBromine 
-type                      LIQUID_GMX 
-backup                    False 
-tgtdir                    targets/LiquidBromine 
+force_cuda                0 
+mts_integrator            0 
+rpmd_beads                0 
+mol2                      ['ETH.mol2', 'ETH.mol2'] 
+liquid_coords             liquid.pdb 
+gas_coords                gas.pdb 
+nvt_coords                surf.pdb 
+name                      ethanol-liquid 
+type                      LIQUID_SMIRNOFF 
+tgtdir                    targets/ethanol-liquid 
 w_rho                     1.0 
 w_hvap                    1.0 
 w_alpha                   1.0 
@@ -100,14 +103,14 @@ w_kappa                   1.0
 w_cp                      1.0 
 w_eps0                    1.0 
 w_normalize               0 
-liquid_eq_steps           1000 
-liquid_md_steps           50000 
-gas_eq_steps              10000 
-gas_md_steps              200000 
+liquid_eq_steps           50000 
+liquid_md_steps           500000 
+gas_eq_steps              2000000 
+gas_md_steps              20000000 
 liquid_timestep           2.0 
-liquid_interval           0.1 
+liquid_interval           1.0 
 gas_timestep              0.5 
-gas_interval              0.1 
+gas_interval              1.0 
 adapt_errors              0 
 minimize_energy           1 
 self_pol_mu0              0.0 
@@ -121,7 +124,7 @@ nvt_interval              0.1
 pure_num_grad             0 
 liquid_fdiff_h            0.01 
 rho_denom                 30.0 
-hvap_denom                0.3 
+hvap_denom                3.0 
 alpha_denom               1.0 
 kappa_denom               5.0 
 cp_denom                  2.0 
@@ -130,28 +133,27 @@ use_cvib_intra            False
 use_cvib_inter            False 
 use_cni                   False 
 ----------------------------------------------------------
-Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
+Using parabolic regularization (Gaussian prior) with strength 1.0e-01 (+), 0.0e+00 (x)
 #========================================================#
 #| [92m           Setup for objective function :           [0m |#
 #========================================================#
-penalty_additive          1.0 
+penalty_additive          0.1 
 normalize_weights         False 
 ----------------------------------------------------------
 #========================================================#
 #| [92m                Setup for optimizer                 [0m |#
 #========================================================#
-jobtype                   NEWTON 
+jobtype                   OPTIMIZE 
 trust0                    1.0 
 mintrust                  0.05 
 eps                       0.01 
-convergence_objective     0.5 
-convergence_step          0.05 
-convergence_gradient      0.01 
+convergence_objective     0.1 
+convergence_step          0.01 
+convergence_gradient      0.1 
 adapt_fac                 0.2 
 adapt_damp                1.0 
 print_hess                True 
 err_tol                   1.0 
-backup                    False 
 input_file                optimize.in 
 ----------------------------------------------------------
 #========================================================#
@@ -159,9 +161,9 @@ input_file                optimize.in
 #| [1m   Newton-Raphson Method (Adaptive Trust Radius)    [0m |#
 #| [1m                                                    [0m |#
 #| [1m       [0mConvergence criteria (1 of 3 needed):        [0m |#
-#| [1m          [0mObjective Function  : 5.000e-01           [0m |#
-#| [1m          [0mNorm of Gradient    : 1.000e-02           [0m |#
-#| [1m          [0mParameter step size : 5.000e-02           [0m |#
+#| [1m          [0mObjective Function  : 1.000e-01           [0m |#
+#| [1m          [0mNorm of Gradient    : 1.000e-01           [0m |#
+#| [1m          [0mParameter step size : 1.000e-02           [0m |#
 #========================================================#
 #========================================================================#
 #|               Color Key for Objective Function -=X2=-                |#
@@ -175,179 +177,178 @@ input_file                optimize.in
 #| [94m        and derivatives through second order        [0m |#
 #========================================================#
 #========================================================#
-#|   Target: LiquidBromine - launching MD simulations   |#
-#|          Time steps: 1000 (eq) + 50000 (md)          |#
+#|  Target: ethanol-liquid - launching MD simulations   |#
+#|         Time steps: 50000 (eq) + 500000 (md)         |#
 #========================================================#
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/src/forcebalance/studies/003_liquid_bromine/optimize.tmp/LiquidBromine/iter_0000/298.15K-1.0atm/npt.out in another terminal window
-Executing process: [92mbash rungmx.sh python npt.py gromacs 298.150 1.000[0m Output: npt.out
+You may tail -f /home/leeping/src/forcebalance/studies/019_hybrid_charge/linear_mix/optimize.tmp/ethanol-liquid/iter_0000/298.15K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py smirnoff 298.150 1.000[0m Output: npt.out
+Running condensed phase simulation locally.
+You may tail -f /home/leeping/src/forcebalance/studies/019_hybrid_charge/linear_mix/optimize.tmp/ethanol-liquid/iter_0000/320.03K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py smirnoff 320.030 1.000[0m Output: npt.out
 Reading information from ./298.15K-1.0atm/npt_result.p
+Reading information from ./320.03K-1.0atm/npt_result.p
 Weights have been renormalized to 1.0
 Physical quantity Density uses denominator =  30.0000
 Weights have been renormalized to 1.0
-Physical quantity H_vap uses denominator =  0.3000
+Physical quantity H_vap uses denominator =  3.0000
 #==========================================================================================#
-#| [1;94m                           LiquidBromine Density (kg m^-3)                            [0m |#
+#| [1;94m                          ethanol-liquid Density (kg m^-3)                            [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm  3102.800     2887.539 +- 2.932   -215.261   1.00000  51.48568 
+      298.15      1.0 atm   785.000      823.633 +- 0.864    38.633   0.50000   0.82917 
+      320.03      1.0 atm   766.000      802.259 +- 0.995    36.259   0.50000   0.73039 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m  Density objective function:  51.486, Derivative:  [0m |#
+#| [92m  Density objective function:  1.560, Derivative:   [0m |#
 #========================================================#
-   0 [  4.9854e+02 ] : VDWS:opls_730
-   1 [ -3.4606e+02 ] : VDWT:opls_730
+   0 [  1.4223e+00 ] : parameters.txt:1.0
 ----------------------------------------------------------
 #==========================================================================================#
-#| [1;94m                 LiquidBromine Enthalpy of Vaporization (kJ mol^-1)                   [0m |#
+#| [1;94m                 ethanol-liquid Enthalpy of Vaporization (kJ mol^-1)                  [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm    29.960       36.603 +- 0.382     6.643   1.00000  490.25391 
+      298.15      1.0 atm    42.300       48.476 +- 0.180     6.176   0.50000   2.11902 
+      320.03      1.0 atm    41.000       47.097 +- 0.204     6.097   0.50000   2.06544 
 --------------------------------------------------------------------------------------------
-#========================================================================#
-#| [92m Enthalpy of Vaporization objective function:  490.254, Derivative: [0m |#
-#========================================================================#
-   0 [  3.6422e+02 ] : VDWS:opls_730
-   1 [  6.8977e+03 ] : VDWT:opls_730
---------------------------------------------------------------------------
+#======================================================================#
+#| [92m Enthalpy of Vaporization objective function:  4.184, Derivative: [0m |#
+#======================================================================#
+   0 [  1.5009e+01 ] : parameters.txt:1.0
+------------------------------------------------------------------------
 #====================================================================#
-#| [94m           LiquidBromine Condensed Phase Properties:            [0m |#
+#| [94m           ethanol-liquid Condensed Phase Properties:           [0m |#
 #| [94m  Property Name                Residual x Weight = Contribution [0m |#
 #====================================================================#
-Density                           51.48568    1.000    5.14857e+01 
-Enthalpy of Vaporization         490.25391    1.000    4.90254e+02 
-Total                                                  5.41740e+02 
+Density                            1.55956    1.000    1.55956e+00 
+Enthalpy of Vaporization           4.18446    1.000    4.18446e+00 
+Total                                                  5.74402e+00 
 ----------------------------------------------------------------------
 #====================================================================#
 #| [94m                  Objective Function Breakdown                  [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
 #====================================================================#
-LiquidBromine                541.73959      1.000 [94m     5.41740e+02[0m 
+ethanol-liquid                 5.74402      1.000 [94m     5.74402e+00[0m 
 Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
-Total                                             [94m     5.41740e+02[0m 
+Total                                             [94m     5.74402e+00[0m 
 ----------------------------------------------------------------------
 
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     0   0.000e+00   0.000e+00   6.608e+03[1m   5.41740e+02[0m   0.000e+00      0.000
+     0   0.000e+00   0.000e+00   1.643e+01[1m   5.74402e+00[0m  -0.000e+00      0.000
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
 #========================================================#
-   0 [  8.62755948e+02 ] : VDWS:opls_730
-   1 [  6.55159715e+03 ] : VDWT:opls_730
+   0 [  1.64310464e+01 ] : parameters.txt:1.0
 ----------------------------------------------------------
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 2.55098594e+03  8.86706178e+02 
- 8.86706178e+02  4.96885975e+04 
+ 2.80358482e+01 
 ----------------------------------------------------------
 Calculating nonlinear optimization step
-Newton-Raphson step found (length 3.2028e-01)
+Newton-Raphson step found (length 5.8607e-01)
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
-   0 [  0.0000e+00 - 2.9420e-01 = -2.9420e-01 ] : VDWS:opls_730
-   1 [  0.0000e+00 - 1.2660e-01 = -1.2660e-01 ] : VDWT:opls_730
+   0 [  0.0000e+00 - 5.8607e-01 = -5.8607e-01 ] : parameters.txt:1.0
 ----------------------------------------------------------
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
-   0 [  3.6700e-01 - 1.5568e-02 =  3.5143e-01 ] : VDWS:opls_730
-   1 [  2.4665e+00 - 3.1384e-01 =  2.1526e+00 ] : VDWT:opls_730
+   0 [  1.0000e+00 - 5.8607e-01 =  4.1393e-01 ] : parameters.txt:1.0
 ----------------------------------------------------------
-Backing up optimize.sav -> optimize.bak/optimize_3.sav
 Input file with saved parameters: optimize.sav
 #========================================================#
 #| [94m     Iteration 1: Evaluating objective function     [0m |#
 #| [94m        and derivatives through second order        [0m |#
 #========================================================#
 #========================================================#
-#|   Target: LiquidBromine - launching MD simulations   |#
-#|          Time steps: 1000 (eq) + 50000 (md)          |#
+#|  Target: ethanol-liquid - launching MD simulations   |#
+#|         Time steps: 50000 (eq) + 500000 (md)         |#
 #========================================================#
-Copying previous iteration final geometry .gro file: /home/leeping/src/forcebalance/studies/003_liquid_bromine/optimize.tmp/LiquidBromine/iter_0000/298.15K-1.0atm/liquid-md.gro to /home/leeping/src/forcebalance/studies/003_liquid_bromine/optimize.tmp/LiquidBromine/iter_0001/298.15K-1.0atm/liquid.gro
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/src/forcebalance/studies/003_liquid_bromine/optimize.tmp/LiquidBromine/iter_0001/298.15K-1.0atm/npt.out in another terminal window
-Executing process: [92mbash rungmx.sh python npt.py gromacs 298.150 1.000[0m Output: npt.out
+You may tail -f /home/leeping/src/forcebalance/studies/019_hybrid_charge/linear_mix/optimize.tmp/ethanol-liquid/iter_0001/298.15K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py smirnoff 298.150 1.000[0m Output: npt.out
+Running condensed phase simulation locally.
+You may tail -f /home/leeping/src/forcebalance/studies/019_hybrid_charge/linear_mix/optimize.tmp/ethanol-liquid/iter_0001/320.03K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py smirnoff 320.030 1.000[0m Output: npt.out
 Reading information from ./298.15K-1.0atm/npt_result.p
+Reading information from ./320.03K-1.0atm/npt_result.p
 Weights have been renormalized to 1.0
 Physical quantity Density uses denominator =  30.0000
 Weights have been renormalized to 1.0
-Physical quantity H_vap uses denominator =  0.3000
+Physical quantity H_vap uses denominator =  3.0000
 #==========================================================================================#
-#| [1;94m                           LiquidBromine Density (kg m^-3)                            [0m |#
+#| [1;94m                          ethanol-liquid Density (kg m^-3)                            [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm  3102.800     3078.414 +- 8.762   -24.386   1.00000   0.66073 
+      298.15      1.0 atm   785.000      812.300 +- 0.608    27.300   0.50000   0.41404 
+      320.03      1.0 atm   766.000      791.263 +- 0.657    25.263   0.50000   0.35456 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m  Density objective function:  0.661, Derivative:   [0m |#
+#| [92m  Density objective function:  0.769, Derivative:   [0m |#
 #========================================================#
-   0 [  4.7380e+01 ] : VDWS:opls_730
-   1 [ -4.5303e+01 ] : VDWT:opls_730
+   0 [  1.1773e+00 ] : parameters.txt:1.0
 ----------------------------------------------------------
 #==========================================================================================#
-#| [1;94m                 LiquidBromine Enthalpy of Vaporization (kJ mol^-1)                   [0m |#
+#| [1;94m                 ethanol-liquid Enthalpy of Vaporization (kJ mol^-1)                  [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm    29.960       29.815 +- 0.369    -0.145   1.00000   0.23413 
+      298.15      1.0 atm    42.300       42.648 +- 0.182     0.348   0.50000   0.00673 
+      320.03      1.0 atm    41.000       40.192 +- 0.195    -0.808   0.50000   0.03623 
 --------------------------------------------------------------------------------------------
 #======================================================================#
-#| [92m Enthalpy of Vaporization objective function:  0.234, Derivative: [0m |#
+#| [92m Enthalpy of Vaporization objective function:  0.043, Derivative: [0m |#
 #======================================================================#
-   0 [ -9.1006e+00 ] : VDWS:opls_730
-   1 [ -1.3490e+02 ] : VDWT:opls_730
+   0 [ -5.4901e-01 ] : parameters.txt:1.0
 ------------------------------------------------------------------------
 #====================================================================#
-#| [94m           LiquidBromine Condensed Phase Properties:            [0m |#
+#| [94m           ethanol-liquid Condensed Phase Properties:           [0m |#
 #| [94m  Property Name                Residual x Weight = Contribution [0m |#
 #====================================================================#
-Density                            0.66073    1.000    6.60731e-01 
-Enthalpy of Vaporization           0.23413    1.000    2.34129e-01 
-Total                                                  8.94860e-01 
+Density                            0.76861    1.000    7.68605e-01 
+Enthalpy of Vaporization           0.04295    1.000    4.29534e-02 
+Total                                                  8.11558e-01 
 ----------------------------------------------------------------------
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-LiquidBromine                  0.89486      1.000 [92m     8.94860e-01[0m ( -5.408e+02 ) 
-Regularization                 0.10258      1.000 [91m     1.02581e-01[0m ( +1.026e-01 ) 
-Total                                             [92m     9.97441e-01[0m ( -5.407e+02 ) 
+ethanol-liquid                 0.81156      1.000 [92m     8.11558e-01[0m ( -4.932e+00 ) 
+Regularization                 0.03435      1.000 [91m     3.43481e-02[0m ( +3.435e-02 ) 
+Total                                             [92m     8.45907e-01[0m ( -4.898e+00 ) 
 -------------------------------------------------------------------------------------
+Creating the directory /home/leeping/src/forcebalance/studies/019_hybrid_charge/linear_mix/result/optimize to print the force field
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
 #========================================================================#
 
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     1   3.203e-01   3.203e-01   1.843e+02[92m   9.97441e-01[0m  -5.407e+02      0.998
+     1   5.861e-01   5.861e-01   5.111e-01[92m   8.45907e-01[0m  -4.898e+00      1.017
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
 #========================================================#
-   0 [  3.76906619e+01 ] : VDWS:opls_730
-   1 [ -1.80452769e+02 ] : VDWT:opls_730
+   0 [  5.11122043e-01 ] : parameters.txt:1.0
 ----------------------------------------------------------
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 1.87762253e+03  9.97450329e+02 
- 9.97450329e+02  4.04165175e+04 
+ 2.63845342e+01 
 ----------------------------------------------------------
 Calculating nonlinear optimization step
-Newton-Raphson step found (length 2.3292e-02)
+Newton-Raphson step found (length 1.9372e-02)
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
-   0 [ -2.9420e-01 - 2.2744e-02 = -3.1694e-01 ] : VDWS:opls_730
-   1 [ -1.2660e-01 + 5.0261e-03 = -1.2158e-01 ] : VDWT:opls_730
+   0 [ -5.8607e-01 - 1.9372e-02 = -6.0544e-01 ] : parameters.txt:1.0
 ----------------------------------------------------------
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
-   0 [  3.5143e-01 - 1.2035e-03 =  3.5023e-01 ] : VDWS:opls_730
-   1 [  2.1526e+00 + 1.2459e-02 =  2.1651e+00 ] : VDWT:opls_730
+   0 [  4.1393e-01 - 1.9372e-02 =  3.9456e-01 ] : parameters.txt:1.0
 ----------------------------------------------------------
 Input file with saved parameters: optimize.sav
 #========================================================#
@@ -355,95 +356,100 @@ Input file with saved parameters: optimize.sav
 #| [94m        and derivatives through second order        [0m |#
 #========================================================#
 #========================================================#
-#|   Target: LiquidBromine - launching MD simulations   |#
-#|          Time steps: 1000 (eq) + 50000 (md)          |#
+#|  Target: ethanol-liquid - launching MD simulations   |#
+#|         Time steps: 50000 (eq) + 500000 (md)         |#
 #========================================================#
-Copying previous iteration final geometry .gro file: /home/leeping/src/forcebalance/studies/003_liquid_bromine/optimize.tmp/LiquidBromine/iter_0001/298.15K-1.0atm/liquid-md.gro to /home/leeping/src/forcebalance/studies/003_liquid_bromine/optimize.tmp/LiquidBromine/iter_0002/298.15K-1.0atm/liquid.gro
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/src/forcebalance/studies/003_liquid_bromine/optimize.tmp/LiquidBromine/iter_0002/298.15K-1.0atm/npt.out in another terminal window
-Executing process: [92mbash rungmx.sh python npt.py gromacs 298.150 1.000[0m Output: npt.out
+You may tail -f /home/leeping/src/forcebalance/studies/019_hybrid_charge/linear_mix/optimize.tmp/ethanol-liquid/iter_0002/298.15K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py smirnoff 298.150 1.000[0m Output: npt.out
+Running condensed phase simulation locally.
+You may tail -f /home/leeping/src/forcebalance/studies/019_hybrid_charge/linear_mix/optimize.tmp/ethanol-liquid/iter_0002/320.03K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py smirnoff 320.030 1.000[0m Output: npt.out
 Reading information from ./298.15K-1.0atm/npt_result.p
+Reading information from ./320.03K-1.0atm/npt_result.p
 Weights have been renormalized to 1.0
 Physical quantity Density uses denominator =  30.0000
 Weights have been renormalized to 1.0
-Physical quantity H_vap uses denominator =  0.3000
+Physical quantity H_vap uses denominator =  3.0000
 #==========================================================================================#
-#| [1;94m                           LiquidBromine Density (kg m^-3)                            [0m |#
+#| [1;94m                          ethanol-liquid Density (kg m^-3)                            [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm  3102.800     3116.126 +- 11.031   13.326   1.00000   0.19731 
+      298.15      1.0 atm   785.000      811.439 +- 0.682    26.439   0.50000   0.38834 
+      320.03      1.0 atm   766.000      789.802 +- 0.722    23.802   0.50000   0.31474 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m  Density objective function:  0.197, Derivative:   [0m |#
+#| [92m  Density objective function:  0.703, Derivative:   [0m |#
 #========================================================#
-   0 [ -3.2496e+01 ] : VDWS:opls_730
-   1 [  3.1686e+01 ] : VDWT:opls_730
+   0 [  1.3111e+00 ] : parameters.txt:1.0
 ----------------------------------------------------------
 #==========================================================================================#
-#| [1;94m                 LiquidBromine Enthalpy of Vaporization (kJ mol^-1)                   [0m |#
+#| [1;94m                 ethanol-liquid Enthalpy of Vaporization (kJ mol^-1)                  [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm    29.960       30.047 +- 0.378     0.087   1.00000   0.08483 
+      298.15      1.0 atm    42.300       42.010 +- 0.177    -0.290   0.50000   0.00469 
+      320.03      1.0 atm    41.000       40.741 +- 0.196    -0.259   0.50000   0.00371 
 --------------------------------------------------------------------------------------------
 #======================================================================#
-#| [92m Enthalpy of Vaporization objective function:  0.085, Derivative: [0m |#
+#| [92m Enthalpy of Vaporization objective function:  0.008, Derivative: [0m |#
 #======================================================================#
-   0 [  4.6023e+00 ] : VDWS:opls_730
-   1 [  8.5490e+01 ] : VDWT:opls_730
+   0 [ -6.6432e-01 ] : parameters.txt:1.0
 ------------------------------------------------------------------------
 #====================================================================#
-#| [94m           LiquidBromine Condensed Phase Properties:            [0m |#
+#| [94m           ethanol-liquid Condensed Phase Properties:           [0m |#
 #| [94m  Property Name                Residual x Weight = Contribution [0m |#
 #====================================================================#
-Density                            0.19731    1.000    1.97307e-01 
-Enthalpy of Vaporization           0.08483    1.000    8.48291e-02 
-Total                                                  2.82136e-01 
+Density                            0.70308    1.000    7.03085e-01 
+Enthalpy of Vaporization           0.00840    1.000    8.39794e-03 
+Total                                                  7.11483e-01 
 ----------------------------------------------------------------------
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-LiquidBromine                  0.28214      1.000 [92m     2.82136e-01[0m ( -6.127e-01 ) 
-Regularization                 0.11523      1.000 [91m     1.15233e-01[0m ( +1.265e-02 ) 
-Total                                             [92m     3.97369e-01[0m ( -6.001e-01 ) 
+ethanol-liquid                 0.71148      1.000 [92m     7.11483e-01[0m ( -1.001e-01 ) 
+Regularization                 0.03666      1.000 [91m     3.66563e-02[0m ( +2.308e-03 ) 
+Total                                             [92m     7.48139e-01[0m ( -9.777e-02 ) 
 -------------------------------------------------------------------------------------
+Backing up result/optimize/parameters.txt -> result/optimize/parameters_1.txt
+Backing up result/optimize/ETH.mol2 -> result/optimize/ETH_1.mol2
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_1.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
 #========================================================================#
 
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     2   3.395e-01   2.329e-02   1.204e+02[92m   3.97369e-01[0m  -6.001e-01      0.680
+     2   6.054e-01   1.937e-02   5.257e-01[92m   7.48139e-01[0m  -9.777e-02     19.748
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
 #========================================================#
-   0 [ -2.85271217e+01 ] : VDWS:opls_730
-   1 [  1.16932634e+02 ] : VDWT:opls_730
+   0 [  5.25709171e-01 ] : parameters.txt:1.0
 ----------------------------------------------------------
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 2.80278438e+03 -2.90151303e+02 
--2.90151303e+02  4.56244781e+04 
+ 2.77157630e+01 
 ----------------------------------------------------------
-Convergence criterion reached in step size (5.00e-02)
+Convergence criterion reached for objective function (1.00e-01)
 #========================================================#
 #| [92m               [0m[1mOptimization Converged[0m               [0m |#
 #| [92m           Final objective function value           [0m |#
-#| [92m  Full:  3.973688e-01  Un-penalized:  2.821356e-01  [0m |#
+#| [92m  Full:  7.481392e-01  Un-penalized:  7.114828e-01  [0m |#
 #========================================================#
 #========================================================#
 #| [94m           Final optimization parameters:           [0m |#
 #========================================================#
-   0 [ -3.1694e-01 ] : VDWS:opls_730
-   1 [ -1.2158e-01 ] : VDWT:opls_730
+   0 [ -6.0544e-01 ] : parameters.txt:1.0
 #========================================================#
 #| [94m             Final physical parameters:             [0m |#
 #========================================================#
-   0 [  3.5023e-01 ] : VDWS:opls_730
-   1 [  2.1651e+00 ] : VDWT:opls_730
+   0 [  3.9456e-01 ] : parameters.txt:1.0
 ----------------------------------------------------------
+Backing up result/optimize/parameters.txt -> result/optimize/parameters_2.txt
+Backing up result/optimize/ETH.mol2 -> result/optimize/ETH_2.mol2
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_2.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
