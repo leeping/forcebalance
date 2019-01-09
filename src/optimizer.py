@@ -602,13 +602,14 @@ class Optimizer(forcebalance.BaseClass):
             # Multiply by 2, so when hist=2 this is simply the difference.
             stdfront = np.std(X_hist[-self.hist:]) if len(X_hist) > self.hist else np.std(X_hist)
             stdfront *= 2
+            dX2_sign = -1 if (len(X_hist) > 1 and X_hist[-1] < X_hist[-2]) else 1
             #================================#
             #| Print optimization progress. |#
             #================================#
             nxk = np.linalg.norm(xk)
             ngd = np.linalg.norm(G)
             if self.goodstep:
-                print_progress(ITERATION, nxk, ndx, ngd, color, X, -1*stdfront, Quality)
+                print_progress(ITERATION, nxk, ndx, ngd, color, X, dX2_sign*stdfront, Quality)
             #================================#
             #|   Print objective function,  |#
             #|     gradient and Hessian.    |#
@@ -628,15 +629,16 @@ class Optimizer(forcebalance.BaseClass):
             #|  Check convergence criteria. |#
             #================================#
             ncrit = 0
-            if ngd < self.convergence_gradient and Best_Step:
-                logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.convergence_gradient)
-                ncrit += 1
-            if ndx < self.convergence_step and (self.converge_lowq or Quality > ThreLQ) and Best_Step:
-                logger.info("Convergence criterion reached in step size (%.2e)\n" % self.convergence_step)
-                ncrit += 1
-            if stdfront < self.convergence_objective and (self.converge_lowq or Quality > ThreLQ) and len(X_hist) >= self.hist and Best_Step:
-                logger.info("Convergence criterion reached for objective function (%.2e)\n" % self.convergence_objective)
-                ncrit += 1
+            if self.uncert or self.converge_lowq or Quality > ThreLQ:
+                if ngd < self.convergence_gradient:
+                    logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.convergence_gradient)
+                    ncrit += 1
+                if ndx < self.convergence_step and ITERATION > self.iterinit:
+                    logger.info("Convergence criterion reached in step size (%.2e)\n" % self.convergence_step)
+                    ncrit += 1
+                if stdfront < self.convergence_objective and len(X_hist) >= self.hist:
+                    logger.info("Convergence criterion reached for objective function (%.2e)\n" % self.convergence_objective)
+                    ncrit += 1
             if ncrit >= self.criteria: break
             #================================#
             #| Save optimization variables  |#
@@ -654,7 +656,6 @@ class Optimizer(forcebalance.BaseClass):
             pk_prev = self.FF.create_pvals(xk)
             #================================#
             #| Calculate optimization step. |#
-            #|  Increase iteration number.  |#
             #================================#
             logger.info(trustprint)
             logger.info("Calculating nonlinear optimization step\n")
@@ -663,7 +664,9 @@ class Optimizer(forcebalance.BaseClass):
             # Increment the parameters.
             xk += dx
             ndx = np.linalg.norm(dx)
-            # Increment the iteration counter.
+            #================================#
+            #|  Increase iteration number.  |#
+            #================================#
             ITERATION += 1
             self.iteration += 1
             # The search code benefits from knowing the step size here.
