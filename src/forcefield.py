@@ -710,7 +710,7 @@ class FF(forcebalance.BaseClass):
                     self.map[dest] = self.map[src]
                 else:
                     warn_press_key("Warning: You wanted to copy parameter from %s to %s, but the source parameter does not seem to exist!" % (src, dest))
-                self.assign_field(self.map[dest],dest,ffname,fflist.index(e),dest.split('/')[1],1)
+                self.assign_field(self.map[dest],dest,ffname,fflist.index(e),parameter_name,1)
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
             for field in e.get('parameter_eval').split(','):
@@ -720,7 +720,7 @@ class FF(forcebalance.BaseClass):
                     raise RuntimeError
                 dest = self.Readers[ffname].build_pid(e, parameter_name)
                 evalcmd  = field.strip().split('=')[1]
-                self.assign_field(None,dest,ffname,fflist.index(e),dest.split('/')[1],None,evalcmd)
+                self.assign_field(None,dest,ffname,fflist.index(e),parameter_name,None,evalcmd)
 
     def make(self,vals=None,use_pvals=False,printdir=None,precision=12):
         """ Create a new force field using provided parameter values.
@@ -1040,7 +1040,10 @@ class FF(forcebalance.BaseClass):
                             break
                     ffnameScript = f.split('.')[0]+'Script.txt'
                     if fnm == f or fnm == ffnameScript:
-                        ttstr = '/'.join([pName.split('/')[0],pName.split('/')[1]])
+                        if fnm.endswith('offxml'):
+                            ttstr = '/'.join([pName.split('/')[0],pName.split('/')[1],pName.split('/')[2]])
+                        else:
+                            ttstr = '/'.join([pName.split('/')[0],pName.split('/')[1]])
                         if ttstr not in termtypelist:
                             termtypelist.append(ttstr)
             else:
