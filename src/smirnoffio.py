@@ -145,9 +145,9 @@ class SMIRNOFF(OpenMM):
         # vs. the .mol2 files to be provided by the force field.
         # But we can assume that these files should exist when this function is called.
 
-        self.mol2_files = kwargs.get('mol2')
-        if self.mol2_files:
-            for fnm in self.mol2_files:
+        self.mol2 = kwargs.get('mol2')
+        if self.mol2:
+            for fnm in self.mol2:
                 if not os.path.exists(fnm):
                     if hasattr(self, 'FF') and fnm in self.FF.fnms: continue
                     logger.error("%s doesn't exist" % fnm)
@@ -271,7 +271,7 @@ class SMIRNOFF(OpenMM):
         # This part requires the OpenEye tools but may be replaced
         # by RDKit when that support comes online.
         oemols = []
-        for fnm in self.mol2_files:
+        for fnm in self.mol2:
             mol = oechem.OEGraphMol()
             ifs = oechem.oemolistream(fnm)
             oechem.OEReadMolecule(ifs, mol)
