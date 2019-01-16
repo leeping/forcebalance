@@ -380,7 +380,7 @@ class Liquid(Target):
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
             else:
                 queue_up(wq, command = cmdstr+' > npt.out 2>&1 ',
-                         input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
+                         input_files = self.nptfiles + self.scripts + self.mol2 + ['forcebalance.p'],
                          output_files = ['npt_result.p', 'npt.out'] + self.extra_output, tgt=self)
 
     def nvt_simulation(self, temperature):
@@ -395,7 +395,7 @@ class Liquid(Target):
                 _exec(cmdstr, copy_stderr=True, outfnm='nvt.out')
             else:
                 queue_up(wq, command = cmdstr+' > nvt.out 2>&1 ',
-                         input_files = self.nvtfiles + self.scripts + ['forcebalance.p'],
+                         input_files = self.nvtfiles + self.scripts + self.mol2 + ['forcebalance.p'],
                          output_files = ['nvt_result.p', 'nvt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):
