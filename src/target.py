@@ -367,11 +367,10 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         os.makedirs(abstempdir)
         if hasattr(self, 'mol2'):
             for f in self.mol2:
-                # print(os.path.join(self.root, self.tgtdir, f), "->", os.path.join(abstempdir, f))
                 if os.path.exists(os.path.join(self.root, self.tgtdir, f)):
                     LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
                 elif f not in self.FF.fnms:
-                    logger.error("%s doesn't exist and it's not in the force field directory either")
+                    logger.error("%s doesn't exist and it's not in the force field directory either" % f)
                     raise RuntimeError
 
 
