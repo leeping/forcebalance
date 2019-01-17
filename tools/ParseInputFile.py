@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 """ @package ParseInputFile Read in ForceBalance input file and print it back out."""
+from __future__ import print_function
 
 from nifty import printcool_dictionary
 from parser import parse_imports
@@ -10,9 +11,9 @@ def main():
     """Input file parser for ForceBalance program.  We will simply read the options and print them back out.
     
     """
-    print "\x1b[1;98mCalling Input File Parser as a standalone script\x1b[0m\n"
+    print("\x1b[1;98mCalling Input File Parser as a standalone script\x1b[0m\n")
     if len(sys.argv) != 2:
-        print "Please call this script with one argument - that is the input file"
+        print("Please call this script with one argument - that is the input file")
         sys.exit(1)
     else:
         options, tgt_opts = parse_inputs(sys.argv[1])

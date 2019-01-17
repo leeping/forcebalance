@@ -3,7 +3,12 @@
 author Lee-Ping Wang
 @date 04/2012
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import zip
+from builtins import range
 import abc
 import os
 import shutil
@@ -160,6 +165,9 @@ class Liquid(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
         # Read in liquid starting coordinates.
         if not os.path.exists(os.path.join(self.root, self.tgtdir, self.liquid_coords)):
             logger.error("%s doesn't exist; please provide liquid_coords option\n" % self.liquid_coords)
@@ -204,18 +212,6 @@ class Liquid(Target):
             # Extra files to be linked into the temp-directory.
             self.nvtfiles += [self.nvt_coords]
             self.scripts += ['nvt.py']
-        # Prepare the temporary directory.
-        self.prepare_temp_directory()
-        # Build keyword dictionary to pass to engine.
-        if self.do_self_pol:
-            self.gas_engine_args.update(self.OptionDict)
-            self.gas_engine_args.update(options)
-            del self.gas_engine_args['name']
-            # Create engine object for gas molecule to do the polarization correction.
-            self.gas_engine = self.engine_(target=self, mol=self.gas_mol, name="selfpol", **self.gas_engine_args)
-        # Don't read indicate.log when calling meta_indicate()
-        self.read_indicate = False
-        self.write_indicate = False
         # Don't read objective.p when calling meta_get()
         # self.read_objective = False
 
@@ -233,10 +229,24 @@ class Liquid(Target):
         # self.SavedMVals = []
         self.AllResults = defaultdict(lambda:defaultdict(list))
 
+    def post_init(self, options):
+        # Prepare the temporary directory.
+        self.prepare_temp_directory()
+        # Build keyword dictionary to pass to engine.
+        if self.do_self_pol:
+            self.gas_engine_args.update(self.OptionDict)
+            self.gas_engine_args.update(options)
+            del self.gas_engine_args['name']
+            # Create engine object for gas molecule to do the polarization correction.
+            self.gas_engine = self.engine_(target=self, mol=self.gas_mol, name="selfpol", **self.gas_engine_args)
+        # Don't read indicate.log when calling meta_indicate()
+        self.read_indicate = False
+        self.write_indicate = False
+
     def prepare_temp_directory(self):
         """ Prepare the temporary directory by copying in important files. """
         abstempdir = os.path.join(self.root,self.tempdir)
-        for f in self.nptfiles + self.nvtfiles:
+        for f in self.nptfiles + (self.nvtfiles if hasattr(self, 'nvtfiles') else []):
             LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
         for f in self.scripts:
             LinkFile(os.path.join(os.path.split(__file__)[0],"data",f),os.path.join(abstempdir,f))
@@ -304,7 +314,8 @@ class Liquid(Target):
                 raise RuntimeError
         # Check the reference data table for validity.
         default_denoms = defaultdict(int)
-        PhasePoints = None
+        PhasePoints = set()
+        RefData_copy = copy.deepcopy(self.RefData)
         for head in self.RefData:
             if head not in known_vars+[i+"_wt" for i in known_vars]:
                 # Only hard-coded properties may be recognized.
@@ -313,9 +324,9 @@ class Liquid(Target):
             if head in known_vars:
                 if head+"_wt" not in self.RefData:
                     # If the phase-point weights are not specified in the reference data file, initialize them all to one.
-                    self.RefData[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
-                wts = np.array(self.RefData[head+"_wt"].values())
-                dat = np.array(self.RefData[head].values())
+                    RefData_copy[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
+                wts = np.array(list(RefData_copy[head+"_wt"].values()))
+                dat = np.array(list(self.RefData[head].values()))
                 avg = np.average(dat, weights=wts)
                 if len(wts) > 1:
                     # If there is more than one data point, then the default denominator is the
@@ -325,9 +336,12 @@ class Liquid(Target):
                     # If there is only one data point, then the denominator is just the single
                     # data point itself.
                     default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
-            self.PhasePoints = self.RefData[head].keys()
+            PhasePoints |= set(self.RefData[head].keys())
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
+        self.RefData = RefData_copy
+        # Here we sort all available PhasePoints by pressure then temperature
+        self.PhasePoints = sorted(list(PhasePoints), key=lambda x: (x[1], x[0]))
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
         logger.debug("global_opts:\n%s\n" % str(global_opts))
@@ -366,7 +380,7 @@ class Liquid(Target):
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
             else:
                 queue_up(wq, command = cmdstr+' > npt.out 2>&1 ',
-                         input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
+                         input_files = self.nptfiles + self.scripts + self.mol2 + ['forcebalance.p'],
                          output_files = ['npt_result.p', 'npt.out'] + self.extra_output, tgt=self)
 
     def nvt_simulation(self, temperature):
@@ -381,14 +395,14 @@ class Liquid(Target):
                 _exec(cmdstr, copy_stderr=True, outfnm='nvt.out')
             else:
                 queue_up(wq, command = cmdstr+' > nvt.out 2>&1 ',
-                         input_files = self.nvtfiles + self.scripts + ['forcebalance.p'],
+                         input_files = self.nvtfiles + self.scripts + self.mol2 + ['forcebalance.p'],
                          output_files = ['nvt_result.p', 'nvt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):
         self.FF.make(mvals)
         # print mvals
         ddict = self.gas_engine.multipole_moments(optimize=True)['dipole']
-        d = np.array(ddict.values())
+        d = np.array(list(ddict.values()))
         if not in_fd():
             logger.info("The molecular dipole moment is % .3f debye\n" % np.linalg.norm(d))
         # Taken from the original OpenMM interface code, this is how we calculate the conversion factor.
@@ -502,7 +516,7 @@ class Liquid(Target):
             GradMapPrint.append([' %8.2f %8.1f %3s' % PT] + ["% 9.3e" % i for i in g])
         o = wopen('gradient_%s.dat' % name)
         for line in GradMapPrint:
-            print >> o, ' '.join(line)
+            print(' '.join(line), file=o)
         o.close()
 
         Delta = np.array([calc[PT] - exp[PT] for PT in points])
@@ -783,8 +797,18 @@ class Liquid(Target):
         self.AllResults[astrm]['Steps'].append(self.liquid_md_steps)
 
         if len(mPoints) > 0:
-            self.AllResults[astrm]['mE'].append(np.array([i for pt, i in zip(Points,mEnergies) if pt in mPoints]))
-            self.AllResults[astrm]['mG'].append(np.array([i for pt, i in zip(Points,mGrads) if pt in mPoints]))
+            mE_idx = 0
+            # QYD: here we use a dictionary to store the index in mE/mG, which is different with the index in Points
+            mE_idx_dict = dict()
+            all_mEs, all_mGs = [], []
+            for pt, mEs, mGs in zip(Points, mEnergies, mGrads):
+                if pt in mPoints:
+                    all_mEs.append(mEs)
+                    all_mGs.append(mGs)
+                    mE_idx_dict[pt] = mE_idx
+                    mE_idx += 1
+            self.AllResults[astrm]['mE'].append(np.array(all_mEs))
+            self.AllResults[astrm]['mG'].append(np.array(all_mGs))
 
         # Number of data sets belonging to this value of the parameters.
         Nrpt = len(self.AllResults[astrm]['R'])
@@ -894,8 +918,8 @@ class Liquid(Target):
                     T = PT[0]
                     beta = 1. / (kb * T)
                     for k in range(mBSims):
-                        kk = Points.index(mBPoints[k])
-                        mU_kln[k, m, :]  = mE[kk]
+                        mE_idx = mE_idx_dict[mBPoints[k]]
+                        mU_kln[k, m, :]  = mE[mE_idx]
                         mU_kln[k, m, :] *= beta
                 if np.abs(np.std(mE)) > 1e-6 and mBSims > 1:
                     mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
@@ -930,7 +954,7 @@ class Liquid(Target):
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
             C = weight_info(W, PT, np.ones(len(Points), dtype=int)*Shots, verbose=mbar_verbose)
-            Gbar = flat(np.matrix(G)*col(W))
+            Gbar = flat(np.dot(G, col(W)))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
             kT    = kb*T
@@ -938,21 +962,21 @@ class Liquid(Target):
             def avg(vec):
                 return np.dot(W,vec)
             def covde(vec):
-                return flat(np.matrix(G)*col(W*vec)) - avg(vec)*Gbar
+                return flat(np.dot(G, col(W*vec))) - avg(vec)*Gbar
             def deprod(vec):
-                return flat(np.matrix(G)*col(W*vec))
+                return flat(np.dot(G, col(W*vec)))
             ## Density.
             Rho_calc[PT]   = np.dot(W,R)
-            Rho_grad[PT]   = mBeta*(flat(np.matrix(G)*col(W*R)) - np.dot(W,R)*Gbar)
+            Rho_grad[PT]   = mBeta*(flat(np.dot(G, col(W*R))) - np.dot(W,R)*Gbar)
             ## Enthalpy of vaporization.
             if PT in mPoints:
                 ii = mPoints.index(PT)
                 mW = flat(mW2[:,ii])
-                mGbar = flat(np.matrix(mG)*col(mW))
+                mGbar = flat(np.dot(mG, col(mW)))
                 Hvap_calc[PT]  = np.dot(mW,mE) - np.dot(W,E)/NMol + kb*T - np.dot(W, PV)/NMol
-                Hvap_grad[PT]  = mGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
-                Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
-                Hvap_grad[PT] -= (mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
+                Hvap_grad[PT]  = mGbar + mBeta*(flat(np.dot(mG,col(mW*mE))) - np.dot(mW,mE)*mGbar)
+                Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.dot(G,col(W*E))) - np.dot(W,E)*Gbar)) / NMol
+                Hvap_grad[PT] -= (mBeta*(flat(np.dot(G,col(W*PV))) - np.dot(W,PV)*Gbar)) / NMol
                 if self.do_self_pol:
                     Hvap_calc[PT] -= EPol
                     Hvap_grad[PT] -= GEPol
@@ -1007,9 +1031,9 @@ class Liquid(Target):
             prefactor = 30.348705333964077
             D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
             Eps0_calc[PT] = 1.0 + prefactor*(D2/avg(V))/T
-            GD2  = 2*(flat(np.matrix(GDx)*col(W*Dx)) - avg(Dx)*flat(np.matrix(GDx)*col(W))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
-            GD2 += 2*(flat(np.matrix(GDy)*col(W*Dy)) - avg(Dy)*flat(np.matrix(GDy)*col(W))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
-            GD2 += 2*(flat(np.matrix(GDz)*col(W*Dz)) - avg(Dz)*flat(np.matrix(GDz)*col(W))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
+            GD2  = 2*(flat(np.dot(GDx,col(W*Dx))) - avg(Dx)*flat(np.dot(GDx,col(W)))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
+            GD2 += 2*(flat(np.dot(GDy,col(W*Dy))) - avg(Dy)*flat(np.dot(GDy,col(W)))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
+            GD2 += 2*(flat(np.dot(GDz,col(W*Dz))) - avg(Dz)*flat(np.dot(GDz,col(W)))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
             Eps0_grad[PT] = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
             ## Surface Tension (Already computed in nvt.py)
             if PT in stResults:
@@ -1096,7 +1120,7 @@ class Liquid(Target):
         Eps0_calc, Eps0_std, Eps0_grad = property_results['eps0']
         Surf_ten_calc, Surf_ten_std, Surf_ten_grad = property_results['surf_ten']
 
-        Points = Rho_calc.keys()
+        Points = list(Rho_calc.keys())
 
         # Get contributions to the objective function
         X_Rho, G_Rho, H_Rho, RhoPrint = self.objective_term(Points, 'rho', Rho_calc, Rho_std, Rho_grad, name="Density")
@@ -1105,7 +1129,7 @@ class Liquid(Target):
         X_Kappa, G_Kappa, H_Kappa, KappaPrint = self.objective_term(Points, 'kappa', Kappa_calc, Kappa_std, Kappa_grad, name="Compressibility")
         X_Cp, G_Cp, H_Cp, CpPrint = self.objective_term(Points, 'cp', Cp_calc, Cp_std, Cp_grad, name="Heat Capacity")
         X_Eps0, G_Eps0, H_Eps0, Eps0Print = self.objective_term(Points, 'eps0', Eps0_calc, Eps0_std, Eps0_grad, name="Dielectric Constant")
-        X_Surf_ten, G_Surf_ten, H_Surf_ten, Surf_tenPrint = self.objective_term(Surf_ten_calc.keys(), 'surf_ten', Surf_ten_calc, Surf_ten_std, Surf_ten_grad, name="Surface Tension")
+        X_Surf_ten, G_Surf_ten, H_Surf_ten, Surf_tenPrint = self.objective_term(list(Surf_ten_calc.keys()), 'surf_ten', Surf_ten_calc, Surf_ten_std, Surf_ten_grad, name="Surface Tension")
 
         Gradient = np.zeros(self.FF.np)
         Hessian = np.zeros((self.FF.np,self.FF.np))

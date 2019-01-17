@@ -46,3 +46,13 @@ If you are here to obtain data for a published force field (e.g. AMBER-FB15), yo
 find it in the Products folder.  Please email me at leeping (at) ucdavis (dot) edu
 if you notice anything that should be added.
 
+#===========================#
+#| Funding Acknowledgement |#
+#===========================#
+
+The development of this code has been supported in part by the following grants and awards:
+
+NIH Grant R01 AI130684-02
+ACS-PRF 58158-DNI6
+NIH Grant U54 GM072970
+Open Force Field Consortium

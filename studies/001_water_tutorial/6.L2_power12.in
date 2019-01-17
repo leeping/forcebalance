@@ -1,0 +1,31 @@
+$options
+jobtype newton                   # Indicates Newton-Raphson type optimization
+forcefield water.itp             # Specify names of force field files (files with tunable constants).  Try changing the PARM tags on the ITP file.
+penalty_additive 0.001           # Regularization prefactor.
+penalty_type L2
+penalty_power 12.0
+trust0 -1.0                      # Trust radius.
+backup false                     # Don't back up any files.
+
+priors
+   BONDSB                               : 1.00e-02
+   BONDSK                               : 1.00e+02
+   ANGLESB                              : 1.00e+01
+   ANGLESK                              : 1.00e+02
+   VDWS                                 : 1.00e-02
+   VDWT                                 : 1.00e-01
+   COUL                                 : 1.00e-01
+   VSITE3A                              : 1.00e-02
+   VSITE3B                              : 1.00e-02
+/priors
+$end
+
+$target
+type abinitio_gmx             # The target type; fitting ab initio data using GROMACS
+name cluster-06                  # Also the subdirectory containing data within "targets"
+$end
+
+$target                          # ForceBalance supports multiple targets
+type abinitio_gmx
+name cluster-12
+$end

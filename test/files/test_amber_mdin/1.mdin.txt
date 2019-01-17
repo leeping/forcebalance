@@ -1,0 +1,1 @@
+[["Minimization with Cartesian restraints"], ["cntrl"], [{"imin": "1", "maxcyc": "200", "ntpr": "5", "ntr": "1", "restraint_wt": "1.0", "restraintmask": "':1-58'"}], [[]]]

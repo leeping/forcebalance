@@ -6,7 +6,12 @@ modules for other programs because it's so simple.
 @author Lee-Ping Wang
 @date 01/2012
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import zip
+from builtins import range
 import os, shutil
 from re import match, sub
 from forcebalance.nifty import *
@@ -294,7 +299,7 @@ def write_key(fout, options, fin=None, defaults={}, verbose=False, prmfnm=None, 
     # Finally write the key file.
     file_out = wopen(fout) 
     for line in out:
-        print >> file_out, line
+        print(line, file=file_out)
     if verbose:
         printcool_dictionary(options, title="%s -> %s with options:" % (fin, fout))
     file_out.close()
@@ -510,6 +515,7 @@ class TINKER(Engine):
                 if isint(s[0]): mode = 2
             if mode == 2:
                 if isint(s[0]):
+                    G.add_node(int(s[0]))
                     mass = float(s[5])
                     self.AtomLists['Mass'].append(mass)
                     if mass < 1.0:
@@ -528,14 +534,14 @@ class TINKER(Engine):
                 if isint(s[0]):
                     a = int(s[0])
                     b = int(s[1])
-                    G.add_node(a)
-                    G.add_node(b)
                     G.add_edge(a, b)
                 else: mode = 0
         # Use networkx to figure out a list of molecule numbers.
         if len(list(G.nodes())) > 0:
             # The following code only works in TINKER 6.2
-            gs = list(nx.connected_component_subgraphs(G))
+            gs = [G.subgraph(c).copy() for c in nx.connected_components(G)]
+            # Deprecated in networkx 2.2
+            # gs = list(nx.connected_component_subgraphs(G))
             tmols = [gs[i] for i in np.argsort(np.array([min(list(g.nodes())) for g in gs]))]
             mnodes = [list(m.nodes()) for m in tmols]
             self.AtomLists['MoleculeNumber'] = [[i+1 in m for m in mnodes].index(1) for i in range(self.mol.na)]
@@ -1049,6 +1055,8 @@ class Liquid_TINKER(Liquid):
         # Dictionary of .dyn files used to restart simulations.
         self.DynDict = OrderedDict()
         self.DynDict_New = OrderedDict()
+        # These functions need to be called after self.nptfiles is populated
+        self.post_init(options)
 
     def npt_simulation(self, temperature, pressure, simnum):
         """ Submit a NPT simulation to the Work Queue. """

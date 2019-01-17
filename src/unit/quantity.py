@@ -69,15 +69,19 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from __future__ import division
+from __future__ import absolute_import
 
+from builtins import str
+from builtins import range
+from builtins import object
 __author__ = "Christopher M. Bruns"
 __version__ = "0.5"
 
 
 import math
 import copy
-from standard_dimensions import *
-from unit import Unit, is_unit, dimensionless
+from .standard_dimensions import *
+from .unit import Unit, is_unit, dimensionless
 
 class Quantity(object):
     """Physical quantity, such as 1.3 meters per second.
@@ -136,7 +140,7 @@ class Quantity(object):
                     if len(value) < 1:
                         unit = dimensionless
                     else:
-                        first_item = iter(value).next()
+                        first_item = next(iter(value))
                         # Avoid infinite recursion for string, because a one-character
                         # string is its own first element
                         if value == first_item:
@@ -477,7 +481,7 @@ class Quantity(object):
         """
         return Quantity(-(self._value), self.unit)
 
-    def __nonzero__(self):
+    def __bool__(self):
         """Returns True if value underlying Quantity is zero, False otherwise.
         """
         return bool(self._value)
@@ -689,8 +693,8 @@ def _is_string(x):
      if isinstance(x, str):
          return True
      try:
-         first_item = iter(x).next()
-         inner_item = iter(first_item).next()
+         first_item = next(iter(x))
+         inner_item = next(iter(first_item))
          if first_item is inner_item:
              return True
          else:

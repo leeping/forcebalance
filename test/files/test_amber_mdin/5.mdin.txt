@@ -1,0 +1,1 @@
+[["! example input for QM simulation with external QM program"], ["cntrl", "qmmm"], [{"ifqnt": "1"}, {"qmmask": "'@*'", "qmcharge": "0", "spin": "1", "qm_theory": "'EXTERN'"}], [[], []]]

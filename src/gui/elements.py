@@ -1,9 +1,15 @@
-import Tkinter as tk
-import tkFileDialog as tkfile
+from __future__ import division
+from __future__ import print_function
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+from builtins import str
+import tkinter as tk
+import tkinter.filedialog as tkfile
 import sys, os, re
 import threading
 
-import objects
+from . import objects
 from forcebalance.output import getLogger, StreamHandler, INFO
 
 class ObjectViewer(tk.LabelFrame):
@@ -53,14 +59,14 @@ class ObjectViewer(tk.LabelFrame):
             os.chdir(self.calculation['options'].opts['root'])
             try: self.calculation.run()
             except:
-                print "An Error occurred"
+                print("An Error occurred")
             self.update()
         
         if threading.active_count() < 2:
             calculation_thread = threading.Thread(target=runthread)
             calculation_thread.start()
         else:
-            print "Calculation already running"
+            print("Calculation already running")
 
     def update(self, *args):
         """Update the list of objects being displayed, based on the contents of self.calculation"""
@@ -280,7 +286,7 @@ class DetailViewer(tk.LabelFrame):
         helpmessage = object.getOptionHelp(option)
         height=0
         for line in object.getOptionHelp(option).splitlines():
-            height += 1 + len(line)/70
+            height += 1 + int(len(line)/70)
 
         self.helptext.insert("end", helpmessage)
         self.helptext['height']=height

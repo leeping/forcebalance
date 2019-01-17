@@ -3,7 +3,10 @@
 @author Lee-Ping Wang
 @date 04/2012
 """
+from __future__ import division
 
+from builtins import zip
+from builtins import range
 import os
 from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
@@ -513,7 +516,13 @@ class OpenMM_Reader(BaseReader):
                 pfx = list(element.iterancestors())[0].attrib["name"]
                 Involved = '.'.join([pfx+"-"+element.attrib[i] for i in suffix_dict[ParentType][InteractionType]])
             else:
-                Involved = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType] if i in element.attrib])
+                Involved1 = '.'.join([element.attrib[i] for i in suffix_dict[ParentType][InteractionType] if i in element.attrib])
+                suffix2 = [i.replace('class','type') for i in suffix_dict[ParentType][InteractionType]]
+                suffix3 = [i.replace('type','class') for i in suffix_dict[ParentType][InteractionType]]
+                Involved2 = '.'.join([element.attrib[i] for i in suffix2 if i in element.attrib])
+                Involved3 = '.'.join([element.attrib[i] for i in suffix3 if i in element.attrib])
+                # Keep the Involved string that is the longest (assuming that is the one that properly matched)
+                Involved = [Involved1, Involved2, Involved3][np.argmax(np.array([len(Involved1),len(Involved2),len(Involved3)]))]
             return "/".join([InteractionType, parameter, Involved])
         except:
             logger.info("Minor warning: Parameter ID %s doesn't contain any atom types, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
@@ -524,7 +533,8 @@ class OpenMM(Engine):
     """ Derived from Engine object for carrying out general purpose OpenMM calculations. """
 
     def __init__(self, name="openmm", **kwargs):
-        self.valkwd = ['ffxml', 'pdb', 'platname', 'precision', 'mmopts', 'vsite_bonds', 'implicit_solvent']
+        if not hasattr(self, 'valkwd'):
+            self.valkwd = ['ffxml', 'pdb', 'platname', 'precision', 'mmopts', 'vsite_bonds', 'implicit_solvent']
         super(OpenMM,self).__init__(name=name, **kwargs)
 
     def setopts(self, platname="CUDA", precision="single", **kwargs):
@@ -928,7 +938,7 @@ class OpenMM(Engine):
         if force:
             Force = list(np.array(State.getForces() / kilojoules_per_mole * nanometer).flatten())
             # Extract forces belonging to real atoms only
-            Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(len(Force)/3) if self.AtomMask[i]])))
+            Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(int(len(Force)/3)) if self.AtomMask[i]])))
         if dipole: Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
         return Result
 
@@ -1288,7 +1298,7 @@ class OpenMM(Engine):
             self.residues_idxs = np.array([[a.index for a in r.atoms()] for r in self.simulation.topology.residues()])
         scale_xyz = np.array([x,y,z])
         # loop over each frame and replace items
-        for i in xrange(len(self.xyz_omms)):
+        for i in range(len(self.xyz_omms)):
             pos, box = self.xyz_omms[i]
             # scale the box vectors
             new_box = np.array(box/nanometer) * scale_xyz
@@ -1346,6 +1356,8 @@ class Liquid_OpenMM(Liquid):
         # Send back the trajectory file.
         if self.save_traj > 0:
             self.extra_output = ['liquid-md.pdb', 'liquid-md.dcd']
+        # These functions need to be called after self.nptfiles is populated
+        self.post_init(options)
 
 class AbInitio_OpenMM(AbInitio):
     """ Force and energy matching using OpenMM. """
@@ -1365,7 +1377,7 @@ class BindingEnergy_OpenMM(BindingEnergy):
     def __init__(self,options,tgt_opts,forcefield):
         self.engine_ = OpenMM
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
-        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
         ## Initialize base class.
         super(BindingEnergy_OpenMM,self).__init__(options,tgt_opts,forcefield)
 
@@ -1375,7 +1387,7 @@ class Interaction_OpenMM(Interaction):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="all.pdb")
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
-        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
         self.engine_ = OpenMM
         ## Initialize base class.
         super(Interaction_OpenMM,self).__init__(options,tgt_opts,forcefield)
@@ -1386,7 +1398,7 @@ class Moments_OpenMM(Moments):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="input.pdb")
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
-        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
         self.engine_ = OpenMM
         ## Initialize base class.
         super(Moments_OpenMM,self).__init__(options,tgt_opts,forcefield)

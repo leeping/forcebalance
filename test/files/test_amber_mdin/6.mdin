@@ -1,0 +1,20 @@
+# mdin file - example for adaptive buffered-force QM/MM dynamics
+&cntrl
+ntt=6, ! adaptive Langevin thermostat is used
+ifqnt=1,
+/
+&qmmm
+abfqmmm=1, ! activate abf QM/MM
+r_core_in=3.0, ! inner radius for extended core region
+r_core_out=3.5, ! outer radius for extended core region
+r_qm_in=3.0, ! inner radius for extended qm region
+r_qm_out=3.5, ! outer radius for extended qm region
+r_buffer_in=4.0, ! inner radius for buffer region
+r_buffer_out=4.5, ! outer radius for buffer region
+coremask=':1', ! core region mask
+qmmask=':112, 1129, 1824, 2395', ! qm region mask
+buffermask='', ! buffer region mask
+corecharge=0, ! core region charge
+qmcharge=0, ! qm region charge
+buffercharge=0, ! buffer region charge
+/

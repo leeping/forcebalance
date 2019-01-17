@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+from builtins import range
 import os, sys, re
 import numpy as np
 from collections import defaultdict, OrderedDict
@@ -110,18 +112,18 @@ for line in ffdata:
     if sec == 'moleculetype' and Insert:
         # Here is where we insert the 'interaction type' sections.
         Insert = False
-        print "[ bondtypes ]"
+        print("[ bondtypes ]")
         for key, val in bondtypes.items():
-            print ''.join(['%5s' % i for i in key.split(',')])+''.join(['%12s' % i for i in val.split(',')])
-        print
-        print "[ angletypes ]"
+            print(''.join(['%5s' % i for i in key.split(',')])+''.join(['%12s' % i for i in val.split(',')]))
+        print()
+        print("[ angletypes ]")
         for key, val in angletypes.items():
-            print ''.join(['%5s' % i for i in key.split(',')])+''.join(['%12s' % i for i in val.split(',')])
-        print
-        print "[ dihedraltypes ]"
+            print(''.join(['%5s' % i for i in key.split(',')])+''.join(['%12s' % i for i in val.split(',')]))
+        print()
+        print("[ dihedraltypes ]")
         for key, val in dihedraltypes.items():
-            print ''.join(['%5s' % i for i in key.split('_')[0].split(',')])+''.join(['%12s' % i for i in val.split(',')])
-        print
+            print(''.join(['%5s' % i for i in key.split('_')[0].split(',')])+''.join(['%12s' % i for i in val.split(',')]))
+        print()
     if sec in ['bonds', 'angles', 'dihedrals'] and re.match('^ *[0-9]',line):
         idict, nat = master[sec]
         itype = s[nat]
@@ -136,8 +138,8 @@ for line in ffdata:
             if ans in dihe_nodup: continue
             dihe_nodup.append(ans)
         if strip in skips:
-            print line,
+            print(line, end=' ')
         else:
-            print ''.join([w[j]+s[j] for j in range(nat)])+w[nat]+itype
+            print(''.join([w[j]+s[j] for j in range(nat)])+w[nat]+itype)
     else:
-        print line,
+        print(line, end=' ')

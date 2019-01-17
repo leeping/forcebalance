@@ -1,0 +1,1 @@
+[["", "Production, NPT, 4ns"], ["cntrl"], [{"ntx": "5", "irest": "1", "ntc": "2", "ntf": "2", "dt": "0.002", "nstlim": "2000000", "cut": "8.0", "temp0": "298.15", "iwrap": "1", "ntt": "3", "ig": "-1", "gamma_ln": "1", "ntp": "1", "barostat": "2", "ntpr": "500000", "ntwr": "500000", "ntxo": "2", "ntwx": "100", "ioutfm": "1", "ntwe": "250"}], [["    ", "", ""]]]

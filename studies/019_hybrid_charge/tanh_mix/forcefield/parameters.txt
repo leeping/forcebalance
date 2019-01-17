@@ -1,0 +1,2 @@
+0.0 # PRM 0
+0.0 # EVAL 0 0.5*(1+tanh(PRM['parameters.txt:1.0']))

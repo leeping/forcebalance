@@ -1,5 +1,8 @@
 """ Target base class from which all ForceBalance fitting targets are derived. """
+from __future__ import print_function
 
+from builtins import str
+from builtins import range
 import abc
 import os
 import subprocess
@@ -9,13 +12,14 @@ import time
 from collections import OrderedDict
 import tarfile
 import forcebalance
-from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key, _exec, lp_load
+from forcebalance.nifty import row, col, printcool_dictionary, link_dir_contents, createWorkQueue, getWorkQueue, wq_wait1, getWQIds, wopen, warn_press_key, _exec, lp_load, LinkFile
 from forcebalance.finite_difference import fdwrap_G, fdwrap_H, f1d2p, f12d3p, in_fd
 from forcebalance.optimizer import Counter
 from forcebalance.output import getLogger
+from future.utils import with_metaclass
 logger = getLogger(__name__)
 
-class Target(forcebalance.BaseClass):
+class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
     
     """
     Base class for all fitting targets.
@@ -72,8 +76,6 @@ class Target(forcebalance.BaseClass):
     parameters need to be computed by finite difference.  Not a bad idea. :)
 
     """
-
-    __metaclass__ = abc.ABCMeta
     
     def __init__(self,options,tgt_opts,forcefield):
         """
@@ -126,7 +128,7 @@ class Target(forcebalance.BaseClass):
         ## Gradient norm below which we skip.
         self.set_option(tgt_opts, 'epsgrad')
         ## Dictionary of whether to call the derivatives.
-        self.pgrad = range(forcefield.np)
+        self.pgrad = list(range(forcefield.np))
         self.OptionDict['pgrad'] = self.pgrad
 
         #======================================#
@@ -161,6 +163,13 @@ class Target(forcebalance.BaseClass):
         self.rundir      = self.tempdir
         ## Need the forcefield (here for now)
         self.FF          = forcefield
+        ## mol2 files that are stored in the forcefield folder
+        ## need to be included in the list of mol2 files for the target
+        if hasattr(self, 'mol2'):
+            for fnm in self.FF.fnms:
+                if fnm.endswith('.mol2'):
+                    self.mol2.append(fnm)
+
         ## Counts how often the objective function was computed
         self.xct         = 0
         ## Counts how often the gradient was computed
@@ -216,7 +225,7 @@ class Target(forcebalance.BaseClass):
         # If the 'zero parameters' text file exists, then we load
         # the parameter names from the file for exclusion.
         pgrad0 = self.pgrad[:]
-        self.pgrad = range(self.FF.np)
+        self.pgrad = list(range(self.FF.np))
         if os.path.exists(zero_prm):
             for ln, line in enumerate(open(zero_prm).readlines()):
                 pid = line.strip()
@@ -263,7 +272,7 @@ class Target(forcebalance.BaseClass):
         if len(zero_pids) > 0:
             fout = open(zero_prm, 'w')
             for pid in zero_pids:
-                print >> fout, pid
+                print(pid, file=fout)
             fout.close()
 
     def get_G(self,mvals=None,customdir=None):
@@ -356,6 +365,14 @@ class Target(forcebalance.BaseClass):
         shutil.rmtree(abstempdir,ignore_errors=True)
         # Create a new temporary directory from scratch
         os.makedirs(abstempdir)
+        if hasattr(self, 'mol2'):
+            for f in self.mol2:
+                if os.path.exists(os.path.join(self.root, self.tgtdir, f)):
+                    LinkFile(os.path.join(self.root, self.tgtdir, f), os.path.join(abstempdir, f))
+                elif f not in self.FF.fnms:
+                    logger.error("%s doesn't exist and it's not in the force field directory either" % f)
+                    raise RuntimeError
+
 
     @abc.abstractmethod
     def get(self,mvals,AGrad=False,AHess=False):

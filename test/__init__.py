@@ -1,3 +1,5 @@
+from builtins import str
+from builtins import object
 import unittest
 import os, sys, time, re
 import traceback
@@ -22,6 +24,10 @@ class ForceBalanceTestCase(unittest.TestCase):
         self.addTypeEqualityFunc(numpy.ndarray, self.assertNdArrayEqual)
 
         self.logger = forcebalance.output.getLogger('forcebalance.test.' + __name__[5:])
+
+        # unset this env to prevent error in mdrun
+        if 'OMP_NUM_THREADS' in os.environ:
+            os.environ.pop('OMP_NUM_THREADS')
 
     def shortDescription(self):
         """Default shortDescription function returns None value if no description

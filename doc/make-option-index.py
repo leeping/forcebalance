@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 from forcebalance import parser, optimizer
 from forcebalance.objective import Implemented_Targets
 import re
@@ -433,7 +434,7 @@ $tgt_opts sections in a ForceBalance input file, one for each target.
             #Answer.append("%s (%s):%s" % (str(j), vartype, parser.gen_opts_types[i][j][1]))
             #Answer.append("%s %s" % (str(j),str(val)))
     #Answer.append("$end")
-    print '\n'.join(Answer)
+    print('\n'.join(Answer))
 
 
 

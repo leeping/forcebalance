@@ -7,10 +7,16 @@ contained inside.
 @date 12/2011
 
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import range
+from builtins import object
 import os, pickle, re, sys
 # import cProfile
 import numpy as np
+from numpy.linalg import multi_dot
 from copy import deepcopy
 import forcebalance
 from forcebalance.parser import parse_inputs
@@ -155,14 +161,16 @@ class Optimizer(forcebalance.BaseClass):
         self.iterinit = 0
         ## The current iteration number
         self.iteration = 0
-
+        ## reset the global variable
+        global ITERATION
+        ITERATION = 0
         #======================================#
         #     Variables which are set here     #
         #======================================#
         ## The objective function (needs to pass in when I instantiate)
         self.Objective = Objective
         ## Whether the penalty function is hyperbolic
-        self.bhyp      = Objective.Penalty.ptyp != 2
+        self.bhyp      = Objective.Penalty.ptyp not in (2, 3)
         ## The force field itself
         self.FF        = FF
         ## Target types which introduce uncertainty into the objective function.
@@ -267,18 +275,18 @@ class Optimizer(forcebalance.BaseClass):
                     in_options = 1
                 if in_options and line1.startswith("$end"):
                     if not have_mvals:
-                        print >> fout, "read_mvals"
-                        print >> fout, self.FF.sprint_map(mvals, precision=8)
-                        print >> fout, "/read_mvals"
+                        print("read_mvals", file=fout)
+                        print(self.FF.sprint_map(mvals, precision=8), file=fout)
+                        print("/read_mvals", file=fout)
                         have_mvals = 1
                     if not have_priors and priors is not None:
-                        print >> fout, "priors"
-                        print >> fout, '\n'.join(["   %-35s  : %.1e" % (k, priors[k]) for k in priors.keys()])
-                        print >> fout, "/priors"
+                        print("priors", file=fout)
+                        print('\n'.join(["   %-35s  : %.1e" % (k, priors[k]) for k in list(priors.keys())]), file=fout)
+                        print("/priors", file=fout)
                         have_priors = 1
                     in_options = 0
                 elif in_options and line1.startswith('jobtype') and jobtype is not None:
-                        print >> fout, "jobtype %s" % jobtype
+                        print("jobtype %s" % jobtype, file=fout)
                         continue
                 if line1.startswith("/read_mvals"):
                     in_mvals = 0
@@ -286,21 +294,21 @@ class Optimizer(forcebalance.BaseClass):
                     in_priors = 0
                 if in_mvals: continue
                 if in_priors: continue
-                print >> fout, line,
+                print(line, end='', file=fout)
                 if line1.startswith("read_mvals"):
                     if have_mvals: 
                         logger.error("Encountered more than one read_mvals section\n")
                         raise RuntimeError
                     have_mvals = 1
                     in_mvals = 1
-                    print >> fout, self.FF.sprint_map(mvals, precision=8)
+                    print(self.FF.sprint_map(mvals, precision=8), file=fout)
                 if line1.startswith("priors") and priors is not None:
                     if have_priors: 
                         logger.error("Encountered more than one priors section\n")
                         raise RuntimeError
                     have_priors = 1
                     in_priors = 1
-                    print >> fout, '\n'.join(["   %-35s  : %.1e" % (k, priors[k]) for k in priors.keys()])
+                    print('\n'.join(["   %-35s  : %.1e" % (k, priors[k]) for k in list(priors.keys())]), file=fout)
         return outfnm
             
     def Run(self):
@@ -556,9 +564,22 @@ class Optimizer(forcebalance.BaseClass):
                         trust = max(ndx*(1./(1+self.adapt_fac)), self.mintrust)
                         trustprint = "Low quality step, reducing trust radius to % .4e\n" % trust
                     elif Quality >= ThreHQ and bump and self.trust0 > 0:
+                        curr_trust = trust
                         trust += self.adapt_fac*trust*np.exp(-1*self.adapt_damp*(trust/self.trust0 - 1))
-                        trustprint = "Increasing trust radius to % .4e\n" % trust
+                        if trust > curr_trust:
+                            trustprint = "Increasing trust radius to % .4e\n" % trust
                     color = "\x1b[92m" if Best_Step else "\x1b[0m"
+                    if Best_Step:
+                        if self.backup:
+                            for fnm in self.FF.fnms:
+                                if os.path.exists(os.path.join(self.resdir, fnm)):
+                                    bak(os.path.join(self.resdir, fnm))
+                        self.FF.make(xk,printdir=self.resdir)
+                        # logger.info("The force field has been written to the '%s' directory.\n" % self.resdir)
+                        outfnm = self.save_mvals_to_input(xk)
+                        # logger.info("Input file with optimization parameters saved to %s.\n" % outfnm)
+                        printcool("The force field has been written to the %s directory.\n"
+                                  "Input file with optimization parameters saved to %s." % (self.resdir, outfnm), color=0)
                     #================================#
                     #|  Hessian update for BFGS.    |#
                     #================================#
@@ -566,8 +587,8 @@ class Optimizer(forcebalance.BaseClass):
                         Hnew = H_stor.copy()
                         Dx   = col(xk - xk_prev)
                         Dy   = col(G  - G_prev)
-                        Mat1 = (Dy*Dy.T)/(Dy.T*Dx)[0,0]
-                        Mat2 = ((Hnew*Dx)*(Hnew*Dx).T)/(Dx.T*Hnew*Dx)[0,0]
+                        Mat1 = (np.dot(Dy,Dy.T))/(np.dot(Dy.T,Dx))[0,0]
+                        Mat2 = (np.dot(np.dot(Hnew,Dx),np.dot(Hnew,Dx).T))/(multi_dot([Dx.T,Hnew,Dx]))[0,0]
                         Hnew += Mat1-Mat2
                         H = Hnew.copy()
                         data['H'] = H.copy()
@@ -581,13 +602,14 @@ class Optimizer(forcebalance.BaseClass):
             # Multiply by 2, so when hist=2 this is simply the difference.
             stdfront = np.std(X_hist[-self.hist:]) if len(X_hist) > self.hist else np.std(X_hist)
             stdfront *= 2
+            dX2_sign = -1 if (len(X_hist) > 1 and X_hist[-1] < X_hist[-2]) else 1
             #================================#
             #| Print optimization progress. |#
             #================================#
             nxk = np.linalg.norm(xk)
             ngd = np.linalg.norm(G)
             if self.goodstep:
-                print_progress(ITERATION, nxk, ndx, ngd, color, X, -1*stdfront, Quality)
+                print_progress(ITERATION, nxk, ndx, ngd, color, X, dX2_sign*stdfront, Quality)
             #================================#
             #|   Print objective function,  |#
             #|     gradient and Hessian.    |#
@@ -607,15 +629,16 @@ class Optimizer(forcebalance.BaseClass):
             #|  Check convergence criteria. |#
             #================================#
             ncrit = 0
-            if ngd < self.convergence_gradient and Best_Step:
-                logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.convergence_gradient)
-                ncrit += 1
-            if ndx < self.convergence_step and (self.converge_lowq or Quality > ThreLQ) and Best_Step:
-                logger.info("Convergence criterion reached in step size (%.2e)\n" % self.convergence_step)
-                ncrit += 1
-            if stdfront < self.convergence_objective and (self.converge_lowq or Quality > ThreLQ) and len(X_hist) >= self.hist and Best_Step:
-                logger.info("Convergence criterion reached for objective function (%.2e)\n" % self.convergence_objective)
-                ncrit += 1
+            if self.uncert or self.converge_lowq or Quality > ThreLQ:
+                if ngd < self.convergence_gradient:
+                    logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.convergence_gradient)
+                    ncrit += 1
+                if ndx < self.convergence_step and ITERATION > self.iterinit:
+                    logger.info("Convergence criterion reached in step size (%.2e)\n" % self.convergence_step)
+                    ncrit += 1
+                if stdfront < self.convergence_objective and len(X_hist) >= self.hist:
+                    logger.info("Convergence criterion reached for objective function (%.2e)\n" % self.convergence_objective)
+                    ncrit += 1
             if ncrit >= self.criteria: break
             #================================#
             #| Save optimization variables  |#
@@ -633,7 +656,6 @@ class Optimizer(forcebalance.BaseClass):
             pk_prev = self.FF.create_pvals(xk)
             #================================#
             #| Calculate optimization step. |#
-            #|  Increase iteration number.  |#
             #================================#
             logger.info(trustprint)
             logger.info("Calculating nonlinear optimization step\n")
@@ -642,7 +664,9 @@ class Optimizer(forcebalance.BaseClass):
             # Increment the parameters.
             xk += dx
             ndx = np.linalg.norm(dx)
-            # Increment the iteration counter.
+            #================================#
+            #|  Increase iteration number.  |#
+            #================================#
             ITERATION += 1
             self.iteration += 1
             # The search code benefits from knowing the step size here.
@@ -724,7 +748,6 @@ class Optimizer(forcebalance.BaseClass):
                     self.iter = 0
                 def _compute(self, dx):
                     self.dx = dx.copy()
-                    #Tmp = np.matrix(self.H)*col(dx)
                     Tmp = np.dot(self.H, dx)
                     Reg_Term   = self.Penalty.compute(xkd+flat(dx), Obj0)
                     self.Val   = (X + np.dot(dx, G) + 0.5*np.dot(dx,Tmp) + Reg_Term[0] - data['X'])
@@ -787,8 +810,8 @@ class Optimizer(forcebalance.BaseClass):
             logger.debug(" H:\n")
             pmat2d(H,precision=5, loglevel=DEBUG)
             
-            Hi = invert_svd(np.matrix(H))
-            dx = flat(-1 * Hi * col(G))
+            Hi = invert_svd(H)
+            dx = flat(-1 * np.dot(Hi, col(G)))
             
             logger.debug(" dx:\n")
             pvec1d(dx,precision=5, loglevel=DEBUG)
@@ -806,11 +829,11 @@ class Optimizer(forcebalance.BaseClass):
                 pvec1d(G,precision=5, loglevel=DEBUG)
                 logger.debug(" HT: (Scal = %.4f)\n" % (1+(L-1)**2))
                 pmat2d(HT,precision=5, loglevel=DEBUG)
-                Hi = invert_svd(np.matrix(HT))
-                dx = flat(-1 * Hi * col(G))
+                Hi = invert_svd(HT)
+                dx = flat(-1 * np.dot(Hi, col(G)))
                 logger.debug(" dx:\n")
                 pvec1d(dx,precision=5, loglevel=DEBUG)
-                sol = flat(0.5*row(dx)*np.matrix(H)*col(dx))[0] + np.dot(dx,G)
+                sol = flat(0.5*multi_dot([row(dx), H, col(dx)]))[0] + np.dot(dx,G)
                 for i in self.excision:    # Reinsert deleted coordinates - don't take a step in those directions
                     dx = np.insert(dx, i, 0)
                 return dx, sol
@@ -887,7 +910,7 @@ class Optimizer(forcebalance.BaseClass):
 
         ## Decide which parameters to redirect.
         ## Currently not used.
-        if self.Objective.Penalty.ptyp in [3,4,5]:
+        if self.Objective.Penalty.ptyp in [4,5,6]:
             self.FF.make_redirect(dx+xk)
 
         return dx, expect, bump
@@ -1076,13 +1099,13 @@ class Optimizer(forcebalance.BaseClass):
         def generate_new_population(sorted, pop):
             newpop = pop[sorted[1]]
             # Individuals in this range are kept
-            a = range(KeepNum)
+            a = list(range(KeepNum))
             logger.info("Keeping: " + str(a) + '\n')
             random.shuffle(a)
             for i in range(0, KeepNum, 2):
                 logger.info("%i and %i reproducing to replace %i and %i\n" % (a[i],a[i+1],len(newpop)-i-2,len(newpop)-i-1))
                 newpop[-i-1], newpop[-i-2] = cross_over(newpop[a[i]],newpop[a[i+1]])
-            b = range(KeepNum, len(newpop))
+            b = list(range(KeepNum, len(newpop)))
             random.shuffle(b)
             for i in b[:MutNum]:
                 logger.info("Randomly mutating %i\n" % i)
@@ -1335,12 +1358,12 @@ class Optimizer(forcebalance.BaseClass):
             Reg = newcond.regularize * np.sum(logrskeys ** 2) / len(logrskeys)
             Obj = np.log(Cond_a) + Reg
             if newcond.verbose and newcond.step_n % 1000 == 0: 
-                logger.info("\rEval# %%6i: Step: %%9.3f Along: %%%is Condition: %%10.3e Regularize: %%8.3f Objective: %%8.3f\n" % max([len(k) for k in self.FF.rs_ord.keys()]) %
-                            (newcond.step_n, nlog, new_rsord.keys()[np.argmax(np.abs(dlog))], Cond_a, Reg, np.log(Cond_a) + Reg))
+                logger.info("\rEval# %%6i: Step: %%9.3f Along: %%%is Condition: %%10.3e Regularize: %%8.3f Objective: %%8.3f\n" % max([len(k) for k in list(self.FF.rs_ord.keys())]) %
+                            (newcond.step_n, nlog, list(new_rsord.keys())[np.argmax(np.abs(dlog))], Cond_a, Reg, np.log(Cond_a) + Reg))
                 # printcool_dictionary(answer['rs_ord'])
             elif newcond.verbose and Obj < newcond.best: 
-                logger.info("\rEval# %%6i: Step: %%9.3f Along: %%%is Condition: %%10.3e Regularize: %%8.3f Objective: %%8.3f (new minimum)\n" % max([len(k) for k in self.FF.rs_ord.keys()]) %
-                            (newcond.step_n, nlog, new_rsord.keys()[np.argmax(np.abs(dlog))], Cond_a, Reg, np.log(Cond_a) + Reg))
+                logger.info("\rEval# %%6i: Step: %%9.3f Along: %%%is Condition: %%10.3e Regularize: %%8.3f Objective: %%8.3f (new minimum)\n" % max([len(k) for k in list(self.FF.rs_ord.keys())]) %
+                            (newcond.step_n, nlog, list(new_rsord.keys())[np.argmax(np.abs(dlog))], Cond_a, Reg, np.log(Cond_a) + Reg))
                 # logger.info("New multipliers:" + ' '.join(['% .3f' % np.exp(s) for s in logrskeys])+'\n')
                 newcond.best = Obj
             newcond.prev_step = logrskeys
@@ -1419,7 +1442,7 @@ class Optimizer(forcebalance.BaseClass):
                 rezero.append(i)
             else:
                 nonzeros.append(optresult[i])
-                printkeys.append(self.FF.rs_ord.keys()[i])
+                printkeys.append(list(self.FF.rs_ord.keys())[i])
         # Now we make sure that the scale factors average to 1.0 in the log space. Otherwise they all grow larger / smaller.
         optresult -= np.mean(nonzeros)
         for i in rezero:
@@ -1429,7 +1452,7 @@ class Optimizer(forcebalance.BaseClass):
         opt_rsord = OrderedDict([(k, est124(np.exp(optresult[i])*self.FF.rs_ord[k])) for i, k in enumerate(self.FF.rs_ord.keys())])
         # Print the final answer
         answer = self.FF.make_rescale(opt_rsord, mvals=self.mvals0, H=H.copy(), multiply=False)
-        logger.info("Condition Number after Rounding Factors -> %.3f\n" % (np.exp(newcond(np.log(opt_rsord.values()), multiply=False))))
+        logger.info("Condition Number after Rounding Factors -> %.3f\n" % (np.exp(newcond(np.log(list(opt_rsord.values())), multiply=False))))
         bar = printcool("Previous values of the rescaling factors / prior widths:")
         logger.info(''.join(["   %-35s  : %.5e\n" % (i, self.FF.rs_ord[i]) for i in self.FF.rs_ord.keys()]))
         logger.info(bar)
@@ -1524,5 +1547,5 @@ class Optimizer(forcebalance.BaseClass):
         """ Write the checkpoint file for the main optimizer. """
         if self.wchk_fnm is not None:
             logger.info("Writing the checkpoint file %s\n" % self.wchk_fnm)
-            with wopen(os.path.join(self.root,self.wchk_fnm)) as f: pickle.dump(self.chk,f)
+            with wopen(os.path.join(self.root,self.wchk_fnm), binary=True) as f: pickle.dump(self.chk, f)
         

@@ -1,3 +1,4 @@
+from __future__ import absolute_import
 from __init__ import ForceBalanceTestCase
 import unittest
 import numpy

@@ -92,26 +92,32 @@ we need more modules!
 @date 04/2012
 
 """
+from __future__ import division
 
+from builtins import zip
+from builtins import str
+from builtins import range
 import os
 import sys
 import numpy as np
-from numpy import sin, cos, tan, exp, log, sqrt, pi
+from numpy import sin, cos, tan, sinh, cosh, tanh, exp, log, sqrt, pi
 from re import match, sub, split
 import forcebalance
-from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io
+from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io, smirnoffio
 from forcebalance.finite_difference import in_fd
 from forcebalance.nifty import *
-from string import count
+# from string import count
 from copy import deepcopy
-try:
-    from lxml import etree
-except: pass
 import traceback
 import itertools
 from collections import OrderedDict, defaultdict
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
+
+try:
+    from lxml import etree
+except:
+    logger.warning("Failed to import lxml module, needed by OpenMM engine")
 
 FF_Extensions = {"itp" : "gmx",
                  "top" : "gmx",
@@ -119,6 +125,7 @@ FF_Extensions = {"itp" : "gmx",
                  "prm" : "tinker",
                  "gen" : "custom",
                  "xml" : "openmm",
+                 "offxml" : "smirnoff",
                  "frcmod" : "frcmod",
                  "mol2" : "mol2",
                  "gbs"  : "gbs",
@@ -131,6 +138,7 @@ FF_IOModules = {"gmx": gmxio.ITP_Reader ,
                 "tinker": tinkerio.Tinker_Reader ,
                 "custom": custom_io.Gen_Reader ,
                 "openmm" : openmmio.OpenMM_Reader,
+                "smirnoff" : smirnoffio.SMIRNOFF_Reader,
                 "frcmod" : amberio.FrcMod_Reader,
                 "mol2" : amberio.Mol2_Reader,
                 "gbs" : psi4io.GBS_Reader,
@@ -329,6 +337,22 @@ class FF(forcebalance.BaseClass):
         options = {'forcefield' : [fnm], 'ffdir' : ffdir, 'duplicate_pnames' : True}
         return cls(options, verbose=False, printopt=False)
 
+    def __getstate__(self):
+        state = deepcopy(self.__dict__)
+        for ffname in self.ffdata:
+            if self.ffdata_isxml[ffname]:
+                temp = etree.tostring(self.ffdata[ffname])
+                del state['ffdata'][ffname]
+                state['ffdata'][ffname] = temp
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        for ffname in self.ffdata:
+            if self.ffdata_isxml[ffname]:
+                temp = etree.ElementTree(etree.fromstring(self.ffdata[ffname]))
+                self.ffdata[ffname] = temp
+
     def addff(self,ffname,xmlScript=False):
         """ Parse a force field file and add it to the class.
 
@@ -418,17 +442,19 @@ class FF(forcebalance.BaseClass):
             else:
                 self.openmmxml = ffname
 
-        if fftype == "mol2":
-            if hasattr(self, "amber_mol2"):
-                warn_press_key("There should only be one .mol2 file - confused!!")
+        if fftype == "smirnoff":
+            if hasattr(self, "offxml"):
+                warn_press_key("There should only be one SMIRNOFF XML file - confused!!")
             else:
-                self.amber_mol2 = ffname
+                self.offxml = ffname
 
+        self.amber_mol2 = []
+        if fftype == "mol2":
+            self.amber_mol2.append(ffname)
+
+        self.amber_frcmod = []
         if fftype == "frcmod":
-            if hasattr(self, "amber_frcmod"):
-                warn_press_key("There should only be one .frcmod file - confused!!")
-            else:
-                self.amber_frcmod = ffname
+            self.amber_frcmod.append(ffname)
 
         # Determine the appropriate parser from the FF_IOModules dictionary.
         # If we can't figure it out, then use the base reader, it ain't so bad. :)
@@ -441,9 +467,13 @@ class FF(forcebalance.BaseClass):
         # The reader is essentially a finite state machine that allows us to
         # build the pid.
         self.Readers[ffname] = Reader(ffname)
-        if fftype == "openmm":
+        if fftype in ["openmm", "smirnoff"]:
             ## Read in an XML force field file as an _ElementTree object
-            self.ffdata[ffname] = etree.parse(absff)
+            try:
+                self.ffdata[ffname] = etree.parse(absff)
+            except NameError:
+                logger.error("If etree not defined, please check if lxml module has been installed")
+                raise
             self.ffdata_isxml[ffname] = True
             # Process the file
             self.addff_xml(ffname)
@@ -666,6 +696,7 @@ class FF(forcebalance.BaseClass):
                 self.assign_p0(self.np,float(e.get(p)))
                 self.assign_field(self.np,pid,ffname,fflist.index(e),p,1)
                 self.np += 1
+                self.patoms.append([])
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_repeat/..'):
             for field in e.get('parameter_repeat').split(','):
@@ -679,7 +710,7 @@ class FF(forcebalance.BaseClass):
                     self.map[dest] = self.map[src]
                 else:
                     warn_press_key("Warning: You wanted to copy parameter from %s to %s, but the source parameter does not seem to exist!" % (src, dest))
-                self.assign_field(self.map[dest],dest,ffname,fflist.index(e),dest.split('/')[1],1)
+                self.assign_field(self.map[dest],dest,ffname,fflist.index(e),parameter_name,1)
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
             for field in e.get('parameter_eval').split(','):
@@ -689,7 +720,7 @@ class FF(forcebalance.BaseClass):
                     raise RuntimeError
                 dest = self.Readers[ffname].build_pid(e, parameter_name)
                 evalcmd  = field.strip().split('=')[1]
-                self.assign_field(None,dest,ffname,fflist.index(e),dest.split('/')[1],None,evalcmd)
+                self.assign_field(None,dest,ffname,fflist.index(e),parameter_name,None,evalcmd)
 
     def make(self,vals=None,use_pvals=False,printdir=None,precision=12):
         """ Create a new force field using provided parameter values.
@@ -766,7 +797,7 @@ class FF(forcebalance.BaseClass):
             if cmd is not None:
                 try:
                     # Bobby Tables, anyone?
-                    if any([x in cmd for x in "system", "subprocess", "import"]):
+                    if any([x in cmd for x in ("system", "subprocess", "import")]):
                         warn_press_key("The command %s (written in the force field file) appears to be unsafe!" % cmd)
                     wval = eval(cmd.replace("PARM","PRM"))
                     # Attempt to allow evaluated parameters to be functions of each other.
@@ -825,7 +856,7 @@ class FF(forcebalance.BaseClass):
 
         for fnm in newffdata:
             if self.ffdata_isxml[fnm]:
-                with wopen(os.path.join(absprintdir,fnm)) as f: newffdata[fnm].write(f)
+                with wopen(os.path.join(absprintdir,fnm), binary=True) as f: newffdata[fnm].write(f)
             elif 'Script.txt' in fnm:
                 # if the xml file contains a script, ForceBalance will generate
                 # a temporary .txt file containing the script and any updates.
@@ -845,7 +876,7 @@ class FF(forcebalance.BaseClass):
                 raise RuntimeError
                 else:
                 '''
-                with wopen(os.path.join(absprintdir,fnmXml)) as f: newffdata[fnmXml].write(f)
+                with wopen(os.path.join(absprintdir,fnmXml), binary=True) as f: newffdata[fnmXml].write(f)
             else:
                 with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
 
@@ -949,7 +980,7 @@ class FF(forcebalance.BaseClass):
                 logger.error('What the hell did you do?\n')
                 raise RuntimeError
         else:
-            pvals = flat(np.matrix(self.tmI)*col(mvals)) + self.pvals0
+            pvals = flat(np.dot(self.tmI,col(mvals))) + self.pvals0
         concern= ['polarizability','epsilon','VDWT']
         # Guard against certain types of parameters changing sign.
 
@@ -979,7 +1010,7 @@ class FF(forcebalance.BaseClass):
         if self.logarithmic_map:
             logger.error('create_mvals has not been implemented for logarithmic_map\n')
             raise RuntimeError
-        mvals = flat(invert_svd(self.tmI) * col(pvals - self.pvals0))
+        mvals = flat(np.dot(invert_svd(self.tmI), col(pvals-self.pvals0)))
 
         return mvals
 
@@ -999,12 +1030,29 @@ class FF(forcebalance.BaseClass):
         rsfac_list = []
         ## Takes the dictionary 'BONDS':{3:'B', 4:'K'}, 'VDW':{4:'S', 5:'T'},
         ## and turns it into a list of term types ['BONDSB','BONDSK','VDWS','VDWT']
-
-        if any([self.Readers[i].pdict == "XML_Override" for i in self.fnms]):
-            termtypelist = ['/'.join([i.split('/')[0],i.split('/')[1]]) for i in self.map]
-        else:
-            termtypelist = itertools.chain(*sum([[[i+self.Readers[f].pdict[i][j] for j in self.Readers[f].pdict[i] if isint(str(j))] for i in self.Readers[f].pdict] for f in self.fnms],[]))
-            #termtypelist = sum([[i+self.Readers.pdict[i][j] for j in self.Readers.pdict[i] if isint(str(j))] for i in self.Readers.pdict],[])
+        termtypelist = []
+        for f in self.fnms:
+            if self.Readers[f].pdict == "XML_Override":
+                for i, pName in enumerate(self.map):
+                    for p in self.pfields:
+                        if p[0] == pName:
+                            fnm = p[1]
+                            break
+                    ffnameScript = f.split('.')[0]+'Script.txt'
+                    if fnm == f or fnm == ffnameScript:
+                        if fnm.endswith('offxml'):
+                            ttstr = '/'.join([pName.split('/')[0],pName.split('/')[1],pName.split('/')[2]])
+                        else:
+                            ttstr = '/'.join([pName.split('/')[0],pName.split('/')[1]])
+                        if ttstr not in termtypelist:
+                            termtypelist.append(ttstr)
+            else:
+                for i in self.Readers[f].pdict:
+                    for j in self.Readers[f].pdict[i]:
+                        if isint(str(j)):
+                            ttstr = i+self.Readers[f].pdict[i][j]
+                            if ttstr not in termtypelist:
+                                termtypelist.append(ttstr)
         for termtype in termtypelist:
             for pid in self.map:
                 if termtype in pid:
@@ -1274,7 +1322,7 @@ class FF(forcebalance.BaseClass):
                     self.qmap.append(i)
                     if 'Multipole/c0' in self.plist[i] or 'Atom/charge' in self.plist[i]:
                         AType = self.plist[i].split('/')[-1].split('.')[0]
-                        nq = count(ListOfAtoms,AType)
+                        nq = ListOfAtoms.count(AType)
                     else:
                         thisq = []
                         for k in self.plist[i].split():
@@ -1285,7 +1333,7 @@ class FF(forcebalance.BaseClass):
                         try:
                             self.qid2.append(np.array([self.atomnames.index(k) for k in thisq]))
                         except: pass
-                        nq = sum(np.array([count(self.plist[i], j) for j in concern]))
+                        nq = sum(np.array([self.plist[i].count(j) for j in concern]))
                     self.qid.append(qnr+np.arange(nq))
                     qnr += nq
             if len(self.qid2) == 0:
@@ -1325,7 +1373,7 @@ class FF(forcebalance.BaseClass):
         # There is a bad bug here .. this matrix multiplication operation doesn't work!!
         # I will proceed using loops. This is unsettling.
         # Input matrices are qmat2 and self.rs (diagonal)
-        transmat = np.matrix(qmat2) * np.matrix(np.diag(self.rs))
+        transmat = np.dot(qmat2, np.diag(self.rs))
         transmat1 = np.zeros((self.np, self.np))
         for i in range(self.np):
             for k in range(self.np):

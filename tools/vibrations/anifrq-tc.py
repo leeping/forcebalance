@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from builtins import range
 import os, sys, re
 import numpy as np
 from forcebalance.molecule import Molecule
@@ -25,7 +28,7 @@ xmode = modes[modenum - 1].reshape(-1,3)
 
 xmodeNorm = np.array([np.linalg.norm(i) for i in xmode])
 idxMax = np.argmax(xmodeNorm)
-print "In mode #%i, the largest displacement comes from atom #%i (%s); norm %.3f" % (modenum, idxMax+1, M.elem[idxMax], np.max(xmodeNorm))
+print("In mode #%i, the largest displacement comes from atom #%i (%s); norm %.3f" % (modenum, idxMax+1, M.elem[idxMax], np.max(xmodeNorm)))
 
 xmode *= 0.3 # Reasonable vibrational amplitude
 

@@ -1,55 +1,23 @@
 #!/usr/bin/env python
 
 """
-@package npt
+@package npt_lipid
 
 Runs a simulation to compute condensed phase properties (for example, the density 
 or the enthalpy of vaporization) and compute the derivative with respect 
 to changing the force field parameters.  This script is a part of ForceBalance.
 
-The basic idea is this: First we run a density simulation to determine
-the average density.  This quantity of course has some uncertainty,
-and in general we want to avoid evaluating finite-difference
-derivatives of noisy quantities.  The key is to realize that the
-densities are sampled from a Boltzmann distribution, so the analytic
-derivative can be computed if the potential energy derivative is
-accessible.  We compute the potential energy derivative using
-finite-difference of snapshot energies and apply a simple formula to
-compute the density derivative.
-
-References
-
-[1] Shirts MR, Mobley DL, Chodera JD, and Pande VS. Accurate and efficient corrections for
-missing dispersion interactions in molecular simulations. JPC B 111:13052, 2007.
-
-[2] Ahn S and Fessler JA. Standard errors of mean, variance, and standard deviation estimators.
-Technical Report, EECS Department, The University of Michigan, 2003.
-
-Copyright And License
-
-@author Lee-Ping Wang <leeping@stanford.edu>
-@author John D. Chodera <jchodera@gmail.com> (Wrote statisticalInefficiency and MTS-VVVR)
-
-All code in this repository is released under the GNU General Public License.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-This program is distributed in the hope that it will be useful, but without any
-warranty; without even the implied warranty of merchantability or fitness for a
-particular purpose.  See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see <http://www.gnu.org/licenses/>.
-
+All code in this repository is released under the BSD 3-Clause License (aka BSD 2.0).
+Please see github.com/leeping/forcebalance for more details.
 """
+from __future__ import division
 
 #==================#
 #| Global Imports |#
 #==================#
 
+from builtins import zip
+from builtins import range
 import os
 import sys
 import glob
@@ -314,13 +282,13 @@ def main():
 
     # Print all options.
     printcool_dictionary(TgtOptions, title="Options from ForceBalance")
-    lipid_snapshots = (lipid_nsteps * lipid_timestep / 1000) / lipid_intvl
-    lipid_iframes = 1000 * lipid_intvl / lipid_timestep
+    lipid_snapshots = int((lipid_nsteps * lipid_timestep / 1000) / lipid_intvl)
+    lipid_iframes = int(1000 * lipid_intvl / lipid_timestep)
     logger.info("For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps\n" \
         % (lipid_snapshots, lipid_iframes, lipid_timestep))
     if lipid_snapshots < 2:
         raise Exception('Please set the number of lipid time steps so that you collect at least two snapshots (minimum %i)' \
-                            % (2000 * (lipid_intvl/lipid_timestep)))
+                            % (2000 * int(lipid_intvl/lipid_timestep)))
 
     #----
     # Loading coordinates
@@ -375,7 +343,7 @@ def main():
                                     ("temperature", "%s %s" % (temperature, temperature)), ("pressure", "%s %s" % (pressure, pressure)),
                                     ("nequil", lipid_nequil), ("minimize", minimize),
                                     ("nsave", int(1000 * lipid_intvl / lipid_timestep)),
-                                    ("verbose", True), ('save_traj', TgtOptions['save_traj']), 
+                                    ("verbose", False), ('save_traj', TgtOptions['save_traj']), 
                                     ("threads", threads), ("anisotropic", anisotropic), 
                                     ("mts", mts), ("faststep", faststep), ("bilayer", True)])
 
@@ -452,7 +420,7 @@ def main():
     # Density
     #----
     # Build the first density derivative.
-    GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / L - np.mean(Rhos) * np.mean(G, axis=1))
+    GRho = mBeta * (flat(np.dot(G, col(Rhos))) / L - np.mean(Rhos) * np.mean(G, axis=1))
     # Print out the density and its derivative.
     Sep = printcool("Density: % .4f +- % .4f kg/m^3\nAnalytic Derivative:" % (Rho_avg, Rho_err))
     FF.print_map(vals=GRho)
@@ -489,9 +457,9 @@ def main():
     # Define some things to make the analytic derivatives easier.
     Gbar = np.mean(G,axis=1)
     def deprod(vec):
-        return flat(np.mat(G)*col(vec))/L
+        return flat(np.dot(G,col(vec)))/L
     def covde(vec):
-        return flat(np.mat(G)*col(vec))/L - Gbar*np.mean(vec)
+        return flat(np.dot(G,col(vec)))/L - Gbar*np.mean(vec)
     def avg(vec):
         return np.mean(vec)
 
@@ -624,9 +592,9 @@ def main():
     Dy = Dips[:,1]
     Dz = Dips[:,2]
     D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
-    GD2  = 2*(flat(np.mat(GDx)*col(Dx))/L - avg(Dx)*(np.mean(GDx,axis=1))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
-    GD2 += 2*(flat(np.mat(GDy)*col(Dy))/L - avg(Dy)*(np.mean(GDy,axis=1))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
-    GD2 += 2*(flat(np.mat(GDz)*col(Dz))/L - avg(Dz)*(np.mean(GDz,axis=1))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
+    GD2  = 2*(flat(np.dot(GDx,col(Dx)))/L - avg(Dx)*(np.mean(GDx,axis=1))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
+    GD2 += 2*(flat(np.dot(GDy,col(Dy)))/L - avg(Dy)*(np.mean(GDy,axis=1))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
+    GD2 += 2*(flat(np.dot(GDz,col(Dz)))/L - avg(Dz)*(np.mean(GDz,axis=1))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
     GEps0 = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
     Sep = printcool("Dielectric constant:           % .4e +- %.4e\nAnalytic Derivative:" % (Eps0, Eps0_err))
     FF.print_map(vals=GEps0)
@@ -643,7 +611,7 @@ def main():
     #----
     Al_avg, Al_err = mean_stderr(Als)
     # Build the first A_l derivative.
-    GAl = mBeta * (flat(np.mat(G) * col(Als)) / L - np.mean(Als) * np.mean(G, axis=1))
+    GAl = mBeta * (flat(np.dot(G, col(Als))) / L - np.mean(Als) * np.mean(G, axis=1))
     # Print out A_l and its derivative.
     Sep = printcool("Average Area per Lipid: % .4f +- % .4f nm^2\nAnalytic Derivative:" % (Al_avg, Al_err))
     FF.print_map(vals=GAl)
@@ -706,7 +674,9 @@ def main():
     #----
     Scd_avg, Scd_e = mean_stderr(Scds)
     Scd_err = flat(Scd_e)
-    GScd = mBeta * (((np.mat(G) * Scds) / L) - (np.mat(np.average(G, axis = 1)).T * np.average(Scds, axis = 0)))
+    # In case I did the conversion incorrectly, this is the code that was here previously:
+    # GScd = mBeta * (((np.mat(G) * Scds) / L) - (np.mat(np.average(G, axis = 1)).T * np.average(Scds, axis = 0)))
+    GScd = mBeta * (((np.dot(G, Scds)) / L) - np.dot(col(np.average(G, axis = 1)), row(np.average(Scds, axis = 0))))
     # Print out S_cd and its derivative.
     scd_avgerr = ' '.join('%.4f +- %.4f \n' % F for F in zip(Scd_avg, Scd_err))
     Sep = printcool("Deuterium order parameter: %s \nAnalytic Derivative:" % scd_avgerr)

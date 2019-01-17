@@ -1,3 +1,8 @@
+from __future__ import division
+from __future__ import print_function
+from builtins import zip
+from builtins import str
+from builtins import object
 import os
 import errno
 import numpy as np
@@ -86,6 +91,9 @@ class Thermo(Target):
         self.set_option(tgt_opts, "md_steps", forceprint=True)
 
         ## Variables
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
         # Prefix names for simulation data
         self.simpfx    = "sim"
         # Data points for quantities
@@ -159,8 +167,8 @@ class Thermo(Target):
                 self.points.append(dp)
             else: # Read headers
                 foundHeader = True
-                headers = zip(*[tuple(h.split("_")) for h in line.split()
-                                if h != "w"])
+                headers = list(zip(*[tuple(h.split("_")) for h in line.split()
+                                if h != "w"]))
 
                 label_header = list(headers[0])[0]
                 label_unit   = list(headers[1])[0]
@@ -365,7 +373,7 @@ class Thermo(Target):
 
         o = wopen('gradient_%s.dat' % quantity)
         for line in GradMapPrint:
-            print >> o, ' '.join(line)
+            print(' '.join(line), file=o)
         o.close()
         
         printer = OrderedDict([("    %-5d %-12.2f %-8.1f"

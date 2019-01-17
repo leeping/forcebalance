@@ -1,0 +1,14 @@
+polyA-polyT 10-mer: initial minimization solvent + ions
+ &cntrl
+  imin   = 1,
+  maxcyc = 1000,
+  ncyc   = 500,
+  ntb    = 1,
+  ntr    = 1,
+  cut    = 10.0
+ /
+Hold the DNA fixed
+500.0
+RES 1 20
+END
+END

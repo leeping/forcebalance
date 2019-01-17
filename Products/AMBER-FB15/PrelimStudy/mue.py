@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import numpy as np
 
 QM_MM = np.loadtxt('EnergyCompare.txt')
@@ -10,4 +11,4 @@ D = QM_MM[:,0]-QM_MM[:,1]
 D -= np.mean(D)
 D /= 4.184
 D = np.abs(D)
-print np.dot(D,QM_Wt)
+print(np.dot(D,QM_Wt))

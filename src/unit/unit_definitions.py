@@ -31,15 +31,16 @@ USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
 from __future__ import division
+from __future__ import absolute_import
 
 __author__ = "Christopher M. Bruns"
 __version__ = "0.6"
 
-from baseunit import BaseUnit
-from standard_dimensions import *
-from unit import Unit, ScaledUnit, UnitSystem, dimensionless
-from unit_operators import * ; # needed for manipulation of units
-from prefix import *
+from .baseunit import BaseUnit
+from .standard_dimensions import *
+from .unit import Unit, ScaledUnit, UnitSystem, dimensionless
+from .unit_operators import * ; # needed for manipulation of units
+from .prefix import *
 import math
 import sys
 

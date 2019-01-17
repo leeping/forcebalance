@@ -3,11 +3,13 @@
 @author Lee-Ping Wang
 @date 05/2012
 """
+from __future__ import division
 
+from builtins import str
 import os
 import shutil
 import numpy as np
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohrang, warn_press_key
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohr2ang, warn_press_key
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
 import re
@@ -146,6 +148,9 @@ class BindingEnergy(Target):
 
         self.set_option(tgt_opts,'cauchy')
         self.set_option(tgt_opts,'attenuate')
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
 
         logger.info("The energy denominator is: %s\n" % str(self.energy_denom)) 
         logger.info("The RMSD denominator is: %s\n" % str(self.rmsd_denom))
@@ -158,7 +163,7 @@ class BindingEnergy(Target):
         elif self.attenuate:
             logger.info("Repulsive interactions beyond energy_denom will be scaled by 1.0 / ( denom**2 + (reference-denom)**2 )\n")
         ## Build keyword dictionaries to pass to engine.
-        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del engine_args['name']
         ## Create engine objects.
         self.engines = OrderedDict()
@@ -184,6 +189,7 @@ class BindingEnergy(Target):
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         self.PrintDict = OrderedDict()
         self.RMSDDict = OrderedDict()
+        EnergyDict = OrderedDict()
         #pool = Pool(processes=4)
         def compute(mvals_):
             # This function has automatically assigned variable names from the interaction master file
@@ -192,8 +198,8 @@ class BindingEnergy(Target):
             VectorD_ = []
             for sys_ in self.sys_opts:
                 Energy_, RMSD_ = self.system_driver(sys_)
-                #print "Setting %s to" % sys_, Energy_
-                exec("%s = Energy_" % sys_) in locals()
+                # Energies are stored in a dictionary.
+                EnergyDict[sys_] = Energy_
                 RMSDNrm_ = RMSD_ / self.rmsd_denom
                 w_ = self.sys_opts[sys_]['rmsd_weight'] if 'rmsd_weight' in self.sys_opts[sys_] else 1.0
                 VectorD_.append(np.sqrt(w_)*RMSDNrm_)
@@ -201,7 +207,12 @@ class BindingEnergy(Target):
                     self.RMSDDict[sys_] = "% 9.3f % 12.5f" % (RMSD_, w_*RMSDNrm_**2)
             VectorE_ = []
             for inter_ in self.inter_opts:
-                Calculated_ = eval(self.inter_opts[inter_]['equation'])
+                def encloseInDictionary(matchobj):
+                    return 'EnergyDict["' + matchobj.group(0)+'"]'
+                # Here we need to evaluate a mathematical expression of the stored variables in EnergyDict.
+                # We start by enclosing every variable in EnergyDict[""] and then calling eval on it.
+                evalExpr = re.sub('[A-Za-z_][A-Za-z0-9_]*', encloseInDictionary, self.inter_opts[inter_]['equation'])
+                Calculated_ = eval(evalExpr)
                 Reference_ = self.inter_opts[inter_]['reference_physical']
                 Delta_ = Calculated_ - Reference_
                 Denom_ = self.energy_denom
