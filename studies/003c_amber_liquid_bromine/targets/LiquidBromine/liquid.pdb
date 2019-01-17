@@ -1,0 +1,403 @@
+REMARK   1 CREATED WITH FORCEBALANCE 2018-02-14
+CRYST1   20.556   20.556   20.556  90.00  90.00  90.00 P 1           1 
+HETATM    1 Br1  BRO A   1       1.400  17.920   5.960  1.00  0.00          Br  
+HETATM    2 Br2  BRO A   1      -0.440  18.450   4.720  1.00  0.00          Br  
+HETATM    3 Br1  BRO A   2      11.290   1.830  19.310  1.00  0.00          Br  
+HETATM    4 Br2  BRO A   2      12.180   3.670  18.290  1.00  0.00          Br  
+HETATM    5 Br1  BRO A   3      17.620  13.930   8.560  1.00  0.00          Br  
+HETATM    6 Br2  BRO A   3      19.900  14.000   8.530  1.00  0.00          Br  
+HETATM    7 Br1  BRO A   4      11.350  16.680  19.220  1.00  0.00          Br  
+HETATM    8 Br2  BRO A   4      10.470  18.530  20.220  1.00  0.00          Br  
+HETATM    9 Br1  BRO A   5      11.250   9.560  19.310  1.00  0.00          Br  
+HETATM   10 Br2  BRO A   5      12.250   7.800  18.270  1.00  0.00          Br  
+HETATM   11 Br1  BRO A   6      11.040   9.050   5.200  1.00  0.00          Br  
+HETATM   12 Br2  BRO A   6      10.740  10.550   6.890  1.00  0.00          Br  
+HETATM   13 Br1  BRO A   7       5.740   3.810   8.600  1.00  0.00          Br  
+HETATM   14 Br2  BRO A   7       5.530   2.010   7.230  1.00  0.00          Br  
+HETATM   15 Br1  BRO A   8       7.510  19.470   1.820  1.00  0.00          Br  
+HETATM   16 Br2  BRO A   8       6.580  18.360   3.580  1.00  0.00          Br  
+HETATM   17 Br1  BRO A   9      10.120   7.530   1.660  1.00  0.00          Br  
+HETATM   18 Br2  BRO A   9      10.510   5.600   0.500  1.00  0.00          Br  
+HETATM   19 Br1  BRO A  10      18.350   4.530   6.320  1.00  0.00          Br  
+HETATM   20 Br2  BRO A  10      16.260   4.950   5.520  1.00  0.00          Br  
+HETATM   21 Br1  BRO A  11      15.900   8.970  18.830  1.00  0.00          Br  
+HETATM   22 Br2  BRO A  11      15.120  10.420  20.410  1.00  0.00          Br  
+HETATM   23 Br1  BRO A  12       5.540   7.600  12.490  1.00  0.00          Br  
+HETATM   24 Br2  BRO A  12       4.500   6.670  10.690  1.00  0.00          Br  
+HETATM   25 Br1  BRO A  13      18.860  16.720   1.450  1.00  0.00          Br  
+HETATM   26 Br2  BRO A  13      16.900  16.430   2.580  1.00  0.00          Br  
+HETATM   27 Br1  BRO A  14       6.140   8.050   2.810  1.00  0.00          Br  
+HETATM   28 Br2  BRO A  14       4.200   7.790   3.980  1.00  0.00          Br  
+HETATM   29 Br1  BRO A  15      14.730   8.550   6.230  1.00  0.00          Br  
+HETATM   30 Br2  BRO A  15      14.920   9.160   4.040  1.00  0.00          Br  
+HETATM   31 Br1  BRO A  16      11.400   3.290  13.890  1.00  0.00          Br  
+HETATM   32 Br2  BRO A  16      11.490   1.490  15.290  1.00  0.00          Br  
+HETATM   33 Br1  BRO A  17      13.620  16.200   8.520  1.00  0.00          Br  
+HETATM   34 Br2  BRO A  17      15.610  16.940   9.360  1.00  0.00          Br  
+HETATM   35 Br1  BRO A  18       6.520  15.580   6.070  1.00  0.00          Br  
+HETATM   36 Br2  BRO A  18       4.290  15.350   5.690  1.00  0.00          Br  
+HETATM   37 Br1  BRO A  19       5.790   8.000   7.340  1.00  0.00          Br  
+HETATM   38 Br2  BRO A  19       7.190   9.360   6.170  1.00  0.00          Br  
+HETATM   39 Br1  BRO A  20       2.050   0.800   7.560  1.00  0.00          Br  
+HETATM   40 Br2  BRO A  20       0.640   1.630   5.980  1.00  0.00          Br  
+HETATM   41 Br1  BRO A  21      18.190   1.130  11.200  1.00  0.00          Br  
+HETATM   42 Br2  BRO A  21      17.690  -1.050  11.600  1.00  0.00          Br  
+HETATM   43 Br1  BRO A  22       7.170   7.270  18.070  1.00  0.00          Br  
+HETATM   44 Br2  BRO A  22       6.330   6.590  16.070  1.00  0.00          Br  
+HETATM   45 Br1  BRO A  23      15.350  10.870   9.110  1.00  0.00          Br  
+HETATM   46 Br2  BRO A  23      13.930  12.220   7.940  1.00  0.00          Br  
+HETATM   47 Br1  BRO A  24      14.150  14.120  20.970  1.00  0.00          Br  
+HETATM   48 Br2  BRO A  24      12.680  13.210  19.470  1.00  0.00          Br  
+HETATM   49 Br1  BRO A  25      11.050  15.220   2.060  1.00  0.00          Br  
+HETATM   50 Br2  BRO A  25       8.880  15.850   1.760  1.00  0.00          Br  
+HETATM   51 Br1  BRO A  26      13.150  10.980  16.430  1.00  0.00          Br  
+HETATM   52 Br2  BRO A  26      14.850   9.900  15.370  1.00  0.00          Br  
+HETATM   53 Br1  BRO A  27       6.220  13.550   3.030  1.00  0.00          Br  
+HETATM   54 Br2  BRO A  27       5.210  11.840   4.160  1.00  0.00          Br  
+HETATM   55 Br1  BRO A  28       6.760  16.600  12.910  1.00  0.00          Br  
+HETATM   56 Br2  BRO A  28       8.830  16.310  13.820  1.00  0.00          Br  
+HETATM   57 Br1  BRO A  29      15.770   6.200   1.920  1.00  0.00          Br  
+HETATM   58 Br2  BRO A  29      13.880   7.110   1.040  1.00  0.00          Br  
+HETATM   59 Br1  BRO A  30      13.800  14.440  15.280  1.00  0.00          Br  
+HETATM   60 Br2  BRO A  30      12.390  16.210  15.590  1.00  0.00          Br  
+HETATM   61 Br1  BRO A  31       5.550  12.860  11.750  1.00  0.00          Br  
+HETATM   62 Br2  BRO A  31       7.790  13.280  11.700  1.00  0.00          Br  
+HETATM   63 Br1  BRO A  32      10.420  12.970  14.450  1.00  0.00          Br  
+HETATM   64 Br2  BRO A  32      10.080  13.480  16.640  1.00  0.00          Br  
+HETATM   65 Br1  BRO A  33      12.890  12.260   4.060  1.00  0.00          Br  
+HETATM   66 Br2  BRO A  33      12.370  11.100   2.170  1.00  0.00          Br  
+HETATM   67 Br1  BRO A  34      19.200  14.630   4.940  1.00  0.00          Br  
+HETATM   68 Br2  BRO A  34      21.220  14.790   3.890  1.00  0.00          Br  
+HETATM   69 Br1  BRO A  35       0.100   3.600   9.280  1.00  0.00          Br  
+HETATM   70 Br2  BRO A  35       2.210   3.600  10.150  1.00  0.00          Br  
+HETATM   71 Br1  BRO A  36       9.510   3.410   7.740  1.00  0.00          Br  
+HETATM   72 Br2  BRO A  36       8.870   1.380   8.580  1.00  0.00          Br  
+HETATM   73 Br1  BRO A  37       9.150   6.480  13.530  1.00  0.00          Br  
+HETATM   74 Br2  BRO A  37      10.100   6.400  15.590  1.00  0.00          Br  
+HETATM   75 Br1  BRO A  38      19.120  18.950  15.020  1.00  0.00          Br  
+HETATM   76 Br2  BRO A  38      20.700  17.810  13.830  1.00  0.00          Br  
+HETATM   77 Br1  BRO A  39      16.490  18.040  19.180  1.00  0.00          Br  
+HETATM   78 Br2  BRO A  39      15.180  16.430  18.250  1.00  0.00          Br  
+HETATM   79 Br1  BRO A  40       5.450  13.340  17.320  1.00  0.00          Br  
+HETATM   80 Br2  BRO A  40       6.520  13.520  15.320  1.00  0.00          Br  
+HETATM   81 Br1  BRO A  41       8.290   6.220   9.920  1.00  0.00          Br  
+HETATM   82 Br2  BRO A  41       9.390   7.130   8.150  1.00  0.00          Br  
+HETATM   83 Br1  BRO A  42      15.390  14.700   5.570  1.00  0.00          Br  
+HETATM   84 Br2  BRO A  42      13.660  15.850   4.640  1.00  0.00          Br  
+HETATM   85 Br1  BRO A  43      12.470   5.470   6.540  1.00  0.00          Br  
+HETATM   86 Br2  BRO A  43      12.600   5.810   4.290  1.00  0.00          Br  
+HETATM   87 Br1  BRO A  44       7.930  10.150  13.940  1.00  0.00          Br  
+HETATM   88 Br2  BRO A  44       8.770   9.960  16.050  1.00  0.00          Br  
+HETATM   89 Br1  BRO A  45       1.150  20.280  11.070  1.00  0.00          Br  
+HETATM   90 Br2  BRO A  45       2.150  18.470  10.110  1.00  0.00          Br  
+HETATM   91 Br1  BRO A  46      12.660   8.310   9.430  1.00  0.00          Br  
+HETATM   92 Br2  BRO A  46      12.000   6.660  10.860  1.00  0.00          Br  
+HETATM   93 Br1  BRO A  47       3.460  10.130  10.270  1.00  0.00          Br  
+HETATM   94 Br2  BRO A  47       1.630  11.480  10.100  1.00  0.00          Br  
+HETATM   95 Br1  BRO A  48      18.960  15.580  17.320  1.00  0.00          Br  
+HETATM   96 Br2  BRO A  48      17.790  15.370  15.370  1.00  0.00          Br  
+HETATM   97 Br1  BRO A  49      12.830  10.940  12.320  1.00  0.00          Br  
+HETATM   98 Br2  BRO A  49      11.630   9.350  13.430  1.00  0.00          Br  
+HETATM   99 Br1  BRO A  50       7.310   9.790  10.190  1.00  0.00          Br  
+HETATM  100 Br2  BRO A  50       9.540  10.160  10.450  1.00  0.00          Br  
+HETATM  101 Br1  BRO A  51       4.880  18.820   7.160  1.00  0.00          Br  
+HETATM  102 Br2  BRO A  51       7.150  19.060   7.170  1.00  0.00          Br  
+HETATM  103 Br1  BRO A  52      11.980   1.780  10.460  1.00  0.00          Br  
+HETATM  104 Br2  BRO A  52      13.280   3.400   9.520  1.00  0.00          Br  
+HETATM  105 Br1  BRO A  53       9.970  17.580   5.010  1.00  0.00          Br  
+HETATM  106 Br2  BRO A  53      11.010  19.020   3.580  1.00  0.00          Br  
+HETATM  107 Br1  BRO A  54      17.840  13.070   0.850  1.00  0.00          Br  
+HETATM  108 Br2  BRO A  54      16.590  12.530   2.690  1.00  0.00          Br  
+HETATM  109 Br1  BRO A  55      14.700  21.300  17.800  1.00  0.00          Br  
+HETATM  110 Br2  BRO A  55      13.210  19.580  17.720  1.00  0.00          Br  
+HETATM  111 Br1  BRO A  56      13.740  20.080   0.940  1.00  0.00          Br  
+HETATM  112 Br2  BRO A  56      13.790  17.830   1.320  1.00  0.00          Br  
+HETATM  113 Br1  BRO A  57       3.320  15.700  15.020  1.00  0.00          Br  
+HETATM  114 Br2  BRO A  57       3.080  15.730  12.750  1.00  0.00          Br  
+HETATM  115 Br1  BRO A  58       5.440  11.010   0.280  1.00  0.00          Br  
+HETATM  116 Br2  BRO A  58       3.880  12.680   0.280  1.00  0.00          Br  
+HETATM  117 Br1  BRO A  59       5.030  15.840   9.520  1.00  0.00          Br  
+HETATM  118 Br2  BRO A  59       2.990  14.890   9.140  1.00  0.00          Br  
+HETATM  119 Br1  BRO A  60       8.180  -0.570  13.570  1.00  0.00          Br  
+HETATM  120 Br2  BRO A  60       8.820   1.140  12.210  1.00  0.00          Br  
+HETATM  121 Br1  BRO A  61       2.570  10.100   6.580  1.00  0.00          Br  
+HETATM  122 Br2  BRO A  61       2.020  12.310   6.390  1.00  0.00          Br  
+HETATM  123 Br1  BRO A  62       5.890  19.470  10.660  1.00  0.00          Br  
+HETATM  124 Br2  BRO A  62       4.820  21.470  10.820  1.00  0.00          Br  
+HETATM  125 Br1  BRO A  63      10.880  14.350   6.670  1.00  0.00          Br  
+HETATM  126 Br2  BRO A  63       9.520  13.650   4.970  1.00  0.00          Br  
+HETATM  127 Br1  BRO A  64       9.350  18.200  10.310  1.00  0.00          Br  
+HETATM  128 Br2  BRO A  64       8.760  16.250   9.290  1.00  0.00          Br  
+HETATM  129 Br1  BRO A  65      11.820  15.300  11.810  1.00  0.00          Br  
+HETATM  130 Br2  BRO A  65      11.290  13.640  10.340  1.00  0.00          Br  
+HETATM  131 Br1  BRO A  66      17.410  11.280   6.040  1.00  0.00          Br  
+HETATM  132 Br2  BRO A  66      19.260  10.570   7.170  1.00  0.00          Br  
+HETATM  133 Br1  BRO A  67       8.780   5.980   4.730  1.00  0.00          Br  
+HETATM  134 Br2  BRO A  67       6.820   4.950   5.240  1.00  0.00          Br  
+HETATM  135 Br1  BRO A  68      12.210   1.020   6.670  1.00  0.00          Br  
+HETATM  136 Br2  BRO A  68      11.770  -1.010   7.610  1.00  0.00          Br  
+HETATM  137 Br1  BRO A  69      -0.360  11.180   3.480  1.00  0.00          Br  
+HETATM  138 Br2  BRO A  69       1.800  10.740   2.890  1.00  0.00          Br  
+HETATM  139 Br1  BRO A  70      16.410  18.310   5.930  1.00  0.00          Br  
+HETATM  140 Br2  BRO A  70      14.630  19.360   4.970  1.00  0.00          Br  
+HETATM  141 Br1  BRO A  71      19.080  19.930   8.060  1.00  0.00          Br  
+HETATM  142 Br2  BRO A  71      19.240  17.710   8.540  1.00  0.00          Br  
+HETATM  143 Br1  BRO A  72       2.950   8.720  14.880  1.00  0.00          Br  
+HETATM  144 Br2  BRO A  72       4.660   9.970  15.710  1.00  0.00          Br  
+HETATM  145 Br1  BRO A  73      15.400  18.450  14.950  1.00  0.00          Br  
+HETATM  146 Br2  BRO A  73      15.300  17.060  13.150  1.00  0.00          Br  
+HETATM  147 Br1  BRO A  74      17.880  11.780  16.630  1.00  0.00          Br  
+HETATM  148 Br2  BRO A  74      16.210  12.830  17.760  1.00  0.00          Br  
+HETATM  149 Br1  BRO A  75      14.160   2.360   3.630  1.00  0.00          Br  
+HETATM  150 Br2  BRO A  75      13.320   3.200   1.680  1.00  0.00          Br  
+HETATM  151 Br1  BRO A  76       3.950  19.250  13.830  1.00  0.00          Br  
+HETATM  152 Br2  BRO A  76       4.960  21.050  14.800  1.00  0.00          Br  
+HETATM  153 Br1  BRO A  77      13.710   6.300  14.400  1.00  0.00          Br  
+HETATM  154 Br2  BRO A  77      14.630   4.890  12.870  1.00  0.00          Br  
+HETATM  155 Br1  BRO A  78      15.750   6.200   9.010  1.00  0.00          Br  
+HETATM  156 Br2  BRO A  78      16.920   4.440   9.860  1.00  0.00          Br  
+HETATM  157 Br1  BRO A  79       3.720  16.340   2.110  1.00  0.00          Br  
+HETATM  158 Br2  BRO A  79       5.330  16.300   0.490  1.00  0.00          Br  
+HETATM  159 Br1  BRO A  80      15.210  13.740  11.470  1.00  0.00          Br  
+HETATM  160 Br2  BRO A  80      16.320  12.660  13.150  1.00  0.00          Br  
+HETATM  161 Br1  BRO A  81       7.150   4.440   1.530  1.00  0.00          Br  
+HETATM  162 Br2  BRO A  81       8.170   2.510   0.870  1.00  0.00          Br  
+HETATM  163 Br1  BRO A  82      20.070  14.240  12.260  1.00  0.00          Br  
+HETATM  164 Br2  BRO A  82      18.470  15.750  11.680  1.00  0.00          Br  
+HETATM  165 Br1  BRO A  83       2.960   4.640   6.150  1.00  0.00          Br  
+HETATM  166 Br2  BRO A  83       2.440   6.350   7.570  1.00  0.00          Br  
+HETATM  167 Br1  BRO A  84      18.420   7.920   4.510  1.00  0.00          Br  
+HETATM  168 Br2  BRO A  84      20.620   7.630   5.020  1.00  0.00          Br  
+HETATM  169 Br1  BRO A  85       6.500   3.950  12.310  1.00  0.00          Br  
+HETATM  170 Br2  BRO A  85       4.510   3.990  13.430  1.00  0.00          Br  
+HETATM  171 Br1  BRO A  86       7.730  12.710   8.060  1.00  0.00          Br  
+HETATM  172 Br2  BRO A  86       5.490  12.290   7.930  1.00  0.00          Br  
+HETATM  173 Br1  BRO A  87      17.260  -0.320   2.480  1.00  0.00          Br  
+HETATM  174 Br2  BRO A  87      17.800   1.000   4.270  1.00  0.00          Br  
+HETATM  175 Br1  BRO A  88       0.980  12.730  15.440  1.00  0.00          Br  
+HETATM  176 Br2  BRO A  88       2.390  12.210  13.720  1.00  0.00          Br  
+HETATM  177 Br1  BRO A  89       3.690   0.150   4.160  1.00  0.00          Br  
+HETATM  178 Br2  BRO A  89       5.190   1.750   3.520  1.00  0.00          Br  
+HETATM  179 Br1  BRO A  90      12.870  18.840  11.150  1.00  0.00          Br  
+HETATM  180 Br2  BRO A  90      11.830  19.010  13.170  1.00  0.00          Br  
+HETATM  181 Br1  BRO A  91       8.670   1.200   4.760  1.00  0.00          Br  
+HETATM  182 Br2  BRO A  91      10.260   2.630   3.960  1.00  0.00          Br  
+HETATM  183 Br1  BRO A  92       9.050  12.110   0.840  1.00  0.00          Br  
+HETATM  184 Br2  BRO A  92       8.700  10.830   2.700  1.00  0.00          Br  
+HETATM  185 Br1  BRO A  93      21.060   7.660  10.570  1.00  0.00          Br  
+HETATM  186 Br2  BRO A  93      19.480   7.300   8.960  1.00  0.00          Br  
+HETATM  187 Br1  BRO A  94       6.370  17.290  16.630  1.00  0.00          Br  
+HETATM  188 Br2  BRO A  94       7.770  16.220  18.070  1.00  0.00          Br  
+HETATM  189 Br1  BRO A  95      19.540  10.510  12.930  1.00  0.00          Br  
+HETATM  190 Br2  BRO A  95      18.630  10.830  10.860  1.00  0.00          Br  
+HETATM  191 Br1  BRO A  96      17.530   7.320  12.360  1.00  0.00          Br  
+HETATM  192 Br2  BRO A  96      15.640   8.530  11.950  1.00  0.00          Br  
+HETATM  193 Br1  BRO A  97       8.420   3.690  17.710  1.00  0.00          Br  
+HETATM  194 Br2  BRO A  97       7.990   3.060  15.570  1.00  0.00          Br  
+HETATM  195 Br1  BRO A  98       8.520  20.370  17.490  1.00  0.00          Br  
+HETATM  196 Br2  BRO A  98       9.880  18.830  16.500  1.00  0.00          Br  
+HETATM  197 Br1  BRO A  99      15.260   0.090   8.910  1.00  0.00          Br  
+HETATM  198 Br2  BRO A  99      15.950   1.670   7.410  1.00  0.00          Br  
+HETATM  199 Br1  BRO A 100      16.250   1.580  14.430  1.00  0.00          Br  
+HETATM  200 Br2  BRO A 100      14.680   1.070  12.860  1.00  0.00          Br  
+TER     201      BRO A 100
+CONECT    1    2
+CONECT    2    1
+CONECT    3    4
+CONECT    4    3
+CONECT    5    6
+CONECT    6    5
+CONECT    7    8
+CONECT    8    7
+CONECT    9   10
+CONECT   10    9
+CONECT   11   12
+CONECT   12   11
+CONECT   13   14
+CONECT   14   13
+CONECT   15   16
+CONECT   16   15
+CONECT   17   18
+CONECT   18   17
+CONECT   19   20
+CONECT   20   19
+CONECT   21   22
+CONECT   22   21
+CONECT   23   24
+CONECT   24   23
+CONECT   25   26
+CONECT   26   25
+CONECT   27   28
+CONECT   28   27
+CONECT   29   30
+CONECT   30   29
+CONECT   31   32
+CONECT   32   31
+CONECT   33   34
+CONECT   34   33
+CONECT   35   36
+CONECT   36   35
+CONECT   37   38
+CONECT   38   37
+CONECT   39   40
+CONECT   40   39
+CONECT   41   42
+CONECT   42   41
+CONECT   43   44
+CONECT   44   43
+CONECT   45   46
+CONECT   46   45
+CONECT   47   48
+CONECT   48   47
+CONECT   49   50
+CONECT   50   49
+CONECT   51   52
+CONECT   52   51
+CONECT   53   54
+CONECT   54   53
+CONECT   55   56
+CONECT   56   55
+CONECT   57   58
+CONECT   58   57
+CONECT   59   60
+CONECT   60   59
+CONECT   61   62
+CONECT   62   61
+CONECT   63   64
+CONECT   64   63
+CONECT   65   66
+CONECT   66   65
+CONECT   67   68
+CONECT   68   67
+CONECT   69   70
+CONECT   70   69
+CONECT   71   72
+CONECT   72   71
+CONECT   73   74
+CONECT   74   73
+CONECT   75   76
+CONECT   76   75
+CONECT   77   78
+CONECT   78   77
+CONECT   79   80
+CONECT   80   79
+CONECT   81   82
+CONECT   82   81
+CONECT   83   84
+CONECT   84   83
+CONECT   85   86
+CONECT   86   85
+CONECT   87   88
+CONECT   88   87
+CONECT   89   90
+CONECT   90   89
+CONECT   91   92
+CONECT   92   91
+CONECT   93   94
+CONECT   94   93
+CONECT   95   96
+CONECT   96   95
+CONECT   97   98
+CONECT   98   97
+CONECT   99  100
+CONECT  100   99
+CONECT  101  102
+CONECT  102  101
+CONECT  103  104
+CONECT  104  103
+CONECT  105  106
+CONECT  106  105
+CONECT  107  108
+CONECT  108  107
+CONECT  109  110
+CONECT  110  109
+CONECT  111  112
+CONECT  112  111
+CONECT  113  114
+CONECT  114  113
+CONECT  115  116
+CONECT  116  115
+CONECT  117  118
+CONECT  118  117
+CONECT  119  120
+CONECT  120  119
+CONECT  121  122
+CONECT  122  121
+CONECT  123  124
+CONECT  124  123
+CONECT  125  126
+CONECT  126  125
+CONECT  127  128
+CONECT  128  127
+CONECT  129  130
+CONECT  130  129
+CONECT  131  132
+CONECT  132  131
+CONECT  133  134
+CONECT  134  133
+CONECT  135  136
+CONECT  136  135
+CONECT  137  138
+CONECT  138  137
+CONECT  139  140
+CONECT  140  139
+CONECT  141  142
+CONECT  142  141
+CONECT  143  144
+CONECT  144  143
+CONECT  145  146
+CONECT  146  145
+CONECT  147  148
+CONECT  148  147
+CONECT  149  150
+CONECT  150  149
+CONECT  151  152
+CONECT  152  151
+CONECT  153  154
+CONECT  154  153
+CONECT  155  156
+CONECT  156  155
+CONECT  157  158
+CONECT  158  157
+CONECT  159  160
+CONECT  160  159
+CONECT  161  162
+CONECT  162  161
+CONECT  163  164
+CONECT  164  163
+CONECT  165  166
+CONECT  166  165
+CONECT  167  168
+CONECT  168  167
+CONECT  169  170
+CONECT  170  169
+CONECT  171  172
+CONECT  172  171
+CONECT  173  174
+CONECT  174  173
+CONECT  175  176
+CONECT  176  175
+CONECT  177  178
+CONECT  178  177
+CONECT  179  180
+CONECT  180  179
+CONECT  181  182
+CONECT  182  181
+CONECT  183  184
+CONECT  184  183
+CONECT  185  186
+CONECT  186  185
+CONECT  187  188
+CONECT  188  187
+CONECT  189  190
+CONECT  190  189
+CONECT  191  192
+CONECT  192  191
+CONECT  193  194
+CONECT  194  193
+CONECT  195  196
+CONECT  196  195
+CONECT  197  198
+CONECT  198  197
+CONECT  199  200
+CONECT  200  199

@@ -1,7 +1,10 @@
-import Tkinter as tk
-import tkFileDialog as tkfile
+from __future__ import absolute_import
+from future import standard_library
+standard_library.install_aliases()
+import tkinter as tk
+import tkinter.filedialog as tkfile
 import sys, os
-import elements
+from . import elements
 
 class MainWindow(tk.Tk):
     def __init__(self):

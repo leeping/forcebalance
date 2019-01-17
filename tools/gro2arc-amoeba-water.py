@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from builtins import range
 from forcebalance.molecule import Molecule
 import os, sys
 

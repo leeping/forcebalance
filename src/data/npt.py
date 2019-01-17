@@ -7,49 +7,17 @@ Runs a simulation to compute condensed phase properties (for example, the densit
 or the enthalpy of vaporization) and compute the derivative with respect 
 to changing the force field parameters.  This script is a part of ForceBalance.
 
-The basic idea is this: First we run a density simulation to determine
-the average density.  This quantity of course has some uncertainty,
-and in general we want to avoid evaluating finite-difference
-derivatives of noisy quantities.  The key is to realize that the
-densities are sampled from a Boltzmann distribution, so the analytic
-derivative can be computed if the potential energy derivative is
-accessible.  We compute the potential energy derivative using
-finite-difference of snapshot energies and apply a simple formula to
-compute the density derivative.
-
-References
-
-[1] Shirts MR, Mobley DL, Chodera JD, and Pande VS. Accurate and efficient corrections for
-missing dispersion interactions in molecular simulations. JPC B 111:13052, 2007.
-
-[2] Ahn S and Fessler JA. Standard errors of mean, variance, and standard deviation estimators.
-Technical Report, EECS Department, The University of Michigan, 2003.
-
-Copyright And License
-
-@author Lee-Ping Wang <leeping@stanford.edu>
-@author John D. Chodera <jchodera@gmail.com> (Wrote statisticalInefficiency and MTS-VVVR)
-
-All code in this repository is released under the GNU General Public License.
-
-This program is free software: you can redistribute it and/or modify it under
-the terms of the GNU General Public License as published by the Free Software
-Foundation, either version 3 of the License, or (at your option) any later
-version.
-
-This program is distributed in the hope that it will be useful, but without any
-warranty; without even the implied warranty of merchantability or fitness for a
-particular purpose.  See the GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License along with
-this program.  If not, see <http://www.gnu.org/licenses/>.
-
+All code in this repository is released under the BSD 3-Clause License (aka BSD 2.0).
+Please see github.com/leeping/forcebalance for more details.
 """
+from __future__ import division
 
 #==================#
 #| Global Imports |#
 #==================#
 
+from builtins import zip
+from builtins import range
 import os
 import sys
 import glob
@@ -71,7 +39,7 @@ logger = getLogger(__name__)
 #========================================================#
 
 parser = argparse.ArgumentParser()
-parser.add_argument('engine', help='MD program that we are using; choose "openmm", "tinker" or "gromacs"')
+parser.add_argument('engine', help='MD program that we are using; choose "openmm", "tinker", "amber" or "gromacs"')
 parser.add_argument('temperature',type=float, help='Temperature (K)')
 parser.add_argument('pressure',type=float, help='Pressure (Atm)')
 
@@ -98,8 +66,14 @@ elif engname == "gromacs" or engname == "gmx":
 elif engname == "tinker":
     from forcebalance.tinkerio import *
     Engine = TINKER
+elif engname == "amber":
+    from forcebalance.amberio import *
+    Engine = AMBER
+elif engname == "smirnoff":
+    from forcebalance.smirnoffio import *
+    Engine = SMIRNOFF
 else:
-    raise Exception('OpenMM, GROMACS, and TINKER are supported at this time.')
+    raise Exception('OpenMM, SMIRNOFF/OpenMM, GROMACS, TINKER, and AMBER are supported at this time.')
 
 #==================#
 #|   Subroutines  |#
@@ -256,7 +230,7 @@ def property_derivatives(engine, FF, mvals, h, pgrad, kT, property_driver, prope
 def main():
 
     """
-    Usage: (runcuda.sh) npt.py <openmm|gromacs|tinker> <liquid_nsteps> <liquid_timestep (fs)> <liquid_intvl (ps> <temperature> <pressure>
+    Usage: (runcuda.sh) npt.py <openmm|gromacs|tinker|amber> <liquid_nsteps> <liquid_timestep (fs)> <liquid_intvl (ps> <temperature> <pressure>
 
     This program is meant to be called automatically by ForceBalance on
     a GPU cluster (specifically, subroutines in openmmio.py).  It is
@@ -320,20 +294,20 @@ def main():
 
     # Print all options.
     printcool_dictionary(TgtOptions, title="Options from ForceBalance")
-    liquid_snapshots = (liquid_nsteps * liquid_timestep / 1000) / liquid_intvl
-    liquid_iframes = 1000 * liquid_intvl / liquid_timestep
-    gas_snapshots = (gas_nsteps * gas_timestep / 1000) / gas_intvl
-    gas_iframes = 1000 * gas_intvl / gas_timestep
+    liquid_snapshots = int((liquid_nsteps * liquid_timestep / 1000) / liquid_intvl)
+    liquid_iframes = int(1000 * liquid_intvl / liquid_timestep)
+    gas_snapshots = int((gas_nsteps * gas_timestep / 1000) / gas_intvl)
+    gas_iframes = int(1000 * gas_intvl / gas_timestep)
     logger.info("For the condensed phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps\n" \
         % (liquid_snapshots, liquid_iframes, liquid_timestep))
     if liquid_snapshots < 2:
         raise Exception('Please set the number of liquid time steps so that you collect at least two snapshots (minimum %i)' \
-                            % (2000 * (liquid_intvl/liquid_timestep)))
+                            % (2000 * int(liquid_intvl/liquid_timestep)))
     logger.info("For the gas phase system, I will collect %i snapshots spaced apart by %i x %.3f fs time steps\n" \
         % (gas_snapshots, gas_iframes, gas_timestep))
     if gas_snapshots < 2:
         raise Exception('Please set the number of gas time steps so that you collect at least two snapshots (minimum %i)' \
-                            % (2000 * (gas_intvl/gas_timestep)))
+                            % (2000 * int(gas_intvl/gas_timestep)))
 
     #----
     # Loading coordinates
@@ -355,7 +329,7 @@ def main():
         EngOpts["liquid"]["vdw_cutoff"] = TgtOptions["vdw_cutoff"]
     EngOpts["gas"] = OrderedDict([("coords", gas_fnm), ("mol", MG), ("pbc", False)])
     GenOpts = OrderedDict([('FF', FF)])
-    if engname == "openmm":
+    if engname in ["openmm", "smirnoff"]:
         # OpenMM-specific options
         EngOpts["liquid"]["platname"] = TgtOptions.get("platname", 'CUDA')
         # For now, always run gas phase calculations on the reference platform
@@ -365,6 +339,17 @@ def main():
             except: raise RuntimeError('Forcing failure because CUDA platform unavailable')
             EngOpts["liquid"]["platname"] = 'CUDA'
         if threads > 1: logger.warn("Setting the number of threads will have no effect on OpenMM engine.\n")
+        if engname == "smirnoff":
+            if not TgtOptions['liquid_coords'].endswith('.pdb'):
+                logger.error("With SMIRNOFF engine, please pass a .pdb file to liquid_coords.")
+                raise RuntimeError
+            EngOpts["liquid"]["pdb"] = TgtOptions['liquid_coords']
+            EngOpts["liquid"]["mol2"] = TgtOptions["mol2"]
+            if not TgtOptions['gas_coords'].endswith('.pdb'):
+                logger.error("With SMIRNOFF engine, please pass a .pdb file to gas_coords.")
+                raise RuntimeError
+            EngOpts["gas"]["pdb"] = TgtOptions['gas_coords']
+            EngOpts["gas"]["mol2"] = TgtOptions["mol2"]
     elif engname == "gromacs":
         # Gromacs-specific options
         GenOpts["gmxpath"] = TgtOptions["gmxpath"]
@@ -386,6 +371,20 @@ def main():
         if force_cuda: logger.warn("force_cuda option has no effect on Tinker engine.")
         if rpmd_beads > 0: raise RuntimeError("TINKER cannot handle RPMD.")
         if mts: logger.warn("Tinker not configured for multiple timestep integrator.")
+    elif engname == "amber":
+        # AMBER-specific options
+        GenOpts["amberhome"] = TgtOptions["amberhome"]
+        if os.path.exists(os.path.splitext(liquid_fnm)[0] + ".mdin"):
+            EngOpts["liquid"]["mdin"] = os.path.splitext(liquid_fnm)[0] + ".mdin"
+        if os.path.exists(os.path.splitext(gas_fnm)[0] + ".mdin"):
+            EngOpts["gas"]["mdin"] = os.path.splitext(gas_fnm)[0] + ".mdin"
+        EngOpts["liquid"]["leapcmd"] = os.path.splitext(liquid_fnm)[0] + ".leap"
+        EngOpts["gas"]["leapcmd"] = os.path.splitext(gas_fnm)[0] + ".leap"
+        EngOpts["liquid"]["pdb"] = liquid_fnm
+        EngOpts["gas"]["pdb"] = gas_fnm
+        if force_cuda: logger.warn("force_cuda option has no effect on Amber engine.")
+        if rpmd_beads > 0: raise RuntimeError("AMBER cannot handle RPMD.")
+        if mts: logger.warn("Amber not configured for multiple timestep integrator.")
     EngOpts["liquid"].update(GenOpts)
     EngOpts["gas"].update(GenOpts)
     for i in EngOpts:
@@ -504,7 +503,7 @@ def main():
     # Density
     #----
     # Build the first density derivative.
-    GRho = mBeta * (flat(np.mat(G) * col(Rhos)) / L - np.mean(Rhos) * np.mean(G, axis=1))
+    GRho = mBeta * (flat(np.dot(G, col(Rhos))) / L - np.mean(Rhos) * np.mean(G, axis=1))
     # Print out the density and its derivative.
     Sep = printcool("Density: % .4f +- % .4f kg/m^3\nAnalytic Derivative:" % (Rho_avg, Rho_err))
     FF.print_map(vals=GRho)
@@ -549,12 +548,12 @@ def main():
 
     # Build the first Hvap derivative.
     GHvap = np.mean(G,axis=1)
-    GHvap += mBeta * (flat(np.mat(G) * col(Energies)) / L - Ene_avg * np.mean(G, axis=1))
+    GHvap += mBeta * (flat(np.dot(G, col(Energies))) / L - Ene_avg * np.mean(G, axis=1))
     GHvap /= NMol
     GHvap -= np.mean(mG,axis=1)
-    GHvap -= mBeta * (flat(np.mat(mG) * col(mEnergies)) / L - mEne_avg * np.mean(mG, axis=1))
+    GHvap -= mBeta * (flat(np.dot(mG, col(mEnergies))) / L - mEne_avg * np.mean(mG, axis=1))
     GHvap *= -1
-    GHvap -= mBeta * (flat(np.mat(G) * col(pV)) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
+    GHvap -= mBeta * (flat(np.dot(G, col(pV))) / L - np.mean(pV) * np.mean(G, axis=1)) / NMol
 
     Sep = printcool("Enthalpy of Vaporization: % .4f +- %.4f kJ/mol\nAnalytic Derivative:" % (Hvap_avg, Hvap_err))
     FF.print_map(vals=GHvap)
@@ -562,9 +561,9 @@ def main():
     # Define some things to make the analytic derivatives easier.
     Gbar = np.mean(G,axis=1)
     def deprod(vec):
-        return flat(np.mat(G)*col(vec))/L
+        return flat(np.dot(G,col(vec)))/L
     def covde(vec):
-        return flat(np.mat(G)*col(vec))/L - Gbar*np.mean(vec)
+        return flat(np.dot(G,col(vec)))/L - Gbar*np.mean(vec)
     def avg(vec):
         return np.mean(vec)
 
@@ -696,9 +695,9 @@ def main():
     Dy = Dips[:,1]
     Dz = Dips[:,2]
     D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
-    GD2  = 2*(flat(np.mat(GDx)*col(Dx))/L - avg(Dx)*(np.mean(GDx,axis=1))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
-    GD2 += 2*(flat(np.mat(GDy)*col(Dy))/L - avg(Dy)*(np.mean(GDy,axis=1))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
-    GD2 += 2*(flat(np.mat(GDz)*col(Dz))/L - avg(Dz)*(np.mean(GDz,axis=1))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
+    GD2  = 2*(flat(np.dot(GDx,col(Dx)))/L - avg(Dx)*(np.mean(GDx,axis=1))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
+    GD2 += 2*(flat(np.dot(GDy,col(Dy)))/L - avg(Dy)*(np.mean(GDy,axis=1))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
+    GD2 += 2*(flat(np.dot(GDz,col(Dz)))/L - avg(Dz)*(np.mean(GDz,axis=1))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
     GEps0 = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
     Sep = printcool("Dielectric constant:           % .4e +- %.4e\nAnalytic Derivative:" % (Eps0, Eps0_err))
     FF.print_map(vals=GEps0)

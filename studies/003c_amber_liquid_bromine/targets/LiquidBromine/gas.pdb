@@ -1,0 +1,7 @@
+REMARK   1 CREATED WITH FORCEBALANCE 2018-02-14
+CRYST1   20.556   20.556   20.556  90.00  90.00  90.00 P 1           1 
+HETATM    1 Br1  BRO A   1       1.283  17.998   5.215  1.00  0.00          Br  
+HETATM    2 Br2  BRO A   1      -0.736  19.301   4.847  1.00  0.00          Br  
+TER       3      BRO A   1
+CONECT    1    2
+CONECT    2    1

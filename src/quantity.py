@@ -1,3 +1,5 @@
+from __future__ import division
+from builtins import object
 import os
 import numpy as np
 
@@ -154,7 +156,7 @@ class Quantity_Density(Quantity):
             ekeep += ['Volume', 'Density']
 
             ekeep_order = [key for (key, value) in
-                           sorted(energyterms.items(), key=lambda (k, v) : v)
+                           sorted(energyterms.items(), key=lambda k_v : k_v[1])
                            if key in ekeep]
 
             # Perform energy component analysis and return properties.
@@ -188,7 +190,7 @@ class Quantity_Density(Quantity):
         # Average and error.
         Rho_avg, Rho_err = mean_stderr(Density)
         # Analytic first derivative.
-        Rho_grad = mBeta * (flat(np.mat(G) * col(Density)) / len(Density) \
+        Rho_grad = mBeta * (flat(np.dot(G, col(Density))) / len(Density) \
                             - np.mean(Density) * np.mean(G, axis=1))
             
         return Rho_avg, Rho_err, Rho_grad
@@ -233,10 +235,10 @@ class Quantity_H_vap(Quantity):
             ekeep2  = ['Total-Energy', 'Potential', 'Kinetic-En.', 'Temperature']
 
             ekeep_order1 = [key for (key, value)
-                            in sorted(energyterms1.items(), key=lambda (k, v) : v)
+                            in sorted(energyterms1.items(), key=lambda k_v1 : k_v1[1])
                             if key in ekeep1]
             ekeep_order2 = [key for (key, value)
-                            in sorted(energyterms2.items(), key=lambda (k, v) : v)
+                            in sorted(energyterms2.items(), key=lambda k_v2 : k_v2[1])
                             if key in ekeep2]
 
             # Perform energy component analysis and return properties.
@@ -287,13 +289,13 @@ class Quantity_H_vap(Quantity):
                            + (self.pressure**2) * (Vol_err**2)/(float(nmol)**2)/(pconv**2))
         # Analytic first derivative.
         Hvap_grad  = np.mean(Gm, axis=1)
-        Hvap_grad += mBeta * (flat(np.mat(Gm) * col(mEnergy)) / len(mEnergy) \
+        Hvap_grad += mBeta * (flat(np.dot(Gm, col(mEnergy))) / len(mEnergy) \
                                - np.mean(mEnergy) * np.mean(Gm, axis=1))
         Hvap_grad -= np.mean(G, axis=1)/nmol
-        Hvap_grad += Beta * (flat(np.mat(G) * col(Energy)) / len(Energy) \
+        Hvap_grad += Beta * (flat(np.dot(G, col(Energy))) / len(Energy) \
                                - np.mean(Energy) * np.mean(G, axis=1))/nmol
         Hvap_grad += (Beta*self.pressure/nmol/pconv) * \
-          (flat(np.mat(G) * col(Volume)) / len(Volume) \
+          (flat(np.dot(G, col(Volume))) / len(Volume) \
            - np.mean(Volume) * np.mean(G, axis=1))
 
         return Hvap_avg, Hvap_err, Hvap_grad

@@ -2,6 +2,7 @@
 """
 setup.py: Install ForceBalance. 
 """
+from __future__ import print_function
 __author__ = "Lee-Ping Wang"
 
 from setuptools import setup,Extension
@@ -15,8 +16,8 @@ try:
     import numpy
     import scipy
 except ImportError:
-    print "Error importing numpy and scipy but these are required to install ForceBalance"
-    print "Please make sure the numpy and scipy modules are installed and try again"
+    print("Error importing numpy and scipy but these are required to install ForceBalance")
+    print("Please make sure the numpy and scipy modules are installed and try again")
     exit()
     
 #===================================#
@@ -26,9 +27,9 @@ except ImportError:
 #|                                 |#
 #| doc/header.tex                  |#
 #| doc/api_header.tex              |#
-#| src/__init__.py                 |#
+#| bin/ForceBalance.py             |#
 #===================================#
-__version__ = "v1.3.2"
+__version__ = "v1.6.0"
 try:
     # use git to find current version
     git_describe = subprocess.check_output(["git", "describe"]).strip()
@@ -56,38 +57,31 @@ DCD = Extension('forcebalance/_dcdlib',
                 include_dirs = ["ext/molfile_plugin/include/","ext/molfile_plugin"] 
                 )
 
-# Multistate Bennett acceptance ratios
-CMBAR = Extension('forcebalance/pymbar/_pymbar',
-                  sources = ["ext/pymbar/_pymbar.c"],
-                  extra_compile_args=["-std=c99","-O2","-shared","-msse2","-msse3"],
-                  include_dirs = [numpy.get_include(),numpy.get_include()+"/numpy/"]
-                  )
-
 # Hungarian algorithm for permutations
 # Used for identifying normal modes
-PERMUTE = Extension('forcebalance/_assign',
-                    sources = ['ext/permute/apc.c', 'ext/permute/assign.c'],
-                    include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')]
-                    )
+# PERMUTE = Extension('forcebalance/_assign',
+#                     sources = ['ext/permute/apc.c', 'ext/permute/assign.c'],
+#                     include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')]
+#                     )
 
 # 'contact' library from MSMBuilder for rapidly computing interatomic distances.
 # If we're on Mac OS, it can't find the OpenMP libraries
-import platform
-if platform.system() == 'Darwin':
-    CONTACT = Extension('forcebalance/_contact_wrap',
-                        sources = ["ext/contact/contact.c",
-                                   "ext/contact/contact_wrap.c"],
-                        extra_compile_args=["-std=c99","-O3","-shared",
-                                            "-Wall"],
-                        include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
-else:
-    CONTACT = Extension('forcebalance/_contact_wrap',
-                        sources = ["ext/contact/contact.c",
-                                   "ext/contact/contact_wrap.c"],
-                        extra_compile_args=["-std=c99","-O3","-shared",
-                                            "-fopenmp", "-Wall"],
-                        extra_link_args=['-lgomp'],
-                        include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
+# import platform
+# if platform.system() == 'Darwin':
+#     CONTACT = Extension('forcebalance/_contact_wrap',
+#                         sources = ["ext/contact/contact.c",
+#                                    "ext/contact/contact_wrap.c"],
+#                         extra_compile_args=["-std=c99","-O3","-shared",
+#                                             "-Wall"],
+#                         include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
+# else:
+#     CONTACT = Extension('forcebalance/_contact_wrap',
+#                         sources = ["ext/contact/contact.c",
+#                                    "ext/contact/contact_wrap.c"],
+#                         extra_compile_args=["-std=c99","-O3","-shared",
+#                                             "-fopenmp", "-Wall"],
+#                         extra_link_args=['-lgomp'],
+#                         include_dirs = [numpy.get_include(), os.path.join(numpy.get_include(), 'numpy')])
     
 
 def buildKeywordDictionary(args):
@@ -95,24 +89,23 @@ def buildKeywordDictionary(args):
     setupKeywords["name"]              = "forcebalance"
     # Don't create a separate installed version number for every commit
     setupKeywords["version"]           = re.sub('-[0-9]*$','',__version__)
-    setupKeywords["author"]            = "Lee-Ping Wang, Arthur Vigil"
-    setupKeywords["author_email"]      = "leeping@stanford.edu"
-    setupKeywords["license"]           = "GPL 3.0"
+    setupKeywords["author"]            = "Lee-Ping Wang"
+    setupKeywords["author_email"]      = "leeping@ucdavis.edu"
+    setupKeywords["license"]           = "BSD 2.0"
     setupKeywords["url"]               = "https://simtk.org/home/forcebalance"
     setupKeywords["download_url"]      = "https://simtk.org/home/forcebalance"
     setupKeywords["scripts"]           = glob.glob("bin/*.py") + glob.glob("bin/*.sh") + glob.glob("bin/*.bash") + glob.glob("bin/ForceBalance") + glob.glob("bin/TidyOutput")
-    setupKeywords["packages"]          = ["forcebalance","forcebalance/pymbar"]
+    setupKeywords["packages"]          = ["forcebalance"]
     setupKeywords["package_dir"]       = {"forcebalance"         : "src",
-                                          "forcebalance/pymbar"  : "ext/pymbar"
                                           }
     setupKeywords["package_data"]      = {
         "forcebalance"                   : ["AUTHORS","LICENSE.txt","data/*.py","data/*.sh","data/*.bash","data/uffparms.in","data/oplsaa.ff/*"]
                                          }
     setupKeywords["data_files"]        = []
-    setupKeywords["ext_modules"]       = [CMBAR, DCD, PERMUTE, CONTACT]
+    setupKeywords["ext_modules"]       = [DCD]
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
-    setupKeywords["install_requires"]  = ['networkx>=1.9,<2.0', 'decorator>=3.4.0']
+    # setupKeywords["install_requires"]  = ['networkx>=1.9,<2.0', 'decorator>=3.4.0']
     setupKeywords["long_description"]  = """
 
     ForceBalance (https://simtk.org/home/forcebalance) is a library
@@ -149,14 +142,14 @@ def doClean():
     try:
         forcebalance_dir=os.path.dirname(__import__('forcebalance').__file__)
     except ImportError:
-        print "Couldn't find existing forcebalance installation. Nothing to clean...\n"
+        print("Couldn't find existing forcebalance installation. Nothing to clean...\n")
         return
     except:
-        print "Couldn't read forcebalance location... Continuing with regular install"
+        print("Couldn't read forcebalance location... Continuing with regular install")
         return
 
     #raw_input("All files in %s will be deleted for clean\nPress <Enter> to continue, <Ctrl+C> to abort\n" % forcebalance_dir)
-    print "Removing the directory tree prior to install: %s" % forcebalance_dir
+    print("Removing the directory tree prior to install: %s" % forcebalance_dir)
     subprocess.call("rm -f %s/../forcebalance-*.egg-info" % forcebalance_dir, shell=True)
     if os.path.exists(forcebalance_dir):
         shutil.rmtree(forcebalance_dir, ignore_errors=True)
@@ -183,9 +176,9 @@ def main():
     try:
         import bz2
     except ImportError:
-        print "Error importing bz2, which is important for distributed calculations and remote targets"
-        print "Please either (1) make sure Python is built/installed with bz2 support"
-        print "or (2) proceed with inefficient reading/writing of files; remote targets won't work."
+        print("Error importing bz2, which is important for distributed calculations and remote targets")
+        print("Please either (1) make sure Python is built/installed with bz2 support")
+        print("or (2) proceed with inefficient reading/writing of files; remote targets won't work.")
 
 if __name__ == '__main__':
     main()

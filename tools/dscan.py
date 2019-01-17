@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
+from builtins import zip
+from builtins import str
+from builtins import range
 from forcebalance.molecule import Molecule
 from optparse import OptionParser
 from copy import deepcopy
@@ -104,7 +109,7 @@ def get_rotated_xyz(mol, quartets, incs):
                     thre = opts.thre * 2.4
                 dxij = xyz[i2] - xyz[i1]
                 if np.dot(dxij, dxij) < (thre**2):
-                    print mol.atomname[i1], mol.atomname[i2], np.linalg.norm(dxij)
+                    print(mol.atomname[i1], mol.atomname[i2], np.linalg.norm(dxij))
                     clash = True
     return xyz, clash
 
@@ -122,7 +127,7 @@ def main():
         for inc1 in range(0, 360, opts.scan):
             for inc2 in range(0, 360, opts.scan):
                 xyzrot, clash = get_rotated_xyz(M, [opts.phi1, opts.phi2], [inc1, inc2])
-                print inc1, inc2, "Clash" if clash else "Ok"
+                print(inc1, inc2, "Clash" if clash else "Ok")
                 comm = "Dihedrals %s, %s set to %i, %i" % (str(opts.phi1), str(opts.phi2), inc1, inc2)
                 if clash: 
                     xyzcsh.append(xyzrot.copy())
@@ -133,7 +138,7 @@ def main():
     else: # One dimensional scan
         for inc1 in range(0, 360, opts.scan):
             xyzrot, clash = get_rotated_xyz(M, [opts.phi1], [inc1])
-            print inc1, "Clash" if clash else "Ok"
+            print(inc1, "Clash" if clash else "Ok")
             comm = "Dihedral %s set to %i" % (str(opts.phi1), inc1)
             if clash: 
                 xyzcsh.append(xyzrot.copy())

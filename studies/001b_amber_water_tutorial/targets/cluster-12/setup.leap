@@ -1,0 +1,5 @@
+loadamberparams sol.frcmod
+SOL = loadmol2 sol.mol2
+x = loadpdb water.pdb
+saveamberparm x water.prmtop water.inpcrd
+quit

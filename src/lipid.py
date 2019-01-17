@@ -3,7 +3,13 @@
 author Lee-Ping Wang
 @date 04/2012
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import str
+from builtins import zip
+from builtins import map
+from builtins import range
 import abc
 import os
 import shutil
@@ -23,6 +29,7 @@ from pymbar import pymbar
 import itertools
 from collections import defaultdict, namedtuple, OrderedDict
 import csv
+import copy
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -109,6 +116,9 @@ class Lipid(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
         # List of trajectory files that may be deleted if self.save_traj == 1.
         self.last_traj = []
         # Extra files to be copied back at the end of a run.
@@ -234,7 +244,7 @@ class Lipid(Target):
                         elif val.lower() == 'false':
                             self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = False
                         elif head == 'scd':
-                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = np.array(map(float, val.split()))
+                            self.RefData.setdefault(head,OrderedDict([]))[(t,pval,punit)] = np.array(list(map(float, val.split())))
                 except:
                     logger.error(line + '\n')
                     logger.error('Encountered an error reading this line!\n')
@@ -246,6 +256,7 @@ class Lipid(Target):
         # Check the reference data table for validity.
         default_denoms = defaultdict(int)
         PhasePoints = None
+        RefData_copy = copy.deepcopy(self.RefData)
         for head in self.RefData:
             if head == 'n_ic':
                 continue
@@ -256,9 +267,9 @@ class Lipid(Target):
             if head in known_vars:
                 if head+"_wt" not in self.RefData:
                     # If the phase-point weights are not specified in the reference data file, initialize them all to one.
-                    self.RefData[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
-                wts = np.array(self.RefData[head+"_wt"].values())
-                dat = np.array(self.RefData[head].values())
+                    RefData_copy[head+"_wt"] = OrderedDict([(key, 1.0) for key in self.RefData[head]])
+                wts = np.array(list(RefData_copy[head+"_wt"].values()))
+                dat = np.array(list(self.RefData[head].values()))
                 # S_cd specifies an array of averages (one for each tail node).  Find avg over axis 0.
                 avg = np.average(dat, weights=wts, axis=0)
                 if len(wts) > 1:
@@ -275,9 +286,10 @@ class Lipid(Target):
                         default_denoms[head+"_denom"] = np.average(np.sqrt(np.abs(dat[0])))
                     else:
                         default_denoms[head+"_denom"] = np.sqrt(np.abs(dat[0]))
-            self.PhasePoints = self.RefData[head].keys()
+            self.PhasePoints = list(self.RefData[head].keys())
             # This prints out all of the reference data.
             # printcool_dictionary(self.RefData[head],head)
+        self.RefData = RefData_copy
         # Create labels for the directories.
         self.Labels = ["%.2fK-%.1f%s" % i for i in self.PhasePoints]
         logger.debug("global_opts:\n%s\n" % str(global_opts))
@@ -434,7 +446,7 @@ class Lipid(Target):
             GradMapPrint.append([' %8.2f %8.1f %3s' % PT] + ["% 9.3e" % i for i in g])
         o = wopen('gradient_%s.dat' % name)
         for line in GradMapPrint:
-            print >> o, ' '.join(line)
+            print(' '.join(line), file=o)
         o.close()
             
         Delta = np.array([calc[PT] - exp[PT] for PT in points])
@@ -691,8 +703,8 @@ class Lipid(Target):
             H = E + PV
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
-            C = weight_info(W, PT, np.ones(len(Points))*Shots, verbose=mbar_verbose)
-            Gbar = flat(np.mat(G)*col(W))
+            C = weight_info(W, PT, np.ones(len(Points), dtype=int)*Shots, verbose=mbar_verbose)
+            Gbar = flat(np.dot(G,col(W)))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
             kT    = kb*T
@@ -700,12 +712,12 @@ class Lipid(Target):
             def avg(vec):
                 return np.dot(W,vec)
             def covde(vec):
-                return flat(np.mat(G)*col(W*vec)) - avg(vec)*Gbar
+                return flat(np.dot(G,col(W*vec))) - avg(vec)*Gbar
             def deprod(vec):
-                return flat(np.mat(G)*col(W*vec))
+                return flat(np.dot(G,col(W*vec)))
             ## Density.
             Rho_calc[PT]   = np.dot(W,R)
-            Rho_grad[PT]   = mBeta*(flat(np.mat(G)*col(W*R)) - np.dot(W,R)*Gbar)
+            Rho_grad[PT]   = mBeta*(flat(np.dot(G,col(W*R))) - np.dot(W,R)*Gbar)
             ## Ignore enthalpy.
             ## Thermal expansion coefficient.
             Alpha_calc[PT] = 1e4 * (avg(H*V)-avg(H)*avg(V))/avg(V)/(kT*T)
@@ -737,13 +749,13 @@ class Lipid(Target):
             prefactor = 30.348705333964077
             D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
             Eps0_calc[PT] = 1.0 + prefactor*(D2/avg(V))/T
-            GD2  = 2*(flat(np.mat(GDx)*col(W*Dx)) - avg(Dx)*flat(np.mat(GDx)*col(W))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
-            GD2 += 2*(flat(np.mat(GDy)*col(W*Dy)) - avg(Dy)*flat(np.mat(GDy)*col(W))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
-            GD2 += 2*(flat(np.mat(GDz)*col(W*Dz)) - avg(Dz)*flat(np.mat(GDz)*col(W))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
+            GD2  = 2*(flat(np.dot(GDx,col(W*Dx))) - avg(Dx)*flat(np.dot(GDx,col(W)))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
+            GD2 += 2*(flat(np.dot(GDy,col(W*Dy))) - avg(Dy)*flat(np.dot(GDy,col(W)))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
+            GD2 += 2*(flat(np.dot(GDz,col(W*Dz))) - avg(Dz)*flat(np.dot(GDz,col(W)))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
             Eps0_grad[PT] = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
             ## Average area per lipid
             Al_calc[PT]   = np.dot(W,A)
-            Al_grad[PT]   = mBeta*(flat(np.mat(G)*col(W*A)) - np.dot(W,A)*Gbar)
+            Al_grad[PT]   = mBeta*(flat(np.dot(G,col(W*A))) - np.dot(W,A)*Gbar)
             ## Bilayer Isothermal compressibility.
             A_m2 = A * 1e-18
             kbT = 1.3806488e-23 * T
@@ -757,7 +769,9 @@ class Lipid(Target):
             LKappa_grad[PT] = (1e3 * 2 * kbT / 128) * (GLKappa1 - GLKappa2)
             ## Deuterium order parameter
             Scd_calc[PT]   = np.dot(W,S)
-            Scd_grad[PT]   = mBeta * (flat(np.average(np.mat(G) * (S * W[:, np.newaxis]), axis = 1)) - np.average(np.average(S * W[:, np.newaxis], axis = 0), axis = 0) * Gbar) 
+            # LPW: In case I did not do the conversion correctly, the line of code previously here was:
+            # Scd_grad[PT]   = mBeta * (flat(np.average(np.mat(G) * (S * W[:, np.newaxis]), axis = 1)) - np.average(np.average(S * W[:, np.newaxis], axis = 0), axis = 0) * Gbar) 
+            Scd_grad[PT]   = mBeta * (flat(np.average(np.dot(G, (S * W[:, np.newaxis])), axis = 1)) - np.average(np.average(S * W[:, np.newaxis], axis = 0), axis = 0) * Gbar) 
             ## Estimation of errors.
             Rho_std[PT]    = np.sqrt(sum(C**2 * np.array(Rho_errs)**2))
             Alpha_std[PT]   = np.sqrt(sum(C**2 * np.array(Alpha_errs)**2)) * 1e4
@@ -765,7 +779,9 @@ class Lipid(Target):
             Cp_std[PT]   = np.sqrt(sum(C**2 * np.array(Cp_errs)**2))
             Eps0_std[PT]   = np.sqrt(sum(C**2 * np.array(Eps0_errs)**2))
             Al_std[PT]    = np.sqrt(sum(C**2 * np.array(Al_errs)**2))
-            Scd_std[PT]    = np.sqrt(sum(np.mat(C**2) * np.array(Scd_errs)**2))
+            # LPW: In case I did not do the conversion correctly, the line of code previously here was:
+            # Scd_std[PT]    = np.sqrt(sum(np.mat(C**2) * np.array(Scd_errs)**2))
+            Scd_std[PT]    = np.sqrt(sum(np.dot(row(C**2), np.array(Scd_errs)**2)))
             LKappa_std[PT]   = np.sqrt(sum(C**2 * np.array(LKappa_errs)**2)) * 1e6
 
         # Get contributions to the objective function

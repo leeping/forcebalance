@@ -1,0 +1,406 @@
+#======================================================================#
+#| [1m            Welcome to ForceBalance version 1.5.0! =D             [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Keri A. McKiernan, Yudong Qiu                   [0m |#
+#| [1m           Arthur Vigil, Erik G. Brandt, Johnny Israeli           [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: very_simple.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: sol.mol2
+Reading force field from file: sol.frcmod
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [ -8.3400e-01 ] : COUL:SOL-1
+   1 [  4.1700e-01 ] : COUL:SOL-2
+   2 [  5.5300e+02 ] : BONDSKOW-HW
+   3 [  9.5720e-01 ] : BONDSBOW-HW
+   4 [  1.0000e+02 ] : ANGLESKHW-OW-HW
+   5 [  1.0452e+02 ] : ANGLESBHW-OW-HW
+   6 [  1.7759e+00 ] : VDWSOW
+   7 [  1.6275e-01 ] : VDWTOW
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   COUL                                 : 1.00000e+00
+   BONDSK                               : 9.37583e+05
+   BONDSB                               : 5.29177e-02
+   ANGLESK                              : 6.05928e+02
+   ANGLESB                              : 5.72958e+01
+   VDWS                                 : 5.29177e-02
+   VDWT                                 : 2.47894e+00
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    COUL                          : 1.00000e+00 ] : COUL:SOL-1
+   1 [    COUL                          : 1.00000e+00 ] : COUL:SOL-2
+   2 [    BONDSK                        : 9.37583e+05 ] : BONDSKOW-HW
+   3 [    BONDSB                        : 5.29177e-02 ] : BONDSBOW-HW
+   4 [    ANGLESK                       : 6.05928e+02 ] : ANGLESKHW-OW-HW
+   5 [    ANGLESB                       : 5.72958e+01 ] : ANGLESBHW-OW-HW
+   6 [    VDWS                          : 5.29177e-02 ] : VDWSOW
+   7 [    VDWT                          : 2.47894e+00 ] : VDWTOW
+----------------------------------------------------------
+Building charge constraints...
+Parameter 0 occurs 1 times in molecule SOL in locations [0] (COUL:SOL-1)
+Parameter 1 occurs 2 times in molecule SOL in locations [1, 2] (COUL:SOL-2 COUL:SOL-3)
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['sol.mol2', 'sol.frcmod'] 
+----------------------------------------------------------
+The 'amberhome' option was not specified; using default.
+pmemd.cuda is available, using CUDA to accelerate calculations.
+Autodetected setup.leap in /home/leeping/src/forcebalance/studies/001b_amber_water_tutorial/targets/cluster-06
+Cannot find a unique file with extension .mdin in /home/leeping/src/forcebalance/studies/001b_amber_water_tutorial/targets/cluster-06 (0 found; )
+[91mWriting amber-all.crd file with no periodic box information[0m
+Fitting the forces on all atoms
+#========================================================#
+#| [92m           Setup for target cluster-06 :            [0m |#
+#========================================================#
+name                      cluster-06 
+type                      ABINITIO_AMBER 
+backup                    False 
+tgtdir                    targets/cluster-06 
+shots                     1208 
+----------------------------------------------------------
+pmemd.cuda is available, using CUDA to accelerate calculations.
+[91mWriting amber-all.crd file with no periodic box information[0m
+Fitting the forces on all atoms
+#========================================================#
+#| [92m           Setup for target cluster-12 :            [0m |#
+#========================================================#
+name                      cluster-12 
+type                      ABINITIO_AMBER 
+backup                    False 
+tgtdir                    targets/cluster-12 
+shots                     1201 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e-02 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          0.01 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   NEWTON 
+trust0                    1.0 
+backup                    False 
+input_file                very_simple.in 
+----------------------------------------------------------
+#========================================================#
+#| [1m                  Main Optimizer                    [0m |#
+#| [1m   Newton-Raphson Method (Adaptive Trust Radius)    [0m |#
+#| [1m                                                    [0m |#
+#| [1m       [0mConvergence criteria (1 of 3 needed):        [0m |#
+#| [1m          [0mObjective Function  : 1.000e-04           [0m |#
+#| [1m          [0mNorm of Gradient    : 1.000e-03           [0m |#
+#| [1m          [0mParameter step size : 1.000e-04           [0m |#
+#========================================================#
+#========================================================#
+#|       Color Key for Objective Function -=X2=-        |#
+#|  [1mBold[0m = Initial step                                 |#
+#|  [92mGreen = Current lowest value of objective function[0m  |#
+#|  [91mRed = Objective function rises, step rejected[0m       |#
+#|  [0mNo color = Not at the lowest value                  |#
+#========================================================#
+#========================================================#
+#| [94m     Iteration 0: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+Trying to write to a symbolic link setup.leap_, removing it first
+
+#================================================================================================#
+#|              Target: cluster-06  Type: AbInitio_AMBER  Objective = 2.78739e-01               |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)          10.9522       27.3135     40.0981%     0.1608    1.000     0.1608 
+    Gradient (kJ/mol/A)      47.9222      139.5348     34.3442%     0.1180    1.000     0.1180 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 4 (H), frame 1207,  33.5001 kJ/mol/A
+Trying to write to a symbolic link setup.leap_, removing it first
+
+#================================================================================================#
+#|              Target: cluster-12  Type: AbInitio_AMBER  Objective = 2.63174e-01               |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)          17.5679       47.3455     37.1057%     0.1377    1.000     0.1377 
+    Gradient (kJ/mol/A)      48.9224      138.1028     35.4246%     0.1255    1.000     0.1255 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 1 (H), frame 1200,  49.3408 kJ/mol/A
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+cluster-06                     0.27874      0.500 [94m     1.39369e-01[0m 
+cluster-12                     0.26317      0.500 [94m     1.31587e-01[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     2.70956e-01[0m 
+----------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     0   0.000e+00   0.000e+00   8.482e+01[1m   2.70956e-01[0m  -0.000e+00      0.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -1.63333662e-01 ] : COUL:SOL-1
+   1 [  2.47125398e-01 ] : COUL:SOL-2
+   2 [  8.48144823e+01 ] : BONDSKOW-HW
+   3 [ -2.72421042e-01 ] : BONDSBOW-HW
+   4 [  0.00000000e+00 ] : ANGLESKHW-OW-HW
+   5 [  0.00000000e+00 ] : ANGLESBHW-OW-HW
+   6 [ -1.65159366e-02 ] : VDWSOW
+   7 [ -5.89639500e-01 ] : VDWTOW
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 5.6001e-02)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  0.0000e+00 + 2.8606e-02 =  2.8606e-02 ] : COUL:SOL-1
+   1 [  0.0000e+00 - 1.2267e-02 = -1.2267e-02 ] : COUL:SOL-2
+   2 [  0.0000e+00 - 7.0843e-07 = -7.0843e-07 ] : BONDSKOW-HW
+   3 [  0.0000e+00 + 4.4825e-02 =  4.4825e-02 ] : BONDSBOW-HW
+   4 [  0.0000e+00 - 1.6517e-19 = -1.6517e-19 ] : ANGLESKHW-OW-HW
+   5 [  0.0000e+00 - 5.9135e-20 = -5.9135e-20 ] : ANGLESBHW-OW-HW
+   6 [  0.0000e+00 + 1.2543e-02 =  1.2543e-02 ] : VDWSOW
+   7 [  0.0000e+00 - 8.5417e-04 = -8.5417e-04 ] : VDWTOW
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [ -8.3400e-01 + 2.8606e-02 = -8.0539e-01 ] : COUL:SOL-1
+   1 [  4.1700e-01 - 1.2267e-02 =  4.0473e-01 ] : COUL:SOL-2
+   2 [  5.5300e+02 - 6.6421e-01 =  5.5234e+02 ] : BONDSKOW-HW
+   3 [  9.5720e-01 + 2.3720e-03 =  9.5957e-01 ] : BONDSBOW-HW
+   4 [  1.0000e+02 + 0.0000e+00 =  1.0000e+02 ] : ANGLESKHW-OW-HW
+   5 [  1.0452e+02 + 0.0000e+00 =  1.0452e+02 ] : ANGLESBHW-OW-HW
+   6 [  1.7759e+00 + 6.6374e-04 =  1.7766e+00 ] : VDWSOW
+   7 [  1.6275e-01 - 2.1174e-03 =  1.6063e-01 ] : VDWTOW
+----------------------------------------------------------
+Backing up very_simple.sav -> very_simple.bak/very_simple_2.sav
+Input file with saved parameters: very_simple.sav
+#========================================================#
+#| [94m     Iteration 1: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+Trying to write to a symbolic link setup.leap_, removing it first
+
+#================================================================================================#
+#|              Target: cluster-06  Type: AbInitio_AMBER  Objective = 2.64971e-01               |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)          10.8245       27.3135     39.6307%     0.1571    1.000     0.1571 
+    Gradient (kJ/mol/A)      45.8372      139.5348     32.8500%     0.1079    1.000     0.1079 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 0 (O), frame 1207,  33.3103 kJ/mol/A
+Trying to write to a symbolic link setup.leap_, removing it first
+
+#================================================================================================#
+#|              Target: cluster-12  Type: AbInitio_AMBER  Objective = 2.57198e-01               |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)          17.6785       47.3455     37.3393%     0.1394    1.000     0.1394 
+    Gradient (kJ/mol/A)      47.3948      138.1028     34.3185%     0.1178    1.000     0.1178 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 15 (O), frame 1200,  49.2507 kJ/mol/A
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+cluster-06                     0.26497      0.500 [92m     1.32486e-01[0m ( -6.884e-03 ) 
+cluster-12                     0.25720      0.500 [92m     1.28599e-01[0m ( -2.988e-03 ) 
+Regularization                 0.00003      1.000 [91m     3.13610e-05[0m ( +3.136e-05 ) 
+Total                                             [92m     2.61116e-01[0m ( -9.840e-03 ) 
+-------------------------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     1   5.600e-02   5.600e-02   1.472e+00[92m   2.61116e-01[0m  -9.840e-03      1.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -7.85783254e-03 ] : COUL:SOL-1
+   1 [ -1.12266388e-03 ] : COUL:SOL-2
+   2 [ -1.47204655e+00 ] : BONDSKOW-HW
+   3 [  2.48611964e-03 ] : BONDSBOW-HW
+   4 [ -3.30345184e-21 ] : ANGLESKHW-OW-HW
+   5 [ -1.18269357e-21 ] : ANGLESBHW-OW-HW
+   6 [ -2.63534154e-04 ] : VDWSOW
+   7 [ -1.03613856e-02 ] : VDWTOW
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 7.7054e-04)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  2.8606e-02 + 5.3059e-04 =  2.9136e-02 ] : COUL:SOL-1
+   1 [ -1.2267e-02 - 1.7686e-04 = -1.2444e-02 ] : COUL:SOL-2
+   2 [ -7.0843e-07 + 5.1347e-07 = -1.9496e-07 ] : BONDSKOW-HW
+   3 [  4.4825e-02 + 3.5564e-05 =  4.4861e-02 ] : BONDSBOW-HW
+   4 [ -1.6517e-19 + 2.0702e-21 = -1.6310e-19 ] : ANGLESKHW-OW-HW
+   5 [ -5.9135e-20 + 4.6713e-22 = -5.8668e-20 ] : ANGLESBHW-OW-HW
+   6 [  1.2543e-02 - 5.2857e-04 =  1.2014e-02 ] : VDWSOW
+   7 [ -8.5417e-04 + 1.6664e-05 = -8.3750e-04 ] : VDWTOW
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [ -8.0539e-01 + 5.3059e-04 = -8.0486e-01 ] : COUL:SOL-1
+   1 [  4.0473e-01 - 1.7686e-04 =  4.0456e-01 ] : COUL:SOL-2
+   2 [  5.5234e+02 + 4.8142e-01 =  5.5282e+02 ] : BONDSKOW-HW
+   3 [  9.5957e-01 + 1.8820e-06 =  9.5957e-01 ] : BONDSBOW-HW
+   4 [  1.0000e+02 + 0.0000e+00 =  1.0000e+02 ] : ANGLESKHW-OW-HW
+   5 [  1.0452e+02 + 0.0000e+00 =  1.0452e+02 ] : ANGLESBHW-OW-HW
+   6 [  1.7766e+00 - 2.7971e-05 =  1.7766e+00 ] : VDWSOW
+   7 [  1.6063e-01 + 4.1310e-05 =  1.6067e-01 ] : VDWTOW
+----------------------------------------------------------
+Input file with saved parameters: very_simple.sav
+#========================================================#
+#| [94m     Iteration 2: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+Trying to write to a symbolic link setup.leap_, removing it first
+
+#================================================================================================#
+#|              Target: cluster-06  Type: AbInitio_AMBER  Objective = 2.64911e-01               |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)          10.8251       27.3135     39.6327%     0.1571    1.000     0.1571 
+    Gradient (kJ/mol/A)      45.8209      139.5348     32.8383%     0.1078    1.000     0.1078 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 0 (O), frame 1207,  33.1488 kJ/mol/A
+Trying to write to a symbolic link setup.leap_, removing it first
+
+#================================================================================================#
+#|              Target: cluster-12  Type: AbInitio_AMBER  Objective = 2.57254e-01               |#
+#|                        Difference   Denominator     Percent                                  |#
+#|  Observable            (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
+#================================================================================================#
+    Energy (kJ/mol)          17.6879       47.3455     37.3591%     0.1396    1.000     0.1396 
+    Gradient (kJ/mol/A)      47.3763      138.1028     34.3051%     0.1177    1.000     0.1177 
+--------------------------------------------------------------------------------------------------
+Maximum force difference on atom 15 (O), frame 1200,  49.0744 kJ/mol/A
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+cluster-06                     0.26491      0.500 [92m     1.32455e-01[0m ( -3.024e-05 ) 
+cluster-12                     0.25725      0.500 [91m     1.28627e-01[0m ( +2.780e-05 ) 
+Regularization                 0.00003      1.000 [91m     3.16129e-05[0m ( +2.519e-07 ) 
+Total                                             [92m     2.61114e-01[0m ( -2.197e-06 ) 
+-------------------------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     2   5.623e-02   7.705e-04   8.096e-01[92m   2.61114e-01[0m  -2.197e-06      0.941
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  1.01825968e-04 ] : COUL:SOL-1
+   1 [ -3.99934974e-04 ] : COUL:SOL-2
+   2 [  8.09614156e-01 ] : BONDSKOW-HW
+   3 [ -7.53462691e-04 ] : BONDSBOW-HW
+   4 [ -3.26204763e-21 ] : ANGLESKHW-OW-HW
+   5 [ -1.17335105e-21 ] : ANGLESBHW-OW-HW
+   6 [  9.32989855e-07 ] : VDWSOW
+   7 [  5.13615797e-05 ] : VDWTOW
+----------------------------------------------------------
+Convergence criterion reached for objective function (1.00e-04)
+#========================================================#
+#| [92m               [0m[1mOptimization Converged[0m               [0m |#
+#| [92m           Final objective function value           [0m |#
+#| [92m  Full:  2.611140e-01  Un-penalized:  2.610823e-01  [0m |#
+#========================================================#
+#========================================================#
+#| [94m           Final optimization parameters:           [0m |#
+#========================================================#
+   0 [  2.9136e-02 ] : COUL:SOL-1
+   1 [ -1.2444e-02 ] : COUL:SOL-2
+   2 [ -1.9496e-07 ] : BONDSKOW-HW
+   3 [  4.4861e-02 ] : BONDSBOW-HW
+   4 [ -1.6310e-19 ] : ANGLESKHW-OW-HW
+   5 [ -5.8668e-20 ] : ANGLESBHW-OW-HW
+   6 [  1.2014e-02 ] : VDWSOW
+   7 [ -8.3750e-04 ] : VDWTOW
+#========================================================#
+#| [94m             Final physical parameters:             [0m |#
+#========================================================#
+   0 [ -8.0486e-01 ] : COUL:SOL-1
+   1 [  4.0456e-01 ] : COUL:SOL-2
+   2 [  5.5282e+02 ] : BONDSKOW-HW
+   3 [  9.5957e-01 ] : BONDSBOW-HW
+   4 [  1.0000e+02 ] : ANGLESKHW-OW-HW
+   5 [  1.0452e+02 ] : ANGLESBHW-OW-HW
+   6 [  1.7766e+00 ] : VDWSOW
+   7 [  1.6067e-01 ] : VDWTOW
+----------------------------------------------------------
+#===========================================================================#
+#|  The force field has been written to the result/very_simple directory.  |#
+#|    Input file with optimization parameters saved to very_simple.sav.    |#
+#===========================================================================#
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#

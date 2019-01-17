@@ -18,12 +18,14 @@ This subclass of Target implements the 'get' method.
 @author Lee-Ping Wang
 @date 12/2011
 """
+from __future__ import absolute_import
 
+from builtins import range
 import os
 import sys
 from re import match
 from forcebalance.target import Target
-from nifty import *
+from .nifty import *
 import numpy as np
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -45,6 +47,9 @@ class Counterpoise(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = True
         ## XYZ elements and coordinates
         self.elem, self.xyzs = self.loadxyz(os.path.join(self.root,self.tgtdir,'all.xyz'))
         ## Counterpoise correction data

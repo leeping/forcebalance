@@ -1,0 +1,10 @@
+! example input for QM simulation with external QM program
+&cntrl
+ifqnt = 1, ! switch on QM/MM
+/
+&qmmm
+qmmask = '@*', ! select QM atoms (here: make all QM)
+qmcharge = 0, ! charge on QM region (default = 0)
+spin = 1, ! spin multiplicity of QM region (default = 1)
+qm_theory = 'EXTERN', ! use external QM program
+/

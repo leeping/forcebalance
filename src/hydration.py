@@ -3,7 +3,9 @@
 @author Lee-Ping Wang
 @date 09/2014
 """
+from __future__ import division
 
+from builtins import range
 import os
 import shutil
 import numpy as np
@@ -69,6 +71,9 @@ class Hydration(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
         ## The vdata.txt file that contains the hydrations.
         self.datafile = os.path.join(self.tgtdir,self.datafile)
         ## Scripts to be copied from the ForceBalance installation directory.
@@ -79,7 +84,7 @@ class Hydration(Target):
         ## This is far from an ideal solution...
         self.OptionDict['engname'] = self.engname
         ## Copy target options into engine options.
-        self.engine_opts = OrderedDict(self.OptionDict.items() + options.items())
+        self.engine_opts = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del self.engine_opts['name']
         ## Carry out necessary operations for specific modes.
         if self.hfemode.lower() in ['sp', 'single']:
@@ -306,9 +311,9 @@ class Hydration(Target):
         def get_hfe(mvals_):
             self.FF.make(mvals_)
             self.hfe_dict = self.hydration_driver_sp()
-            return np.array(self.hfe_dict.values())
+            return np.array(list(self.hfe_dict.values()))
         calc_hfe = get_hfe(mvals)
-        D = calc_hfe - np.array(self.expval.values())
+        D = calc_hfe - np.array(list(self.expval.values()))
         dD = np.zeros((self.FF.np,len(self.IDs)))
         if AGrad or AHess:
             for p in self.pgrad:
@@ -343,7 +348,7 @@ class Hydration(Target):
                     if AGrad: 
                         dEg = results['Potential_Derivatives']
                         dEaq = results['Potential_Derivatives'] + results['Hydration_Derivatives']
-                        data[p]['dHyd'] = (flat(np.matrix(dEaq)*col(expmbH)/L)-np.mean(dEg,axis=1)*np.mean(expmbH)) / np.mean(expmbH)
+                        data[p]['dHyd'] = (flat(np.dot(dEaq,col(expmbH))/L)-np.mean(dEg,axis=1)*np.mean(expmbH)) / np.mean(expmbH)
                 elif p == "liq":
                     Eg = results['Potentials'] - results['Hydration']
                     Eaq = results['Potentials']
@@ -356,7 +361,7 @@ class Hydration(Target):
                     if AGrad: 
                         dEg = results['Potential_Derivatives'] - results['Hydration_Derivatives']
                         dEaq = results['Potential_Derivatives']
-                        data[p]['dHyd'] = -(flat(np.matrix(dEg)*col(exppbH)/L)-np.mean(dEaq,axis=1)*np.mean(exppbH)) / np.mean(exppbH)
+                        data[p]['dHyd'] = -(flat(np.dot(dEg, col(exppbH))/L)-np.mean(dEaq,axis=1)*np.mean(exppbH)) / np.mean(exppbH)
                 os.chdir('..')
             # Calculate the hydration free energy using gas phase, liquid phase or the average of both.
             # Note that the molecular dynamics methods return energies in kJ/mol.
@@ -378,8 +383,8 @@ class Hydration(Target):
                 elif self.hfemode == 'exp_both':
                     dD[:, ilabel] = 0.5*self.whfe[ilabel]*(data['liq']['dHyd']+data['gas']['dHyd']) / 4.184
             os.chdir('..')
-        calc_hfe = np.array(self.hfe_dict.values())
-        D = self.whfe*(calc_hfe - np.array(self.expval.values()))
+        calc_hfe = np.array(list(self.hfe_dict.values()))
+        D = self.whfe*(calc_hfe - np.array(list(self.expval.values())))
         return D, dD
 
     def get_ti2(self, mvals, AGrad=False, AHess=False):
@@ -403,7 +408,7 @@ class Hydration(Target):
                     dE = results['Potential_Derivatives']
                     dH = results['Hydration_Derivatives']
                     # Calculate the parametric derivative of the average hydration energy.
-                    data[p]['dHyd'] = np.mean(dH,axis=1)-beta*(flat(np.matrix(dE)*col(H)/len(H))-np.mean(dE,axis=1)*np.mean(H))
+                    data[p]['dHyd'] = np.mean(dH,axis=1)-beta*(flat(np.dot(dE, col(H))/len(H))-np.mean(dE,axis=1)*np.mean(H))
                 os.chdir('..')
             # Calculate the hydration free energy as the average of liquid and gas hydration energies.
             # Note that the molecular dynamics methods return energies in kJ/mol.
@@ -412,8 +417,8 @@ class Hydration(Target):
                 # Calculate the derivative of the hydration free energy.
                 dD[:, ilabel] = 0.5*self.whfe[ilabel]*(data['liq']['dHyd']+data['gas']['dHyd']) / 4.184
             os.chdir('..')
-        calc_hfe = np.array(self.hfe_dict.values())
-        D = self.whfe*(calc_hfe - np.array(self.expval.values()))
+        calc_hfe = np.array(list(self.hfe_dict.values()))
+        D = self.whfe*(calc_hfe - np.array(list(self.expval.values())))
         return D, dD
 
     def get(self, mvals, AGrad=False, AHess=False):

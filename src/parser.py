@@ -45,13 +45,15 @@ If you add an entirely new type, make sure to implement the interpretation of th
 @author Lee-Ping Wang
 @date 11/2012
 """
+from __future__ import absolute_import
 
+from builtins import str
 import os
 import re
 import sys
 import itertools
 import traceback
-from nifty import printcool, printcool_dictionary, which, isfloat
+from .nifty import printcool, printcool_dictionary, which, isfloat
 from copy import deepcopy
 from collections import OrderedDict
 
@@ -65,7 +67,7 @@ gen_opts_types = {
     'strings' : {"gmxpath"      : (which('mdrun'), 60, 'Path for GROMACS executables (if not the default)', 'All targets that use GROMACS', ['GMX']),
                  "gmxsuffix"    : ('', 60, 'The suffix of GROMACS executables', 'All targets that use GROMACS', ['GMX']),
                  "tinkerpath"   : (which('testgrad'), 60, 'Path for TINKER executables (if not the default)', 'All targets that use TINKER', ['TINKER']),
-                 "penalty_type" : ("L2", 100, 'Type of the penalty, L2 or Hyp in the optimizer', 'All optimizations'),
+                 "penalty_type" : ("L2", 100, 'Type of the penalty: L2, L1 or Box', 'All optimizations'),
                  "scan_vals"    : (None, -100, 'Values to scan in the parameter space, given like this: -0.1:0.1:11', 'Job types scan_mvals and scan_pvals'),
                  "readchk"      : (None, -50, 'Name of the restart file we read from', 'Restart jobtype "newton" with "writechk" set'),
                  "writechk"     : (None, -50, 'Name of the restart file we write to (can be same as readchk)', 'Main optimizer'),
@@ -86,7 +88,6 @@ gen_opts_types = {
                  "criteria"   : (1, 160, 'The number of convergence criteria that must be met for main optimizer to converge', 'Main Optimizer'),
                  "rpmd_beads"       : (0, -160, 'Number of beads in ring polymer MD (zero to disable)', 'Condensed phase property targets (advanced usage)', 'liquid_openmm'),
                  "zerograd"         : (-1, 0, 'Set to a nonnegative number to turn on zero gradient skipping at that optimization step.', 'All'),
-                 "amber_nbcut"            : (9999, -20, 'Specify the nonbonded cutoff for AMBER engine in Angstrom (I should port this to other engines too.)', 'AMBER targets, especially large nonperiodic systems', ['AMBER'])
                  },
     'bools'   : {"backup"           : (1,  10,  'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, -50,  'Write the checkpoint file at every optimization step'),
@@ -122,6 +123,7 @@ gen_opts_types = {
                  "penalty_alpha"          : (1e-3,  53, 'Extra parameter for fusion penalty function.  Dictates position of log barrier or L1-L0 switch distance',
                                              'Objective function, FUSION_BARRIER or FUSION_L0 penalty type, advanced usage in basis set optimizations'),
                  "penalty_hyperbolic_b"   : (1e-6,  54, 'Cusp region for hyperbolic constraint; for x=0, the Hessian is a/2b', 'Penalty type L1'),
+                 "penalty_power"          : (2.0,   52, 'Power of the Euclidean norm of the parameter vector (default 2.0 is normal L2 penalty)', 'Penalty type L2'),
                  "adaptive_factor"        : (0.25,  10, 'The step size is increased / decreased by up to this much in the event of a good / bad step; increase for a more variable step size.', 'Main Optimizer'),
                  "adaptive_damping"       : (0.5,   10, 'Damping factor that ties down the trust radius to trust0; decrease for a more variable step size.', 'Main Optimizer'),
                  "error_tolerance"        : (0.0,   10, 'Error tolerance; the optimizer will only reject steps that increase the objective function by more than this number.', 'Main Optimizer'),
@@ -149,12 +151,10 @@ tgt_opts_types = {
                  "nvt_coords"         : (None, 0, 'Provide file name for condensed phase NVT coordinates.', 'Condensed phase properties', 'Liquid'),
                  "lipid_coords"         : (None, 0, 'Provide file name for lipid coordinates.', 'Condensed phase properties', 'Lipid'),
                  "coords"                : (None, -10, 'Coordinates for single point evaluation; if not provided, will search for a default.', 'Energy/force matching, ESP evaluations, interaction energies'),
-                 "pdb"                   : (None, -10, 'PDB file mainly used for building OpenMM systems but can also contain coordinates.', 'Targets that use OpenMM', 'OpenMM'),
+                 "pdb"                   : (None, -10, 'PDB file mainly used for building OpenMM and AMBER systems.', 'Targets that use AMBER and OpenMM', 'AMBER, OpenMM'),
                  "gmx_mdp"               : (None, -10, 'Gromacs .mdp files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_top"               : (None, -10, 'Gromacs .top files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
                  "gmx_ndx"               : (None, -10, 'Gromacs .ndx files.  If not provided, will search for default.', 'Targets that use GROMACS', 'GMX'),
-                 "amber_mol2"            : (None, -10, 'Name of mol2 file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
-                 "amber_frcmod"          : (None, -10, 'Name of frcmod file to pass to tleap when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
                  "amber_leapcmd"         : (None, -10, 'File containing commands for "tleap" when setting up AMBER simulations.', 'Targets that use AMBER', 'AMBER'),
                  "tinker_key"            : (None, -10, 'TINKER .key files.  If not provided, will search for default.', 'Targets that use TINKER', 'TINKER'),
                  "expdata_txt"           : ('expset.txt', 0, 'Text file containing experimental data.', 'Thermodynamic properties target', 'thermo'),
@@ -172,6 +172,7 @@ tgt_opts_types = {
     'lists'   : {"name"      : ([], 200, 'The name of the target, corresponding to the directory targets/name ; may provide a list if multiple targets have the same settings', 'All targets (important)'),
                  "fd_ptypes" : ([], -100, 'The parameter types that are differentiated using finite difference', 'In conjunction with fdgrad, fdhess, fdhessdiag; usually not needed'),
                  "quantities" : ([], 100, 'List of quantities to be fitted, each must have corresponding Quantity subclass', 'Thermodynamic properties target', 'thermo'),
+                 "mol2"      : ([], 50, 'List of .mol2 files needed to set up the system (in addition to any specified under forcefield)', 'All targets that use SMIRNOFF', 'smirnoff')
                  },
     'ints'    : {"shots"              : (-1, 0, 'Number of snapshots; defaults to all of the snapshots', 'Energy + Force Matching', 'AbInitio'),
                  "sleepy"             : (0, -50, 'Wait a number of seconds every time this target is visited (gives me a chance to ctrl+C)', 'All targets (advanced usage)'),
@@ -240,6 +241,7 @@ tgt_opts_types = {
                  "hfe_temperature"  : (298.15, -100, 'Simulation temperature for hydration free energies (Kelvin)', 'Hydration free energy using molecular dynamics', 'hydration'),
                  "hfe_pressure"   : (1.0, -100, 'Simulation temperature for hydration free energies (atm)', 'Hydration free energy using molecular dynamics', 'hydration'),
                  "energy_denom"   : (1.0, 0, 'Energy normalization for binding energies in kcal/mol (default is to use stdev)', 'Binding energy targets', 'binding'),
+                 "energy_rms_override"   : (0.0, 0, 'If nonzero, override the Energy RMS used to normalize the energy part of the objective function term', 'Energy matching', 'abinitio'),
                  "rmsd_denom"     : (0.1, 0, 'RMSD normalization for optimized geometries in Angstrom', 'Binding energy targets', 'binding'),
                  "wavenumber_tol" : (10.0, 0, 'Frequency normalization (in wavenumber) for vibrational frequencies', 'Vibrational frequency targets', 'vibration'),
                  "dipole_denom"   : (1.0, 0, 'Dipole normalization (Debye) ; set to 0 if a zero weight is desired', 'Monomer property targets', 'monomer'),

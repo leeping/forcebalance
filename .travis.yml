@@ -1,0 +1,140 @@
+# After changing this file, check it on:
+#   http://lint.travis-ci.org/
+
+language: python
+
+# Run jobs on container-based infrastructure, can be overridden per job
+sudo: false
+dist: trusty
+
+python:
+    - 2.7
+    - 3.5
+    - 3.6
+
+before_install:
+  - ls
+  - pwd
+  - uname -a
+  - free -m
+  - df -h
+  - ulimit -a
+
+install:
+    # Pull down a miniconda
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+  - bash miniconda.sh -b -p $HOME/miniconda
+  - export PATH="$HOME/miniconda/bin:$PATH"
+
+    # Build out the environment
+  - hash -r
+  - conda config --set always_yes yes --set changeps1 no
+  - conda update -q conda
+  - conda info -a
+
+    # swig: for building CCTools
+    # future: for builtins
+    
+  - conda create -q -n forcebalance_env python=$TRAVIS_PYTHON_VERSION numpy scipy lxml networkx swig future
+  - source activate forcebalance_env
+
+    # Add conda-forge and omnia to your channel list
+  - conda config --add channels omnia --add channels conda-forge
+  
+    # Update to conda-forge versions of packages
+  - conda update --yes --all
+
+    # Install Work Queue
+  # - conda install swig
+  # - cctools_src="cctools-4.3.2-source"
+  # - cctools_pfx="$HOME/opt/cctools/4.3.2"
+  # - wget http://www3.nd.edu/~ccl/software/files/$cctools_src.tar.gz
+  # - tar xzf $cctools_src.tar.gz
+  # - cd $cctools_src
+  # - sed -i s/"config_perl_path=auto"/"config_perl_path=no"/g configure
+  # - sed -i s/"config_globus_path=auto"/"config_globus_path=no"/g configure
+  # - pypath=$(dirname $(dirname $(which python)))
+  # - echo $pypath; ls $pypath
+  # - swgpath=$(dirname $(dirname $(which swig)))
+  # - ./configure --prefix $cctools_pfx --with-python-path $pypath --with-swig-path $swgpath
+  # - make -j 2 &> make.log
+  # - make install &> install.log
+  # - cd work_queue
+  # - make install
+  # - cd ../..
+  # - cp -r $cctools_pfx/
+
+    # Omnia packages
+  - conda install -c omnia pymbar openmm
+
+    # Gromacs
+  - wget ftp://ftp.gromacs.org/pub/gromacs/gromacs-4.6.7.tar.gz
+  - echo "Extracting Gromacs - log suppressed.."
+  - tar xvzf gromacs-4.6.7.tar.gz &> untar.log
+  - cd gromacs-4.6.7
+  - mkdir build_d
+  - cd build_d
+    # Build double precision version
+  - echo "Building Gromacs double precision - logs suppressed..."
+  - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=ON -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
+  - make -j 2 &> make.log
+  - make install &> install.log
+  - tail -500 install.log
+  - cd ..
+  - mkdir build_s
+  - cd build_s
+    # Build double precision version
+  - echo "Building Gromacs single precision - log suppressed.."
+  - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=OFF -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
+  - make -j 2 &> make.log
+  - make install &> install.log
+  - tail -500 install.log
+  - cd ../..
+  - . /home/travis/opt/gromacs/4.6.7/bin/GMXRC.bash
+  - which mdrun
+  - which mdrun_d
+  
+    # Tinker binaries
+  - wget https://dasher.wustl.edu/tinker/downloads/bin-linux64-8.2.1.tar.gz -O tinker.tar.gz
+  - tar xvzf tinker.tar.gz &> untar.log
+  - mkdir -p $HOME/opt/tinker/8.2.1
+  - mv bin-linux64 $HOME/opt/tinker/8.2.1/bin
+  - export PATH="$HOME/opt/tinker/8.2.1/bin:$PATH"
+
+    # Amber
+  - conda install -c ambermd ambertools
+
+    # Install anything not in conda
+  # - pip install pint
+  - pip install codecov
+  # - pip install pytest-cov
+  # - conda list
+
+
+    # Extract data archives
+  - cd studies/001_water_tutorial
+  - tar xvjf targets.tar.bz2
+  - cd -
+
+    # Install ForceBalance
+  - python setup.py install
+
+
+before_script:
+  - python -V
+  - python -c 'import numpy; print(numpy.version.version)'
+  # - pip install -e .
+
+script:
+  - cd studies/001_water_tutorial
+  - tar xvjf targets.tar.bz2
+  - ForceBalance very_simple.in
+  - cd ..
+  - python test
+  # - py.test -v --cov=eex/ --durations=5
+
+notifications:
+  email: false
+
+after_success:
+  # - codecov

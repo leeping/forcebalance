@@ -3,11 +3,13 @@
 @author Lee-Ping Wang
 @date 09/2012
 """
+from __future__ import division
 
+from builtins import zip
 import os
 import shutil
 import numpy as np
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohrang, warn_press_key
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohr2ang, warn_press_key
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
 from re import match, sub
@@ -42,7 +44,7 @@ class Moments(Target):
         self.set_option(tgt_opts, 'polarizability_denom')
         self.set_option(tgt_opts, 'optimize_geometry')
 
-	self.denoms = {}
+        self.denoms = {}
         self.denoms['dipole'] = self.dipole_denom
         self.denoms['quadrupole'] = self.quadrupole_denom
         self.denoms['polarizability'] = self.polarizability_denom
@@ -50,6 +52,9 @@ class Moments(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = False
         ## The mdata.txt file that contains the moments.
         self.mfnm = os.path.join(self.tgtdir,"mdata.txt")
         ## Dictionary of reference multipole moments.
@@ -57,7 +62,7 @@ class Moments(Target):
         ## Read in the reference data
         self.read_reference_data()
         ## Build keyword dictionaries to pass to engine.
-        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del engine_args['name']
         ## Create engine object.
         self.engine = self.engine_(target=self, **engine_args)

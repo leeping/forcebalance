@@ -1,5 +1,8 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
+from builtins import zip
+from builtins import input
 import os, sys, re
 import numpy as np
 import shutil
@@ -46,18 +49,18 @@ frqs, modes, intens, elem, xyz = read_frq_gen(fout)
 frqs1 = scale_freqs(frqs)
 
 if list(frqs1) != sorted(list(frqs1)):
-    print "Warning, sorted freqs are out of order."
-    raw_input()
+    print("Warning, sorted freqs are out of order.")
+    input()
 
 with open('vdata.txt', 'w') as f:
-    print >> f, commblk
-    print >> f, len(elem)
-    print >> f, "Coordinates and vibrations calculated from %s" % fout
+    print(commblk, file=f)
+    print(len(elem), file=f)
+    print("Coordinates and vibrations calculated from %s" % fout, file=f)
     for e, i in zip(elem, xyz):
-        print >> f, "%2s % 8.3f % 8.3f % 8.3f" % (e, i[0], i[1], i[2])
+        print("%2s % 8.3f % 8.3f % 8.3f" % (e, i[0], i[1], i[2]), file=f)
     for frq, mode in zip(frqs1, modes):
-        print >> f
-        print >> f, "%.4f" % frq
+        print(file=f)
+        print("%.4f" % frq, file=f)
         for i in mode:
-            print >> f, "% 8.3f % 8.3f % 8.3f" % (i[0], i[1], i[2])
+            print("% 8.3f % 8.3f % 8.3f" % (i[0], i[1], i[2]), file=f)
 

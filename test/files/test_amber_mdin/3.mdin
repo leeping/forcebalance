@@ -1,0 +1,35 @@
+md for big water box (from Dave Case, comments by Lee-Ping)
+&cntrl
+ imin=0,           ! 0 = MD; 1 = Minimize; 5 = Trajectory analysis
+ maxcyc=500,       ! Number of minimization steps
+ ntmin=2,          ! Minimization algorithm; 2 = Steepest descent
+ nscm=0,           ! Interval for removing translation/rotation 
+ ntxo=2,           ! Restart output format; 1 = ASCII, 2 = NetCDF
+ dx0=0.1,          ! Minimizer step length
+ ntpr=5000,        ! Interval for printing output
+ ntwx=50000,       ! Interval for writing trajectory
+ ntwr=50000,       ! Interval for writing restart
+ cut=9.,           ! Nonbonded cutoff
+ ioutfm=1,         ! Trajectory output format; 0 = ASCII, 1 = NetCDF
+ ntx=5,            ! 1 = Read coors only; 5 = Full restart
+ irest=1,          ! 0 = Do not restart ; 1 = Restart
+ tempi=300.,       ! Initial temperature
+ temp0=300.,       ! Reference temperature
+ ntt=3,            ! Thermostat ; 3 = Langevin
+ gamma_ln=5.,      ! Langevin collision frequency (ps^-1)
+ ntb=1,            ! 0 = no PBC ; 1 = constant V ; 2 = constant P
+ ntp=0,            ! 0 = constant V ; 1 = isotropic position scaling
+ ntc=2,            ! SHAKE; 1 = none, 2 = H-bonds, 3 = All-bonds
+ ntf=2,            ! No bonds involving H-atoms (use with NTC=2)
+ tol=0.0000001,    ! SHAKE tolerance,
+ taup=1.0,         ! Pressure relaxation time (ps)
+ dt=.002,          ! Time step (ps)
+ nstlim=500000000, ! Number of MD steps
+ ig=-1,            ! Random number seed; -1 based on date/time
+ ntr=0,            ! 1 = Restrain atoms based on mask
+ restraint_wt=0.1, ! Restraint force constant 
+ restraintmask='!:WAT,NA&!@H=',
+/
+&ewald
+ dsum_tol=0.000001, ! Ewald force error is 10-50 times this
+/

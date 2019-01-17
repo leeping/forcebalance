@@ -1,3 +1,4 @@
+from __future__ import division
 from collections import defaultdict, OrderedDict
 import re
 import numpy as np
@@ -7,9 +8,10 @@ import numpy as np
 BondEnergies = defaultdict(lambda:defaultdict(dict))
 
 ## Covalent radii from Cordero et al. 'Covalent radii revisited' Dalton Transactions 2008, 2832-2838.
+# Sodium replaced 1.66 -> 1.0.  I think ionic radii are more appropriate.
 Radii = [0.31, 0.28, # H and He
          1.28, 0.96, 0.84, 0.76, 0.71, 0.66, 0.57, 0.58, # First row elements
-         1.66, 1.41, 1.21, 1.11, 1.07, 1.05, 1.02, 1.06, # Second row elements
+         0.0, 1.41, 1.21, 1.11, 1.07, 1.05, 1.02, 1.06, # Second row elements
          2.03, 1.76, 1.70, 1.60, 1.53, 1.39, 1.61, 1.52, 1.50, 
          1.24, 1.32, 1.22, 1.22, 1.20, 1.19, 1.20, 1.20, 1.16, # Third row elements, K through Kr
          2.20, 1.95, 1.90, 1.75, 1.64, 1.54, 1.47, 1.46, 1.42, 
@@ -48,6 +50,9 @@ Elements = ["None",'H','He',
 
 BondChars = ['-','=','3']
 
+# Sources: http://www.science.uwaterloo.ca/~cchieh/cact/c120/bondel.html
+# http://www.wiredchemist.com/chemistry/data/bond_energies_lengths.html
+# http://s-owl.cengage.com/ebooks/vining_owlbook_prototype/ebook/ch8/Sect8-3-a.html
 data_from_web= """H-H 	432 	74
 H-B 	389 	119
 H-C 	411 	109

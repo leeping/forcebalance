@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+from __future__ import division
+from __future__ import print_function
 import numpy as np
 import itertools
 import os, sys
@@ -76,11 +78,11 @@ class MolG(nx.Graph):
 
 def col(vec):
     """Given any list, array, or matrix, return a 1-column matrix."""
-    return np.mat(np.array(vec).reshape(-1, 1))
+    return np.array(vec).reshape(-1, 1)
 
 def row(vec):
     """Given any list, array, or matrix, return a 1-row matrix."""
-    return np.mat(np.array(vec).reshape(1, -1))
+    return np.array(vec).reshape(1, -1)
 
 def flat(vec):
     """Given any list, array, or matrix, return a single-index array."""
@@ -151,20 +153,20 @@ def get_equivalent_atoms(MyG):
 def charge_as_array(M2Mol, QMat):
     oldq = np.array([atom.charge for atom in M2Mol.atoms])
     def get_symq(q):
-        return np.array([float("% .6f" % i) for i in flat(np.mat(QMat) * col(oldq))])
+        return np.array([float("% .6f" % i) for i in flat(np.dot(QMat, col(oldq)))])
     J = 0
     M = 0
     oldq  = get_symq(oldq)
-    print "Total charge is % .6f" % sum(oldq)
-    print "Doing something stupid to make sure all of the charges add up to EXACTLY an integer."
+    print("Total charge is % .6f" % sum(oldq))
+    print("Doing something stupid to make sure all of the charges add up to EXACTLY an integer.")
     CorrQ = (float(int(round(sum(oldq)))) - sum(oldq)) / len(oldq)
-    print "Adding % .6f to all charges" % CorrQ
+    print("Adding % .6f to all charges" % CorrQ)
     oldq += CorrQ
     while True:
-        print "Adjusting charge element %i by" % (M%len(oldq)), J,
+        print("Adjusting charge element %i by" % (M%len(oldq)), J, end=' ')
         oldq[M%len(oldq)] += J
         newq = get_symq(oldq)
-        print ": Total charge is now % .6f" % sum(newq)
+        print(": Total charge is now % .6f" % sum(newq))
         if abs(float(int(round(sum(newq)))) - sum(newq)) < 1e-8:
             break
         oldq[M%len(oldq)] -= J
@@ -187,7 +189,7 @@ def main():
     M = Molecule(sys.argv[1])
     MyG = build_graph(M)
     QMat, Suffix = get_equivalent_atoms(MyG)
-    M2   = Mol2.mol2_set(sys.argv[1]).compounds.items()[0][1]
+    M2   = list(Mol2.mol2_set(sys.argv[1]).compounds.items())[0][1]
     NewQ = charge_as_array(M2, QMat)
     update_mol2(M2, NewQ, Suffix)
     
@@ -195,11 +197,11 @@ def main():
 
     if len(sys.argv) >= 3:
         with open(sys.argv[2],'w') as f: 
-            print >> f, M2
-            print >> f, Ending
+            print(M2, file=f)
+            print(Ending, file=f)
     else:
-        print M2
-        print Ending
+        print(M2)
+        print(Ending)
     
 if __name__ == "__main__":
     main()

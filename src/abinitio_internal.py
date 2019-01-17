@@ -3,7 +3,9 @@
 @author Lee-Ping Wang
 @date 04/2012
 """
+from __future__ import division
 
+from builtins import range
 import os
 from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
@@ -36,6 +38,9 @@ class AbInitio_Internal(AbInitio):
     """
 
     def __init__(self,options,tgt_opts,forcefield):
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = True
         ## Name of the trajectory, we need this BEFORE initializing the SuperClass
         self.coords = "all.gro"
         ## Initialize the SuperClass!

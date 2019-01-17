@@ -3,10 +3,14 @@
 @author Lee-Ping Wang
 @date 05/2012
 """
+from __future__ import division
+from __future__ import print_function
 
+from builtins import zip
+from builtins import range
 import os
 import shutil
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohrang, warn_press_key, warn_once, pvec1d, commadash, uncommadash, isint
+from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, bohr2ang, warn_press_key, warn_once, pvec1d, commadash, uncommadash, isint
 import numpy as np
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule, format_xyz_coord
@@ -47,7 +51,7 @@ def norm2(arr, a=0, n=None, step=3):
     else:
         if ((arr.shape[0]-a)%step != 0):
             raise RuntimeError("Please provide an array with (length-%i) divisible by %i" % (a, step))
-        n = (arr.shape[0]-a)/step
+        n = int((arr.shape[0]-a)/step)
     answer = []
     for j in range(n):
         d = arr[a+step*j:a+step*j+step]
@@ -111,6 +115,7 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'w_force','w_force')
         if not self.force:
             self.w_force = 0.0
+        self.set_option(tgt_opts,'energy_rms_override','energy_rms_override')
         self.set_option(tgt_opts,'force_map','force_map')
         self.set_option(tgt_opts,'w_netforce','w_netforce')
         self.set_option(tgt_opts,'w_torque','w_torque')
@@ -143,6 +148,9 @@ class AbInitio(Target):
         #======================================#
         #     Variables which are set here     #
         #======================================#
+        ## LPW 2018-02-11: This is set to True if the target calculates
+        ## a single-point property over several existing snapshots.
+        self.loop_over_snapshots = True
         ## Boltzmann weights
         self.boltz_wts = []
         ## Reference (QM) energies
@@ -169,8 +177,11 @@ class AbInitio(Target):
         ## Whether to compute net forces and torques, or not.
         self.use_nft       = self.w_netforce > 0 or self.w_torque > 0
         ## Read in the trajectory file
-        self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords),
-                            top=(os.path.join(self.root,self.tgtdir,self.pdb) if hasattr(self, 'pdb') else None))
+        if hasattr(self, 'pdb') and self.pdb is not None:
+            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords),
+                                top=(os.path.join(self.root,self.tgtdir,self.pdb)))
+        else:
+            self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords))
         ## Set the number of snapshots
         if self.ns != -1:
             self.mol = self.mol[:self.ns]
@@ -178,7 +189,7 @@ class AbInitio(Target):
         ## The number of (atoms + drude particles + virtual sites)
         self.nparticles  = len(self.mol.elem)
         ## Build keyword dictionaries to pass to engine.
-        engine_args = OrderedDict(self.OptionDict.items() + options.items())
+        engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del engine_args['name']
         ## Create engine object.
         self.engine = self.engine_(target=self, mol=self.mol, **engine_args)
@@ -193,6 +204,7 @@ class AbInitio(Target):
         ## Save the mvals from the last time we updated the vsites.
         self.save_vmvals = {}
         self.set_option(None, 'shots', val=self.ns)
+        self.M_orig = None
 
     def build_invdist(self, mvals):
         for i in self.pgrad:
@@ -215,7 +227,7 @@ class AbInitio(Target):
                 esparr = np.array(espset).reshape(-1,3)
                 # Create a matrix with Nesp rows and Natoms columns.
                 DistMat = np.array([[np.linalg.norm(i - j) for j in xyz] for i in esparr])
-                invdists.append(1. / (DistMat / bohrang))
+                invdists.append(1. / (DistMat / bohr2ang))
                 sn += 1
         for i in self.pgrad:
             if 'VSITE' in self.FF.plist[i]:
@@ -277,7 +289,7 @@ class AbInitio(Target):
         Torques = []
         for b in sorted(set(Block)):
             AtomBlock = np.array([i for i in range(len(Block)) if Block[i] == b])
-            CrdBlock = np.array(list(itertools.chain(*[range(3*i, 3*i+3) for i in AtomBlock])))
+            CrdBlock = np.array(list(itertools.chain(*[list(range(3*i, 3*i+3)) for i in AtomBlock])))
             com = np.sum(xyz1[AtomBlock]*np.outer(Mass[AtomBlock],np.ones(3)), axis=0) / np.sum(Mass[AtomBlock])
             frc = frc1[CrdBlock].reshape(-1,3)
             NetForce = np.sum(frc, axis=0)
@@ -293,8 +305,8 @@ class AbInitio(Target):
             if len(xyzb) > 1:
                 Torques += [i for i in Torque]
         netfrc_torque = np.array(NetForces + Torques)
-        self.nnf = len(NetForces)/3
-        self.ntq = len(Torques)/3
+        self.nnf = int(len(NetForces)/3)
+        self.ntq = int(len(Torques)/3)
         return netfrc_torque
 
     def read_reference_data(self):
@@ -373,7 +385,7 @@ class AbInitio(Target):
         if len(self.fqm) > 0:
             self.fqm = np.array(self.fqm)
             self.fqm *= fqcgmx
-            self.qmatoms = range(self.fqm.shape[1]/3)
+            self.qmatoms = list(range(int(self.fqm.shape[1]/3)))
         else:
             logger.info("QM forces are not present, only fitting energies.\n")
             self.force = 0
@@ -387,7 +399,7 @@ class AbInitio(Target):
                     self.fitatoms = self.qmatoms
                 else:
                     warn_press_key("Provided an integer for fitatoms; will assume this means the first %i atoms" % int(self.fitatoms_in))
-                    self.fitatoms = range(int(self.fitatoms_in))
+                    self.fitatoms = list(range(int(self.fitatoms_in)))
             else:
                 # If provided a "comma and dash" list, then expand the list.
                 self.fitatoms = uncommadash(self.fitatoms_in)
@@ -799,7 +811,12 @@ class AbInitio(Target):
                                           col(M_all_print[:,0])-col(Q_all_print[:,0]),
                                           col(self.boltz_wts)))
             np.savetxt("EnergyCompare.txt", EnergyComparison, header="%11s  %12s  %12s  %12s" % ("QMEnergy", "MMEnergy", "Delta(MM-QM)", "Weight"), fmt="% 12.6e")
-            plot_mm_vs_qm(M_all_print[:,0], Q_all_print[:,0], title='Abinitio '+self.name)
+            if self.writelevel > 1:
+                plot_qm_vs_mm(Q_all_print[:,0], M_all_print[:,0],
+                              M_orig=self.M_orig[:,0] if self.M_orig is not None else None,
+                              title='Abinitio '+self.name)
+            if self.M_orig is None:
+                self.M_orig = M_all_print.copy()
         if self.force and self.writelevel > 1:
             # Write .xyz files which can be viewed in vmd.
             QMTraj = self.mol[:].atom_select(self.fitatoms)
@@ -818,8 +835,8 @@ class AbInitio(Target):
             #     Mforce_obj.xyzs[i] = np.vstack((Mforce_obj.xyzs[i], Fpad))
             #     Qforce_obj.xyzs[i] = np.vstack((Qforce_obj.xyzs[i], Fpad))
             if Mforce_obj.na != Mforce_obj.xyzs[0].shape[0]:
-                print Mforce_obj.na
-                print Mforce_obj.xyzs[0].shape[0]
+                print(Mforce_obj.na)
+                print(Mforce_obj.xyzs[0].shape[0])
                 warn_once('\x1b[91mThe printing of forces is not set up correctly.  Not printing forces.  Please report this issue.\x1b[0m')
             else:
                 if self.writelevel > 1:
@@ -844,6 +861,10 @@ class AbInitio(Target):
         if np.sum(W_Components) > 0 and self.w_normalize:
             W_Components /= np.sum(W_Components)
 
+        if self.energy_rms_override != 0.0:
+            QQ0[0] = self.energy_rms_override ** 2
+            Q0[0] = 0.0
+            
         def compute_objective(SPX_like,divide=1,L=None,R=None,L2=None,R2=None):
             a = 0
             n = 1
@@ -971,8 +992,8 @@ class AbInitio(Target):
             # for i in range(NP):
             #     print "Now working on parameter number", i
             #     dqPdqM.append(f12d3p(fdwrap(new_charges,mvals,i), h = self.h)[0])
-            # dqPdqM = mat(dqPdqM).T
-            dqPdqM = np.matrix([(f12d3p(fdwrap(new_charges,mvals,i), h = self.h, f0 = charge0)[0] if i in self.pgrad else np.zeros_like(charge0)) for i in range(NP)]).T
+            # dqPdqM = np.matrix(dqPdqM).T
+            dqPdqM = np.array([(f12d3p(fdwrap(new_charges,mvals,i), h = self.h, f0 = charge0)[0] if i in self.pgrad else np.zeros_like(charge0)) for i in range(NP)]).T
         xyzs = np.array(self.mol.xyzs)
         espqvals = np.array(self.espval)
         espxyz   = np.array(self.espxyz)
@@ -992,23 +1013,23 @@ class AbInitio(Target):
         for i in range(self.ns):
             P   = self.boltz_wts[i]
             Z  += P
-            dVdqP   = np.matrix(self.invdists[i])
+            dVdqP   = np.array(self.invdists[i])
             espqval = espqvals[i]
-            espmval = dVdqP * col(new_charges(mvals))
+            espmval = np.dot(dVdqP, col(new_charges(mvals)))
             desp    = flat(espmval) - espqval
             X      += P * np.dot(desp, desp) / self.nesp
             Q      += P * np.dot(espqval, espqval) / self.nesp
             D      += P * (np.dot(espqval, espqval) / self.nesp - (np.sum(espqval) / self.nesp)**2)
             if AGrad:
-                dVdqM   = (dVdqP * dqPdqM).T
+                dVdqM   = np.dot(dVdqP, dqPdqM).T
                 for p, vsd in ddVdqPdVS.items():
-                    dVdqM[p,:] += flat(vsd[i] * col(new_charges(mvals)))
-                G      += flat(P * 2 * dVdqM * col(desp)) / self.nesp
+                    dVdqM[p,:] += flat(np.dot(vsd[i], col(new_charges(mvals))))
+                G      += flat(P * 2 * np.dot(dVdqM, col(desp))) / self.nesp
                 if AHess:
                     d2VdqM2 = np.zeros(dVdqM.shape)
                     for p, vsd in dddVdqPdVS2.items():
-                        d2VdqM2[p,:] += flat(vsd[i] * col(new_charges(mvals)))
-                    H      += np.array(P * 2 * (dVdqM * dVdqM.T + d2VdqM2 * col(desp))) / self.nesp
+                        d2VdqM2[p,:] += flat(np.dot(vsd[i], col(new_charges(mvals))))
+                    H      += np.array(P * 2 * (np.dot(dVdqM, dVdqM.T) + np.dot(d2VdqM2, col(desp)))) / self.nesp
         # Redundant but we keep it anyway
         D /= Z
         X /= Z
@@ -1036,9 +1057,9 @@ class AbInitio(Target):
         self.respterm = R
         X += R
         if AGrad:
-            G += flat(dqPdqM.T * col(dR))
+            G += flat(np.dot(dqPdqM.T, col(dR)))
             if AHess:
-                H += np.diag(flat(dqPdqM.T * col(ddR)))
+                H += np.diag(flat(np.dot(dqPdqM.T, col(ddR))))
 
         if not in_fd():
             self.esp_trm = X
@@ -1104,21 +1125,29 @@ def compute_objective_part(SPX,QQ0,Q0,Z,a,n,energy=False,subtract_mean=False,div
         raise RuntimeError('Please pass either 0, 1, 2 to divide')
     return X2
 
-def plot_mm_vs_qm(M, Q, title=''):
+def plot_qm_vs_mm(Q, M, M_orig=None, title=''):
     import matplotlib.pyplot as plt
     qm_min_dx = np.argmin(Q)
     e_qm = Q - Q[qm_min_dx]
     e_mm = M - M[qm_min_dx]
-    plt.plot(e_mm, e_qm, 'o')
+    if M_orig is not None:
+        e_mm_orig = M_orig - M_orig[qm_min_dx]
+        plt.plot(e_qm, e_mm_orig, 'x', markersize=5, label='Orig.')
+    plt.plot(e_qm, e_mm, '.', markersize=5, label='Current')
     plt.xlabel('QM Energies (kJ/mol)')
     plt.ylabel('MM Energies (kJ/mol)')
     x1,x2,y1,y2 = plt.axis()
-    if x2 < y2:
-        x2 = y2
-    else:
-        y2 = x2
-    plt.axis((0,x2,0,y2))
-    plt.plot([0,x2],[0,y2], '--' )
+    x1 = min(x1, y1)
+    y1 = x1
+    x2 = max(x2, y2)
+    y2 = x2
+    rng = x2-x1
+    plt.axis('equal')
+    plt.axis([x1-0.05*rng, x2+0.05*rng, y1-0.05*rng, y2+0.05*rng])
+    plt.plot([x1,x2],[y1,y2], '--' )
+    plt.legend(loc='lower right')
     plt.title(title)
-    plt.savefig('e_qm_vs_mm.pdf')
+    fig = plt.gcf()
+    fig.set_size_inches(5,5)
+    fig.savefig('e_qm_vs_mm.pdf')
     plt.close()
