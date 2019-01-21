@@ -379,8 +379,12 @@ class Liquid(Target):
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
             else:
+                if hasattr(self, 'FF'):
+                    mol2_send = list(set(self.mol2).difference(set(self.FF.fnms)))
+                else:
+                    mol2_send = self.mol2
                 queue_up(wq, command = cmdstr+' > npt.out 2>&1 ',
-                         input_files = self.nptfiles + self.scripts + self.mol2 + ['forcebalance.p'],
+                         input_files = self.nptfiles + self.scripts + mol2_send + ['forcebalance.p'],
                          output_files = ['npt_result.p', 'npt.out'] + self.extra_output, tgt=self)
 
     def nvt_simulation(self, temperature):
@@ -394,8 +398,12 @@ class Liquid(Target):
                 logger.info("You may tail -f %s/nvt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='nvt.out')
             else:
+                if hasattr(self, 'FF'):
+                    mol2_send = list(set(self.mol2).difference(set(self.FF.fnms)))
+                else:
+                    mol2_send = self.mol2
                 queue_up(wq, command = cmdstr+' > nvt.out 2>&1 ',
-                         input_files = self.nvtfiles + self.scripts + self.mol2 + ['forcebalance.p'],
+                         input_files = self.nvtfiles + self.scripts + mol2_send + ['forcebalance.p'],
                          output_files = ['nvt_result.p', 'nvt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):
