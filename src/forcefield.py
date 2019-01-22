@@ -700,7 +700,7 @@ class FF(forcebalance.BaseClass):
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_repeat/..'):
             for field in e.get('parameter_repeat').split(','):
-                parameter_name = field.strip().split('=')[0]
+                parameter_name = field.strip().split('=', 1)
                 if parameter_name not in e.attrib:
                     logger.error("Parameter \'%s\' is not found for \'%s\', please check %s" % (parameter_name, e.get('type'), ffname) )
                     raise RuntimeError
@@ -714,7 +714,7 @@ class FF(forcebalance.BaseClass):
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
             for field in e.get('parameter_eval').split(','):
-                parameter_name = field.strip().split('=')[0]
+                parameter_name = field.strip().split('=')[1]
                 if parameter_name not in e.attrib:
                     logger.error("Parameter \'%s\' is not found for \'%s\', please check %s" % (parameter_name, e.get('type'), ffname) )
                     raise RuntimeError
