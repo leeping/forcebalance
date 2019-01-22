@@ -714,12 +714,12 @@ class FF(forcebalance.BaseClass):
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
             for field in e.get('parameter_eval').split(','):
-                parameter_name = field.strip().split('=')[1]
+                parameter_name = field.strip().split('=', 1)[0]
                 if parameter_name not in e.attrib:
                     logger.error("Parameter \'%s\' is not found for \'%s\', please check %s" % (parameter_name, e.get('type'), ffname) )
                     raise RuntimeError
                 dest = self.Readers[ffname].build_pid(e, parameter_name)
-                evalcmd  = field.strip().split('=')[1]
+                evalcmd  = field.strip().split('=', 1)[1]
                 self.assign_field(None,dest,ffname,fflist.index(e),parameter_name,None,evalcmd)
 
     def make(self,vals=None,use_pvals=False,printdir=None,precision=12):
