@@ -700,12 +700,12 @@ class FF(forcebalance.BaseClass):
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_repeat/..'):
             for field in e.get('parameter_repeat').split(','):
-                parameter_name = field.strip().split('=', 1)
+                parameter_name = field.strip().split('=', 1)[0]
                 if parameter_name not in e.attrib:
                     logger.error("Parameter \'%s\' is not found for \'%s\', please check %s" % (parameter_name, e.get('type'), ffname) )
                     raise RuntimeError
                 dest = self.Readers[ffname].build_pid(e, parameter_name)
-                src  = field.strip().split('=')[1]
+                src  = field.strip().split('=', 1)[1]
                 if src in self.map:
                     self.map[dest] = self.map[src]
                 else:
