@@ -101,6 +101,7 @@ gen_opts_types = {
                  "normalize_weights": (1, 100, 'Normalize the weights for the fitting targets', 'Objective function (all calculations)'),
                  "verbose_options"  : (0, 150, 'Set to false to suppress printing options that are equal to their defaults', 'Printing output'),
                  "rigid_water"      : (0, -150, 'Perform calculations using rigid water molecules.', 'Currently used in AMOEBA parameterization (advanced usage)', ['OPENMM','TINKER']),
+                 "restrain_h"       : (0, -150, 'Perform calculations with contrained hydrogen bond lengths.', 'Used in liquid-OpenMM', ['OPENMM']),
                  "vsite_bonds"      : (0, -150, 'Generate bonds from virtual sites to host atom bonded atoms.', 'Currently used in AMOEBA parameterization (advanced usage)', ['OPENMM','TINKER']),
                  "use_pvals"        : (0, -150, 'Bypass the transformation matrix and use the physical parameters directly', 'Creating the force field; advanced usage, be careful.'),
                  "asynchronous"     : (0, 0, 'Execute Work Queue tasks and local calculations asynchronously for improved speed', 'Targets that use Work Queue (advanced usage)'),
