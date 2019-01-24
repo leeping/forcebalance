@@ -669,6 +669,9 @@ class OpenMM(Engine):
                 elif self.FF.amoeba_pol == 'direct':
                     self.mmopts['polarization'] = 'direct'
             self.mmopts['rigidWater'] = self.FF.rigid_water
+            if self.FF.restrain_h== True:
+                self.mmopts['constraints'] = HBonds
+                logger.info('Restraining hyrdrogen bond lengths (SHAKE)')
 
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
