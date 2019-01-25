@@ -67,7 +67,7 @@ install:
     # Omnia packages
   - conda install -c omnia pymbar openmm
 
-    # Gromacs (from Bioconda)
+    # Gromacs
   - wget ftp://ftp.gromacs.org/pub/gromacs/gromacs-4.6.7.tar.gz
   - echo "Extracting Gromacs - log suppressed.."
   - tar xvzf gromacs-4.6.7.tar.gz &> untar.log
@@ -79,6 +79,7 @@ install:
   - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=ON -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
   - make -j 2 &> make.log
   - make install &> install.log
+  - tail -500 install.log
   - cd ..
   - mkdir build_s
   - cd build_s
@@ -87,8 +88,11 @@ install:
   - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=OFF -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
   - make -j 2 &> make.log
   - make install &> install.log
+  - tail -500 install.log
   - cd ../..
   - . /home/travis/opt/gromacs/4.6.7/bin/GMXRC.bash
+  - which mdrun
+  - which mdrun_d
   
     # Tinker binaries
   - wget https://dasher.wustl.edu/tinker/downloads/bin-linux64-8.2.1.tar.gz -O tinker.tar.gz
@@ -122,10 +126,11 @@ before_script:
   # - pip install -e .
 
 script:
+  - cd studies/001_water_tutorial
+  - tar xvjf targets.tar.bz2
+  - ForceBalance very_simple.in
+  - cd ..
   - python test
-  # - cd studies/001_water_tutorial
-  # - tar xvjf targets.tar.bz2
-  # - ForceBalance very_simple.in
   # - py.test -v --cov=eex/ --durations=5
 
 notifications:

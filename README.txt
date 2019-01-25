@@ -55,3 +55,4 @@ The development of this code has been supported in part by the following grants 
 NIH Grant R01 AI130684-02
 ACS-PRF 58158-DNI6
 NIH Grant U54 GM072970
+Open Force Field Consortium

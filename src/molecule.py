@@ -17,6 +17,7 @@ from warnings import warn
 
 import numpy as np
 from numpy import sin, cos, arccos
+from numpy.linalg import multi_dot
 from pkg_resources import parse_version
 
 # For Python 3 compatibility
@@ -333,7 +334,7 @@ def isint(word):
 
 def isfloat(word):
     """Matches ANY number; it can be a decimal, scientific notation, integer, or what have you"""
-    return re.match('^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
+    return re.match(r'^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?$',word)
 
 # Used to get the white spaces in a split line.
 splitter = re.compile(r'(\s+|\S+)')
@@ -352,12 +353,12 @@ def CubicLattice(a):
     bet  = beta*np.pi/180
     gamm = gamma*np.pi/180
     v = np.sqrt(1 - cos(alph)**2 - cos(bet)**2 - cos(gamm)**2 + 2*cos(alph)*cos(bet)*cos(gamm))
-    Mat = np.matrix([[a, b*cos(gamm), c*cos(bet)],
-                  [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
-                  [0, 0, c*v/sin(gamm)]])
-    L1 = Mat*np.matrix([[1],[0],[0]])
-    L2 = Mat*np.matrix([[0],[1],[0]])
-    L3 = Mat*np.matrix([[0],[0],[1]])
+    Mat = np.array([[a, b*cos(gamm), c*cos(bet)],
+                    [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
+                    [0, 0, c*v/sin(gamm)]])
+    L1 = Mat.dot(np.array([[1],[0],[0]]))
+    L2 = Mat.dot(np.array([[0],[1],[0]]))
+    L3 = Mat.dot(np.array([[0],[0],[1]]))
     return Box(a,b,c,alpha,beta,gamma,np.array(L1).flatten(),np.array(L2).flatten(),np.array(L3).flatten(),v*a*b*c)
 
 def BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma):
@@ -366,12 +367,12 @@ def BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma):
     bet  = beta*np.pi/180
     gamm = gamma*np.pi/180
     v = np.sqrt(1 - cos(alph)**2 - cos(bet)**2 - cos(gamm)**2 + 2*cos(alph)*cos(bet)*cos(gamm))
-    Mat = np.matrix([[a, b*cos(gamm), c*cos(bet)],
-                  [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
-                  [0, 0, c*v/sin(gamm)]])
-    L1 = Mat*np.matrix([[1],[0],[0]])
-    L2 = Mat*np.matrix([[0],[1],[0]])
-    L3 = Mat*np.matrix([[0],[0],[1]])
+    Mat = np.array([[a, b*cos(gamm), c*cos(bet)],
+                    [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
+                    [0, 0, c*v/sin(gamm)]])
+    L1 = Mat.dot(np.array([[1],[0],[0]]))
+    L2 = Mat.dot(np.array([[0],[1],[0]]))
+    L3 = Mat.dot(np.array([[0],[0],[1]]))
     return Box(a,b,c,alpha,beta,gamma,np.array(L1).flatten(),np.array(L2).flatten(),np.array(L3).flatten(),v*a*b*c)
 
 def BuildLatticeFromVectors(v1, v2, v3):
@@ -386,12 +387,12 @@ def BuildLatticeFromVectors(v1, v2, v3):
     bet  = beta*np.pi/180
     gamm = gamma*np.pi/180
     v = np.sqrt(1 - cos(alph)**2 - cos(bet)**2 - cos(gamm)**2 + 2*cos(alph)*cos(bet)*cos(gamm))
-    Mat = np.matrix([[a, b*cos(gamm), c*cos(bet)],
-                  [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
-                  [0, 0, c*v/sin(gamm)]])
-    L1 = Mat*np.matrix([[1],[0],[0]])
-    L2 = Mat*np.matrix([[0],[1],[0]])
-    L3 = Mat*np.matrix([[0],[0],[1]])
+    Mat = np.array([[a, b*cos(gamm), c*cos(bet)],
+                    [0, b*sin(gamm), c*((cos(alph)-cos(bet)*cos(gamm))/sin(gamm))],
+                    [0, 0, c*v/sin(gamm)]])
+    L1 = Mat.dot(np.array([[1],[0],[0]]))
+    L2 = Mat.dot(np.array([[0],[1],[0]]))
+    L3 = Mat.dot(np.array([[0],[0],[1]]))
     return Box(a,b,c,alpha,beta,gamma,np.array(L1).flatten(),np.array(L2).flatten(),np.array(L3).flatten(),v*a*b*c)
 
 #===========================#
@@ -612,26 +613,26 @@ def either(A, B, key):
 #===========================#
 def EulerMatrix(T1,T2,T3):
     """ Constructs an Euler matrix from three Euler angles. """
-    DMat = np.matrix(np.zeros((3,3)))
+    DMat = np.zeros((3,3))
     DMat[0,0] = np.cos(T1)
     DMat[0,1] = np.sin(T1)
     DMat[1,0] = -np.sin(T1)
     DMat[1,1] = np.cos(T1)
     DMat[2,2] = 1
-    CMat = np.matrix(np.zeros((3,3)))
+    CMat = np.zeros((3,3))
     CMat[0,0] = 1
     CMat[1,1] = np.cos(T2)
     CMat[1,2] = np.sin(T2)
     CMat[2,1] = -np.sin(T2)
     CMat[2,2] = np.cos(T2)
-    BMat = np.matrix(np.zeros((3,3)))
+    BMat = np.zeros((3,3))
     BMat[0,0] = np.cos(T3)
     BMat[0,1] = np.sin(T3)
     BMat[1,0] = -np.sin(T3)
     BMat[1,1] = np.cos(T3)
     BMat[2,2] = 1
-    EMat = BMat*CMat*DMat
-    return np.matrix(EMat)
+    EMat = multi_dot([BMat, CMat, DMat])
+    return EMat
 
 def ComputeOverlap(theta,elem,xyz1,xyz2):
     """
@@ -639,7 +640,7 @@ def ComputeOverlap(theta,elem,xyz1,xyz2):
     fictitious density.  Good for fine-tuning alignment but gets stuck
     in local minima.
     """
-    xyz2R = np.array(EulerMatrix(theta[0],theta[1],theta[2])*np.matrix(xyz2.T)).T
+    xyz2R = np.dot(EulerMatrix(theta[0],theta[1],theta[2]), xyz2.T).T
     Obj = 0.0
     elem = np.array(elem)
     for i in set(elem):
@@ -658,7 +659,7 @@ def AlignToDensity(elem,xyz1,xyz2,binary=False):
     grid = np.pi*np.array(list(itertools.product([0,1],[0,1],[0,1])))
     ovlp = np.array([ComputeOverlap(e, elem, xyz1, xyz2) for e in grid]) # Mao
     t1 = grid[np.argmin(ovlp)]
-    xyz2R = np.array(EulerMatrix(t1[0],t1[1],t1[2])*np.matrix(xyz2.T)).T.copy()
+    xyz2R = np.dot(EulerMatrix(t1[0],t1[1],t1[2]), xyz2.T).T.copy()
     return xyz2R
 
 def AlignToMoments(elem,xyz1,xyz2=None):
@@ -681,7 +682,7 @@ def AlignToMoments(elem,xyz1,xyz2=None):
         if np.abs(determ + 1.0) > Thresh:
             print("in AlignToMoments, determinant is % .3f" % determ)
         BB[:,2] *= -1
-    xyzr = np.array(np.matrix(BB).T * np.matrix(xyz).T).T.copy()
+    xyzr = np.dot(BB.T, xyz.T).T.copy()
     if xyz2 is not None:
         xyzrr = AlignToDensity(elem,xyz1,xyzr,binary=True)
         return xyzrr
@@ -708,20 +709,17 @@ def get_rotate_translate(matrix1,matrix2):
 
     # Do the SVD in order to get rotation matrix
     v,s,wt = np.linalg.svd(covar)
-    v = np.matrix(v)
-    wt = np.matrix(wt)
 
     # Rotation matrix
     # Transposition of v,wt
-    wvt = wt.T*v.T
+    wvt = np.dot(wt.T, v.T)
 
     # Ensure a right-handed coordinate system
-    d = np.matrix(np.eye(3))
+    d = np.eye(3)
     if np.linalg.det(wvt) < 0:
         d[2,2] = -1.0
 
-    rot_matrix = np.array((wt.T*d*v.T).T)
-    # rot_matrix = np.transpose(np.dot(np.transpose(wt),np.transpose(v)))
+    rot_matrix = multi_dot([wt.T,d,v.T]).T
     trans_matrix = avg_pos2-np.dot(avg_pos1,rot_matrix)
     return trans_matrix, rot_matrix
 
@@ -809,10 +807,10 @@ def extract_pop(M, verbose=True):
     """
 
     # Read in the charge and spin on the whole system.
-    srch  = lambda s : np.array([float(re.search('(?<=%s )[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?' % s, c).group(0)) for c in M.comms if all([i in c for i in ('charge', 'sz')])])
+    srch  = lambda s : np.array([float(re.search(r'(?<=%s )[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?' % s, c).group(0)) for c in M.comms if all([i in c for i in ('charge', 'sz')])])
     Chgs  = srch('charge') # An array of the net charge.
     SpnZs = srch('sz')    # An array of the net Z-spin.
-    Spn2s = srch('sz\^2') # An array of the sum of sz^2 by atom.
+    Spn2s = srch(r'sz\^2') # An array of the sum of sz^2 by atom.
 
     chg, chgpass = extract_int(Chgs, 0.3, 1.0, label="charge")
     spn, spnpass = extract_int(abs(SpnZs), 0.3, 1.0, label="spin-z")
@@ -982,6 +980,76 @@ def AtomContact(xyz, pairs, box=None, displace=False):
         return dr, dxyz
     else:
         return dr
+
+#===================================#
+#| Rotation subroutine 2018-10-28  |#
+#| Copied from geomeTRIC.rotate    |#
+#===================================#
+
+def form_rot(q):
+    """
+    Given a quaternion p, form a rotation matrix from it.
+    
+    Parameters
+    ----------
+    q : numpy.ndarray
+        1D array with 3 elements representing the rotation quaterion.
+        Elements of quaternion are : [cos(a/2), sin(a/2)*axis[0..2]]
+    
+    Returns
+    -------
+    numpy.array
+        3x3 rotation matrix
+    """
+    assert q.ndim == 1
+    assert q.shape[0] == 4
+    # Take the "complex conjugate"
+    qc = np.zeros_like(q)
+    qc[0] =  q[0]
+    qc[1] = -q[1]
+    qc[2] = -q[2]
+    qc[3] = -q[3]
+    # Form al_q and al_qc matrices
+    al_q = np.array([[ q[0], -q[1], -q[2], -q[3]],
+                     [ q[1],  q[0], -q[3],  q[2]],
+                     [ q[2],  q[3],  q[0], -q[1]],
+                     [ q[3], -q[2],  q[1],  q[0]]])
+    ar_qc = np.array([[ qc[0], -qc[1], -qc[2], -qc[3]],
+                      [ qc[1],  qc[0],  qc[3], -qc[2]],
+                      [ qc[2], -qc[3],  qc[0],  qc[1]],
+                      [ qc[3],  qc[2], -qc[1],  qc[0]]])
+    # Multiply matrices
+    R4 = np.dot(al_q,ar_qc)
+    return R4[1:, 1:]
+
+def axis_angle(axis, angle):
+    """
+    Given a rotation axis and angle, return the corresponding
+    3x3 rotation matrix, which will rotate a (Nx3) array of
+    xyz coordinates as x0_rot = np.dot(R, x0.T).T
+
+    Parameters
+    ----------
+    axis : numpy.ndarray
+        1D array with 3 elements representing the rotation axis
+    angle : float
+        The angle of the rotation
+    
+    Returns
+    -------
+    numpy.array
+        3x3 rotation matrix
+    """
+    assert axis.ndim == 1
+    assert axis.shape[0] == 3
+    axis /= np.linalg.norm(axis)
+    # Make quaternion
+    ct2 = np.cos(angle/2)
+    st2 = np.sin(angle/2)
+    q = np.array([ct2, st2*axis[0], st2*axis[1], st2*axis[2]])
+    # Form rotation matrix
+    R = form_rot(q)
+    return R
 
 class Molecule(object):
     """ Lee-Ping's general file format conversion class.
@@ -2069,6 +2137,237 @@ class Molecule(object):
             dxij.append(dxij_i)
         return AtomIterator, drij, dxij
 
+    def rotate_bond(self, frame, aj, ak, increment=15):
+        """ 
+        Return a new Molecule object containing the selected frame
+        plus a number of frames where the selected dihedral angle is rotated
+        in steps of 'increment' given in degrees.
+        
+        This function is designed to be called by Molecule.rotate_check_clash().
+
+        Parameters
+        ----------
+        frame : int
+            Structure number of the current Molecule to be rotated
+        aj, ak : int
+            Atom numbers of the bond to be rotated
+        increment : float
+            Degrees of the rotation increment
+        
+        Returns
+        -------
+        Molecule
+            New Molecule object containing the rotated structures
+        """
+        # Select the single frame containing the structure to be rotated.
+        M = self[frame]
+
+        # Delete the connection between atoms to be rotated in order
+        # to determine the rotation fragments.
+        delBonds = []
+        for ibond, bond in enumerate(M.bonds):
+            if bond == (aj, ak) or bond == (ak, aj):
+                delBonds.append(bond)
+        if len(delBonds) > 1:
+            raise RuntimeError('Expected only one bond to be deleted')
+        if len(M.molecules) != 1:
+            raise RuntimeError('Expected a single molecule')
+        M.bonds.remove(delBonds[0])
+        M.top_settings['read_bonds']=True
+        M.build_topology(force_bonds=False)
+        if len(M.molecules) != 2:
+            raise RuntimeError('Expected two molecules after removing a bond')
+
+        # gAtoms contains the set of atoms to be rotated
+        # oAtoms contains the "other" atoms
+        if len(M.molecules[0].L()) < len(M.molecules[1].L()):
+            gAtoms = M.molecules[0].L()
+            oAtoms = M.molecules[1].L()
+        else:
+            gAtoms = M.molecules[1].L()
+            oAtoms = M.molecules[0].L()
+
+        # atom2 is the "reference atom" on the group being rotated
+        # and will be moved to the origin during the rotation operation
+        if aj in gAtoms:
+            atom1 = ak
+            atom2 = aj
+        else:
+            atom1 = aj
+            atom2 = ak
+        M.bonds.append(delBonds[0])
+        
+        # Rotation axis
+        axis = M.xyzs[0][atom2] - M.xyzs[0][atom1]
+    
+        # Move the "reference atom" to the origin
+        x0 = M.xyzs[0][gAtoms]
+        x0_ref = M.xyzs[0][atom2]
+        x0 -= x0_ref
+    
+        # Create grid in rotation angle
+        # and the rotated structures
+        for thetaDeg in np.arange(increment, 360, increment):
+            theta = np.pi * thetaDeg / 180
+            # Make quaternion
+            R = axis_angle(axis, theta)
+            # Get rotated coordinates
+            x0_rot = np.dot(R, x0.T).T
+            # Copy old coordinates to new
+            xnew = M.xyzs[0].copy()
+            # Write rotated positions into new coordinates;
+            # shift back to original positions
+            xnew[gAtoms] = x0_rot + x0_ref
+            # Append new coordinates to our Molecule object
+            M.xyzs.append(xnew)
+            M.comms.append("Rotated by %.2f degrees" % increment)
+        return M, (gAtoms, oAtoms)
+
+    def find_clashes(self, thre=0.0, pbc=True, groups=None):
+        """ 
+        Obtain a list of atoms that 'clash' (i.e. are more than
+        3 bonds apart and are closer than the provided threshold.)
+
+        Parameters
+        ----------
+        thre : float
+            Create a sorted-list of all non-bonded atom pairs 
+            with distance below this threshold
+        pbc : bool
+            Whether to use PBC when computing interatomic distances
+        filt : tuple (group1, group2)
+            If not None, only compute distances between atoms in 'group1'
+            and atoms in 'group2'. For example this could be [gAtoms, oAtoms]
+            from rotate_bond
+
+        Returns
+        -------
+        minPair_frames : list of tuples
+           The closest pair of non-bonded atoms in each frame
+        minDist_frames : list of tuples
+           The distance between the closest pair of non-bonded atoms in each frame
+        clashPairs_frames : list of lists
+           Pairs of non-bonded atoms with distance below the threshold in each frame
+        clashDists_frames : list of lists
+           Distances between pairs of non-bonded atoms below the threshold in each frame
+        """
+        if groups is not None:
+            AtomIterator = np.ascontiguousarray([[min(g), max(g)] for g in itertools.product(groups[0], groups[1])])
+        else:
+            AtomIterator = np.ascontiguousarray(np.vstack((np.fromiter(itertools.chain(*[[i]*(self.na-i-1) for i in range(self.na)]),dtype=np.int32),
+                                                           np.fromiter(itertools.chain(*[range(i+1,self.na) for i in range(self.na)]),dtype=np.int32))).T)
+        ang13 = [(min(a[0], a[2]), max(a[0], a[2])) for a in self.find_angles()]
+        dih14 = [(min(d[0], d[3]), max(d[0], d[3])) for d in self.find_dihedrals()]
+        bondedPairs = np.where([tuple(aPair) in (self.bonds+ang13+dih14) for aPair in AtomIterator])[0]
+        AtomIterator_nb = np.delete(AtomIterator, bondedPairs, axis=0)
+
+        minPair_frames = []
+        minDist_frames = []
+        clashPairs_frames = []
+        clashDists_frames = []
+        for frame in range(len(self)):
+            if hasattr(self, 'boxes') and pbc:
+                box=np.array([self.boxes[frame].a, self.boxes[frame].b, self.boxes[frame].c])
+                drij = AtomContact(self.xyzs[frame],AtomIterator_nb,box=box)
+            else:
+                drij = AtomContact(self.xyzs[frame],AtomIterator_nb)
+            clashPairIdx = np.where(drij < thre)[0]
+            clashPairs = AtomIterator_nb[clashPairIdx]
+            clashDists = drij[clashPairIdx]
+            sorter = np.argsort(clashDists)
+            clashPairs = clashPairs[sorter]
+            clashDists = clashDists[sorter]
+            minIdx = np.argmin(drij)
+            minPair = AtomIterator_nb[minIdx]
+            minDist = drij[minIdx]
+            minPair_frames.append(minPair)
+            minDist_frames.append(minDist)
+            clashPairs_frames.append(clashPairs.copy())
+            clashDists_frames.append(clashDists.copy())
+        return minPair_frames, minDist_frames, clashPairs_frames, clashDists_frames
+
+    def rotate_check_clash(self, frame, rotate_index, thresh_hyd=1.4, thresh_hvy=1.8, printLevel=1):
+        """ 
+        Return a new Molecule object containing the selected frame 
+        plus a number of frames where the selected dihedral angle is rotated
+        in steps of 'increment' given in degrees.  Additionally, check for
+        if pairs of non-bonded atoms "clash" i.e. approach below the specified
+        thresholds.
+
+        Parameters
+        ----------
+        frame : int
+            Structure number of the current Molecule to be rotated
+            (if only a single frame, this number should be 0)
+        rotate_index : tuple
+            4 atom indices (ai, aj, ak, al) representing the dihedral angle to be rotated.
+            The first and last indices are used to measure the dihedral angle.
+        thresh_hyd : float
+            Clash threshold for hydrogen atoms.  Reasonable values are in between 1.3 and 2.0.
+        thresh_hvy : float
+            Clash threshold for heavy atoms.  Reasonable values are in between 1.7 and 2.5.
+        printLevel: int
+            Sets the amount of printout (larger = more printout)
+        
+        Returns
+        -------
+        Molecule
+            New Molecule object containing the rotated structures
+        Success : bool
+            True if no clashes
+        """
+        if not hasattr(self, 'atomname'):
+            raise RuntimeError("Please add atom names before calling rotate_check_clash().")
+        ai, aj, ak, al = rotate_index
+        Success = False
+        # Create grid of rotated structures
+        M_rot_H, frags = self.rotate_bond(frame, aj, ak, 15)
+        phis = M_rot_H.measure_dihedrals(*rotate_index)
+        for i in range(len(M_rot_H)):
+            M_rot_H.comms[i] = ('Rigid scan: atomname %s, serial %s, dihedral %.3f' 
+                                % ('-'.join([self.atomname[i] for i in rotate_index]), 
+                                   '-'.join(["%i" % (i+1) for i in rotate_index]), phis[i]))
+        heavyIdx = [i for i in range(self.na) if self.elem[i] != 'H']
+        heavy_frags = [[],[]]
+        for iHeavy, iAll in enumerate(heavyIdx):
+            if iAll in frags[0]:
+                heavy_frags[0].append(iHeavy)
+            if iAll in frags[1]:
+                heavy_frags[1].append(iHeavy)
+        M_rot_C = M_rot_H.atom_select(heavyIdx)
+        minPair_H_frames, minDist_H_frames, clashPairs_H_frames, clashDists_H_frames = M_rot_H.find_clashes(thre=thresh_hyd, groups=frags)
+        minPair_C_frames, minDist_C_frames, clashPairs_C_frames, clashDists_C_frames = M_rot_C.find_clashes(thre=thresh_hvy, groups=heavy_frags)
+        # Get the following information: (1) Whether a clash exists, (2) the frame with the smallest distance,
+        # (3) the pair of atoms with the smallest distance, (4) the smallest distance
+        haveClash_H = any([len(c) > 0 for c in clashPairs_H_frames])
+        minFrame_H = np.argmin(minDist_H_frames)
+        minAtoms_H = minPair_H_frames[minFrame_H]
+        minDist_H = minDist_H_frames[minFrame_H]
+        haveClash_C = any([len(c) > 0 for c in clashPairs_C_frames])
+        minFrame_C = np.argmin(minDist_C_frames)
+        minAtoms_C = minPair_C_frames[minFrame_C]
+        minDist_C = minDist_C_frames[minFrame_C]
+        if not (haveClash_H or haveClash_C):
+            if printLevel >= 1: 
+                print("\n    \x1b[1;92mSuccess - no clashes. Thresh(H, Hvy) = (%.2f, %.2f)\x1b[0m" % (thresh_hyd, thresh_hvy))
+                mini = M_rot_H.atomname[minAtoms_H[0]]
+                minj = M_rot_H.atomname[minAtoms_H[1]]
+                print("    Closest (Hyd) : rot-frame %i atoms %s-%s %.2f" % (minFrame_H, mini, minj, minDist_H))
+                mini = M_rot_C.atomname[minAtoms_C[0]]
+                minj = M_rot_C.atomname[minAtoms_C[1]]
+                print("    Closest (Hvy) : rot-frame %i atoms %s-%s %.2f" % (minFrame_C, mini, minj, minDist_C))
+            Success = True
+        else:
+            if haveClash_H:
+                mini = M_rot_H.atomname[minAtoms_H[0]]
+                minj = M_rot_H.atomname[minAtoms_H[1]]
+                if printLevel >= 2: print("    Clash (Hyd) : rot-frame %i atoms %s-%s %.2f" % (minFrame_H, mini, minj, minDist_H))
+            if haveClash_C:
+                mini = M_rot_C.atomname[minAtoms_C[0]]
+                minj = M_rot_C.atomname[minAtoms_C[1]]
+                if printLevel >= 2: print("    Clash (Hvy) : rot-frame %i atoms %s-%s %.2f" % (minFrame_C, mini, minj, minDist_C))
+        return M_rot_H, Success
+
     def find_angles(self):
 
         """ Return a list of 3-tuples corresponding to all of the
@@ -2119,6 +2418,28 @@ class Molecule(object):
                             if a4 != a2 and len({a1, a2, a3, a4}) == 4:
                                 dihidx.append((a1, a2, a3, a4))
         return dihidx
+
+    def measure_distances(self, i, j):
+        distances = []
+        for s in range(self.ns):
+            x1 = self.xyzs[s][i]
+            x2 = self.xyzs[s][j]
+            distance = np.linalg.norm(x1-x2)
+            distances.append(distance)
+        return distances
+
+    def measure_angles(self, i, j, k):
+        angles = []
+        for s in range(self.ns):
+            x1 = self.xyzs[s][i]
+            x2 = self.xyzs[s][j]
+            x3 = self.xyzs[s][k]
+            v1 = x1-x2
+            v2 = x3-x2
+            n = np.dot(v1,v2)/(np.linalg.norm(v1)*np.linalg.norm(v2))
+            angle = np.arccos(n)
+            angles.append(angle * 180/ np.pi)
+        return angles
 
     def measure_dihedrals(self, i, j, k, l):
         """ Return a series of dihedral angles, given four atom indices numbered from zero. """
@@ -2975,7 +3296,7 @@ class Molecule(object):
         for line in open(fnm):
             line = line.strip().expandtabs()
             sline = line.split()
-            if re.match('^\*',line):
+            if re.match(r'^\*',line):
                 if len(sline) == 1:
                     comms.append(';'.join(list(thiscomm)))
                     thiscomm = []
@@ -3061,8 +3382,8 @@ class Molecule(object):
             dline = line.split('!')[0].split()
             if "Z-matrix Print" in line:
                 zmatrix = True
-            if re.match('^\$',line):
-                wrd = re.sub('\$','',line).lower()
+            if re.match(r'^\$',line):
+                wrd = re.sub(r'\$','',line).lower()
                 if zmatrix:
                     if wrd == 'end':
                         zmatrix = False
@@ -3233,7 +3554,8 @@ class Molecule(object):
                     conect_B_list.append(int(line_rest[:5]) - 1)
                     line_rest = line_rest[5:]
                 for conect_B in conect_B_list:
-                    bonds.append([conect_A, conect_B])
+                    bond = (min((conect_A, conect_B)), max((conect_A, conect_B)))
+                    bonds.append(bond)
 
         Answer={"xyzs":XYZList, "chain":list(ChainID), "altloc":list(AltLoc), "icode":list(ICode),
                 "atomname":[str(i) for i in AtomNames], "resid":list(ResidueID), "resname":list(ResidueNames),
@@ -3301,16 +3623,16 @@ class Molecule(object):
         convThis = 0
         readChargeMult = 0
         energy_scf = []
-        float_match  = {'energy_scfThis'   : ("^[1-9][0-9]* +[-+]?([0-9]*\.)?[0-9]+ +[-+]?([0-9]*\.)?[0-9]+([eE][-+]?[0-9]+)[A-Za-z0 ]*$", 1),
-                        'energy_opt'       : ("^Final energy is +[-+]?([0-9]*\.)?[0-9]+$", -1),
+        float_match  = {'energy_scfThis'   : (r"^[1-9][0-9]* +[-+]?([0-9]*\.)?[0-9]+ +[-+]?([0-9]*\.)?[0-9]+([eE][-+]?[0-9]+)[A-Za-z0 ]*$", 1),
+                        'energy_opt'       : (r"^Final energy is +[-+]?([0-9]*\.)?[0-9]+$", -1),
                         'charge'           : ("Sum of atomic charges", -1),
                         'mult'             : ("Sum of spin +charges", -1),
-                        'energy_mp2'       : ("^(ri)*(-)*mp2 +total energy += +[-+]?([0-9]*\.)?[0-9]+ +au$",-2),
-                        'energy_ccsd'      : ("^CCSD Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1),
-                        'energy_ccsdt'     : ("^CCSD\(T\) Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1),
-                        'zpe'              : ("^(\s+)?Zero point vibrational energy:\s+[-+]?([0-9]*\.)?[0-9]+\s+kcal\/mol$", -2),
-                        'entropy'          : ("^(\s+)?Total Entropy:\s+[-+]?([0-9]*\.)?[0-9]+\s+cal\/mol\.K$", -2),
-                        'enthalpy'         : ("^(\s+)?Total Enthalpy:\s+[-+]?([0-9]*\.)?[0-9]+\s+kcal\/mol$", -2)
+                        'energy_mp2'       : (r"^(ri)*(-)*mp2 +total energy += +[-+]?([0-9]*\.)?[0-9]+ +au$",-2),
+                        'energy_ccsd'      : (r"^CCSD Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1),
+                        'energy_ccsdt'     : (r"^CCSD\(T\) Total Energy += +[-+]?([0-9]*\.)?[0-9]+$",-1),
+                        'zpe'              : (r"^(\s+)?Zero point vibrational energy:\s+[-+]?([0-9]*\.)?[0-9]+\s+kcal\/mol$", -2),
+                        'entropy'          : (r"^(\s+)?Total Entropy:\s+[-+]?([0-9]*\.)?[0-9]+\s+cal\/mol\.K$", -2),
+                        'enthalpy'         : (r"^(\s+)?Total Enthalpy:\s+[-+]?([0-9]*\.)?[0-9]+\s+kcal\/mol$", -2)
                         }
         matrix_match = {'analytical_grad'  :'Full Analytical Gradient',
                         'gradient_scf'     :'Gradient of SCF Energy',
@@ -3369,7 +3691,7 @@ class Molecule(object):
                 fatal = 1
             if XMode >= 1:
                 # Perfectionist here; matches integer, element, and three floating points
-                if re.match("^[0-9]+ +[A-Z][A-Za-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
+                if re.match(r"^[0-9]+ +[A-Z][A-Za-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
                     XMode = 2
                     sline = line.split()
                     elemThis.append(sline[1])
@@ -3388,12 +3710,12 @@ class Molecule(object):
                 XMode = 1
             if MMode >= 1:
                 # Perfectionist here; matches integer, element, and two floating points
-                if re.match("^[0-9]+ +[A-Z][a-z]?( +[-+]?([0-9]*\.)?[0-9]+){2}$", line):
+                if re.match(r"^[0-9]+ +[A-Z][a-z]?( +[-+]?([0-9]*\.)?[0-9]+){2}$", line):
                     MMode = 2
                     sline = line.split()
                     mkchgThis.append(float(sline[2]))
                     mkspnThis.append(float(sline[3]))
-                elif re.match("^[0-9]+ +[A-Z][a-z]?( +[-+]?([0-9]*\.)?[0-9]+){1}$", line):
+                elif re.match(r"^[0-9]+ +[A-Z][a-z]?( +[-+]?([0-9]*\.)?[0-9]+){1}$", line):
                     MMode = 2
                     sline = line.split()
                     mkchgThis.append(float(sline[2]))
@@ -3464,7 +3786,7 @@ class Molecule(object):
                 pcmgradmode = True
             if pcmgradmode:
                 # Perfectionist here; matches integer, and three floating points
-                if re.match("^[0-9]+ +( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
+                if re.match(r"^[0-9]+ +( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
                     pcmgrad.append([float(i) for i in line.split()[1:]])
                 if 'Gradient time' in line:
                     pcmgradmode = False
@@ -3503,7 +3825,7 @@ class Molecule(object):
                         Mats[key]["Strip"] = []
                         Mats[key]["Mode"] = 2
                     # Match a single integer followed by any number of floats.  This is a strip of data to be added to the matrix
-                    elif re.match("^[0-9]+( +[-+]?([0-9]*\.)?[0-9]+)+$",line):
+                    elif re.match(r"^[0-9]+( +[-+]?([0-9]*\.)?[0-9]+)+$",line):
                         Mats[key]["Strip"].append([float(i) for i in line.split()[1:]])
                     # In any other case, the matrix is terminated.
                     elif Mats[key]["Mode"] >= 2:
@@ -3909,15 +4231,19 @@ class Molecule(object):
             logger.error("Unable to init DCD plugin\n")
             raise IOError
         natoms    = c_int(self.na)
-        dcd       = _dcdlib.open_dcd_write(self.fout, "dcd", natoms)
+        fname     = self.fout.encode('ascii')
+        dcd       = _dcdlib.open_dcd_write(create_string_buffer(fname), "dcd", natoms)
         ts        = MolfileTimestep()
         _xyz      = c_float * (natoms.value * 3)
         for I in selection:
             xyz = self.xyzs[I]
             ts.coords = _xyz(*list(xyz.flatten()))
-            ts.A      = self.boxes[I].a if 'boxes' in self.Data else 1.0
-            ts.B      = self.boxes[I].b if 'boxes' in self.Data else 1.0
-            ts.C      = self.boxes[I].c if 'boxes' in self.Data else 1.0
+            ts.A      = c_float(self.boxes[I].a if 'boxes' in self.Data else 1.0)
+            ts.B      = c_float(self.boxes[I].b if 'boxes' in self.Data else 1.0)
+            ts.C      = c_float(self.boxes[I].c if 'boxes' in self.Data else 1.0)
+            ts.alpha  = c_float(self.boxes[I].alpha  if 'boxes' in self.Data else 90.0)
+            ts.beta   = c_float(self.boxes[I].beta   if 'boxes' in self.Data else 90.0)
+            ts.gamma  = c_float(self.boxes[I].gamma  if 'boxes' in self.Data else 90.0)
             result    = _dcdlib.write_timestep(dcd, byref(ts))
             if result != 0:
                 logger.error("Error encountered when writing DCD\n")

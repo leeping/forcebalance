@@ -379,8 +379,12 @@ class Liquid(Target):
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
             else:
+                if hasattr(self, 'FF'):
+                    mol2_send = list(set(self.mol2).difference(set(self.FF.fnms)))
+                else:
+                    mol2_send = self.mol2
                 queue_up(wq, command = cmdstr+' > npt.out 2>&1 ',
-                         input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
+                         input_files = self.nptfiles + self.scripts + mol2_send + ['forcebalance.p'],
                          output_files = ['npt_result.p', 'npt.out'] + self.extra_output, tgt=self)
 
     def nvt_simulation(self, temperature):
@@ -394,8 +398,12 @@ class Liquid(Target):
                 logger.info("You may tail -f %s/nvt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='nvt.out')
             else:
+                if hasattr(self, 'FF'):
+                    mol2_send = list(set(self.mol2).difference(set(self.FF.fnms)))
+                else:
+                    mol2_send = self.mol2
                 queue_up(wq, command = cmdstr+' > nvt.out 2>&1 ',
-                         input_files = self.nvtfiles + self.scripts + ['forcebalance.p'],
+                         input_files = self.nvtfiles + self.scripts + mol2_send + ['forcebalance.p'],
                          output_files = ['nvt_result.p', 'nvt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):
@@ -954,7 +962,7 @@ class Liquid(Target):
             # The weights that we want are the last ones.
             W = flat(W2[:,i])
             C = weight_info(W, PT, np.ones(len(Points), dtype=int)*Shots, verbose=mbar_verbose)
-            Gbar = flat(np.matrix(G)*col(W))
+            Gbar = flat(np.dot(G, col(W)))
             mBeta = -1/kb/T
             Beta  = 1/kb/T
             kT    = kb*T
@@ -962,21 +970,21 @@ class Liquid(Target):
             def avg(vec):
                 return np.dot(W,vec)
             def covde(vec):
-                return flat(np.matrix(G)*col(W*vec)) - avg(vec)*Gbar
+                return flat(np.dot(G, col(W*vec))) - avg(vec)*Gbar
             def deprod(vec):
-                return flat(np.matrix(G)*col(W*vec))
+                return flat(np.dot(G, col(W*vec)))
             ## Density.
             Rho_calc[PT]   = np.dot(W,R)
-            Rho_grad[PT]   = mBeta*(flat(np.matrix(G)*col(W*R)) - np.dot(W,R)*Gbar)
+            Rho_grad[PT]   = mBeta*(flat(np.dot(G, col(W*R))) - np.dot(W,R)*Gbar)
             ## Enthalpy of vaporization.
             if PT in mPoints:
                 ii = mPoints.index(PT)
                 mW = flat(mW2[:,ii])
-                mGbar = flat(np.matrix(mG)*col(mW))
+                mGbar = flat(np.dot(mG, col(mW)))
                 Hvap_calc[PT]  = np.dot(mW,mE) - np.dot(W,E)/NMol + kb*T - np.dot(W, PV)/NMol
-                Hvap_grad[PT]  = mGbar + mBeta*(flat(np.matrix(mG)*col(mW*mE)) - np.dot(mW,mE)*mGbar)
-                Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.matrix(G)*col(W*E)) - np.dot(W,E)*Gbar)) / NMol
-                Hvap_grad[PT] -= (mBeta*(flat(np.matrix(G)*col(W*PV)) - np.dot(W,PV)*Gbar)) / NMol
+                Hvap_grad[PT]  = mGbar + mBeta*(flat(np.dot(mG,col(mW*mE))) - np.dot(mW,mE)*mGbar)
+                Hvap_grad[PT] -= (Gbar + mBeta*(flat(np.dot(G,col(W*E))) - np.dot(W,E)*Gbar)) / NMol
+                Hvap_grad[PT] -= (mBeta*(flat(np.dot(G,col(W*PV))) - np.dot(W,PV)*Gbar)) / NMol
                 if self.do_self_pol:
                     Hvap_calc[PT] -= EPol
                     Hvap_grad[PT] -= GEPol
@@ -1031,9 +1039,9 @@ class Liquid(Target):
             prefactor = 30.348705333964077
             D2 = avg(Dx**2)+avg(Dy**2)+avg(Dz**2)-avg(Dx)**2-avg(Dy)**2-avg(Dz)**2
             Eps0_calc[PT] = 1.0 + prefactor*(D2/avg(V))/T
-            GD2  = 2*(flat(np.matrix(GDx)*col(W*Dx)) - avg(Dx)*flat(np.matrix(GDx)*col(W))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
-            GD2 += 2*(flat(np.matrix(GDy)*col(W*Dy)) - avg(Dy)*flat(np.matrix(GDy)*col(W))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
-            GD2 += 2*(flat(np.matrix(GDz)*col(W*Dz)) - avg(Dz)*flat(np.matrix(GDz)*col(W))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
+            GD2  = 2*(flat(np.dot(GDx,col(W*Dx))) - avg(Dx)*flat(np.dot(GDx,col(W)))) - Beta*(covde(Dx**2) - 2*avg(Dx)*covde(Dx))
+            GD2 += 2*(flat(np.dot(GDy,col(W*Dy))) - avg(Dy)*flat(np.dot(GDy,col(W)))) - Beta*(covde(Dy**2) - 2*avg(Dy)*covde(Dy))
+            GD2 += 2*(flat(np.dot(GDz,col(W*Dz))) - avg(Dz)*flat(np.dot(GDz,col(W)))) - Beta*(covde(Dz**2) - 2*avg(Dz)*covde(Dz))
             Eps0_grad[PT] = prefactor*(GD2/avg(V) - mBeta*covde(V)*D2/avg(V)**2)/T
             ## Surface Tension (Already computed in nvt.py)
             if PT in stResults:

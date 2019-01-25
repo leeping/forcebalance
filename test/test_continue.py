@@ -30,6 +30,8 @@ class TestWaterTutorial(ForceBalanceTestCase):
 
     def runTest(self):
         """Check continuation from a previous run"""
+        if not sys.version_info <= (2,7):
+            self.skipTest("Existing pickle file only works with Python 3")
         self.logger.debug("\nSetting input file to 'test_continue.in'\n")
         input_file='test_continue.in'
 
