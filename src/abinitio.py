@@ -115,6 +115,7 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'w_force','w_force')
         if not self.force:
             self.w_force = 0.0
+        self.set_option(tgt_opts,'energy_rms_override','energy_rms_override')
         self.set_option(tgt_opts,'force_map','force_map')
         self.set_option(tgt_opts,'w_netforce','w_netforce')
         self.set_option(tgt_opts,'w_torque','w_torque')
@@ -810,9 +811,10 @@ class AbInitio(Target):
                                           col(M_all_print[:,0])-col(Q_all_print[:,0]),
                                           col(self.boltz_wts)))
             np.savetxt("EnergyCompare.txt", EnergyComparison, header="%11s  %12s  %12s  %12s" % ("QMEnergy", "MMEnergy", "Delta(MM-QM)", "Weight"), fmt="% 12.6e")
-            plot_qm_vs_mm(Q_all_print[:,0], M_all_print[:,0],
-                          M_orig=self.M_orig[:,0] if self.M_orig is not None else None,
-                          title='Abinitio '+self.name)
+            if self.writelevel > 1:
+                plot_qm_vs_mm(Q_all_print[:,0], M_all_print[:,0],
+                              M_orig=self.M_orig[:,0] if self.M_orig is not None else None,
+                              title='Abinitio '+self.name)
             if self.M_orig is None:
                 self.M_orig = M_all_print.copy()
         if self.force and self.writelevel > 1:
@@ -859,6 +861,10 @@ class AbInitio(Target):
         if np.sum(W_Components) > 0 and self.w_normalize:
             W_Components /= np.sum(W_Components)
 
+        if self.energy_rms_override != 0.0:
+            QQ0[0] = self.energy_rms_override ** 2
+            Q0[0] = 0.0
+            
         def compute_objective(SPX_like,divide=1,L=None,R=None,L2=None,R2=None):
             a = 0
             n = 1
@@ -986,8 +992,8 @@ class AbInitio(Target):
             # for i in range(NP):
             #     print "Now working on parameter number", i
             #     dqPdqM.append(f12d3p(fdwrap(new_charges,mvals,i), h = self.h)[0])
-            # dqPdqM = mat(dqPdqM).T
-            dqPdqM = np.matrix([(f12d3p(fdwrap(new_charges,mvals,i), h = self.h, f0 = charge0)[0] if i in self.pgrad else np.zeros_like(charge0)) for i in range(NP)]).T
+            # dqPdqM = np.matrix(dqPdqM).T
+            dqPdqM = np.array([(f12d3p(fdwrap(new_charges,mvals,i), h = self.h, f0 = charge0)[0] if i in self.pgrad else np.zeros_like(charge0)) for i in range(NP)]).T
         xyzs = np.array(self.mol.xyzs)
         espqvals = np.array(self.espval)
         espxyz   = np.array(self.espxyz)
@@ -1007,23 +1013,23 @@ class AbInitio(Target):
         for i in range(self.ns):
             P   = self.boltz_wts[i]
             Z  += P
-            dVdqP   = np.matrix(self.invdists[i])
+            dVdqP   = np.array(self.invdists[i])
             espqval = espqvals[i]
-            espmval = dVdqP * col(new_charges(mvals))
+            espmval = np.dot(dVdqP, col(new_charges(mvals)))
             desp    = flat(espmval) - espqval
             X      += P * np.dot(desp, desp) / self.nesp
             Q      += P * np.dot(espqval, espqval) / self.nesp
             D      += P * (np.dot(espqval, espqval) / self.nesp - (np.sum(espqval) / self.nesp)**2)
             if AGrad:
-                dVdqM   = (dVdqP * dqPdqM).T
+                dVdqM   = np.dot(dVdqP, dqPdqM).T
                 for p, vsd in ddVdqPdVS.items():
-                    dVdqM[p,:] += flat(vsd[i] * col(new_charges(mvals)))
-                G      += flat(P * 2 * dVdqM * col(desp)) / self.nesp
+                    dVdqM[p,:] += flat(np.dot(vsd[i], col(new_charges(mvals))))
+                G      += flat(P * 2 * np.dot(dVdqM, col(desp))) / self.nesp
                 if AHess:
                     d2VdqM2 = np.zeros(dVdqM.shape)
                     for p, vsd in dddVdqPdVS2.items():
-                        d2VdqM2[p,:] += flat(vsd[i] * col(new_charges(mvals)))
-                    H      += np.array(P * 2 * (dVdqM * dVdqM.T + d2VdqM2 * col(desp))) / self.nesp
+                        d2VdqM2[p,:] += flat(np.dot(vsd[i], col(new_charges(mvals))))
+                    H      += np.array(P * 2 * (np.dot(dVdqM, dVdqM.T) + np.dot(d2VdqM2, col(desp)))) / self.nesp
         # Redundant but we keep it anyway
         D /= Z
         X /= Z
@@ -1051,9 +1057,9 @@ class AbInitio(Target):
         self.respterm = R
         X += R
         if AGrad:
-            G += flat(dqPdqM.T * col(dR))
+            G += flat(np.dot(dqPdqM.T, col(dR)))
             if AHess:
-                H += np.diag(flat(dqPdqM.T * col(ddR)))
+                H += np.diag(flat(np.dot(dqPdqM.T, col(ddR))))
 
         if not in_fd():
             self.esp_trm = X
@@ -1127,7 +1133,7 @@ def plot_qm_vs_mm(Q, M, M_orig=None, title=''):
     if M_orig is not None:
         e_mm_orig = M_orig - M_orig[qm_min_dx]
         plt.plot(e_qm, e_mm_orig, 'x', markersize=5, label='Orig.')
-    plt.plot(e_qm, e_mm, '.', markersize=10, label='Current')
+    plt.plot(e_qm, e_mm, '.', markersize=5, label='Current')
     plt.xlabel('QM Energies (kJ/mol)')
     plt.ylabel('MM Energies (kJ/mol)')
     x1,x2,y1,y2 = plt.axis()
