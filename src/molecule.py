@@ -4344,10 +4344,14 @@ class Molecule(object):
                 resId = resIds[i]
                 coords = self.xyzs[sn][i]
                 symbol = self.elem[i]
+                if hasattr(self, 'partial_charge'):
+                    bfactor = self.partial_charge[i]
+                else:
+                    bfactor = 0.0
                 atomIndices[i] = atomIndex
-                line = "%s%5d %-4s %3s %s%4s    %s%s%s  1.00  0.00          %2s  " % (
+                line = "%s%5d %-4s %3s %s%4s    %s%s%s %5.2f  0.00          %2s  " % (
                     recordName, atomIndex%100000, atomName, resName, chainName, resId, _format_83(coords[0]),
-                    _format_83(coords[1]), _format_83(coords[2]), symbol)
+                    _format_83(coords[1]), _format_83(coords[2]), bfactor, symbol)
                 assert len(line) == 80, 'Fixed width overflow detected'
                 out.append(line)
                 atomIndex += 1
