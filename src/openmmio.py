@@ -671,7 +671,7 @@ class OpenMM(Engine):
             self.mmopts['rigidWater'] = self.FF.rigid_water
             if self.FF.restrain_h== True:
                 self.mmopts['constraints'] = HBonds
-                logger.info('Restraining hyrdrogen bond lengths (SHAKE)')
+                logger.info('Constraining hydrogen bond lengths (SHAKE)')
 
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
