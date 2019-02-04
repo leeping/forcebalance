@@ -669,7 +669,7 @@ class OpenMM(Engine):
                 elif self.FF.amoeba_pol == 'direct':
                     self.mmopts['polarization'] = 'direct'
             self.mmopts['rigidWater'] = self.FF.rigid_water
-            if self.FF.restrain_h== True:
+            if self.FF.constrain_h== True:
                 self.mmopts['constraints'] = HBonds
                 logger.info('Constraining hydrogen bond lengths (SHAKE)')
 
