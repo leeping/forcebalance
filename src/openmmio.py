@@ -1048,12 +1048,12 @@ class OpenMM(Engine):
                 pos[i_atom][j] += diff
                 context.setPositions(pos)
                 grad_plus = context.getState(getForces=True).getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole))
-                grad_plus = grad_plus[realAtomIdxs]
+                grad_plus = -grad_plus[realAtomIdxs] # gradients are negative forces
                 # minus perturbation
                 pos[i_atom][j] -= 2*diff
                 context.setPositions(pos)
                 grad_minus = context.getState(getForces=True).getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole))
-                grad_minus = grad_minus[realAtomIdxs]
+                grad_minus = -grad_minus[realAtomIdxs] # gradients are negative forces
                 # set the perturbation back to zero
                 pos[i_atom][j] += diff
                 # fill one row of the hessian matrix
@@ -1096,17 +1096,11 @@ class OpenMM(Engine):
         hessian_matrix = self.build_mass_weighted_hessian(shot=shot, optimize=optimize)
         # step 2: diagonalize the hessian matrix
         eigvals, eigvecs = np.linalg.eigh(hessian_matrix)
-        # step 3: adjust the eigenvalues and eigenvectors
-        if np.sum(eigvals) < 0:
-            # the eigenvalues are sorted already
-            # make sure the negative is smaller than the positive eigenvalues
-            eigvals = -eigvals[::-1]
-            eigvecs = -eigvecs[:, ::-1]
-        # step 4: convert eigenvalues to frequencies
+        # step 3: convert eigenvalues to frequencies
         coef = 0.5 / np.pi * 33.3564095 # 10^12 Hz => cm-1
         negatives = (eigvals >= 0).astype(int) * 2 - 1 # record the negative ones
         freqs = np.sqrt(np.abs(eigvals)) * coef * negatives
-        # step 5: convert eigenvectors to normal modes
+        # step 4: convert eigenvectors to normal modes
         massList = np.array(self.AtomLists['Mass'])[realAtomIdxs] # unit in dalton
         if not noa == len(massList) == len(eigvecs)/3:
             error('number of the real atoms not consistent bewteen massList and hessian')
@@ -1117,7 +1111,7 @@ class OpenMM(Engine):
         # nomalize the scaled normal modes
         norm_factors = np.sqrt(np.sum(np.square(normal_modes), axis=(1,2)))
         normal_modes /= norm_factors[:, np.newaxis, np.newaxis]
-        # step 6: remove the 6 freqs with smallest abs value and corresponding normal modes
+        # step 5: remove the 6 freqs with smallest abs value and corresponding normal modes
         n_remove = 5 if len(realAtomIdxs) == 2 else 6
         larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])
         freqs = freqs[larger_freq_idxs]
