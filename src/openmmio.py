@@ -747,12 +747,12 @@ class OpenMM(Engine):
 
         # vss = [(i, [system.getVirtualSite(i).getParticle(j) for j in range(system.getVirtualSite(i).getNumParticles())]) \
         #            for i in range(system.getNumParticles()) if system.isVirtualSite(i)]
-        self.AtomMask = []
         self.AtomLists = defaultdict(list)
         self.AtomLists['Mass'] = [a.element.mass.value_in_unit(dalton) if a.element is not None else 0 for a in Atoms]
         self.AtomLists['ParticleType'] = ['A' if m >= 1.0 else 'D' for m in self.AtomLists['Mass']]
         self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
+        self.realAtomIdxs = [i for i, a in enumerate(self.AtomMask) if a is True]
 
     def create_simulation(self, timestep=1.0, faststep=0.25, temperature=None, pressure=None, anisotropic=False, mts=False, collision=1.0, nbarostat=25, rpmd_beads=0, **kwargs):
 
@@ -940,8 +940,7 @@ class OpenMM(Engine):
         if force:
             Force = state.getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole))
             # Extract forces belonging to real atoms only
-            realAtomIdxs = [i for i, a in enumerate(self.AtomMask) if a is True]
-            Result["Force"] = Force[realAtomIdxs].flatten()
+            Result["Force"] = Force[self.realAtomIdxs].flatten()
         if dipole:
             Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
         return Result
@@ -1032,15 +1031,14 @@ class OpenMM(Engine):
         context = self.simulation.context
         pos = context.getState(getPositions=True).getPositions(asNumpy=True)
         # pull real atoms and their mass
-        realAtomIdxs = [i for i, a in enumerate(self.AtomMask) if a is True]
-        massList = np.array(self.AtomLists['Mass'])[realAtomIdxs] # unit in dalton
+        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
         # initialize an empty hessian matrix
-        noa = len(realAtomIdxs)
+        noa = len(self.realAtomIdxs)
         hessian = np.empty((noa*3, noa*3), dtype=float)
         # finite difference step size
         diff = Quantity(0.0001, unit=nanometer)
         coef = 1.0 / (0.0001 * 2) # 1/2h
-        for i, i_atom in enumerate(realAtomIdxs):
+        for i, i_atom in enumerate(self.realAtomIdxs):
             massWeight = 1.0 / np.sqrt(massList * massList[i])
             # loop over the x, y, z coordinates
             for j in range(3):
@@ -1048,12 +1046,12 @@ class OpenMM(Engine):
                 pos[i_atom][j] += diff
                 context.setPositions(pos)
                 grad_plus = context.getState(getForces=True).getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole))
-                grad_plus = -grad_plus[realAtomIdxs] # gradients are negative forces
+                grad_plus = -grad_plus[self.realAtomIdxs] # gradients are negative forces
                 # minus perturbation
                 pos[i_atom][j] -= 2*diff
                 context.setPositions(pos)
                 grad_minus = context.getState(getForces=True).getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole))
-                grad_minus = -grad_minus[realAtomIdxs] # gradients are negative forces
+                grad_minus = -grad_minus[self.realAtomIdxs] # gradients are negative forces
                 # set the perturbation back to zero
                 pos[i_atom][j] += diff
                 # fill one row of the hessian matrix
@@ -1088,8 +1086,7 @@ class OpenMM(Engine):
         if not optimize:
             warn_once("Asking for normal modes without geometry optimization?")
         # step 0: check number of real atoms
-        realAtomIdxs = [i for i, a in enumerate(self.AtomMask) if a is True]
-        noa = len(realAtomIdxs)
+        noa = len(self.realAtomIdxs)
         if noa < 2:
             error('normal mode analysis not suitable for system with one or less atoms')
         # step 1: build a full hessian matrix
@@ -1101,7 +1098,7 @@ class OpenMM(Engine):
         negatives = (eigvals >= 0).astype(int) * 2 - 1 # record the negative ones
         freqs = np.sqrt(np.abs(eigvals)) * coef * negatives
         # step 4: convert eigenvectors to normal modes
-        massList = np.array(self.AtomLists['Mass'])[realAtomIdxs] # unit in dalton
+        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
         if not noa == len(massList) == len(eigvecs)/3:
             error('number of the real atoms not consistent bewteen massList and hessian')
         # scale the eigenvectors by mass^-1/2
@@ -1112,7 +1109,7 @@ class OpenMM(Engine):
         norm_factors = np.sqrt(np.sum(np.square(normal_modes), axis=(1,2)))
         normal_modes /= norm_factors[:, np.newaxis, np.newaxis]
         # step 5: remove the 6 freqs with smallest abs value and corresponding normal modes
-        n_remove = 5 if len(realAtomIdxs) == 2 else 6
+        n_remove = 5 if len(self.realAtomIdxs) == 2 else 6
         larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])
         freqs = freqs[larger_freq_idxs]
         normal_modes = normal_modes[larger_freq_idxs]
