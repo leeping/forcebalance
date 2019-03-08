@@ -4,17 +4,15 @@
 @date 03/2019
 """
 from __future__ import division
-from builtins import str
 import os
 import shutil
 import numpy as np
 import re
 import subprocess
-from subprocess import PIPE
 from collections import OrderedDict
 from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohr2ang, warn_press_key
 from forcebalance.target import Target
-from forcebalance.molecule import Molecule, format_xyz_coord
+from forcebalance.molecule import Molecule
 from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
@@ -164,7 +162,7 @@ class OptGeoTarget(Target):
         title_str = "Optimized Geometries, Objective = % .5e" % self.objective
         column_head_str =  " %-15s %11s %11s %11s %11s %11s %11s %11s" % ('System', 'RMSD_bond',
             'denom_bond', 'RMSD_angle', 'denom_angle', 'RMSD_dihedral', 'denom_dihedral', 'Term.')
-        printcool_dictionary(self.PrintDict,title=)
+        printcool_dictionary(self.PrintDict,title=title_str+'\n'+column_head_str)
 
     def get(self, mvals, AGrad=False, AHess=False):
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
