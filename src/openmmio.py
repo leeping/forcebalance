@@ -669,9 +669,9 @@ class OpenMM(Engine):
                 elif self.FF.amoeba_pol == 'direct':
                     self.mmopts['polarization'] = 'direct'
             self.mmopts['rigidWater'] = self.FF.rigid_water
-            if self.FF.restrain_h== True:
-                self.mmopts['constraints'] = HBonds
-                logger.info('Constraining hydrogen bond lengths (SHAKE)')
+            # if self.FF.restrain_h== True:
+            #     self.mmopts['constraints'] = HBonds
+            #     logger.info('Constraining hydrogen bond lengths (SHAKE)')
 
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
@@ -1541,7 +1541,7 @@ class Vibration_OpenMM(Vibration):
     """ Vibrational frequency matching using TINKER. """
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
-        # self.set_option(tgt_opts,'coords',default="input.pdb")
+        self.set_option(tgt_opts,'coords',default="input.pdb")
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
         self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
         self.engine_ = OpenMM
