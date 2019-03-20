@@ -84,7 +84,7 @@ class TestAmber99SB(ForceBalanceTestCase):
         # Set up OpenMM engine
         openmm = False
         try:
-            import simtk.openmm 
+            import simtk.openmm
             openmm = True
         except: logger.warn("OpenMM cannot be imported, skipping OpenMM tests.")
         if openmm: self.engines['OpenMM'] = OpenMM(coords="all.gro", pdb="conf.pdb", ffxml="a99sb.xml", platname="Reference", precision="double")
@@ -110,9 +110,9 @@ class TestAmber99SB(ForceBalanceTestCase):
         fin = os.path.join(datadir, 'test_energy_force.dat')
         RefData = np.loadtxt(fin)
         for n1 in self.engines.keys():
-            self.assertNdArrayEqual(Data[n1][:,0], RefData[:,0], delta=0.01, 
+            self.assertNdArrayEqual(Data[n1][:,0], RefData[:,0], delta=0.01,
                                     msg="%s energies do not match the reference" % (n1))
-            self.assertNdArrayEqual(Data[n1][:,1:].flatten(), RefData[:,1:].flatten(), 
+            self.assertNdArrayEqual(Data[n1][:,1:].flatten(), RefData[:,1:].flatten(),
                                     delta=0.1, msg="%s forces do not match the reference" % (n1))
 
     def test_optimized_geometries(self):
@@ -139,7 +139,7 @@ class TestAmber99SB(ForceBalanceTestCase):
                                    msg="%s optimized energies do not match the reference" % n1)
             self.assertAlmostEqual(Data[n1][1], RefData[1], delta=0.001,
                                    msg="%s RMSD from starting structure do not match the reference" % n1)
-                
+
     def test_interaction_energies(self):
         """ Test GMX, OpenMM, and TINKER interaction energies using AMBER force field """
         printcool("Test GMX, OpenMM, and TINKER interaction energies using AMBER force field")
@@ -162,7 +162,7 @@ class TestAmber99SB(ForceBalanceTestCase):
         for n1 in self.engines.keys():
             self.assertNdArrayEqual(Data[n1], RefData, delta=0.0001,
                                     msg="%s interaction energies do not match the reference" % n1)
-        
+
     def test_multipole_moments(self):
         """ Test GMX, OpenMM, and TINKER multipole moments using AMBER force field """
         printcool("Test GMX, OpenMM, and TINKER multipole moments using AMBER force field")
@@ -220,18 +220,19 @@ class TestAmber99SB(ForceBalanceTestCase):
             q1 = np.array(list(Data[n1]['quadrupole'].values()))
             self.assertNdArrayEqual(d1, RefDip, delta=0.02, msg="%s dipole moments at optimized geometry do not match the reference" % n1)
             self.assertNdArrayEqual(q1, RefQuad, delta=0.02, msg="%s quadrupole moments at optimized geometry do not match the reference" % n1)
-        
+
     def test_normal_modes(self):
         """ Test GMX and TINKER normal modes """
         printcool("Test GMX and TINKER normal modes")
         missing_pkgs = []
-        for eng in ['TINKER', 'GMX']:
+        for eng in ['TINKER', 'GMX', 'OpenMM']:
             if eng not in self.engines:
                 missing_pkgs.append(eng)
         if len(missing_pkgs) > 0:
             self.skipTest("Missing packages: %s" % ', '.join(missing_pkgs))
         FreqG, ModeG = self.engines['GMX'].normal_modes(shot=5, optimize=False)
         FreqT, ModeT = self.engines['TINKER'].normal_modes(shot=5, optimize=False)
+        FreqO, ModeO = self.engines['OpenMM'].normal_modes(shot=5, optimize=False)
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
             fout = os.path.join(datadir, 'test_normal_modes.freq.dat')
@@ -242,28 +243,31 @@ class TestAmber99SB(ForceBalanceTestCase):
             np.save(fout, ModeT)
         FreqRef = np.loadtxt(os.path.join(datadir, 'test_normal_modes.freq.dat'))
         ModeRef = np.load(os.path.join(datadir, 'test_normal_modes.mode.dat.npy'))
-        for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER')]:
+        for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER'), (FreqO, ModeO, 'OpenMM')]:
             for v, vr, m, mr in zip(Freq, FreqRef, Mode, ModeRef):
                 if vr < 0: continue
                 # Frequency tolerance is half a wavenumber.
                 self.assertAlmostEqual(v, vr, delta=0.5, msg="%s vibrational frequencies do not match the reference" % Name)
+                # A less tight normal mode tolerance for OpenMM because it used finite-difference hessian
+                delta = 0.02 if Name == 'OpenMM' else 0.01
                 for a in range(len(m)):
                     try:
-                        self.assertNdArrayEqual(m[a], mr[a], delta=0.01, msg="%s normal modes do not match the reference" % Name)
+                        self.assertNdArrayEqual(m[a], mr[a], delta=delta, msg="%s normal modes do not match the reference" % Name)
                     except:
-                        self.assertNdArrayEqual(m[a], -1.0*mr[a], delta=0.01, msg="%s normal modes do not match the reference" % Name)
+                        self.assertNdArrayEqual(m[a], -1.0*mr[a], delta=delta, msg="%s normal modes do not match the reference" % Name)
 
     def test_normal_modes_optimized(self):
         """ Test GMX and TINKER normal modes at optimized geometry """
         printcool("Test GMX and TINKER normal modes at optimized geometry")
         missing_pkgs = []
-        for eng in ['TINKER', 'GMX']:
+        for eng in ['TINKER', 'GMX', 'OpenMM']:
             if eng not in self.engines:
                 missing_pkgs.append(eng)
         if len(missing_pkgs) > 0:
             self.skipTest("Missing packages: %s" % ', '.join(missing_pkgs))
         FreqG, ModeG = self.engines['GMX'].normal_modes(shot=5, optimize=True)
         FreqT, ModeT = self.engines['TINKER'].normal_modes(shot=5, optimize=True)
+        FreqO, ModeO = self.engines['OpenMM'].normal_modes(shot=5, optimize=True)
         datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
             fout = os.path.join(datadir, 'test_normal_modes_optimized.freq.dat')
@@ -274,17 +278,18 @@ class TestAmber99SB(ForceBalanceTestCase):
             np.save(fout, ModeT)
         FreqRef = np.loadtxt(os.path.join(datadir, 'test_normal_modes_optimized.freq.dat'))
         ModeRef = np.load(os.path.join(datadir, 'test_normal_modes_optimized.mode.dat.npy'))
-        for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER')]:
+        for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER'), (FreqO, ModeO, 'OpenMM')]:
             for v, vr, m, mr in zip(Freq, FreqRef, Mode, ModeRef):
                 if vr < 0: continue
                 # Frequency tolerance is half a wavenumber.
-                self.assertAlmostEqual(v, vr, delta=0.5, msg="%s vibrational frequencies at optimized geometry do not match the reference" % Name)
+                self.assertAlmostEqual(v, vr, delta=0.5, msg="%s vibrational frequencies do not match the reference" % Name)
+                # A less tight normal mode tolerance for OpenMM because it used finite-difference hessian
+                delta = 0.02 if Name == 'OpenMM' else 0.01
                 for a in range(len(m)):
                     try:
-                        self.assertNdArrayEqual(m[a], mr[a], delta=0.01, msg="%s normal modes at optimized geometry do not match the reference" % Name)
+                        self.assertNdArrayEqual(m[a], mr[a], delta=delta, msg="%s normal modes do not match the reference" % Name)
                     except:
-                        self.assertNdArrayEqual(m[a], -1.0*mr[a], delta=0.01, msg="%s normal modes at optimized geometry do not match the reference" % Name)
-
+                        self.assertNdArrayEqual(m[a], -1.0*mr[a], delta=delta, msg="%s normal modes do not match the reference" % Name)
 
 class TestAmoebaWater6(ForceBalanceTestCase):
 
@@ -458,5 +463,5 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         """@override ForceBalanceTestCase.shortDescription()"""
         return super(TestAmoebaWater6,self).shortDescription() + " (TINKER and OpenMM Engines)"
 
-if __name__ == '__main__':           
+if __name__ == '__main__':
     unittest.main()
