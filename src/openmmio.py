@@ -15,10 +15,10 @@ from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
+from forcebalance.vibration import Vibration
 import networkx as nx
 import numpy as np
 import sys
-from forcebalance.finite_difference import *
 import pickle
 import shutil
 from copy import deepcopy
@@ -669,7 +669,7 @@ class OpenMM(Engine):
                 elif self.FF.amoeba_pol == 'direct':
                     self.mmopts['polarization'] = 'direct'
             self.mmopts['rigidWater'] = self.FF.rigid_water
-            if self.FF.restrain_h== True:
+            if self.FF.constrain_h is True:
                 self.mmopts['constraints'] = HBonds
                 logger.info('Constraining hydrogen bond lengths (SHAKE)')
 
@@ -748,12 +748,12 @@ class OpenMM(Engine):
 
         # vss = [(i, [system.getVirtualSite(i).getParticle(j) for j in range(system.getVirtualSite(i).getNumParticles())]) \
         #            for i in range(system.getNumParticles()) if system.isVirtualSite(i)]
-        self.AtomMask = []
         self.AtomLists = defaultdict(list)
         self.AtomLists['Mass'] = [a.element.mass.value_in_unit(dalton) if a.element is not None else 0 for a in Atoms]
         self.AtomLists['ParticleType'] = ['A' if m >= 1.0 else 'D' for m in self.AtomLists['Mass']]
         self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
+        self.realAtomIdxs = [i for i, a in enumerate(self.AtomMask) if a is True]
 
     def create_simulation(self, timestep=1.0, faststep=0.25, temperature=None, pressure=None, anisotropic=False, mts=False, collision=1.0, nbarostat=25, rpmd_beads=0, **kwargs):
 
@@ -935,14 +935,15 @@ class OpenMM(Engine):
     def evaluate_one_(self, force=False, dipole=False):
         """ Perform a single point calculation on the current geometry. """
 
-        State = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
+        state = self.simulation.context.getState(getPositions=dipole, getEnergy=True, getForces=force)
         Result = {}
-        Result["Energy"] = State.getPotentialEnergy() / kilojoules_per_mole
+        Result["Energy"] = state.getPotentialEnergy() / kilojoules_per_mole
         if force:
-            Force = list(np.array(State.getForces() / kilojoules_per_mole * nanometer).flatten())
+            Force = state.getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole))
             # Extract forces belonging to real atoms only
-            Result["Force"] = np.array(list(itertools.chain(*[Force[3*i:3*i+3] for i in range(int(len(Force)/3)) if self.AtomMask[i]])))
-        if dipole: Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
+            Result["Force"] = Force[self.realAtomIdxs].flatten()
+        if dipole:
+            Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
         return Result
 
     def evaluate_(self, force=False, dipole=False, traj=False):
@@ -1005,9 +1006,115 @@ class OpenMM(Engine):
         Result = self.evaluate_(dipole=True, traj=True)
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
+    def build_mass_weighted_hessian(self, shot=0, optimize=True):
+        """OpenMM single frame hessian evaluation
+        Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
+
+        Parameters
+        ----------
+        shot: int
+            The frame number in the trajectory of this target
+
+        Returns
+        -------
+        hessian: np.array with shape 3N x 3N, N = number of "real" atoms
+            The result hessian matrix.
+            The row indices are fx0, fy0, fz0, fx1, fy1, ...
+            The column indices are x0, y0, z0, x1, y1, ..
+            The unit is kilojoule / (nanometer^2 * mole * dalton) => 10^24 s^-2
+        """
+        self.update_simulation()
+        if optimize is True:
+            self.optimize(shot=shot, crit=1e-10)
+        else:
+            warn_once("Computing mass-weighted hessian without geometry optimization")
+            self.set_positions(shot=shot)
+        context = self.simulation.context
+        pos = context.getState(getPositions=True).getPositions(asNumpy=True)
+        # pull real atoms and their mass
+        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
+        # initialize an empty hessian matrix
+        noa = len(self.realAtomIdxs)
+        hessian = np.empty((noa*3, noa*3), dtype=float)
+        # finite difference step size
+        diff = Quantity(0.0001, unit=nanometer)
+        coef = 1.0 / (0.0001 * 2) # 1/2h
+        for i, i_atom in enumerate(self.realAtomIdxs):
+            massWeight = 1.0 / np.sqrt(massList * massList[i])
+            # loop over the x, y, z coordinates
+            for j in range(3):
+                # plus perturbation
+                pos[i_atom][j] += diff
+                context.setPositions(pos)
+                grad_plus = context.getState(getForces=True).getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole))
+                grad_plus = -grad_plus[self.realAtomIdxs] # gradients are negative forces
+                # minus perturbation
+                pos[i_atom][j] -= 2*diff
+                context.setPositions(pos)
+                grad_minus = context.getState(getForces=True).getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole))
+                grad_minus = -grad_minus[self.realAtomIdxs] # gradients are negative forces
+                # set the perturbation back to zero
+                pos[i_atom][j] += diff
+                # fill one row of the hessian matrix
+                hessian[i*3+j] = np.ravel((grad_plus - grad_minus) * coef * massWeight[:, np.newaxis])
+        # make hessian symmetric by averaging upper right and lower left
+        hessian += hessian.T
+        hessian *= 0.5
+        # recover the original position
+        context.setPositions(pos)
+        return hessian
+
     def normal_modes(self, shot=0, optimize=True):
-        logger.error("OpenMM cannot do normal mode analysis\n")
-        raise NotImplementedError
+        """OpenMM Normal Mode Analysis
+        Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
+
+        Parameters
+        ----------
+        shot: int
+            The frame number in the trajectory of this target
+        optimize: bool, default True
+            Optimize the geometry before evaluating the normal modes
+
+        Returns
+        -------
+        freqs: np.array with shape (3N - 6) x 1, N = number of "real" atoms
+            Harmonic frequencies, sorted from smallest to largest, with the 6 smallest removed, in unit cm^-1
+        normal_modes: np.array with shape (3N - 6) x (3N), N = number of "real" atoms
+            The normal modes corresponding to each of the frequencies, scaled by mass^-1/2.
+        """
+        if self.precision == 'single':
+            warn_once("Single-precision OpenMM engine used for normal mode analysis - recommend that you use mix or double precision.")
+        if not optimize:
+            warn_once("Asking for normal modes without geometry optimization?")
+        # step 0: check number of real atoms
+        noa = len(self.realAtomIdxs)
+        if noa < 2:
+            error('normal mode analysis not suitable for system with one or less atoms')
+        # step 1: build a full hessian matrix
+        hessian_matrix = self.build_mass_weighted_hessian(shot=shot, optimize=optimize)
+        # step 2: diagonalize the hessian matrix
+        eigvals, eigvecs = np.linalg.eigh(hessian_matrix)
+        # step 3: convert eigenvalues to frequencies
+        coef = 0.5 / np.pi * 33.3564095 # 10^12 Hz => cm-1
+        negatives = (eigvals >= 0).astype(int) * 2 - 1 # record the negative ones
+        freqs = np.sqrt(np.abs(eigvals)) * coef * negatives
+        # step 4: convert eigenvectors to normal modes
+        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
+        if not noa == len(massList) == len(eigvecs)/3:
+            error('number of the real atoms not consistent bewteen massList and hessian')
+        # scale the eigenvectors by mass^-1/2
+        normal_modes = (eigvecs.reshape(noa, -1) / np.sqrt(massList)[:, np.newaxis]).reshape(noa*3, noa*3)
+        # re-arange to row index and shape
+        normal_modes = normal_modes.T.reshape(noa*3, noa, 3)
+        # nomalize the scaled normal modes
+        norm_factors = np.sqrt(np.sum(np.square(normal_modes), axis=(1,2)))
+        normal_modes /= norm_factors[:, np.newaxis, np.newaxis]
+        # step 5: remove the 6 freqs with smallest abs value and corresponding normal modes
+        n_remove = 5 if len(self.realAtomIdxs) == 2 else 6
+        larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])
+        freqs = freqs[larger_freq_idxs]
+        normal_modes = normal_modes[larger_freq_idxs]
+        return freqs, normal_modes
 
     def optimize(self, shot=0, crit=1e-4):
 
@@ -1429,3 +1536,14 @@ class Hydration_OpenMM(Hydration):
         ## Send back the trajectory file.
         if self.save_traj > 0:
             self.extra_output = ['openmm-md.dcd']
+
+class Vibration_OpenMM(Vibration):
+    """ Vibrational frequency matching using TINKER. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'coords',default="input.pdb")
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.engine_ = OpenMM
+        ## Initialize base class.
+        super(Vibration_OpenMM,self).__init__(options,tgt_opts,forcefield)
