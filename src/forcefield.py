@@ -233,6 +233,8 @@ class FF(forcebalance.BaseClass):
         self.set_option(options, 'amoeba_eps')
         ## Switch for rigid water molecules
         self.set_option(options, 'rigid_water')
+        ## Switch for constraining bonds involving hydrogen
+        self.set_option(options, 'constrain_h')
         ## Bypass the transformation and use physical parameters directly
         self.set_option(options, 'use_pvals')
         ## Allow duplicate parameter names (internally construct unique names)
