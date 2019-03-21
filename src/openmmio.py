@@ -15,6 +15,7 @@ from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
+from forcebalance.vibration import Vibration
 from forcebalance.opt_geo_target import OptGeoTarget
 import networkx as nx
 import numpy as np
@@ -669,7 +670,7 @@ class OpenMM(Engine):
                 elif self.FF.amoeba_pol == 'direct':
                     self.mmopts['polarization'] = 'direct'
             self.mmopts['rigidWater'] = self.FF.rigid_water
-            if self.FF.restrain_h== True:
+            if self.FF.constrain_h is True:
                 self.mmopts['constraints'] = HBonds
                 logger.info('Constraining hydrogen bond lengths (SHAKE)')
 
@@ -1556,6 +1557,17 @@ class Hydration_OpenMM(Hydration):
         ## Send back the trajectory file.
         if self.save_traj > 0:
             self.extra_output = ['openmm-md.dcd']
+
+class Vibration_OpenMM(Vibration):
+    """ Vibrational frequency matching using TINKER. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'coords',default="input.pdb")
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.engine_ = OpenMM
+        ## Initialize base class.
+        super(Vibration_OpenMM,self).__init__(options,tgt_opts,forcefield)
 
 class OptGeoTarget_OpenMM(OptGeoTarget):
     """ Optimized geometry matching using OpenMM. """
