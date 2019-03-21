@@ -98,6 +98,7 @@ class OptGeoTarget(Target):
             global_opts.setdefault('bond_denom', 0.01)
             global_opts.setdefault('angle_denom', 1.0)
             global_opts.setdefault('dihedral_denom', 1.0)
+            global_opts.setdefault('improper_denom', 1.0)
             # copy global options into each system
             for sys_name, sys_opt_dict in sys_opts.items():
                 for k,v in global_opts.items():
@@ -112,7 +113,7 @@ class OptGeoTarget(Target):
         "Build internal coordinates system with geometric.internal.PrimitiveInternalCoordinates"
         # geometric module is imported to build internal coordinates
         # importing here will avoid import error for calculations not using this target
-        from geometric.internal import PrimitiveInternalCoordinates, Distance, Angle, Dihedral
+        from geometric.internal import PrimitiveInternalCoordinates, Distance, Angle, Dihedral, OutOfPlane
         self.internal_coordinates = OrderedDict()
         for sysname, sysopt in self.sys_opts:
             geofile = sysopt['geometry']
@@ -122,7 +123,7 @@ class OptGeoTarget(Target):
             m = Molecule(topfile)
             p_IC = PrimitiveInternalCoordinates(m)
             # here we explicitly pick the bonds, angles and dihedrals to evaluate
-            ic_bonds, ic_angles, ic_dihedrals = [], [], []
+            ic_bonds, ic_angles, ic_dihedrals, ic_impropers = [], [], [], []
             for ic in p_IC.Internals:
                 if isinstance(ic, Distance):
                     ic_bonds.append(ic)
@@ -130,18 +131,23 @@ class OptGeoTarget(Target):
                     ic_angles.append(ic)
                 elif isinstance(ic, Dihedral):
                     ic_dihedrals.append(ic)
+                elif isinstance(ic, OutOfPlane):
+                    ic_impropers.append(ic)
             # compute and store reference values
             pos_ref = m0.xyzs[0]
             vref_bonds = np.array([ic.value(pos_ref) for ic in ic_bonds])
             vref_angles = np.array([ic.value(pos_ref) for ic in ic_angles])
             vref_dihedrals = np.array([ic.value(pos_ref) for ic in ic_dihedrals])
+            vref_impropers = np.array([ic.value(pos_ref) for ic in ic_impropers])
             self.internal_coordinates[sysname] = {
                 'ic_bonds': ic_bonds,
                 'ic_angles': ic_angles,
                 'ic_dihedrals': ic_dihedrals,
+                'ic_impropers': ic_impropers,
                 'vref_bonds': vref_bonds,
                 'vref_angles': vref_angles,
                 'vref_dihedrals': vref_dihedrals,
+                'vref_impropers': vref_impropers,
             }
 
     def system_driver(self, sysname):
@@ -155,13 +161,14 @@ class OptGeoTarget(Target):
             pos = engine.getContextPosition()
             v_ic['bonds'] = np.array([ic.value(pos) for ic in ic_dict['ic_bonds']])
             v_ic['angles'] = np.array([ic.value(pos) for ic in ic_dict['ic_angles']])
-            v_ic['dihedrals'] = np.array([ic.value(pos) for ic in ic_dict['dihedrals']])
+            v_ic['dihedrals'] = np.array([ic.value(pos) for ic in ic_dict['ic_dihedrals']])
+            v_ic['impropers'] = np.array([ic.value(pos) for ic in ic_dict['ic_impropers']])
         return v_ic
 
     def indicate(self):
         title_str = "Optimized Geometries, Objective = % .5e" % self.objective
-        column_head_str =  " %-15s %11s %11s %11s %11s %11s %11s %11s" % ('System', 'RMSD_bond',
-            'denom_bond', 'RMSD_angle', 'denom_angle', 'RMSD_dihedral', 'denom_dihedral', 'Term.')
+        column_head_str =  " %-15s %11s %11s %11s %11s %11s %11s %11s %11s %11s" % ('System', 'RMSD_bond', 'denom_bond', \
+            'RMSD_angle', 'denom_angle', 'RMSD_dihedral', 'denom_dihedral', 'RMSD_improper', 'denom_improper', 'Term.')
         printcool_dictionary(self.PrintDict,title=title_str+'\n'+column_head_str)
 
     def get(self, mvals, AGrad=False, AHess=False):
@@ -176,6 +183,12 @@ class OptGeoTarget(Target):
                 bond_denom = sysopt['bond_denom']
                 angle_denom = sysopt['angle_denom']
                 dihedral_denom = sysopt['dihedral_denom']
+                improper_denom = sysopt['improper_denom']
+                # inverse demon to be scaling factors, 0 for denom 0
+                scale_bond = 1.0 / bond_denom if bond_denom != 0 else 0.0
+                scale_angle = 1.0 / angle_denom if angle_denom != 0 else 0.0
+                scale_dihedral = 1.0 / dihedral_denom if dihedral_denom != 0 else 0.0
+                scale_improper = 1.0 / improper_denom if improper_denom != 0 else 0.0
                 # calculate new internal coordinates f
                 v_ic = self.system_driver(sysname)
                 # objective contribution from bonds
@@ -190,13 +203,18 @@ class OptGeoTarget(Target):
                 vref_dihedrals = self.internal_coordinates[sysname]['vref_dihedrals']
                 vtar_dihedrals = v_ic['dihedrals']
                 rmsd_dihedral = np.sqrt(np.sum((vref_dihedrals - vtar_dihedrals)**2))
+                # objective contribution from improper dihedrals
+                vref_impropers = self.internal_coordinates[sysname]['vref_impropers']
+                vtar_impropers = v_ic['impropers']
+                rmsd_improper = np.sqrt(np.sum((vref_impropers - vtar_impropers)**2))
                 # add total objective value to result list
-                obj_total = rmsd_bond / bond_denom + rmsd_angle / angle_denom + rmsd_dihedral / dihedral_denom
+                obj_total = rmsd_bond * scale_bond + rmsd_angle * scale_angle + \
+                    rmsd_dihedral * scale_dihedral + rmsd_improper * scale_improper
                 v_obj_list.append(obj_total)
                 # save print string
                 if not in_fd():
-                    self.PrintDict[sysname] = "% 7.3f % 5.2f % 7.3f % 5.2f % 7.3f % 5.2f %9.3f" % (rmsd_bond,
-                        bond_denom, rmsd_angle, angle_denom, rmsd_dihedral, dihedral_denom, obj_total)
+                    self.PrintDict[sysname] = "% 7.3f % 5.2f % 7.3f % 5.2f % 7.3f % 5.2f % 7.3f % 5.2f %9.3f" % (rmsd_bond, \
+                        bond_denom, rmsd_angle, angle_denom, rmsd_dihedral, dihedral_denom, rmsd_improper, improper_denom, obj_total)
             return np.array(v_obj_list, dtype=float)
         V = compute(mvals)
         dV = np.zeros((self.FF.np,len(V)))
