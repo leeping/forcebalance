@@ -12,3 +12,8 @@ forcebalance.egg-info/
 
 .vscode/
 **/.DS_Store
+
+studies/*/targets/
+studies/*/*.tmp/
+studies/*/*.bak/
+sutdies/*/*.err
