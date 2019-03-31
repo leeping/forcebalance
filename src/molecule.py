@@ -37,7 +37,7 @@ except NameError:
 # |              Chemical file format conversion module                |#
 # |                                                                    |#
 # |                Lee-Ping Wang (leeping@ucdavis.edu)                 |#
-# |                     Last updated June 6, 2018                      |#
+# |                    Last updated March 31, 2019                     |#
 # |                                                                    |#
 # |   This code is part of ForceBalance and is covered under the       |#
 # |   ForceBalance copyright notice and 3-clause BSD license.          |#
@@ -179,9 +179,16 @@ AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames 
 #================================#
 #       Set up the logger        #
 #================================#
-try:
+if "forcebalance" in __name__:
+    # If this module is part of ForceBalance, use the package level logger
     from .output import *
-except (ImportError, ValueError):
+    package = "ForceBalance"
+elif "geometric" in __name__:
+    # This ensures logging behavior is consistent with the rest of geomeTRIC
+    from .nifty import logger
+    package = "geomeTRIC"
+else:
+    # Previous default behavior if FB package level loggers could not be imported
     from logging import *
     class RawStreamHandler(StreamHandler):
         """Exactly like output.StreamHandler except it does no extra formatting
@@ -195,9 +202,17 @@ except (ImportError, ValueError):
             message = record.getMessage()
             self.stream.write(message)
             self.flush()
-    logger=getLogger()
-    logger.handlers = [RawStreamHandler(sys.stdout)]
+    # logger=getLogger()
+    # logger.handlers = [RawStreamHandler(sys.stdout)]
+    # LPW: Daniel Smith suggested the below four lines to improve logger behavior
+    logger = getLogger("MoleculeLogger")
     logger.setLevel(INFO)
+    handler = RawStreamHandler()
+    logger.addHandler(handler)
+    if __name__ == "__main__":
+        package = "LPW-molecule.py"
+    else:
+        package = __name__.split('.')[0]
 
 module_name = __name__.replace('.molecule','')
 
@@ -266,7 +281,7 @@ if "forcebalance" in __name__:
             have_dcdlib = True
             break
     if not have_dcdlib:
-        warn('The dcdlib module cannot be imported (Cannot read/write DCD files)')
+        logger.info('The dcdlib module cannot be imported (Cannot read/write DCD files)')
 
     #============================#
     #| PDB read/write functions |#
@@ -274,7 +289,7 @@ if "forcebalance" in __name__:
     try:
         from .PDB import *
     except ImportError:
-        warn('The pdb module cannot be imported (Cannot read/write PDB files)')
+        logger.info('The pdb module cannot be imported (Cannot read/write PDB files)')
 
     #=============================#
     #| Mol2 read/write functions |#
@@ -282,7 +297,7 @@ if "forcebalance" in __name__:
     try:
         from . import Mol2
     except ImportError:
-        warn('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
+        logger.info('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
 
     #==============================#
     #| OpenMM interface functions |#
@@ -292,7 +307,24 @@ if "forcebalance" in __name__:
         from simtk.openmm import *
         from simtk.openmm.app import *
     except ImportError:
-        warn('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
+        logger.info('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
+elif "geometric" in __name__:
+    #============================#
+    #| PDB read/write functions |#
+    #============================#
+    try:
+        from .PDB import *
+    except ImportError:
+        logger.info('The pdb module cannot be imported (Cannot read/write PDB files)')
+    #==============================#
+    #| OpenMM interface functions |#
+    #==============================#
+    try:
+        from simtk.unit import *
+        from simtk.openmm import *
+        from simtk.openmm.app import *
+    except ImportError:
+        logger.info('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
 
 #===========================#
 #| Convenience subroutines |#
@@ -435,7 +467,7 @@ try:
             coors = nx.get_node_attributes(self,'x')
             return np.array([coors[i] for i in self.L()])
 except ImportError:
-    warn("NetworkX cannot be imported (topology tools won't work).  Most functionality should still work though.")
+    logger.warning("NetworkX cannot be imported (topology tools won't work).  Most functionality should still work though.")
 
 def TopEqual(mol1, mol2):
     """ For the nanoreactor project: Determine whether two Molecule objects have the same topologies. """
@@ -680,7 +712,7 @@ def AlignToMoments(elem,xyz1,xyz2=None):
     Thresh = 1e-3
     if np.abs(determ - 1.0) > Thresh:
         if np.abs(determ + 1.0) > Thresh:
-            print("in AlignToMoments, determinant is % .3f" % determ)
+            logger.info("in AlignToMoments, determinant is % .3f" % determ)
         BB[:,2] *= -1
     xyzr = np.dot(BB.T, xyz.T).T.copy()
     if xyz2 is not None:
@@ -1251,7 +1283,7 @@ class Molecule(object):
     def __getattr__(self, key):
         """ Whenever we try to get a class attribute, it first tries to get the attribute from the Data dictionary. """
         if key == 'qm_forces':
-            warn('qm_forces is a deprecated keyword because it actually meant gradients; setting to qm_grads.')
+            logger.warning('qm_forces is a deprecated keyword because it actually meant gradients; setting to qm_grads.')
             key = 'qm_grads'
         if key == 'ns':
             return len(self)
@@ -1291,7 +1323,7 @@ class Molecule(object):
         ## These attributes return a list of attribute names defined in this class, that belong in the chosen category.
         ## For example: self.FrameKeys should return set(['xyzs','boxes']) if xyzs and boxes exist in self.Data
         if key == 'qm_forces':
-            warn('qm_forces is a deprecated keyword because it actually meant gradients; setting to qm_grads.')
+            logger.warning('qm_forces is a deprecated keyword because it actually meant gradients; setting to qm_grads.')
             key = 'qm_grads'
         if key in AllVariableNames:
             self.Data[key] = value
@@ -1406,7 +1438,7 @@ class Molecule(object):
                 Sum.Data[key] = self.Data[key]
             elif diff(self, other, key):
                 for i, j in zip(self.Data[key], other.Data[key]):
-                    print(i, j, i==j)
+                    logger.info("%s %s %s" % (i, j, str(i==j)))
                 logger.error('The data member called %s is not the same for these two objects\n' % key)
                 raise RuntimeError
             elif key in self.Data:
@@ -1421,7 +1453,10 @@ class Molecule(object):
                 if type(other.Data[key]) is not list:
                     logger.error('Key %s in other is a FrameKey, it must be a list\n' % key)
                     raise RuntimeError
-                Sum.Data[key] = list(self.Data[key] + other.Data[key])
+                if isinstance(self.Data[key][0], np.ndarray):
+                    Sum.Data[key] = [i.copy() for i in self.Data[key]] + [i.copy() for i in other.Data[key]]
+                else:
+                    Sum.Data[key] = list(self.Data[key] + other.Data[key])
             elif either(self, other, key):
                 # TINKER 6.3 compatibility - catch the specific case that one has a periodic box and the other doesn't.
                 if key == 'boxes':
@@ -1445,7 +1480,7 @@ class Molecule(object):
             if key in ['fnm', 'ftype', 'bonds', 'molecules', 'topology']: pass
             elif diff(self, other, key):
                 for i, j in zip(self.Data[key], other.Data[key]):
-                    print(i, j, i==j)
+                    logger.info("%s %s %s" % (i, j, str(i==j)))
                 logger.error('The data member called %s is not the same for these two objects\n' % key)
                 raise RuntimeError
             # Information from the other class is added to this class (if said info doesn't exist.)
@@ -1460,7 +1495,10 @@ class Molecule(object):
                 if type(other.Data[key]) is not list:
                     logger.error('Key %s in other is a FrameKey, it must be a list\n' % key)
                     raise RuntimeError
-                self.Data[key] += other.Data[key]
+                if isinstance(self.Data[key][0], np.ndarray):
+                    self.Data[key] += [i.copy() for i in other.Data[key]]
+                else:
+                    self.Data[key] += other.Data[key]
             elif either(self, other, key):
                 # TINKER 6.3 compatibility - catch the specific case that one has a periodic box and the other doesn't.
                 if key == 'boxes':
@@ -1548,7 +1586,7 @@ class Molecule(object):
                 if hasattr(self, 'na'):
                     continue
             if arg == 'qm_forces':
-                warn('qm_forces is a deprecated keyword because it actually meant gradients; setting to qm_grads.')
+                logger.warning('qm_forces is a deprecated keyword because it actually meant gradients; setting to qm_grads.')
                 arg = 'qm_grads'
             if arg not in self.Data:
                 logger.error("%s is a required attribute for writing this type of file but it's not present\n" % arg)
@@ -1572,10 +1610,10 @@ class Molecule(object):
             ftype = os.path.splitext(fnm)[1][1:]
         ## Fill in comments.
         if 'comms' not in self.Data:
-            self.comms = ['Generated by ForceBalance from %s: Frame %i of %i' % (fnm, i+1, self.ns) for i in range(self.ns)]
+            self.comms = ['Generated by %s from %s: Frame %i of %i' % (package, fnm, i+1, self.ns) for i in range(self.ns)]
         if 'xyzs' in self.Data and len(self.comms) < len(self.xyzs):
             for i in range(len(self.comms), len(self.xyzs)):
-                self.comms.append("Frame %i: generated by ForceBalance" % i)
+                self.comms.append("Frame %i: generated by %s" % (i, package))
         ## I needed to add in this line because the DCD writer requires the file name,
         ## but the other methods don't.
         self.fout = fnm
@@ -1677,7 +1715,7 @@ class Molecule(object):
                     self.Data[key] = val
             ## Create a list of comment lines if we don't already have them from reading the file.
             if 'comms' not in self.Data:
-                self.comms = ['Generated by ForceBalance from %s: Frame %i of %i' % (fnm, i+1, self.ns) for i in range(self.ns)]
+                self.comms = ['Generated by %s from %s: Frame %i of %i' % (package, fnm, i+1, self.ns) for i in range(self.ns)]
             else:
                 self.comms = [i.expandtabs() for i in self.comms]
 
@@ -1928,7 +1966,7 @@ class Molecule(object):
             ymax = self.boxes[sn].b
             zmax = self.boxes[sn].c
             if any([i != 90.0 for i in [self.boxes[sn].alpha, self.boxes[sn].beta, self.boxes[sn].gamma]]):
-                print("Warning: Topology building will not work with broken molecules in nonorthogonal cells.")
+                logger.warning("Warning: Topology building will not work with broken molecules in nonorthogonal cells.")
                 toppbc = False
         else:
             xmin = mins[0]
@@ -2084,7 +2122,7 @@ class Molecule(object):
         sn = kwargs.get('topframe', self.top_settings['topframe'])
         self.top_settings['topframe'] = sn
         if self.na > 100000:
-            print("Warning: Large number of atoms (%i), topology building may take a long time" % self.na)
+            logger.warning("Warning: Large number of atoms (%i), topology building may take a long time" % self.na)
         # Build bonds from connectivity graph if not read from file.
         if (not self.top_settings['read_bonds']) or force_bonds:
             self.build_bonds()
@@ -2446,10 +2484,10 @@ class Molecule(object):
         phis = []
         if 'bonds' in self.Data:
             if any(p not in self.bonds for p in [(min(i,j),max(i,j)),(min(j,k),max(j,k)),(min(k,l),max(k,l))]):
-                print([(min(i,j),max(i,j)),(min(j,k),max(j,k)),(min(k,l),max(k,l))])
-                warn("Measuring dihedral angle for four atoms that aren't bonded.  Hope you know what you're doing!")
+                logger.warning([(min(i,j),max(i,j)),(min(j,k),max(j,k)),(min(k,l),max(k,l))])
+                logger.warning("Measuring dihedral angle for four atoms that aren't bonded.  Hope you know what you're doing!")
         else:
-            warn("This molecule object doesn't have bonds defined, sanity-checking is off.")
+            logger.warning("This molecule object doesn't have bonds defined, sanity-checking is off.")
         for s in range(self.ns):
             x4 = self.xyzs[s][l]
             x3 = self.xyzs[s][k]
@@ -3944,7 +3982,7 @@ class Molecule(object):
             for i in np.where(np.array(conv) == 0)[0]:
                 Answer['qm_grads'].insert(i, Answer['qm_grads'][0]*0.0)
             if len(Answer['qm_grads']) != len(Answer['qm_energies']):
-                warn("Number of energies and gradients is inconsistent (composite jobs?)  Deleting gradients.")
+                logger.warning("Number of energies and gradients is inconsistent (composite jobs?)  Deleting gradients.")
                 del Answer['qm_grads']
         # A strange peculiarity; Q-Chem sometimes prints out the final Mulliken charges a second time, after the geometry optimization.
         if mkchg:
@@ -4107,7 +4145,7 @@ class Molecule(object):
             np.max(self.xyzs[I][:,0]) > xhi or
             np.max(self.xyzs[I][:,1]) > yhi or
             np.max(self.xyzs[I][:,2]) > zhi):
-            warn("Some atom positions are outside the simulation box, be careful")
+            logger.warning("Some atom positions are outside the simulation box, be careful")
         out.append("% .3f % .3f xlo xhi" % (xlo, xhi))
         out.append("% .3f % .3f ylo yhi" % (ylo, yhi))
         out.append("% .3f % .3f zlo zhi" % (zlo, zhi))
@@ -4145,7 +4183,7 @@ class Molecule(object):
     def write_mdcrd(self, selection, **kwargs):
         self.require('xyzs')
         # In mdcrd files, there is only one comment line
-        out = ['mdcrd file generated using ForceBalance']
+        out = ['mdcrd file generated using %s' % package]
         for I in selection:
             xyz = self.xyzs[I]
             out += [''.join(["%8.3f" % i for i in g]) for g in grouper(10, list(xyz.flatten()))]
@@ -4219,7 +4257,6 @@ class Molecule(object):
             xyzwrite = xyz.copy()
             xyzwrite /= 10.0 # GROMACS uses nanometers
             out.append(self.comms[I])
-            #out.append("Generated by ForceBalance from %s" % self.fnm)
             out.append("%5i" % self.na)
             for an, line in enumerate(xyzwrite):
                 out.append(format_gro_coord(self.resid[an],self.resname[an],atomname[an],an+1,xyzwrite[an]))
@@ -4320,7 +4357,7 @@ class Molecule(object):
 
         out = []
         # Create the PDB header.
-        out.append("REMARK   1 CREATED WITH FORCEBALANCE %s" % (str(date.today())))
+        out.append("REMARK   1 CREATED WITH %s %s" % (package.upper(), str(date.today())))
         if 'boxes' in self.Data:
             a = self.boxes[0].a
             b = self.boxes[0].b
@@ -4485,8 +4522,8 @@ class Molecule(object):
                 self.boxes = [mybox for i in range(self.ns)]
 
 def main():
-    print("Basic usage as an executable: molecule.py input.format1 output.format2")
-    print("where format stands for xyz, pdb, gro, etc.")
+    logger.info("Basic usage as an executable: molecule.py input.format1 output.format2")
+    logger.info("where format stands for xyz, pdb, gro, etc.")
     Mao = Molecule(sys.argv[1])
     Mao.write(sys.argv[2])
 
