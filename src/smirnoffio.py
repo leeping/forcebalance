@@ -15,6 +15,7 @@ from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
+from forcebalance.opt_geo_target import OptGeoTarget
 import networkx as nx
 import numpy as np
 import sys
@@ -50,7 +51,7 @@ try:
     from openeye import oechem
 except:
     warn_once("Failed to import openforcefield and/or OpenEye toolkit.")
-    
+
 """Dictionary for building parameter identifiers.  As usual they go like this:
 Bond/length/OW.HW
 The dictionary is two-layered because the same interaction type (Bond)
@@ -104,7 +105,7 @@ class SMIRNOFF(OpenMM):
         super(SMIRNOFF,self).__init__(name=name, **kwargs)
 
     def readsrc(self, **kwargs):
-        """ 
+        """
         SMIRNOFF simulations always require the following passed in via kwargs:
 
         Parameters
@@ -141,7 +142,7 @@ class SMIRNOFF(OpenMM):
             logger.error('Must provide either a molecule object or coordinate file.\n')
             raise RuntimeError
 
-        # Here we cannot distinguish the .mol2 files linked by the target 
+        # Here we cannot distinguish the .mol2 files linked by the target
         # vs. the .mol2 files to be provided by the force field.
         # But we can assume that these files should exist when this function is called.
 
@@ -168,7 +169,7 @@ class SMIRNOFF(OpenMM):
         integrator parameters, thermostat, barostat etc.
 
         This is mostly copied and modified from openmmio.py's OpenMM.prepare(),
-        but we are calling ForceField() from the OpenFF toolkit and ignoring 
+        but we are calling ForceField() from the OpenFF toolkit and ignoring
         AMOEBA stuff.
         """
         self.pdb = PDBFile(self.abspdb)
@@ -253,7 +254,7 @@ class SMIRNOFF(OpenMM):
         self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
         if hasattr(self,'FF') and fftmp:
-            for f in self.FF.fnms: 
+            for f in self.FF.fnms:
                 os.unlink(f)
 
     def update_simulation(self, **kwargs):
@@ -309,7 +310,7 @@ class SMIRNOFF(OpenMM):
 
     def optimize(self, shot=0, crit=1e-4):
 
-        """ Optimize the geometry and align the optimized geometry to the starting geometry, and return the RMSD. 
+        """ Optimize the geometry and align the optimized geometry to the starting geometry, and return the RMSD.
         We are copying because we need to skip over virtual site stuff.
         """
 
@@ -428,6 +429,15 @@ class AbInitio_SMIRNOFF(AbInitio):
         self.engine_ = SMIRNOFF
         ## Initialize base class.
         super(AbInitio_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
+
+class OptGeoTarget_SMIRNOFF(OptGeoTarget):
+    """ Optimized geometry fitting using SMIRNOFF format powered by OpenMM """
+    def __init__(self,options,tgt_opts,forcefield):
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.engine_ = SMIRNOFF
+        ## Initialize base class.
+        super(OptGeoTarget_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
 
 # class BindingEnergy_SMIRNOFF(BindingEnergy):
 #     """ Binding energy matching using OpenMM. """

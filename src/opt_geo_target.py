@@ -17,6 +17,39 @@ from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
+def periodic_diff(a, b, v_periodic=np.pi*2):
+    ''' convenient function for computing the minimum difference in periodic coordinates
+    Parameters
+    ----------
+    a: np.ndarray or float
+        Reference values in a numpy array
+    b: np.ndarray or float
+        Target values in a numpy arrary
+    v_periodic: float > 0
+        Value of the periodic boundary
+
+    Returns
+    -------
+    diff: np.ndarray
+        The array of same shape containing the difference between a and b
+        All return values are in range [-v_periodic/2, v_periodic/2),
+        "( )" means exclusive, "[ ]" means inclusive
+
+    Examples
+    -------
+    periodic_diff(0.0, 2.1, 2.0) => -0.1
+    periodic_diff(0.0, 1.9, 2.0) => 0.1
+    periodic_diff(0.0, 1.0, 2.0) => -1.0
+    periodic_diff(1.0, 0.0, 2.0) => -1.0
+    periodic_diff(1.0, 0.1, 2.0) => -0.9
+    periodic_diff(1.0, 10.1, 2.0) => 0.9
+    periodic_diff(1.0, 9.9, 2.0) => -0.9
+    '''
+    assert v_periodic > 0
+    h = 0.5 * v_periodic
+    return (a - b + h) % v_periodic - h
+
+
 
 class OptGeoTarget(Target):
     """ Subclass of Target for fitting MM optimized geometries to QM optimized geometries. """
@@ -31,13 +64,31 @@ class OptGeoTarget(Target):
         self.engines = OrderedDict()
         for sysname, sysopt in self.sys_opts.items():
             if self.engine_.__name__ == 'OpenMM':
+                # path to pdb file
+                pdbpath = os.path.join(self.root, self.tgtdir, sysopt['topology'])
                 # use the PDB file with topology
-                # we explicitly do this because Openmm(pdb=file) does not copy topology into self.mol (openmmio.py line 615)
+                M = Molecule(pdbpath)
+                # replace geometry with values from xyz file for higher presision
+                M0 = Molecule(os.path.join(self.root, self.tgtdir, sysopt['geometry']))
+                M.xyzs = M0.xyzs
+                # here mol=M is given for the purpose of using the topology from the input pdb file
+                # if we don't do this, pdb=top.pdb option will only copy some basic information but not the topology into OpenMM.mol (openmmio.py line 615)
+                self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, pdb=pdbpath, **engine_args)
+            elif self.engine_.__name__ == 'SMIRNOFF':
+                # SMIRNOFF is a subclass of OpenMM engine but it requires the mol2 input
+                # note: OpenMM.mol is a Molecule class instance;  mol2 is a file format.
+                # path to .pdb file
+                pdbpath = os.path.join(self.root, self.tgtdir, sysopt['topology'])
+                # a list of paths to .mol2 files
+                mol2path = [os.path.join(self.root, self.tgtdir, f) for f in sysopt['mol2']]
+                # use the PDB file with topology
                 M = Molecule(os.path.join(self.root, self.tgtdir, sysopt['topology']))
                 # replace geometry with values from xyz file for higher presision
                 M0 = Molecule(os.path.join(self.root, self.tgtdir, sysopt['geometry']))
                 M.xyzs = M0.xyzs
-                self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, pdb=os.path.join(self.root, self.tgtdir, sysopt['topology']), **engine_args)
+                # here mol=M is given for the purpose of using the topology from the input pdb file
+                # if we don't do this, pdb=top.pdb option will only copy some basic information but not the topology into OpenMM.mol (openmmio.py line 615)
+                self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, pdb=pdbpath, mol2=mol2path, **engine_args)
         ## Create internal coordinates
         self._build_internal_coordinates()
 
@@ -90,15 +141,19 @@ class OptGeoTarget(Target):
                         if section == 'global':
                             warn_press_key("Line %i: key %s should not appear in $global section" % (ln, key))
                         section_opts[key] = ls[1]
-                    elif key in ['bond_denom', 'angle_denom', 'dihedral_denom']:
+                    elif key in ['bond_denom', 'angle_denom', 'dihedral_denom', 'improper_denom']:
                         if len(ls) != 2:
                             warn_press_key("Line %i: one value expected for key %s" % (ln, key))
                         section_opts[key] = float(ls[1])
+                    elif key == 'mol2':
+                        # special parsing for mol2 option for SMIRNOFF engine
+                        # the value is a list of filenames
+                        section_opts[key] = ls[1:]
             # apply a few default global options
-            global_opts.setdefault('bond_denom', 0.01)
-            global_opts.setdefault('angle_denom', 1.0)
-            global_opts.setdefault('dihedral_denom', 1.0)
-            global_opts.setdefault('improper_denom', 1.0)
+            global_opts.setdefault('bond_denom', 0.1)
+            global_opts.setdefault('angle_denom', 0.1)
+            global_opts.setdefault('dihedral_denom', 0.1)
+            global_opts.setdefault('improper_denom', 0.1)
             # copy global options into each system
             for sys_name, sys_opt_dict in sys_opts.items():
                 for k,v in global_opts.items():
@@ -115,9 +170,9 @@ class OptGeoTarget(Target):
         # importing here will avoid import error for calculations not using this target
         from geometric.internal import PrimitiveInternalCoordinates, Distance, Angle, Dihedral, OutOfPlane
         self.internal_coordinates = OrderedDict()
-        for sysname, sysopt in self.sys_opts:
-            geofile = sysopt['geometry']
-            topfile = sysopt['topology']
+        for sysname, sysopt in self.sys_opts.items():
+            geofile = os.path.join(self.root, self.tgtdir, sysopt['geometry'])
+            topfile = os.path.join(self.root, self.tgtdir, sysopt['topology'])
             logger.info("Building internal coordinates from file: %s\n" % topfile)
             m0 = Molecule(geofile)
             m = Molecule(topfile)
@@ -154,15 +209,18 @@ class OptGeoTarget(Target):
         """ Run calculation for one system, return internal coordinate values after optimization """
         engine = self.engines[sysname]
         ic_dict = self.internal_coordinates[sysname]
-        v_ic = {}
-        if engine.__name__ == 'OpenMM':
+        if engine.__class__.__name__ in ('OpenMM', 'SMIRNOFF'):
             # OpenMM.optimize() by default resets geometry to initial geometry before optimization
             engine.optimize()
             pos = engine.getContextPosition()
-            v_ic['bonds'] = np.array([ic.value(pos) for ic in ic_dict['ic_bonds']])
-            v_ic['angles'] = np.array([ic.value(pos) for ic in ic_dict['ic_angles']])
-            v_ic['dihedrals'] = np.array([ic.value(pos) for ic in ic_dict['ic_dihedrals']])
-            v_ic['impropers'] = np.array([ic.value(pos) for ic in ic_dict['ic_impropers']])
+        else:
+            raise NotImplementedError("system_driver() not implemented for %s" % engine.__name__)
+        v_ic = {
+            'bonds': np.array([ic.value(pos) for ic in ic_dict['ic_bonds']]),
+            'angles': np.array([ic.value(pos) for ic in ic_dict['ic_angles']]),
+            'dihedrals': np.array([ic.value(pos) for ic in ic_dict['ic_dihedrals']]),
+            'impropers': np.array([ic.value(pos) for ic in ic_dict['ic_impropers']]),
+        }
         return v_ic
 
     def indicate(self):
@@ -194,19 +252,19 @@ class OptGeoTarget(Target):
                 # objective contribution from bonds
                 vref_bonds = self.internal_coordinates[sysname]['vref_bonds']
                 vtar_bonds = v_ic['bonds']
-                rmsd_bond = np.sqrt(np.sum((vref_bonds - vtar_bonds)**2))
+                rmsd_bond = np.sqrt(np.sum((vref_bonds - vtar_bonds)**2)/len(vref_bonds))
                 # objective contribution from angles
                 vref_angles = self.internal_coordinates[sysname]['vref_angles']
                 vtar_angles = v_ic['angles']
-                rmsd_angle = np.sqrt(np.sum((vref_angles - vtar_angles)**2))
+                rmsd_angle = np.sqrt(np.sum(periodic_diff(vref_angles, vtar_angles)**2)/len(vref_angles))
                 # objective contribution from dihedrals
                 vref_dihedrals = self.internal_coordinates[sysname]['vref_dihedrals']
                 vtar_dihedrals = v_ic['dihedrals']
-                rmsd_dihedral = np.sqrt(np.sum((vref_dihedrals - vtar_dihedrals)**2))
+                rmsd_dihedral = np.sqrt(np.sum(periodic_diff(vref_dihedrals, vtar_dihedrals)**2)/len(vref_dihedrals))
                 # objective contribution from improper dihedrals
                 vref_impropers = self.internal_coordinates[sysname]['vref_impropers']
                 vtar_impropers = v_ic['impropers']
-                rmsd_improper = np.sqrt(np.sum((vref_impropers - vtar_impropers)**2))
+                rmsd_improper = np.sqrt(np.sum(periodic_diff(vref_impropers, vtar_impropers)**2)/len(vref_impropers))
                 # add total objective value to result list
                 obj_total = rmsd_bond * scale_bond + rmsd_angle * scale_angle + \
                     rmsd_dihedral * scale_dihedral + rmsd_improper * scale_improper
