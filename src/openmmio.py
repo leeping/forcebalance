@@ -1571,7 +1571,6 @@ class Vibration_OpenMM(Vibration):
 
 class OptGeoTarget_OpenMM(OptGeoTarget):
     """ Optimized geometry matching using OpenMM. """
-
     def __init__(self,options,tgt_opts,forcefield):
         self.engine_ = OpenMM
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)

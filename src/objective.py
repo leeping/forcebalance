@@ -31,13 +31,13 @@ except:
     logger.warning("Tinker module import failed\n")
 
 try:
-    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM, Hydration_OpenMM, Vibration_OpenMM
+    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM, Hydration_OpenMM, Vibration_OpenMM, OptGeoTarget_OpenMM
 except:
     logger.warning(traceback.format_exc())
     logger.warning("OpenMM module import failed; check OpenMM package\n")
 
 try:
-    from forcebalance.smirnoffio import AbInitio_SMIRNOFF, Liquid_SMIRNOFF
+    from forcebalance.smirnoffio import AbInitio_SMIRNOFF, Liquid_SMIRNOFF, OptGeoTarget_SMIRNOFF
 except:
     logger.warning(traceback.format_exc())
     logger.warning("SMIRNOFF module import failed; check SMIRNOFF package\n")
@@ -105,6 +105,8 @@ Implemented_Targets = {
     'MOMENTS_GMX':Moments_GMX,
     'MOMENTS_OPENMM':Moments_OpenMM,
     'HYDRATION_OPENMM':Hydration_OpenMM,
+    'OPTGEOTARGET_OPENMM': OptGeoTarget_OpenMM,
+    'OPTGEOTARGET_SMIRNOFF': OptGeoTarget_SMIRNOFF,
     'REMOTE_TARGET':RemoteTarget,
     }
 
