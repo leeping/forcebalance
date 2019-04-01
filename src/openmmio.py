@@ -943,7 +943,7 @@ class OpenMM(Engine):
             # Extract forces belonging to real atoms only
             Result["Force"] = Force[self.realAtomIdxs].flatten()
         if dipole:
-            Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=State.getPositions())
+            Result["Dipole"] = get_dipole(self.simulation, q=self.nbcharges, mass=self.AtomLists['Mass'], positions=state.getPositions())
         return Result
 
     def evaluate_(self, force=False, dipole=False, traj=False):
