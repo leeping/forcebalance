@@ -15,6 +15,7 @@ from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
+from forcebalance.vibration import Vibration
 from forcebalance.opt_geo_target import OptGeoTarget
 import networkx as nx
 import numpy as np
@@ -247,12 +248,12 @@ class SMIRNOFF(OpenMM):
 
         # vss = [(i, [system.getVirtualSite(i).getParticle(j) for j in range(system.getVirtualSite(i).getNumParticles())]) \
         #            for i in range(system.getNumParticles()) if system.isVirtualSite(i)]
-        self.AtomMask = []
         self.AtomLists = defaultdict(list)
         self.AtomLists['Mass'] = [a.element.mass.value_in_unit(dalton) if a.element is not None else 0 for a in Atoms]
         self.AtomLists['ParticleType'] = ['A' if m >= 1.0 else 'D' for m in self.AtomLists['Mass']]
         self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
+        self.realAtomIdxs = [i for i, a in enumerate(self.AtomMask) if a is True]
         if hasattr(self,'FF') and fftmp:
             for f in self.FF.fnms:
                 os.unlink(f)
@@ -429,6 +430,21 @@ class AbInitio_SMIRNOFF(AbInitio):
         self.engine_ = SMIRNOFF
         ## Initialize base class.
         super(AbInitio_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
+
+
+class Vibration_SMIRNOFF(Vibration):
+    """ Vibrational frequency matching using TINKER. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'coords',default="input.pdb")
+        self.set_option(tgt_opts,'pdb',default="conf.pdb")
+        self.set_option(tgt_opts,'mol2',forceprint=True)
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.engine_ = SMIRNOFF
+        ## Initialize base class.
+        super(Vibration_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
+
 
 class OptGeoTarget_SMIRNOFF(OptGeoTarget):
     """ Optimized geometry fitting using SMIRNOFF format powered by OpenMM """
