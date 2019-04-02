@@ -45,7 +45,6 @@ commblk = """#==========================================#
 fout = sys.argv[1]
 
 frqs, modes, intens, elem, xyz = read_frq_gen(fout)
-
 frqs1 = scale_freqs(frqs)
 
 if list(frqs1) != sorted(list(frqs1)):
@@ -61,6 +60,6 @@ with open('vdata.txt', 'w') as f:
     for frq, mode in zip(frqs1, modes):
         print(file=f)
         print("%.4f" % frq, file=f)
-        for i in mode:
+        for i in mode.reshape(-1,3):
             print("% 8.3f % 8.3f % 8.3f" % (i[0], i[1], i[2]), file=f)
 
