@@ -37,7 +37,7 @@ except:
     logger.warning("OpenMM module import failed; check OpenMM package\n")
 
 try:
-    from forcebalance.smirnoffio import AbInitio_SMIRNOFF, Liquid_SMIRNOFF, OptGeoTarget_SMIRNOFF
+    from forcebalance.smirnoffio import AbInitio_SMIRNOFF, Liquid_SMIRNOFF, Vibration_SMIRNOFF, OptGeoTarget_SMIRNOFF
 except:
     logger.warning(traceback.format_exc())
     logger.warning("SMIRNOFF module import failed; check SMIRNOFF package\n")
@@ -84,6 +84,7 @@ Implemented_Targets = {
     'VIBRATION_GMX':Vibration_GMX,
     'VIBRATION_AMBER':Vibration_AMBER,
     'VIBRATION_OPENMM':Vibration_OpenMM,
+    'VIBRATION_SMIRNOFF': Vibration_SMIRNOFF,
     'THERMO_GMX':Thermo_GMX,
     'LIQUID_OPENMM':Liquid_OpenMM,
     'LIQUID_SMIRNOFF':Liquid_SMIRNOFF,
