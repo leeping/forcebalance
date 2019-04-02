@@ -225,9 +225,10 @@ class OptGeoTarget(Target):
 
     def indicate(self):
         title_str = "Optimized Geometries, Objective = % .5e" % self.objective
-        column_head_str =  " %-15s %11s %11s %11s %11s %11s %11s %11s %11s %11s" % ('System', 'RMSD_bond', 'denom_bond', \
-            'RMSD_angle', 'denom_angle', 'RMSD_dihedral', 'denom_dihedral', 'RMSD_improper', 'denom_improper', 'Term.')
-        printcool_dictionary(self.PrintDict,title=title_str+'\n'+column_head_str)
+        #QYD: This title is carefully placed to align correctly
+        column_head_str1 =  " %-20s %13s     %13s     %15s   %15s   %17s " % ("System", "Bonds", "Angles", "Dihedrals", "Impropers", "Term.")
+        column_head_str2 =  " %-20s %9s %7s %9s %7s %9s %7s %9s %7s %17s " % ('', 'RMSD', 'denom', 'RMSD', 'denom', 'RMSD', 'denom', 'RMSD', 'denom', '')
+        printcool_dictionary(self.PrintDict,title=title_str + '\n' + column_head_str1 + '\n' + column_head_str2, center=[True,False,False])
 
     def get(self, mvals, AGrad=False, AHess=False):
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
@@ -271,7 +272,7 @@ class OptGeoTarget(Target):
                 v_obj_list.append(obj_total)
                 # save print string
                 if not in_fd():
-                    self.PrintDict[sysname] = "% 7.3f % 5.2f % 7.3f % 5.2f % 7.3f % 5.2f % 7.3f % 5.2f %9.3f" % (rmsd_bond, \
+                    self.PrintDict[sysname] = "% 9.3f % 7.2f % 9.3f % 7.2f % 9.3f % 7.2f % 9.3f % 7.2f %17.3f" % (rmsd_bond, \
                         bond_denom, rmsd_angle, angle_denom, rmsd_dihedral, dihedral_denom, rmsd_improper, improper_denom, obj_total)
             return np.array(v_obj_list, dtype=float)
         V = compute(mvals)
