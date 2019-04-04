@@ -91,6 +91,8 @@ class OptGeoTarget(Target):
                 self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, pdb=pdbpath, mol2=mol2path, **engine_args)
         ## Create internal coordinates
         self._build_internal_coordinates()
+        ## Option for how much data to write to disk.
+        self.set_option(tgt_opts,'writelevel','writelevel')
 
     def parse_optgeo_options(self, filename):
         """ Parse an optgeo_options.txt file into specific OptGeoTarget Target Options"""
@@ -150,10 +152,10 @@ class OptGeoTarget(Target):
                         # the value is a list of filenames
                         section_opts[key] = ls[1:]
             # apply a few default global options
-            global_opts.setdefault('bond_denom', 0.1)
-            global_opts.setdefault('angle_denom', 0.1)
-            global_opts.setdefault('dihedral_denom', 0.1)
-            global_opts.setdefault('improper_denom', 0.1)
+            global_opts.setdefault('bond_denom', 0.02)
+            global_opts.setdefault('angle_denom', 0.05)
+            global_opts.setdefault('dihedral_denom', 0.2)
+            global_opts.setdefault('improper_denom', 0.2)
             # copy global options into each system
             for sys_name, sys_opt_dict in sys_opts.items():
                 for k,v in global_opts.items():
@@ -277,7 +279,32 @@ class OptGeoTarget(Target):
                     self.PrintDict[sysname] = "% 9.3f % 7.2f % 9.3f % 7.2f % 9.3f % 7.2f % 9.3f % 7.2f %17.3f" % (rmsd_bond, \
                         bond_denom, rmsd_angle, angle_denom, rmsd_dihedral, dihedral_denom, rmsd_improper, improper_denom, obj_total)
             return np.array(v_obj_list, dtype=float)
+
         V = compute(mvals)
+
+        # write objective decomposition if wanted
+        if self.writelevel > 0:
+            # recover mvals
+            self.FF.make(mvals)
+            with open('rmsd_decomposition.txt', 'w') as fout:
+                fout.write('%-25s %15s %15s %15s\n' % ("Internal Coordinate", "Ref QM Value", "Cur MM Value", "Difference"))
+                for sysname in self.internal_coordinates:
+                    # reference data
+                    sys_data = self.internal_coordinates[sysname]
+                    sys_data['ic_bonds']
+                    # compute all internal coordinate values again
+                    v_ic = self.system_driver(sysname)
+                    for p in ['bonds', 'angles', 'dihedrals', 'impropers']:
+                        fout.write('--- ' + p + ' ---\n')
+                        ic_list = sys_data['ic_' + p]
+                        ref_v = sys_data['vref_' + p]
+                        tar_v = v_ic[p]
+                        # print each value
+                        for ic, v1, v2 in zip(ic_list, ref_v, tar_v):
+                            diff = periodic_diff(v1, v2) if p != 'bonds' else v1-v2
+                            fout.write('%-25s %15.5f %15.5f %+15.3e\n' % (ic, v1, v2, diff))
+
+        # compute gradients and hessian
         dV = np.zeros((self.FF.np,len(V)))
         if AGrad or AHess:
             for p in self.pgrad:
