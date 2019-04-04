@@ -64,6 +64,7 @@ $target
 name optgeo
 type OptGeoTarget_SMIRNOFF
 weight 1.0
+writelevel 1
 $end
 
 $target
@@ -72,7 +73,7 @@ type VIBRATION_SMIRNOFF
 pdb input.pdb
 mol2 9HXanthene.mol2
 weight 1.0
-# (float) Wavenumber tolerance, normalizes the objective function. 
+# (float) Wavenumber tolerance, normalizes the objective function.
 # This is set to a large value only for demo purpose
 wavenumber_tol 200.0
 $end
