@@ -267,11 +267,13 @@ class OptGeoTarget(Target):
                 vtar_impropers = v_ic['impropers']
                 rmsd_improper = np.sqrt(np.sum(periodic_diff(vref_impropers, vtar_impropers)**2)/len(vref_impropers))
                 # add total objective value to result list
-                obj_total = rmsd_bond * scale_bond + rmsd_angle * scale_angle + \
-                    rmsd_dihedral * scale_dihedral + rmsd_improper * scale_improper
-                v_obj_list.append(obj_total)
+                sys_obj_list = [rmsd_bond * scale_bond, rmsd_angle * scale_angle, \
+                                rmsd_dihedral * scale_dihedral, rmsd_improper * scale_improper]
+                # keep individual objective terms for each property
+                v_obj_list += sys_obj_list
                 # save print string
                 if not in_fd():
+                    obj_total = sum(v**2 for v in sys_obj_list)
                     self.PrintDict[sysname] = "% 9.3f % 7.2f % 9.3f % 7.2f % 9.3f % 7.2f % 9.3f % 7.2f %17.3f" % (rmsd_bond, \
                         bond_denom, rmsd_angle, angle_denom, rmsd_dihedral, dihedral_denom, rmsd_improper, improper_denom, obj_total)
             return np.array(v_obj_list, dtype=float)
