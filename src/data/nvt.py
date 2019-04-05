@@ -4,8 +4,8 @@
 """
 @package nvt
 
-Runs a simulation to compute condensed phase properties (for example, the density 
-or the enthalpy of vaporization) and compute the derivative with respect 
+Runs a simulation to compute condensed phase properties (for example, the density
+or the enthalpy of vaporization) and compute the derivative with respect
 to changing the force field parameters.  This script is a part of ForceBalance.
 
 The algorithm used to compute the surface tension is the test-area method.
@@ -13,7 +13,8 @@ We run a NVT simulation on a film of water in a long PBC box. For each frame, we
 increase and decrease the area of the xy surface by ΔS but keep the volumn constant,
 and compute the energy change ΔU+ and UΔ-, then the surface tension is computed by:
 
-γ = -kT/(2ΔS) * [ ln<exp(-ΔE+/kT)> - ln<exp(-ΔE-/kT)> ]
+β = 1/kT
+γ = -1/(2βΔS) * [ ln<exp(-ΔE+/kT)> - ln<exp(-ΔE-/kT)> ]
 
 References
 
@@ -24,8 +25,8 @@ The partial derivatives of surface tension with respect to forcefield parameters
 are computed using the analytic formula:
 
 β = 1/kT
-∂γ/∂α = -kT/(2ΔS) * { 1/<exp(-βΔE+)> * [<-β ∂E+/∂α exp(-βΔE+)> - <exp(-βΔE+)><-β ∂E/∂α>]
-                     -1/<exp(-βΔE-)> * [<-β ∂E-/∂α exp(-βΔE-)> - <exp(-βΔE-)><-β ∂E/∂α>] }
+∂γ/∂α = 1/(2ΔS) * [ <(∂E+/∂α - ∂E/∂α) exp(-βΔE+)> / <exp(-βΔE+)>
+                   -<(∂E-/∂α - ∂E/∂α) exp(-βΔE-)> / <exp(-βΔE-)> ]
 
 Copyright And License
 
@@ -301,7 +302,7 @@ def main():
         % (nvt_snapshots, nvt_iframes, nvt_timestep))
     if nvt_snapshots < 2:
         raise Exception('Please set the number of liquid time steps so that you collect at least two snapshots (minimum %i)' \
-                            % (2000 * int(nvt_interval,nvt_timestep)))
+                            % (2000 * (nvt_interval/nvt_timestep)))
 
     #----
     # Loading coordinates
@@ -371,14 +372,14 @@ def main():
     #============================================#
     #  Compute the potential energy derivatives. #
     #============================================#
-    if AGrad:
-        logger.info("Calculating potential energy derivatives with finite difference step size: %f\n" % h)
-        # Switch for whether to compute the derivatives two different ways for consistency.
-        FDCheck = False
-        printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Potentials), color=4, bold=True)
-        click()
-        G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Potentials), AGrad, dipole=False)
-        logger.info("Condensed phase energy derivatives took %.3f seconds\n" % click())
+    # if AGrad:
+    #     logger.info("Calculating potential energy derivatives with finite difference step size: %f\n" % h)
+    #     # Switch for whether to compute the derivatives two different ways for consistency.
+    #     FDCheck = False
+    #     printcool("Condensed phase energy and dipole derivatives\nInitializing array to length %i" % len(Potentials), color=4, bold=True)
+    #     click()
+    #     G, GDx, GDy, GDz = energy_derivatives(Liquid, FF, mvals, h, pgrad, len(Potentials), AGrad, dipole=False)
+    #     logger.info("Condensed phase energy derivatives took %.3f seconds\n" % click())
 
     #==============================================#
     #  Condensed phase properties and derivatives. #
@@ -443,20 +444,19 @@ def main():
     printcool("Surface Tension:       % .4f +- %.4f mJ m^-2" % (surf_ten, surf_ten_err))
     # Analytic Gradient of surface tension
     # Formula:      β = 1/kT
-    #           ∂γ/∂α = -kT/(2ΔS) * { 1/<exp(-βΔE+)> * [<-β ∂E+/∂α exp(-βΔE+)> - <-β ∂E/∂α><exp(-βΔE+)>]
-    #                                -1/<exp(-βΔE-)> * [<-β ∂E-/∂α exp(-βΔE-)> - <-β ∂E/∂α><exp(-βΔE-)>] }
+    # ∂γ/∂α = 1/(2ΔS) * [ <(∂E+/∂α - ∂E/∂α) exp(-βΔE+)> / <exp(-βΔE+)>
+    #                    -<(∂E-/∂α - ∂E/∂α) exp(-βΔE-)> / <exp(-βΔE-)> ]
     n_params = len(mvals)
     G_surf_ten = np.zeros(n_params)
     if AGrad:
         beta = 1.0 / kT
         plus_denom = np.mean(np.exp(-beta*dE_plus))
         minus_denom = np.mean(np.exp(-beta*dE_minus))
+        prefactor = 0.5 / delta_S / 6.0221409e-1 # Unit mJ m^-2
         for param_i in range(n_params):
-            plus_left = np.mean(-beta * G_plus[param_i] * np.exp(-beta*dE_plus))
-            plus_right = np.mean(-beta * G[param_i]) * plus_denom
-            minus_left = np.mean(-beta * G_minus[param_i] * np.exp(-beta*dE_minus))
-            minus_right = np.mean(-beta * G[param_i]) * minus_denom
-            G_surf_ten[param_i] = prefactor * (1.0/plus_denom*(plus_left-plus_right) - 1.0/minus_denom*(minus_left-minus_right))
+            plus_numer = np.mean( G_plus[param_i] * np.exp(-beta*dE_plus) )
+            minus_numer = np.mean( G_minus[param_i] * np.exp(-beta*dE_minus) )
+            G_surf_ten[param_i] = prefactor * (plus_numer/plus_denom - minus_numer/minus_denom)
         printcool("Analytic Derivatives:")
         FF.print_map(vals=G_surf_ten)
 

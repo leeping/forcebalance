@@ -240,16 +240,17 @@ class TestAmber99SB:
             np.testing.assert_allclose(q1, RefQuad, rtol=0, atol=0.02, err_msg="%s quadrupole moments at optimized geometry do not match the reference" % n1)
 
     def test_normal_modes(self):
-        """ Test GMX and TINKER normal modes """
+        """ Test GMX TINKER and OpenMM normal modes """
         printcool("Test GMX and TINKER normal modes")
         missing_pkgs = []
-        for eng in ['TINKER', 'GMX']:
+        for eng in ['TINKER', 'GMX', 'OpenMM']:
             if eng not in self.engines:
                 missing_pkgs.append(eng)
         if len(missing_pkgs) > 0:
             pytest.skip("Missing packages: %s" % ', '.join(missing_pkgs))
         FreqG, ModeG = self.engines['GMX'].normal_modes(shot=5, optimize=False)
         FreqT, ModeT = self.engines['TINKER'].normal_modes(shot=5, optimize=False)
+        FreqO, ModeO = self.engines['OpenMM'].normal_modes(shot=5, optimize=False)
         datadir = os.path.join(self.cwd, 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
             fout = os.path.join(datadir, 'test_normal_modes.freq.dat')
@@ -260,28 +261,30 @@ class TestAmber99SB:
             np.save(fout, ModeT)
         FreqRef = np.loadtxt(os.path.join(datadir, 'test_normal_modes.freq.dat'))
         ModeRef = np.load(os.path.join(datadir, 'test_normal_modes.mode.dat.npy'))
-        for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER')]:
+        for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER'), (FreqO, ModeO, 'OpenMM')]:
             for v, vr, m, mr in zip(Freq, FreqRef, Mode, ModeRef):
                 if vr < 0: continue
                 # Frequency tolerance is half a wavenumber.
                 np.testing.assert_allclose(v, vr, rtol=0, atol=0.5, err_msg="%s vibrational frequencies do not match the reference" % Name)
+                delta = 0.02 if Name == 'OpenMM' else 0.01
                 for a in range(len(m)):
                     try:
-                        np.testing.assert_allclose(m[a], mr[a], rtol=0, atol=0.01, err_msg="%s normal modes do not match the reference" % Name)
+                        np.testing.assert_allclose(m[a], mr[a], rtol=0, atol=delta, err_msg="%s normal modes do not match the reference" % Name)
                     except:
-                        np.testing.assert_allclose(m[a], -1.0*mr[a], rtol=0, atol=0.01, err_msg="%s normal modes do not match the reference" % Name)
+                        np.testing.assert_allclose(m[a], -1.0*mr[a], rtol=0, atol=delta, err_msg="%s normal modes do not match the reference" % Name)
 
     def test_normal_modes_optimized(self):
-        """ Test GMX and TINKER normal modes at optimized geometry """
+        """ Test GMX TINKER and OpenMM normal modes at optimized geometry """
         printcool("Test GMX and TINKER normal modes at optimized geometry")
         missing_pkgs = []
-        for eng in ['TINKER', 'GMX']:
+        for eng in ['TINKER', 'GMX', 'OpenMM']:
             if eng not in self.engines:
                 missing_pkgs.append(eng)
         if len(missing_pkgs) > 0:
             pytest.skip("Missing packages: %s" % ', '.join(missing_pkgs))
         FreqG, ModeG = self.engines['GMX'].normal_modes(shot=5, optimize=True)
         FreqT, ModeT = self.engines['TINKER'].normal_modes(shot=5, optimize=True)
+        FreqO, ModeO = self.engines['OpenMM'].normal_modes(shot=5, optimize=True)
         datadir = os.path.join(self.cwd, 'files', 'test_engine', self.__class__.__name__)
         if SAVEDATA:
             fout = os.path.join(datadir, 'test_normal_modes_optimized.freq.dat')
@@ -292,16 +295,17 @@ class TestAmber99SB:
             np.save(fout, ModeT)
         FreqRef = np.loadtxt(os.path.join(datadir, 'test_normal_modes_optimized.freq.dat'))
         ModeRef = np.load(os.path.join(datadir, 'test_normal_modes_optimized.mode.dat.npy'))
-        for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER')]:
+        for Freq, Mode, Name in [(FreqG, ModeG, 'GMX'), (FreqT, ModeT, 'TINKER'), (FreqO, ModeO, 'OpenMM')]:
             for v, vr, m, mr in zip(Freq, FreqRef, Mode, ModeRef):
                 if vr < 0: continue
                 # Frequency tolerance is half a wavenumber.
                 np.testing.assert_allclose(v, vr, rtol=0, atol=0.5, err_msg="%s vibrational frequencies do not match the reference" % Name)
+                delta = 0.02 if Name == 'OpenMM' else 0.01
                 for a in range(len(m)):
                     try:
-                        np.testing.assert_allclose(m[a], mr[a], rtol=0, atol=0.01, err_msg="%s normal modes do not match the reference" % Name)
+                        np.testing.assert_allclose(m[a], mr[a], rtol=0, atol=delta, err_msg="%s normal modes do not match the reference" % Name)
                     except:
-                        np.testing.assert_allclose(m[a], -1.0*mr[a], rtol=0, atol=0.01, err_msg="%s normal modes do not match the reference" % Name)
+                        np.testing.assert_allclose(m[a], -1.0*mr[a], rtol=0, atol=delta, err_msg="%s normal modes do not match the reference" % Name)
 
 
 class TestAmoebaWater6:
