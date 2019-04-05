@@ -23,7 +23,7 @@ class TestWaterTutorial:
         os.chdir(tmpfolder)
 
     @classmethod
-    def tearDown(cls):
+    def teardown_class(cls):
         # remove temporary folder 'files/test_liquid.run'
         tmpfolder = os.path.join(cls.cwd, 'files', 'test_liquid.run')
         if os.path.isdir(tmpfolder):
