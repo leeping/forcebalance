@@ -31,17 +31,17 @@ except:
     logger.warning("Tinker module import failed\n")
 
 try:
-    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM, Hydration_OpenMM
+    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM, Hydration_OpenMM, Vibration_OpenMM, OptGeoTarget_OpenMM
 except:
     logger.warning(traceback.format_exc())
     logger.warning("OpenMM module import failed; check OpenMM package\n")
 
 try:
-    from forcebalance.smirnoffio import AbInitio_SMIRNOFF, Liquid_SMIRNOFF
+    from forcebalance.smirnoffio import AbInitio_SMIRNOFF, Liquid_SMIRNOFF, Vibration_SMIRNOFF, OptGeoTarget_SMIRNOFF
 except:
     logger.warning(traceback.format_exc())
     logger.warning("SMIRNOFF module import failed; check SMIRNOFF package\n")
-    
+
 try:
     from forcebalance.abinitio_internal import AbInitio_Internal
 except:
@@ -83,13 +83,15 @@ Implemented_Targets = {
     'VIBRATION_TINKER':Vibration_TINKER,
     'VIBRATION_GMX':Vibration_GMX,
     'VIBRATION_AMBER':Vibration_AMBER,
+    'VIBRATION_OPENMM':Vibration_OpenMM,
+    'VIBRATION_SMIRNOFF': Vibration_SMIRNOFF,
     'THERMO_GMX':Thermo_GMX,
     'LIQUID_OPENMM':Liquid_OpenMM,
     'LIQUID_SMIRNOFF':Liquid_SMIRNOFF,
-    'LIQUID_TINKER':Liquid_TINKER, 
-    'LIQUID_GMX':Liquid_GMX, 
-    'LIQUID_AMBER':Liquid_AMBER, 
-    'LIPID_GMX':Lipid_GMX, 
+    'LIQUID_TINKER':Liquid_TINKER,
+    'LIQUID_GMX':Liquid_GMX,
+    'LIQUID_AMBER':Liquid_AMBER,
+    'LIPID_GMX':Lipid_GMX,
     'COUNTERPOISE':Counterpoise,
     'THCDF_PSI4':THCDF_Psi4,
     'RDVR3_PSI4':RDVR3_Psi4,
@@ -104,6 +106,8 @@ Implemented_Targets = {
     'MOMENTS_GMX':Moments_GMX,
     'MOMENTS_OPENMM':Moments_OpenMM,
     'HYDRATION_OPENMM':Hydration_OpenMM,
+    'OPTGEOTARGET_OPENMM': OptGeoTarget_OpenMM,
+    'OPTGEOTARGET_SMIRNOFF': OptGeoTarget_SMIRNOFF,
     'REMOTE_TARGET':RemoteTarget,
     }
 
@@ -112,9 +116,9 @@ Letters = ['X','G','H']
 
 class Objective(forcebalance.BaseClass):
     """ Objective function.
-    
+
     The objective function is a combination of contributions from the different
-    fitting targets.  Basically, it loops through the targets, gets their 
+    fitting targets.  Basically, it loops through the targets, gets their
     contributions to the objective function and then sums all of them
     (although more elaborate schemes are conceivable).  The return value is the
     same data type as calling the target itself: a dictionary containing
@@ -179,7 +183,7 @@ class Objective(forcebalance.BaseClass):
 
         printcool_dictionary(self.PrintOptionDict, "Setup for objective function :")
 
-        
+
     def Target_Terms(self, mvals, Order=0, verbose=False, customdir=None):
         ## This is the objective function; it's a dictionary containing the value, first and second derivatives
         Objective = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
@@ -436,11 +440,11 @@ class Penalty(object):
             DC2 = p*(m2**(p/2-1))*np.eye(len(mvals))
             DC2 += p*(p-2)*(m2**(p/2-2))*np.outer(mvals, mvals)
         return DC0, DC1, DC2
-            
+
     def BOX(self, mvals):
         """
         Box-style constraints.  A penalty term of mvals[i]^Power is added for each parameter.
-        
+
         If Power = 2.0 (default value of penalty_power) then this is the same as L2 regularization.
         If set to a larger number such as 12.0, then this corresponds to adding a flat-bottomed
         restraint to each parameter separately.
@@ -450,7 +454,7 @@ class Penalty(object):
         @return DC1 The gradient of DC0
         @return DC2 The Hessian (just a constant)
         """
-        
+
         if self.p == 2.0:
             return self.L2_norm(mvals)
         else:
@@ -520,7 +524,7 @@ class Penalty(object):
                 # I will implement them if necessary.
                 # DC2[pi] -= self.b**2*(dp**2 + self.b**2)**-1.5
                 # DC2[pj] += self.b**2*(dp**2 + self.b**2)**-1.5
-                #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp), 
+                #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp),
                 #print "First Derivative = % .4f, Second Derivative = % .4f" % (dp*(dp**2 + self.b**2)**-0.5, self.b**2*(dp**2 + self.b**2)**-1.5)
         return DC0, DC1, np.diag(DC2)
 
@@ -561,7 +565,7 @@ class Penalty(object):
                 # I will implement them later if necessary.
                 # DC2[pi] -= self.b**2*(dp**2 + self.b**2)**-1.5 - self.a/dp**2
                 # DC2[pj] += self.b**2*(dp**2 + self.b**2)**-1.5 - self.a/dp**2
-                #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp), 
+                #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp),
                 #print "First Derivative = % .4f, Second Derivative = % .4f" % (dp*(dp**2 + self.b**2)**-0.5, self.b**2*(dp**2 + self.b**2)**-1.5)
         return DC0, DC1, np.diag(DC2)
 
@@ -612,16 +616,16 @@ class Penalty(object):
         #     p = mvals[i]
         #     DC0 += 1e-6*p*p
         #     DC1[i] = 2e-6*p
-            
+
                 # The second derivatives have off-diagonal terms,
                 # but we're not using them right now anyway
                 #DC2[pi,pi] += (hpp - hp**2)*emh
                 #DC2[pi,pj] -= (hpp - hp**2)*emh
                 #DC2[pj,pi] -= (hpp - hp**2)*emh
                 #DC2[pj,pj] += (hpp - hp**2)*emh
-                #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp), 
+                #print "pvals[%i] = %.4f, pvals[%i] = %.4f dp = %.4f" % (pi, pvals[pi], pj, pvals[pj], dp),
                 #print "First Derivative = % .4f, Second Derivative = % .4f" % (dp*(dp**2 + self.b**2)**-0.5, self.b**2*(dp**2 + self.b**2)**-1.5)
-            
+
             #print "grp:", gnm, "dp:", ' '.join(["% .1e" % i for i in dps]), "Contributions:", ' '.join(["% .1e" % i for i in Contribs])
 
         #print DC0, DC1, DC2

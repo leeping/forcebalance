@@ -1,0 +1,1865 @@
+#======================================================================#
+#| [1m            Welcome to ForceBalance version 1.6.0! =D             [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Keri A. McKiernan, Yudong Qiu                   [0m |#
+#| [1m           Arthur Vigil, Erik G. Brandt, Johnny Israeli           [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: optimize.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: smirnoff99Frosst.offxml
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  9.3800e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.4000e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  9.0000e+02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3230e+00 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.8000e+02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0900e+00 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.3400e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0800e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0950e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  7.0000e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2000e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.4000e+02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.2000e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  1.0000e+02 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.2000e+02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4000e+02 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  3.6250e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  1.0500e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  1.5700e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.4870e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.5000e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  1.4590e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.0940e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  1.9080e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  1.7000e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  1.6837e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   HarmonicBondForce/Bond/k             : 1.00000e+01
+   HarmonicBondForce/Bond/length        : 1.00000e-02
+   HarmonicAngleForce/Angle/k           : 1.00000e+01
+   HarmonicAngleForce/Angle/angle       : 1.00000e+01
+   PeriodicTorsionForce/Proper/k1       : 1.00000e+00
+   NonbondedForce/Atom/epsilon          : 1.00000e-02
+   NonbondedForce/Atom/rmin_half        : 1.00000e-01
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    HarmonicBondForce/Bond/k      : 1.00000e+01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [    HarmonicBondForce/Bond/length  : 1.00000e-02 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [    HarmonicBondForce/Bond/k      : 1.00000e+01 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [    HarmonicBondForce/Bond/length  : 1.00000e-02 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [    HarmonicBondForce/Bond/k      : 1.00000e+01 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [    HarmonicBondForce/Bond/length  : 1.00000e-02 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [    HarmonicBondForce/Bond/k      : 1.00000e+01 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [    HarmonicBondForce/Bond/length  : 1.00000e-02 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [    HarmonicAngleForce/Angle/angle  : 1.00000e+01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [    HarmonicAngleForce/Angle/k    : 1.00000e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [    HarmonicAngleForce/Angle/angle  : 1.00000e+01 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [    HarmonicAngleForce/Angle/k    : 1.00000e+01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [    HarmonicAngleForce/Angle/angle  : 1.00000e+01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [    HarmonicAngleForce/Angle/k    : 1.00000e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [    HarmonicAngleForce/Angle/angle  : 1.00000e+01 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [    HarmonicAngleForce/Angle/k    : 1.00000e+01 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [    PeriodicTorsionForce/Proper/k1  : 1.00000e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [    PeriodicTorsionForce/Proper/k1  : 1.00000e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [    NonbondedForce/Atom/epsilon   : 1.00000e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [    NonbondedForce/Atom/rmin_half  : 1.00000e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [    NonbondedForce/Atom/epsilon   : 1.00000e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [    NonbondedForce/Atom/rmin_half  : 1.00000e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [    NonbondedForce/Atom/epsilon   : 1.00000e-02 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [    NonbondedForce/Atom/rmin_half  : 1.00000e-01 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [    NonbondedForce/Atom/epsilon   : 1.00000e-02 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [    NonbondedForce/Atom/rmin_half  : 1.00000e-01 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['smirnoff99Frosst.offxml'] 
+priors                    OrderedDict([('HarmonicBondForce/Bond/k', 10.0), ('HarmonicBondForce/Bond/length', 0.01), ('HarmonicAngleForce/Angle/k', 10.0), ('HarmonicAngleForce/Angle/angle', 10.0), ('PeriodicTorsionForce/Proper/k1', 1.0), ('NonbondedForce/Atom/epsilon', 0.01), ('NonbondedForce/Atom/rmin_half', 0.1)]) 
+----------------------------------------------------------
+Backing up: optimize.tmp/optgeo to: optimize.bak/optgeo_8.tar.bz2
+Reading interactions from file: targets/optgeo/optgeo_options.txt
+Building internal coordinates from file: /home2/qyd/projects/forcebalance-dev/studies/022_opt_geo_target/targets/optgeo/conf.pdb
+#========================================================#
+#| [92m             Setup for target optgeo :              [0m |#
+#========================================================#
+precision                 double 
+platname                  Reference 
+name                      optgeo 
+type                      OPTGEOTARGET_SMIRNOFF 
+tgtdir                    targets/optgeo 
+optgeo_options            targets/optgeo/optgeo_options.txt 
+writelevel                1 
+----------------------------------------------------------
+Backing up: optimize.tmp/vibration to: optimize.bak/vibration_2.tar.bz2
+#========================================================#
+#| [92m            Setup for target vibration :            [0m |#
+#========================================================#
+pdb                       input.pdb 
+mol2                      ['9HXanthene.mol2'] 
+precision                 double 
+platname                  Reference 
+name                      vibration 
+type                      VIBRATION_SMIRNOFF 
+tgtdir                    targets/vibration 
+denom                     200.0 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          1.0 
+normalize_weights         False 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   OPTIMIZE 
+trust0                    0.25 
+mintrust                  0.05 
+eps                       0.01 
+convergence_objective     0.1 
+convergence_step          0.1 
+convergence_gradient      0.1 
+adapt_fac                 0.2 
+adapt_damp                1.0 
+err_tol                   1.0 
+input_file                optimize.in 
+----------------------------------------------------------
+#========================================================#
+#| [1m                  Main Optimizer                    [0m |#
+#| [1m   Newton-Raphson Method (Adaptive Trust Radius)    [0m |#
+#| [1m                                                    [0m |#
+#| [1m       [0mConvergence criteria (1 of 3 needed):        [0m |#
+#| [1m          [0mObjective Function  : 1.000e-01           [0m |#
+#| [1m          [0mNorm of Gradient    : 1.000e-01           [0m |#
+#| [1m          [0mParameter step size : 1.000e-01           [0m |#
+#========================================================#
+#========================================================#
+#|       Color Key for Objective Function -=X2=-        |#
+#|  [1mBold[0m = Initial step                                 |#
+#|  [92mGreen = Current lowest value of objective function[0m  |#
+#|  [91mRed = Objective function rises, step rejected[0m       |#
+#|  [0mNo color = Not at the lowest value                  |#
+#========================================================#
+#========================================================#
+#| [94m     Iteration 0: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#======================================================================================================================#
+#| [92m                                  Optimized Geometries, Objective =  5.48557e+00                                  [0m |#
+#| [92m  System                       Bonds            Angles           Dihedrals         Impropers               Term.  [0m |#
+#| [92m                            RMSD   denom      RMSD   denom      RMSD   denom      RMSD   denom                    [0m |#
+#======================================================================================================================#
+9HXanthene                    0.021    0.01     0.027    0.03     0.076    0.20     0.005    0.20             5.486 
+------------------------------------------------------------------------------------------------------------------------
+
+#==========================================================================#
+#|                       Frequencies (wavenumbers)                        |#
+#|  Target: vibration  Type: Vibration_SMIRNOFF  Objective = 2.32082e+01  |#
+#|  Mode #            Reference   Calculated   Difference   Ref(dot)Calc  |#
+#==========================================================================#
+    0                   31.1817      39.5880       8.4063         0.9917 
+    1                  127.2863     137.0455       9.7592         0.9969 
+    2                  200.5311     228.9315      28.4004         0.9372 
+    3                  245.4174     234.9776     -10.4398         0.9372 
+    4                  258.8788     240.5108     -18.3680         0.9955 
+    5                  295.5887     307.4914      11.9027         0.9868 
+    6                  385.5805     343.9707     -41.6098         0.9888 
+    7                  413.3227     432.0155      18.6928         0.0037 
+    8                  461.1571     437.3206     -23.8365         0.0006 
+    9                  468.4759     443.7455     -24.7304         0.9877 
+    10                 553.9686     505.7497     -48.2189         0.9592 
+    11                 557.9183     524.8687     -33.0496         0.9531 
+    12                 559.2968     558.3256      -0.9712         0.9390 
+    13                 609.7540     622.7650      13.0110         0.0013 
+    14                 650.9588     634.9113     -16.0475         0.0037 
+    15                 691.9021     663.3716     -28.5305         0.7621 
+    16                 731.3959     690.2186     -41.1773         0.9542 
+    17                 748.6224     711.4277     -37.1947         0.9897 
+    18                 757.4865     733.1037     -24.3828         0.9530 
+    19                 793.4162     791.2665      -2.1497         0.0493 
+    20                 796.3137     791.3024      -5.0113         0.0481 
+    21                 829.9391     798.9558     -30.9833         0.9768 
+    22                 886.2937     885.6260      -0.6677         0.0059 
+    23                 898.9488     892.3635      -6.5853         0.3125 
+    24                 905.1053     912.2779       7.1726         0.0659 
+    25                 931.8180     954.5618      22.7438         0.0033 
+    26                 972.6908     973.1083       0.4175         0.3438 
+    27                 981.1443    1019.3588      38.2145         0.0018 
+    28                1002.3531    1034.2162      31.8631         0.0023 
+    29                1002.6108    1093.8774      91.2666         0.0577 
+    30                1006.9971    1096.9093      89.9122         0.4570 
+    31                1043.4229    1148.9419     105.5190         0.0009 
+    32                1045.2039    1171.7953     126.5914         0.0007 
+    33                1101.4212    1172.1451      70.7239         0.0015 
+    34                1122.1664    1172.7740      50.6076         0.7413 
+    35                1175.8590    1208.0771      32.2181         0.0606 
+    36                1177.5535    1226.4928      48.9393         0.0211 
+    37                1180.0345    1285.3706     105.3361         0.0051 
+    38                1198.0738    1285.9386      87.8648         0.0002 
+    39                1209.4283    1294.0627      84.6344         0.1762 
+    40                1213.4868    1321.5111     108.0243         0.0302 
+    41                1233.7197    1331.1122      97.3925         0.0215 
+    42                1248.6007    1429.5401     180.9394         0.0041 
+    43                1296.1008    1451.5319     155.4311         0.7927 
+    44                1311.1904    1492.1654     180.9750         0.1158 
+    45                1325.6114    1570.3027     244.6913         0.0318 
+    46                1351.5363    1660.5989     309.0626         0.0045 
+    47                1456.1390    1674.9029     218.7639         0.8023 
+    48                1461.1551    1699.6550     238.4999         0.0132 
+    49                1467.0845    1717.3464     250.2619         0.3477 
+    50                1486.3167    1757.5737     271.2570         0.6228 
+    51                1498.4933    1775.8689     277.3756         0.3020 
+    52                1571.5221    1814.6929     243.1708         0.5892 
+    53                1591.5923    1815.5314     223.9391         0.6939 
+    54                1597.5166    1847.2643     249.7477         0.0303 
+    55                1620.6702    1875.4551     254.7849         0.0292 
+    56                2881.8985    2911.1127      29.2142         0.8773 
+    57                2918.3100    2981.1389      62.8289         0.8759 
+    58                3057.8158    3066.2460       8.4302         0.3032 
+    59                3058.9610    3066.2905       7.3295         0.2553 
+    60                3076.7507    3066.3656     -10.3851         0.4442 
+    61                3076.9099    3066.3993     -10.5106         0.4796 
+    62                3093.3546    3067.2109     -26.1437         0.0798 
+    63                3093.7472    3067.2203     -26.5269         0.0626 
+    64                3108.9905    3068.2866     -40.7039         0.7017 
+    65                3109.6289    3068.3759     -41.2530         0.7082 
+----------------------------------------------------------------------------
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+optgeo                         5.48557      1.000 [94m     5.48557e+00[0m 
+vibration                     23.20816      1.000 [94m     2.32082e+01[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     2.86937e+01[0m 
+----------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     0   0.000e+00   0.000e+00   7.817e+00[1m   2.86937e+01[0m   0.000e+00      0.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  6.29042981e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  4.23735228e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  9.62440887e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [ -1.09489786e+00 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  1.00825973e-01 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [ -4.19242952e-01 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [ -1.36536618e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [ -1.52105505e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  8.93835352e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  6.38068999e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [ -6.91093191e-01 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  8.26022914e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  3.15869209e+00 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  6.12011968e+00 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.17589942e+00 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  8.89654096e-04 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  2.30097697e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [ -5.12733496e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  9.31081803e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.25324037e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  3.23168484e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  4.37535178e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  4.60446228e-03 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  3.55062796e-02 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  3.63633287e-03 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  4.59623839e-02 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Finding trust radius: H+0.0000*I, length 2.2392e+00 (target 2.5000e-01)
+Finding trust radius: H+9.0000*I, length 5.8235e-01 (target 2.5000e-01)
+Finding trust radius: H+61.6869*I, length 1.1590e-01 (target 2.5000e-01)
+Finding trust radius: H+30.0993*I, length 2.2082e-01 (target 2.5000e-01)
+Finding trust radius: H+30.0993*I, length 2.2082e-01 (target 2.5000e-01)
+Finding trust radius: H+20.5808*I, length 3.0534e-01 (target 2.5000e-01)
+Finding trust radius: H+40.8412*I, length 1.6864e-01 (target 2.5000e-01)
+Finding trust radius: H+27.6613*I, length 2.3759e-01 (target 2.5000e-01)
+Finding trust radius: H+26.6996*I, length 2.4494e-01 (target 2.5000e-01)
+Finding trust radius: H+25.8184*I, length 2.5210e-01 (target 2.5000e-01)
+Finding trust radius: H+26.0609*I, length 2.5008e-01 (target 2.5000e-01)
+Finding trust radius: H+26.0751*I, length 2.4997e-01 (target 2.5000e-01)
+Finding trust radius: H+26.0711*I, length 2.5000e-01 (target 2.5000e-01)
+Finding trust radius: H+26.0712*I, length 2.5000e-01 (target 2.5000e-01)
+Finding trust radius: H+26.0713*I, length 2.5000e-01 (target 2.5000e-01)
+Trust-radius step found (length 2.5000e-01),  2.6071e+01 added to Hessian diagonal
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  0.0000e+00 - 2.1658e-02 = -2.1658e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  0.0000e+00 - 1.5499e-02 = -1.5499e-02 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  0.0000e+00 - 3.3086e-03 = -3.3086e-03 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  0.0000e+00 + 3.8515e-02 =  3.8515e-02 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  0.0000e+00 - 3.5830e-03 = -3.5830e-03 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  0.0000e+00 + 1.4582e-02 =  1.4582e-02 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  0.0000e+00 + 4.8760e-03 =  4.8760e-03 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  0.0000e+00 + 5.0631e-02 =  5.0631e-02 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  0.0000e+00 - 3.0446e-02 = -3.0446e-02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  0.0000e+00 - 2.2106e-02 = -2.2106e-02 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  0.0000e+00 + 2.7732e-02 =  2.7732e-02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  0.0000e+00 - 2.8116e-02 = -2.8116e-02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  0.0000e+00 - 7.6431e-02 = -7.6431e-02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  0.0000e+00 - 2.0970e-01 = -2.0970e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  0.0000e+00 - 4.1109e-02 = -4.1109e-02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  0.0000e+00 + 6.4454e-06 =  6.4454e-06 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  0.0000e+00 - 5.1256e-02 = -5.1256e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  0.0000e+00 + 2.0210e-03 =  2.0210e-03 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  0.0000e+00 - 3.2216e-03 = -3.2216e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  0.0000e+00 - 4.3314e-03 = -4.3314e-03 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  0.0000e+00 - 1.0968e-02 = -1.0968e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  0.0000e+00 - 1.4817e-02 = -1.4817e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  0.0000e+00 - 1.4900e-04 = -1.4900e-04 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  0.0000e+00 - 1.1381e-03 = -1.1381e-03 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  0.0000e+00 - 1.1816e-04 = -1.1816e-04 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  0.0000e+00 - 1.4725e-03 = -1.4725e-03 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  9.3800e+02 - 2.1658e-01 =  9.3778e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.4000e+00 - 1.5499e-04 =  1.3998e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  9.0000e+02 - 3.3086e-02 =  8.9997e+02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3230e+00 + 3.8515e-04 =  1.3234e+00 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.8000e+02 - 3.5830e-02 =  6.7996e+02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0900e+00 + 1.4582e-04 =  1.0901e+00 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.3400e+02 + 4.8760e-02 =  7.3405e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0800e+00 + 5.0631e-04 =  1.0805e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0950e+02 - 3.0446e-01 =  1.0920e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  7.0000e+01 - 2.2106e-01 =  6.9779e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2000e+02 + 2.7732e-01 =  1.2028e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.4000e+02 - 2.8116e-01 =  1.3972e+02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.2000e+02 - 7.6431e-01 =  1.1924e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  1.0000e+02 - 2.0970e+00 =  9.7903e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.2000e+02 - 4.1109e-01 =  1.1959e+02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4000e+02 + 6.4454e-05 =  1.4000e+02 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  3.6250e+00 - 5.1256e-02 =  3.5737e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  1.0500e+00 + 2.0210e-03 =  1.0520e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  1.5700e-02 - 3.2216e-05 =  1.5668e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.4870e+00 - 4.3314e-04 =  1.4866e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.5000e-02 - 1.0968e-04 =  1.4890e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  1.4590e+00 - 1.4817e-03 =  1.4575e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.0940e-01 - 1.4900e-06 =  1.0940e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  1.9080e+00 - 1.1381e-04 =  1.9079e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  1.7000e-01 - 1.1816e-06 =  1.7000e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  1.6837e+00 - 1.4725e-04 =  1.6836e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Backing up optimize.sav -> optimize.bak/optimize_8.sav
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 1: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#======================================================================================================================#
+#| [92m                                  Optimized Geometries, Objective =  5.35245e+00                                  [0m |#
+#| [92m  System                       Bonds            Angles           Dihedrals         Impropers               Term.  [0m |#
+#| [92m                            RMSD   denom      RMSD   denom      RMSD   denom      RMSD   denom                    [0m |#
+#======================================================================================================================#
+9HXanthene                    0.021    0.01     0.026    0.03     0.076    0.20     0.005    0.20             5.352 
+------------------------------------------------------------------------------------------------------------------------
+
+#==========================================================================#
+#|                       Frequencies (wavenumbers)                        |#
+#|  Target: vibration  Type: Vibration_SMIRNOFF  Objective = 2.15041e+01  |#
+#|  Mode #            Reference   Calculated   Difference   Ref(dot)Calc  |#
+#==========================================================================#
+    0                   31.1817      39.2174       8.0357         0.9917 
+    1                  127.2863     136.5470       9.2607         0.9969 
+    2                  200.5311     228.0132      27.4821         0.9373 
+    3                  245.4174     234.8837     -10.5337         0.9372 
+    4                  258.8788     239.7227     -19.1561         0.9954 
+    5                  295.5887     306.1616      10.5729         0.9869 
+    6                  385.5805     343.7071     -41.8734         0.9888 
+    7                  413.3227     433.3492      20.0265         0.0037 
+    8                  461.1571     437.0924     -24.0647         0.0006 
+    9                  468.4759     445.0837     -23.3922         0.9878 
+    10                 553.9686     506.4681     -47.5005         0.9589 
+    11                 557.9183     524.7963     -33.1220         0.9532 
+    12                 559.2968     557.2617      -2.0351         0.9392 
+    13                 609.7540     622.1573      12.4033         0.0013 
+    14                 650.9588     634.2114     -16.7474         0.0037 
+    15                 691.9021     662.3634     -29.5387         0.7531 
+    16                 731.3959     689.9542     -41.4417         0.9567 
+    17                 748.6224     712.1194     -36.5030         0.9909 
+    18                 757.4865     732.3970     -25.0895         0.9540 
+    19                 793.4162     775.1791     -18.2371         0.0495 
+    20                 796.3137     776.2063     -20.1074         0.0485 
+    21                 829.9391     798.1916     -31.7475         0.9772 
+    22                 886.2937     883.7661      -2.5276         0.0059 
+    23                 898.9488     890.4967      -8.4521         0.3125 
+    24                 905.1053     905.4626       0.3573         0.0744 
+    25                 931.8180     937.9000       6.0820         0.0034 
+    26                 972.6908     962.3348     -10.3560         0.3984 
+    27                 981.1443    1018.0116      36.8673         0.0018 
+    28                1002.3531    1032.4271      30.0740         0.0023 
+    29                1002.6108    1075.2630      72.6522         0.0577 
+    30                1006.9971    1078.5157      71.5186         0.4672 
+    31                1043.4229    1144.5871     101.1642         0.0005 
+    32                1045.2039    1151.9589     106.7550         0.0007 
+    33                1101.4212    1152.3215      50.9003         0.0015 
+    34                1122.1664    1167.7546      45.5882         0.7440 
+    35                1175.8590    1205.7250      29.8660         0.0705 
+    36                1177.5535    1223.6582      46.1047         0.0501 
+    37                1180.0345    1281.2839     101.2494         0.2796 
+    38                1198.0738    1285.1289      87.0551         0.2175 
+    39                1209.4283    1286.4727      77.0444         0.1464 
+    40                1213.4868    1315.4213     101.9345         0.0329 
+    41                1233.7197    1325.1118      91.3921         0.0219 
+    42                1248.6007    1425.2792     176.6785         0.0058 
+    43                1296.1008    1444.4540     148.3532         0.7399 
+    44                1311.1904    1486.0244     174.8340         0.1372 
+    45                1325.6114    1562.5326     236.9212         0.0307 
+    46                1351.5363    1646.6307     295.0944         0.0042 
+    47                1456.1390    1664.9867     208.8477         0.8510 
+    48                1461.1551    1694.0062     232.8511         0.0092 
+    49                1467.0845    1707.2216     240.1371         0.3512 
+    50                1486.3167    1749.2075     262.8908         0.5663 
+    51                1498.4933    1772.4410     273.9477         0.2406 
+    52                1571.5221    1807.8248     236.3027         0.5844 
+    53                1591.5923    1808.6903     217.0980         0.7009 
+    54                1597.5166    1840.2956     242.7790         0.0308 
+    55                1620.6702    1870.0033     249.3331         0.0291 
+    56                2881.8985    2911.4415      29.5430         0.8771 
+    57                2918.3100    2980.6267      62.3167         0.8761 
+    58                3057.8158    3066.2535       8.4377         0.3535 
+    59                3058.9610    3066.3001       7.3391         0.3147 
+    60                3076.7507    3066.3770     -10.3737         0.3883 
+    61                3076.9099    3066.4073     -10.5026         0.4180 
+    62                3093.3546    3067.1788     -26.1758         0.0736 
+    63                3093.7472    3067.1885     -26.5587         0.0557 
+    64                3108.9905    3068.2775     -40.7130         0.7075 
+    65                3109.6289    3068.3671     -41.2618         0.7138 
+----------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+optgeo                         5.35245      1.000 [92m     5.35245e+00[0m ( -1.331e-01 ) 
+vibration                     21.50410      1.000 [92m     2.15041e+01[0m ( -1.704e+00 ) 
+Regularization                 0.06250      1.000 [91m     6.24999e-02[0m ( +6.250e-02 ) 
+Total                                             [92m     2.69191e+01[0m ( -1.775e+00 ) 
+-------------------------------------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_45.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     1   2.500e-01   2.500e-01   6.460e+00[92m   2.69191e+01[0m  -1.775e+00      0.996
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  5.72806506e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  3.97342484e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  8.79813505e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [ -1.00718173e+00 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  9.28590665e-02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [ -3.68399028e-01 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [ -1.27338518e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [ -1.26797798e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  7.75666442e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  5.67322813e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [ -6.35199964e-01 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  7.47675631e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.92300653e+00 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  5.44396269e+00 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.04593568e+00 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [ -1.76123938e-04 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  1.37756823e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [ -5.03430352e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  7.65640656e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.03409540e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  2.84266739e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  3.80688743e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  3.65132807e-03 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  3.16115977e-02 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  3.44880687e-03 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  4.03830583e-02 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Increasing trust radius to  3.0000e-01
+Calculating nonlinear optimization step
+Finding trust radius: H+0.0000*I, length 1.9870e+00 (target 3.0000e-01)
+Finding trust radius: H+9.0000*I, length 5.0808e-01 (target 3.0000e-01)
+Finding trust radius: H+61.6869*I, length 9.7744e-02 (target 3.0000e-01)
+Finding trust radius: H+29.4754*I, length 1.9210e-01 (target 3.0000e-01)
+Finding trust radius: H+29.4754*I, length 1.9210e-01 (target 3.0000e-01)
+Finding trust radius: H+20.2615*I, length 2.6616e-01 (target 3.0000e-01)
+Finding trust radius: H+15.4279*I, length 3.3415e-01 (target 3.0000e-01)
+Finding trust radius: H+17.7830*I, length 2.9712e-01 (target 3.0000e-01)
+Finding trust radius: H+17.7736*I, length 2.9725e-01 (target 3.0000e-01)
+Finding trust radius: H+17.5400*I, length 3.0055e-01 (target 3.0000e-01)
+Finding trust radius: H+16.7172*I, length 3.1279e-01 (target 3.0000e-01)
+Finding trust radius: H+17.5779*I, length 3.0001e-01 (target 3.0000e-01)
+Finding trust radius: H+17.5790*I, length 3.0000e-01 (target 3.0000e-01)
+Finding trust radius: H+17.5787*I, length 3.0000e-01 (target 3.0000e-01)
+Finding trust radius: H+17.5788*I, length 3.0000e-01 (target 3.0000e-01)
+Finding trust radius: H+17.5787*I, length 3.0000e-01 (target 3.0000e-01)
+Trust-radius step found (length 3.0000e-01),  1.7579e+01 added to Hessian diagonal
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [ -2.1658e-02 - 2.7932e-02 = -4.9590e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [ -1.5499e-02 - 2.0806e-02 = -3.6306e-02 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [ -3.3086e-03 - 4.2732e-03 = -7.5819e-03 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  3.8515e-02 + 5.0598e-02 =  8.9113e-02 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [ -3.5830e-03 - 4.7278e-03 = -8.3109e-03 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.4582e-02 + 1.8192e-02 =  3.2775e-02 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  4.8760e-03 + 6.5187e-03 =  1.1395e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  5.0631e-02 + 5.9936e-02 =  1.1057e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [ -3.0446e-02 - 3.7485e-02 = -6.7931e-02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [ -2.2106e-02 - 2.7680e-02 = -4.9786e-02 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  2.7732e-02 + 3.3589e-02 =  6.1321e-02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [ -2.8116e-02 - 3.5819e-02 = -6.3935e-02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [ -7.6431e-02 - 5.9737e-02 = -1.3617e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [ -2.0970e-01 - 2.6328e-01 = -4.7297e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [ -4.1109e-02 - 5.2229e-02 = -9.3338e-02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  6.4454e-06 + 7.7745e-05 =  8.4191e-05 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [ -5.1256e-02 - 3.8284e-02 = -8.9540e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  2.0210e-03 + 2.6599e-03 =  4.6810e-03 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [ -3.2216e-03 - 3.7569e-03 = -6.9786e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [ -4.3314e-03 - 5.0675e-03 = -9.3990e-03 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [ -1.0968e-02 - 1.3533e-02 = -2.4500e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [ -1.4817e-02 - 1.8083e-02 = -3.2899e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [ -1.4900e-04 - 1.6054e-04 = -3.0955e-04 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [ -1.1381e-03 - 1.3954e-03 = -2.5335e-03 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [ -1.1816e-04 - 1.5638e-04 = -2.7454e-04 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [ -1.4725e-03 - 1.7778e-03 = -3.2504e-03 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  9.3778e+02 - 2.7932e-01 =  9.3750e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.3998e+00 - 2.0806e-04 =  1.3996e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  8.9997e+02 - 4.2732e-02 =  8.9992e+02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3234e+00 + 5.0598e-04 =  1.3239e+00 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.7996e+02 - 4.7278e-02 =  6.7992e+02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0901e+00 + 1.8192e-04 =  1.0903e+00 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.3405e+02 + 6.5187e-02 =  7.3411e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0805e+00 + 5.9936e-04 =  1.0811e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0920e+02 - 3.7485e-01 =  1.0882e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  6.9779e+01 - 2.7680e-01 =  6.9502e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2028e+02 + 3.3589e-01 =  1.2061e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.3972e+02 - 3.5819e-01 =  1.3936e+02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.1924e+02 - 5.9737e-01 =  1.1864e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  9.7903e+01 - 2.6328e+00 =  9.5270e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.1959e+02 - 5.2229e-01 =  1.1907e+02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4000e+02 + 7.7745e-04 =  1.4000e+02 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  3.5737e+00 - 3.8284e-02 =  3.5355e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  1.0520e+00 + 2.6599e-03 =  1.0547e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  1.5668e-02 - 3.7569e-05 =  1.5630e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.4866e+00 - 5.0675e-04 =  1.4861e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.4890e-02 - 1.3533e-04 =  1.4755e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  1.4575e+00 - 1.8083e-03 =  1.4557e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.0940e-01 - 1.6054e-06 =  1.0940e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  1.9079e+00 - 1.3954e-04 =  1.9077e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  1.7000e-01 - 1.5638e-06 =  1.7000e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  1.6836e+00 - 1.7778e-04 =  1.6834e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 2: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#======================================================================================================================#
+#| [92m                                  Optimized Geometries, Objective =  5.19410e+00                                  [0m |#
+#| [92m  System                       Bonds            Angles           Dihedrals         Impropers               Term.  [0m |#
+#| [92m                            RMSD   denom      RMSD   denom      RMSD   denom      RMSD   denom                    [0m |#
+#======================================================================================================================#
+9HXanthene                    0.021    0.01     0.025    0.03     0.076    0.20     0.005    0.20             5.194 
+------------------------------------------------------------------------------------------------------------------------
+
+#==========================================================================#
+#|                       Frequencies (wavenumbers)                        |#
+#|  Target: vibration  Type: Vibration_SMIRNOFF  Objective = 1.96744e+01  |#
+#|  Mode #            Reference   Calculated   Difference   Ref(dot)Calc  |#
+#==========================================================================#
+    0                   31.1817      38.6772       7.4955         0.9917 
+    1                  127.2863     136.2565       8.9702         0.9969 
+    2                  200.5311     227.5314      27.0003         0.9375 
+    3                  245.4174     234.7589     -10.6585         0.9372 
+    4                  258.8788     239.6295     -19.2493         0.9954 
+    5                  295.5887     305.2979       9.7092         0.9870 
+    6                  385.5805     343.3708     -42.2097         0.9888 
+    7                  413.3227     435.5229      22.2002         0.0037 
+    8                  461.1571     436.7794     -24.3777         0.0006 
+    9                  468.4759     447.3199     -21.1560         0.9880 
+    10                 553.9686     508.2885     -45.6801         0.9585 
+    11                 557.9183     525.7617     -32.1566         0.9532 
+    12                 559.2968     556.0352      -3.2616         0.9394 
+    13                 609.7540     621.2265      11.4725         0.0013 
+    14                 650.9588     633.3342     -17.6246         0.0038 
+    15                 691.9021     661.1794     -30.7227         0.7432 
+    16                 731.3959     690.9266     -40.4693         0.9581 
+    17                 748.6224     714.4934     -34.1290         0.9918 
+    18                 757.4865     731.4497     -26.0368         0.9554 
+    19                 793.4162     763.0875     -30.3287         0.0494 
+    20                 796.3137     765.0591     -31.2546         0.0486 
+    21                 829.9391     797.2810     -32.6581         0.9778 
+    22                 886.2937     881.4274      -4.8663         0.0059 
+    23                 898.9488     888.1640     -10.7848         0.3125 
+    24                 905.1053     898.7857      -6.3196         0.0803 
+    25                 931.8180     925.5169      -6.3011         0.0036 
+    26                 972.6908     956.0752     -16.6156         0.4405 
+    27                 981.1443    1016.1879      35.0436         0.0018 
+    28                1002.3531    1029.9856      27.6325         0.0023 
+    29                1002.6108    1061.2618      58.6510         0.0576 
+    30                1006.9971    1064.7421      57.7450         0.4770 
+    31                1043.4229    1137.0694      93.6465         0.0039 
+    32                1045.2039    1137.4520      92.2481         0.0027 
+    33                1101.4212    1139.0515      37.6303         0.9447 
+    34                1122.1664    1161.2022      39.0358         0.7470 
+    35                1175.8590    1202.6860      26.8270         0.0856 
+    36                1177.5535    1219.6978      42.1443         0.0933 
+    37                1180.0345    1274.6792      94.6447         0.2424 
+    38                1198.0738    1276.2255      78.1517         0.2136 
+    39                1209.4283    1285.0639      75.6356         0.8709 
+    40                1213.4868    1307.8516      94.3648         0.0358 
+    41                1233.7197    1318.0062      84.2865         0.0221 
+    42                1248.6007    1418.5573     169.9566         0.0085 
+    43                1296.1008    1436.2698     140.1690         0.6201 
+    44                1311.1904    1477.5921     166.4017         0.1653 
+    45                1325.6114    1552.4453     226.8339         0.0289 
+    46                1351.5363    1629.3042     277.7679         0.0038 
+    47                1456.1390    1652.5912     196.4522         0.8785 
+    48                1461.1551    1686.6764     225.5213         0.0053 
+    49                1467.0845    1693.8552     226.7707         0.3533 
+    50                1486.3167    1740.1222     253.8055         0.4824 
+    51                1498.4933    1769.0317     270.5384         0.1806 
+    52                1571.5221    1799.4535     227.9314         0.5790 
+    53                1591.5923    1800.4274     208.8351         0.7135 
+    54                1597.5166    1831.7774     234.2608         0.0313 
+    55                1620.6702    1863.4136     242.7434         0.0289 
+    56                2881.8985    2911.8511      29.9526         0.8769 
+    57                2918.3100    2979.9942      61.6842         0.8764 
+    58                3057.8158    3066.2700       8.4542         0.3809 
+    59                3058.9610    3066.3170       7.3560         0.3491 
+    60                3076.7507    3066.4122     -10.3385         0.3302 
+    61                3076.9099    3066.4403     -10.4696         0.3467 
+    62                3093.3546    3067.1516     -26.2030         0.0639 
+    63                3093.7472    3067.1619     -26.5853         0.0451 
+    64                3108.9905    3068.2828     -40.7077         0.7158 
+    65                3109.6289    3068.3729     -41.2560         0.7218 
+----------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+optgeo                         5.19410      1.000 [92m     5.19410e+00[0m ( -1.584e-01 ) 
+vibration                     19.67437      1.000 [92m     1.96744e+01[0m ( -1.830e+00 ) 
+Regularization                 0.30105      1.000 [91m     3.01048e-01[0m ( +2.385e-01 ) 
+Total                                             [92m     2.51695e+01[0m ( -1.750e+00 ) 
+-------------------------------------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_46.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     2   5.487e-01   3.000e-01   5.346e+00[92m   2.51695e+01[0m  -1.750e+00      0.999
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  4.92526123e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  3.60259997e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  7.62413849e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [ -8.92969924e-01 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  8.31129340e-02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [ -3.10128517e-01 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [ -1.14715197e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [ -1.00982869e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  6.20268881e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  4.64796901e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [ -4.44534837e-01 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  6.17220835e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.42256399e+00 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  4.56206891e+00 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  8.91317130e-01 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [ -2.07211540e-03 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  1.14200744e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [ -4.53494217e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  6.12882763e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  8.16562239e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  2.26342152e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  3.00789354e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  2.89906690e-03 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  2.48825477e-02 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  2.81554674e-03 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  3.43497326e-02 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Increasing trust radius to  3.4912e-01
+Calculating nonlinear optimization step
+Finding trust radius: H+0.0000*I, length 1.6658e+00 (target 3.4912e-01)
+Finding trust radius: H+9.0000*I, length 4.2415e-01 (target 3.4912e-01)
+Finding trust radius: H+61.6869*I, length 8.1146e-02 (target 3.4912e-01)
+Finding trust radius: H+9.0000*I, length 4.2415e-01 (target 3.4912e-01)
+Finding trust radius: H+23.5623*I, length 1.9463e-01 (target 3.4912e-01)
+Finding trust radius: H+3.4377*I, length 7.8202e-01 (target 3.4912e-01)
+Finding trust radius: H+14.7414*I, length 2.8909e-01 (target 3.4912e-01)
+Finding trust radius: H+12.3875*I, length 3.3237e-01 (target 3.4912e-01)
+Finding trust radius: H+12.0316*I, length 3.4009e-01 (target 3.4912e-01)
+Finding trust radius: H+11.4411*I, length 3.5371e-01 (target 3.4912e-01)
+Finding trust radius: H+10.4741*I, length 3.7859e-01 (target 3.4912e-01)
+Finding trust radius: H+11.6315*I, length 3.4920e-01 (target 3.4912e-01)
+Finding trust radius: H+11.6383*I, length 3.4904e-01 (target 3.4912e-01)
+Finding trust radius: H+11.6347*I, length 3.4912e-01 (target 3.4912e-01)
+Finding trust radius: H+11.6347*I, length 3.4912e-01 (target 3.4912e-01)
+Finding trust radius: H+11.6348*I, length 3.4912e-01 (target 3.4912e-01)
+Trust-radius step found (length 3.4912e-01),  1.1635e+01 added to Hessian diagonal
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [ -4.9590e-02 - 3.3931e-02 = -8.3521e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [ -3.6306e-02 - 2.7236e-02 = -6.3541e-02 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [ -7.5819e-03 - 5.2078e-03 = -1.2790e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  8.9113e-02 + 6.4048e-02 =  1.5316e-01 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [ -8.3109e-03 - 6.0688e-03 = -1.4380e-02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  3.2775e-02 + 2.1653e-02 =  5.4428e-02 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  1.1395e-02 + 8.4234e-03 =  1.9818e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.1057e-01 + 6.6806e-02 =  1.7737e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [ -6.7931e-02 - 4.2206e-02 = -1.1014e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [ -4.9786e-02 - 3.1636e-02 = -8.1421e-02 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  6.1321e-02 + 3.4685e-02 =  9.6006e-02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [ -6.3935e-02 - 4.1238e-02 = -1.0517e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [ -1.3617e-01 - 5.4151e-02 = -1.9032e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [ -4.7297e-01 - 3.0964e-01 = -7.8261e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [ -9.3338e-02 - 6.3501e-02 = -1.5684e-01 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  8.4191e-05 + 2.6511e-04 =  3.4930e-04 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [ -8.9540e-02 - 4.0244e-02 = -1.2978e-01 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  4.6810e-03 + 3.5335e-03 =  8.2145e-03 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [ -6.9786e-03 - 4.2327e-03 = -1.1211e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [ -9.3990e-03 - 5.6222e-03 = -1.5021e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [ -2.4500e-02 - 1.4905e-02 = -3.9405e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [ -3.2899e-02 - 1.9747e-02 = -5.2647e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [ -3.0955e-04 - 1.6940e-04 = -4.7895e-04 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [ -2.5335e-03 - 1.4586e-03 = -3.9921e-03 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [ -2.7454e-04 - 1.7224e-04 = -4.4679e-04 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [ -3.2504e-03 - 2.0277e-03 = -5.2781e-03 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  9.3750e+02 - 3.3931e-01 =  9.3716e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.3996e+00 - 2.7236e-04 =  1.3994e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  8.9992e+02 - 5.2078e-02 =  8.9987e+02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3239e+00 + 6.4048e-04 =  1.3245e+00 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.7992e+02 - 6.0688e-02 =  6.7986e+02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0903e+00 + 2.1653e-04 =  1.0905e+00 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.3411e+02 + 8.4234e-02 =  7.3420e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0811e+00 + 6.6806e-04 =  1.0818e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0882e+02 - 4.2206e-01 =  1.0840e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  6.9502e+01 - 3.1636e-01 =  6.9186e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2061e+02 + 3.4685e-01 =  1.2096e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.3936e+02 - 4.1238e-01 =  1.3895e+02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.1864e+02 - 5.4151e-01 =  1.1810e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  9.5270e+01 - 3.0964e+00 =  9.2174e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.1907e+02 - 6.3501e-01 =  1.1843e+02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4000e+02 + 2.6511e-03 =  1.4000e+02 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  3.5355e+00 - 4.0244e-02 =  3.4952e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  1.0547e+00 + 3.5335e-03 =  1.0582e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  1.5630e-02 - 4.2327e-05 =  1.5588e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.4861e+00 - 5.6222e-04 =  1.4855e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.4755e-02 - 1.4905e-04 =  1.4606e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  1.4557e+00 - 1.9747e-03 =  1.4537e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.0940e-01 - 1.6940e-06 =  1.0940e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  1.9077e+00 - 1.4586e-04 =  1.9076e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  1.7000e-01 - 1.7224e-06 =  1.7000e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  1.6834e+00 - 2.0277e-04 =  1.6832e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 3: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#======================================================================================================================#
+#| [92m                                  Optimized Geometries, Objective =  5.01374e+00                                  [0m |#
+#| [92m  System                       Bonds            Angles           Dihedrals         Impropers               Term.  [0m |#
+#| [92m                            RMSD   denom      RMSD   denom      RMSD   denom      RMSD   denom                    [0m |#
+#======================================================================================================================#
+9HXanthene                    0.021    0.01     0.024    0.03     0.076    0.20     0.005    0.20             5.014 
+------------------------------------------------------------------------------------------------------------------------
+
+#==========================================================================#
+#|                       Frequencies (wavenumbers)                        |#
+#|  Target: vibration  Type: Vibration_SMIRNOFF  Objective = 1.77305e+01  |#
+#|  Mode #            Reference   Calculated   Difference   Ref(dot)Calc  |#
+#==========================================================================#
+    0                   31.1817      37.9489       6.7672         0.9918 
+    1                  127.2863     135.8913       8.6050         0.9969 
+    2                  200.5311     226.9579      26.4268         0.9377 
+    3                  245.4174     234.6203     -10.7971         0.9373 
+    4                  258.8788     239.5761     -19.3027         0.9954 
+    5                  295.5887     304.2062       8.6175         0.9871 
+    6                  385.5805     342.9760     -42.6045         0.9889 
+    7                  413.3227     436.4165      23.0938         0.9683 
+    8                  461.1571     437.5261     -23.6310         0.9817 
+    9                  468.4759     449.4092     -19.0667         0.9882 
+    10                 553.9686     509.9490     -44.0196         0.9582 
+    11                 557.9183     526.5084     -31.4099         0.9531 
+    12                 559.2968     554.6780      -4.6188         0.9397 
+    13                 609.7540     620.0501      10.2961         0.0013 
+    14                 650.9588     632.3088     -18.6500         0.0038 
+    15                 691.9021     659.8448     -32.0573         0.7326 
+    16                 731.3959     691.4762     -39.9197         0.9578 
+    17                 748.6224     716.6365     -31.9859         0.9920 
+    18                 757.4865     730.3194     -27.1671         0.9569 
+    19                 793.4162     752.0784     -41.3378         0.0492 
+    20                 796.3137     755.0573     -41.2564         0.0487 
+    21                 829.9391     796.2452     -33.6939         0.9785 
+    22                 886.2937     878.6842      -7.6095         0.0059 
+    23                 898.9488     885.4373     -13.5115         0.3125 
+    24                 905.1053     891.3504     -13.7549         0.0846 
+    25                 931.8180     914.1013     -17.7167         0.0037 
+    26                 972.6908     951.3762     -21.3146         0.4763 
+    27                 981.1443    1013.8566      32.7123         0.0018 
+    28                1002.3531    1026.8674      24.5143         0.0023 
+    29                1002.6108    1048.1928      45.5820         0.0574 
+    30                1006.9971    1051.9297      44.9326         0.4881 
+    31                1043.4229    1123.1913      79.7684         0.0039 
+    32                1045.2039    1123.5983      78.3944         0.0029 
+    33                1101.4212    1132.2381      30.8169         0.9421 
+    34                1122.1664    1153.0459      30.8795         0.7500 
+    35                1175.8590    1198.9272      23.0682         0.1096 
+    36                1177.5535    1214.3663      36.8128         0.1570 
+    37                1180.0345    1263.2069      83.1724         0.0187 
+    38                1198.0738    1265.7525      67.6787         0.0050 
+    39                1209.4283    1285.0690      75.6407         0.8708 
+    40                1213.4868    1298.9615      85.4747         0.0385 
+    41                1233.7197    1310.4870      76.7673         0.0216 
+    42                1248.6007    1408.0003     159.3996         0.0112 
+    43                1296.1008    1428.5032     132.4024         0.4320 
+    44                1311.1904    1466.5198     155.3294         0.1982 
+    45                1325.6114    1540.0955     214.4841         0.0266 
+    46                1351.5363    1609.2815     257.7452         0.0034 
+    47                1456.1390    1638.6050     182.4660         0.8862 
+    48                1461.1551    1677.1533     215.9982         0.0018 
+    49                1467.0845    1677.6594     210.5749         0.3544 
+    50                1486.3167    1731.5126     245.1959         0.3755 
+    51                1498.4933    1765.7296     267.2363         0.1308 
+    52                1571.5221    1790.0019     218.4798         0.5727 
+    53                1591.5923    1791.2539     199.6616         0.7342 
+    54                1597.5166    1822.1798     224.6632         0.0321 
+    55                1620.6702    1856.1012     235.4310         0.0287 
+    56                2881.8985    2912.3013      30.4028         0.8767 
+    57                2918.3100    2979.2651      60.9551         0.8766 
+    58                3057.8158    3066.3079       8.4921         0.3894 
+    59                3058.9610    3066.3538       7.3928         0.3597 
+    60                3076.7507    3066.4798     -10.2709         0.2818 
+    61                3076.9099    3066.5068     -10.4031         0.2873 
+    62                3093.3546    3067.1407     -26.2139         0.0508 
+    63                3093.7472    3067.1518     -26.5954         0.0304 
+    64                3108.9905    3068.3143     -40.6762         0.7263 
+    65                3109.6289    3068.4050     -41.2239         0.7320 
+----------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+optgeo                         5.01374      1.000 [92m     5.01374e+00[0m ( -1.804e-01 ) 
+vibration                     17.73052      1.000 [92m     1.77305e+01[0m ( -1.944e+00 ) 
+Regularization                 0.80362      1.000 [91m     8.03624e-01[0m ( +5.026e-01 ) 
+Total                                             [92m     2.35479e+01[0m ( -1.622e+00 ) 
+-------------------------------------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_47.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     3   8.965e-01   3.491e-01   4.011e+00[92m   2.35479e+01[0m  -1.622e+00      0.994
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  4.06625120e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  3.11261297e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  6.19006279e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [ -7.49777994e-01 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.99179250e-02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [ -2.46937111e-01 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [ -9.79074644e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [ -7.07852664e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  4.33977275e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  3.43920398e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [ -5.37757992e-01 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  5.06347212e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  6.02472517e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  3.57114064e+00 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  6.98479802e-01 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [ -3.80306586e-03 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  3.71888806e-01 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [ -4.19630376e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  4.90350728e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  6.50551441e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.74870438e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  2.27830935e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  2.31206003e-03 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  1.84758537e-02 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  2.67027750e-03 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  2.81136027e-02 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Increasing trust radius to  3.9609e-01
+Calculating nonlinear optimization step
+Finding trust radius: H+0.0000*I, length 1.2981e+00 (target 3.9609e-01)
+Finding trust radius: H+9.0000*I, length 3.2858e-01 (target 3.9609e-01)
+Finding trust radius: H+61.6869*I, length 6.1698e-02 (target 3.9609e-01)
+Finding trust radius: H+9.0000*I, length 3.2858e-01 (target 3.9609e-01)
+Finding trust radius: H+23.5623*I, length 1.4949e-01 (target 3.9609e-01)
+Finding trust radius: H+3.4377*I, length 6.0824e-01 (target 3.9609e-01)
+Finding trust radius: H+10.4568*I, length 2.9335e-01 (target 3.9609e-01)
+Finding trust radius: H+7.9888*I, length 3.5849e-01 (target 3.9609e-01)
+Finding trust radius: H+6.0272*I, length 4.3545e-01 (target 3.9609e-01)
+Finding trust radius: H+7.0018*I, length 3.9346e-01 (target 3.9609e-01)
+Finding trust radius: H+6.9959*I, length 3.9369e-01 (target 3.9609e-01)
+Finding trust radius: H+6.9256*I, length 3.9645e-01 (target 3.9609e-01)
+Finding trust radius: H+6.5751*I, length 4.1080e-01 (target 3.9609e-01)
+Finding trust radius: H+6.9345*I, length 3.9610e-01 (target 3.9609e-01)
+Finding trust radius: H+6.9347*I, length 3.9609e-01 (target 3.9609e-01)
+Finding trust radius: H+6.9347*I, length 3.9609e-01 (target 3.9609e-01)
+Finding trust radius: H+6.9347*I, length 3.9609e-01 (target 3.9609e-01)
+Trust-radius step found (length 3.9609e-01),  6.9347e+00 added to Hessian diagonal
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [ -8.3521e-02 - 4.1746e-02 = -1.2527e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [ -6.3541e-02 - 3.5630e-02 = -9.9171e-02 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [ -1.2790e-02 - 6.2334e-03 = -1.9023e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.5316e-01 + 8.1420e-02 =  2.3458e-01 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [ -1.4380e-02 - 7.7779e-03 = -2.2158e-02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  5.4428e-02 + 2.5910e-02 =  8.0338e-02 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  1.9818e-02 + 1.0944e-02 =  3.0762e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.7737e-01 + 6.9601e-02 =  2.4697e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [ -1.1014e-01 - 4.4523e-02 = -1.5466e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [ -8.1421e-02 - 3.4592e-02 = -1.1601e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  9.6006e-02 + 4.8806e-02 =  1.4481e-01 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [ -1.0517e-01 - 4.9549e-02 = -1.5472e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [ -1.9032e-01 - 3.2210e-02 = -2.2253e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [ -7.8261e-01 - 3.5444e-01 = -1.1370e+00 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [ -1.5684e-01 - 7.5322e-02 = -2.3216e-01 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  3.4930e-04 + 6.3494e-04 =  9.8423e-04 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [ -1.2978e-01 - 1.8397e-02 = -1.4818e-01 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  8.2145e-03 + 4.0960e-03 =  1.2310e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [ -1.1211e-02 - 5.0648e-03 = -1.6276e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [ -1.5021e-02 - 6.6944e-03 = -2.1716e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [ -3.9405e-02 - 1.6448e-02 = -5.5853e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [ -5.2647e-02 - 2.1336e-02 = -7.3983e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [ -4.7895e-04 - 1.8680e-04 = -6.6575e-04 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [ -3.9921e-03 - 1.4643e-03 = -5.4564e-03 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [ -4.4679e-04 - 2.3838e-04 = -6.8516e-04 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [ -5.2781e-03 - 2.2890e-03 = -7.5671e-03 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  9.3716e+02 - 4.1746e-01 =  9.3675e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.3994e+00 - 3.5630e-04 =  1.3990e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  8.9987e+02 - 6.2334e-02 =  8.9981e+02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3245e+00 + 8.1420e-04 =  1.3253e+00 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.7986e+02 - 7.7779e-02 =  6.7978e+02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0905e+00 + 2.5910e-04 =  1.0908e+00 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.3420e+02 + 1.0944e-01 =  7.3431e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0818e+00 + 6.9601e-04 =  1.0825e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0840e+02 - 4.4523e-01 =  1.0795e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  6.9186e+01 - 3.4592e-01 =  6.8840e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2096e+02 + 4.8806e-01 =  1.2145e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.3895e+02 - 4.9549e-01 =  1.3845e+02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.1810e+02 - 3.2210e-01 =  1.1777e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  9.2174e+01 - 3.5444e+00 =  8.8630e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.1843e+02 - 7.5322e-01 =  1.1768e+02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4000e+02 + 6.3494e-03 =  1.4001e+02 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  3.4952e+00 - 1.8397e-02 =  3.4768e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  1.0582e+00 + 4.0960e-03 =  1.0623e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  1.5588e-02 - 5.0648e-05 =  1.5537e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.4855e+00 - 6.6944e-04 =  1.4848e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.4606e-02 - 1.6448e-04 =  1.4441e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  1.4537e+00 - 2.1336e-03 =  1.4516e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.0940e-01 - 1.8680e-06 =  1.0939e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  1.9076e+00 - 1.4643e-04 =  1.9075e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  1.7000e-01 - 2.3838e-06 =  1.6999e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  1.6832e+00 - 2.2890e-04 =  1.6829e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 4: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#======================================================================================================================#
+#| [92m                                  Optimized Geometries, Objective =  4.81198e+00                                  [0m |#
+#| [92m  System                       Bonds            Angles           Dihedrals         Impropers               Term.  [0m |#
+#| [92m                            RMSD   denom      RMSD   denom      RMSD   denom      RMSD   denom                    [0m |#
+#======================================================================================================================#
+9HXanthene                    0.020    0.01     0.024    0.03     0.076    0.20     0.005    0.20             4.812 
+------------------------------------------------------------------------------------------------------------------------
+
+#==========================================================================#
+#|                       Frequencies (wavenumbers)                        |#
+#|  Target: vibration  Type: Vibration_SMIRNOFF  Objective = 1.57582e+01  |#
+#|  Mode #            Reference   Calculated   Difference   Ref(dot)Calc  |#
+#==========================================================================#
+    0                   31.1817      37.0307       5.8490         0.9918 
+    1                  127.2863     135.9719       8.6856         0.9969 
+    2                  200.5311     227.2500      26.7189         0.9380 
+    3                  245.4174     234.4569     -10.9605         0.9373 
+    4                  258.8788     240.8222     -18.0566         0.9954 
+    5                  295.5887     304.2509       8.6622         0.9872 
+    6                  385.5805     342.5096     -43.0709         0.9889 
+    7                  413.3227     435.9765      22.6538         0.9685 
+    8                  461.1571     441.5072     -19.6499         0.9817 
+    9                  468.4759     453.5681     -14.9078         0.9885 
+    10                 553.9686     514.0238     -39.9448         0.9577 
+    11                 557.9183     529.6266     -28.2917         0.9529 
+    12                 559.2968     553.1456      -6.1512         0.9401 
+    13                 609.7540     618.6207       8.8667         0.0013 
+    14                 650.9588     631.0995     -19.8593         0.0038 
+    15                 691.9021     658.3180     -33.5841         0.7208 
+    16                 731.3959     694.7930     -36.6029         0.9543 
+    17                 748.6224     722.2205     -26.4019         0.9887 
+    18                 757.4865     729.0031     -28.4834         0.9586 
+    19                 793.4162     747.0250     -46.3912         0.0488 
+    20                 796.3137     750.9531     -45.3606         0.0486 
+    21                 829.9391     795.0636     -34.8755         0.9793 
+    22                 886.2937     875.4927     -10.8010         0.0059 
+    23                 898.9488     882.2635     -16.6853         0.3124 
+    24                 905.1053     887.2606     -17.8447         0.0864 
+    25                 931.8180     909.0684     -22.7496         0.0039 
+    26                 972.6908     950.8261     -21.8647         0.4946 
+    27                 981.1443    1010.8968      29.7525         0.0017 
+    28                1002.3531    1022.9318      20.5787         0.0023 
+    29                1002.6108    1041.9892      39.3784         0.0571 
+    30                1006.9971    1045.9335      38.9364         0.4961 
+    31                1043.4229    1116.7134      73.2905         0.0039 
+    32                1045.2039    1117.1552      71.9513         0.0030 
+    33                1101.4212    1123.8421      22.4209         0.9379 
+    34                1122.1664    1142.9967      20.8303         0.7531 
+    35                1175.8590    1194.2420      18.3830         0.1509 
+    36                1177.5535    1207.0548      29.5013         0.2508 
+    37                1180.0345    1247.2007      67.1662         0.0198 
+    38                1198.0738    1254.2058      56.1320         0.0075 
+    39                1209.4283    1285.1707      75.7424         0.8708 
+    40                1213.4868    1288.5897      75.1029         0.0407 
+    41                1233.7197    1302.9901      69.2704         0.0201 
+    42                1248.6007    1392.6998     144.0991         0.0128 
+    43                1296.1008    1421.8129     125.7121         0.2642 
+    44                1311.1904    1452.1987     141.0083         0.2330 
+    45                1325.6114    1525.4222     199.8108         0.0235 
+    46                1351.5363    1586.9351     235.3988         0.0028 
+    47                1456.1390    1623.6605     167.5215         0.8775 
+    48                1461.1551    1658.9504     197.7953         0.1921 
+    49                1467.0845    1665.1260     198.0415         0.0233 
+    50                1486.3167    1724.0667     237.7500         0.2615 
+    51                1498.4933    1762.2222     263.7289         0.0950 
+    52                1571.5221    1779.7052     208.1831         0.5650 
+    53                1591.5923    1781.6396     190.0473         0.7663 
+    54                1597.5166    1811.7572     214.2406         0.0331 
+    55                1620.6702    1848.2800     227.6098         0.0284 
+    56                2881.8985    2912.7450      30.8465         0.8764 
+    57                2918.3100    2978.4823      60.1723         0.8769 
+    58                3057.8158    3066.3813       8.5655         0.3861 
+    59                3058.9610    3066.4255       7.4645         0.3556 
+    60                3076.7507    3066.5911     -10.1596         0.2450 
+    61                3076.9099    3066.6170     -10.2929         0.2436 
+    62                3093.3546    3067.1580     -26.1966         0.0333 
+    63                3093.7472    3067.1702     -26.5770         0.0106 
+    64                3108.9905    3068.3849     -40.6056         0.7389 
+    65                3109.6289    3068.4764     -41.1525         0.7440 
+----------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+optgeo                         4.81198      1.000 [92m     4.81198e+00[0m ( -2.018e-01 ) 
+vibration                     15.75820      1.000 [92m     1.57582e+01[0m ( -1.972e+00 ) 
+Regularization                 1.65992      1.000 [91m     1.65992e+00[0m ( +8.563e-01 ) 
+Total                                             [92m     2.22301e+01[0m ( -1.318e+00 ) 
+-------------------------------------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_48.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     4   1.288e+00   3.961e-01   2.654e+00[92m   2.22301e+01[0m  -1.318e+00      0.987
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  2.99882504e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  2.31274310e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  4.52617486e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [ -5.66136009e-01 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  5.44869395e-02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [ -1.78274687e-01 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [ -7.64537126e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [ -4.04457830e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  2.55217646e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  2.32735879e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [ -2.47223998e-01 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  3.51853131e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.63197830e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  2.39986518e+00 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  4.78758003e-01 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [ -5.82691970e-03 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  1.42842336e-01 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [ -2.68669333e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  3.46943011e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  4.58313619e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.06216617e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  1.35972461e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.27135027e-03 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  1.07923088e-02 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  1.49088400e-03 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  1.74039988e-02 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Increasing trust radius to  4.4025e-01
+Calculating nonlinear optimization step
+Finding trust radius: H+0.0000*I, length 8.6843e-01 (target 4.4025e-01)
+Finding trust radius: H+9.0000*I, length 2.1901e-01 (target 4.4025e-01)
+Finding trust radius: H+61.6869*I, length 4.0938e-02 (target 4.4025e-01)
+Finding trust radius: H+9.0000*I, length 2.1901e-01 (target 4.4025e-01)
+Finding trust radius: H+23.5623*I, length 9.9418e-02 (target 4.4025e-01)
+Finding trust radius: H+3.4377*I, length 4.0596e-01 (target 4.4025e-01)
+Finding trust radius: H+1.3131*I, length 6.0389e-01 (target 4.4025e-01)
+Finding trust radius: H+3.7269*I, length 3.8867e-01 (target 4.4025e-01)
+Finding trust radius: H+3.0806*I, length 4.2957e-01 (target 4.4025e-01)
+Finding trust radius: H+2.3178*I, length 4.9057e-01 (target 4.4025e-01)
+Finding trust radius: H+2.9597*I, length 4.3820e-01 (target 4.4025e-01)
+Finding trust radius: H+2.9236*I, length 4.4084e-01 (target 4.4025e-01)
+Finding trust radius: H+2.9314*I, length 4.4027e-01 (target 4.4025e-01)
+Finding trust radius: H+2.9316*I, length 4.4025e-01 (target 4.4025e-01)
+Finding trust radius: H+2.9316*I, length 4.4025e-01 (target 4.4025e-01)
+Finding trust radius: H+2.9316*I, length 4.4025e-01 (target 4.4025e-01)
+Finding trust radius: H+2.9316*I, length 4.4025e-01 (target 4.4025e-01)
+Trust-radius step found (length 4.4025e-01),  2.9316e+00 added to Hessian diagonal
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [ -1.2527e-01 - 5.3413e-02 = -1.7868e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [ -9.9171e-02 - 4.8376e-02 = -1.4755e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [ -1.9023e-02 - 7.7418e-03 = -2.6765e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  2.3458e-01 + 1.0910e-01 =  3.4368e-01 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [ -2.2158e-02 - 1.0932e-02 = -3.3090e-02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  8.0338e-02 + 3.2831e-02 =  1.1317e-01 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  3.0762e-02 + 1.5334e-02 =  4.6096e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  2.4697e-01 + 6.5211e-02 =  3.1219e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [ -1.5466e-01 - 4.5406e-02 = -2.0007e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [ -1.1601e-01 - 4.0731e-02 = -1.5674e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.4481e-01 + 3.6905e-02 =  1.8172e-01 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [ -1.5472e-01 - 5.6864e-02 = -2.1159e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [ -2.2253e-01 - 1.0024e-02 = -2.3255e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [ -1.1370e+00 - 3.9156e-01 = -1.5286e+00 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [ -2.3216e-01 - 9.0899e-02 = -3.2306e-01 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  9.8423e-04 + 1.5769e-03 =  2.5611e-03 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [ -1.4818e-01 - 1.6512e-02 = -1.6469e-01 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  1.2310e-02 + 5.0798e-03 =  1.7390e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [ -1.6276e-02 - 6.1328e-03 = -2.2409e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [ -2.1716e-02 - 8.0385e-03 = -2.9754e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [ -5.5853e-02 - 1.4854e-02 = -7.0707e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [ -7.3983e-02 - 1.8795e-02 = -9.2778e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [ -6.6575e-04 - 1.0370e-04 = -7.6945e-04 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [ -5.4564e-03 - 8.8888e-04 = -6.3453e-03 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [ -6.8516e-04 - 1.6880e-04 = -8.5397e-04 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [ -7.5671e-03 - 1.6337e-03 = -9.2008e-03 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  9.3675e+02 - 5.3413e-01 =  9.3621e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.3990e+00 - 4.8376e-04 =  1.3985e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  8.9981e+02 - 7.7418e-02 =  8.9973e+02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3253e+00 + 1.0910e-03 =  1.3264e+00 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.7978e+02 - 1.0932e-01 =  6.7967e+02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0908e+00 + 3.2831e-04 =  1.0911e+00 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.3431e+02 + 1.5334e-01 =  7.3446e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0825e+00 + 6.5211e-04 =  1.0831e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0795e+02 - 4.5406e-01 =  1.0750e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  6.8840e+01 - 4.0731e-01 =  6.8433e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2145e+02 + 3.6905e-01 =  1.2182e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.3845e+02 - 5.6864e-01 =  1.3788e+02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.1777e+02 - 1.0024e-01 =  1.1767e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  8.8630e+01 - 3.9156e+00 =  8.4714e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.1768e+02 - 9.0899e-01 =  1.1677e+02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4001e+02 + 1.5769e-02 =  1.4003e+02 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  3.4768e+00 - 1.6512e-02 =  3.4603e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  1.0623e+00 + 5.0798e-03 =  1.0674e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  1.5537e-02 - 6.1328e-05 =  1.5476e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.4848e+00 - 8.0385e-04 =  1.4840e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.4441e-02 - 1.4854e-04 =  1.4293e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  1.4516e+00 - 1.8795e-03 =  1.4497e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.0939e-01 - 1.0370e-06 =  1.0939e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  1.9075e+00 - 8.8888e-05 =  1.9074e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  1.6999e-01 - 1.6880e-06 =  1.6999e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  1.6829e+00 - 1.6337e-04 =  1.6828e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 5: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#======================================================================================================================#
+#| [92m                                  Optimized Geometries, Objective =  4.56868e+00                                  [0m |#
+#| [92m  System                       Bonds            Angles           Dihedrals         Impropers               Term.  [0m |#
+#| [92m                            RMSD   denom      RMSD   denom      RMSD   denom      RMSD   denom                    [0m |#
+#======================================================================================================================#
+9HXanthene                    0.020    0.01     0.023    0.03     0.076    0.20     0.005    0.20             4.569 
+------------------------------------------------------------------------------------------------------------------------
+
+#==========================================================================#
+#|                       Frequencies (wavenumbers)                        |#
+#|  Target: vibration  Type: Vibration_SMIRNOFF  Objective = 1.38473e+01  |#
+#|  Mode #            Reference   Calculated   Difference   Ref(dot)Calc  |#
+#==========================================================================#
+    0                   31.1817      35.7145       4.5328         0.9919 
+    1                  127.2863     135.8907       8.6044         0.9969 
+    2                  200.5311     227.2535      26.7224         0.9382 
+    3                  245.4174     234.2897     -11.1277         0.9373 
+    4                  258.8788     241.8322     -17.0466         0.9955 
+    5                  295.5887     303.6477       8.0590         0.9873 
+    6                  385.5805     341.9728     -43.6077         0.9888 
+    7                  413.3227     435.4772      22.1545         0.9686 
+    8                  461.1571     444.1308     -17.0263         0.9818 
+    9                  468.4759     456.4048     -12.0711         0.9887 
+    10                 553.9686     516.7264     -37.2422         0.9574 
+    11                 557.9183     531.3905     -26.5278         0.9528 
+    12                 559.2968     551.5787      -7.7181         0.9404 
+    13                 609.7540     616.8423       7.0883         0.0013 
+    14                 650.9588     629.7645     -21.1943         0.0039 
+    15                 691.9021     656.6716     -35.2305         0.7102 
+    16                 731.3959     696.8697     -34.5262         0.9506 
+    17                 748.6224     725.9485     -22.6739         0.9811 
+    18                 757.4865     727.4758     -30.0107         0.9604 
+    19                 793.4162     745.4930     -47.9232         0.0481 
+    20                 796.3137     749.7865     -46.5272         0.0485 
+    21                 829.9391     793.7938     -36.1453         0.9801 
+    22                 886.2937     871.9356     -14.3581         0.0060 
+    23                 898.9488     878.7676     -20.1812         0.3123 
+    24                 905.1053     885.2295     -19.8758         0.0868 
+    25                 931.8180     907.2645     -24.5535         0.0039 
+    26                 972.6908     950.9623     -21.7285         0.5017 
+    27                 981.1443    1007.1806      26.0363         0.0017 
+    28                1002.3531    1018.0309      15.6778         0.0024 
+    29                1002.6108    1039.3586      36.7478         0.0569 
+    30                1006.9971    1043.4067      36.4096         0.5000 
+    31                1043.4229    1113.8299      70.4070         0.0021 
+    32                1045.2039    1114.0837      68.8798         0.0007 
+    33                1101.4212    1114.5532      13.1320         0.0015 
+    34                1122.1664    1130.9910       8.8246         0.7557 
+    35                1175.8590    1188.4036      12.5446         0.2293 
+    36                1177.5535    1196.9054      19.3519         0.3801 
+    37                1180.0345    1228.6233      48.5888         0.0204 
+    38                1198.0738    1240.6285      42.5547         0.0102 
+    39                1209.4283    1276.7259      67.2976         0.4391 
+    40                1213.4868    1285.3225      71.8357         0.0123 
+    41                1233.7197    1295.8955      62.1758         0.0176 
+    42                1248.6007    1373.1100     124.5093         0.0133 
+    43                1296.1008    1415.4376     119.3368         0.1583 
+    44                1311.1904    1434.3811     123.1907         0.2637 
+    45                1325.6114    1508.8691     183.2577         0.0197 
+    46                1351.5363    1563.1251     211.5888         0.0021 
+    47                1456.1390    1608.4986     152.3596         0.8557 
+    48                1461.1551    1638.4250     177.2699         0.1941 
+    49                1467.0845    1651.2218     184.1373         0.0241 
+    50                1486.3167    1718.1517     231.8350         0.1599 
+    51                1498.4933    1757.8043     259.3110         0.0766 
+    52                1571.5221    1768.9093     197.3872         0.5564 
+    53                1591.5923    1772.7286     181.1363         0.7997 
+    54                1597.5166    1800.8148     203.2982         0.0345 
+    55                1620.6702    1840.1705     219.5003         0.0281 
+    56                2881.8985    2913.1388      31.2403         0.8761 
+    57                2918.3100    2977.6120      59.3020         0.8772 
+    58                3057.8158    3066.5483       8.7325         0.3731 
+    59                3058.9610    3066.5902       7.6292         0.3400 
+    60                3076.7507    3066.7897      -9.9610         0.2172 
+    61                3076.9099    3066.8146     -10.0953         0.2110 
+    62                3093.3546    3067.2524     -26.1022         0.0071 
+    63                3093.7472    3067.2663     -26.4809         0.0195 
+    64                3108.9905    3068.5485     -40.4420         0.7541 
+    65                3109.6289    3068.6409     -40.9880         0.7586 
+----------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+optgeo                         4.56868      1.000 [92m     4.56868e+00[0m ( -2.433e-01 ) 
+vibration                     13.84730      1.000 [92m     1.38473e+01[0m ( -1.911e+00 ) 
+Regularization                 2.96606      1.000 [91m     2.96606e+00[0m ( +1.306e+00 ) 
+Total                                             [92m     2.13820e+01[0m ( -8.481e-01 ) 
+-------------------------------------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_49.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     5   1.722e+00   4.403e-01   1.399e+00[92m   2.13820e+01[0m  -8.481e-01      0.978
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  1.76285380e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.17682885e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  2.53130031e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [ -3.22033774e-01 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  3.18420932e-02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [ -9.54662565e-02 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [ -4.48739950e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [ -1.00834164e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  8.61497648e-02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  1.21925207e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [ -9.51179526e-02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.91978270e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [ -4.20697213e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  1.15383380e+00 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  2.12607628e-01 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [ -7.13113082e-03 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [ -3.94836047e-01 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [ -1.46377171e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  1.65003022e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  2.22039924e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  4.90177541e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  5.81477046e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  2.49041521e-04 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  4.07444993e-03 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [ -1.66938014e-04 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  6.94899539e-03 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Increasing trust radius to  4.8139e-01
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 4.1741e-01)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [ -1.7868e-01 - 7.1897e-02 = -2.5058e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [ -1.4755e-01 - 5.9340e-02 = -2.0689e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [ -2.6765e-02 - 9.3834e-03 = -3.6148e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  3.4368e-01 + 1.4452e-01 =  4.8821e-01 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [ -3.3090e-02 - 1.5537e-02 = -4.8627e-02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.1317e-01 + 4.0240e-02 =  1.5341e-01 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  4.6096e-02 + 2.1344e-02 =  6.7440e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  3.1219e-01 + 2.6374e-02 =  3.3856e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [ -2.0007e-01 - 3.2891e-02 = -2.3296e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [ -1.5674e-01 - 4.7130e-02 = -2.0388e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.8172e-01 + 9.4989e-03 =  1.9122e-01 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [ -2.1159e-01 - 6.3646e-02 = -2.7523e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [ -2.3255e-01 + 3.7185e-02 = -1.9537e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [ -1.5286e+00 - 3.5242e-01 = -1.8810e+00 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [ -3.2306e-01 - 9.0163e-02 = -4.1322e-01 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  2.5611e-03 + 4.3249e-03 =  6.8860e-03 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [ -1.6469e-01 + 8.7356e-03 = -1.5596e-01 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  1.7390e-02 + 6.4145e-03 =  2.3805e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [ -2.2409e-02 - 6.1941e-03 = -2.8603e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [ -2.9754e-02 - 8.2618e-03 = -3.8016e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [ -7.0707e-02 - 8.7263e-03 = -7.9433e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [ -9.2778e-02 - 8.7989e-03 = -1.0158e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [ -7.6945e-04 + 2.3927e-04 = -5.3018e-04 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [ -6.3453e-03 + 1.0125e-03 = -5.3328e-03 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [ -8.5397e-04 + 4.0096e-04 = -4.5301e-04 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [ -9.2008e-03 + 1.0170e-03 = -8.1838e-03 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  9.3621e+02 - 7.1897e-01 =  9.3549e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.3985e+00 - 5.9340e-04 =  1.3979e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  8.9973e+02 - 9.3834e-02 =  8.9964e+02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3264e+00 + 1.4452e-03 =  1.3279e+00 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.7967e+02 - 1.5537e-01 =  6.7951e+02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0911e+00 + 4.0240e-04 =  1.0915e+00 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.3446e+02 + 2.1344e-01 =  7.3467e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0831e+00 + 2.6374e-04 =  1.0834e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0750e+02 - 3.2891e-01 =  1.0717e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  6.8433e+01 - 4.7130e-01 =  6.7961e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2182e+02 + 9.4989e-02 =  1.2191e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.3788e+02 - 6.3646e-01 =  1.3725e+02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.1767e+02 + 3.7185e-01 =  1.1805e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  8.4714e+01 - 3.5242e+00 =  8.1190e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.1677e+02 - 9.0163e-01 =  1.1587e+02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4003e+02 + 4.3249e-02 =  1.4007e+02 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  3.4603e+00 + 8.7356e-03 =  3.4690e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  1.0674e+00 + 6.4145e-03 =  1.0738e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  1.5476e-02 - 6.1941e-05 =  1.5414e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.4840e+00 - 8.2618e-04 =  1.4832e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.4293e-02 - 8.7263e-05 =  1.4206e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  1.4497e+00 - 8.7989e-04 =  1.4488e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.0939e-01 + 2.3927e-06 =  1.0939e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  1.9074e+00 + 1.0125e-04 =  1.9075e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  1.6999e-01 + 4.0096e-06 =  1.7000e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  1.6828e+00 + 1.0170e-04 =  1.6829e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 6: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#======================================================================================================================#
+#| [92m                                  Optimized Geometries, Objective =  4.29049e+00                                  [0m |#
+#| [92m  System                       Bonds            Angles           Dihedrals         Impropers               Term.  [0m |#
+#| [92m                            RMSD   denom      RMSD   denom      RMSD   denom      RMSD   denom                    [0m |#
+#======================================================================================================================#
+9HXanthene                    0.019    0.01     0.022    0.03     0.076    0.20     0.005    0.20             4.290 
+------------------------------------------------------------------------------------------------------------------------
+
+#==========================================================================#
+#|                       Frequencies (wavenumbers)                        |#
+#|  Target: vibration  Type: Vibration_SMIRNOFF  Objective = 1.23345e+01  |#
+#|  Mode #            Reference   Calculated   Difference   Ref(dot)Calc  |#
+#==========================================================================#
+    0                   31.1817      34.1423       2.9606         0.9920 
+    1                  127.2863     135.9181       8.6318         0.9969 
+    2                  200.5311     227.3766      26.8455         0.9384 
+    3                  245.4174     234.1208     -11.2966         0.9373 
+    4                  258.8788     242.7866     -16.0922         0.9956 
+    5                  295.5887     302.8959       7.3072         0.9873 
+    6                  385.5805     341.4104     -44.1701         0.9888 
+    7                  413.3227     434.8851      21.5624         0.9689 
+    8                  461.1571     444.9444     -16.2127         0.9819 
+    9                  468.4759     457.4701     -11.0058         0.9890 
+    10                 553.9686     517.8090     -36.1596         0.9574 
+    11                 557.9183     531.7903     -26.1280         0.9530 
+    12                 559.2968     550.2673      -9.0295         0.9408 
+    13                 609.7540     614.8242       5.0702         0.0013 
+    14                 650.9588     628.4984     -22.4604         0.0039 
+    15                 691.9021     655.1196     -36.7825         0.7050 
+    16                 731.3959     698.5622     -32.8337         0.9530 
+    17                 748.6224     725.8898     -22.7326         0.0139 
+    18                 757.4865     728.1530     -29.3335         0.0118 
+    19                 793.4162     751.8192     -41.5970         0.0486 
+    20                 796.3137     755.4654     -40.8483         0.0486 
+    21                 829.9391     792.6634     -37.2757         0.9809 
+    22                 886.2937     868.5672     -17.7265         0.0060 
+    23                 898.9488     875.5148     -23.4340         0.3122 
+    24                 905.1053     889.0934     -16.0119         0.0848 
+    25                 931.8180     913.7884     -18.0296         0.0039 
+    26                 972.6908     953.3873     -19.3035         0.4828 
+    27                 981.1443    1003.3147      22.1704         0.0017 
+    28                1002.3531    1012.9996      10.6465         0.0024 
+    29                1002.6108    1046.3640      43.7532         0.0570 
+    30                1006.9971    1050.2456      43.2485         0.4930 
+    31                1043.4229    1104.1381      60.7152         0.0025 
+    32                1045.2039    1119.3947      74.1908         0.0157 
+    33                1101.4212    1121.7408      20.3196         0.0174 
+    34                1122.1664    1122.2106       0.0442         0.0230 
+    35                1175.8590    1182.0006       6.1416         0.3582 
+    36                1177.5535    1185.4336       7.8801         0.5051 
+    37                1180.0345    1211.9902      31.9557         0.0201 
+    38                1198.0738    1228.5131      30.4393         0.0122 
+    39                1209.4283    1265.6203      56.1920         0.4324 
+    40                1213.4868    1285.4923      72.0055         0.0123 
+    41                1233.7197    1290.2472      56.5275         0.0149 
+    42                1248.6007    1353.8471     105.2464         0.0133 
+    43                1296.1008    1409.3835     113.2827         0.1020 
+    44                1311.1904    1416.8770     105.6866         0.2812 
+    45                1325.6114    1494.0095     168.3981         0.0164 
+    46                1351.5363    1542.6982     191.1619         0.0014 
+    47                1456.1390    1595.8833     139.7443         0.8298 
+    48                1461.1551    1620.2829     159.1278         0.1962 
+    49                1467.0845    1638.8986     171.8141         0.0242 
+    50                1486.3167    1714.1968     227.8801         0.0913 
+    51                1498.4933    1752.1764     253.6831         0.0734 
+    52                1571.5221    1759.5657     188.0436         0.5488 
+    53                1591.5923    1767.0148     175.4225         0.7824 
+    54                1597.5166    1791.2094     193.6928         0.0364 
+    55                1620.6702    1833.0357     212.3655         0.0278 
+    56                2881.8985    2913.2663      31.3678         0.8759 
+    57                2918.3100    2976.8104      58.5004         0.8774 
+    58                3057.8158    3066.8817       9.0659         0.3529 
+    59                3058.9610    3066.9207       7.9597         0.3154 
+    60                3076.7507    3067.1323      -9.6184         0.1914 
+    61                3076.9099    3067.1560      -9.7539         0.1808 
+    62                3093.3546    3067.4977     -25.8569         0.0306 
+    63                3093.7472    3067.5138     -26.2334         0.0635 
+    64                3108.9905    3068.8722     -40.1183         0.7702 
+    65                3109.6289    3068.9657     -40.6632         0.7738 
+----------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+optgeo                         4.29049      1.000 [92m     4.29049e+00[0m ( -2.782e-01 ) 
+vibration                     12.33454      1.000 [92m     1.23345e+01[0m ( -1.513e+00 ) 
+Regularization                 4.48959      1.000 [91m     4.48959e+00[0m ( +1.524e+00 ) 
+Total                                             [92m     2.11146e+01[0m ( -2.674e-01 ) 
+-------------------------------------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_50.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     6   2.119e+00   4.174e-01   8.642e-01[92m   2.11146e+01[0m  -2.674e-01      0.986
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  1.84152934e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [ -3.01817222e-02 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  2.06912627e-03 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [ -2.15381757e-03 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [ -7.27648804e-05 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.59633396e-03 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [ -1.02683094e-04 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  6.03138946e-02 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [ -3.58344954e-02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  3.18558518e-03 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [ -8.93367501e-02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  2.37156527e-02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [ -5.55924828e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  7.04456358e-02 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [ -5.20583247e-02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [ -1.02318247e-03 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [ -6.43969394e-01 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [ -2.01473953e-03 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  1.08132510e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.95510485e-04 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.59369478e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  2.02581310e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [ -6.68514996e-06 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  3.13595566e-03 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  8.30052185e-04 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  6.43857143e-03 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 7.4033e-02)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [ -2.5058e-01 - 8.2358e-03 = -2.5881e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [ -2.0689e-01 + 1.6328e-02 = -1.9056e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [ -3.6148e-02 - 8.6682e-04 = -3.7015e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  4.8821e-01 + 2.4592e-03 =  4.9067e-01 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [ -4.8627e-02 + 2.8415e-05 = -4.8598e-02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.5341e-01 - 1.8487e-04 =  1.5322e-01 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  6.7440e-02 + 1.2698e-04 =  6.7567e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  3.3856e-01 - 1.6196e-02 =  3.2236e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [ -2.3296e-01 + 1.2413e-02 = -2.2054e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [ -2.0388e-01 - 1.4626e-03 = -2.0534e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.9122e-01 - 1.3109e-02 =  1.7811e-01 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [ -2.7523e-01 - 1.0167e-02 = -2.8540e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [ -1.9537e-01 + 3.6799e-02 = -1.5857e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [ -1.8810e+00 - 1.7892e-02 = -1.8989e+00 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [ -4.1322e-01 + 2.3993e-02 = -3.8923e-01 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  6.8860e-03 + 6.9559e-04 =  7.5816e-03 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [ -1.5596e-01 + 4.5179e-02 = -1.1078e-01 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  2.3805e-02 - 3.1364e-03 =  2.0668e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [ -2.8603e-02 - 6.0803e-04 = -2.9211e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [ -3.8016e-02 - 2.1413e-04 = -3.8230e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [ -7.9433e-02 - 6.9701e-03 = -8.6403e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [ -1.0158e-01 - 9.1424e-03 = -1.1072e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [ -5.3018e-04 + 2.0630e-05 = -5.0955e-04 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [ -5.3328e-03 - 1.4526e-03 = -6.7854e-03 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [ -4.5301e-04 - 4.0405e-04 = -8.5706e-04 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [ -8.1838e-03 - 3.0951e-03 = -1.1279e-02 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  9.3549e+02 - 8.2358e-02 =  9.3541e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.3979e+00 + 1.6328e-04 =  1.3981e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  8.9964e+02 - 8.6682e-03 =  8.9963e+02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3279e+00 + 2.4592e-05 =  1.3279e+00 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.7951e+02 + 2.8415e-04 =  6.7951e+02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0915e+00 - 1.8487e-06 =  1.0915e+00 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.3467e+02 + 1.2698e-03 =  7.3468e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0834e+00 - 1.6196e-04 =  1.0832e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0717e+02 + 1.2413e-01 =  1.0729e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  6.7961e+01 - 1.4626e-02 =  6.7947e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2191e+02 - 1.3109e-01 =  1.2178e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.3725e+02 - 1.0167e-01 =  1.3715e+02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.1805e+02 + 3.6799e-01 =  1.1841e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  8.1190e+01 - 1.7892e-01 =  8.1011e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.1587e+02 + 2.3993e-01 =  1.1611e+02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4007e+02 + 6.9559e-03 =  1.4008e+02 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  3.4690e+00 + 4.5179e-02 =  3.5142e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  1.0738e+00 - 3.1364e-03 =  1.0707e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  1.5414e-02 - 6.0803e-06 =  1.5408e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.4832e+00 - 2.1413e-05 =  1.4832e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.4206e-02 - 6.9701e-05 =  1.4136e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  1.4488e+00 - 9.1424e-04 =  1.4479e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.0939e-01 + 2.0630e-07 =  1.0939e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  1.9075e+00 - 1.4526e-04 =  1.9073e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  1.7000e-01 - 4.0405e-06 =  1.6999e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  1.6829e+00 - 3.0951e-04 =  1.6826e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 7: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#======================================================================================================================#
+#| [92m                                  Optimized Geometries, Objective =  4.31002e+00                                  [0m |#
+#| [92m  System                       Bonds            Angles           Dihedrals         Impropers               Term.  [0m |#
+#| [92m                            RMSD   denom      RMSD   denom      RMSD   denom      RMSD   denom                    [0m |#
+#======================================================================================================================#
+9HXanthene                    0.019    0.01     0.022    0.03     0.076    0.20     0.005    0.20             4.310 
+------------------------------------------------------------------------------------------------------------------------
+
+#==========================================================================#
+#|                       Frequencies (wavenumbers)                        |#
+#|  Target: vibration  Type: Vibration_SMIRNOFF  Objective = 1.22776e+01  |#
+#|  Mode #            Reference   Calculated   Difference   Ref(dot)Calc  |#
+#==========================================================================#
+    0                   31.1817      34.3862       3.2045         0.9920 
+    1                  127.2863     136.5856       9.2993         0.9969 
+    2                  200.5311     228.4496      27.9185         0.9383 
+    3                  245.4174     233.9764     -11.4410         0.9373 
+    4                  258.8788     243.6902     -15.1886         0.9956 
+    5                  295.5887     304.2910       8.7023         0.9874 
+    6                  385.5805     341.3309     -44.2496         0.9888 
+    7                  413.3227     434.5774      21.2547         0.9690 
+    8                  461.1571     445.4418     -15.7153         0.9819 
+    9                  468.4759     457.9855     -10.4904         0.9889 
+    10                 553.9686     518.8035     -35.1651         0.9576 
+    11                 557.9183     533.1012     -24.8171         0.9532 
+    12                 559.2968     550.2047      -9.0921         0.9409 
+    13                 609.7540     614.2581       4.5041         0.0013 
+    14                 650.9588     628.2965     -22.6623         0.0039 
+    15                 691.9021     654.9702     -36.9319         0.7078 
+    16                 731.3959     700.7006     -30.6953         0.9550 
+    17                 748.6224     725.5363     -23.0861         0.0139 
+    18                 757.4865     729.9142     -27.5723         0.0118 
+    19                 793.4162     760.6058     -32.8104         0.0490 
+    20                 796.3137     763.6123     -32.7014         0.0486 
+    21                 829.9391     792.6048     -37.3343         0.9810 
+    22                 886.2937     868.2146     -18.0791         0.0060 
+    23                 898.9488     875.0977     -23.8511         0.3123 
+    24                 905.1053     895.2650      -9.8403         0.0816 
+    25                 931.8180     923.4271      -8.3909         0.0038 
+    26                 972.6908     957.7669     -14.9239         0.4550 
+    27                 981.1443    1002.9628      21.8185         0.0017 
+    28                1002.3531    1012.5372      10.1841         0.0024 
+    29                1002.6108    1057.4440      54.8332         0.0571 
+    30                1006.9971    1061.1218      54.1247         0.4837 
+    31                1043.4229    1103.7112      60.2883         0.0026 
+    32                1045.2039    1118.7601      73.5562         0.0157 
+    33                1101.4212    1133.6188      32.1976         0.0174 
+    34                1122.1664    1134.0714      11.9050         0.0229 
+    35                1175.8590    1181.7196       5.8606         0.3666 
+    36                1177.5535    1184.8154       7.2619         0.5106 
+    37                1180.0345    1211.0727      31.0382         0.0200 
+    38                1198.0738    1227.7112      29.6374         0.0122 
+    39                1209.4283    1265.0678      55.6395         0.4317 
+    40                1213.4868    1285.5197      72.0329         0.0123 
+    41                1233.7197    1289.7131      55.9934         0.0148 
+    42                1248.6007    1352.8136     104.2129         0.0133 
+    43                1296.1008    1409.4218     113.3210         0.0980 
+    44                1311.1904    1416.1986     105.0082         0.2817 
+    45                1325.6114    1493.4611     167.8497         0.0162 
+    46                1351.5363    1541.7606     190.2243         0.0014 
+    47                1456.1390    1595.3320     139.1930         0.8283 
+    48                1461.1551    1619.2302     158.0751         0.1968 
+    49                1467.0845    1638.2104     171.1259         0.0242 
+    50                1486.3167    1714.1248     227.8081         0.0888 
+    51                1498.4933    1751.7790     253.2857         0.0729 
+    52                1571.5221    1758.9783     187.4562         0.5487 
+    53                1591.5923    1766.7641     175.1718         0.7800 
+    54                1597.5166    1790.4338     192.9172         0.0364 
+    55                1620.6702    1832.4257     211.7555         0.0278 
+    56                2881.8985    2913.0969      31.1984         0.8760 
+    57                2918.3100    2976.9845      58.6745         0.8773 
+    58                3057.8158    3066.8724       9.0566         0.3492 
+    59                3058.9610    3066.9110       7.9500         0.3114 
+    60                3076.7507    3067.1059      -9.6448         0.1913 
+    61                3076.9099    3067.1296      -9.7803         0.1801 
+    62                3093.3546    3067.4847     -25.8699         0.0340 
+    63                3093.7472    3067.5011     -26.2461         0.0669 
+    64                3108.9905    3068.8537     -40.1368         0.7706 
+    65                3109.6289    3068.9473     -40.6816         0.7743 
+----------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+optgeo                         4.31002      1.000 [91m     4.31002e+00[0m ( +1.953e-02 ) 
+vibration                     12.27757      1.000 [92m     1.22776e+01[0m ( -5.697e-02 ) 
+Regularization                 4.50125      1.000 [91m     4.50125e+00[0m ( +1.166e-02 ) 
+Total                                             [92m     2.10888e+01[0m ( -2.578e-02 ) 
+-------------------------------------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_51.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     7   2.122e+00   7.403e-02   5.152e-02[92m   2.10888e+01[0m  -2.578e-02      0.963
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  2.96680316e-04 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.18164761e-02 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  7.03954171e-05 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [ -3.26746398e-04 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  5.55886464e-05 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  7.67051235e-05 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  5.39568308e-04 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [ -8.23095540e-03 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.74120414e-02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  1.31832997e-04 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [ -3.72679762e-02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.71107789e-03 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.56758545e-02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  1.36268564e-03 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  2.09133704e-02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [ -5.51664077e-04 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [ -7.37792431e-03 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  7.10235996e-04 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [ -9.61510687e-04 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [ -6.15755597e-04 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [ -1.76874355e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [ -1.62041289e-03 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  5.02306617e-04 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [ -1.20969856e-03 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  3.07768350e-04 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [ -1.44669631e-03 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Convergence criterion reached for gradient norm (1.00e-01)
+Convergence criterion reached in step size (1.00e-01)
+Convergence criterion reached for objective function (1.00e-01)
+#========================================================#
+#| [92m               [0m[1mOptimization Converged[0m               [0m |#
+#| [92m           Final objective function value           [0m |#
+#| [92m  Full:  2.108884e+01  Un-penalized:  1.658759e+01  [0m |#
+#========================================================#
+#========================================================#
+#| [94m           Final optimization parameters:           [0m |#
+#========================================================#
+   0 [ -2.5881e-01 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [ -1.9056e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [ -3.7015e-02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  4.9067e-01 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [ -4.8598e-02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.5322e-01 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  6.7567e-02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  3.2236e-01 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [ -2.2054e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [ -2.0534e-01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.7811e-01 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [ -2.8540e-01 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [ -1.5857e-01 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [ -1.8989e+00 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [ -3.8923e-01 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  7.5816e-03 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [ -1.1078e-01 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  2.0668e-02 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [ -2.9211e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [ -3.8230e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [ -8.6403e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [ -1.1072e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [ -5.0955e-04 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [ -6.7854e-03 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [ -8.5706e-04 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [ -1.1279e-02 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+#========================================================#
+#| [94m             Final physical parameters:             [0m |#
+#========================================================#
+   0 [  9.3541e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.3981e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  8.9963e+02 ] : HarmonicBondForce/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3279e+00 ] : HarmonicBondForce/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.7951e+02 ] : HarmonicBondForce/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0915e+00 ] : HarmonicBondForce/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.3468e+02 ] : HarmonicBondForce/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0832e+00 ] : HarmonicBondForce/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0729e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  6.7947e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2178e+02 ] : HarmonicAngleForce/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.3715e+02 ] : HarmonicAngleForce/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.1841e+02 ] : HarmonicAngleForce/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  8.1011e+01 ] : HarmonicAngleForce/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.1611e+02 ] : HarmonicAngleForce/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4008e+02 ] : HarmonicAngleForce/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  3.5142e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  17 [  1.0707e+00 ] : PeriodicTorsionForce/Proper/k1/[*:1]~[#6X3:2]-[#8X2:3]-[*:4]
+  18 [  1.5408e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
+  19 [  1.4832e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.4136e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X3]
+  21 [  1.4479e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.0939e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
+  23 [  1.9073e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
+  24 [  1.6999e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H0+0:1]
+  25 [  1.6826e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H0+0:1]
+----------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_52.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#
