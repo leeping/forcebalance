@@ -65,13 +65,10 @@ class TestAmber99SB:
         setup any state specific to the execution of the given class (which usually contains tests).
         """
         tinkerpath = which('testgrad')
-        # try to find mdrun_d or gmx_d or mdrun or gmx
+        # try to find mdrun_d or gmx_d
+        # gmx should be built with config -DGMX_DOUBLE=ON
         gmxpath = which('mdrun_d') or which('gmx_d')
-        if gmxpath:
-            gmxsuffix = '_d'
-        else:
-            gmxsuffix = ''
-            gmxpath = which('mdrun') or which('gmx')
+        gmxsuffix = '_d'
         # self.logger.debug("\nBuilding options for target...\n")
         cls.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cls.cwd, "files", "amber_alaglu"))
