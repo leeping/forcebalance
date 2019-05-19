@@ -48,10 +48,8 @@ try:
     # QYD: name of class are modified to avoid colliding with ForceBalance Molecule
     from openforcefield.topology import Molecule as OffMolecule
     from openforcefield.topology import Topology as OffTopology
-    # Import the OpenEye toolkit
-    from openeye import oechem
 except:
-    warn_once("Failed to import openforcefield and/or OpenEye toolkit.")
+    warn_once("Failed to import openforcefield toolkit.")
 
 ## pdict is a useless variable if the force field is XML.
 pdict = "XML_Override"
