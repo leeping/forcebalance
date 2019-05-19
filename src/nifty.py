@@ -860,7 +860,7 @@ def createWorkQueue(wq_port, debug=True, name=package):
     global WORK_QUEUE
     if debug:
         work_queue.set_debug_flag('all')
-    WORK_QUEUE = work_queue.WorkQueue(port=wq_port, catalog=True, exclusive=False, shutdown=False)
+    WORK_QUEUE = work_queue.WorkQueue(port=wq_port)
     WORK_QUEUE.specify_name(name)
     #WORK_QUEUE.specify_keepalive_timeout(8640000)
     WORK_QUEUE.specify_keepalive_interval(8640000)
