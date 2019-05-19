@@ -45,34 +45,13 @@ except:
 try:
     # Import the SMIRNOFF forcefield engine and some useful tools
     from openforcefield.typing.engines.smirnoff import ForceField
-    # LPW: openforcefield's PME is different from openmm's PME
-    from openforcefield.typing.engines.smirnoff.forcefield import NoCutoff, PME
-    from openforcefield.utils import get_data_filename, extractPositionsFromOEMol, generateTopologyFromOEMol
+    # QYD: name of class are modified to avoid colliding with ForceBalance Molecule
+    from openforcefield.topology import Molecule as OffMolecule
+    from openforcefield.topology import Topology as OffTopology
     # Import the OpenEye toolkit
     from openeye import oechem
 except:
     warn_once("Failed to import openforcefield and/or OpenEye toolkit.")
-
-"""Dictionary for building parameter identifiers.  As usual they go like this:
-Bond/length/OW.HW
-The dictionary is two-layered because the same interaction type (Bond)
-could be under two different parent types (HarmonicBondForce, AmoebaHarmonicBondForce)"""
-suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
-                "HarmonicAngleForce" : {"Angle" : ["class1","class2","class3"],},
-                "PeriodicTorsionForce" : {"Proper" : ["class1","class2","class3","class4"],},
-                "NonbondedForce" : {"Atom": ["type"]},
-                "CustomNonbondedForce" : {"Atom": ["class"]},
-                "GBSAOBCForce" : {"Atom": ["type"]},
-                "AmoebaBondForce" : {"Bond" : ["class1","class2"]},
-                "AmoebaAngleForce" : {"Angle" : ["class1","class2","class3"]},
-                "AmoebaStretchBendForce" : {"StretchBend" : ["class1","class2","class3"]},
-                "AmoebaVdwForce" : {"Vdw" : ["class"]},
-                "AmoebaMultipoleForce" : {"Multipole" : ["type","kz","kx"], "Polarize" : ["type"]},
-                "AmoebaUreyBradleyForce" : {"UreyBradley" : ["class1","class2","class3"]},
-                "Residues.Residue" : {"VirtualSite" : ["index"]},
-                ## LPW's custom parameter definitions
-                "ForceBalance" : {"GB": ["type"]},
-                }
 
 ## pdict is a useless variable if the force field is XML.
 pdict = "XML_Override"
@@ -178,10 +157,10 @@ class SMIRNOFF(OpenMM):
         ## Create the OpenFF ForceField object.
         if hasattr(self, 'FF'):
             self.offxml = [self.FF.offxml]
-            self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml))
+            self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml), allow_cosmetic_attributes=True)
         else:
             self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
-            self.forcefield = ForceField(*self.offxml)
+            self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
 
         ## OpenMM options for setting up the System.
         self.mmopts = dict(mmopts)
@@ -198,26 +177,6 @@ class SMIRNOFF(OpenMM):
 
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
-        if pbc:
-            minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
-            self.SetPME = True
-            self.mmopts.setdefault('nonbondedMethod', PME)
-            nonbonded_cutoff = kwargs.get('nonbonded_cutoff', 8.5)
-            # Conversion to nanometers
-            nonbonded_cutoff /= 10
-            if nonbonded_cutoff > 0.05*(float(int(minbox - 1))):
-                warn_press_key("nonbonded_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (nonbonded_cutoff*10, minbox))
-
-            self.mmopts.setdefault('nonbondedCutoff', nonbonded_cutoff*nanometer)
-            self.mmopts.setdefault('useSwitchingFunction', True)
-            self.mmopts.setdefault('switchingDistance', (nonbonded_cutoff-0.1)*nanometer)
-            self.mmopts.setdefault('useDispersionCorrection', True)
-        else:
-            if 'nonbonded_cutoff' in kwargs or 'vdw_cutoff' in kwargs:
-                warn_press_key('No periodic boundary conditions, your provided nonbonded_cutoff and vdw_cutoff will not be used')
-            self.SetPME = False
-            self.mmopts.setdefault('nonbondedMethod', NoCutoff)
-            self.mmopts['removeCMMotion'] = False
 
         ## Generate OpenMM-compatible positions
         self.xyz_omms = []
@@ -269,30 +228,19 @@ class SMIRNOFF(OpenMM):
             self.simkwargs = kwargs
 
         self.mod = Modeller(self.pdb.topology, self.pdb.positions)
-        self.forcefield = ForceField(*self.offxml)
+        self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
         # This part requires the OpenEye tools but may be replaced
         # by RDKit when that support comes online.
-        oemols = []
+        openff_mols = []
         for fnm in self.mol2:
-            mol = oechem.OEGraphMol()
-            ifs = oechem.oemolistream(fnm)
-            oechem.OEReadMolecule(ifs, mol)
-            oechem.OETriposAtomNames(mol)
-            oemols.append(mol)
-        self.system = self.forcefield.createSystem(self.pdb.topology, oemols, **self.mmopts)
+            mol = OffMolecule.from_file(fnm) 
+            openff_mols.append(mol)
+        off_topology = OffTopology.from_openmm(self.pdb.topology, unique_molecules=openff_mols)
+        self.system = self.forcefield.create_openmm_system(off_topology)
 
         # Commenting out all virtual site stuff for now.
         # self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
-
-        for i in self.system.getForces():
-            if isinstance(i, NonbondedForce):
-                self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
-                if self.SetPME:
-                    i.setNonbondedMethod(i.PME)
-            if isinstance(i, AmoebaMultipoleForce):
-                if self.SetPME:
-                    i.setNonbondedMethod(i.PME)
 
         #----
         # If the virtual site parameters have changed,
