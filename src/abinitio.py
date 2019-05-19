@@ -357,7 +357,7 @@ class AbInitio(Target):
             if len(sline) == 0: continue
             elif sline[0] == 'ENERGY':
                 self.eqm.append(float(sline[1]))
-            elif sline[0] == 'FORCES':
+            elif sline[0] in ['FORCES', 'GRADIENT']:
                 self.fqm.append([float(i) for i in sline[1:]])
             elif sline[0] == 'ESPXYZ':
                 self.espxyz.append([float(i) for i in sline[1:]])
