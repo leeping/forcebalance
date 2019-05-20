@@ -1,5 +1,5 @@
 #======================================================================#
-#| [1m            Welcome to ForceBalance version 1.5.5! =D             [0m |#
+#| [1m            Welcome to ForceBalance version 1.6.0! =D             [0m |#
 #| [1m                 Force Field Optimization System                  [0m |#
 #| [1m                                                                  [0m |#
 #| [1m                             Authors:                             [0m |#
@@ -61,50 +61,48 @@ Reading force field from file: smirnoff99Frosst.offxml
 #=========================================================#
 #| [92m Starting parameter indices, physical values and IDs [0m |#
 #=========================================================#
-   0 [  1.6000e-01 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  2.5000e-01 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  1.5700e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  1.4870e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  1.5700e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  1.3870e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  3.0000e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  1.0940e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  1.9080e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  2.1040e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  1.7210e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  1.6000e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [  2.5000e-01 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  1.5700e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  1.4870e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  1.5700e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  1.3870e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [  5.2700e-05 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [  1.0940e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  1.9080e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  2.1040e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  1.7210e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 -----------------------------------------------------------
 #=========================================================#
 #| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
 #=========================================================#
-   PeriodicTorsionForce/Proper          : 2.50000e-01
-   NonbondedForce/Atom                  : 1.90800e+00
-   NonbondedForce/Atom/epsilon          : 1.00000e-01
-   PeriodicTorsionForce/Proper/k        : 1.00000e+00
-   NonbondedForce/Atom/rmin_half        : 1.00000e+00
+   ProperTorsions/Proper/k1             : 1.60000e-01
+   ProperTorsions/Proper/k2             : 2.50000e-01
+   ProperTorsions/Proper/k              : 1.00000e+00
+   vdW/Atom/epsilon                     : 1.00000e-01
+   vdW/Atom/rmin_half                   : 1.00000e+00
 -----------------------------------------------------------
 #========================================================#
 #| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
 #========================================================#
-   0 [    PeriodicTorsionForce/Proper/k  : 1.00000e+00 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [    PeriodicTorsionForce/Proper/k  : 1.00000e+00 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [    NonbondedForce/Atom/epsilon   : 1.00000e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [    NonbondedForce/Atom/rmin_half  : 1.00000e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [    NonbondedForce/Atom/epsilon   : 1.00000e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [    NonbondedForce/Atom/rmin_half  : 1.00000e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [    NonbondedForce/Atom/epsilon   : 1.00000e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [    NonbondedForce/Atom/epsilon   : 1.00000e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [    NonbondedForce/Atom/rmin_half  : 1.00000e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [    NonbondedForce/Atom/epsilon   : 1.00000e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [    NonbondedForce/Atom/rmin_half  : 1.00000e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [    ProperTorsions/Proper/k       : 1.00000e+00 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [    ProperTorsions/Proper/k       : 1.00000e+00 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [    vdW/Atom/epsilon              : 1.00000e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [    vdW/Atom/rmin_half            : 1.00000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [    vdW/Atom/epsilon              : 1.00000e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [    vdW/Atom/rmin_half            : 1.00000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [    vdW/Atom/epsilon              : 1.00000e-01 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [    vdW/Atom/epsilon              : 1.00000e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [    vdW/Atom/rmin_half            : 1.00000e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [    vdW/Atom/epsilon              : 1.00000e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [    vdW/Atom/rmin_half            : 1.00000e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #========================================================#
 #| [92m               Setup for force field                [0m |#
 #========================================================#
 fnms                      ['smirnoff99Frosst.offxml'] 
-priors                    OrderedDict([('NonbondedForce/Atom/epsilon', 0.1), ('PeriodicTorsionForce/Proper/k', 1.0), ('NonbondedForce/Atom/rmin_half', 1.0)]) 
+priors                    OrderedDict([('ProperTorsions/Proper/k', 1.0), ('vdW/Atom/epsilon', 0.1), ('vdW/Atom/rmin_half', 1.0)]) 
 ----------------------------------------------------------
-Backing up: optimize.tmp/ethanol-liquid to: optimize.bak/ethanol-liquid_0.tar.bz2
-/home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/targets/ethanol-liquid/ETH.mol2 -> /home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/optimize.tmp/ethanol-liquid/ETH.mol2
 Autodetected 256 molecules with 9 atoms each in liquid coordinates
 #========================================================#
 #| [92m         Setup for target ethanol-liquid :          [0m |#
@@ -156,8 +154,6 @@ use_cvib_intra            False
 use_cvib_inter            False 
 use_cni                   False 
 ----------------------------------------------------------
-Backing up: optimize.tmp/ethanol-torsiondrive to: optimize.bak/ethanol-torsiondrive_2.tar.bz2
-/home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/targets/ethanol-torsiondrive/ETH.mol2 -> /home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/optimize.tmp/ethanol-torsiondrive/ETH.mol2
 QM forces are not present, only fitting energies.
 #========================================================#
 #| [92m      Setup for target ethanol-torsiondrive :       [0m |#
@@ -221,10 +217,10 @@ input_file                optimize.in
 #|         Time steps: 50000 (eq) + 500000 (md)         |#
 #========================================================#
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/optimize.tmp/ethanol-liquid/iter_0000/298.15K-1.0atm/npt.out in another terminal window
+You may tail -f /home2/qyd/projects/forcebalance-dev/studies/017_smirnoff_ethanol/optimize.tmp/ethanol-liquid/iter_0000/298.15K-1.0atm/npt.out in another terminal window
 Executing process: [92mbash runcuda.sh python npt.py smirnoff 298.150 1.000[0m Output: npt.out
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/optimize.tmp/ethanol-liquid/iter_0000/320.03K-1.0atm/npt.out in another terminal window
+You may tail -f /home2/qyd/projects/forcebalance-dev/studies/017_smirnoff_ethanol/optimize.tmp/ethanol-liquid/iter_0000/320.03K-1.0atm/npt.out in another terminal window
 Executing process: [92mbash runcuda.sh python npt.py smirnoff 320.030 1.000[0m Output: npt.out
 Reading information from ./298.15K-1.0atm/npt_result.p
 Reading information from ./320.03K-1.0atm/npt_result.p
@@ -236,153 +232,151 @@ Physical quantity H_vap uses denominator =  3.0000
 #| [1;94m                          ethanol-liquid Density (kg m^-3)                            [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm   785.000      798.134 +- 0.642    13.134   0.50000   0.09584 
-      320.03      1.0 atm   766.000      775.046 +- 0.723     9.046   0.50000   0.04546 
+      298.15      1.0 atm   785.000      785.774 +- 0.564     0.774   0.50000   0.00033 
+      320.03      1.0 atm   766.000      759.551 +- 0.738    -6.449   0.50000   0.02311 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m  Density objective function:  0.141, Derivative:   [0m |#
+#| [92m  Density objective function:  0.023, Derivative:   [0m |#
 #========================================================#
-   0 [  5.1703e-02 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  5.2079e-03 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  3.0861e+00 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [ -1.0560e+01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  1.9721e+00 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [ -5.5170e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  4.7188e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  3.8700e+00 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  2.1244e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  4.0703e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [ -9.2123e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  9.4150e-02 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -7.6974e-02 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [ -1.0719e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  2.3708e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [ -6.5318e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  1.2428e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -1.3091e+00 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [ -1.0237e+00 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [ -6.4821e-01 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [ -1.4177e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  1.9946e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #==========================================================================================#
 #| [1;94m                 ethanol-liquid Enthalpy of Vaporization (kJ mol^-1)                  [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm    42.300       35.809 +- 0.187    -6.491   0.50000   2.34094 
-      320.03      1.0 atm    41.000       34.183 +- 0.217    -6.817   0.50000   2.58147 
+      298.15      1.0 atm    42.300       33.859 +- 0.183    -8.441   0.50000   3.95830 
+      320.03      1.0 atm    41.000       31.612 +- 0.197    -9.388   0.50000   4.89650 
 --------------------------------------------------------------------------------------------
 #======================================================================#
-#| [92m Enthalpy of Vaporization objective function:  4.922, Derivative: [0m |#
+#| [92m Enthalpy of Vaporization objective function:  8.855, Derivative: [0m |#
 #======================================================================#
-   0 [ -2.7419e-01 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  2.8082e+00 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [ -3.9576e+01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  1.1799e+01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [ -2.3114e+01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  6.4965e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [ -5.6655e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [ -2.2293e+01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [ -3.7228e+01 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  2.2273e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  1.2184e+02 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [ -7.1144e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -3.6692e+00 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [ -4.8188e+01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  1.6061e+01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [ -3.2446e+01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  3.8087e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -4.5184e+01 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [ -2.7841e+01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [ -4.5190e+01 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  8.9178e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  1.6561e+02 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ------------------------------------------------------------------------
 #====================================================================#
 #| [94m           ethanol-liquid Condensed Phase Properties:           [0m |#
 #| [94m  Property Name                Residual x Weight = Contribution [0m |#
 #====================================================================#
-Density                            0.14130    1.000    1.41302e-01 
-Enthalpy of Vaporization           4.92241    1.000    4.92241e+00 
-Total                                                  5.06371e+00 
+Density                            0.02344    1.000    2.34400e-02 
+Enthalpy of Vaporization           8.85480    1.000    8.85480e+00 
+Total                                                  8.87824e+00 
 ----------------------------------------------------------------------
 
 #============================================================================================#
-#|      Target: ethanol-torsiondrive  Type: AbInitio_SMIRNOFF  Objective = 1.26640e+00      |#
+#|      Target: ethanol-torsiondrive  Type: AbInitio_SMIRNOFF  Objective = 3.43600e-01      |#
 #|                    Difference   Denominator     Percent                                  |#
 #|  Observable        (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
 #============================================================================================#
-    Energy (kJ/mol)       2.0729        1.8420    112.5345%     1.2664    1.000     1.2664 
+    Energy (kJ/mol)       1.0797        1.8420     58.6174%     0.3436    1.000     0.3436 
 ----------------------------------------------------------------------------------------------
 #====================================================================#
 #| [94m                  Objective Function Breakdown                  [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
 #====================================================================#
-ethanol-liquid                 5.06371      1.000 [94m     5.06371e+00[0m 
-ethanol-torsiondrive           1.26640      1.000 [94m     1.26640e+00[0m 
+ethanol-liquid                 8.87824      1.000 [94m     8.87824e+00[0m 
+ethanol-torsiondrive           0.34360      1.000 [94m     3.43600e-01[0m 
 Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
-Total                                             [94m     6.33011e+00[0m 
+Total                                             [94m     9.22184e+00[0m 
 ----------------------------------------------------------------------
 
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     0   0.000e+00   0.000e+00   1.260e+02[1m   6.33011e+00[0m  -0.000e+00      0.000
+     0   0.000e+00   0.000e+00   1.923e+02[1m   9.22184e+00[0m   0.000e+00      0.000
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
 #========================================================#
-   0 [ -1.53842505e+00 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  6.12088452e+00 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [ -3.73723916e+01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [ -8.21442883e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [ -2.11496299e+01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  9.53856035e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [ -5.29846448e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [ -1.84457665e+01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [ -3.52382024e+01 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  5.70539526e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  1.11434468e+02 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [ -1.91684196e+00 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -2.67629012e+00 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [ -4.95617171e+01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  1.79726054e+01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [ -3.31134239e+01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  5.02555303e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -4.68861468e+01 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [ -2.88645067e+01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [ -4.58391477e+01 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  7.28559751e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  1.67167811e+02 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 7.19443748e+00 -4.91586284e-02  1.50736239e+00 -2.09378593e+00  9.14151967e-01 -1.09015998e+00  1.99418158e-02  1.20499793e+00  1.23893722e+00  6.18305882e-02 -4.63431396e+00 
--4.91586284e-02  8.00455563e+00 -1.27230288e+01  1.70265053e+00 -6.73686384e+00  1.89955872e+00 -1.84031077e-01 -6.55286527e+00 -1.11085337e+01 -2.04106842e-02  3.37829339e+01 
- 1.50736239e+00 -1.27230288e+01  1.96500784e+02 -1.66304905e+02  1.15830930e+02 -8.76887171e+01  2.83011221e+00  1.33584804e+02  1.74695451e+02  3.61972927e+00 -5.96543961e+02 
--2.09378593e+00  1.70265053e+00 -1.66304905e+02  4.24884721e+02 -1.05786718e+02  2.18244952e+02 -2.54708811e+00 -1.76787048e+02 -1.29935217e+02 -1.50275211e+01  5.13029046e+02 
- 9.14151967e-01 -6.73686384e+00  1.15830930e+02 -1.05786718e+02  7.14875784e+01 -5.51723805e+01  1.69601927e+00  8.11573927e+01  1.04210181e+02  2.35963576e+00 -3.57598270e+02 
--1.09015998e+00  1.89955872e+00 -8.76887171e+01  2.18244952e+02 -5.51723805e+01  1.15377897e+02 -1.33078738e+00 -9.20281353e+01 -6.79730231e+01 -7.83897339e+00  2.67342988e+02 
- 1.99418158e-02 -1.84031077e-01  2.83011221e+00 -2.54708811e+00  1.69601927e+00 -1.33078738e+00  2.04153829e+00  1.97515530e+00  2.55157865e+00  5.62441504e-02 -8.73455522e+00 
- 1.20499793e+00 -6.55286527e+00  1.33584804e+02 -1.76787048e+02  8.11573927e+01 -9.20281353e+01  1.97515530e+00  1.07731227e+02  1.15878624e+02  5.12083065e+00 -4.11108309e+02 
- 1.23893722e+00 -1.11085337e+01  1.74695451e+02 -1.29935217e+02  1.04210181e+02 -6.79730231e+01  2.55157865e+00  1.15878624e+02  1.61664963e+02  2.26497937e+00 -5.40226516e+02 
- 6.18305882e-02 -2.04106842e-02  3.61972927e+00 -1.50275211e+01  2.35963576e+00 -7.83897339e+00  5.62441504e-02  5.12083065e+00  2.26497937e+00  2.59503320e+00 -1.06578782e+01 
--4.63431396e+00  3.37829339e+01 -5.96543961e+02  5.13029046e+02 -3.57598270e+02  2.67342988e+02 -8.73455522e+00 -4.11108309e+02 -5.40226516e+02 -1.06578782e+01  1.84798695e+03 
+ 7.38355832e+00 -4.79699652e-03 -6.76271146e-03  3.64495336e+00  1.51822198e-01  2.13005520e+00 -9.19633566e-01 -7.33744590e-01  6.29017661e-01 -3.34252242e-01 -3.76806101e+00 
+-4.79699652e-03  8.10553114e+00  1.15380637e+01 -1.24191360e+01  8.44224895e+00 -4.58816559e+00  9.75234373e+00  8.64933498e+00  1.07443390e+01  4.84552822e-02 -4.30078021e+01 
+-6.76271146e-03  1.15380637e+01  1.85522152e+02 -1.65046769e+02  1.19865481e+02 -7.49042313e+01  1.64897786e+02  1.26259243e+02  1.47030376e+02  2.14812758e+00 -5.89598775e+02 
+ 3.64495336e+00 -1.24191360e+01 -1.65046769e+02  3.34056557e+02 -1.05390816e+02  1.68393824e+02 -1.45114866e+02 -1.50731314e+02 -9.52010393e+01 -1.12394545e+01  4.84032640e+02 
+ 1.51822198e-01  8.44224895e+00  1.19865481e+02 -1.05390816e+02  8.07334046e+01 -4.70268692e+01  1.08689225e+02  8.21223764e+01  9.73210311e+01  1.24898188e+00 -3.87977745e+02 
+ 2.13005520e+00 -4.58816559e+00 -7.49042313e+01  1.68393824e+02 -4.70268692e+01  8.89529890e+01 -6.40384699e+01 -7.17850752e+01 -3.84838469e+01 -6.02000161e+00  2.12416476e+02 
+-9.19633566e-01  9.75234373e+00  1.64897786e+02 -1.45114866e+02  1.08689225e+02 -6.40384699e+01  1.63496380e+02  1.13378343e+02  1.36814638e+02  2.85461506e+00 -5.17121930e+02 
+-7.33744590e-01  8.64933498e+00  1.26259243e+02 -1.50731314e+02  8.21223764e+01 -7.17850752e+01  1.13378343e+02  9.64495293e+01  9.39944373e+01  3.37888912e+00 -3.96625117e+02 
+ 6.29017661e-01  1.07443390e+01  1.47030376e+02 -9.52010393e+01  9.73210311e+01 -3.84838469e+01  1.36814638e+02  9.39944373e+01  1.29431234e+02  5.35727387e-02 -4.81592365e+02 
+-3.34252242e-01  4.84552822e-02  2.14812758e+00 -1.12394545e+01  1.24898188e+00 -6.02000161e+00  2.85461506e+00  3.37888912e+00  5.35727387e-02  2.63202609e+00 -2.21047330e+00 
+-3.76806101e+00 -4.30078021e+01 -5.89598775e+02  4.84032640e+02 -3.87977745e+02  2.12416476e+02 -5.17121930e+02 -3.96625117e+02 -4.81592365e+02 -2.21047330e+00  1.95613816e+03 
 ----------------------------------------------------------
 Calculating nonlinear optimization step
-Finding trust radius: H+0.0000*I, length 4.8984e-01 (target 2.5000e-01)
-Finding trust radius: H+9.0000*I, length 2.5480e-01 (target 2.5000e-01)
-Finding trust radius: H+61.6869*I, length 1.2179e-01 (target 2.5000e-01)
-Finding trust radius: H+9.0000*I, length 2.5480e-01 (target 2.5000e-01)
-Finding trust radius: H+23.5623*I, length 1.6904e-01 (target 2.5000e-01)
-Finding trust radius: H+3.4377*I, length 3.5401e-01 (target 2.5000e-01)
-Finding trust radius: H+12.3822*I, length 2.2260e-01 (target 2.5000e-01)
-Finding trust radius: H+7.9388*I, length 2.6802e-01 (target 2.5000e-01)
-Finding trust radius: H+9.6009*I, length 2.4808e-01 (target 2.5000e-01)
-Finding trust radius: H+9.4140*I, length 2.5012e-01 (target 2.5000e-01)
-Finding trust radius: H+9.4274*I, length 2.4997e-01 (target 2.5000e-01)
-Finding trust radius: H+9.4249*I, length 2.5000e-01 (target 2.5000e-01)
-Finding trust radius: H+9.4248*I, length 2.5000e-01 (target 2.5000e-01)
-Finding trust radius: H+9.4248*I, length 2.5000e-01 (target 2.5000e-01)
-Finding trust radius: H+9.4248*I, length 2.5000e-01 (target 2.5000e-01)
-Trust-radius step found (length 2.5000e-01),  9.4248e+00 added to Hessian diagonal
+Finding trust radius: H+0.0000*I, length 2.9691e-01 (target 2.5000e-01)
+Finding trust radius: H+9.0000*I, length 1.9187e-01 (target 2.5000e-01)
+Finding trust radius: H+23.5623*I, length 1.5632e-01 (target 2.5000e-01)
+Finding trust radius: H+0.0000*I, length 2.9691e-01 (target 2.5000e-01)
+Finding trust radius: H+3.4377*I, length 2.3188e-01 (target 2.5000e-01)
+Finding trust radius: H+9.0000*I, length 1.9187e-01 (target 2.5000e-01)
+Finding trust radius: H+1.7940*I, length 2.5504e-01 (target 2.5000e-01)
+Finding trust radius: H+1.8226*I, length 2.5454e-01 (target 2.5000e-01)
+Finding trust radius: H+2.1115*I, length 2.4978e-01 (target 2.5000e-01)
+Finding trust radius: H+2.0971*I, length 2.5001e-01 (target 2.5000e-01)
+Finding trust radius: H+2.0976*I, length 2.5000e-01 (target 2.5000e-01)
+Finding trust radius: H+2.0976*I, length 2.5000e-01 (target 2.5000e-01)
+Finding trust radius: H+2.0976*I, length 2.5000e-01 (target 2.5000e-01)
+Finding trust radius: H+2.0976*I, length 2.5000e-01 (target 2.5000e-01)
+Trust-radius step found (length 2.5000e-01),  2.0976e+00 added to Hessian diagonal
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
-   0 [  0.0000e+00 + 8.1284e-02 =  8.1284e-02 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  0.0000e+00 - 1.8483e-01 = -1.8483e-01 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  0.0000e+00 + 9.1357e-02 =  9.1357e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  0.0000e+00 + 9.8537e-02 =  9.8537e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  0.0000e+00 + 2.0159e-02 =  2.0159e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  0.0000e+00 + 8.1349e-03 =  8.1349e-03 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  0.0000e+00 + 1.0080e-03 =  1.0080e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  0.0000e+00 + 1.5168e-02 =  1.5168e-02 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  0.0000e+00 + 4.0470e-02 =  4.0470e-02 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  0.0000e+00 + 2.4193e-03 =  2.4193e-03 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  0.0000e+00 - 3.6449e-02 = -3.6449e-02 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  0.0000e+00 + 1.4509e-01 =  1.4509e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [  0.0000e+00 - 6.8703e-02 = -6.8703e-02 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  0.0000e+00 + 2.5272e-03 =  2.5272e-03 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  0.0000e+00 + 7.1777e-02 =  7.1777e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  0.0000e+00 + 2.3603e-02 =  2.3603e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  0.0000e+00 + 7.1831e-02 =  7.1831e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [  0.0000e+00 + 1.4127e-01 =  1.4127e-01 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [  0.0000e+00 - 4.4834e-03 = -4.4834e-03 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  0.0000e+00 + 5.0125e-02 =  5.0125e-02 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  0.0000e+00 + 1.8106e-03 =  1.8106e-03 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  0.0000e+00 - 5.7964e-02 = -5.7964e-02 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
-   0 [  1.6000e-01 + 8.1284e-02 =  2.4128e-01 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  2.5000e-01 - 1.8483e-01 =  6.5172e-02 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  1.5700e-02 + 9.1357e-03 =  2.4836e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  1.4870e+00 + 9.8537e-02 =  1.5855e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  1.5700e-02 + 2.0159e-03 =  1.7716e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  1.3870e+00 + 8.1349e-03 =  1.3951e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  3.0000e-01 + 1.0080e-04 =  3.0010e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  1.0940e-01 + 1.5168e-03 =  1.1092e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  1.9080e+00 + 4.0470e-02 =  1.9485e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  2.1040e-01 + 2.4193e-04 =  2.1064e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  1.7210e+00 - 3.6449e-02 =  1.6846e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  1.6000e-01 + 1.4509e-01 =  3.0509e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [  2.5000e-01 - 6.8703e-02 =  1.8130e-01 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  1.5700e-02 + 2.5272e-04 =  1.5953e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  1.4870e+00 + 7.1777e-02 =  1.5588e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  1.5700e-02 + 2.3603e-03 =  1.8060e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  1.3870e+00 + 7.1831e-02 =  1.4588e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [  5.2700e-05 + 1.4127e-02 =  1.4180e-02 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [  1.0940e-01 - 4.4834e-04 =  1.0895e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  1.9080e+00 + 5.0125e-02 =  1.9581e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  2.1040e-01 + 1.8106e-04 =  2.1058e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  1.7210e+00 - 5.7964e-02 =  1.6630e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
-Backing up optimize.sav -> optimize.bak/optimize_3.sav
 Input file with saved parameters: optimize.sav
 #========================================================#
 #| [94m     Iteration 1: Evaluating objective function     [0m |#
@@ -393,10 +387,10 @@ Input file with saved parameters: optimize.sav
 #|         Time steps: 50000 (eq) + 500000 (md)         |#
 #========================================================#
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/optimize.tmp/ethanol-liquid/iter_0001/298.15K-1.0atm/npt.out in another terminal window
+You may tail -f /home2/qyd/projects/forcebalance-dev/studies/017_smirnoff_ethanol/optimize.tmp/ethanol-liquid/iter_0001/298.15K-1.0atm/npt.out in another terminal window
 Executing process: [92mbash runcuda.sh python npt.py smirnoff 298.150 1.000[0m Output: npt.out
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/optimize.tmp/ethanol-liquid/iter_0001/320.03K-1.0atm/npt.out in another terminal window
+You may tail -f /home2/qyd/projects/forcebalance-dev/studies/017_smirnoff_ethanol/optimize.tmp/ethanol-liquid/iter_0001/320.03K-1.0atm/npt.out in another terminal window
 Executing process: [92mbash runcuda.sh python npt.py smirnoff 320.030 1.000[0m Output: npt.out
 Reading information from ./298.15K-1.0atm/npt_result.p
 Reading information from ./320.03K-1.0atm/npt_result.p
@@ -408,142 +402,142 @@ Physical quantity H_vap uses denominator =  3.0000
 #| [1;94m                          ethanol-liquid Density (kg m^-3)                            [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm   785.000      783.856 +- 0.570    -1.144   0.50000   0.00073 
-      320.03      1.0 atm   766.000      764.036 +- 0.704    -1.964   0.50000   0.00214 
+      298.15      1.0 atm   785.000      768.707 +- 0.608   -16.293   0.50000   0.14747 
+      320.03      1.0 atm   766.000      747.298 +- 0.615   -18.702   0.50000   0.19432 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m  Density objective function:  0.003, Derivative:   [0m |#
+#| [92m  Density objective function:  0.342, Derivative:   [0m |#
 #========================================================#
-   0 [  8.0673e-03 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [ -2.5407e-02 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [ -2.9109e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  1.5737e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [ -1.8072e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  6.8243e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [ -5.3795e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [ -4.2968e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [ -1.7404e-01 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [ -3.2904e-02 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  1.1846e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  1.7077e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -2.5837e-01 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [ -3.7732e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  1.5590e+01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [ -2.2493e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  8.8406e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -2.7136e-01 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [ -5.2715e+00 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [ -2.0251e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [ -4.9829e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  1.1483e+01 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #==========================================================================================#
 #| [1;94m                 ethanol-liquid Enthalpy of Vaporization (kJ mol^-1)                  [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm    42.300       42.326 +- 0.197     0.026   0.50000   0.00004 
-      320.03      1.0 atm    41.000       40.563 +- 0.197    -0.437   0.50000   0.01063 
+      298.15      1.0 atm    42.300       39.326 +- 0.189    -2.974   0.50000   0.49153 
+      320.03      1.0 atm    41.000       37.484 +- 0.219    -3.516   0.50000   0.68696 
 --------------------------------------------------------------------------------------------
 #======================================================================#
-#| [92m Enthalpy of Vaporization objective function:  0.011, Derivative: [0m |#
+#| [92m Enthalpy of Vaporization objective function:  1.178, Derivative: [0m |#
 #======================================================================#
-   0 [ -2.4497e-04 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  4.1558e-02 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [ -1.0525e+00 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  3.9819e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [ -7.2385e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  1.0344e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [ -1.6397e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [ -6.9029e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [ -1.2175e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  3.5345e-03 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  3.5666e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  2.4323e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -1.4012e+00 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [ -1.8754e+01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  5.4788e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [ -1.1268e+01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  2.1210e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -9.8260e-01 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [ -1.0403e+01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [ -1.6429e+01 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [ -1.5075e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  5.1405e+01 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ------------------------------------------------------------------------
 #====================================================================#
 #| [94m           ethanol-liquid Condensed Phase Properties:           [0m |#
 #| [94m  Property Name                Residual x Weight = Contribution [0m |#
 #====================================================================#
-Density                            0.00287    1.000    2.86887e-03 
-Enthalpy of Vaporization           0.01067    1.000    1.06701e-02 
-Total                                                  1.35390e-02 
+Density                            0.34179    1.000    3.41788e-01 
+Enthalpy of Vaporization           1.17849    1.000    1.17849e+00 
+Total                                                  1.52028e+00 
 ----------------------------------------------------------------------
 
 #============================================================================================#
-#|      Target: ethanol-torsiondrive  Type: AbInitio_SMIRNOFF  Objective = 5.15969e-01      |#
+#|      Target: ethanol-torsiondrive  Type: AbInitio_SMIRNOFF  Objective = 1.34181e-01      |#
 #|                    Difference   Denominator     Percent                                  |#
 #|  Observable        (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
 #============================================================================================#
-    Energy (kJ/mol)       1.3231        1.8420     71.8310%     0.5160    1.000     0.5160 
+    Energy (kJ/mol)       0.6747        1.8420     36.6307%     0.1342    1.000     0.1342 
 ----------------------------------------------------------------------------------------------
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-ethanol-liquid                 0.01354      1.000 [92m     1.35390e-02[0m ( -5.050e+00 ) 
-ethanol-torsiondrive           0.51597      1.000 [92m     5.15969e-01[0m ( -7.504e-01 ) 
+ethanol-liquid                 1.52028      1.000 [92m     1.52028e+00[0m ( -7.358e+00 ) 
+ethanol-torsiondrive           0.13418      1.000 [92m     1.34181e-01[0m ( -2.094e-01 ) 
 Regularization                 0.06250      1.000 [91m     6.25000e-02[0m ( +6.250e-02 ) 
-Total                                             [92m     5.92008e-01[0m ( -5.738e+00 ) 
+Total                                             [92m     1.71696e+00[0m ( -7.505e+00 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_11.offxml
+Creating the directory /home2/qyd/projects/forcebalance-dev/studies/017_smirnoff_ethanol/result/optimize to print the force field
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
 #========================================================================#
 
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     1   2.500e-01   2.500e-01   4.889e+00[92m   5.92008e-01[0m  -5.738e+00      1.002
+     1   2.500e-01   2.500e-01   7.580e+01[92m   1.71696e+00[0m  -7.505e+00      0.836
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
 #========================================================#
-   0 [ -7.43733613e-01 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  1.69029993e+00 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [ -1.75964828e+00 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  8.29818874e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [ -8.91004980e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  7.47877121e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [ -2.82448122e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [ -1.10501921e+00 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [ -1.39826035e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [ -8.68059251e-02 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  3.48871062e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  1.52249794e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -1.17538258e+00 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [ -2.27572363e+01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  2.08596457e+01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [ -1.34883806e+01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  1.10709823e+01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -9.86601884e-01 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [ -1.56850319e+01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [ -1.83607980e+01 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [ -6.61065407e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  6.24615846e+01 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 7.25913399e+00  2.33105160e-02 -2.90710378e+00  2.84828899e+00 -1.73356458e+00  1.32892874e+00 -4.27309804e-02 -2.07381187e+00 -2.58374935e+00  4.63151251e-02  1.06105466e+01 
- 2.33105160e-02  7.74309663e+00 -6.59080034e+00 -9.92566634e+00 -3.23028409e+00 -2.72606088e+00 -9.55280165e-02 -1.89502933e+00 -6.46920631e+00  1.49985442e-01  1.40264746e+01 
--2.90710378e+00 -6.59080034e+00  1.56408094e+02 -1.12634565e+02  9.79183346e+01 -4.87586026e+01  2.33331627e+00  1.07071327e+02  1.56783844e+02 -1.90425182e+00 -5.55810457e+02 
- 2.84828899e+00 -9.92566634e+00 -1.12634565e+02  4.54018781e+02 -7.22068844e+01  1.92521062e+02 -1.95939441e+00 -1.40108437e+02 -8.29269980e+01 -8.12677323e+00  4.51489890e+02 
--1.73356458e+00 -3.23028409e+00  9.79183346e+01 -7.22068844e+01  6.45062377e+01 -3.06388170e+01  1.48183450e+00  6.81406599e+01  1.00043539e+02 -1.18696917e+00 -3.53517296e+02 
- 1.32892874e+00 -2.72606088e+00 -4.87586026e+01  1.92521062e+02 -3.06388170e+01  8.50281663e+01 -8.46169009e-01 -6.00163274e+01 -3.53662665e+01 -3.49716190e+00  1.92919624e+02 
--4.27309804e-02 -9.55280165e-02  2.33331627e+00 -1.95939441e+00  1.48183450e+00 -8.46169009e-01  2.03554928e+00  1.66301513e+00  2.35558396e+00 -2.02185868e-02 -8.40866982e+00 
--2.07381187e+00 -1.89502933e+00  1.07071327e+02 -1.40108437e+02  6.81406599e+01 -6.00163274e+01  1.66301513e+00  8.67022255e+01  1.03753357e+02  3.06834589e-01 -3.93027186e+02 
--2.58374935e+00 -6.46920631e+00  1.56783844e+02 -8.29269980e+01  1.00043539e+02 -3.53662665e+01  2.35558396e+00  1.03753357e+02  1.65488698e+02 -2.63375158e+00 -5.60922180e+02 
- 4.63151251e-02  1.49985442e-01 -1.90425182e+00 -8.12677323e+00 -1.18696917e+00 -3.49716190e+00 -2.02185868e-02  3.06834589e-01 -2.63375158e+00  2.33365390e+00  6.67461056e+00 
- 1.06105466e+01  1.40264746e+01 -5.55810457e+02  4.51489890e+02 -3.53517296e+02  1.92919624e+02 -8.40866982e+00 -3.93027186e+02 -5.60922180e+02  6.67461056e+00  2.02715098e+03 
+ 7.32464215e+00 -1.41343935e-01 -2.79576487e+00  3.90673847e+00 -1.55405116e+00  2.35928675e+00 -2.10577097e-01 -2.24384166e+00 -2.17996482e+00 -1.29690280e-01  7.90499421e+00 
+-1.41343935e-01  8.16361552e+00  1.11422261e+01 -1.17407235e+01  7.51461563e+00 -4.89100958e+00  4.74001924e-01  8.22779591e+00  1.03112167e+01  2.01529052e-01 -3.65745078e+01 
+-2.79576487e+00  1.11422261e+01  1.73201424e+02 -1.29099563e+02  1.02743385e+02 -6.53246153e+01  9.32530962e+00  1.12259505e+02  1.42713239e+02  3.97517919e+00 -4.73442347e+02 
+ 3.90673847e+00 -1.17407235e+01 -1.29099563e+02  3.74161647e+02 -7.76082737e+01  2.07722061e+02 -8.21592482e+00 -1.44856499e+02 -8.32509161e+01 -1.18006612e+01  3.80762661e+02 
+-1.55405116e+00  7.51461563e+00  1.02743385e+02 -7.76082737e+01  6.38719744e+01 -3.89580451e+01  5.55451645e+00  6.74389517e+01  8.59332572e+01  2.35855699e+00 -2.85010238e+02 
+ 2.35928675e+00 -4.89100958e+00 -6.53246153e+01  2.07722061e+02 -3.89580451e+01  1.18851262e+02 -4.33389778e+00 -7.75268079e+01 -4.01145179e+01 -6.63298298e+00  1.93370495e+02 
+-2.10577097e-01  4.74001924e-01  9.32530962e+00 -8.21592482e+00  5.55451645e+00 -4.33389778e+00  2.53783362e+00  6.38480131e+00  7.68983348e+00  2.55726899e-01 -2.59514162e+01 
+-2.24384166e+00  8.22779591e+00  1.12259505e+02 -1.44856499e+02  6.74389517e+01 -7.75268079e+01  6.38480131e+00  8.88300651e+01  8.83972984e+01  4.52347965e+00 -3.16085920e+02 
+-2.17996482e+00  1.03112167e+01  1.42713239e+02 -8.32509161e+01  8.59332572e+01 -4.01145179e+01  7.68983348e+00  8.83972984e+01  1.23978516e+02  2.46400503e+00 -3.94983396e+02 
+-1.29690280e-01  2.01529052e-01  3.97517919e+00 -1.18006612e+01  2.35855699e+00 -6.63298298e+00  2.55726899e-01  4.52347965e+00  2.46400503e+00  2.38107091e+00 -1.15218817e+01 
+ 7.90499421e+00 -3.65745078e+01 -4.73442347e+02  3.80762661e+02 -2.85010238e+02  1.93370495e+02 -2.59514162e+01 -3.16085920e+02 -3.94983396e+02 -1.15218817e+01  1.32183689e+03 
 ----------------------------------------------------------
 Increasing trust radius to  3.0000e-01
 Calculating nonlinear optimization step
-Newton-Raphson step found (length 2.4284e-01)
+Newton-Raphson step found (length 1.9736e-01)
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
-   0 [  8.1284e-02 + 1.0468e-01 =  1.8596e-01 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [ -1.8483e-01 - 1.9518e-01 = -3.8001e-01 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  9.1357e-02 + 7.6229e-02 =  1.6759e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  9.8537e-02 + 4.0911e-03 =  1.0263e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  2.0159e-02 + 3.4042e-02 =  5.4201e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  8.1349e-03 - 2.0505e-02 = -1.2370e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  1.0080e-03 + 9.6875e-04 =  1.9767e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  1.5168e-02 + 3.6537e-02 =  5.1705e-02 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  4.0470e-02 - 2.5602e-03 =  3.7910e-02 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  2.4193e-03 + 7.7351e-03 =  1.0154e-02 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [ -3.6449e-02 + 3.3313e-02 = -3.1356e-03 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  1.4509e-01 + 3.5238e-02 =  1.8033e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -6.8703e-02 - 4.2373e-02 = -1.1108e-01 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  2.5272e-03 + 1.0614e-01 =  1.0867e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  7.1777e-02 + 3.2426e-02 =  1.0420e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  2.3603e-02 - 9.0134e-04 =  2.2701e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  7.1831e-02 - 7.0286e-02 =  1.5446e-03 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [  1.4127e-01 - 1.3334e-01 =  7.9333e-03 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [ -4.4834e-03 + 2.5375e-02 =  2.0892e-02 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  5.0125e-02 - 1.1483e-02 =  3.8642e-02 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  1.8106e-03 + 2.1404e-03 =  3.9510e-03 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [ -5.7964e-02 - 9.8361e-03 = -6.7800e-02 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
-   0 [  2.4128e-01 + 1.0468e-01 =  3.4596e-01 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  6.5172e-02 - 1.9518e-01 = -1.3001e-01 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  2.4836e-02 + 7.6229e-03 =  3.2459e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  1.5855e+00 + 4.0911e-03 =  1.5896e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  1.7716e-02 + 3.4042e-03 =  2.1120e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  1.3951e+00 - 2.0505e-02 =  1.3746e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  3.0010e-01 + 9.6875e-05 =  3.0020e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  1.1092e-01 + 3.6537e-03 =  1.1457e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  1.9485e+00 - 2.5602e-03 =  1.9459e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  2.1064e-01 + 7.7351e-04 =  2.1142e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  1.6846e+00 + 3.3313e-02 =  1.7179e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  3.0509e-01 + 3.5238e-02 =  3.4033e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [  1.8130e-01 - 4.2373e-02 =  1.3892e-01 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  1.5953e-02 + 1.0614e-02 =  2.6567e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  1.5588e+00 + 3.2426e-02 =  1.5912e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  1.8060e-02 - 9.0134e-05 =  1.7970e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  1.4588e+00 - 7.0286e-02 =  1.3885e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [  1.4180e-02 - 1.3334e-02 =  8.4603e-04 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [  1.0895e-01 + 2.5375e-03 =  1.1149e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  1.9581e+00 - 1.1483e-02 =  1.9466e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  2.1058e-01 + 2.1404e-04 =  2.1080e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  1.6630e+00 - 9.8361e-03 =  1.6532e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 Input file with saved parameters: optimize.sav
 #========================================================#
@@ -555,10 +549,10 @@ Input file with saved parameters: optimize.sav
 #|         Time steps: 50000 (eq) + 500000 (md)         |#
 #========================================================#
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/optimize.tmp/ethanol-liquid/iter_0002/298.15K-1.0atm/npt.out in another terminal window
+You may tail -f /home2/qyd/projects/forcebalance-dev/studies/017_smirnoff_ethanol/optimize.tmp/ethanol-liquid/iter_0002/298.15K-1.0atm/npt.out in another terminal window
 Executing process: [92mbash runcuda.sh python npt.py smirnoff 298.150 1.000[0m Output: npt.out
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/optimize.tmp/ethanol-liquid/iter_0002/320.03K-1.0atm/npt.out in another terminal window
+You may tail -f /home2/qyd/projects/forcebalance-dev/studies/017_smirnoff_ethanol/optimize.tmp/ethanol-liquid/iter_0002/320.03K-1.0atm/npt.out in another terminal window
 Executing process: [92mbash runcuda.sh python npt.py smirnoff 320.030 1.000[0m Output: npt.out
 Reading information from ./298.15K-1.0atm/npt_result.p
 Reading information from ./320.03K-1.0atm/npt_result.p
@@ -570,141 +564,141 @@ Physical quantity H_vap uses denominator =  3.0000
 #| [1;94m                          ethanol-liquid Density (kg m^-3)                            [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm   785.000      787.656 +- 0.500     2.656   0.50000   0.00392 
-      320.03      1.0 atm   766.000      768.084 +- 0.624     2.084   0.50000   0.00241 
+      298.15      1.0 atm   785.000      784.810 +- 0.642    -0.190   0.50000   0.00002 
+      320.03      1.0 atm   766.000      764.975 +- 0.636    -1.025   0.50000   0.00058 
 --------------------------------------------------------------------------------------------
 #========================================================#
-#| [92m  Density objective function:  0.006, Derivative:   [0m |#
+#| [92m  Density objective function:  0.001, Derivative:   [0m |#
 #========================================================#
-   0 [  1.7292e-02 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [ -1.1580e-02 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  4.5418e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [ -2.2599e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  2.3769e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [ -1.0748e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  7.3855e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  5.9121e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  1.7869e-01 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  3.9229e-02 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [ -2.0280e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  1.4810e-04 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [  5.6789e-03 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [ -1.7819e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  6.5551e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [ -9.9275e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  2.9168e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -6.1767e-03 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [ -2.0236e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [ -1.1435e-01 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [ -1.5317e-02 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  4.8555e-01 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #==========================================================================================#
 #| [1;94m                 ethanol-liquid Enthalpy of Vaporization (kJ mol^-1)                  [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm    42.300       42.654 +- 0.184     0.354   0.50000   0.00695 
-      320.03      1.0 atm    41.000       40.725 +- 0.208    -0.275   0.50000   0.00420 
+      298.15      1.0 atm    42.300       42.990 +- 0.189     0.690   0.50000   0.02645 
+      320.03      1.0 atm    41.000       40.948 +- 0.205    -0.052   0.50000   0.00015 
 --------------------------------------------------------------------------------------------
 #======================================================================#
-#| [92m Enthalpy of Vaporization objective function:  0.011, Derivative: [0m |#
+#| [92m Enthalpy of Vaporization objective function:  0.027, Derivative: [0m |#
 #======================================================================#
-   0 [  2.7479e-02 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [ -2.0336e-02 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  1.2611e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  8.7923e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  5.4157e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [ -7.4390e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  1.4944e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  7.1223e-02 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  1.3420e-01 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [ -5.6917e-03 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [ -4.5580e-01 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  3.9147e-02 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [  6.5850e-02 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  1.7038e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [ -8.8851e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  1.0381e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [ -4.3073e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -9.9753e-02 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [  1.1199e+00 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  1.6159e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [ -1.0824e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [ -7.7183e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ------------------------------------------------------------------------
 #====================================================================#
 #| [94m           ethanol-liquid Condensed Phase Properties:           [0m |#
 #| [94m  Property Name                Residual x Weight = Contribution [0m |#
 #====================================================================#
-Density                            0.00633    1.000    6.33055e-03 
-Enthalpy of Vaporization           0.01115    1.000    1.11523e-02 
-Total                                                  1.74828e-02 
+Density                            0.00060    1.000    6.03763e-04 
+Enthalpy of Vaporization           0.02660    1.000    2.65998e-02 
+Total                                                  2.72036e-02 
 ----------------------------------------------------------------------
 
 #============================================================================================#
-#|      Target: ethanol-torsiondrive  Type: AbInitio_SMIRNOFF  Objective = 1.00741e-01      |#
+#|      Target: ethanol-torsiondrive  Type: AbInitio_SMIRNOFF  Objective = 7.82871e-02      |#
 #|                    Difference   Denominator     Percent                                  |#
 #|  Observable        (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
 #============================================================================================#
-    Energy (kJ/mol)       0.5847        1.8420     31.7398%     0.1007    1.000     0.1007 
+    Energy (kJ/mol)       0.5154        1.8420     27.9798%     0.0783    1.000     0.0783 
 ----------------------------------------------------------------------------------------------
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-ethanol-liquid                 0.01748      1.000 [91m     1.74828e-02[0m ( +3.944e-03 ) 
-ethanol-torsiondrive           0.10074      1.000 [92m     1.00741e-01[0m ( -4.152e-01 ) 
-Regularization                 0.22493      1.000 [91m     2.24925e-01[0m ( +1.624e-01 ) 
-Total                                             [92m     3.43149e-01[0m ( -2.489e-01 ) 
+ethanol-liquid                 0.02720      1.000 [92m     2.72036e-02[0m ( -1.493e+00 ) 
+ethanol-torsiondrive           0.07829      1.000 [92m     7.82871e-02[0m ( -5.589e-02 ) 
+Regularization                 0.07465      1.000 [91m     7.46452e-02[0m ( +1.215e-02 ) 
+Total                                             [92m     1.80136e-01[0m ( -1.537e+00 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_12.offxml
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_1.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
 #========================================================================#
 
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     2   4.743e-01   2.428e-01   4.457e+00[92m   3.43149e-01[0m  -2.489e-01      0.985
+     2   2.732e-01   1.974e-01   8.067e+00[92m   1.80136e-01[0m  -1.537e+00      0.985
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
 #========================================================#
-   0 [  2.61897268e-02 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  4.47471916e-03 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  6.61851132e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [ -2.69066850e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  3.86593982e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [ -1.20619648e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  9.56776263e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  7.60437630e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  3.56144714e-01 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  1.87459951e-02 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [ -3.14285385e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  1.79404106e-02 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [  1.08978046e-01 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  1.63470745e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [ -2.92960278e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  9.69695162e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [ -1.63084270e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -1.04679082e-01 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [  9.59203419e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  1.57782710e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [ -1.28018910e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [ -7.60914681e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 7.24274049e+00 -1.21462245e-01  2.28215640e+00 -4.10949110e+00  1.43989481e+00 -1.74697194e+00  3.59239686e-02  2.01415531e+00  2.32296904e+00  7.46928611e-02 -8.52669467e+00 
--1.21462245e-01  7.46881349e+00 -7.45379180e+00  4.07160446e-01 -3.84604043e+00  1.54491323e+00 -1.21775042e-01 -4.40962286e+00 -7.01679097e+00 -3.57894712e-01  1.55928524e+01 
- 2.28215640e+00 -7.45379180e+00  1.25909319e+02 -1.31427695e+02  7.79530345e+01 -5.11176846e+01  2.00729691e+00  9.53255738e+01  1.34323885e+02  3.88559991e+00 -4.08519915e+02 
--4.10949110e+00  4.07160446e-01 -1.31427695e+02  4.38197060e+02 -7.59684490e+01  1.98652417e+02 -2.12378930e+00 -1.41741122e+02 -9.36954996e+01 -8.25358670e+00  5.24102376e+02 
- 1.43989481e+00 -3.84604043e+00  7.79530345e+01 -7.59684490e+01  5.14594986e+01 -2.82446909e+01  1.26421925e+00  5.91140625e+01  8.61891607e+01  2.30781447e+00 -2.56320243e+02 
--1.74697194e+00  1.54491323e+00 -5.11176846e+01  1.98652417e+02 -2.82446909e+01  9.52084940e+01 -8.23950751e-01 -5.89887350e+01 -3.02286330e+01 -3.65425280e+00  2.10956951e+02 
- 3.59239686e-02 -1.21775042e-01  2.00729691e+00 -2.12378930e+00  1.26421925e+00 -8.23950751e-01  2.03266483e+00  1.54387479e+00  2.17596322e+00  6.19199398e-02 -6.64271409e+00 
- 2.01415531e+00 -4.40962286e+00  9.53255738e+01 -1.41741122e+02  5.91140625e+01 -5.89887350e+01  1.54387479e+00  8.09208882e+01  9.68062416e+01  3.53531565e+00 -3.27257690e+02 
- 2.32296904e+00 -7.01679097e+00  1.34323885e+02 -9.36954996e+01  8.61891607e+01 -3.02286330e+01  2.17596322e+00  9.68062416e+01  1.57109052e+02  3.46108324e+00 -4.30296788e+02 
- 7.46928611e-02 -3.57894712e-01  3.88559991e+00 -8.25358670e+00  2.30781447e+00 -3.65425280e+00  6.19199398e-02  3.53531565e+00  3.46108324e+00  2.20329800e+00 -1.34361859e+01 
--8.52669467e+00  1.55928524e+01 -4.08519915e+02  5.24102376e+02 -2.56320243e+02  2.10956951e+02 -6.64271409e+00 -3.27257690e+02 -4.30296788e+02 -1.34361859e+01  1.39396040e+03 
+ 7.22785530e+00  5.17141350e-02  1.19729632e+00  1.53813031e+00  9.16209804e-01  8.17191205e-01 -2.24005760e-01  4.88190933e-01  1.50353027e+00 -1.84575443e-01 -6.71525465e+00 
+ 5.17141350e-02  7.75066902e+00  6.42248769e+00 -5.17619464e+00  5.12449191e+00 -3.43529698e-01 -2.15012064e+00  4.74286204e+00  7.76167300e+00 -7.94507958e-01 -3.86707122e+01 
+ 1.19729632e+00  6.42248769e+00  1.66361415e+02 -1.80048125e+02  1.05543936e+02 -7.02359247e+01 -1.62608944e+01  1.22361522e+02  1.51655498e+02 -7.09637517e+00 -6.95453559e+02 
+ 1.53813031e+00 -5.17619464e+00 -1.80048125e+02  5.41452904e+02 -1.02825390e+02  2.35173606e+02  1.95874490e+00 -1.85431666e+02 -1.28426154e+02 -7.50081626e+00  6.05942236e+02 
+ 9.16209804e-01  5.12449191e+00  1.05543936e+02 -1.02825390e+02  7.06967280e+01 -3.84883730e+01 -1.15761533e+01  7.67090323e+01  9.92927760e+01 -5.22129761e+00 -4.53951107e+02 
+ 8.17191205e-01 -3.43529698e-01 -7.02359247e+01  2.35173606e+02 -3.84883730e+01  1.06376555e+02 -1.31371799e+00 -7.59752803e+01 -4.65949502e+01 -4.21382048e+00  2.21964680e+02 
+-2.24005760e-01 -2.15012064e+00 -1.62608944e+01  1.95874490e+00 -1.15761533e+01 -1.31371799e+00  5.11245049e+00 -9.78625350e+00 -1.73665968e+01  1.55811939e+00  7.86586566e+01 
+ 4.88190933e-01  4.74286204e+00  1.22361522e+02 -1.85431666e+02  7.67090323e+01 -7.59752803e+01 -9.78625350e+00  1.00826567e+02  1.07331872e+02 -3.00599947e+00 -4.94749843e+02 
+ 1.50353027e+00  7.76167300e+00  1.51655498e+02 -1.28426154e+02  9.92927760e+01 -4.65949502e+01 -1.73665968e+01  1.07331872e+02  1.46770220e+02 -8.37692365e+00 -6.61968750e+02 
+-1.84575443e-01 -7.94507958e-01 -7.09637517e+00 -7.50081626e+00 -5.22129761e+00 -4.21382048e+00  1.55811939e+00 -3.00599947e+00 -8.37692365e+00  3.03667291e+00  3.80710169e+01 
+-6.71525465e+00 -3.86707122e+01 -6.95453559e+02  6.05942236e+02 -4.53951107e+02  2.21964680e+02  7.86586566e+01 -4.94749843e+02 -6.61968750e+02  3.80710169e+01  3.04233284e+03 
 ----------------------------------------------------------
 Calculating nonlinear optimization step
-Newton-Raphson step found (length 5.4284e-02)
+Newton-Raphson step found (length 7.3600e-02)
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
-   0 [  1.8596e-01 + 6.3951e-04 =  1.8660e-01 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [ -3.8001e-01 + 1.6071e-02 = -3.6394e-01 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  1.6759e-01 + 1.4594e-02 =  1.8218e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  1.0263e-01 + 6.7748e-03 =  1.0940e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  5.4201e-02 + 4.8720e-03 =  5.9073e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [ -1.2370e-02 - 1.8512e-02 = -3.0882e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  1.9767e-03 + 1.1260e-03 =  3.1027e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  5.1705e-02 + 2.0770e-02 =  7.2474e-02 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  3.7910e-02 + 3.1898e-02 =  6.9808e-02 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  1.0154e-02 + 1.0665e-02 =  2.0819e-02 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [ -3.1356e-03 + 2.2337e-02 =  1.9201e-02 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  1.8033e-01 + 1.0173e-03 =  1.8134e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -1.1108e-01 - 1.0552e-02 = -1.2163e-01 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  1.0867e-01 - 1.2746e-02 =  9.5920e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  1.0420e-01 - 1.8885e-02 =  8.5317e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  2.2701e-02 + 3.7151e-02 =  5.9852e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  1.5446e-03 + 3.6905e-02 =  3.8450e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [  7.9333e-03 - 3.7193e-02 = -2.9259e-02 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [  2.0892e-02 + 1.1305e-02 =  3.2197e-02 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  3.8642e-02 + 1.8873e-02 =  5.7516e-02 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  3.9510e-03 - 2.6191e-03 =  1.3319e-03 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [ -6.7800e-02 + 1.3007e-02 = -5.4793e-02 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
-   0 [  3.4596e-01 + 6.3951e-04 =  3.4660e-01 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [ -1.3001e-01 + 1.6071e-02 = -1.1394e-01 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  3.2459e-02 + 1.4594e-03 =  3.3918e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  1.5896e+00 + 6.7748e-03 =  1.5964e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  2.1120e-02 + 4.8720e-04 =  2.1607e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  1.3746e+00 - 1.8512e-02 =  1.3561e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  3.0020e-01 + 1.1260e-04 =  3.0031e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  1.1457e-01 + 2.0770e-03 =  1.1665e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  1.9459e+00 + 3.1898e-02 =  1.9778e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  2.1142e-01 + 1.0665e-03 =  2.1248e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  1.7179e+00 + 2.2337e-02 =  1.7402e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  3.4033e-01 + 1.0173e-03 =  3.4134e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [  1.3892e-01 - 1.0552e-02 =  1.2837e-01 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  2.6567e-02 - 1.2746e-03 =  2.5292e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  1.5912e+00 - 1.8885e-02 =  1.5723e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  1.7970e-02 + 3.7151e-03 =  2.1685e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  1.3885e+00 + 3.6905e-02 =  1.4255e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [  8.4603e-04 - 8.4603e-04 =  0.0000e+00 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [  1.1149e-01 + 1.1305e-03 =  1.1262e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  1.9466e+00 + 1.8873e-02 =  1.9655e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  2.1080e-01 - 2.6191e-04 =  2.1053e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  1.6532e+00 + 1.3007e-02 =  1.6662e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 Input file with saved parameters: optimize.sav
 #========================================================#
@@ -716,10 +710,10 @@ Input file with saved parameters: optimize.sav
 #|         Time steps: 50000 (eq) + 500000 (md)         |#
 #========================================================#
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/optimize.tmp/ethanol-liquid/iter_0003/298.15K-1.0atm/npt.out in another terminal window
+You may tail -f /home2/qyd/projects/forcebalance-dev/studies/017_smirnoff_ethanol/optimize.tmp/ethanol-liquid/iter_0003/298.15K-1.0atm/npt.out in another terminal window
 Executing process: [92mbash runcuda.sh python npt.py smirnoff 298.150 1.000[0m Output: npt.out
 Running condensed phase simulation locally.
-You may tail -f /home/leeping/src/forcebalance/studies/017_smirnoff_ethanol/linear/optimize.tmp/ethanol-liquid/iter_0003/320.03K-1.0atm/npt.out in another terminal window
+You may tail -f /home2/qyd/projects/forcebalance-dev/studies/017_smirnoff_ethanol/optimize.tmp/ethanol-liquid/iter_0003/320.03K-1.0atm/npt.out in another terminal window
 Executing process: [92mbash runcuda.sh python npt.py smirnoff 320.030 1.000[0m Output: npt.out
 Reading information from ./298.15K-1.0atm/npt_result.p
 Reading information from ./320.03K-1.0atm/npt_result.p
@@ -731,147 +725,147 @@ Physical quantity H_vap uses denominator =  3.0000
 #| [1;94m                          ethanol-liquid Density (kg m^-3)                            [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm   785.000      784.450 +- 0.477    -0.550   0.50000   0.00017 
-      320.03      1.0 atm   766.000      767.084 +- 0.472     1.084   0.50000   0.00065 
+      298.15      1.0 atm   785.000      784.447 +- 0.639    -0.553   0.50000   0.00017 
+      320.03      1.0 atm   766.000      765.006 +- 0.565    -0.994   0.50000   0.00055 
 --------------------------------------------------------------------------------------------
 #========================================================#
 #| [92m  Density objective function:  0.001, Derivative:   [0m |#
 #========================================================#
-   0 [  5.8781e-03 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [ -3.7308e-04 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  4.3369e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [ -3.4708e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  2.7387e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [ -1.4199e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  1.4194e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  7.3979e-02 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [ -3.7502e-02 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  3.3838e-03 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [ -3.2550e-01 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [ -5.1090e-03 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -7.4508e-03 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [ -1.8809e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  6.8607e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [ -1.0850e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  3.4776e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -3.4137e-05 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [ -2.1764e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [ -8.1400e-02 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [ -1.1036e-02 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  6.6750e-01 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #==========================================================================================#
 #| [1;94m                 ethanol-liquid Enthalpy of Vaporization (kJ mol^-1)                  [0m |#
 #| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
 #==========================================================================================#
-      298.15      1.0 atm    42.300       42.134 +- 0.178    -0.166   0.50000   0.00152 
-      320.03      1.0 atm    41.000       40.849 +- 0.202    -0.151   0.50000   0.00127 
+      298.15      1.0 atm    42.300       42.581 +- 0.200     0.281   0.50000   0.00440 
+      320.03      1.0 atm    41.000       40.645 +- 0.188    -0.355   0.50000   0.00700 
 --------------------------------------------------------------------------------------------
 #======================================================================#
-#| [92m Enthalpy of Vaporization objective function:  0.003, Derivative: [0m |#
+#| [92m Enthalpy of Vaporization objective function:  0.011, Derivative: [0m |#
 #======================================================================#
-   0 [ -6.2786e-03 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  4.2172e-02 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [ -8.7500e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  2.6022e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [ -5.5726e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  1.0175e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [ -1.3827e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [ -6.0210e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [ -9.6768e-01 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [ -2.0978e-02 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  2.7287e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [ -8.1282e-03 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -3.5649e-02 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [ -1.7963e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  1.1030e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [ -5.4167e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [ -2.8442e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [  2.3033e-04 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [ -5.1630e-02 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [ -1.4912e-01 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [ -2.0930e-02 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [ -1.5195e-01 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ------------------------------------------------------------------------
 #====================================================================#
 #| [94m           ethanol-liquid Condensed Phase Properties:           [0m |#
 #| [94m  Property Name                Residual x Weight = Contribution [0m |#
 #====================================================================#
-Density                            0.00082    1.000    8.20136e-04 
-Enthalpy of Vaporization           0.00279    1.000    2.79321e-03 
-Total                                                  3.61335e-03 
+Density                            0.00072    1.000    7.18042e-04 
+Enthalpy of Vaporization           0.01139    1.000    1.13928e-02 
+Total                                                  1.21108e-02 
 ----------------------------------------------------------------------
 
 #============================================================================================#
-#|      Target: ethanol-torsiondrive  Type: AbInitio_SMIRNOFF  Objective = 8.82264e-02      |#
+#|      Target: ethanol-torsiondrive  Type: AbInitio_SMIRNOFF  Objective = 7.71704e-02      |#
 #|                    Difference   Denominator     Percent                                  |#
 #|  Observable        (Calc-Ref)     RMS (Ref)   Difference       Term   x Wt =   Contrib.  |#
 #============================================================================================#
-    Energy (kJ/mol)       0.5471        1.8420     29.7029%     0.0882    1.000     0.0882 
+    Energy (kJ/mol)       0.5117        1.8420     27.7796%     0.0772    1.000     0.0772 
 ----------------------------------------------------------------------------------------------
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-ethanol-liquid                 0.00361      1.000 [92m     3.61335e-03[0m ( -1.387e-02 ) 
-ethanol-torsiondrive           0.08823      1.000 [92m     8.82264e-02[0m ( -1.252e-02 ) 
-Regularization                 0.22781      1.000 [91m     2.27811e-01[0m ( +2.886e-03 ) 
-Total                                             [92m     3.19650e-01[0m ( -2.350e-02 ) 
+ethanol-liquid                 0.01211      1.000 [92m     1.21108e-02[0m ( -1.509e-02 ) 
+ethanol-torsiondrive           0.07717      1.000 [92m     7.71704e-02[0m ( -1.117e-03 ) 
+Regularization                 0.07742      1.000 [91m     7.74246e-02[0m ( +2.779e-03 ) 
+Total                                             [92m     1.66706e-01[0m ( -1.343e-02 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_13.offxml
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_2.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
 #========================================================================#
 
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     3   4.773e-01   5.428e-02   2.274e+00[92m   3.19650e-01[0m  -2.350e-02      1.734
+     3   2.783e-01   7.360e-02   8.690e-01[92m   1.66706e-01[0m  -1.343e-02      0.662
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
 #========================================================#
-   0 [ -2.49814710e-02 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [  4.03797512e-02 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [ -7.19475306e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [ -6.05939985e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [ -4.23688235e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [ -1.31233753e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [ -9.44445810e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [ -3.88486948e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [ -8.97039945e-01 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [ -1.26765747e-02 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  1.76954863e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [ -2.35795798e-02 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -4.05551710e-02 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [ -1.21447649e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  7.12662566e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [ -5.70345690e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  3.65204756e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -5.83223248e-02 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [ -2.04874214e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [ -1.15484454e-01 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [ -4.07347857e-02 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  1.82627757e-01 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 7.20729743e+00 -1.11692810e-01  1.43561255e+00 -3.86462160e+00  9.64103384e-01 -1.47669779e+00  2.80027715e-02  1.46670833e+00  9.53285123e-01  5.65028101e-02 -6.47963452e+00 
--1.11692810e-01  7.70614812e+00 -9.09253361e+00  1.01536546e+00 -4.66243447e+00  2.51749710e+00 -1.52100874e-01 -5.63128433e+00 -7.52144796e+00 -4.72510603e-01  2.04095624e+01 
- 1.43561255e+00 -9.09253361e+00  1.52251000e+02 -1.12061474e+02  9.53296513e+01 -4.48294272e+01  2.44904721e+00  1.12102948e+02  1.51028203e+02  4.59619757e+00 -4.89540926e+02 
--3.86462160e+00  1.01536546e+00 -1.12061474e+02  4.52377173e+02 -7.30285955e+01  1.74931712e+02 -2.22745109e+00 -1.32388433e+02 -3.93376744e+01 -7.81307888e+00  5.06039042e+02 
- 9.64103384e-01 -4.66243447e+00  9.53296513e+01 -7.30285955e+01  6.27970979e+01 -2.85450045e+01  1.55223798e+00  7.14718183e+01  9.61871621e+01  2.88131627e+00 -3.12559322e+02 
--1.47669779e+00  2.51749710e+00 -4.48294272e+01  1.74931712e+02 -2.85450045e+01  7.13954127e+01 -8.95832656e-01 -5.20971154e+01 -1.52136883e+01 -3.16407596e+00  1.98751489e+02 
- 2.80027715e-02 -1.52100874e-01  2.44904721e+00 -2.22745109e+00  1.55223798e+00 -8.95832656e-01  2.04057668e+00  1.88017302e+00  2.37105758e+00  7.94504642e-02 -8.15532854e+00 
- 1.46670833e+00 -5.63128433e+00  1.12102948e+02 -1.32388433e+02  7.14718183e+01 -5.20971154e+01  1.88017302e+00  9.21609396e+01  1.03173175e+02  3.98970821e+00 -3.84596138e+02 
- 9.53285123e-01 -7.52144796e+00  1.51028203e+02 -3.93376744e+01  9.61871621e+01 -1.52136883e+01  2.37105758e+00  1.03173175e+02  1.70518560e+02  3.60674488e+00 -4.66846236e+02 
- 5.65028101e-02 -4.72510603e-01  4.59619757e+00 -7.81307888e+00  2.88131627e+00 -3.16407596e+00  7.94504642e-02  3.98970821e+00  3.60674488e+00  2.21096366e+00 -1.61501906e+01 
--6.47963452e+00  2.04095624e+01 -4.89540926e+02  5.06039042e+02 -3.12559322e+02  1.98751489e+02 -8.15532854e+00 -3.84596138e+02 -4.66846236e+02 -1.61501906e+01  1.66740264e+03 
+ 7.26261871e+00  1.35264491e-01  3.19746851e+00 -2.65036458e+00  2.10116407e+00 -9.99630941e-01  9.45856648e-04  2.33376422e+00  3.24042971e+00 -1.76843680e-02 -1.10558876e+01 
+ 1.35264491e-01  7.72298279e+00  7.48750019e+00 -1.07222114e+01  5.55126612e+00 -3.17165612e+00  2.31494372e-03  6.39664022e+00  8.52595946e+00 -3.59455443e-01 -3.60011749e+01 
+ 3.19746851e+00  7.48750019e+00  1.68702006e+02 -1.44759255e+02  1.06422650e+02 -5.86074294e+01  5.15355694e-02  1.21152563e+02  1.60291221e+02 -3.52333901e+00 -6.18769681e+02 
+-2.65036458e+00 -1.07222114e+01 -1.44759255e+02  3.81523201e+02 -8.82754277e+01  1.83333862e+02 -3.25241151e-02 -1.44755245e+02 -9.36538213e+01 -2.28411773e+00  5.61156559e+02 
+ 2.10116407e+00  5.55126612e+00  1.06422650e+02 -8.82754277e+01  7.02294477e+01 -3.47980929e+01  3.27383474e-02  7.67864189e+01  1.03673441e+02 -2.38177634e+00 -3.96095204e+02 
+-9.99630941e-01 -3.17165612e+00 -5.86074294e+01  1.83333862e+02 -3.47980929e+01  9.27179941e+01 -1.24200966e-02 -6.30662519e+01 -3.14127682e+01 -1.72255379e+00  2.25567836e+02 
+ 9.45856648e-04  2.31494372e-03  5.15355694e-02 -3.25241151e-02  3.27383474e-02 -1.24200966e-02  2.00001894e+00  3.53373037e-02  5.04514299e-02 -1.57793342e-03 -1.93364314e-01 
+ 2.33376422e+00  6.39664022e+00  1.21152563e+02 -1.44755245e+02  7.67864189e+01 -6.30662519e+01  3.53373037e-02  9.62519133e+01  1.09658158e+02 -1.71883876e+00 -4.53506420e+02 
+ 3.24042971e+00  8.52595946e+00  1.60291221e+02 -9.36538213e+01  1.03673441e+02 -3.14127682e+01  5.04514299e-02  1.09658158e+02  1.66022483e+02 -4.36153954e+00 -5.92728557e+02 
+-1.76843680e-02 -3.59455443e-01 -3.52333901e+00 -2.28411773e+00 -2.38177634e+00 -1.72255379e+00 -1.57793342e-03 -1.71883876e+00 -4.36153954e+00  2.32472166e+00  1.51644183e+01 
+-1.10558876e+01 -3.60011749e+01 -6.18769681e+02  5.61156559e+02 -3.96095204e+02  2.25567836e+02 -1.93364314e-01 -4.53506420e+02 -5.92728557e+02  1.51644183e+01  2.35145759e+03 
 ----------------------------------------------------------
 Convergence criterion reached in step size (1.00e-01)
 Convergence criterion reached for objective function (1.00e-01)
 #========================================================#
 #| [92m               [0m[1mOptimization Converged[0m               [0m |#
 #| [92m           Final objective function value           [0m |#
-#| [92m  Full:  3.196504e-01  Un-penalized:  9.183974e-02  [0m |#
+#| [92m  Full:  1.667057e-01  Un-penalized:  8.928117e-02  [0m |#
 #========================================================#
 #========================================================#
 #| [94m           Final optimization parameters:           [0m |#
 #========================================================#
-   0 [  1.8660e-01 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [ -3.6394e-01 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  1.8218e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  1.0940e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  5.9073e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [ -3.0882e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  3.1027e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  7.2474e-02 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  6.9808e-02 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  2.0819e-02 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  1.9201e-02 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  1.8134e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -1.2163e-01 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  9.5920e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  8.5317e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  5.9852e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  3.8450e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -2.9259e-02 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [  3.2197e-02 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  5.7516e-02 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  1.3319e-03 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [ -5.4793e-02 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 #========================================================#
 #| [94m             Final physical parameters:             [0m |#
 #========================================================#
-   0 [  3.4660e-01 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [ -1.1394e-01 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  3.3918e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  1.5964e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  2.1607e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [  1.3561e+00 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  3.0031e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  1.1665e-01 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  1.9778e+00 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  2.1248e-01 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  1.7402e+00 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  3.4134e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [  1.2837e-01 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  2.5292e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  1.5723e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  2.1685e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  1.4255e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [  0.0000e+00 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [  1.1262e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  1.9655e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  2.1053e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [  1.6662e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_14.offxml
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_3.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
