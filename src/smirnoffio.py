@@ -43,6 +43,8 @@ except:
     pass
 
 try:
+    # import the hack for openforcefield to improve performance by 10x
+    from forcebalance import smirnoff_hack
     # Import the SMIRNOFF forcefield engine and some useful tools
     from openforcefield.typing.engines.smirnoff import ForceField
     # QYD: name of class are modified to avoid colliding with ForceBalance Molecule
@@ -160,6 +162,18 @@ class SMIRNOFF(OpenMM):
             self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
             self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
 
+        ## Load mol2 files for smirnoff topology
+        # This part requires the OpenEye tools but may be replaced
+        # by RDKit when that support comes online.
+        openff_mols = []
+        for fnm in self.mol2:
+            mol = OffMolecule.from_file(fnm)
+            openff_mols.append(mol)
+        self.off_topology = OffTopology.from_openmm(self.pdb.topology, unique_molecules=openff_mols)
+
+        # used in create_simulation()
+        self.mod = Modeller(self.pdb.topology, self.pdb.positions)
+
         ## OpenMM options for setting up the System.
         self.mmopts = dict(mmopts)
 
@@ -225,16 +239,8 @@ class SMIRNOFF(OpenMM):
         if len(kwargs) > 0:
             self.simkwargs = kwargs
 
-        self.mod = Modeller(self.pdb.topology, self.pdb.positions)
         self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
-        # This part requires the OpenEye tools but may be replaced
-        # by RDKit when that support comes online.
-        openff_mols = []
-        for fnm in self.mol2:
-            mol = OffMolecule.from_file(fnm) 
-            openff_mols.append(mol)
-        off_topology = OffTopology.from_openmm(self.pdb.topology, unique_molecules=openff_mols)
-        self.system = self.forcefield.create_openmm_system(off_topology)
+        self.system = self.forcefield.create_openmm_system(self.off_topology)
 
         # Commenting out all virtual site stuff for now.
         # self.vsinfo = PrepareVirtualSites(self.system)
@@ -456,3 +462,4 @@ class OptGeoTarget_SMIRNOFF(OptGeoTarget):
 #         ## Send back the trajectory file.
 #         if self.save_traj > 0:
 #             self.extra_output = ['openmm-md.dcd']
+
