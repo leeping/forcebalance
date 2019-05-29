@@ -67,8 +67,17 @@ def smirnoff_analyze_parameter_coverage(forcefield, targets):
     ff = ForceField(absffpath, allow_cosmetic_attributes=True)
     # analyze each target
     for target in targets:
-        if hasattr(target, 'engine') and isinstance(target.engine, SMIRNOFF) and hasattr(target.engine,'off_topology'):
-            molecule_force_list = ff.label_molecules(target.engine.off_topology)
+        off_topology = None
+        ## remote targets are not initialized yet, we do a manual setup here
+        if isinstance(target, forcebalance.target.RemoteTarget):
+            if target.r_tgt_opts['type'].endswith('SMIRNOFF'):
+                target_path = os.path.join(target.root, target.tgtdir)
+                openff_mols = [OffMolecule.from_file(os.path.join(target_path,fnm)) for fnm in target.r_tgt_opts.get('mol2', [])]
+                off_topology = OffTopology.from_molecules(openff_mols)
+        elif hasattr(target, 'engine') and isinstance(target.engine, SMIRNOFF) and hasattr(target.engine,'off_topology'):
+            off_topology = target.engine.off_topology
+        if off_topology is not None:
+            molecule_force_list = ff.label_molecules(off_topology)
             for mol_idx, mol_forces in enumerate(molecule_force_list):
                 for force_tag, force_dict in mol_forces.items():
                     # e.g. force_tag = 'Bonds'
@@ -77,7 +86,7 @@ def smirnoff_analyze_parameter_coverage(forcefield, targets):
                         parameter_assignment_data[target.name].append(param_dict)
                         parameter_counter[parameter.smirks] += 1
         else:
-            logger.warning("No target.engine.off_topology found for target %s" % target.name)
+            logger.warning("No smirnoff topology or molecule found for target %s\n" % target.name)
     # write out parameter assignment data
     out_json_path = os.path.join(forcefield.root, 'smirnoff_parameter_assignments.json')
     with open(out_json_path, 'w') as jsonfile:
@@ -85,6 +94,7 @@ def smirnoff_analyze_parameter_coverage(forcefield, targets):
         logger.info("Force field assignment data written to %s\n" % out_json_path)
     # print parameter coverages
     logger.info("%4s %-100s   %10s\n" % ("idx", "Parameter", "Count"))
+    logger.info("-"*118 + '\n')
     n_covered = 0
     for i,p in enumerate(forcefield.plist):
         smirks = p.split('/')[-1]
