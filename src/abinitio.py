@@ -116,6 +116,7 @@ class AbInitio(Target):
         if not self.force:
             self.w_force = 0.0
         self.set_option(tgt_opts,'energy_rms_override','energy_rms_override')
+        self.set_option(tgt_opts,'force_rms_override','force_rms_override')
         self.set_option(tgt_opts,'force_map','force_map')
         self.set_option(tgt_opts,'w_netforce','w_netforce')
         self.set_option(tgt_opts,'w_torque','w_torque')
@@ -145,6 +146,8 @@ class AbInitio(Target):
             if not self.all_at_once:
                 logger.error("Asymmetric weights only work when all_at_once is enabled")
                 raise RuntimeError
+        # allow user to overwrite the force denominator
+        self.set_option(tgt_opts,'force_denom','force_denom')
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -864,7 +867,13 @@ class AbInitio(Target):
         if self.energy_rms_override != 0.0:
             QQ0[0] = self.energy_rms_override ** 2
             Q0[0] = 0.0
-            
+
+        if self.force_rms_override != 0.0:
+            # x 100 to match unit from kJ/mol/nm to kJ/mol/A
+            # / 3 to match the number of force component = 3 * nat
+            QQ0[1:3*nat+1] = self.force_rms_override ** 2 * 100 / 3
+            Q0[1:3*nat+1] = 0.0
+
         def compute_objective(SPX_like,divide=1,L=None,R=None,L2=None,R2=None):
             a = 0
             n = 1
