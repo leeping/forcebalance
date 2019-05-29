@@ -244,6 +244,7 @@ tgt_opts_types = {
                  "hfe_pressure"   : (1.0, -100, 'Simulation temperature for hydration free energies (atm)', 'Hydration free energy using molecular dynamics', 'hydration'),
                  "energy_denom"   : (1.0, 0, 'Energy normalization for binding energies in kcal/mol (default is to use stdev)', 'Binding energy targets', 'binding'),
                  "energy_rms_override"   : (0.0, 0, 'If nonzero, override the Energy RMS used to normalize the energy part of the objective function term', 'Energy matching', 'abinitio'),
+                 "force_rms_override"   : (0.0, 0, 'If nonzero, override the Force RMS used to normalize the energy part of the objective function term', 'Force matching', 'abinitio'),
                  "rmsd_denom"     : (0.1, 0, 'RMSD normalization for optimized geometries in Angstrom', 'Binding energy targets', 'binding'),
                  "wavenumber_tol" : (10.0, 0, 'Frequency normalization (in wavenumber) for vibrational frequencies', 'Vibrational frequency targets', 'vibration'),
                  "dipole_denom"   : (1.0, 0, 'Dipole normalization (Debye) ; set to 0 if a zero weight is desired', 'Monomer property targets', 'monomer'),
