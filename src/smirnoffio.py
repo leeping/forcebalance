@@ -29,9 +29,10 @@ from forcebalance.molecule import *
 from forcebalance.chemistry import *
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict, Counter
 from forcebalance.output import getLogger
 from forcebalance.openmmio import OpenMM, UpdateSimulationParameters
+import json
 
 logger = getLogger(__name__)
 try:
@@ -55,6 +56,43 @@ except:
 
 ## pdict is a useless variable if the force field is XML.
 pdict = "XML_Override"
+
+def smirnoff_analyze_parameter_coverage(forcefield, targets):
+    printcool("SMIRNOFF Parameter Coverage Analysis")
+    assert hasattr(forcefield, 'offxml'), "Only SMIRNOFF Force Field is supported"
+    parameter_assignment_data = defaultdict(list)
+    parameter_counter = Counter()
+    # build the openforcefield.typing.engines.smirnoff.ForceField object
+    absffpath = os.path.join(forcefield.root,forcefield.ffdir,forcefield.offxml)
+    ff = ForceField(absffpath, allow_cosmetic_attributes=True)
+    # analyze each target
+    for target in targets:
+        if hasattr(target, 'engine') and isinstance(target.engine, SMIRNOFF) and hasattr(target.engine,'off_topology'):
+            molecule_force_list = ff.label_molecules(target.engine.off_topology)
+            for mol_idx, mol_forces in enumerate(molecule_force_list):
+                for force_tag, force_dict in mol_forces.items():
+                    # e.g. force_tag = 'Bonds'
+                    for atom_indices, parameter in force_dict.items():
+                        param_dict = {'id': parameter.id, 'smirks': parameter.smirks, 'type':force_tag, 'atoms': list(atom_indices),}
+                        parameter_assignment_data[target.name].append(param_dict)
+                        parameter_counter[parameter.smirks] += 1
+        else:
+            logger.warning("No target.engine.off_topology found for target %s" % target.name)
+    # write out parameter assignment data
+    out_json_path = os.path.join(forcefield.root, 'smirnoff_parameter_assignments.json')
+    with open(out_json_path, 'w') as jsonfile:
+        json.dump(parameter_assignment_data, jsonfile, indent=2)
+        logger.info("Force field assignment data written to %s\n" % out_json_path)
+    # print parameter coverages
+    logger.info("%4s %-100s   %10s\n" % ("idx", "Parameter", "Count"))
+    n_covered = 0
+    for i,p in enumerate(forcefield.plist):
+        smirks = p.split('/')[-1]
+        logger.info('%4i %-100s : %10d\n' % (i, p, parameter_counter[smirks]))
+        if parameter_counter[smirks] > 0:
+            n_covered += 1
+    logger.info("SNIRNOFF Parameter Coverage Analysis result: %d/%d parameters are covered.\n" % (n_covered, len(forcefield.plist)))
+    logger.info("-"*118 + '\n')
 
 class SMIRNOFF_Reader(BaseReader):
     """ Class for parsing OpenMM force field files. """
@@ -155,12 +193,12 @@ class SMIRNOFF(OpenMM):
         self.pdb = PDBFile(self.abspdb)
 
         ## Create the OpenFF ForceField object.
-        if hasattr(self, 'FF'):
-            self.offxml = [self.FF.offxml]
-            self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml), allow_cosmetic_attributes=True)
-        else:
-            self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
-            self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
+        # if hasattr(self, 'FF'):
+        #     self.offxml = [self.FF.offxml]
+        #     self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml), allow_cosmetic_attributes=True)
+        # else:
+        #     self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
+        #     self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
 
         ## Load mol2 files for smirnoff topology
         # This part requires the OpenEye tools but may be replaced
@@ -193,10 +231,10 @@ class SMIRNOFF(OpenMM):
         ## Generate OpenMM-compatible positions
         self.xyz_omms = []
         for I in range(len(self.mol)):
-            xyz = self.mol.xyzs[I]
-            xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
+            position = self.mol.xyzs[I] * angstrom
+            # xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
             # An extra step with adding virtual particles
-            mod = Modeller(self.pdb.topology, xyz_omm)
+            # mod = Modeller(self.pdb.topology, xyz_omm)
             # LPW commenting out because we don't have virtual sites yet.
             # mod.addExtraParticles(self.forcefield)
             if self.pbc:
@@ -204,16 +242,14 @@ class SMIRNOFF(OpenMM):
                 if self.mol.boxes[I].alpha != 90.0 or self.mol.boxes[I].beta != 90.0 or self.mol.boxes[I].gamma != 90.0:
                     logger.error('OpenMM cannot handle nonorthogonal boxes.\n')
                     raise RuntimeError
-                box_omm = [Vec3(self.mol.boxes[I].a, 0, 0)*angstrom,
-                           Vec3(0, self.mol.boxes[I].b, 0)*angstrom,
-                           Vec3(0, 0, self.mol.boxes[I].c)*angstrom]
+                box_omm = np.diagonal([self.mol.boxes[I].a, self.mol.boxes[I].b, self.mol.boxes[I].c]) * angstrom
             else:
                 box_omm = None
             # Finally append it to list.
-            self.xyz_omms.append((mod.getPositions(), box_omm))
+            self.xyz_omms.append((position, box_omm))
 
         ## Build a topology and atom lists.
-        Top = mod.getTopology()
+        Top = self.pdb.topology
         Atoms = list(Top.atoms())
         Bonds = [(a.index, b.index) for a, b in list(Top.bonds())]
 
