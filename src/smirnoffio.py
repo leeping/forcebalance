@@ -225,6 +225,11 @@ class SMIRNOFF(OpenMM):
 
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
+        ## print warning for 'nonbonded_cutoff' keywords
+        if 'nonbonded_cutoff' in kwargs:
+            logger.warning("nonbonded_cutoff keyword ignored because it's set in the offxml file\n")
+
+
 
         ## Generate OpenMM-compatible positions
         self.xyz_omms = []
