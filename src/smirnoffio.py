@@ -192,17 +192,15 @@ class SMIRNOFF(OpenMM):
         """
         self.pdb = PDBFile(self.abspdb)
 
-        ## Create the OpenFF ForceField object.
-        # if hasattr(self, 'FF'):
-        #     self.offxml = [self.FF.offxml]
-        #     self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml), allow_cosmetic_attributes=True)
-        # else:
-        #     self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
-        #     self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
+        # Create the OpenFF ForceField object.
+        if hasattr(self, 'FF'):
+            self.offxml = [self.FF.offxml]
+            self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml), allow_cosmetic_attributes=True)
+        else:
+            self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
+            self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
 
         ## Load mol2 files for smirnoff topology
-        # This part requires the OpenEye tools but may be replaced
-        # by RDKit when that support comes online.
         openff_mols = []
         for fnm in self.mol2:
             mol = OffMolecule.from_file(fnm)
