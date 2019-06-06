@@ -146,6 +146,7 @@ tgt_opts_types = {
                  "openmm_platform" : (None, -10, 'OpenMM platform.  Choose either Reference, CUDA or OpenCL.  AMOEBA is on Reference or CUDA only.', 'Targets that use OpenMM', 'OpenMM'),
                  "qdata_txt"             : (None, -10, 'Text file containing quantum data.  If not provided, will search for a default (qdata.txt).', 'Energy/force matching, ESP evaluations, interaction energies', 'TINKER'),
                  "inter_txt"             : ('interactions.txt', 0, 'Text file containing interacting systems.  If not provided, will search for a default.', 'Binding energy target', 'BindingEnergy'),
+                 "optgeo_options_txt"     : ('optgeo_options.txt', 0, 'Text file containing extra options for Optimized Geometry target.  If not provided, will search for a default.', 'Optimized Geometry target', 'OptGeoTarget'),
                  "reassign_modes"        : (None, -180, 'Reassign modes before fitting frequencies, using either linear assignment "permute" or maximum overlap "overlap".', 'Vibrational frequency targets', 'vibration'),
                  "liquid_coords"         : (None, 0, 'Provide file name for condensed phase coordinates.', 'Condensed phase properties', 'Liquid'),
                  "gas_coords"            : (None, 0, 'Provide file name for gas phase coordinates.', 'Condensed phase properties', 'Liquid'),

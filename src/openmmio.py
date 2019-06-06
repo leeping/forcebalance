@@ -16,6 +16,7 @@ from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
 from forcebalance.vibration import Vibration
+from forcebalance.opt_geo_target import OptGeoTarget
 import networkx as nx
 import numpy as np
 import sys
@@ -986,7 +987,7 @@ class OpenMM(Engine):
         self.set_positions(shot)
         return self.evaluate_()["Energy"]
 
-    def energy_force_one(self):
+    def energy_force_one(self, shot):
         self.set_positions(shot)
         Result = self.evaluate_(force=True)
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Force"]))
@@ -1144,6 +1145,26 @@ class OpenMM(Engine):
         # self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
         self.simulation.context.setPositions(ResetVirtualSites_fast(mod.getPositions(), self.vsinfo))
         return E, M.ref_rmsd(0)[1]
+
+    def getContextPosition(self, removeVirtual=False):
+        """
+        Get current position from simulation context.
+
+        Parameters
+        ----------
+        removeVirtual: bool
+            Remove positions of virtual atoms, result will only have positions of real atoms.
+
+        Returns
+        -------
+        pos: np.ndarray of shape (N x 3)
+            Position array in unit of Angstrom. If removeVirtual=True, N = No. real atoms, else N = No. all atoms.
+
+        """
+        pos = self.simulation.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(angstrom)
+        if removeVirtual:
+            pos = pos[self.realAtomIdxs]
+        return pos
 
     def multipole_moments(self, shot=0, optimize=True, polarizability=False):
 
@@ -1547,3 +1568,12 @@ class Vibration_OpenMM(Vibration):
         self.engine_ = OpenMM
         ## Initialize base class.
         super(Vibration_OpenMM,self).__init__(options,tgt_opts,forcefield)
+
+class OptGeoTarget_OpenMM(OptGeoTarget):
+    """ Optimized geometry matching using OpenMM. """
+    def __init__(self,options,tgt_opts,forcefield):
+        self.engine_ = OpenMM
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        ## Initialize base class.
+        super(OptGeoTarget_OpenMM,self).__init__(options,tgt_opts,forcefield)
