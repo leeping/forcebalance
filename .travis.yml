@@ -19,18 +19,9 @@ before_install:
   - free -m
   - df -h
   - ulimit -a
+  - devtools/travis-ci/before_install.sh
 
 install:
-    # Pull down a miniconda
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-  - bash miniconda.sh -b -p $HOME/miniconda
-  - export PATH="$HOME/miniconda/bin:$PATH"
-
-    # Build out the environment
-  - hash -r
-  - conda config --set always_yes yes --set changeps1 no
-  - conda update -q conda
-  - conda info -a
 
     # swig: for building CCTools
     # future: for builtins
@@ -117,7 +108,7 @@ install:
   - cd -
 
     # Install ForceBalance
-  - python setup.py install
+  - python setup.py develop --no-deps
 
 
 before_script:

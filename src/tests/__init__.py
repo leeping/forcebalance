@@ -10,7 +10,7 @@ import forcebalance.output
 forcebalance.output.getLogger("forcebalance.test").propagate=False
 
 os.chdir(os.path.dirname(__file__) + "/..")
-__all__ = [module[:-3] for module in sorted(os.listdir('test'))
+__all__ = [module[:-3] for module in sorted(os.listdir('tests'))
            if re.match("^test_.*\.py$",module)]
 
 class ForceBalanceTestCase(unittest.TestCase):
@@ -37,13 +37,13 @@ class ForceBalanceTestCase(unittest.TestCase):
         message = super(ForceBalanceTestCase,self).shortDescription()
         if message: return message
         else: return self.id()
-    
+
     def assertNdArrayEqual(self, A, B, msg=None, delta=.00001):
         """Provide equality checking for numpy arrays, with informative error messages
         when applicable. A and B are equal if they have the same dimensions and
         for all elements a in A and corresponding elements b in B,
         a == b +/- delta"""
-        
+
         if A.shape != B.shape:
             reason = "Tried to compare ndarray of size %s to ndarray of size %s\n" % (str(A.shape),str(B.shape))
             if self.longMessage and msg:
@@ -65,19 +65,19 @@ class ForceBalanceTestCase(unittest.TestCase):
             if self.longMessage and msg:
                 reason += msg
             raise self.failureException(reason)
-            
+
     def assertEqual(self, first, second, msg=None):
         self.logger.debug(">ASSERT(%s==%s)\n" % (str(first), str(second)))
         return super(ForceBalanceTestCase,self).assertEqual(first,second,msg)
-        
+
     def assertNotEqual(self, first, second, msg=None):
         self.logger.debug(">ASSERT(%s!=%s)\n" % (str(first), str(second)))
         return super(ForceBalanceTestCase,self).assertNotEqual(first,second,msg)
-        
+
     def assertTrue(self, expr, msg=None):
         self.logger.debug(">ASSERT(%s)\n" % (str(expr)))
         return super(ForceBalanceTestCase,self).assertTrue(expr, msg)
-        
+
 class ForceBalanceTestResult(unittest.TestResult):
     """This manages the reporting of test results as they are run,
        and also records results in the internal data structures provided
@@ -102,7 +102,7 @@ class ForceBalanceTestResult(unittest.TestResult):
 
         super(ForceBalanceTestResult, self).addFailure(test,err)
         self.logger.warning("\r\x1b[31;1m" + "FAIL" + "\x1b[0m    " + test.shortDescription() + "\n")
-        
+
         errorMessage = self.buildErrorMessage(test, err)
 
         for line in errorMessage.splitlines():
@@ -119,7 +119,7 @@ class ForceBalanceTestResult(unittest.TestResult):
 
         for line in errorMessage.splitlines():
             self.logger.warning("\t >\t" + line + "\n")
-    
+
     def buildErrorMessage(self, test, err):
         """Compile error data from test exceptions into a helpful message"""
 
@@ -160,7 +160,7 @@ class ForceBalanceTestResult(unittest.TestResult):
         self.logger.debug("\nCompleted test suite\n")
         self.logger.info("\n<run=%d errors=%d fail=%d in %.2fs>\n" % (self.testsRun,len(self.errors),len(self.failures), self.runTime))
         if self.wasSuccessful(): self.logger.info("All tests passed successfully\n")
-        else: 
+        else:
             self.logger.info("Some tests failed or had errors!\n")
             sys.exit(1)
 
@@ -172,18 +172,18 @@ class ForceBalanceTestRunner(object):
     def __init__(self, logger=forcebalance.output.getLogger("forcebalance.test"), verbose = False):
         self.logger = logger
         forcebalance.output.getLogger("forcebalance.test")
-        
+
     def check(self, test_modules=__all__):
         """This tries importing test modules which is helpful for error checking
         since the unittest loader is not very good at identifying syntax errors
         when discovering tests. Checking that test_modules are all importable
         produced better, more informative exceptions and lets you know when your
         test modules have syntax errors"""
-        
+
         # if test suite is being running from within forcebalance module, append the forcebalance prefix
         if __name__=="forcebalance.test.__init__":
             test_modules = ["forcebalance.test." + test_module for test_module in test_modules]
-            
+
         for test_module in test_modules:
                 __import__(test_module)
 
@@ -194,7 +194,7 @@ class ForceBalanceTestRunner(object):
             logfile='test/test.log',
             loglevel=forcebalance.output.INFO,
             **kwargs):
-            
+
         self.check()
 
         self.logger.setLevel(loglevel)
@@ -216,7 +216,7 @@ class ForceBalanceTestRunner(object):
         tests.addTests(systemTests) # integration tests should be run after other tests
 
         result = ForceBalanceTestResult()
-        
+
         forcebalance.output.getLogger("forcebalance").addHandler(forcebalance.output.NullHandler())
 
         ### START TESTING ###
