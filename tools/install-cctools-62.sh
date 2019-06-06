@@ -2,7 +2,7 @@
 
 # Download latest version from website.
 echo "Downloading source."
-cctools="cctools-6.0.4"
+cctools="cctools-6.2.10"
 cctools_src="$cctools-source"
 rm -rf $cctools_src $cctools_src.tar*
 wget http://www3.nd.edu/~ccl/software/files/$cctools_src.tar.gz
@@ -23,13 +23,13 @@ sed -i s/"config_perl_path=auto"/"config_perl_path=no"/g configure
 # Disable globus
 sed -i s/"config_globus_path=auto"/"config_globus_path=no"/g configure
 
-#---- 
-# Provide install prefix for cctools as well as 
+#----
+# Provide install prefix for cctools as well as
 # locations of Swig and Python packages (i.e. the
 # executable itself is inside the bin subdirectory).
 #
-# This is to ensure that we can call the correct 
-# versions of Python and Swig since the version 
+# This is to ensure that we can call the correct
+# versions of Python and Swig since the version
 # installed for the OS might be too old.
 #----
 prefix=$HOME/opt
@@ -61,7 +61,14 @@ fi
 # and Python lives in $HOME/local.
 #----
 # Configure, make, make install.
-./configure --prefix $prefix/$cctools --with-python-path $pypath --with-swig-path $swgpath
+# check python version
+PYTHON_VERSION=`python -c 'import sys; print(sys.version_info[0])'`
+if [ "$PYTHON_VERSION" -eq "3" ]
+then
+    ./configure --prefix $prefix/$cctools --with-python3-path $pypath --with-swig-path $swgpath --with-perl-path no --with-globus-path no
+else
+    ./configure --prefix $prefix/$cctools --with-python-path $pypath --with-swig-path $swgpath
+fi
 make && make install && cd work_queue && make install
 
 #----
@@ -72,7 +79,7 @@ cd $prefix/
 rm -f cctools
 ln -s $cctools cctools
 cd cctools/bin
-for i in wq_submit_workers.common sge_submit_workers torque_submit_workers slurm_submit_workers ; do 
+for i in wq_submit_workers.common sge_submit_workers torque_submit_workers slurm_submit_workers ; do
     if [ -f $HOME/etc/work_queue/$i ] ; then
         echo "Replacing $i with LP's custom version"
         mv $i $i.bak
@@ -82,9 +89,11 @@ done
 cd ../..
 
 # Install Python module.
+PYTHON_SITEPACKAGES=`python -c "import site; print(site.getsitepackages()[0])"`
+PNAME=$(basename $(dirname $PYTHON_SITEPACKAGES))
 echo "Before installing Python module, will remove these files"
-echo "from $pypath/lib/python2.7/site-packages/"
-ls $pypath/lib/python2.7/site-packages/*work_queue*
-rm -f $pypath/lib/python2.7/site-packages/*work_queue*
-cp -r $prefix/cctools/lib/python2.7/site-packages/* $pypath/lib/python2.7/site-packages/
+echo "from $PYTHON_SITEPACKAGES"
+ls $PYTHON_SITEPACKAGES/*work_queue*
+rm -f $PYTHON_SITEPACKAGES/*work_queue*
+cp -r $prefix/cctools/lib/$PNAME/site-packages/* $PYTHON_SITEPACKAGES
 echo "Python module installed"
