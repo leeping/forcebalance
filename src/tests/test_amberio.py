@@ -6,14 +6,13 @@ from collections import OrderedDict
 import forcebalance
 import abc
 import numpy
-from __init__ import ForceBalanceTestCase
 from test_target import TargetTests # general targets tests defined in test_target.py
 from forcebalance.nifty import *
 from forcebalance.amberio import splitComment, parse_amber_namelist
 
-class TestSplitComment(ForceBalanceTestCase):
+class TestSplitComment:
     # def setUp(self):
-        
+
     def test_split_comment(self):
         """ Test splitting of comment field in AMBER namelist """
         printcool("Test splitting of comment field in AMBER namelist")
@@ -22,7 +21,7 @@ class TestSplitComment(ForceBalanceTestCase):
 
         # Exclamation mark outside of quote
         test_input_output(" restraint_wt=0.1, ! Restraint force constant ", " restraint_wt=0.1, ")
-            
+
         # Exclamation marks enclosed in quote
         test_input_output(" restraintmask='!:WAT,NA&!@H=', ! This is a comment", " restraintmask='!:WAT,NA&!@H=', ")
 
@@ -47,7 +46,7 @@ class TestSplitComment(ForceBalanceTestCase):
             self.assertEqual(a2, b2)
             self.assertEqual(a3, b3)
             self.assertEqual(a4, b4)
-        
+
         # missing_pkgs = []
         # for eng in ['TINKER', 'GMX', 'OpenMM']:
         #     if eng not in self.engines:
@@ -93,5 +92,5 @@ class TestSplitComment(ForceBalanceTestCase):
 #         """@override ForceBalanceTestCase.shortDescription()"""
 #         return super(TestAbInitio_GMX,self).shortDescription() + " (AbInitio_GMX)"
 
-if __name__ == '__main__':           
+if __name__ == '__main__':
     unittest.main()

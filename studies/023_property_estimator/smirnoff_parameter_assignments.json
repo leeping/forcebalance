@@ -1,0 +1,410 @@
+{
+  "ethanol-torsiondrive": [
+    {
+      "id": "b1",
+      "smirks": "[#6X4:1]-[#6X4:2]",
+      "type": "Bonds",
+      "atoms": [
+        0,
+        1
+      ]
+    },
+    {
+      "id": "b83",
+      "smirks": "[#6X4:1]-[#1:2]",
+      "type": "Bonds",
+      "atoms": [
+        0,
+        4
+      ]
+    },
+    {
+      "id": "b83",
+      "smirks": "[#6X4:1]-[#1:2]",
+      "type": "Bonds",
+      "atoms": [
+        0,
+        5
+      ]
+    },
+    {
+      "id": "b83",
+      "smirks": "[#6X4:1]-[#1:2]",
+      "type": "Bonds",
+      "atoms": [
+        0,
+        7
+      ]
+    },
+    {
+      "id": "b14",
+      "smirks": "[#6:1]-[#8:2]",
+      "type": "Bonds",
+      "atoms": [
+        1,
+        2
+      ]
+    },
+    {
+      "id": "b83",
+      "smirks": "[#6X4:1]-[#1:2]",
+      "type": "Bonds",
+      "atoms": [
+        1,
+        6
+      ]
+    },
+    {
+      "id": "b83",
+      "smirks": "[#6X4:1]-[#1:2]",
+      "type": "Bonds",
+      "atoms": [
+        1,
+        8
+      ]
+    },
+    {
+      "id": "b87",
+      "smirks": "[#8:1]-[#1:2]",
+      "type": "Bonds",
+      "atoms": [
+        2,
+        3
+      ]
+    },
+    {
+      "id": "a1",
+      "smirks": "[*:1]~[#6X4:2]-[*:3]",
+      "type": "Angles",
+      "atoms": [
+        0,
+        1,
+        2
+      ]
+    },
+    {
+      "id": "a1",
+      "smirks": "[*:1]~[#6X4:2]-[*:3]",
+      "type": "Angles",
+      "atoms": [
+        0,
+        1,
+        6
+      ]
+    },
+    {
+      "id": "a1",
+      "smirks": "[*:1]~[#6X4:2]-[*:3]",
+      "type": "Angles",
+      "atoms": [
+        0,
+        1,
+        8
+      ]
+    },
+    {
+      "id": "a1",
+      "smirks": "[*:1]~[#6X4:2]-[*:3]",
+      "type": "Angles",
+      "atoms": [
+        1,
+        0,
+        4
+      ]
+    },
+    {
+      "id": "a1",
+      "smirks": "[*:1]~[#6X4:2]-[*:3]",
+      "type": "Angles",
+      "atoms": [
+        1,
+        0,
+        5
+      ]
+    },
+    {
+      "id": "a1",
+      "smirks": "[*:1]~[#6X4:2]-[*:3]",
+      "type": "Angles",
+      "atoms": [
+        1,
+        0,
+        7
+      ]
+    },
+    {
+      "id": "a27",
+      "smirks": "[*:1]-[#8:2]-[*:3]",
+      "type": "Angles",
+      "atoms": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "a1",
+      "smirks": "[*:1]~[#6X4:2]-[*:3]",
+      "type": "Angles",
+      "atoms": [
+        2,
+        1,
+        6
+      ]
+    },
+    {
+      "id": "a1",
+      "smirks": "[*:1]~[#6X4:2]-[*:3]",
+      "type": "Angles",
+      "atoms": [
+        2,
+        1,
+        8
+      ]
+    },
+    {
+      "id": "a2",
+      "smirks": "[#1:1]-[#6X4:2]-[#1:3]",
+      "type": "Angles",
+      "atoms": [
+        4,
+        0,
+        5
+      ]
+    },
+    {
+      "id": "a2",
+      "smirks": "[#1:1]-[#6X4:2]-[#1:3]",
+      "type": "Angles",
+      "atoms": [
+        4,
+        0,
+        7
+      ]
+    },
+    {
+      "id": "a2",
+      "smirks": "[#1:1]-[#6X4:2]-[#1:3]",
+      "type": "Angles",
+      "atoms": [
+        5,
+        0,
+        7
+      ]
+    },
+    {
+      "id": "a2",
+      "smirks": "[#1:1]-[#6X4:2]-[#1:3]",
+      "type": "Angles",
+      "atoms": [
+        6,
+        1,
+        8
+      ]
+    },
+    {
+      "id": "t85",
+      "smirks": "[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "id": "t9",
+      "smirks": "[#1:1]-[#6X4:2]-[#6X4:3]-[#8X2:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        2,
+        1,
+        0,
+        4
+      ]
+    },
+    {
+      "id": "t9",
+      "smirks": "[#1:1]-[#6X4:2]-[#6X4:3]-[#8X2:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        2,
+        1,
+        0,
+        5
+      ]
+    },
+    {
+      "id": "t9",
+      "smirks": "[#1:1]-[#6X4:2]-[#6X4:3]-[#8X2:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        2,
+        1,
+        0,
+        7
+      ]
+    },
+    {
+      "id": "t84",
+      "smirks": "[*:1]-[#6X4:2]-[#8X2:3]-[#1:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        3,
+        2,
+        1,
+        6
+      ]
+    },
+    {
+      "id": "t84",
+      "smirks": "[*:1]-[#6X4:2]-[#8X2:3]-[#1:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        3,
+        2,
+        1,
+        8
+      ]
+    },
+    {
+      "id": "t3",
+      "smirks": "[#1:1]-[#6X4:2]-[#6X4:3]-[#1:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        4,
+        0,
+        1,
+        6
+      ]
+    },
+    {
+      "id": "t3",
+      "smirks": "[#1:1]-[#6X4:2]-[#6X4:3]-[#1:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        4,
+        0,
+        1,
+        8
+      ]
+    },
+    {
+      "id": "t3",
+      "smirks": "[#1:1]-[#6X4:2]-[#6X4:3]-[#1:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        5,
+        0,
+        1,
+        6
+      ]
+    },
+    {
+      "id": "t3",
+      "smirks": "[#1:1]-[#6X4:2]-[#6X4:3]-[#1:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        5,
+        0,
+        1,
+        8
+      ]
+    },
+    {
+      "id": "t3",
+      "smirks": "[#1:1]-[#6X4:2]-[#6X4:3]-[#1:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        6,
+        1,
+        0,
+        7
+      ]
+    },
+    {
+      "id": "t3",
+      "smirks": "[#1:1]-[#6X4:2]-[#6X4:3]-[#1:4]",
+      "type": "ProperTorsions",
+      "atoms": [
+        7,
+        0,
+        1,
+        8
+      ]
+    },
+    {
+      "id": "n16",
+      "smirks": "[#6X4:1]",
+      "type": "vdW",
+      "atoms": [
+        0
+      ]
+    },
+    {
+      "id": "n16",
+      "smirks": "[#6X4:1]",
+      "type": "vdW",
+      "atoms": [
+        1
+      ]
+    },
+    {
+      "id": "n19",
+      "smirks": "[#8X2H1+0:1]",
+      "type": "vdW",
+      "atoms": [
+        2
+      ]
+    },
+    {
+      "id": "n12",
+      "smirks": "[#1:1]-[#8]",
+      "type": "vdW",
+      "atoms": [
+        3
+      ]
+    },
+    {
+      "id": "n2",
+      "smirks": "[#1:1]-[#6X4]",
+      "type": "vdW",
+      "atoms": [
+        4
+      ]
+    },
+    {
+      "id": "n2",
+      "smirks": "[#1:1]-[#6X4]",
+      "type": "vdW",
+      "atoms": [
+        5
+      ]
+    },
+    {
+      "id": "n3",
+      "smirks": "[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]",
+      "type": "vdW",
+      "atoms": [
+        6
+      ]
+    },
+    {
+      "id": "n2",
+      "smirks": "[#1:1]-[#6X4]",
+      "type": "vdW",
+      "atoms": [
+        7
+      ]
+    },
+    {
+      "id": "n3",
+      "smirks": "[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]",
+      "type": "vdW",
+      "atoms": [
+        8
+      ]
+    }
+  ]
+}

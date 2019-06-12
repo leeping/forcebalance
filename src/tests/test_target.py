@@ -1,25 +1,25 @@
-from __future__ import division
-from __future__ import absolute_import
-from builtins import str
-from builtins import range
-from builtins import object
-from past.utils import old_div
-import unittest
-import sys, os, re
+from __future__ import division, absolute_import
+
+import sys
+import os
 import forcebalance
-import abc
-import numpy
-from __init__ import ForceBalanceTestCase
+import numpy as np
 
-class TargetTests(object):
-    def setUp(self):
-        self.logger.debug("\nBuilding options for target...\n")
-        self.options=forcebalance.parser.gen_opts_defaults.copy()
-        self.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
-        self.ff = None  # Forcefield this target is fitting
-        self.options.update({'root': os.getcwd() + '/test/files'})
+class TargetTests:
 
-        os.chdir(self.options['root'])
+    @classmethod
+    def setup_class(cls):
+        """
+        setup any state specific to the execution of the given class (which usually contains tests).
+        """
+        #cls.logger.debug("\nBuilding options for target...\n")
+        cls.options=forcebalance.parser.gen_opts_defaults.copy()
+        cls.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
+        cls.ff = None  # Forcefield this target is fitting
+        cls.cwd = os.path.dirname(os.path.realpath(__file__))
+        cls.options['root'] = os.path.join(cls.cwd, "files")
+
+        os.chdir(cls.options['root'])
 
     def test_get_function(self):
         """Check target get() function output"""
@@ -30,7 +30,7 @@ class TargetTests(object):
         objective = self.target.get(self.mvals)
         self.target.indicate()
         self.logger.debug("objective =\n%s" % str(objective))
-        
+
         # check objective dictionary keys
         self.logger.debug("\n>ASSERT objective dictionary has X, G, H keys\n")
         self.assertEqual(dict,type(objective))
@@ -89,7 +89,4 @@ class TargetTests(object):
             self.assertAlmostEqual(g[p], G[p], delta=X*.01)
 
         os.chdir('../..')
-        
 
-if __name__ == '__main__':           
-    unittest.main()

@@ -43,6 +43,12 @@ except:
     logger.warning("SMIRNOFF module import failed; check SMIRNOFF package\n")
 
 try:
+    from forcebalance.property_estimator_io import PropertyEstimate_SMIRNOFF
+except:
+    logger.warning(traceback.format_exc())
+    logger.warning("property estimator module import failed\n")
+
+try:
     from forcebalance.abinitio_internal import AbInitio_Internal
 except:
     logger.warning(traceback.format_exc())
@@ -108,6 +114,7 @@ Implemented_Targets = {
     'HYDRATION_OPENMM':Hydration_OpenMM,
     'OPTGEOTARGET_OPENMM': OptGeoTarget_OpenMM,
     'OPTGEOTARGET_SMIRNOFF': OptGeoTarget_SMIRNOFF,
+    'PROPERTYESTIMATE_SMIRNOFF': PropertyEstimate_SMIRNOFF,
     'REMOTE_TARGET':RemoteTarget,
     }
 
