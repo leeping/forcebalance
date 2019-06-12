@@ -37,7 +37,7 @@ except:
     logger.warning("OpenMM module import failed; check OpenMM package\n")
 
 try:
-    from forcebalance.smirnoffio import AbInitio_SMIRNOFF, Liquid_SMIRNOFF, Vibration_SMIRNOFF, OptGeoTarget_SMIRNOFF
+    from forcebalance.smirnoffio import AbInitio_SMIRNOFF, Liquid_SMIRNOFF, Vibration_SMIRNOFF, OptGeoTarget_SMIRNOFF, smirnoff_analyze_parameter_coverage
 except:
     logger.warning(traceback.format_exc())
     logger.warning("SMIRNOFF module import failed; check SMIRNOFF package\n")
@@ -147,10 +147,13 @@ class Objective(forcebalance.BaseClass):
 
         ## The list of fitting targets
         self.Targets = []
+        enable_smirnoff_prints = False # extra prints for SMIRNOFF forcefield
         for opts in tgt_opts:
             if opts['type'] not in Implemented_Targets:
                 logger.error('The target type \x1b[1;91m%s\x1b[0m is not implemented!\n' % opts['type'])
                 raise RuntimeError
+            elif opts['type'].endswith("SMIRNOFF"):
+                enable_smirnoff_prints = True
             # Create a target object.  This is done by looking up the
             # Target class from the Implemented_Targets dictionary
             # using opts['type'] as the key.  The object is created by
@@ -162,6 +165,8 @@ class Objective(forcebalance.BaseClass):
         if len(set([Tgt.name for Tgt in self.Targets])) != len([Tgt.name for Tgt in self.Targets]):
             logger.error("The list of target names is not unique!\n")
             raise RuntimeError
+        if enable_smirnoff_prints:
+            smirnoff_analyze_parameter_coverage(forcefield, self.Targets)
         ## The force field (it seems to be everywhere)
         self.FF = forcefield
         ## Initialize the penalty function.

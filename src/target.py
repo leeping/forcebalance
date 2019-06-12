@@ -365,6 +365,8 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         shutil.rmtree(abstempdir,ignore_errors=True)
         # Create a new temporary directory from scratch
         os.makedirs(abstempdir)
+        # QYD: Potential bug:
+        # this function may be skipped when continue=True, causing mol2 file missing in temp folder
         if hasattr(self, 'mol2'):
             for f in self.mol2:
                 if os.path.exists(os.path.join(self.root, self.tgtdir, f)):
