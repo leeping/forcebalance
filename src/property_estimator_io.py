@@ -9,6 +9,7 @@ from __future__ import division, print_function
 import os
 import time
 import json
+import copy
 import numpy as np
 
 from forcebalance.target import Target
@@ -29,6 +30,8 @@ class PropertyEstimate_SMIRNOFF(Target):
         super(PropertyEstimate_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
         # get filename for property estimator input file
         self.set_option(tgt_opts,'prop_est_input',forceprint=True)
+        # Finite difference size for numerical gradients
+        self.set_option(tgt_opts,'liquid_fdiff_h', forceprint=True)
         # initialize the properties to compute
         self.init_properties()
 
@@ -121,7 +124,6 @@ class PropertyEstimate_SMIRNOFF(Target):
         assert 'denoms' in prop_est_configure, 'missing denoms'
         return prop_est_configure
 
-
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
         """
         submit jobs for evaluating the objective function
@@ -140,36 +142,138 @@ class PropertyEstimate_SMIRNOFF(Target):
         1. This function is called before wq_complete() and get().
         2. This function should not block.
         """
+        # numerical gradients
+        # create a structure for storing job ids for all perturbations
+        self.prop_est_job_ids = {'0': None, '-h': [], '+h': []}
+        # step 1: submit evalutation with zero perturbation
+        self.prop_est_job_ids['0'] = self.submit_property_estimate(mvals)
+        logger.info('One job submitted to property estimator\n')
+        # step 2: submit evaluation with -h and +h perturbations
+        if AGrad is True:
+            for i_m in range(len(mvals)):
+                for d_h in ['-h', '+h']:
+                    delta_m = -self.liquid_fdiff_h if d_h == '-h' else +self.liquid_fdiff_h
+                    # copy the original mvals and perturb
+                    new_mvals = copy.deepcopy(mvals)
+                    new_mvals[i_m] += delta_m
+                    # submit the single job with perturbation
+                    job_id = self.submit_property_estimate(new_mvals, reweight=True)
+                    # store the job id
+                    self.prop_est_job_ids[d_h].append(job_id)
+            logger.info('%d jobs with +- perturbations and reweight submitted to property estimator\n' % (len(mvals)*2))
+        # create a dictionary to store job data
+        self.prop_est_job_state = {}
+        for job_id in [self.prop_est_job_ids['0']] + self.prop_est_job_ids['-h'] + self.prop_est_job_ids['+h']:
+            self.prop_est_job_state[job_id] = "submitted"
+
+    def submit_property_estimate(self, mvals, reweight=False):
+        """
+        submit a single property estimate job
+
+        Parameters
+        ----------
+        mvals: np.ndarray
+            mvals array containing the math values of the parameters
+        reweight: bool
+            use reweight to or not
+
+        Returns
+        -------
+        job_id: str
+            The ID of the submitted job
+        """
         # write a force field file with the current mvals
+        # self.FF.offxml file will be overwritten using new parameters
         self.FF.make(mvals)
-        param_names = self.FF.plist
-        ## TO-DO: Implement real submit jobs
+        ## TO-DO: implement real submit job
         job_spec = {
             'offxml': self.FF.offxml, # offxml filename
             'ref_doi': self.prop_est_configure['source_doi'], # doi string
-            'compute_gradients': param_names, # compute gradients for these params
-            #'compute_hessian': param_names, # this can be skipped for now, FB will estimate hessian using gradient
+            'reweight': reweight,
         }
-        #self.prop_est_job_id = self.client.submit_property_estimate(job_spec)
-        ## mock job id
-        self.prop_est_job_id = '82101023'
+        # job_id = self.client.submit_property_estimate(job_spec)
+        ## mock
+        job_id = '1293791'
+        return job_id
 
     def wq_complete(self):
         """
-        Wait until all jobs complete.
-        This function should block until all simulations are finished.
-        This function is called before get()
+        Check if all jobs are finished
+        This function should have a sleep in it if not finished.
+
+        Returns
+        -------
+        finished: bool
+            True if all jobs are finished, False if not
         """
-        while True:
-            time.sleep(10)
-            ## TO-DO: update function below for checking if job finished
-            # status = self.client.check_job_status(self.prop_est_job_id)
-            status = 'COMPLETE'
-            if status == 'COMPLETE':
-                return
-            elif status == 'ERROR':
-                logger.error("property estimator job failed")
-                raise RuntimeError("property estimator job failed")
+        # check status of the jobs that are not finished
+        unfinished_job_ids = [job_id for job_id, status in self.prop_est_job_state.items() if status != 'COMPLETE']
+        if len(unfinished_job_ids) == 0:
+            return True
+        else:
+            for job_id in unfinished_job_ids:
+                ## TO-DO: update function below for checking if job finished
+                # status = self.client.check_job_status(job_id)
+                # mock
+                status = 'COMPLETE'
+                self.prop_est_job_state[job_id] = status
+            # check again if all jobs just finished
+            if all(self.prop_est_job_state[job_id] == 'COMPLETE' for job_id in unfinished_job_ids):
+                return True
+            else:
+                logger.info("%d/%d property estimate jobs finished\n" % (len(unfinished_job_ids), len(self.prop_est_job_state)))
+                time.sleep(10)
+
+    def download_property_estimate_data(self, job_id):
+        """
+        download property estimate data from server
+
+        Parameters
+        ----------
+        job_id: string
+            job_id received when submitting the job
+
+        Returns
+        -------
+        property_data: dict
+            dictionary of property data
+        """
+        ## TO-DO: implement real downlaod data from server
+        # data = self.client.download_data(job_id)
+        ## mock:
+        prop_est_data = {
+            'values': {
+                'density': {
+                    (298.15, 1.0): 1.03,
+                    (328.15, 1.0): 0.95,
+                },
+                'dielectric': {
+                    (298.15, 1.0): 0.64,
+                    (328.15, 1.0): 0.44,
+                },
+                'Hvap': {
+                    (298.15, 1.0): 0.61,
+                    (328.15, 1.0): 0.43,
+                }
+            },
+            'value_errors': {
+                'density': {
+                    (298.15, 1.0): 0.03,
+                    (328.15, 1.0): 0.04,
+                },
+                'dielectric': {
+                    (298.15, 1.0): 0.04,
+                    (328.15, 1.0): 0.05,
+                },
+                'Hvap': {
+                    (298.15, 1.0): 0.06,
+                    (328.15, 1.0): 0.04,
+                }
+            }
+        }
+        return prop_est_data
+
+
 
     def get(self, mvals, AGrad=True, AHess=True):
         """
@@ -199,54 +303,30 @@ class PropertyEstimate_SMIRNOFF(Target):
         2. obj_hess is all zero when AHess == False or AGrad == False, because the hessian estimate
         depends on gradients
         """
-        ## TO-DO: get real property data
-        # prop_est_data = self.client.download_job_data(self.prop_est_job_id)
-        ## mock data
-        zero_grad = np.zeros(self.FF.np)
-        prop_est_data = {
-            'values': {
-                'density': {
-                    (298.15, 1.0): 1.03,
-                    (328.15, 1.0): 0.95,
-                },
-                'dielectric': {
-                    (298.15, 1.0): 0.64,
-                    (328.15, 1.0): 0.44,
-                },
-                'Hvap': {
-                    (298.15, 1.0): 0.61,
-                    (328.15, 1.0): 0.43,
-                }
-            },
-            'value_errors': {
-                'density': {
-                    (298.15, 1.0): 0.03,
-                    (328.15, 1.0): 0.04,
-                },
-                'dielectric': {
-                    (298.15, 1.0): 0.04,
-                    (328.15, 1.0): 0.05,
-                },
-                'Hvap': {
-                    (298.15, 1.0): 0.06,
-                    (328.15, 1.0): 0.04,
-                }
-            },
-            'gradients': {
-                'density': {
-                    (298.15, 1.0): zero_grad,
-                    (328.15, 1.0): zero_grad,
-                },
-                'dielectric': {
-                    (298.15, 1.0): zero_grad,
-                    (328.15, 1.0): zero_grad,
-                },
-                'Hvap': {
-                    (298.15, 1.0): zero_grad,
-                    (328.15, 1.0): zero_grad,
-                }
-            }
-        }
+        # downlaod property data for unperturbed simulation
+        job_id_0 = self.prop_est_job_ids['0']
+        prop_est_data = self.download_property_estimate_data(job_id_0)
+        # download purturbed property values and do finite-difference calculations
+        if AGrad is True:
+            assert len(self.prop_est_job_ids['-h']) == self.FF.np, 'number of submitted jobs not consistent'
+            zero_grad = np.zeros(self.FF.np)
+            prop_est_gradients = {}
+            for property_name in self.ref_data:
+                prop_est_gradients[property_name] = {}
+                for phase_point in self.ref_data[property_name]:
+                    prop_est_gradients[property_name][phase_point] = zero_grad
+            for i_m in range(len(mvals)):
+                job_id_minus_h = self.prop_est_job_ids['-h'][i_m]
+                prop_est_data_minus_h = self.download_property_estimate_data(job_id_minus_h)
+                job_id_plus_h = self.prop_est_job_ids['+h'][i_m]
+                prop_est_data_plus_h = self.download_property_estimate_data(job_id_plus_h)
+                for property_name in prop_est_gradients:
+                    for phase_point in prop_est_gradients[property_name]:
+                        value_plus = prop_est_data_plus_h[property_name][phase_point]
+                        value_minus = prop_est_data_minus_h[property_name][phase_point]
+                        # three point formula
+                        grad = (value_plus - value_minus) / (self.liquid_fdiff_h * 2)
+                        prop_est_gradients[property_name][phase_point][i_m] = grad
         # compute objective value
         obj_value = 0.0
         obj_grad = np.zeros(self.FF.np)
@@ -271,11 +351,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                 if AGrad is True:
                     param_names = self.FF.plist
                     # get gradients in physical unit
-                    ## TO-DO: load gradients from real data
-                    grad_dict = prop_est_data['gradients'][property_name][(temperature, pressure)]
-                    grad_array = np.array([grad_dict[param_name] for param_name in param_names])
-                    # convert from d_P/d_pval to d_P/d_mval
-                    grad_array = self.FF.create_pvals(grad)
+                    grad_array = prop_est_gradients[property_name][phase_point_key]
                     # compute objective gradient
                     this_obj_grad = 2.0 * weight * diff * grad_array / denom**2
                     if AHess is True:

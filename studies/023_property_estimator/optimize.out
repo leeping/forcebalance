@@ -104,7 +104,7 @@ Reading force field from file: smirnoff99Frosst.offxml
 fnms                      ['smirnoff99Frosst.offxml'] 
 priors                    OrderedDict([('ProperTorsions/Proper/k', 1.0), ('vdW/Atom/epsilon', 0.1), ('vdW/Atom/rmin_half', 1.0)]) 
 ----------------------------------------------------------
-Backing up: optimize.tmp/ethanol-property-estimate to: optimize.bak/ethanol-property-estimate_2.tar.bz2
+Backing up: optimize.tmp/ethanol-property-estimate to: optimize.bak/ethanol-property-estimate_3.tar.bz2
 #========================================================#
 #| [92m  Loaded experimental data from property estimator  [0m |#
 #========================================================#
@@ -133,8 +133,9 @@ name                      ethanol-property-estimate
 type                      PROPERTYESTIMATE_SMIRNOFF 
 tgtdir                    targets/ethanol-property-estimate 
 prop_est_input            prop_est_input.json 
+liquid_fdiff_h            0.01 
 ----------------------------------------------------------
-Backing up: optimize.tmp/ethanol-torsiondrive to: optimize.bak/ethanol-torsiondrive_2.tar.bz2
+Backing up: optimize.tmp/ethanol-torsiondrive to: optimize.bak/ethanol-torsiondrive_3.tar.bz2
 QM forces are not present, only fitting energies.
 #========================================================#
 #| [92m      Setup for target ethanol-torsiondrive :       [0m |#
@@ -213,6 +214,8 @@ input_file                optimize.in
 #| [94m     Iteration 0: Evaluating objective function     [0m |#
 #| [94m        and derivatives through second order        [0m |#
 #========================================================#
+One job submitted to property estimator
+22 jobs with +- perturbations and reweight submitted to property estimator
 
 #===================================================================================================#
 #| [1;94m                               ethanol-property-estimate density                               [0m |#
@@ -320,12 +323,13 @@ Newton-Raphson step found (length 2.3920e-01)
    9 [  2.1040e-01 + 3.4360e-04 =  2.1074e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
   10 [  1.7210e+00 + 6.8930e-02 =  1.7899e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
-Backing up optimize.sav -> optimize.bak/optimize_3.sav
 Input file with saved parameters: optimize.sav
 #========================================================#
 #| [94m     Iteration 1: Evaluating objective function     [0m |#
 #| [94m        and derivatives through second order        [0m |#
 #========================================================#
+One job submitted to property estimator
+22 jobs with +- perturbations and reweight submitted to property estimator
 
 #===================================================================================================#
 #| [1;94m                               ethanol-property-estimate density                               [0m |#
@@ -367,7 +371,7 @@ ethanol-torsiondrive           0.06282      1.000 [92m     6.28238e-02[0m ( -2
 Regularization                 0.05722      1.000 [91m     5.72182e-02[0m ( +5.722e-02 ) 
 Total                                             [92m     1.21392e-01[0m ( -2.236e-01 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_3.offxml
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_6.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -443,6 +447,8 @@ Input file with saved parameters: optimize.sav
 #| [94m     Iteration 2: Evaluating objective function     [0m |#
 #| [94m        and derivatives through second order        [0m |#
 #========================================================#
+One job submitted to property estimator
+22 jobs with +- perturbations and reweight submitted to property estimator
 
 #===================================================================================================#
 #| [1;94m                               ethanol-property-estimate density                               [0m |#
@@ -484,7 +490,7 @@ ethanol-torsiondrive           0.05521      1.000 [92m     5.52055e-02[0m ( -7
 Regularization                 0.06018      1.000 [91m     6.01816e-02[0m ( +2.963e-03 ) 
 Total                                             [92m     1.16737e-01[0m ( -4.655e-03 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_4.offxml
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_7.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -560,7 +566,7 @@ Convergence criterion reached for objective function (1.00e-01)
    9 [  2.1091e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
   10 [  1.8129e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 ----------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_5.offxml
+Backing up result/optimize/smirnoff99Frosst.offxml -> result/optimize/smirnoff99Frosst_8.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
