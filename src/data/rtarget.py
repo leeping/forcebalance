@@ -49,6 +49,7 @@ os.chdir(os.path.join(Tgt.root,Tgt.tempdir))
 for f in os.listdir('.'):
     if os.path.isdir(f) and f.startswith('iter'):
         os.chdir(f)
+        break
 
 forcebalance.nifty.lp_dump(Ans, 'objective.p')        # or some other method of storing resulting objective
 
