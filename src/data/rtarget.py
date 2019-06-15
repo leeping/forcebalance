@@ -43,11 +43,26 @@ Tgt.submit_jobs(mvals, AGrad = AGrad, AHess = AHess)
 
 Ans = Tgt.meta_get(mvals, AGrad = AGrad, AHess = AHess)
 
+# go to the tmp folder
+os.chdir(os.path.join(Tgt.root,Tgt.tempdir))
+# go to the 'iter_0000' folder
+for f in os.listdir('.'):
+    if os.path.isdir(f) and f.startswith('iter'):
+        os.chdir(f)
+
 forcebalance.nifty.lp_dump(Ans, 'objective.p')        # or some other method of storing resulting objective
 
 # also run target.indicate()
 logger = forcebalance.output.getLogger("forcebalance")
 logger.addHandler(forcebalance.output.RawFileHandler('indicate.log'))
 Tgt.indicate()
-
 print("\n")
+
+# compress all files into target_result.tar.bz2
+
+with tarfile.open(name=os.path.join(options['root'],"target_result.tar.bz2"), mode='w:bz2', dereference=True) as tar:
+    for f in os.listdir('.'):
+        if os.path.isfile(f):
+            tar.add(f)
+
+
