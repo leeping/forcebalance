@@ -15,7 +15,7 @@ from forcebalance.nifty import warn_once, printcool, printcool_dictionary
 from forcebalance.output import getLogger
 from forcebalance.target import Target
 from openforcefield.typing.engines import smirnoff
-from propertyestimator.client import PropertyEstimatorClient, ConnectionOptions
+from propertyestimator.client import PropertyEstimatorClient, ConnectionOptions, PropertyEstimatorOptions
 from propertyestimator.datasets import ThermoMLDataSet
 from propertyestimator.utils.exceptions import PropertyEstimatorException
 from simtk import unit
@@ -238,24 +238,28 @@ class PropertyEstimate_SMIRNOFF(Target):
         self._client = None  # The client object which will communicate with an already spun up server.
 
         self._data_set = None  # The data set of properties to estimate.
-        self._force_balance_properties = {}  # The data set in a forcebalance compatible format.
+        self._reference_properties = {}  # The data set in a forcebalance compatible format.
 
         self._normalised_weights = None  # The normalised weights of the different properties.
 
         # Store a `Future` like object which can be queried for the results of
         # a property estimation.
-        self._estimation_request = None
+        self._pending_estimate_request = None
+
+        self._pending_gradient_requests = {}
 
         # Store a map between a force balance parameter index and a property estimator
         # `ParameterGradientKey`, as well as the inverse.
-        self._parameter_index_to_key = None
-        self._parameter_key_to_index = None
+        # self._parameter_index_to_key = None
+        # self._parameter_key_to_index = None
 
         # Store a copy of the objective function details from the previous optimisation cycle.
         self._last_obj_details = {}
 
         # Get the filename for the property estimator input file.
         self.set_option(tgt_opts, 'prop_est_input', forceprint=True)
+        # Finite difference size for numerical gradients
+        self.set_option(tgt_opts, 'liquid_fdiff_h', forceprint=True)
 
         # Initialize the target.
         self._initialize()
@@ -326,7 +330,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                              'were are unsupported by the estimator.')
 
         # Convert the reference data into a format that forcebalance can understand
-        self._force_balance_properties = {}
+        self._reference_properties = {}
 
         for substance_identifier in self._data_set.properties:
 
@@ -335,11 +339,11 @@ class PropertyEstimate_SMIRNOFF(Target):
                 class_name = physical_property.__class__.__name__
                 mapped_name = PropertyEstimate_SMIRNOFF.estimator_to_force_balance_map[class_name]
 
-                if mapped_name not in self._force_balance_properties:
-                    self._force_balance_properties[mapped_name] = {}
+                if mapped_name not in self._reference_properties:
+                    self._reference_properties[mapped_name] = {}
 
                 key, value, _ = self._property_to_key_value(physical_property)
-                self._force_balance_properties[mapped_name][key] = value
+                self._reference_properties[mapped_name][key] = value
 
         # Print the reference data
         printcool("Loaded experimental data from property estimator")
@@ -353,10 +357,10 @@ class PropertyEstimate_SMIRNOFF(Target):
         # Assign and normalize weights for each phase point (average for now)
         self._normalised_weights = {}
 
-        for property_name in self._force_balance_properties:
+        for property_name in self._reference_properties:
 
             self._normalised_weights[property_name] = (self._options.weights[property_name] /
-                                                       len(self._force_balance_properties[property_name]))
+                                                       len(self._reference_properties[property_name]))
 
     def _build_parameter_gradient_keys(self):
         """Build the list of parameter gradient keys based
@@ -368,6 +372,31 @@ class PropertyEstimate_SMIRNOFF(Target):
         """
         # TODO for Simon: Build the gradient keys. `self.FF.plist` may be of use?
         raise NotImplementedError()
+
+    def _submit_request(self, mvals, reweight_only=False):
+        """Submit a property estimator request to the property estimator,
+        and request.
+
+        Parameters
+        ----------
+        mvals: np.ndarray
+            mvals array containing the math values of the parameters
+        reweight_only: bool
+            If true, the estimator will only attempt to estimate the
+            properties using data reweighting.
+        """
+
+        self.FF.make(mvals)
+        force_field = smirnoff.ForceField(self.FF.offxml)
+
+        options = PropertyEstimatorOptions()
+
+        if reweight_only:
+            options.allowed_calculation_layers = ['ReweightingLayer']
+
+        return self._client.request_estimate(property_set=self._data_set,
+                                             force_field=force_field,
+                                             options=options)
 
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
         """
@@ -387,66 +416,132 @@ class PropertyEstimate_SMIRNOFF(Target):
         1. This function is called before wq_complete() and get().
         2. This function should not block.
         """
+        # The below snipped will both estimate the properties, and their
+        # gradients with respect to a set of chosen parameters.
 
-        # Make the force field based on the current values of the parameters.
-        self.FF.make(mvals)
+        # # Make the force field based on the current values of the parameters.
+        # self.FF.make(mvals)
+        #
+        # force_field = smirnoff.ForceField(self.FF.offxml)
+        # parameter_gradient_keys = []
+        #
+        # if AGrad is True:
+        #     parameter_gradient_keys = self._build_parameter_gradient_keys()
+        #
+        # self._pending_estimate_request = self._client.request_estimate(property_set=self._data_set,
+        #                                                                force_field=force_field,
+        #                                                                parameter_gradient_keys=
+        #                                                                parameter_gradient_keys)
 
-        force_field = smirnoff.ForceField(self.FF.offxml)
-        parameter_gradient_keys = []
+        # Submit the reference property estimation request.
+        self._pending_estimate_request = self._submit_request(mvals)
+        self._pending_gradient_requests = {}
 
         if AGrad is True:
-            parameter_gradient_keys = self._build_parameter_gradient_keys()
 
-        self._estimation_request = self._client.request_estimate(property_set=self._data_set,
-                                                                 force_field=force_field,
-                                                                 parameter_gradient_keys=parameter_gradient_keys)
+            for parameter_index in range(len(mvals)):
 
-    def wq_complete(self):
-        """
-        Check if all jobs are finished
-        This function should have a sleep in it if not finished.
+                self._pending_gradient_requests[parameter_index] = {'reverse': None, 'forward': None}
 
-        Returns
-        -------
-        finished: bool
-            True if all jobs are finished, False if not
-        """
+                for direction, delta_h in zip(['reverse', 'forward'], [-self.liquid_fdiff_h, self.liquid_fdiff_h]):
+                    # copy the original mvals and perturb
+                    new_mvals = mvals.copy()
+                    new_mvals[parameter_index] += delta_h
 
-        # TODO: Should this method wait for all results to have finished?
-        results = self._estimation_request.results()
+                    # Submit the request with the parameter perturbation
+                    self._pending_gradient_requests[parameter_index][direction] = \
+                        self._submit_request(new_mvals, reweight_only=True)
 
-        if isinstance(results, PropertyEstimatorException):
+            logger.info(f'{len(mvals) * 2} jobs (each with {self._data_set.number_of_properties} properties) with +- '
+                        f'perturbations and employing only reweighting were submitted to the property estimator\n')
 
-            raise ValueError(f'An uncaught exception occured within the property '
-                             f'estimator (directory={results.directory}: {results.message}')
-
-        return len(results.queued_properties) == 0
-
-    def _download_property_estimate_data(self, results, AGrad):
-        """
+    @staticmethod
+    def _is_request_finished(estimation_request):
+        """Checks whether a property estimation request has
+        completed.
 
         Parameters
         ----------
-        results: propertyestimator.client.PropertyEstimatorResult
-            The results of estimating a data set of properties.
-        AGrad: bool
-            A flag for whether or not per parameter gradients were estimated.
+        estimation_request: PropertyEstimatorClient.Request
+            The request to check.
+
+        Returns
+        -------
+        bool
+            True if all properties have been attempted to be
+            estimated.
+        """
+        results = estimation_request.results()
+        return isinstance(results, PropertyEstimatorException) or len(results.queued_properties) == 0
+
+    @staticmethod
+    def _check_estimation_request(estimation_request):
+        """Checks whether a property estimation request has finished
+        with any exceptions.
+
+        Parameters
+        ----------
+        estimation_request: PropertyEstimatorClient.Request
+            The request to check.
+        """
+        results = estimation_request.results()
+
+        # Check for any exceptions that were raised while estimating
+        # the properties.
+        if isinstance(results, PropertyEstimatorException):
+            raise ValueError(f'An uncaught exception occured within the property '
+                             f'estimator (directory={results.directory}: {results.message}')
+
+        if len(results.unsuccessful_properties) > 0:
+
+            exceptions = '\n'.join(f'{result.directory}: {result.message}'
+                                   for result in results.exceptions)
+
+            # TODO: How should we handle this case.
+            raise ValueError(f'Some properties could not be estimated:\n\n{exceptions}.')
+
+        elif len(results.exceptions) > 0:
+
+            exceptions = '\n'.join(f'{result.directory}: {result.message}'
+                                   for result in results.exceptions)
+
+            # In some cases, an exception will be raised when executing a property but
+            # it will not stop the property from being estimated (e.g an error occured
+            # while reweighting so a simulation was used to estimate the property instead).
+            logger.warning(f'A number of non-fatal exceptions occured:\n\n{exceptions}')
+
+    @staticmethod
+    def _extract_property_data(estimation_request):
+        """Extract the property estimates #and their gradients#
+        from a relevant property estimator request object.
+
+        Parameters
+        ----------
+        estimation_request: PropertyEstimatorClient.Request
+            The request to extract the data from.
 
         Returns
         -------
         dict of str, Any
             The estimated properties in a force balance dictionary.
-        dict of str, Any
-            The estimated gradients in a force balance dictionary.
+        # dict of str, Any, optional
+        #     The estimated gradients in a force balance dictionary.
         """
 
+        # TODO: A given property may have been estimated for a number of different substances.
+        #  How should these be consumed by force balance?
         estimated_property_data = {'values': {}, 'value_errors': {}}
-        # TODO: The gradient of a given property may have been computed
-        #       for a number of different substances. How should these be
-        #       consumed by force balance?
-        estimated_gradients = {}
+        # estimated_gradients = {}
 
-        # Extract the results of the property estimations.
+        # Make sure the request actually finished and was error free.
+        if not PropertyEstimate_SMIRNOFF._is_request_finished(estimation_request):
+            raise ValueError('Trying to extract the results of an unfinished request.')
+
+        PropertyEstimate_SMIRNOFF._check_estimation_request(estimation_request)
+
+        # Extract the results from the request.
+        results = estimation_request.results()
+
         for substance_id in results.estimated_properties:
 
             for physical_property in results.estimated_properties[substance_id]:
@@ -460,27 +555,52 @@ class PropertyEstimate_SMIRNOFF(Target):
                     estimated_property_data['values'][mapped_name] = {}
                     estimated_property_data['value_errors'][mapped_name] = {}
 
-                key, value, uncertainty = self._property_to_key_value(physical_property)
+                key, value, uncertainty = PropertyEstimate_SMIRNOFF._property_to_key_value(physical_property)
                 estimated_property_data['values'][mapped_name][key] = value
                 estimated_property_data['value_errors'][mapped_name][key] = uncertainty
 
-                if AGrad is False:
-                    continue
+                # The below snippet will extract any property estimator calculated
+                # gradients.
+                #
+                # if AGrad is False:
+                #     continue
+                #
+                # # Pull out any estimated gradients.
+                # if mapped_name not in estimated_gradients:
+                #     estimated_gradients[mapped_name] = {}
+                #
+                # if key not in estimated_gradients[mapped_name]:
+                #     estimated_gradients[mapped_name][key] = {}
+                #
+                # for gradient in physical_property.gradients:
+                #     parameter_index = self._parameter_key_to_index(gradient.key)
+                #     gradient_value = gradient.value
+                #
+                #     estimated_gradients[mapped_name][key][parameter_index] = gradient_value
 
-                # Pull out any estimated gradients.
-                if mapped_name not in estimated_gradients:
-                    estimated_gradients[mapped_name] = {}
+        return estimated_property_data  # , estimated_gradients
 
-                if key not in estimated_gradients[mapped_name]:
-                    estimated_gradients[mapped_name][key] = {}
+    def wq_complete(self):
+        """
+        Check if all jobs are finished
+        This function should have a sleep in it if not finished.
 
-                for gradient in physical_property.gradients:
-                    parameter_index = self._parameter_key_to_index(gradient.key)
-                    gradient_value = gradient.value
+        Returns
+        -------
+        finished: bool
+            True if all jobs are finished, False if not
+        """
 
-                    estimated_gradients[mapped_name][key][parameter_index] = gradient_value
+        all_finished = self._is_request_finished(self._pending_estimate_request)
 
-        return estimated_property_data, estimated_gradients
+        for parameter_index in self._pending_gradient_requests:
+
+            for direction in self._pending_gradient_requests[parameter_index]:
+
+                request = self._pending_gradient_requests[parameter_index][direction]
+                all_finished = all_finished & self._is_request_finished(request)
+
+        return all_finished
 
     def get(self, mvals, AGrad=True, AHess=True):
         """
@@ -510,34 +630,36 @@ class PropertyEstimate_SMIRNOFF(Target):
         depends on gradients
         """
 
-        results = self._estimation_request.results()
+        # Extract the properties estimated using the unperturbed parameters.
+        estimated_property_data = self._extract_property_data(self._pending_estimate_request)
 
-        # Check for any exceptions that were raised while estimating
-        # the properties.
-        if isinstance(results, PropertyEstimatorException):
+        assert len(self._pending_gradient_requests) == self.FF.np, 'number of submitted jobs not consistent'
 
-            raise ValueError(f'An uncaught exception occured within the property '
-                             f'estimator (directory={results.directory}: {results.message}')
+        zero_gradient = np.zeros(self.FF.np)
+        estimated_gradients = {}
 
-        if len(results.unsuccessful_properties) > 0:
+        for property_name in self._reference_properties:
 
-            exceptions = '\n'.join(f'{result.directory}: {result.message}'
-                                   for result in results.exceptions)
+            estimated_gradients[property_name] = {}
 
-            # TODO: How should we handle this case.
-            raise ValueError(f'Some properties could not be estimated:\n\n{exceptions}.')
+            for phase_point in self._reference_properties[property_name]:
+                estimated_gradients[property_name][phase_point] = zero_gradient
 
-        elif len(results.exceptions) > 0:
+        for parameter_index in range(len(mvals)):
 
-            exceptions = '\n'.join(f'{result.directory}: {result.message}'
-                                   for result in results.exceptions)
+            results_reverse = self._extract_property_data(self._pending_gradient_requests[parameter_index]['reverse'])
+            results_forward = self._extract_property_data(self._pending_gradient_requests[parameter_index]['forward'])
 
-            # In some cases, an exception will be raised when executing a property but
-            # it will not stop the property from being estimated (e.g an error occured
-            # while reweighting so a simulation was used to estimate the property instead).
-            logger.warning(f'A number of non-fatal exceptions occured:\n\n{exceptions}')
+            for property_name in estimated_gradients:
 
-        estimated_property_data, estimated_gradients = self._download_property_estimate_data(results, AGrad)
+                for phase_point in estimated_gradients[property_name]:
+
+                    value_plus = results_forward[property_name][phase_point]
+                    value_minus = results_reverse[property_name][phase_point]
+
+                    # three point formula
+                    gradient = (value_plus - value_minus) / (self.liquid_fdiff_h * 2)
+                    estimated_gradients[property_name][phase_point][parameter_index] = gradient
 
         # compute objective value
         obj_value = 0.0
@@ -547,7 +669,7 @@ class PropertyEstimate_SMIRNOFF(Target):
         # store details for printing
         self._last_obj_details = {}
 
-        for property_name in self._force_balance_properties:
+        for property_name in self._reference_properties:
 
             self.last_obj_details[property_name] = []
 
@@ -559,8 +681,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                 temperature, pressure = phase_point_key
                 ref_value = self.ref_data[property_name][phase_point_key]
 
-                # TODO: load computed value and standard error from real data
-                # TODO: Don't we already have access to this?
+                # TODO: load computed value and standard error from real data - is this done now?
                 tar_value = estimated_property_data['values'][property_name][(temperature, pressure)]
                 tar_error = estimated_property_data['value_errors'][property_name][(temperature, pressure)]
 
