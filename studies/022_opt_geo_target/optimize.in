@@ -49,13 +49,13 @@ normalize_weights no
 constrain_charge false
 
 priors
-    HarmonicBondForce/Bond/k        1.0e+01
-    HarmonicBondForce/Bond/length   1.0e-02
-    HarmonicAngleForce/Angle/k      1.0e+01
-    HarmonicAngleForce/Angle/angle  1.0e+01
-    PeriodicTorsionForce/Proper/k1  1.0e+00
-    NonbondedForce/Atom/epsilon     1.0e-02
-    NonbondedForce/Atom/rmin_half   1.0e-01
+    Bonds/Bond/k                    1.0e+01
+    Bonds/Bond/length               1.0e-02
+    Angles/Angle/k                  1.0e+01
+    Angles/Angle/angle              1.0e+01
+    ProperTorsions/Proper/k1        1.0e+00
+    vdW/Atom/epsilon                1.0e-02
+    vdW/Atom/rmin_half              1.0e-01
 /priors
 
 $end

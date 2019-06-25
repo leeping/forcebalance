@@ -427,7 +427,7 @@ class AbInitio_SMIRNOFF(AbInitio):
         self.set_option(tgt_opts,'mol2',forceprint=True)
         self.set_option(tgt_opts,'coords',default="all.gro")
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
-        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
         self.engine_ = SMIRNOFF
         ## Initialize base class.
         super(AbInitio_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
