@@ -50,23 +50,23 @@ print_hessian
 constrain_charge false
 
 priors
-   NonbondedForce/Atom/epsilon          : 0.1
-   PeriodicTorsionForce/Proper/k        : 1.0
-   NonbondedForce/Atom/rmin_half        : 1.0
+   ProperTorsions/Proper/k              : 1.0
+   vdW/Atom/epsilon                     : 0.1
+   vdW/Atom/rmin_half                   : 1.0
 /priors      
 
 read_mvals
-   0 [  1.86601380e-01 ] : PeriodicTorsionForce/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   1 [ -3.63938926e-01 ] : PeriodicTorsionForce/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
-   2 [  1.82179741e-01 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]
-   3 [  1.09402664e-01 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]
-   4 [  5.90729218e-02 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   5 [ -3.08817431e-02 ] : NonbondedForce/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
-   6 [  3.10270779e-03 ] : NonbondedForce/Atom/epsilon/[#1:1]-[#8]
-   7 [  7.24741894e-02 ] : NonbondedForce/Atom/epsilon/[#6X4:1]
-   8 [  6.98077027e-02 ] : NonbondedForce/Atom/rmin_half/[#6X4:1]
-   9 [  2.08192792e-02 ] : NonbondedForce/Atom/epsilon/[#8X2H1+0:1]
-  10 [  1.92008771e-02 ] : NonbondedForce/Atom/rmin_half/[#8X2H1+0:1]
+   0 [  1.81344348e-01 ] : ProperTorsions/Proper/k1/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   1 [ -1.21628484e-01 ] : ProperTorsions/Proper/k2/[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]
+   2 [  9.59201667e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   3 [  8.53174833e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   4 [  5.98520367e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   5 [  3.84500433e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   6 [ -2.92592604e-02 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   7 [  3.21968178e-02 ] : vdW/Atom/epsilon/[#6X4:1]
+   8 [  5.75159044e-02 ] : vdW/Atom/rmin_half/[#6X4:1]
+   9 [  1.33191723e-03 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+  10 [ -5.47932248e-02 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
 /read_mvals
 $end
 

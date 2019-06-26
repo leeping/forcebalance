@@ -20,27 +20,27 @@ from future.utils import with_metaclass
 logger = getLogger(__name__)
 
 class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
-    
+
     """
     Base class for all fitting targets.
-    
+
     In ForceBalance a Target is defined as a set of reference data
     plus a corresponding method to simulate that data using the force field.
-    
+
     The 'computable quantities' may include energies and forces where the
     reference values come from QM calculations (energy and force matching),
     energies from an EDA analysis (Maybe in the future, FDA?), molecular
     properties (like polarizability, refractive indices, multipole moments
     or vibrational frequencies), relative entropies, and bulk properties.
     Single-molecule or bulk properties can even come from the experiment!
-    
+
     The central idea in ForceBalance is that each quantity makes a
     contribution to the overall objective function.  So we can build force
     fields that fit several quantities at once, rather than putting all of
     our chips behind energy and force matching.  In the future
     ForceBalance may even include multiobjective optimization into the
     optimizer.
-    
+
     The optimization is done by way of minimizing an 'objective
     function', which is comprised of squared differences between the
     computed and reference values.  These differences are not computed
@@ -52,8 +52,8 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
     An important node: Target requires that all subclasses
     have a method get(self,mvals,AGrad=False,AHess=False)
     that does the following:
-    
-    Inputs: 
+
+    Inputs:
     mvals        = The parameter vector, which modifies the force field
     (Note to self: We include mvals with each Target because we can create
     copies of the force field and do finite difference derivatives)
@@ -76,7 +76,7 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
     parameters need to be computed by finite difference.  Not a bad idea. :)
 
     """
-    
+
     def __init__(self,options,tgt_opts,forcefield):
         """
         All options here are intended to be usable by every
@@ -185,7 +185,7 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         ## Whether to write objective.p at every iteration (true for all but remote.)
         self.write_objective      = True
         ## Create a new temp directory.
-        if not options['continue']: 
+        if not options['continue']:
             self.refresh_temp_directory()
         else:
             if not os.path.exists(os.path.join(self.root,self.tempdir)):
@@ -204,9 +204,9 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         return Ans
 
     def read_0grads(self):
-        
+
         """ Read a file from the target directory containing names of
-        parameters that don't contribute to the gradient. 
+        parameters that don't contribute to the gradient.
 
         *Note* that we are checking the derivatives of the objective
         function, and not the derivatives of the quantities that go
@@ -220,7 +220,7 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         for excluding the calculation of property Hessians.  This is
         mostly fine since we rarely if ever calculate an explicit
         property Hessian. """
-        
+
         zero_prm = os.path.join(self.root, self.tgtdir, 'zerograd.txt')
         # If the 'zero parameters' text file exists, then we load
         # the parameter names from the file for exclusion.
@@ -300,7 +300,7 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
                 elif self.fdgrad:
                     Ans['G'][i] = f1d2p(fdwrap_G(self,mvals,i),self.h,f0 = Ans['X'])
         self.gct += 1
-        if Counter() == self.zerograd and self.zerograd >= 0: 
+        if Counter() == self.zerograd and self.zerograd >= 0:
             self.write_0grads(Ans)
         return Ans
 
@@ -330,11 +330,11 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
             for i in self.pgrad:
                 if any([j in self.FF.plist[i] for j in self.fd2_pids]) or 'ALL' in self.fd2_pids:
                     Ans['G'][i], Ans['H'][i,i] = f12d3p(fdwrap_G(self,mvals,i),self.h, f0 = Ans['X'])
-        if Counter() == self.zerograd and self.zerograd >= 0: 
+        if Counter() == self.zerograd and self.zerograd >= 0:
             self.write_0grads(Ans)
         self.hct += 1
         return Ans
-    
+
     def link_from_tempdir(self,absdestdir):
         link_dir_contents(os.path.join(self.root,self.tempdir), absdestdir)
 
@@ -365,6 +365,8 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         shutil.rmtree(abstempdir,ignore_errors=True)
         # Create a new temporary directory from scratch
         os.makedirs(abstempdir)
+        # QYD: Potential bug:
+        # this function may be skipped when continue=True, causing mol2 file missing in temp folder
         if hasattr(self, 'mol2'):
             for f in self.mol2:
                 if os.path.exists(os.path.join(self.root, self.tgtdir, f)):
@@ -377,15 +379,15 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
     @abc.abstractmethod
     def get(self,mvals,AGrad=False,AHess=False):
 
-        """ 
-        
+        """
+
         Every target must be able to return a contribution
         to the objective function - however, this must be implemented
         in the specific subclass.  See abinitio for an
         example.
 
         """
-        
+
         logger.error('The get method is not implemented in the Target base class\n')
         raise NotImplementedError
 
@@ -400,25 +402,25 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
 
     def read(self,mvals,AGrad=False,AHess=False):
 
-        """ 
+        """
 
         Read data from disk for the initial optimization step if the
-        user has provided the directory to the "read" option.  
+        user has provided the directory to the "read" option.
 
         """
         mvals1 = np.loadtxt('mvals.txt')
 
         if len(mvals) > 0 and (np.max(np.abs(mvals1 - mvals)) > 1e-3):
             warn_press_key("mvals from mvals.txt does not match up with get! (Are you reading data from a previous run?)\nmvals(call)=%s mvals(disk)=%s" % (mvals, mvals1))
-        
+
         return lp_load('objective.p')
 
     def absrd(self, inum=None):
 
-        """ 
+        """
         Supply the correct directory specified by user's "read" option.
         """
-        
+
         if self.evaluated:
             logger.error("Tried to read from disk, but not allowed because this target is evaluated already\n")
             raise RuntimeError
@@ -477,7 +479,7 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
     def maxrd(self):
 
         """ Supply the latest existing temp-directory containing valid data. """
-        
+
         abs_rd = os.path.join(self.root, self.tempdir)
 
         iterints = [int(d.replace('iter_','')) for d in os.listdir(abs_rd) if os.path.isdir(os.path.join(abs_rd, d))]
@@ -491,7 +493,7 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
     def maxid(self):
 
         """ Supply the latest existing temp-directory. """
-        
+
         abs_rd = os.path.join(self.root, self.tempdir)
 
         iterints = [int(d.replace('iter_','')) for d in os.listdir(abs_rd) if os.path.isdir(os.path.join(abs_rd, d))]
@@ -499,19 +501,19 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
 
     def meta_indicate(self, customdir=None):
 
-        """ 
+        """
 
         Wrap around the indicate function, so it can print to screen and
         also to a file.  If reading from checkpoint file, don't call
         the indicate() function, instead just print the file contents
         to the screen.
-        
+
         """
         # Using the module level logger
         logger = getLogger(__name__)
         # Note that reading information is not supported for custom folders (e.g. microiterations during search)
         if self.rd is not None and (not self.evaluated) and self.read_indicate and customdir is None:
-            # Move into the directory for reading data, 
+            # Move into the directory for reading data,
             cwd = os.getcwd()
             os.chdir(self.absrd())
             logger.info(open('indicate.log').read())
@@ -540,20 +542,20 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
                 logger.info(open('indicate.log').read())
                 # Go back to the directory where we were
                 os.chdir(cwd)
-        
+
     def meta_get(self, mvals, AGrad=False, AHess=False, customdir=None):
-        """ 
-        Wrapper around the get function.  
+        """
+        Wrapper around the get function.
         Create the directory for the target, and then calls 'get'.
         If we are reading existing data, go into the appropriate read directory and call read() instead.
         The 'get' method should not worry about the directory that it's running in.
-        
+
         """
         ## Directory of the current iteration; if not None, then the simulation runs under
         ## temp/target_name/iteration_number
         ## The 'customdir' is customizable and can go below anything
         cwd = os.getcwd()
-        
+
         absgetdir = os.path.join(self.root,self.tempdir)
         if Counter() is not None:
             # Not expecting more than ten thousand iterations
@@ -586,22 +588,22 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         ## Save the force field files to this directory, so that it
         ## reflects the objective function and properties that were
         ## printed out.
-        if not in_fd(): 
+        if not in_fd():
             self.FF.make(mvals)
 
         os.chdir(cwd)
-        
+
         return Answer
 
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
         return
 
     def stage(self, mvals, AGrad=False, AHess=False, customdir=None, firstIteration=False):
-        """ 
+        """
 
         Stages the directory for the target, and then launches Work Queue processes if any.
         The 'get' method should not worry about the directory that it's running in.
-        
+
         """
         if self.sleepy > 0:
             logger.info("Sleeping for %i seconds as directed...\n" % self.sleepy)
@@ -610,7 +612,7 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         ## temp/target_name/iteration_number
         ## The 'customdir' is customizable and can go below anything
         cwd = os.getcwd()
-        
+
         absgetdir = os.path.join(self.root,self.tempdir)
         if Counter() is not None:
             ## Not expecting more than ten thousand iterations
@@ -627,17 +629,17 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         if not in_fd():
             np.savetxt('mvals.txt', mvals)
         ## Read in file that specifies which derivatives may be skipped.
-        if Counter() >= self.zerograd and self.zerograd >= 0: 
+        if Counter() >= self.zerograd and self.zerograd >= 0:
             self.read_0grads()
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Submit jobs to the Work Queue.
-        if self.rd is None or (not firstIteration): 
+        if self.rd is None or (not firstIteration):
             self.submit_jobs(mvals, AGrad, AHess)
         elif customdir is not None:
             # Allows us to submit micro-iteration jobs for remote targets
             self.submit_jobs(mvals, AGrad, AHess)
         os.chdir(cwd)
-        
+
         return
 
     def wq_complete(self):
@@ -661,21 +663,21 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
     def printcool_table(self, data=OrderedDict([]), headings=[], banner=None, footnote=None, color=0):
         """ Print target information in an organized table format.  Implemented 6/30 because
         multiple targets are already printing out tabulated information in very similar ways.
-        This method is a simple wrapper around printcool_dictionary.  
+        This method is a simple wrapper around printcool_dictionary.
 
         The input should be something like:
 
         @param data Column contents in the form of an OrderedDict, with string keys and list vals.
         The key is printed in the leftmost column and the vals are printed in the other columns.
         If non-strings are passed, they will be converted to strings (not recommended).
-        
+
         @param headings Column headings in the form of a list.  It must be equal to the number to the list length
         for each of the "vals" in OrderedDict, plus one.  Use "\n" characters to specify long
         column names that may take up more than one line.
 
         @param banner Optional heading line, which will be printed at the top in the title.
         @param footnote Optional footnote line, which will be printed at the bottom.
-        
+
         """
         tline="Target: %s  Type: %s  Objective = %.5e" % (self.name, self.__class__.__name__, self.objective)
         nc = len(headings)
@@ -721,11 +723,11 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         printcool_dictionary(PrintDict, title='\n'.join(tlines), keywidth=cwidths[0], center=[i in centers for i in range(len(tlines))], leftpad=4, color=color)
 
     def serialize_ff(self, mvals, outside=None):
-        """ 
+        """
         This code writes a force field pickle file to an folder in
         "job.tmp/dnm/forcebalance.p", because it takes
         time to compress and most targets can simply reuse this file.
-        
+
         Inputs:
         mvals = Mathematical parameter values
         outside = Write this file outside the targets directory
@@ -751,23 +753,23 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
             forcebalance.nifty.lp_dump((self.FF, mvals), 'forcefield.p')
         os.chdir(cwd)
         forcebalance.nifty.LinkFile(os.path.join(self.ffpd, 'forcefield.p'), 'forcefield.p')
-               
+
 class RemoteTarget(Target):
     def __init__(self,options,tgt_opts,forcefield):
         super(RemoteTarget, self).__init__(options,tgt_opts,forcefield)
-        
+
         self.r_options = options.copy()
         self.r_options["type"]="single"
         self.set_option(tgt_opts, "remote_prefix", "rpfx")
         self.set_option(tgt_opts, "remote_backup", "rbak")
-        
+
         self.r_tgt_opts = tgt_opts.copy()
         self.r_tgt_opts["remote"]=False
-        
+
         tar = tarfile.open(name="%s/target.tar.bz2" % (self.tempdir), mode='w:bz2', dereference=True)
         tar.add("%s/targets/%s" % (self.root, self.name), arcname = "targets/%s" % self.name)
         tar.close()
-        
+
         self.remote_indicate = ""
 
         if options['wq_port'] == 0:
@@ -786,15 +788,15 @@ class RemoteTarget(Target):
 
         self.serialize_ff(mvals, outside="forcefield-remote")
         forcebalance.nifty.lp_dump((AGrad, AHess, id_string, self.r_options, self.r_tgt_opts, self.pgrad),'options.p')
-        
+
         # Link in the rpfx script.
         if len(self.rpfx) > 0:
             forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data",self.rpfx),self.rpfx)
         forcebalance.nifty.LinkFile(os.path.join(os.path.split(__file__)[0],"data","rtarget.py"),"rtarget.py")
         forcebalance.nifty.LinkFile(os.path.join(self.root, self.tempdir, "target.tar.bz2"),"target.tar.bz2")
-        
+
         wq = getWorkQueue()
-        
+
         # logger.info("Sending target '%s' to work queue for remote evaluation\n" % self.name)
         # input:
         #   forcefield.p: pickled force field
@@ -807,20 +809,22 @@ class RemoteTarget(Target):
         # if len(self.rpfx) > 0 and self.rpfx not in ['rungmx.sh', 'runcuda.sh']:
         #     logger.error('Unsupported prefix script for launching remote target')
         #     raise RuntimeError
-        forcebalance.nifty.queue_up(wq, "%spython rtarget.py > rtarget.out 2>&1" % (("sh %s%s " % (self.rpfx, " -b" if self.rbak else "")) 
+        forcebalance.nifty.queue_up(wq, "%spython rtarget.py > rtarget.out 2>&1" % (("sh %s%s " % (self.rpfx, " -b" if self.rbak else ""))
                                                                                     if len(self.rpfx) > 0 else ""),
                                     ["forcefield.p", "options.p", "rtarget.py", "target.tar.bz2"] + ([self.rpfx] if len(self.rpfx) > 0 else []),
-                                    ['objective.p', 'indicate.log', 'rtarget.out'],
+                                    ['target_result.tar.bz2'],
                                     tgt=self, tag=self.name, verbose=False)
 
     def read(self,mvals,AGrad=False,AHess=False):
         return self.get(mvals, AGrad, AHess)
 
     def get(self,mvals,AGrad=False,AHess=False):
+        with tarfile.open("target_result.tar.bz2", "r") as tar:
+            tar.extractall()
         with open('indicate.log', 'r') as f:
             self.remote_indicate = f.read()
         return lp_load('objective.p')
-        
+
     def indicate(self):
         logger.info(self.remote_indicate)
 
