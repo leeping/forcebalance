@@ -51,7 +51,7 @@ try:
     # Import the OpenEye toolkit
     from openeye import oechem
 except:
-    warn_once("Failed to import openforcefield and/or OpenEye toolkit.")
+    pass
 
 """Dictionary for building parameter identifiers.  As usual they go like this:
 Bond/length/OW.HW
