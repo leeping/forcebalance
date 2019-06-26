@@ -29,9 +29,10 @@ from forcebalance.molecule import *
 from forcebalance.chemistry import *
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict, Counter
 from forcebalance.output import getLogger
 from forcebalance.openmmio import OpenMM, UpdateSimulationParameters
+import json
 
 logger = getLogger(__name__)
 try:
@@ -43,39 +44,65 @@ except:
     pass
 
 try:
+    # import the hack for openforcefield to improve performance by 10x
+    from forcebalance import smirnoff_hack
     # Import the SMIRNOFF forcefield engine and some useful tools
     from openforcefield.typing.engines.smirnoff import ForceField
-    # LPW: openforcefield's PME is different from openmm's PME
-    from openforcefield.typing.engines.smirnoff.forcefield import NoCutoff, PME
-    from openforcefield.utils import get_data_filename, extractPositionsFromOEMol, generateTopologyFromOEMol
-    # Import the OpenEye toolkit
-    from openeye import oechem
+    # QYD: name of class are modified to avoid colliding with ForceBalance Molecule
+    from openforcefield.topology import Molecule as OffMolecule
+    from openforcefield.topology import Topology as OffTopology
 except:
     pass
 
-"""Dictionary for building parameter identifiers.  As usual they go like this:
-Bond/length/OW.HW
-The dictionary is two-layered because the same interaction type (Bond)
-could be under two different parent types (HarmonicBondForce, AmoebaHarmonicBondForce)"""
-suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
-                "HarmonicAngleForce" : {"Angle" : ["class1","class2","class3"],},
-                "PeriodicTorsionForce" : {"Proper" : ["class1","class2","class3","class4"],},
-                "NonbondedForce" : {"Atom": ["type"]},
-                "CustomNonbondedForce" : {"Atom": ["class"]},
-                "GBSAOBCForce" : {"Atom": ["type"]},
-                "AmoebaBondForce" : {"Bond" : ["class1","class2"]},
-                "AmoebaAngleForce" : {"Angle" : ["class1","class2","class3"]},
-                "AmoebaStretchBendForce" : {"StretchBend" : ["class1","class2","class3"]},
-                "AmoebaVdwForce" : {"Vdw" : ["class"]},
-                "AmoebaMultipoleForce" : {"Multipole" : ["type","kz","kx"], "Polarize" : ["type"]},
-                "AmoebaUreyBradleyForce" : {"UreyBradley" : ["class1","class2","class3"]},
-                "Residues.Residue" : {"VirtualSite" : ["index"]},
-                ## LPW's custom parameter definitions
-                "ForceBalance" : {"GB": ["type"]},
-                }
-
 ## pdict is a useless variable if the force field is XML.
 pdict = "XML_Override"
+
+def smirnoff_analyze_parameter_coverage(forcefield, targets):
+    printcool("SMIRNOFF Parameter Coverage Analysis")
+    assert hasattr(forcefield, 'offxml'), "Only SMIRNOFF Force Field is supported"
+    parameter_assignment_data = defaultdict(list)
+    parameter_counter = Counter()
+    # build the openforcefield.typing.engines.smirnoff.ForceField object
+    absffpath = os.path.join(forcefield.root,forcefield.ffdir,forcefield.offxml)
+    ff = ForceField(absffpath, allow_cosmetic_attributes=True)
+    # analyze each target
+    for target in targets:
+        off_topology = None
+        ## remote targets are not initialized yet, we do a manual setup here
+        if isinstance(target, forcebalance.target.RemoteTarget):
+            if target.r_tgt_opts['type'].endswith('SMIRNOFF'):
+                target_path = os.path.join(target.root, target.tgtdir)
+                openff_mols = [OffMolecule.from_file(os.path.join(target_path,fnm)) for fnm in target.r_tgt_opts.get('mol2', [])]
+                off_topology = OffTopology.from_molecules(openff_mols)
+        elif hasattr(target, 'engine') and isinstance(target.engine, SMIRNOFF) and hasattr(target.engine,'off_topology'):
+            off_topology = target.engine.off_topology
+        if off_topology is not None:
+            molecule_force_list = ff.label_molecules(off_topology)
+            for mol_idx, mol_forces in enumerate(molecule_force_list):
+                for force_tag, force_dict in mol_forces.items():
+                    # e.g. force_tag = 'Bonds'
+                    for atom_indices, parameter in force_dict.items():
+                        param_dict = {'id': parameter.id, 'smirks': parameter.smirks, 'type':force_tag, 'atoms': list(atom_indices),}
+                        parameter_assignment_data[target.name].append(param_dict)
+                        parameter_counter[parameter.smirks] += 1
+        else:
+            logger.warning("No smirnoff topology or molecule found for target %s\n" % target.name)
+    # write out parameter assignment data
+    out_json_path = os.path.join(forcefield.root, 'smirnoff_parameter_assignments.json')
+    with open(out_json_path, 'w') as jsonfile:
+        json.dump(parameter_assignment_data, jsonfile, indent=2)
+        logger.info("Force field assignment data written to %s\n" % out_json_path)
+    # print parameter coverages
+    logger.info("%4s %-100s   %10s\n" % ("idx", "Parameter", "Count"))
+    logger.info("-"*118 + '\n')
+    n_covered = 0
+    for i,p in enumerate(forcefield.plist):
+        smirks = p.split('/')[-1]
+        logger.info('%4i %-100s : %10d\n' % (i, p, parameter_counter[smirks]))
+        if parameter_counter[smirks] > 0:
+            n_covered += 1
+    logger.info("SNIRNOFF Parameter Coverage Analysis result: %d/%d parameters are covered.\n" % (n_covered, len(forcefield.plist)))
+    logger.info("-"*118 + '\n')
 
 class SMIRNOFF_Reader(BaseReader):
     """ Class for parsing OpenMM force field files. """
@@ -175,13 +202,23 @@ class SMIRNOFF(OpenMM):
         """
         self.pdb = PDBFile(self.abspdb)
 
-        ## Create the OpenFF ForceField object.
+        # Create the OpenFF ForceField object.
         if hasattr(self, 'FF'):
             self.offxml = [self.FF.offxml]
-            self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml))
+            self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml), allow_cosmetic_attributes=True)
         else:
             self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
-            self.forcefield = ForceField(*self.offxml)
+            self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
+
+        ## Load mol2 files for smirnoff topology
+        openff_mols = []
+        for fnm in self.mol2:
+            mol = OffMolecule.from_file(fnm)
+            openff_mols.append(mol)
+        self.off_topology = OffTopology.from_openmm(self.pdb.topology, unique_molecules=openff_mols)
+
+        # used in create_simulation()
+        self.mod = Modeller(self.pdb.topology, self.pdb.positions)
 
         ## OpenMM options for setting up the System.
         self.mmopts = dict(mmopts)
@@ -198,34 +235,19 @@ class SMIRNOFF(OpenMM):
 
         ## Set system options from periodic boundary conditions.
         self.pbc = pbc
-        if pbc:
-            minbox = min([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
-            self.SetPME = True
-            self.mmopts.setdefault('nonbondedMethod', PME)
-            nonbonded_cutoff = kwargs.get('nonbonded_cutoff', 8.5)
-            # Conversion to nanometers
-            nonbonded_cutoff /= 10
-            if nonbonded_cutoff > 0.05*(float(int(minbox - 1))):
-                warn_press_key("nonbonded_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (nonbonded_cutoff*10, minbox))
+        ## print warning for 'nonbonded_cutoff' keywords
+        if 'nonbonded_cutoff' in kwargs:
+            logger.warning("nonbonded_cutoff keyword ignored because it's set in the offxml file\n")
 
-            self.mmopts.setdefault('nonbondedCutoff', nonbonded_cutoff*nanometer)
-            self.mmopts.setdefault('useSwitchingFunction', True)
-            self.mmopts.setdefault('switchingDistance', (nonbonded_cutoff-0.1)*nanometer)
-            self.mmopts.setdefault('useDispersionCorrection', True)
-        else:
-            if 'nonbonded_cutoff' in kwargs or 'vdw_cutoff' in kwargs:
-                warn_press_key('No periodic boundary conditions, your provided nonbonded_cutoff and vdw_cutoff will not be used')
-            self.SetPME = False
-            self.mmopts.setdefault('nonbondedMethod', NoCutoff)
-            self.mmopts['removeCMMotion'] = False
+
 
         ## Generate OpenMM-compatible positions
         self.xyz_omms = []
         for I in range(len(self.mol)):
-            xyz = self.mol.xyzs[I]
-            xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
+            position = self.mol.xyzs[I] * angstrom
+            # xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
             # An extra step with adding virtual particles
-            mod = Modeller(self.pdb.topology, xyz_omm)
+            # mod = Modeller(self.pdb.topology, xyz_omm)
             # LPW commenting out because we don't have virtual sites yet.
             # mod.addExtraParticles(self.forcefield)
             if self.pbc:
@@ -233,16 +255,14 @@ class SMIRNOFF(OpenMM):
                 if self.mol.boxes[I].alpha != 90.0 or self.mol.boxes[I].beta != 90.0 or self.mol.boxes[I].gamma != 90.0:
                     logger.error('OpenMM cannot handle nonorthogonal boxes.\n')
                     raise RuntimeError
-                box_omm = [Vec3(self.mol.boxes[I].a, 0, 0)*angstrom,
-                           Vec3(0, self.mol.boxes[I].b, 0)*angstrom,
-                           Vec3(0, 0, self.mol.boxes[I].c)*angstrom]
+                box_omm = np.diagonal([self.mol.boxes[I].a, self.mol.boxes[I].b, self.mol.boxes[I].c]) * angstrom
             else:
                 box_omm = None
             # Finally append it to list.
-            self.xyz_omms.append((mod.getPositions(), box_omm))
+            self.xyz_omms.append((position, box_omm))
 
         ## Build a topology and atom lists.
-        Top = mod.getTopology()
+        Top = self.pdb.topology
         Atoms = list(Top.atoms())
         Bonds = [(a.index, b.index) for a, b in list(Top.bonds())]
 
@@ -268,31 +288,12 @@ class SMIRNOFF(OpenMM):
         if len(kwargs) > 0:
             self.simkwargs = kwargs
 
-        self.mod = Modeller(self.pdb.topology, self.pdb.positions)
-        self.forcefield = ForceField(*self.offxml)
-        # This part requires the OpenEye tools but may be replaced
-        # by RDKit when that support comes online.
-        oemols = []
-        for fnm in self.mol2:
-            mol = oechem.OEGraphMol()
-            ifs = oechem.oemolistream(fnm)
-            oechem.OEReadMolecule(ifs, mol)
-            oechem.OETriposAtomNames(mol)
-            oemols.append(mol)
-        self.system = self.forcefield.createSystem(self.pdb.topology, oemols, **self.mmopts)
+        self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
+        self.system = self.forcefield.create_openmm_system(self.off_topology)
 
         # Commenting out all virtual site stuff for now.
         # self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
-
-        for i in self.system.getForces():
-            if isinstance(i, NonbondedForce):
-                self.nbcharges = np.array([i.getParticleParameters(j)[0]._value for j in range(i.getNumParticles())])
-                if self.SetPME:
-                    i.setNonbondedMethod(i.PME)
-            if isinstance(i, AmoebaMultipoleForce):
-                if self.SetPME:
-                    i.setNonbondedMethod(i.PME)
 
         #----
         # If the virtual site parameters have changed,
@@ -510,3 +511,4 @@ class OptGeoTarget_SMIRNOFF(OptGeoTarget):
 #         ## Send back the trajectory file.
 #         if self.save_traj > 0:
 #             self.extra_output = ['openmm-md.dcd']
+

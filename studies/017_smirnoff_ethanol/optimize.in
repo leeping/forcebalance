@@ -50,9 +50,9 @@ print_hessian
 constrain_charge false
 
 priors
-   NonbondedForce/Atom/epsilon          : 0.1
-   PeriodicTorsionForce/Proper/k        : 1.0
-   NonbondedForce/Atom/rmin_half        : 1.0
+   ProperTorsions/Proper/k              : 1.0
+   vdW/Atom/epsilon                     : 0.1
+   vdW/Atom/rmin_half                   : 1.0
 /priors      
 
 $end
