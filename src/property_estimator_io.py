@@ -14,21 +14,28 @@ import numpy as np
 from forcebalance.nifty import warn_once, printcool, printcool_dictionary
 from forcebalance.output import getLogger
 from forcebalance.target import Target
-from openforcefield.typing.engines import smirnoff
-from propertyestimator.client import PropertyEstimatorClient, ConnectionOptions, PropertyEstimatorOptions
-from propertyestimator.datasets import ThermoMLDataSet
-from propertyestimator.utils.exceptions import PropertyEstimatorException
-from simtk import unit
 
 logger = getLogger(__name__)
 
 try:
     import propertyestimator
+    from propertyestimator.client import PropertyEstimatorClient, ConnectionOptions, PropertyEstimatorOptions
+    from propertyestimator.datasets import ThermoMLDataSet, PhysicalPropertyDataSet
+    from propertyestimator.utils.exceptions import PropertyEstimatorException
+    from propertyestimator.utils.serialization import TypedJSONDecoder
+    from propertyestimator.workflow import WorkflowOptions
 except ImportError:
-    # TODO: Shouldn't this be allowed to raise an exception,
-    #       or at least signal in some way to force balance
-    #       that it isn't available?
     warn_once("Failed to import the propertyestimator package.")
+
+try:
+    from openforcefield.typing.engines import smirnoff
+except ImportError:
+    warn_once("Failed to import the openforcefield package.")
+
+try:
+    from simtk import unit
+except ImportError:
+    warn_once("Failed to import the openmm package.")
 
 
 class PropertyEstimate_SMIRNOFF(Target):
@@ -42,9 +49,10 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         Attributes
         ----------
-        client_config: OptionsFile.ClientConfiguration
-            Configuration options for a `propertyestimator` client.
-        sources: list of OptionsFile.ThermoMLPropertySource
+        client_config: propertyestimator.client.ConnectionOptions
+            The options for how the `propertyestimator` client should
+            connect to a running server instance.
+        sources: list of OptionsFile.PropertySource
             A list of sources to the properties which this target aims
             to fit against.
         weights: list of PropertyWeight
@@ -53,76 +61,38 @@ class PropertyEstimate_SMIRNOFF(Target):
             ???
         """
 
-        class ClientConfiguration:
-
-            def __init__(self, server_address="localhost", server_port=8000):
-                """Constructs a new ClientConfiguration object.
-
-                Parameters
-                ----------
-                server_address: str
-                    The address of a running `propertyestimator` server.
-                server_port: int
-                    The port of a running `propertyestimator` server.
-                """
-
-                assert server_address is not None and server_port is not None
-
-                self.server_address = server_address
-                self.server_port = server_port
-
-            def to_dict(self):
-                """Converts this object to a dictionary
-
-                Returns
-                -------
-                dict of str and str
-                    The dictionary representation of this class.
-                """
-                return {'server_address': self.server_address, 'server_port': self.server_port}
-
-            @classmethod
-            def from_dict(cls, dictionary):
-                """Creates an instance of this class from a dictionary.
-
-                Parameters
-                ----------
-                dict of str and str
-                    The dictionary representation to build the class from.
-                """
-                return cls(dictionary.get('server_address'), dictionary.get('server_port'))
-
-        class ThermoMLPropertySource:
+        class PropertySource:
             """Represents the source (either a path or a doi) of
             a ThermoML property.
             """
 
             @property
-            def path(self):
-                """str: A path to the ThermoML property .xml file."""
-                return self._path
+            def thermoml_doi(self):
+                """str: The doi of a ThermoML property .xml file."""
+                return self._thermoml_doi
 
             @property
-            def doi(self):
-                """str: The doi of a ThermoML property .xml file."""
-                return self._doi
+            def path(self):
+                """str: A path to a either a JSON property file or a
+                ThermoML .xml archive file."""
+                return self._path
 
-            def __init__(self, path=None, doi=None):
-                """Constructs a new ThermoMLPropertySource object.
+            def __init__(self, path=None, thermoml_doi=None):
+                """Constructs a new PropertySource object.
 
                 Parameters
                 ----------
                 path: str, optional
                     A path to the ThermoML property .xml file.
-                doi: str, optional
+                thermoml_doi: str, optional
                     The doi of a ThermoML property .xml file.
                 """
 
-                assert (path is None and doi is not None or
-                        path is not None and doi is None)
+                assert (path is None and thermoml_doi is not None or
+                        path is not None and thermoml_doi is None)
 
                 self._path = path
-                self._doi = doi
+                self._thermoml_doi = thermoml_doi
 
             def to_dict(self):
                 """Converts this object to a dictionary
@@ -136,7 +106,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                 if self.path is not None:
                     return {'path': self.path}
                 else:
-                    return {'doi': self.doi}
+                    return {'thermoml_doi': self.thermoml_doi}
 
             @classmethod
             def from_dict(cls, dictionary):
@@ -147,11 +117,11 @@ class PropertyEstimate_SMIRNOFF(Target):
                 dict of str and str
                     The dictionary representation to build the class from.
                 """
-                return cls(dictionary.get('path'), dictionary.get('doi'))
+                return cls(dictionary.get('path'), dictionary.get('thermoml_doi'))
 
         def __init__(self):
 
-            self.client_config = self.ClientConfiguration()
+            self.connection_options = ConnectionOptions()
             self.sources = []
             self.weights = {}
             self.denominators = {}
@@ -166,7 +136,7 @@ class PropertyEstimate_SMIRNOFF(Target):
             """
 
             value = {
-                'client_config': self.client_config.to_dict(),
+                'connection_options': self.connection_options.__getstate__(),
                 'sources': [source.to_dict() for source in self.sources],
 
                 'weights': {
@@ -180,26 +150,32 @@ class PropertyEstimate_SMIRNOFF(Target):
             return json.dumps(value, sort_keys=True, indent=4, separators=(',', ': '))
 
         @classmethod
-        def from_json(cls, json_string):
+        def from_json(cls, json_source):
             """Creates this class from a JSON string.
 
             Parameters
             -------
-            json_string
+            json_source: str or file-like object
                 The JSON representation of this class.
             """
 
-            dictionary = json.loads(json_string)
+            if isinstance(json_source, str):
+                with open(json_source, 'r') as file:
+                    dictionary = json.load(file)
+            else:
+                dictionary = json.load(json_source)
 
-            assert ('client_config' in dictionary and
+            assert ('connection_options' in dictionary and
                     'sources' in dictionary and
                     'weights' in dictionary and
                     'denominators' in dictionary)
 
             value = cls()
 
-            value.client_config = cls.ClientConfiguration.from_dict(dictionary['client_config'])
-            value.sources = [cls.ThermoMLPropertySource.from_dict(source) for source in dictionary['sources']]
+            value.connection_options = ConnectionOptions()
+            value.connection_options.__setstate__(dictionary['connection_options'])
+
+            value.sources = [cls.PropertySource.from_dict(source) for source in dictionary['sources']]
 
             value.weights = {
                 property_name: dictionary['weights'][property_name] for property_name in dictionary['weights']
@@ -209,20 +185,6 @@ class PropertyEstimate_SMIRNOFF(Target):
             }
 
             return value
-
-    # A mapping of property estimator property names to
-    # force balance names.
-    estimator_to_force_balance_map = {
-        'Density': 'density',
-        'DielectricConstant': 'dielectric'
-    }
-
-    # A mapping of force balance property names to
-    # property estimator names.
-    force_balance_to_estimator_map = {
-        'density': 'Density',
-        'dielectric': 'DielectricConstant'
-    }
 
     # A dictionary of the units that force balance expects each property in.
     default_units = {
@@ -265,36 +227,53 @@ class PropertyEstimate_SMIRNOFF(Target):
         self._initialize()
 
     @staticmethod
-    def _property_to_key_value(physical_property):
-        """Converts a property estimator `PhysicalProperty` object
-        into a force balance key-value pair.
-
-        TODO: Currently nothing actually stores the substance for
-              which a property was calculated (e.g. water, methanol)
+    def _refactor_properties_dictionary(properties):
+        """Refactors a property dictionary of the form
+        `property = dict[substance_id][property_index]` to one of the form
+        `property = dict[property_type][substance_id][state_tuple]['value' or 'uncertainty']` where
+        the state tuple is equal to (temperature in K .6f, pressure in atm .6f).
 
         Parameters
         ----------
-        physical_property: propertyestimator.properties.PhysicalProperty
-            The physical property to encode.
+        properties: dict of str and list of PhysicalProperty
+            The original dictionary of properties.
 
         Returns
         -------
-        tuple
-            The phase point key.
-        float
-            The property value.
-        float
-            The uncertainty in the value.
+        dict of str and dict of str and dict of tuple and dict of str and float
+            The refactored properties dictionary.
         """
-        class_name = physical_property.__class__.__name__
 
-        phase_point_key = (physical_property.thermodynamic_state.temperature.value_in_unit(unit.kelvin),
-                           physical_property.thermodynamic_state.pressure.value_in_unit(unit.atmosphere))
+        refactored_properties = {}
 
-        value = physical_property.value.value_in_unit(PropertyEstimate_SMIRNOFF.default_units[class_name])
-        uncertainty = physical_property.uncertainty.value_in_unit(PropertyEstimate_SMIRNOFF.default_units[class_name])
+        for substance_id in properties:
 
-        return phase_point_key, value, uncertainty
+            for physical_property in properties[substance_id]:
+
+                class_name = physical_property.__class__.__name__
+
+                temperature = physical_property.thermodynamic_state.temperature.value_in_unit(unit.kelvin)
+                pressure = physical_property.thermodynamic_state.pressure.value_in_unit(unit.atmosphere)
+
+                state_tuple = (f'{temperature:.6f}', f'{pressure:.6f}')
+
+                default_unit = PropertyEstimate_SMIRNOFF.default_units[class_name]
+
+                value = physical_property.value.value_in_unit(default_unit)
+                uncertainty = physical_property.uncertainty.value_in_unit(default_unit)
+
+                if class_name not in refactored_properties:
+                    refactored_properties[class_name] = {}
+
+                if substance_id not in refactored_properties[class_name]:
+                    refactored_properties[class_name][substance_id] = {}
+
+                refactored_properties[class_name][substance_id][state_tuple] = {
+                    'value': value,
+                    'uncertainty': uncertainty
+                }
+
+        return refactored_properties
 
     def _initialize(self):
         """Initializes the property estimator target from an input json file.
@@ -306,53 +285,71 @@ class PropertyEstimate_SMIRNOFF(Target):
         """
 
         # Load in the options from a user provided JSON file.
-        with open(os.path.join(self.tgtdir, self.prop_est_input), 'r') as file:
-            self._options = self.OptionsFile.from_json(file.read())
+        print(f'{os.path.join(self.tgtdir, self.prop_est_input)}')
+        options_file_path = os.path.join(self.tgtdir, self.prop_est_input)
+        self._options = self.OptionsFile.from_json(options_file_path)
 
         # Attempt to create a property estimator client object using the specified
         # connection options.
-        connection_options = ConnectionOptions(server_address=self._options.client_config.server_address,
-                                               server_port=self._options.client_config.server_port)
-
-        self._client = PropertyEstimatorClient(connection_options=connection_options)
+        self._client = PropertyEstimatorClient(connection_options=self._options.connection_options)
 
         # Load in the experimental data set from either the specified doi or
         # local file paths.
-        self._data_set = ThermoMLDataSet.from_file(*[source.path for source in
-                                                     self._options.sources if source.path])
+        self._data_set = PhysicalPropertyDataSet()
 
-        self._data_set.merge(ThermoMLDataSet.from_doi(*[source.doi for source in
-                                                        self._options.sources if source.doi]))
+        self._data_set.merge(ThermoMLDataSet.from_doi(*[source.thermoml_doi for source in
+                                                        self._options.sources if source.thermoml_doi]))
+
+        self._data_set.merge(ThermoMLDataSet.from_file(*[
+            os.path.join(self.tgtdir, source.path) for
+            source in self._options.sources if source.path and os.path.splitext(source.path)[1] == '.xml'
+        ]))
+
+        for source in self._options.sources:
+
+            print(source.path, os.path.splitext(source.path)[1].lower())
+
+            if not source.path or os.path.splitext(source.path)[1].lower() != '.json':
+                continue
+
+            with open(os.path.join(self.tgtdir, source.path), 'r') as file:
+                physical_property = json.load(file, cls=TypedJSONDecoder)
+
+                if physical_property.substance.identifier not in self._data_set.properties:
+                    self._data_set.properties[physical_property.substance.identifier] = []
+
+                self._data_set.properties[physical_property.substance.identifier].append(physical_property)
 
         if len(self._data_set.properties) == 0:
             raise ValueError('The physical property data set to optimise against is empty. '
                              'Either no physical properties were specified, or those that '
                              'were are unsupported by the estimator.')
 
-        # Convert the reference data into a format that forcebalance can understand
-        self._reference_properties = {}
+        # Convert the reference data into a more easily comparable form.
+        self._reference_properties = self._refactor_properties_dictionary(self._data_set.properties)
 
-        for substance_identifier in self._data_set.properties:
-
-            for physical_property in self._data_set.properties[substance_identifier]:
-
-                class_name = physical_property.__class__.__name__
-                mapped_name = PropertyEstimate_SMIRNOFF.estimator_to_force_balance_map[class_name]
-
-                if mapped_name not in self._reference_properties:
-                    self._reference_properties[mapped_name] = {}
-
-                key, value, _ = self._property_to_key_value(physical_property)
-                self._reference_properties[mapped_name][key] = value
-
-        # Print the reference data
+        # Print the reference data, and count the number of instances of
+        # each property type.
         printcool("Loaded experimental data from property estimator")
 
-        for property_name, property_data in self.ref_data.items():
-            dict_for_print = {("%.2fK-%.1fatm" % phase_point_key): ("%f" % value) for phase_point_key, value in
-                              property_data.items()}
+        number_of_properties = {property_name: 0.0 for property_name in self._reference_properties}
 
-            printcool_dictionary(dict_for_print, title="Reference %s data" % property_name)
+        for property_name in self._reference_properties:
+
+            for substance_id in self._reference_properties[property_name]:
+
+                dict_for_print = {}
+
+                for state_tuple in self._reference_properties[property_name][substance_id]:
+
+                    value = self._reference_properties[property_name][substance_id][state_tuple]['value']
+                    uncertainty = self._reference_properties[property_name][substance_id][state_tuple]['uncertainty']
+
+                    dict_for_print["%sK-%satm" % state_tuple] = ("%f+/-%f" % (value, uncertainty))
+
+                    number_of_properties[property_name] += 1.0
+
+                printcool_dictionary(dict_for_print, title="Reference %s (%s) data" % (property_name, substance_id))
 
         # Assign and normalize weights for each phase point (average for now)
         self._normalised_weights = {}
@@ -360,7 +357,7 @@ class PropertyEstimate_SMIRNOFF(Target):
         for property_name in self._reference_properties:
 
             self._normalised_weights[property_name] = (self._options.weights[property_name] /
-                                                       len(self._reference_properties[property_name]))
+                                                       number_of_properties[property_name])
 
     def _build_parameter_gradient_keys(self):
         """Build the list of parameter gradient keys based
@@ -370,7 +367,6 @@ class PropertyEstimate_SMIRNOFF(Target):
         -------
         list of propertyestimator.properties.ParameterGradientKey
         """
-        # TODO for Simon: Build the gradient keys. `self.FF.plist` may be of use?
         raise NotImplementedError()
 
     def _submit_request(self, mvals, reweight_only=False):
@@ -387,9 +383,16 @@ class PropertyEstimate_SMIRNOFF(Target):
         """
 
         self.FF.make(mvals)
-        force_field = smirnoff.ForceField(self.FF.offxml)
+        force_field = smirnoff.ForceField(self.FF.offxml, allow_cosmetic_attributes=True)
 
         options = PropertyEstimatorOptions()
+
+        workflow_options = WorkflowOptions(WorkflowOptions.ConvergenceMode.NoChecks)
+
+        options.workflow_options = {
+            'Density': workflow_options,
+            'DielectricConstant': workflow_options
+        }
 
         if reweight_only:
             options.allowed_calculation_layers = ['ReweightingLayer']
@@ -435,6 +438,8 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         # Submit the reference property estimation request.
         self._pending_estimate_request = self._submit_request(mvals)
+        self._pending_estimate_request.results(synchronous=True, polling_interval=5)
+
         self._pending_gradient_requests = {}
 
         if AGrad is True:
@@ -522,16 +527,12 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         Returns
         -------
-        dict of str, Any
-            The estimated properties in a force balance dictionary.
+        dict of str and dict of str and dict of tuple and dict of str and float
+            The estimated properties in a dictionary of the form
+            `property = dict[property_type][substance_id][state_tuple]['value' or 'uncertainty']`
         # dict of str, Any, optional
         #     The estimated gradients in a force balance dictionary.
         """
-
-        # TODO: A given property may have been estimated for a number of different substances.
-        #  How should these be consumed by force balance?
-        estimated_property_data = {'values': {}, 'value_errors': {}}
-        # estimated_gradients = {}
 
         # Make sure the request actually finished and was error free.
         if not PropertyEstimate_SMIRNOFF._is_request_finished(estimation_request):
@@ -542,43 +543,84 @@ class PropertyEstimate_SMIRNOFF(Target):
         # Extract the results from the request.
         results = estimation_request.results()
 
-        for substance_id in results.estimated_properties:
+        estimated_data = PropertyEstimate_SMIRNOFF._refactor_properties_dictionary(results.estimated_properties)
+        # estimated_gradients = {}
 
-            for physical_property in results.estimated_properties[substance_id]:
+        # The below snippet will extract any property estimator calculated
+        # gradients.
+        # for substance_id in results.estimated_properties:
+        #
+        #     for physical_property in results.estimated_properties[substance_id]:
+        #
+        #         # Convert the property estimator properties list into
+        #         # a force balance dictionary.
+        #         class_name = physical_property.__class__.__name__
+        #
+        #         if AGrad is False:
+        #             continue
+        #
+        #         # Pull out any estimated gradients.
+        #         if class_name not in estimated_gradients:
+        #             estimated_gradients[class_name] = {}
+        #
+        #         if substance_id not in estimated_gradients[class_name]:
+        #             estimated_gradients[class_name][substance_id] = {}
+        #
+        #         if state_key not in estimated_gradients[class_name][substance_id]:
+        #             estimated_gradients[class_name][substance_id][state_key] = {}
+        #
+        #         for gradient in physical_property.gradients:
+        #             parameter_index = self._parameter_key_to_index(gradient.key)
+        #             gradient_value = gradient.value
+        #
+        #             estimated_gradients[class_name][substance_id][state_key][parameter_index] = gradient_value
 
-                # Convert the property estimator properties list into
-                # a force balance dictionary.
-                class_name = physical_property.__class__.__name__
-                mapped_name = PropertyEstimate_SMIRNOFF.estimator_to_force_balance_map[class_name]
+        return estimated_data  # , estimated_gradients
 
-                if mapped_name not in estimated_property_data['values']:
-                    estimated_property_data['values'][mapped_name] = {}
-                    estimated_property_data['value_errors'][mapped_name] = {}
+    def _extract_property_gradients(self, mvals):
+        """Extract gradients of all of the observables with respect to
+        the force field parameters.
 
-                key, value, uncertainty = PropertyEstimate_SMIRNOFF._property_to_key_value(physical_property)
-                estimated_property_data['values'][mapped_name][key] = value
-                estimated_property_data['value_errors'][mapped_name][key] = uncertainty
+        Returns
+        -------
+        dict of str and dict of str and dict of tuple and float
+            The estimated gradients in a dictionary of the form
+            `gradient = dict[property_type][substance_id][state_tuple]`
+        """
 
-                # The below snippet will extract any property estimator calculated
-                # gradients.
-                #
-                # if AGrad is False:
-                #     continue
-                #
-                # # Pull out any estimated gradients.
-                # if mapped_name not in estimated_gradients:
-                #     estimated_gradients[mapped_name] = {}
-                #
-                # if key not in estimated_gradients[mapped_name]:
-                #     estimated_gradients[mapped_name][key] = {}
-                #
-                # for gradient in physical_property.gradients:
-                #     parameter_index = self._parameter_key_to_index(gradient.key)
-                #     gradient_value = gradient.value
-                #
-                #     estimated_gradients[mapped_name][key][parameter_index] = gradient_value
+        zero_gradient = np.zeros(self.FF.np)
+        estimated_gradients = {}
 
-        return estimated_property_data  # , estimated_gradients
+        for property_name in self._reference_properties:
+
+            estimated_gradients[property_name] = {}
+
+            for substance_id in self._reference_properties[property_name]:
+
+                estimated_gradients[substance_id] = {}
+
+                for phase_point in self._reference_properties[property_name][substance_id]:
+                    estimated_gradients[property_name][substance_id][phase_point] = zero_gradient
+
+        for parameter_index in range(len(mvals)):
+
+            results_reverse = self._extract_property_data(self._pending_gradient_requests[parameter_index]['reverse'])
+            results_forward = self._extract_property_data(self._pending_gradient_requests[parameter_index]['forward'])
+
+            for property_name in estimated_gradients:
+
+                for substance_id in self._reference_properties[property_name]:
+
+                    for phase_point in estimated_gradients[property_name][substance_id]:
+
+                        value_plus = results_forward[property_name][substance_id][phase_point]
+                        value_minus = results_reverse[property_name][substance_id][phase_point]
+
+                        # three point formula
+                        gradient = (value_plus - value_minus) / (self.liquid_fdiff_h * 2)
+                        estimated_gradients[property_name][substance_id][phase_point][parameter_index] = gradient
+
+        return estimated_gradients
 
     def wq_complete(self):
         """
@@ -591,16 +633,21 @@ class PropertyEstimate_SMIRNOFF(Target):
             True if all jobs are finished, False if not
         """
 
-        all_finished = self._is_request_finished(self._pending_estimate_request)
+        if not self._is_request_finished(self._pending_estimate_request):
+            return False
 
         for parameter_index in self._pending_gradient_requests:
 
             for direction in self._pending_gradient_requests[parameter_index]:
 
                 request = self._pending_gradient_requests[parameter_index][direction]
-                all_finished = all_finished & self._is_request_finished(request)
 
-        return all_finished
+                if self._is_request_finished(request):
+                    continue
+
+                return False
+
+        return True
 
     def get(self, mvals, AGrad=True, AHess=True):
         """
@@ -632,34 +679,13 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         # Extract the properties estimated using the unperturbed parameters.
         estimated_property_data = self._extract_property_data(self._pending_estimate_request)
+        estimated_gradients = {}
 
         assert len(self._pending_gradient_requests) == self.FF.np, 'number of submitted jobs not consistent'
 
-        zero_gradient = np.zeros(self.FF.np)
-        estimated_gradients = {}
-
-        for property_name in self._reference_properties:
-
-            estimated_gradients[property_name] = {}
-
-            for phase_point in self._reference_properties[property_name]:
-                estimated_gradients[property_name][phase_point] = zero_gradient
-
-        for parameter_index in range(len(mvals)):
-
-            results_reverse = self._extract_property_data(self._pending_gradient_requests[parameter_index]['reverse'])
-            results_forward = self._extract_property_data(self._pending_gradient_requests[parameter_index]['forward'])
-
-            for property_name in estimated_gradients:
-
-                for phase_point in estimated_gradients[property_name]:
-
-                    value_plus = results_forward[property_name][phase_point]
-                    value_minus = results_reverse[property_name][phase_point]
-
-                    # three point formula
-                    gradient = (value_plus - value_minus) / (self.liquid_fdiff_h * 2)
-                    estimated_gradients[property_name][phase_point][parameter_index] = gradient
+        if AGrad:
+            # Optionally extract and gradients.
+            estimated_gradients = self._extract_property_gradients(mvals)
 
         # compute objective value
         obj_value = 0.0
@@ -671,39 +697,37 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         for property_name in self._reference_properties:
 
-            self.last_obj_details[property_name] = []
+            self._last_obj_details[property_name] = []
 
             denom = self._options.denominators[property_name]
             weight = self._normalised_weights[property_name]
 
-            for phase_point_key in self.ref_data[property_name]:
+            for substance_id in self._reference_properties[property_name]:
 
-                temperature, pressure = phase_point_key
-                ref_value = self.ref_data[property_name][phase_point_key]
+                for phase_point_key in self._reference_properties[property_name][substance_id]:
 
-                # TODO: load computed value and standard error from real data - is this done now?
-                tar_value = estimated_property_data['values'][property_name][(temperature, pressure)]
-                tar_error = estimated_property_data['value_errors'][property_name][(temperature, pressure)]
+                    temperature, pressure = phase_point_key
+                    ref_value = self._reference_properties[property_name][substance_id][phase_point_key]['value']
 
-                diff = tar_value - ref_value
+                    tar_value = estimated_property_data[property_name][substance_id][phase_point_key]['value']
+                    tar_error = estimated_property_data[property_name][substance_id][phase_point_key]['uncertainty']
 
-                obj_contrib = weight * (diff / denom) ** 2
-                obj_value += obj_contrib
+                    diff = tar_value - ref_value
 
-                self.last_obj_details[property_name].append(
-                    (temperature, pressure, ref_value, tar_value, tar_error, diff, weight, denom, obj_contrib))
+                    obj_contrib = weight * (diff / denom) ** 2
+                    obj_value += obj_contrib
 
-                # compute objective gradient
-                if AGrad is True:
-                    # TODO `param_names` not used?
-                    # param_names = self.FF.plist
-                    # get gradients in physical unit
-                    grad_array = estimated_gradients[property_name][phase_point_key]
+                    self._last_obj_details[property_name].append(
+                        (temperature, pressure, ref_value, tar_value, tar_error, diff, weight, denom, obj_contrib))
+
                     # compute objective gradient
-                    # TODO: `this_obj_grad` is not used?
-                    # this_obj_grad = 2.0 * weight * diff * grad_array / denom ** 2
-                    if AHess is True:
-                        obj_hess += 2.0 * weight * (np.outer(grad_array, grad_array)) / denom ** 2
+                    if AGrad is True:
+                        # get gradients in physical unit
+                        grad_array = estimated_gradients[property_name][substance_id][phase_point_key]
+                        # compute objective gradient
+                        obj_grad += 2.0 * weight * diff * grad_array / denom ** 2
+                        if AHess is True:
+                            obj_hess += 2.0 * weight * (np.outer(grad_array, grad_array)) / denom ** 2
 
         return {'X': obj_value, 'G': obj_grad, 'H': obj_hess}
 
