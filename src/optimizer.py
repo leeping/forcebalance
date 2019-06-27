@@ -718,7 +718,7 @@ class Optimizer(forcebalance.BaseClass):
         H1 = H.copy()
         H1 = np.delete(H1, self.excision, axis=0)
         H1 = np.delete(H1, self.excision, axis=1)
-        Eig = np.linalg.eig(H1)[0]            # Diagonalize Hessian
+        Eig = np.linalg.eigh(H1)[0]            # Diagonalize Hessian
         Emin = min(Eig)
         if Emin < self.eps:         # Mix in SD step if Hessian minimum eigenvalue is negative
             # Experiment.
