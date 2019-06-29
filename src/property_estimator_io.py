@@ -603,7 +603,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
             for substance_id in self._reference_properties[property_name]:
 
-                estimated_gradients[substance_id] = {}
+                estimated_gradients[property_name][substance_id] = {}
 
                 for phase_point in self._reference_properties[property_name][substance_id]:
                     estimated_gradients[property_name][substance_id][phase_point] = zero_gradient
