@@ -736,6 +736,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                         if AHess is True:
                             obj_hess += 2.0 * weight * (np.outer(grad_array, grad_array)) / denom ** 2
 
+        logger.info(f'X={obj_value} G={obj_grad} H={obj_hess}')
         return {'X': obj_value, 'G': obj_grad, 'H': obj_hess}
 
     def indicate(self):
@@ -745,7 +746,7 @@ class PropertyEstimate_SMIRNOFF(Target):
         """
         for property_name, details in self._last_obj_details.items():
             dict_for_print = {
-                "  %9.2fK %7.1fatm" % detail[:2]: "%9.3f %14.3f +- %-7.3f % 7.3f % 9.5f % 9.5f % 9.5f " % detail[2:] for
+                "  %sK %satm" % detail[:2]: "%9.3f %14.3f +- %-7.3f % 7.3f % 9.5f % 9.5f % 9.5f " % detail[2:] for
                 detail in details}
             title = '%s %s\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    ' \
                     'Denom     Term  ' % (self.name, property_name)
