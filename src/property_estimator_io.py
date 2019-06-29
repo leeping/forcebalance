@@ -22,7 +22,7 @@ try:
     from propertyestimator.client import PropertyEstimatorClient, ConnectionOptions, PropertyEstimatorOptions
     from propertyestimator.datasets import ThermoMLDataSet, PhysicalPropertyDataSet
     from propertyestimator.utils.exceptions import PropertyEstimatorException
-    from propertyestimator.utils.serialization import TypedJSONDecoder
+    from propertyestimator.utils.serialization import TypedJSONDecoder, TypedJSONEncoder
     from propertyestimator.workflow import WorkflowOptions
 except ImportError:
     warn_once("Failed to import the propertyestimator package.")
@@ -481,10 +481,6 @@ class PropertyEstimate_SMIRNOFF(Target):
             estimated.
         """
         results = estimation_request.results()
-
-        if hasattr(results, 'json'):
-            print(results.json())
-
         return isinstance(results, PropertyEstimatorException) or len(results.queued_properties) == 0
 
     @staticmethod
@@ -649,6 +645,14 @@ class PropertyEstimate_SMIRNOFF(Target):
             for direction in self._pending_gradient_requests[parameter_index]:
 
                 request = self._pending_gradient_requests[parameter_index][direction]
+
+                with open(f'{parameter_index}_{direction}_request.json', 'w') as file:
+                    json.dump(request.json(), file)
+
+                results = request.results()
+
+                with open(f'{parameter_index}_{direction}_results.json', 'w') as file:
+                    json.dump(results, file, cls=TypedJSONEncoder)
 
                 if self._is_request_finished(request):
                     continue
