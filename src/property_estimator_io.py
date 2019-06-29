@@ -393,9 +393,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         if reweight_only:
 
-            density_options = WorkflowOptions(convergence_mode=WorkflowOptions.ConvergenceMode.AbsoluteUncertainty,
-                                              absolute_uncertainty=0.005 * unit.grams / unit.milliliter)
-
+            density_options = WorkflowOptions(WorkflowOptions.ConvergenceMode.NoChecks)
             options.allowed_calculation_layers = ['ReweightingLayer']
 
         options.workflow_options = {
@@ -483,6 +481,10 @@ class PropertyEstimate_SMIRNOFF(Target):
             estimated.
         """
         results = estimation_request.results()
+
+        if hasattr(results, 'json'):
+            print(results.json())
+
         return isinstance(results, PropertyEstimatorException) or len(results.queued_properties) == 0
 
     @staticmethod
@@ -638,6 +640,8 @@ class PropertyEstimate_SMIRNOFF(Target):
         finished: bool
             True if all jobs are finished, False if not
         """
+
+        print('Checking main request')
 
         if not self._is_request_finished(self._pending_estimate_request):
             return False
