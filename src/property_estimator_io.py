@@ -621,8 +621,8 @@ class PropertyEstimate_SMIRNOFF(Target):
 
                     for phase_point in estimated_gradients[property_name][substance_id]:
 
-                        value_plus = results_forward[property_name][substance_id][phase_point]
-                        value_minus = results_reverse[property_name][substance_id][phase_point]
+                        value_plus = results_forward[property_name][substance_id][phase_point]['value']
+                        value_minus = results_reverse[property_name][substance_id][phase_point]['value']
 
                         # three point formula
                         gradient = (value_plus - value_minus) / (self.liquid_fdiff_h * 2)
@@ -641,26 +641,19 @@ class PropertyEstimate_SMIRNOFF(Target):
             True if all jobs are finished, False if not
         """
 
-        print('Checking main request')
-
         if not self._is_request_finished(self._pending_estimate_request):
             return False
-
-        print('Checking grads finished')
 
         for parameter_index in self._pending_gradient_requests:
 
             for direction in self._pending_gradient_requests[parameter_index]:
 
-                print(f'Checking grad finished {parameter_index} {direction}')
                 request = self._pending_gradient_requests[parameter_index][direction]
 
                 if self._is_request_finished(request):
                     continue
 
                 return False
-
-        print('Grads finished')
 
         return True
 
