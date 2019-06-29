@@ -391,13 +391,17 @@ class PropertyEstimate_SMIRNOFF(Target):
                                           absolute_uncertainty=0.0005 * unit.grams / unit.milliliter)
         dielectric_options = WorkflowOptions(WorkflowOptions.ConvergenceMode.NoChecks)
 
+        if reweight_only:
+
+            density_options = WorkflowOptions(convergence_mode=WorkflowOptions.ConvergenceMode.AbsoluteUncertainty,
+                                              absolute_uncertainty=0.005 * unit.grams / unit.milliliter)
+
+            options.allowed_calculation_layers = ['ReweightingLayer']
+
         options.workflow_options = {
             'Density': density_options,
             'DielectricConstant': dielectric_options
         }
-
-        if reweight_only:
-            options.allowed_calculation_layers = ['ReweightingLayer']
 
         return self._client.request_estimate(property_set=self._data_set,
                                              force_field=force_field,
