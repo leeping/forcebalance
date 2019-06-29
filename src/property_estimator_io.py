@@ -642,16 +642,21 @@ class PropertyEstimate_SMIRNOFF(Target):
         if not self._is_request_finished(self._pending_estimate_request):
             return False
 
+        print('Checking grads finished')
+
         for parameter_index in self._pending_gradient_requests:
 
             for direction in self._pending_gradient_requests[parameter_index]:
 
+                print(f'Checking grad finished {parameter_index} {direction}')
                 request = self._pending_gradient_requests[parameter_index][direction]
 
                 if self._is_request_finished(request):
                     continue
 
                 return False
+
+        print('Grads finished')
 
         return True
 
