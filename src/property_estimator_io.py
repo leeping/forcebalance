@@ -387,11 +387,13 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         options = PropertyEstimatorOptions()
 
-        workflow_options = WorkflowOptions(WorkflowOptions.ConvergenceMode.NoChecks)
+        density_options = WorkflowOptions(WorkflowOptions.ConvergenceMode.AbsoluteUncertainty,
+                                          0.0005 * unit.grams / unit.milliliter)
+        dielectric_options = WorkflowOptions(WorkflowOptions.ConvergenceMode.NoChecks)
 
         options.workflow_options = {
-            'Density': workflow_options,
-            'DielectricConstant': workflow_options
+            'Density': density_options,
+            'DielectricConstant': dielectric_options
         }
 
         if reweight_only:
