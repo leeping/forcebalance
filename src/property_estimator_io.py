@@ -461,6 +461,9 @@ class PropertyEstimate_SMIRNOFF(Target):
                     self._pending_gradient_requests[parameter_index][direction] = \
                         self._submit_request(new_mvals, reweight_only=True)
 
+                    self._pending_gradient_requests[parameter_index][direction].results(synchronous=True,
+                                                                                        polling_interval=5)
+
             logger.info(f'{len(mvals) * 2} jobs (each with {self._data_set.number_of_properties} properties) with +- '
                         f'perturbations and employing only reweighting were submitted to the property estimator\n')
 
@@ -645,14 +648,6 @@ class PropertyEstimate_SMIRNOFF(Target):
             for direction in self._pending_gradient_requests[parameter_index]:
 
                 request = self._pending_gradient_requests[parameter_index][direction]
-
-                with open(f'{parameter_index}_{direction}_request.json', 'w') as file:
-                    json.dump(request.json(), file)
-
-                results = request.results()
-
-                with open(f'{parameter_index}_{direction}_results.json', 'w') as file:
-                    json.dump(results, file, cls=TypedJSONEncoder)
 
                 if self._is_request_finished(request):
                     continue
