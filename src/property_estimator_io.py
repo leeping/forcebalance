@@ -730,6 +730,8 @@ class PropertyEstimate_SMIRNOFF(Target):
                     self._last_obj_details[property_name].append(
                         (temperature, pressure, ref_value, tar_value, tar_error, diff, weight, denom, obj_contrib))
 
+                    logger.info(f'Obj contrib {weight} {diff} {denom}')
+
                     # compute objective gradient
                     if AGrad is True:
                         # get gradients in physical unit
