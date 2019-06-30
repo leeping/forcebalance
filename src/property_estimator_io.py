@@ -736,6 +736,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                         grad_array = estimated_gradients[property_name][substance_id][phase_point_key]
                         # compute objective gradient
                         obj_grad += 2.0 * weight * diff * grad_array / denom ** 2
+                        logger.info(f'Grad contrib {weight} {diff} {grad_array} {denom}')
                         if AHess is True:
                             obj_hess += 2.0 * weight * (np.outer(grad_array, grad_array)) / denom ** 2
 
