@@ -369,7 +369,7 @@ class PropertyEstimate_SMIRNOFF(Target):
         """
         raise NotImplementedError()
 
-    def _submit_request(self, mvals, reweight_only=False):
+    def _submit_request(self, mvals, options):
         """Submit a property estimator request to the property estimator,
         and request.
 
@@ -377,29 +377,12 @@ class PropertyEstimate_SMIRNOFF(Target):
         ----------
         mvals: np.ndarray
             mvals array containing the math values of the parameters
-        reweight_only: bool
-            If true, the estimator will only attempt to estimate the
-            properties using data reweighting.
+        options: PropertyEstimatorOptions
+            The options to use for this request.
         """
 
         self.FF.make(mvals)
         force_field = smirnoff.ForceField(self.FF.offxml, allow_cosmetic_attributes=True)
-
-        options = PropertyEstimatorOptions()
-
-        density_options = WorkflowOptions(convergence_mode=WorkflowOptions.ConvergenceMode.AbsoluteUncertainty,
-                                          absolute_uncertainty=0.0005 * unit.grams / unit.milliliter)
-        dielectric_options = WorkflowOptions(WorkflowOptions.ConvergenceMode.NoChecks)
-
-        if reweight_only:
-
-            density_options = WorkflowOptions(WorkflowOptions.ConvergenceMode.NoChecks)
-            options.allowed_calculation_layers = ['ReweightingLayer']
-
-        options.workflow_options = {
-            'Density': density_options,
-            'DielectricConstant': dielectric_options
-        }
 
         return self._client.request_estimate(property_set=self._data_set,
                                              force_field=force_field,
@@ -440,13 +423,32 @@ class PropertyEstimate_SMIRNOFF(Target):
         #                                                                parameter_gradient_keys=
         #                                                                parameter_gradient_keys)
 
+        estimation_options = PropertyEstimatorOptions()
+
+        density_options = WorkflowOptions(convergence_mode=WorkflowOptions.ConvergenceMode.AbsoluteUncertainty,
+                                          absolute_uncertainty=0.0005 * unit.grams / unit.milliliter)
+
+        estimation_options.workflow_options = {
+            'Density': density_options,
+        }
+
         # Submit the reference property estimation request.
-        self._pending_estimate_request = self._submit_request(mvals)
+        self._pending_estimate_request = self._submit_request(mvals, estimation_options)
         self._pending_estimate_request.results(synchronous=True, polling_interval=5)
 
         self._pending_gradient_requests = {}
 
         if AGrad is True:
+
+            from time import sleep
+            gradient_options = PropertyEstimatorOptions()
+
+            density_options = WorkflowOptions(WorkflowOptions.ConvergenceMode.NoChecks)
+            gradient_options.allowed_calculation_layers = ['ReweightingLayer']
+
+            gradient_options.workflow_options = {
+                'Density': density_options,
+            }
 
             for parameter_index in range(len(mvals)):
 
@@ -459,7 +461,10 @@ class PropertyEstimate_SMIRNOFF(Target):
 
                     # Submit the request with the parameter perturbation
                     self._pending_gradient_requests[parameter_index][direction] = \
-                        self._submit_request(new_mvals, reweight_only=True)
+                        self._submit_request(new_mvals, gradient_options)
+
+                    # Add a slight delay to allow the server to process the last request.
+                    sleep(0.5)
 
                     self._pending_gradient_requests[parameter_index][direction].results(synchronous=True,
                                                                                         polling_interval=5)
@@ -509,7 +514,6 @@ class PropertyEstimate_SMIRNOFF(Target):
             exceptions = '\n'.join(f'{result.directory}: {result.message}'
                                    for result in results.exceptions)
 
-            # TODO: How should we handle this case.
             raise ValueError(f'Some properties could not be estimated:\n\n{exceptions}.')
 
         elif len(results.exceptions) > 0:
@@ -609,6 +613,8 @@ class PropertyEstimate_SMIRNOFF(Target):
                 for phase_point in self._reference_properties[property_name][substance_id]:
                     estimated_gradients[property_name][substance_id][phase_point] = zero_gradient
 
+        logger.info('Extracting Gradients:\n\n')
+
         for parameter_index in range(len(mvals)):
 
             results_reverse = self._extract_property_data(self._pending_gradient_requests[parameter_index]['reverse'])
@@ -627,8 +633,12 @@ class PropertyEstimate_SMIRNOFF(Target):
                         gradient = (value_plus - value_minus) / (self.liquid_fdiff_h * 2)
                         estimated_gradients[property_name][substance_id][phase_point][parameter_index] = gradient
 
-                        logger.info(f'Gradient ({parameter_index}) -={value_minus} +={value_plus} '
-                                    f'dparam={self.liquid_fdiff_h} grad={gradient}')
+                        logger.info(f'index={parameter_index} '
+                                    f'value_minus={value_minus} '
+                                    f'value_plus={value_plus} '
+                                    f'gradient={gradient}\n')
+
+        logger.info('\nGradients extracted.\n')
 
         return estimated_gradients
 
@@ -687,6 +697,7 @@ class PropertyEstimate_SMIRNOFF(Target):
         depends on gradients
         """
 
+        # Ensure the input flags are actual booleans.
         AGrad = bool(AGrad)
         AHess = bool(AHess)
 
@@ -695,8 +706,6 @@ class PropertyEstimate_SMIRNOFF(Target):
         estimated_gradients = {}
 
         assert len(self._pending_gradient_requests) == self.FF.np, 'number of submitted jobs not consistent'
-
-        logger.info(f'Getting with options mvals={mvals} AGrad={AGrad} AHess={AHess}')
 
         if AGrad is True:
             # Optionally extract and gradients.
@@ -714,7 +723,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
             self._last_obj_details[property_name] = []
 
-            denom = self._options.denominators[property_name]
+            denominator = self._options.denominators[property_name]
             weight = self._normalised_weights[property_name]
 
             for substance_id in self._reference_properties[property_name]:
@@ -722,32 +731,37 @@ class PropertyEstimate_SMIRNOFF(Target):
                 for phase_point_key in self._reference_properties[property_name][substance_id]:
 
                     temperature, pressure = phase_point_key
-                    ref_value = self._reference_properties[property_name][substance_id][phase_point_key]['value']
+                    reference_value = self._reference_properties[property_name][substance_id][phase_point_key]['value']
 
-                    tar_value = estimated_property_data[property_name][substance_id][phase_point_key]['value']
-                    tar_error = estimated_property_data[property_name][substance_id][phase_point_key]['uncertainty']
+                    target_value = estimated_property_data[property_name][substance_id][phase_point_key]['value']
+                    target_error = estimated_property_data[property_name][substance_id][phase_point_key]['uncertainty']
 
-                    diff = tar_value - ref_value
+                    diff = target_value - reference_value
 
-                    obj_contrib = weight * (diff / denom) ** 2
+                    obj_contrib = weight * (diff / denominator) ** 2
                     obj_value += obj_contrib
 
-                    self._last_obj_details[property_name].append(
-                        (temperature, pressure, ref_value, tar_value, tar_error, diff, weight, denom, obj_contrib))
-
-                    logger.info(f'Obj contrib {weight} {diff} {denom} AGrad={AGrad}')
+                    self._last_obj_details[property_name].append((temperature,
+                                                                  pressure,
+                                                                  reference_value,
+                                                                  target_value,
+                                                                  target_error,
+                                                                  diff,
+                                                                  weight,
+                                                                  denominator,
+                                                                  obj_contrib))
 
                     # compute objective gradient
                     if AGrad is True:
+
                         # get gradients in physical unit
                         grad_array = estimated_gradients[property_name][substance_id][phase_point_key]
                         # compute objective gradient
-                        obj_grad += 2.0 * weight * diff * grad_array / denom ** 2
-                        logger.info(f'Grad contrib {weight} {diff} {grad_array} {denom}')
-                        if AHess is True:
-                            obj_hess += 2.0 * weight * (np.outer(grad_array, grad_array)) / denom ** 2
+                        obj_grad += 2.0 * weight * diff * grad_array / denominator ** 2
 
-        logger.info(f'X={obj_value} G={obj_grad} H={obj_hess}')
+                        if AHess is True:
+                            obj_hess += 2.0 * weight * (np.outer(grad_array, grad_array)) / denominator ** 2
+
         return {'X': obj_value, 'G': obj_grad, 'H': obj_hess}
 
     def indicate(self):
