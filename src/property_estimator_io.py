@@ -687,6 +687,9 @@ class PropertyEstimate_SMIRNOFF(Target):
         depends on gradients
         """
 
+        AGrad = bool(AGrad)
+        AHess = bool(AHess)
+
         # Extract the properties estimated using the unperturbed parameters.
         estimated_property_data = self._extract_property_data(self._pending_estimate_request)
         estimated_gradients = {}
@@ -695,7 +698,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         logger.info(f'Getting with options mvals={mvals} AGrad={AGrad} AHess={AHess}')
 
-        if AGrad:
+        if AGrad is True:
             # Optionally extract and gradients.
             estimated_gradients = self._extract_property_gradients(mvals)
 
