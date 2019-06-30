@@ -693,6 +693,8 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         assert len(self._pending_gradient_requests) == self.FF.np, 'number of submitted jobs not consistent'
 
+        logger.info(f'Getting with options mvals={mvals} AGrad={AGrad} AHess={AHess}')
+
         if AGrad:
             # Optionally extract and gradients.
             estimated_gradients = self._extract_property_gradients(mvals)
@@ -730,7 +732,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                     self._last_obj_details[property_name].append(
                         (temperature, pressure, ref_value, tar_value, tar_error, diff, weight, denom, obj_contrib))
 
-                    logger.info(f'Obj contrib {weight} {diff} {denom}')
+                    logger.info(f'Obj contrib {weight} {diff} {denom} AGrad={AGrad}')
 
                     # compute objective gradient
                     if AGrad is True:
