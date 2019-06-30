@@ -627,6 +627,9 @@ class PropertyEstimate_SMIRNOFF(Target):
                         gradient = (value_plus - value_minus) / (self.liquid_fdiff_h * 2)
                         estimated_gradients[property_name][substance_id][phase_point][parameter_index] = gradient
 
+                        logger.info(f'Gradient ({parameter_index}) -={value_minus} +={value_plus} '
+                                    f'dparam={self.liquid_fdiff_h} grad={gradient}')
+
         return estimated_gradients
 
     def wq_complete(self):
