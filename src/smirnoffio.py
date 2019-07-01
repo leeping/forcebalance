@@ -52,7 +52,7 @@ try:
     from openforcefield.topology import Molecule as OffMolecule
     from openforcefield.topology import Topology as OffTopology
 except:
-    warn_once("Failed to import openforcefield toolkit.")
+    pass
 
 ## pdict is a useless variable if the force field is XML.
 pdict = "XML_Override"
@@ -255,7 +255,7 @@ class SMIRNOFF(OpenMM):
                 if self.mol.boxes[I].alpha != 90.0 or self.mol.boxes[I].beta != 90.0 or self.mol.boxes[I].gamma != 90.0:
                     logger.error('OpenMM cannot handle nonorthogonal boxes.\n')
                     raise RuntimeError
-                box_omm = np.diagonal([self.mol.boxes[I].a, self.mol.boxes[I].b, self.mol.boxes[I].c]) * angstrom
+                box_omm = np.diag([self.mol.boxes[I].a, self.mol.boxes[I].b, self.mol.boxes[I].c]) * angstrom
             else:
                 box_omm = None
             # Finally append it to list.
