@@ -453,8 +453,6 @@ class PropertyEstimate_SMIRNOFF(Target):
 
                 self._parameter_units[parameter_gradient_key] = parameter_unit
 
-        parameter_gradient_keys = [parameter_gradient_keys[0]]
-
         # Set up some simple convergence criteria.
         estimation_options = PropertyEstimatorOptions()
 
