@@ -1577,3 +1577,18 @@ class OptGeoTarget_OpenMM(OptGeoTarget):
         self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
         ## Initialize base class.
         super(OptGeoTarget_OpenMM,self).__init__(options,tgt_opts,forcefield)
+
+    def create_engines(self, engine_args):
+        """ create a dictionary of self.engines = {sysname: Engine} """
+        self.engines = OrderedDict()
+        for sysname, sysopt in self.sys_opts.items():
+            # path to pdb file
+            pdbpath = os.path.join(self.root, self.tgtdir, sysopt['topology'])
+            # use the PDB file with topology
+            M = Molecule(pdbpath)
+            # replace geometry with values from xyz file for higher presision
+            M0 = Molecule(os.path.join(self.root, self.tgtdir, sysopt['geometry']))
+            M.xyzs = M0.xyzs
+            # here mol=M is given for the purpose of using the topology from the input pdb file
+            # if we don't do this, pdb=top.pdb option will only copy some basic information but not the topology into OpenMM.mol (openmmio.py line 615)
+            self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, pdb=pdbpath, **engine_args)
