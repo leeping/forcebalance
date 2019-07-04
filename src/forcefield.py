@@ -259,6 +259,8 @@ class FF(forcebalance.BaseClass):
         ## force field file, we go to the specific line/field in a given file
         ## and change the number.
         self.pfields     = []
+        # unit strings that might appear in offxml file
+        self.offxml_unit_strs = defaultdict(str)
         ## List of rescaling factors
         self.rs          = []
         ## The transformation matrix for mathematical -> physical parameters
@@ -695,7 +697,12 @@ class FF(forcebalance.BaseClass):
                     raise RuntimeError
                 pid = self.Readers[ffname].build_pid(e, p)
                 self.map[pid] = self.np
-                self.assign_p0(self.np,float(e.get(p)))
+                # offxml file later than v0.3 may have unit strings in the field
+                quantity_str = e.get(p)
+                res = re.search(r'^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?', quantity_str)
+                value_str, unit_str = quantity_str[:res.end()], quantity_str[res.end():]
+                self.assign_p0(self.np, float(value_str))
+                self.offxml_unit_strs[pid] = unit_str
                 self.assign_field(self.np,pid,ffname,fflist.index(e),p,1)
                 self.np += 1
                 self.patoms.append([])
@@ -811,7 +818,8 @@ class FF(forcebalance.BaseClass):
             else:
                 wval = mult*pvals[self.map[pid]]
             if self.ffdata_isxml[fnm]:
-                xml_lines[fnm][ln].attrib[fld] = OMMFormat % (wval)
+                # offxml files with version higher than 0.3 may have unit strings in the field
+                xml_lines[fnm][ln].attrib[fld] = OMMFormat % (wval) + self.offxml_unit_strs[pid]
                 # list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (wval)
             # Text force fields are a bit harder.
             # Our pointer is given by the line and field number.
