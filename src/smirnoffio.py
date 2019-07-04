@@ -308,8 +308,11 @@ class SMIRNOFF(OpenMM):
 
         #self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
         self.forcefield = smirnoff_hack.getForceField(*self.offxml)
-        self.system = self.forcefield.create_openmm_system(self.off_topology)
-
+        try:
+            self.system = self.forcefield.create_openmm_system(self.off_topology)
+        except Exception as error:
+            logger.error("Error when creating system for %s" % self.mol2)
+            raise error
         # Commenting out all virtual site stuff for now.
         # self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
@@ -342,7 +345,7 @@ class SMIRNOFF(OpenMM):
         X0 = np.array([j for i, j in enumerate(self.simulation.context.getState(getPositions=True).getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
         # Minimize the energy.  Optimizer works best in "steps".
         for logc in np.linspace(0, np.log10(crit), steps):
-            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole)
+            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=1000)
         # Get the optimized geometry.
         S = self.simulation.context.getState(getPositions=True, getEnergy=True)
         X1 = np.array([j for i, j in enumerate(S.getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
