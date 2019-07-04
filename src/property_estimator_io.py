@@ -457,10 +457,10 @@ class PropertyEstimate_SMIRNOFF(Target):
         estimation_options = PropertyEstimatorOptions()
 
         simulation_options = WorkflowOptions(convergence_mode=WorkflowOptions.ConvergenceMode.AbsoluteUncertainty,
-                                             absolute_uncertainty=0.0005 * unit.grams / unit.milliliter)
+                                             absolute_uncertainty=0.0002 * unit.grams / unit.milliliter)
 
         reweighting_options = WorkflowOptions(convergence_mode=WorkflowOptions.ConvergenceMode.AbsoluteUncertainty,
-                                              absolute_uncertainty=0.005 * unit.grams / unit.milliliter)
+                                              absolute_uncertainty=0.0008 * unit.grams / unit.milliliter)
 
         estimation_options.workflow_options = {
             'Density': {
