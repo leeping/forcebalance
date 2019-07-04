@@ -64,7 +64,7 @@ def smirnoff_analyze_parameter_coverage(forcefield, targets):
     parameter_counter = Counter()
     # build the openforcefield.typing.engines.smirnoff.ForceField object
     absffpath = os.path.join(forcefield.root,forcefield.ffdir,forcefield.offxml)
-    ff = ForceField(absffpath, allow_cosmetic_attributes=True)
+    ff = smirnoff_hack.getForceField(absffpath) #ForceField(absffpath, allow_cosmetic_attributes=True)
     # analyze each target
     for target in targets:
         off_topology = None
@@ -219,10 +219,10 @@ class SMIRNOFF(OpenMM):
         # Create the OpenFF ForceField object.
         if hasattr(self, 'FF'):
             self.offxml = [self.FF.offxml]
-            self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml), allow_cosmetic_attributes=True)
+            self.forcefield = smirnoff_hack.getForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml))
         else:
             self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
-            self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
+            self.forcefield = smirnoff_hack.getForceField(*self.offxml)
 
         ## Load mol2 files for smirnoff topology
         openff_mols = []
@@ -306,7 +306,8 @@ class SMIRNOFF(OpenMM):
         if len(kwargs) > 0:
             self.simkwargs = kwargs
 
-        self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
+        #self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
+        self.forcefield = smirnoff_hack.getForceField(*self.offxml)
         self.system = self.forcefield.create_openmm_system(self.off_topology)
 
         # Commenting out all virtual site stuff for now.
