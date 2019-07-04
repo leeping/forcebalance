@@ -371,8 +371,8 @@ class PropertyEstimate_SMIRNOFF(Target):
             forward_mvals = mvals.copy()
             forward_mvals[index] += perturbation_amount
 
-            reverse_physical_values = self.FF.create_mvals(reverse_mvals)
-            forward_physical_values = self.FF.create_mvals(forward_mvals)
+            reverse_physical_values = self.FF.create_pvals(reverse_mvals)
+            forward_physical_values = self.FF.create_pvals(forward_mvals)
 
             gradients = (forward_physical_values - reverse_physical_values) / (2.0 * perturbation_amount)
             jacobian_list.append(gradients)
