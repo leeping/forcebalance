@@ -215,7 +215,7 @@ class OptGeoTarget(Target):
         return v_ic
 
     def indicate(self):
-        title_str = "Optimized Geometries, Objective = % .5e" % self.objective
+        title_str = "%s, Objective = % .5e" % (self.name, self.objective)
         #QYD: This title is carefully placed to align correctly
         column_head_str1 =  " %-20s %13s     %13s     %15s   %15s   %17s " % ("System", "Bonds", "Angles", "Dihedrals", "Impropers", "Term.")
         column_head_str2 =  " %-20s %9s %7s %9s %7s %9s %7s %9s %7s %17s " % ('', 'RMSD', 'denom', 'RMSD', 'denom', 'RMSD', 'denom', 'RMSD', 'denom', '')
