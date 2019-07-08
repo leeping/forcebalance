@@ -49,7 +49,7 @@ OpenEyeToolkitWrapper.generate_conformers = cached_generate_conformers
 
 # final timing: 56s
 
-# cache the ForceField creation
+# cache the ForceField creation (no longer needed since using OpenFF API for parameter modifications)
 
 import hashlib
 from openforcefield.typing.engines.smirnoff import ForceField

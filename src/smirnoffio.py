@@ -47,7 +47,7 @@ try:
     # import the hack for openforcefield to improve performance by 10x
     from forcebalance import smirnoff_hack
     # Import the SMIRNOFF forcefield engine and some useful tools
-    from openforcefield.typing.engines.smirnoff import ForceField
+    from openforcefield.typing.engines.smirnoff import ForceField as OpenFF_ForceField
     # QYD: name of class are modified to avoid colliding with ForceBalance Molecule
     from openforcefield.topology import Molecule as OffMolecule
     from openforcefield.topology import Topology as OffTopology
@@ -62,9 +62,8 @@ def smirnoff_analyze_parameter_coverage(forcefield, targets):
     assert hasattr(forcefield, 'offxml'), "Only SMIRNOFF Force Field is supported"
     parameter_assignment_data = defaultdict(list)
     parameter_counter = Counter()
-    # build the openforcefield.typing.engines.smirnoff.ForceField object
-    absffpath = os.path.join(forcefield.root,forcefield.ffdir,forcefield.offxml)
-    ff = smirnoff_hack.getForceField(absffpath) #ForceField(absffpath, allow_cosmetic_attributes=True)
+    # The openforcefield.typing.engines.smirnoff.ForceField object should now be contained in forcebalance.forcefield.FF
+    ff = forcefield.openff_forcefield
     # analyze each target
     for target in targets:
         off_topology = None
@@ -257,11 +256,10 @@ class SMIRNOFF(OpenMM):
         # Create the OpenFF ForceField object.
         if hasattr(self, 'FF'):
             self.offxml = [self.FF.offxml]
-            #self.forcefield = smirnoff_hack.getForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml))
             self.forcefield = self.FF.openff_forcefield
         else:
             self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
-            self.forcefield = smirnoff_hack.getForceField(*self.offxml)
+            self.forcefield = OpenFF_ForceField(*self.offxml)
 
         ## Load mol2 files for smirnoff topology
         openff_mols = []
@@ -345,11 +343,8 @@ class SMIRNOFF(OpenMM):
         if len(kwargs) > 0:
             self.simkwargs = kwargs
 
-        # Because self.forcefield is being updated in ForceField.make()
+        # Because self.forcefield is being updated in forcebalance.forcefield.FF.make()
         # there is no longer a need to create a new force field object here.
-        #self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
-        #self.forcefield = smirnoff_hack.getForceField(*self.offxml)
-        
         try:
             self.system = self.forcefield.create_openmm_system(self.off_topology)
         except Exception as error:
