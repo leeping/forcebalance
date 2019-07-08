@@ -47,7 +47,7 @@ try:
     # import the hack for openforcefield to improve performance by 10x
     from forcebalance import smirnoff_hack
     # Import the SMIRNOFF forcefield engine and some useful tools
-    from openforcefield.typing.engines.smirnoff import ForceField
+    from openforcefield.typing.engines.smirnoff import ForceField as OpenFF_ForceField
     # QYD: name of class are modified to avoid colliding with ForceBalance Molecule
     from openforcefield.topology import Molecule as OffMolecule
     from openforcefield.topology import Topology as OffTopology
@@ -62,9 +62,8 @@ def smirnoff_analyze_parameter_coverage(forcefield, targets):
     assert hasattr(forcefield, 'offxml'), "Only SMIRNOFF Force Field is supported"
     parameter_assignment_data = defaultdict(list)
     parameter_counter = Counter()
-    # build the openforcefield.typing.engines.smirnoff.ForceField object
-    absffpath = os.path.join(forcefield.root,forcefield.ffdir,forcefield.offxml)
-    ff = smirnoff_hack.getForceField(absffpath) #ForceField(absffpath, allow_cosmetic_attributes=True)
+    # The openforcefield.typing.engines.smirnoff.ForceField object should now be contained in forcebalance.forcefield.FF
+    ff = forcefield.openff_forcefield
     # analyze each target
     for target in targets:
         off_topology = None
@@ -138,6 +137,44 @@ class SMIRNOFF_Reader(BaseReader):
             logger.info("Minor warning: Parameter ID %s doesn't contain any SMIRKS patterns, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
             return "/".join([ParentType, InteractionType, parameter])
 
+def assign_openff_parameter(ff, new_value, pid):
+    """
+    Assign a SMIRNOFF parameter given the openforcefield.ForceField object, the desired parameter value,
+    and the parameter's unique ID.
+    """
+    # Split the parameter's unique ID into four fields using a slash:
+    # Input: ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+    # Output: ProperTorsions, Proper, k1, [*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+    # The first, third and fourth fields will be used for parameter assignment.
+    # We use "value_name" to describe names of individual numerical values within a single parameter type
+    # e.g. k1 in the above example.
+    (handler_name, tag_name, value_name, smirks) = pid.split('/')
+
+    # Get the OpenFF parameter object
+    parameter = ff.get_parameter_handler(handler_name).parameters[smirks]
+
+    if hasattr(parameter, value_name):
+        # If the value name is an attribute of the parameter then we set it directly.
+        unit = getattr(parameter, value_name).unit
+        setattr(parameter, value_name, new_value*unit)
+    else:
+        # If the value name is a periodic attribute (say, k1) then we need to use
+        # a regex to split the value name into 'k' and '1', then set the appropriate
+        # value in the k-list
+        attribute_split = re.split(r'(\d+)', value_name)
+        # print(attribute_split)
+        # assert len(attribute_split) == 2
+        assert hasattr(parameter, attribute_split[0])
+        # attribute_split[0] is a string such as 'k'
+        value_name = attribute_split[0]
+        # parameter_index is the position of k1 in the values associated with 'k'
+        parameter_index = int(attribute_split[1]) - 1
+        # Get the list of values, update the appropriate one and then set the new attribute to the updated list
+        value_list = getattr(parameter, value_name)
+        unit = value_list[parameter_index].unit
+        value_list[parameter_index] = new_value*unit
+        setattr(parameter, value_name, value_list)
+            
 class SMIRNOFF(OpenMM):
 
     """ Derived from Engine object for carrying out OpenMM calculations that use the SMIRNOFF force field. """
@@ -219,10 +256,10 @@ class SMIRNOFF(OpenMM):
         # Create the OpenFF ForceField object.
         if hasattr(self, 'FF'):
             self.offxml = [self.FF.offxml]
-            self.forcefield = smirnoff_hack.getForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml))
+            self.forcefield = self.FF.openff_forcefield
         else:
             self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
-            self.forcefield = smirnoff_hack.getForceField(*self.offxml)
+            self.forcefield = OpenFF_ForceField(*self.offxml)
 
         ## Load mol2 files for smirnoff topology
         openff_mols = []
@@ -306,8 +343,8 @@ class SMIRNOFF(OpenMM):
         if len(kwargs) > 0:
             self.simkwargs = kwargs
 
-        #self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
-        self.forcefield = smirnoff_hack.getForceField(*self.offxml)
+        # Because self.forcefield is being updated in forcebalance.forcefield.FF.make()
+        # there is no longer a need to create a new force field object here.
         try:
             self.system = self.forcefield.create_openmm_system(self.off_topology)
         except Exception as error:

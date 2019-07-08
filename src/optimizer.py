@@ -24,7 +24,7 @@ from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, 
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
-import time
+import time, datetime
 from forcebalance.output import getLogger, DEBUG, CleanStreamHandler
 logger = getLogger(__name__)
 
@@ -313,7 +313,9 @@ class Optimizer(forcebalance.BaseClass):
             
     def Run(self):
         """ Call the appropriate optimizer.  This is the method we might want to call from an executable. """
-
+        now = datetime.datetime.now().strftime("%Y-%m-%d %I:%M %p")
+        logger.info("Calculation started at %s\n" % now)
+        t0        = time.time()
         xk = self.OptTab[self.jobtype]()
 
         ## Don't print a "result" force field if it's the same as the input.
@@ -363,6 +365,7 @@ class Optimizer(forcebalance.BaseClass):
         self.writechk()
 
         ## Print out final message
+        logger.info("Wall time since calculation start: %.1f seconds\n" % (time.time() - t0))
         if self.failmsg:
             bar = printcool("I have not failed.\nI've just found 10,000 ways that won't work.",ansi="40;97")
         else:

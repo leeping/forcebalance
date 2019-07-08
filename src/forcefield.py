@@ -106,6 +106,7 @@ from re import match, sub, split
 import forcebalance
 from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io, smirnoffio
 from forcebalance.finite_difference import in_fd
+from forcebalance.smirnoffio import assign_openff_parameter
 from forcebalance.nifty import *
 # from string import count
 from copy import deepcopy
@@ -453,7 +454,11 @@ class FF(forcebalance.BaseClass):
             if hasattr(self, "offxml"):
                 warn_press_key("There should only be one SMIRNOFF XML file - confused!!")
             else:
+                # OpenFF force field wants parameters to be modified using its API, so we enable that here
+                from openforcefield.typing.engines.smirnoff import ForceField as OpenFF_ForceField
                 self.offxml = ffname
+                self.openff_forcefield = OpenFF_ForceField(os.path.join(self.root, self.ffdir, self.offxml),
+                                                           allow_cosmetic_attributes=True)
 
         self.amber_mol2 = []
         if fftype == "mol2":
@@ -761,6 +766,7 @@ class FF(forcebalance.BaseClass):
         stored values in the class state, but I don't think that's a good idea anymore.
         @param[in] use_pvals Switch for whether to bypass the coordinate transformation
         and use physical parameters directly.
+        @param[in] precision Number of decimal points to print out
 
         """
         if type(vals)==np.ndarray and vals.ndim != 1:
@@ -833,6 +839,10 @@ class FF(forcebalance.BaseClass):
             if self.ffdata_isxml[fnm]:
                 # offxml files with version higher than 0.3 may have unit strings in the field
                 xml_lines[fnm][ln].attrib[fld] = OMMFormat % (wval) + self.offxml_unit_strs[pid]
+                # If this is a SMIRNOFF parameter, assign it directly in the openforcefield.ForceField object
+                # as well as writing out the file.
+                if fnm == self.offxml:
+                    assign_openff_parameter(self.openff_forcefield, wval, pid)
                 # list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (wval)
             # Text force fields are a bit harder.
             # Our pointer is given by the line and field number.
