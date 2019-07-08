@@ -558,9 +558,16 @@ class OptGeoTarget_SMIRNOFF(OptGeoTarget):
         system_mval_masks = {sysname: np.zeros(n_params, dtype=bool) for sysname in self.sys_opts}
         # smirks to param_idxs map
         smirks_params_map = defaultdict(list)
-        for pname, pidx in self.FF.map.items():
+        # New code for mapping smirks to mathematical parameter IDs
+        for pname in self.FF.pTree:
             smirks = pname.rsplit('/',maxsplit=1)[-1]
-            smirks_params_map[smirks].append(pidx)
+            # print("pname %s mathid %s -> smirks %s" % (pname, str(self.FF.get_mathid(pname)), smirks))
+            for pidx in self.FF.get_mathid(pname):
+                smirks_params_map[smirks].append(pidx)
+        # Old code for mapping smirks to mathematical parameter IDs
+        # for pname, pidx in self.FF.map.items():
+        #     smirks = pname.rsplit('/',maxsplit=1)[-1]
+        #     smirks_params_map[smirks].append(pidx)
         # go over all smirks for each system
         for sysname in self.sys_opts:
             engine = self.engines[sysname]
