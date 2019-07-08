@@ -345,7 +345,7 @@ class SMIRNOFF(OpenMM):
         X0 = np.array([j for i, j in enumerate(self.simulation.context.getState(getPositions=True).getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
         # Minimize the energy.  Optimizer works best in "steps".
         for logc in np.linspace(0, np.log10(crit), steps):
-            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=1000)
+            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=10000)
         # Get the optimized geometry.
         S = self.simulation.context.getState(getPositions=True, getEnergy=True)
         X1 = np.array([j for i, j in enumerate(S.getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
