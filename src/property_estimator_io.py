@@ -469,9 +469,6 @@ class PropertyEstimate_SMIRNOFF(Target):
             },
         }
 
-        # A temporary addition until the Neff bug is fixed in PE.
-        estimation_options.allowed_calculation_layers = ['SimulationLayer']
-
         self._pending_estimate_request = self._client.request_estimate(property_set=self._data_set,
                                                                        force_field=force_field,
                                                                        options=estimation_options,
