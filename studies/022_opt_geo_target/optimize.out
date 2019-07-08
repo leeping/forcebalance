@@ -142,7 +142,7 @@ Reading force field from file: smirnoff99Frosst_experimental.offxml
 fnms                      ['smirnoff99Frosst_experimental.offxml'] 
 priors                    OrderedDict([('HarmonicBondForce/Bond/k', 10.0), ('HarmonicBondForce/Bond/length', 0.01), ('HarmonicAngleForce/Angle/k', 10.0), ('HarmonicAngleForce/Angle/angle', 10.0), ('PeriodicTorsionForce/Proper/k1', 1.0), ('NonbondedForce/Atom/epsilon', 0.01), ('NonbondedForce/Atom/rmin_half', 0.1)]) 
 ----------------------------------------------------------
-Backing up: optimize.tmp/optgeo to: optimize.bak/optgeo_33.tar.bz2
+Backing up: optimize.tmp/optgeo to: optimize.bak/optgeo_34.tar.bz2
 Reading optgeo options from file: targets/optgeo/optgeo_options.txt
 #========================================================#
 #| [92m             Setup for target optgeo :              [0m |#
@@ -155,7 +155,7 @@ tgtdir                    targets/optgeo
 optgeo_options            targets/optgeo/optgeo_options.txt 
 writelevel                1 
 ----------------------------------------------------------
-Backing up: optimize.tmp/vibration to: optimize.bak/vibration_24.tar.bz2
+Backing up: optimize.tmp/vibration to: optimize.bak/vibration_25.tar.bz2
 #========================================================#
 #| [92m            Setup for target vibration :            [0m |#
 #========================================================#
@@ -224,6 +224,7 @@ adapt_damp                1.0
 err_tol                   1.0 
 input_file                optimize.in 
 ----------------------------------------------------------
+Calculation started at 2019-07-08 10:53 AM
 #========================================================#
 #| [1m                  Main Optimizer                    [0m |#
 #| [1m  Newton-Raphson Method (Hessian Diagonal Search)   [0m |#
@@ -464,7 +465,7 @@ Optimization step found (length 3.1621e-02)
   24 [  1.7000e-01 - 1.4260e-06 =  1.7000e-01 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
   25 [  1.6837e+00 - 2.4771e-04 =  1.6835e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
 ----------------------------------------------------------
-Backing up optimize.sav -> optimize.bak/optimize_7.sav
+Backing up optimize.sav -> optimize.bak/optimize_8.sav
 Input file with saved parameters: optimize.sav
 #========================================================#
 #| [94m     Iteration 1: Evaluating objective function     [0m |#
@@ -560,7 +561,7 @@ vibration                     12.69260      1.000 [92m     1.26926e+01[0m ( -3
 Regularization                 0.00100      1.000 [91m     9.99883e-04[0m ( +9.999e-04 ) 
 Total                                             [92m     1.77753e+01[0m ( -4.178e+00 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_37.offxml
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_48.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -797,7 +798,7 @@ vibration                      7.62679      1.000 [92m     7.62679e+00[0m ( -5
 Regularization                 0.01249      1.000 [91m     1.24865e-02[0m ( +1.149e-02 ) 
 Total                                             [92m     1.19490e+01[0m ( -5.826e+00 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_38.offxml
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_49.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -1028,7 +1029,7 @@ vibration                      7.47968      1.000 [92m     7.47968e+00[0m ( -1
 Regularization                 0.01411      1.000 [91m     1.41063e-02[0m ( +1.620e-03 ) 
 Total                                             [92m     9.77497e+00[0m ( -2.174e+00 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_39.offxml
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_50.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -1264,7 +1265,7 @@ vibration                      6.94823      1.000 [92m     6.94823e+00[0m ( -5
 Regularization                 0.01615      1.000 [91m     1.61481e-02[0m ( +2.042e-03 ) 
 Total                                             [92m     8.81139e+00[0m ( -9.636e-01 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_40.offxml
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_51.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -1501,7 +1502,7 @@ vibration                      6.53400      1.000 [92m     6.53400e+00[0m ( -4
 Regularization                 0.01812      1.000 [91m     1.81186e-02[0m ( +1.971e-03 ) 
 Total                                             [92m     8.10548e+00[0m ( -7.059e-01 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_41.offxml
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_52.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -1738,7 +1739,7 @@ vibration                      5.94679      1.000 [92m     5.94679e+00[0m ( -5
 Regularization                 0.02131      1.000 [91m     2.13130e-02[0m ( +3.194e-03 ) 
 Total                                             [92m     7.47122e+00[0m ( -6.343e-01 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_42.offxml
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_53.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -1977,7 +1978,7 @@ vibration                      5.60809      1.000 [92m     5.60809e+00[0m ( -3
 Regularization                 0.02333      1.000 [91m     2.33271e-02[0m ( +2.014e-03 ) 
 Total                                             [92m     6.92431e+00[0m ( -5.469e-01 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_43.offxml
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_54.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -2214,7 +2215,7 @@ vibration                      2.32283      1.000 [92m     2.32283e+00[0m ( -3
 Regularization                 0.06841      1.000 [91m     6.84052e-02[0m ( +4.508e-02 ) 
 Total                                             [92m     3.86223e+00[0m ( -3.062e+00 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_44.offxml
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_55.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -2438,7 +2439,7 @@ vibration                      2.19355      1.000 [92m     2.19355e+00[0m ( -1
 Regularization                 0.07072      1.000 [91m     7.07179e-02[0m ( +2.313e-03 ) 
 Total                                             [92m     3.37464e+00[0m ( -4.876e-01 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_45.offxml
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_56.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -2677,7 +2678,7 @@ vibration                      2.13213      1.000 [92m     2.13213e+00[0m ( -6
 Regularization                 0.07273      1.000 [91m     7.27315e-02[0m ( +2.014e-03 ) 
 Total                                             [92m     3.10602e+00[0m ( -2.686e-01 ) 
 -------------------------------------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_46.offxml
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_57.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
@@ -2781,11 +2782,12 @@ Convergence criterion reached in step size (1.00e-02)
   24 [  1.7002e-01 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
   25 [  1.6848e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
 ----------------------------------------------------------
-Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_47.offxml
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_58.offxml
 #========================================================================#
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
 #========================================================================#
+Wall time since calculation start: 142.5 seconds
 #========================================================#
 #| [1;44;93m               Calculation Finished.                [0m |#
 #| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
