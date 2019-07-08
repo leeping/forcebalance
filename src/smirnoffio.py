@@ -64,7 +64,7 @@ def smirnoff_analyze_parameter_coverage(forcefield, targets):
     parameter_counter = Counter()
     # build the openforcefield.typing.engines.smirnoff.ForceField object
     absffpath = os.path.join(forcefield.root,forcefield.ffdir,forcefield.offxml)
-    ff = ForceField(absffpath, allow_cosmetic_attributes=True)
+    ff = smirnoff_hack.getForceField(absffpath) #ForceField(absffpath, allow_cosmetic_attributes=True)
     # analyze each target
     for target in targets:
         off_topology = None
@@ -72,7 +72,21 @@ def smirnoff_analyze_parameter_coverage(forcefield, targets):
         if isinstance(target, forcebalance.target.RemoteTarget):
             if target.r_tgt_opts['type'].endswith('SMIRNOFF'):
                 target_path = os.path.join(target.root, target.tgtdir)
-                openff_mols = [OffMolecule.from_file(os.path.join(target_path,fnm)) for fnm in target.r_tgt_opts.get('mol2', [])]
+                if target.r_tgt_opts['type'] == 'OPTGEOTARGET_SMIRNOFF':
+                    # parse optgeo_options_txt and get the names of the mol2 files
+                    optgeo_options_txt = os.path.join(target_path, target.r_tgt_opts['optgeo_options_txt'])
+                    sys_opts = forcebalance.opt_geo_target.OptGeoTarget.parse_optgeo_options(optgeo_options_txt)
+                    openff_mols = [OffMolecule.from_file(os.path.join(target_path,fnm), allow_undefined_stereo=True) \
+                                   for sysopt in sys_opts.values() for fnm in sysopt['mol2']]
+                else:
+                    openff_mols = [OffMolecule.from_file(os.path.join(target_path,fnm), allow_undefined_stereo=True) \
+                                   for fnm in target.r_tgt_opts.get('mol2', [])]
+                off_topology = OffTopology.from_molecules(openff_mols)
+        elif isinstance(target, forcebalance.opt_geo_target.OptGeoTarget):
+            if target.engine_.__name__ == 'SMIRNOFF':
+                target_path = os.path.join(target.root, target.tgtdir)
+                openff_mols = [OffMolecule.from_file(os.path.join(target_path,fnm), allow_undefined_stereo=True) \
+                    for sysopt in target.sys_opts.values() for fnm in sysopt['mol2']]
                 off_topology = OffTopology.from_molecules(openff_mols)
         elif hasattr(target, 'engine') and isinstance(target.engine, SMIRNOFF) and hasattr(target.engine,'off_topology'):
             off_topology = target.engine.off_topology
@@ -205,15 +219,19 @@ class SMIRNOFF(OpenMM):
         # Create the OpenFF ForceField object.
         if hasattr(self, 'FF'):
             self.offxml = [self.FF.offxml]
-            self.forcefield = ForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml), allow_cosmetic_attributes=True)
+            self.forcefield = smirnoff_hack.getForceField(os.path.join(self.root, self.FF.ffdir, self.FF.offxml))
         else:
             self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
-            self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
+            self.forcefield = smirnoff_hack.getForceField(*self.offxml)
 
         ## Load mol2 files for smirnoff topology
         openff_mols = []
         for fnm in self.mol2:
-            mol = OffMolecule.from_file(fnm)
+            try:
+                mol = OffMolecule.from_file(fnm, allow_undefined_stereo=True)
+            except Exception as e:
+                logger.error("Error when loading %s" % fnm)
+                raise e
             openff_mols.append(mol)
         self.off_topology = OffTopology.from_openmm(self.pdb.topology, unique_molecules=openff_mols)
 
@@ -288,9 +306,13 @@ class SMIRNOFF(OpenMM):
         if len(kwargs) > 0:
             self.simkwargs = kwargs
 
-        self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
-        self.system = self.forcefield.create_openmm_system(self.off_topology)
-
+        #self.forcefield = ForceField(*self.offxml, allow_cosmetic_attributes=True)
+        self.forcefield = smirnoff_hack.getForceField(*self.offxml)
+        try:
+            self.system = self.forcefield.create_openmm_system(self.off_topology)
+        except Exception as error:
+            logger.error("Error when creating system for %s" % self.mol2)
+            raise error
         # Commenting out all virtual site stuff for now.
         # self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
@@ -323,7 +345,7 @@ class SMIRNOFF(OpenMM):
         X0 = np.array([j for i, j in enumerate(self.simulation.context.getState(getPositions=True).getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
         # Minimize the energy.  Optimizer works best in "steps".
         for logc in np.linspace(0, np.log10(crit), steps):
-            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole)
+            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=10000)
         # Get the optimized geometry.
         S = self.simulation.context.getState(getPositions=True, getEnergy=True)
         X1 = np.array([j for i, j in enumerate(S.getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
@@ -371,6 +393,17 @@ class SMIRNOFF(OpenMM):
         B = self.B.energy()
 
         return (D - A - B) / 4.184
+
+    def get_smirks_counter(self):
+        """Get a counter for the time of appreance of each SMIRKS"""
+        smirks_counter = Counter()
+        molecule_force_list = self.forcefield.label_molecules(self.off_topology)
+        for mol_idx, mol_forces in enumerate(molecule_force_list):
+            for force_tag, force_dict in mol_forces.items():
+                # e.g. force_tag = 'Bonds'
+                for parameter in force_dict.values():
+                    smirks_counter[parameter.smirks] += 1
+        return smirks_counter
 
 class Liquid_SMIRNOFF(Liquid):
     """ Condensed phase property matching using OpenMM. """
@@ -427,10 +460,43 @@ class AbInitio_SMIRNOFF(AbInitio):
         self.set_option(tgt_opts,'mol2',forceprint=True)
         self.set_option(tgt_opts,'coords',default="all.gro")
         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
-        self.set_option(tgt_opts,'openmm_platform','platname',default="CUDA", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
         self.engine_ = SMIRNOFF
         ## Initialize base class.
         super(AbInitio_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
+
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        # we update the self.pgrads here so it's not overwritten in rtarget.py
+        self.smirnoff_update_pgrads()
+
+    def smirnoff_update_pgrads(self):
+        """
+        Update self.pgrads based on smirks present in mol2 files
+
+        This can greatly improve gradients evaluation in big optimizations
+
+        Note
+        ----
+        1. This function assumes the names of the forcefield parameters has the smirks as the last item
+        2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
+        """
+        orig_pgrad_set = set(self.pgrad)
+        # smirks to param_idxs map
+        smirks_params_map = defaultdict(list)
+        for pname, pidx in self.FF.map.items():
+            smirks = pname.rsplit('/',maxsplit=1)[-1]
+            smirks_params_map[smirks].append(pidx)
+        pgrads_set = set()
+        # get the smirks for this target, keep only the pidx corresponding to these smirks
+        smirks_counter = self.engine.get_smirks_counter()
+        for smirks in smirks_counter:
+            if smirks_counter[smirks] > 0:
+                pidx_list = smirks_params_map[smirks]
+                # update the set of parameters present in this target
+                pgrads_set.update(pidx_list)
+        # this ensure we do not add any new items into self.pgrad
+        pgrads_set.intersection_update(orig_pgrad_set)
+        self.pgrad = sorted(list(pgrads_set))
 
 
 class Vibration_SMIRNOFF(Vibration):
@@ -455,6 +521,58 @@ class OptGeoTarget_SMIRNOFF(OptGeoTarget):
         self.engine_ = SMIRNOFF
         ## Initialize base class.
         super(OptGeoTarget_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
+
+    def create_engines(self, engine_args):
+        """ create a dictionary of self.engines = {sysname: Engine} """
+        self.engines = OrderedDict()
+        for sysname, sysopt in self.sys_opts.items():
+            # SMIRNOFF is a subclass of OpenMM engine but it requires the mol2 input
+            # note: OpenMM.mol is a Molecule class instance;  mol2 is a file format.
+            # path to .pdb file
+            pdbpath = os.path.join(self.root, self.tgtdir, sysopt['topology'])
+            # a list of paths to .mol2 files
+            mol2path = [os.path.join(self.root, self.tgtdir, f) for f in sysopt['mol2']]
+            # use the PDB file with topology
+            M = Molecule(os.path.join(self.root, self.tgtdir, sysopt['topology']))
+            # replace geometry with values from xyz file for higher presision
+            M0 = Molecule(os.path.join(self.root, self.tgtdir, sysopt['geometry']))
+            M.xyzs = M0.xyzs
+            # here mol=M is given for the purpose of using the topology from the input pdb file
+            # if we don't do this, pdb=top.pdb option will only copy some basic information but not the topology into OpenMM.mol (openmmio.py line 615)
+            self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, pdb=pdbpath, mol2=mol2path, **engine_args)
+        self.build_system_mval_masks()
+
+    def build_system_mval_masks(self):
+        """
+        Build a mask of mvals for each system, to speed up finite difference gradients
+
+        Note
+        ----
+        1. This function assumes the names of the forcefield parameters has the smirks as the last item
+        2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
+        """
+        # only need to build once
+        if hasattr(self, 'system_mval_masks'): return
+        n_params = len(self.FF.map)
+        # default mask with all False
+        system_mval_masks = {sysname: np.zeros(n_params, dtype=bool) for sysname in self.sys_opts}
+        # smirks to param_idxs map
+        smirks_params_map = defaultdict(list)
+        for pname, pidx in self.FF.map.items():
+            smirks = pname.rsplit('/',maxsplit=1)[-1]
+            smirks_params_map[smirks].append(pidx)
+        # go over all smirks for each system
+        for sysname in self.sys_opts:
+            engine = self.engines[sysname]
+            smirks_counter = engine.get_smirks_counter()
+            for smirks in smirks_counter:
+                if smirks_counter[smirks] > 0:
+                    pidx_list = smirks_params_map[smirks]
+                    # set mask value to True for present smirks
+                    system_mval_masks[sysname][pidx_list] = True
+        # finish
+        logger.info("system_mval_masks is built for faster gradient evaluations")
+        self.system_mval_masks = system_mval_masks
 
 # class BindingEnergy_SMIRNOFF(BindingEnergy):
 #     """ Binding energy matching using OpenMM. """
@@ -511,4 +629,3 @@ class OptGeoTarget_SMIRNOFF(OptGeoTarget):
 #         ## Send back the trajectory file.
 #         if self.save_traj > 0:
 #             self.extra_output = ['openmm-md.dcd']
-
