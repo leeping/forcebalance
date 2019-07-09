@@ -21,21 +21,29 @@ from propertyestimator.properties import ParameterGradientKey
 logger = getLogger(__name__)
 
 try:
+    # noinspection PyUnresolvedReferences
     import propertyestimator
+    # noinspection PyUnresolvedReferences
     from propertyestimator.client import PropertyEstimatorClient, ConnectionOptions, PropertyEstimatorOptions
+    # noinspection PyUnresolvedReferences
     from propertyestimator.datasets import ThermoMLDataSet, PhysicalPropertyDataSet
+    # noinspection PyUnresolvedReferences
     from propertyestimator.utils.exceptions import PropertyEstimatorException
+    # noinspection PyUnresolvedReferences
     from propertyestimator.utils.serialization import TypedJSONDecoder, TypedJSONEncoder
+    # noinspection PyUnresolvedReferences
     from propertyestimator.workflow import WorkflowOptions
 except ImportError:
     warn_once("Failed to import the propertyestimator package.")
 
 try:
+    # noinspection PyUnresolvedReferences
     from openforcefield.typing.engines import smirnoff
 except ImportError:
     warn_once("Failed to import the openforcefield package.")
 
 try:
+    # noinspection PyUnresolvedReferences
     from simtk import unit
 except ImportError:
     warn_once("Failed to import the openmm package.")
@@ -55,77 +63,26 @@ class PropertyEstimate_SMIRNOFF(Target):
         connection_options: propertyestimator.client.ConnectionOptions
             The options for how the `propertyestimator` client should
             connect to a running server instance.
-        sources: list of OptionsFile.PropertySource
-            A list of sources to the properties which this target aims
-            to fit against.
+        estimation_options: propertyestimator.client.PropertyEstimatorOptions
+            The options for how properties should be estimated by the
+            `propertyestimator` (e.g. the uncertainties to which properties
+            should be estimated).
+        data_set_path: str
+            The path to a JSON serialized PhysicalPropertyDataSet which
+            contains those physical properties which will be optimised
+            against.
         weights: list of PropertyWeight
             The weighting of each property which will be optimised against.
         denominators: list of PropertyDenominator
             ???
         """
 
-        class PropertySource:
-            """Represents the source (either a path or a doi) of
-            a ThermoML property.
-            """
-
-            @property
-            def thermoml_doi(self):
-                """str: The doi of a ThermoML property .xml file."""
-                return self._thermoml_doi
-
-            @property
-            def path(self):
-                """str: A path to a either a JSON property file or a
-                ThermoML .xml archive file."""
-                return self._path
-
-            def __init__(self, path=None, thermoml_doi=None):
-                """Constructs a new PropertySource object.
-
-                Parameters
-                ----------
-                path: str, optional
-                    A path to the ThermoML property .xml file.
-                thermoml_doi: str, optional
-                    The doi of a ThermoML property .xml file.
-                """
-
-                assert (path is None and thermoml_doi is not None or
-                        path is not None and thermoml_doi is None)
-
-                self._path = path
-                self._thermoml_doi = thermoml_doi
-
-            def to_dict(self):
-                """Converts this object to a dictionary
-
-                Returns
-                -------
-                dict of str and str
-                    The dictionary representation of this class.
-                """
-
-                if self.path is not None:
-                    return {'path': self.path}
-                else:
-                    return {'thermoml_doi': self.thermoml_doi}
-
-            @classmethod
-            def from_dict(cls, dictionary):
-                """Creates an instance of this class from a dictionary.
-
-                Parameters
-                ----------
-                dict of str and str
-                    The dictionary representation to build the class from.
-                """
-                return cls(dictionary.get('path'), dictionary.get('thermoml_doi'))
-
         def __init__(self):
 
             self.connection_options = ConnectionOptions()
-            self.sources = []
+            self.estimation_options = PropertyEstimatorOptions()
+
+            self.data_set_path = ''
             self.weights = {}
             self.denominators = {}
 
@@ -140,7 +97,9 @@ class PropertyEstimate_SMIRNOFF(Target):
 
             value = {
                 'connection_options': self.connection_options.__getstate__(),
-                'sources': [source.to_dict() for source in self.sources],
+                'estimation_options': self.estimation_options.__getstate__(),
+
+                'data_set_path': self.data_set_path,
 
                 'weights': {
                     property_name: self.weights[property_name] for property_name in self.weights
@@ -150,7 +109,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                 }
             }
 
-            return json.dumps(value, sort_keys=True, indent=4, separators=(',', ': '))
+            return json.dumps(value, sort_keys=True, indent=4, separators=(',', ': '), cls=TypedJSONEncoder)
 
         @classmethod
         def from_json(cls, json_source):
@@ -164,12 +123,13 @@ class PropertyEstimate_SMIRNOFF(Target):
 
             if isinstance(json_source, str):
                 with open(json_source, 'r') as file:
-                    dictionary = json.load(file)
+                    dictionary = json.load(file, cls=TypedJSONDecoder)
             else:
-                dictionary = json.load(json_source)
+                dictionary = json.load(json_source, cls=TypedJSONDecoder)
 
             assert ('connection_options' in dictionary and
-                    'sources' in dictionary and
+                    'estimation_options' in dictionary and
+                    'data_set_path' in dictionary and
                     'weights' in dictionary and
                     'denominators' in dictionary)
 
@@ -178,7 +138,10 @@ class PropertyEstimate_SMIRNOFF(Target):
             value.connection_options = ConnectionOptions()
             value.connection_options.__setstate__(dictionary['connection_options'])
 
-            value.sources = [cls.PropertySource.from_dict(source) for source in dictionary['sources']]
+            value.estimation_options = PropertyEstimatorOptions()
+            value.estimation_options.__setstate__(dictionary['estimation_options'])
+
+            value.data_set_path = dictionary['data_set_path']
 
             value.weights = {
                 property_name: dictionary['weights'][property_name] for property_name in dictionary['weights']
@@ -293,37 +256,14 @@ class PropertyEstimate_SMIRNOFF(Target):
         # connection options.
         self._client = PropertyEstimatorClient(connection_options=self._options.connection_options)
 
-        # Load in the experimental data set from either the specified doi or
-        # local file paths.
-        self._data_set = PhysicalPropertyDataSet()
+        # Load in the experimental data set.
+        data_set_path = os.path.join(self.tgtdir, self._options.data_set_path)
 
-        self._data_set.merge(ThermoMLDataSet.from_doi(*[source.thermoml_doi for source in
-                                                        self._options.sources if source.thermoml_doi]))
-
-        self._data_set.merge(ThermoMLDataSet.from_file(*[
-            os.path.join(self.tgtdir, source.path) for
-            source in self._options.sources if source.path and os.path.splitext(source.path)[1] == '.xml'
-        ]))
-
-        for source in self._options.sources:
-
-            print(source.path, os.path.splitext(source.path)[1].lower())
-
-            if not source.path or os.path.splitext(source.path)[1].lower() != '.json':
-                continue
-
-            with open(os.path.join(self.tgtdir, source.path), 'r') as file:
-                physical_property = json.load(file, cls=TypedJSONDecoder)
-
-                if physical_property.substance.identifier not in self._data_set.properties:
-                    self._data_set.properties[physical_property.substance.identifier] = []
-
-                self._data_set.properties[physical_property.substance.identifier].append(physical_property)
+        with open(data_set_path, 'r') as file:
+            self._data_set = PhysicalPropertyDataSet.parse_json(file.read())
 
         if len(self._data_set.properties) == 0:
-            raise ValueError('The physical property data set to optimise against is empty. '
-                             'Either no physical properties were specified, or those that '
-                             'were are unsupported by the estimator.')
+            raise ValueError('The physical property data set to optimise against is empty.')
 
         # Convert the reference data into a more easily comparable form.
         self._reference_properties = self._refactor_properties_dictionary(self._data_set.properties)
@@ -470,27 +410,11 @@ class PropertyEstimate_SMIRNOFF(Target):
 
                 self._parameter_units[parameter_gradient_key] = parameter_unit
 
-        # Set up some simple convergence criteria.
-        estimation_options = PropertyEstimatorOptions()
-
-        simulation_options = WorkflowOptions(convergence_mode=WorkflowOptions.ConvergenceMode.AbsoluteUncertainty,
-                                             absolute_uncertainty=0.0004 * unit.grams / unit.milliliter)
-
-        reweighting_options = WorkflowOptions(convergence_mode=WorkflowOptions.ConvergenceMode.AbsoluteUncertainty,
-                                              absolute_uncertainty=0.0008 * unit.grams / unit.milliliter)
-
-        estimation_options.workflow_options = {
-            'Density': {
-                'SimulationLayer': simulation_options,
-                'ReweightingLayer': reweighting_options
-            },
-        }
-
+        # Submit the estimation request.
         self._pending_estimate_request = self._client.request_estimate(property_set=self._data_set,
                                                                        force_field=force_field,
-                                                                       options=estimation_options,
-                                                                       parameter_gradient_keys=
-                                                                       parameter_gradient_keys)
+                                                                       options=self._options.estimation_options,
+                                                                       parameter_gradient_keys=parameter_gradient_keys)
 
         logger.info(f'Requesting the estimation of {self._data_set.number_of_properties} properties, and '
                     f'their gradients with respect to {len(parameter_gradient_keys)} parameters.\n')
