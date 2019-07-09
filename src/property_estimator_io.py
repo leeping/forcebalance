@@ -52,7 +52,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         Attributes
         ----------
-        client_config: propertyestimator.client.ConnectionOptions
+        connection_options: propertyestimator.client.ConnectionOptions
             The options for how the `propertyestimator` client should
             connect to a running server instance.
         sources: list of OptionsFile.PropertySource
@@ -360,6 +360,23 @@ class PropertyEstimate_SMIRNOFF(Target):
                                                        number_of_properties[property_name])
 
     def _build_pvals_jacobian(self, mvals, perturbation_amount=1.0e-4):
+        """Build the matrix which maps the gradients of properties with
+        respect to physical parameters to gradients with respect to
+        force balance mathematical parameters.
+
+        Parameters
+        ----------
+        mvals: numpy.ndarray
+            The current force balance mathematical parameters.
+        perturbation_amount: float
+            The amount to perturb the mathematical parameters by
+            when calculating the finite difference gradients.
+
+        Returns
+        -------
+        numpy.ndarray
+            A matrix of d(Physical Parameter)/d(Mathematical Parameter).
+        """
 
         jacobian_list = []
 
