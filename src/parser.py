@@ -322,7 +322,7 @@ def read_mvals(fobj):
     for line in fobj:
         if re.match("(/read_mvals)|(^\$end)",line):
             break
-        Answer.append(float(line.split('[')[-1].split(']')[0].split()[-1]))
+        Answer.append(float(line.split('[', maxsplit=1)[-1].split(']', maxsplit=1)[0].split()[-1]))
     return Answer
 
 def read_pvals(fobj):
@@ -330,7 +330,7 @@ def read_pvals(fobj):
     for line in fobj:
         if re.match("(/read_pvals)|(^\$end)",line):
             break
-        Answer.append(float(line.split('[')[-1].split(']')[0].split()[-1]))
+        Answer.append(float(line.split('[', maxsplit=1)[-1].split(']', maxsplit=1)[0].split()[-1]))
     return Answer
 
 def read_priors(fobj):
