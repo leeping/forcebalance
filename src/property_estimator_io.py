@@ -419,7 +419,6 @@ class PropertyEstimate_SMIRNOFF(Target):
         logger.info(f'Requesting the estimation of {self._data_set.number_of_properties} properties, and '
                     f'their gradients with respect to {len(parameter_gradient_keys)} parameters.\n')
 
-        logger.info(f'Requested gradients keys: {parameter_gradient_keys}')
         self._pending_estimate_request.results(True)
 
     @staticmethod
@@ -526,8 +525,6 @@ class PropertyEstimate_SMIRNOFF(Target):
                     gradient_value = gradient.value.value_in_unit(gradient_unit)
                     estimated_gradients[class_name][substance_id][state_tuple][parameter_index] = gradient_value
 
-        logger.info(f'PVal Gradients={estimated_gradients}')
-
         for property_type in estimated_gradients:
 
             for substance_id in estimated_gradients[property_type]:
@@ -538,8 +535,6 @@ class PropertyEstimate_SMIRNOFF(Target):
                     mval_gradients = np.matmul(jacobian, pval_gradients)
 
                     estimated_gradients[property_type][substance_id][state_tuple] = mval_gradients
-
-        logger.info(f'MVal Gradients={estimated_gradients}')
 
         return estimated_data, estimated_gradients
 
@@ -594,9 +589,6 @@ class PropertyEstimate_SMIRNOFF(Target):
         # Extract the properties estimated using the unperturbed parameters.
         estimated_property_data, estimated_gradients = self._extract_property_data(self._pending_estimate_request,
                                                                                    mvals, AGrad)
-
-        logger.info(f'{estimated_property_data}\n')
-        logger.info(f'{estimated_gradients}\n')
 
         # compute objective value
         obj_value = 0.0
