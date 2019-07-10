@@ -622,6 +622,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
                     self._last_obj_details[property_name].append((temperature,
                                                                   pressure,
+                                                                  substance_id,
                                                                   reference_value,
                                                                   target_value,
                                                                   target_error,
@@ -650,8 +651,8 @@ class PropertyEstimate_SMIRNOFF(Target):
         """
         for property_name, details in self._last_obj_details.items():
             dict_for_print = {
-                "  %sK %satm" % detail[:2]: "%9.3f %14.3f +- %-7.3f % 7.3f % 9.5f % 9.5f % 9.5f " % detail[2:] for
+                "  %sK %satm %s" % detail[:3]: "%9.3f %14.3f +- %-7.3f % 7.3f % 9.5f % 9.5f % 9.5f " % detail[3:] for
                 detail in details}
-            title = '%s %s\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    ' \
+            title = '%s %s\nTemperature  Pressure Substance  Reference  Calculated +- Stdev     Delta    Weight    ' \
                     'Denom     Term  ' % (self.name, property_name)
             printcool_dictionary(dict_for_print, title=title, bold=True, color=4, keywidth=15)
