@@ -231,13 +231,18 @@ class OptGeoTarget(Target):
             self.FF.make(mvals)
             v_obj_list = []
             for sysname, sysopt in self.sys_opts.items():
-                n_bonds = len(self.internal_coordinates[sysname]['vref_bonds'])
-                n_angles = len(self.internal_coordinates[sysname]['vref_angles'])
-                n_dihedrals = len(self.internal_coordinates[sysname]['vref_dihedrals'])
-                n_impropers = len(self.internal_coordinates[sysname]['vref_impropers'])
+                # ref values of each type
+                vref_bonds = self.internal_coordinates[sysname]['vref_bonds']
+                vref_angles = self.internal_coordinates[sysname]['vref_angles']
+                vref_dihedrals = self.internal_coordinates[sysname]['vref_dihedrals']
+                vref_impropers = self.internal_coordinates[sysname]['vref_impropers']
+                # counts of each type
+                n_bonds = len(vref_bonds)
+                n_angles = len(vref_angles)
+                n_dihedrals = len(vref_dihedrals)
+                n_impropers = len(vref_impropers)
                 # use self.system_mval_masks to skip evaluations when computing gradients
                 if enable_system_mval_mask and in_fd() and (p_idx is not None) and (self.system_mval_masks[sysname][p_idx] == False):
-                    # v_obj_list += [0, 0, 0, 0]
                     v_obj_list += [0] * (n_bonds + n_angles + n_dihedrals + n_impropers)
                     continue
                 # read denominators from system options
@@ -250,36 +255,31 @@ class OptGeoTarget(Target):
                 scale_angle = 1.0 / angle_denom if angle_denom != 0 else 0.0
                 scale_dihedral = 1.0 / dihedral_denom if dihedral_denom != 0 else 0.0
                 scale_improper = 1.0 / improper_denom if improper_denom != 0 else 0.0
-                # calculate new internal coordinates f
+                # calculate new internal coordinates
                 v_ic = self.system_driver(sysname)
                 # objective contribution from bonds
-                vref_bonds = self.internal_coordinates[sysname]['vref_bonds']
                 vtar_bonds = v_ic['bonds']
-                rmsd_bond = compute_rmsd(vref_bonds, vtar_bonds)
-                diff_bond = ((vref_bonds - vtar_bonds) / np.sqrt(len(vref_bonds)) * scale_bond).tolist() if len(vref_bonds) > 0 else []
+                diff_bond = ((vref_bonds - vtar_bonds) / n_bonds**0.5 * scale_bond).tolist() if n_bonds > 0 else []
                 # objective contribution from angles
-                vref_angles = self.internal_coordinates[sysname]['vref_angles']
                 vtar_angles = v_ic['angles']
-                rmsd_angle = compute_rmsd(vref_angles, vtar_angles, v_periodic=np.pi*2)
-                diff_angle = (periodic_diff(vref_angles, vtar_angles, np.pi*2) / np.sqrt(len(vref_angles)) * scale_angle).tolist() if len(vref_angles) > 0 else []
+                diff_angle = (periodic_diff(vref_angles, vtar_angles, np.pi*2) / n_angles**0.5 * scale_angle).tolist() if n_angles > 0 else []
                 # objective contribution from dihedrals
-                vref_dihedrals = self.internal_coordinates[sysname]['vref_dihedrals']
                 vtar_dihedrals = v_ic['dihedrals']
-                rmsd_dihedral = compute_rmsd(vref_dihedrals, vtar_dihedrals, v_periodic=np.pi*2)
-                diff_dihedral = (periodic_diff(vref_dihedrals, vtar_dihedrals, np.pi*2) / np.sqrt(len(vref_dihedrals)) * scale_dihedral).tolist() if len(vref_dihedrals) > 0 else []
+                diff_dihedral = (periodic_diff(vref_dihedrals, vtar_dihedrals, np.pi*2) / n_dihedrals**0.5 * scale_dihedral).tolist() if n_dihedrals > 0 else []
                 # objective contribution from improper dihedrals
-                vref_impropers = self.internal_coordinates[sysname]['vref_impropers']
                 vtar_impropers = v_ic['impropers']
-                rmsd_improper = compute_rmsd(vref_impropers, vtar_impropers, v_periodic=np.pi*2)
-                diff_improper = (periodic_diff(vref_impropers, vtar_impropers, np.pi*2) / np.sqrt(len(vref_impropers)) * scale_improper).tolist() if len(vref_impropers) > 0 else []
-                # add total objective value to result list
-                # sys_obj_list = [rmsd_bond * scale_bond, rmsd_angle * scale_angle, \
-                #                   rmsd_dihedral * scale_dihedral, rmsd_improper * scale_improper]
+                diff_improper = (periodic_diff(vref_impropers, vtar_impropers, np.pi*2) / n_impropers**0.5 * scale_improper).tolist() if n_impropers > 0 else []
+                # combine objective values into a big result list
                 sys_obj_list = diff_bond + diff_angle + diff_dihedral + diff_improper
-                # keep individual objective terms for each property
+                # extend the result v_obj_list by individual terms in this system
                 v_obj_list += sys_obj_list
                 # save print string
                 if not in_fd():
+                    # For printing, we group the RMSD by type
+                    rmsd_bond = compute_rmsd(vref_bonds, vtar_bonds)
+                    rmsd_angle = compute_rmsd(vref_angles, vtar_angles, v_periodic=np.pi*2)
+                    rmsd_dihedral = compute_rmsd(vref_dihedrals, vtar_dihedrals, v_periodic=np.pi*2)
+                    rmsd_improper = compute_rmsd(vref_impropers, vtar_impropers, v_periodic=np.pi*2)
                     obj_total = sum(v**2 for v in sys_obj_list)
                     self.PrintDict[sysname] = "% 9.3f % 7.2f % 9.3f % 7.2f % 9.3f % 7.2f % 9.3f % 7.2f %17.3f" % (rmsd_bond, \
                         bond_denom, rmsd_angle, angle_denom, rmsd_dihedral, dihedral_denom, rmsd_improper, improper_denom, obj_total)
