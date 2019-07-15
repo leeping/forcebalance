@@ -148,33 +148,44 @@ def assign_openff_parameter(ff, new_value, pid):
     # The first, third and fourth fields will be used for parameter assignment.
     # We use "value_name" to describe names of individual numerical values within a single parameter type
     # e.g. k1 in the above example.
-    (handler_name, tag_name, value_name, smirks) = pid.split('/')
 
-    # Get the OpenFF parameter object
-    parameter = ff.get_parameter_handler(handler_name).parameters[smirks]
-
-    if hasattr(parameter, value_name):
-        # If the value name is an attribute of the parameter then we set it directly.
-        unit = getattr(parameter, value_name).unit
-        setattr(parameter, value_name, new_value*unit)
+    # QYD: cache the parameter finding procedure, then directly change the _value of the quantity
+    # Note: This cache requires the quantity does not get overwritten, which is True since this function is the only
+    # place we modify the OpenFF ForceField parameters.
+    if not hasattr(ff, '_forcebalance_assign_parameter_map'):
+        ff._forcebalance_assign_parameter_map = dict()
+    if pid not in ff._forcebalance_assign_parameter_map:
+        (handler_name, tag_name, value_name, smirks) = pid.split('/')
+        # Get the OpenFF parameter object
+        parameter = ff.get_parameter_handler(handler_name).parameters[smirks]
+        if hasattr(parameter, value_name):
+            # If the value name is an attribute of the parameter then we set it directly.
+            unit = getattr(parameter, value_name).unit
+            # Get the quantity of the parameter in the OpenFF forcefield object
+            param_quantity = getattr(parameter, value_name)
+        else:
+            # If the value name is a periodic attribute (say, k1) then we need to use
+            # a regex to split the value name into 'k' and '1', then set the appropriate
+            # value in the k-list
+            attribute_split = re.split(r'(\d+)', value_name)
+            # print(attribute_split)
+            # assert len(attribute_split) == 2
+            assert hasattr(parameter, attribute_split[0])
+            # attribute_split[0] is a string such as 'k'
+            value_name = attribute_split[0]
+            # parameter_index is the position of k1 in the values associated with 'k'
+            parameter_index = int(attribute_split[1]) - 1
+            # Get the list of values, update the appropriate one and then set the new attribute to the updated list
+            value_list = getattr(parameter, value_name)
+            # Get the quantity of the parameter in the OpenFF forcefield object
+            param_quantity = value_list[parameter_index]
+        # save the found quantity in cache
+        ff._forcebalance_assign_parameter_map[pid] = param_quantity
     else:
-        # If the value name is a periodic attribute (say, k1) then we need to use
-        # a regex to split the value name into 'k' and '1', then set the appropriate
-        # value in the k-list
-        attribute_split = re.split(r'(\d+)', value_name)
-        # print(attribute_split)
-        # assert len(attribute_split) == 2
-        assert hasattr(parameter, attribute_split[0])
-        # attribute_split[0] is a string such as 'k'
-        value_name = attribute_split[0]
-        # parameter_index is the position of k1 in the values associated with 'k'
-        parameter_index = int(attribute_split[1]) - 1
-        # Get the list of values, update the appropriate one and then set the new attribute to the updated list
-        value_list = getattr(parameter, value_name)
-        unit = value_list[parameter_index].unit
-        value_list[parameter_index] = new_value*unit
-        setattr(parameter, value_name, value_list)
-            
+        param_quantity = ff._forcebalance_assign_parameter_map[pid]
+    # set new_value directly in the quantity
+    param_quantity._value = new_value
+
 class SMIRNOFF(OpenMM):
 
     """ Derived from Engine object for carrying out OpenMM calculations that use the SMIRNOFF force field. """
