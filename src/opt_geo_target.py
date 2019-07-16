@@ -259,16 +259,20 @@ class OptGeoTarget(Target):
                 v_ic = self.system_driver(sysname)
                 # objective contribution from bonds
                 vtar_bonds = v_ic['bonds']
-                diff_bond = ((vref_bonds - vtar_bonds) / n_bonds**0.5 * scale_bond).tolist() if n_bonds > 0 else []
+                diff_bond = ((vref_bonds - vtar_bonds) * scale_bond).tolist() if n_bonds > 0 else []
+                # diff_bond = ((vref_bonds - vtar_bonds) / n_bonds**0.5 * scale_bond).tolist() if n_bonds > 0 else []
                 # objective contribution from angles
                 vtar_angles = v_ic['angles']
-                diff_angle = (periodic_diff(vref_angles, vtar_angles, np.pi*2) / n_angles**0.5 * scale_angle).tolist() if n_angles > 0 else []
+                diff_angle = (periodic_diff(vref_angles, vtar_angles, np.pi*2) * scale_angle).tolist() if n_angles > 0 else []
+                # diff_angle = (periodic_diff(vref_angles, vtar_angles, np.pi*2) / n_angles**0.5 * scale_angle).tolist() if n_angles > 0 else []
                 # objective contribution from dihedrals
                 vtar_dihedrals = v_ic['dihedrals']
-                diff_dihedral = (periodic_diff(vref_dihedrals, vtar_dihedrals, np.pi*2) / n_dihedrals**0.5 * scale_dihedral).tolist() if n_dihedrals > 0 else []
+                diff_dihedral = (periodic_diff(vref_dihedrals, vtar_dihedrals, np.pi*2) * scale_dihedral).tolist() if n_dihedrals > 0 else []
+                # diff_dihedral = (periodic_diff(vref_dihedrals, vtar_dihedrals, np.pi*2) / n_dihedrals**0.5 * scale_dihedral).tolist() if n_dihedrals > 0 else []
                 # objective contribution from improper dihedrals
                 vtar_impropers = v_ic['impropers']
-                diff_improper = (periodic_diff(vref_impropers, vtar_impropers, np.pi*2) / n_impropers**0.5 * scale_improper).tolist() if n_impropers > 0 else []
+                diff_improper = (periodic_diff(vref_impropers, vtar_impropers, np.pi*2) * scale_improper).tolist() if n_impropers > 0 else []
+                # diff_improper = (periodic_diff(vref_impropers, vtar_impropers, np.pi*2) / n_impropers**0.5 * scale_improper).tolist() if n_impropers > 0 else []
                 # combine objective values into a big result list
                 sys_obj_list = diff_bond + diff_angle + diff_dihedral + diff_improper
                 # extend the result v_obj_list by individual terms in this system
