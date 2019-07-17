@@ -49,9 +49,13 @@ normalize_weights no
 constrain_charge false
 
 priors
-   ProperTorsions/Proper/k              : 1.0
-   vdW/Atom/epsilon                     : 0.1
-   vdW/Atom/rmin_half                   : 1.0
+   Bonds/Bond/k                         : 1.0e+01
+   Bonds/Bond/length                    : 1.0e-01
+   Angles/Angle/k                       : 1.0e+01
+   Angles/Angle/angle                   : 1.0e+01
+   ProperTorsions/Proper/k              : 1.0e+01
+   vdW/Atom/epsilon                     : 1.0e-01
+   vdW/Atom/rmin_half                   : 1.0e-01
 /priors      
 
 $end
