@@ -144,9 +144,9 @@ class OptGeoTarget(Target):
                         section_opts[key] = ls[1:]
         # apply a few default global options
         global_opts.setdefault('bond_denom', 0.02)
-        global_opts.setdefault('angle_denom', 0.05)
-        global_opts.setdefault('dihedral_denom', 0.2)
-        global_opts.setdefault('improper_denom', 0.2)
+        global_opts.setdefault('angle_denom', 3)
+        global_opts.setdefault('dihedral_denom', 10.0)
+        global_opts.setdefault('improper_denom', 10.0)
         # copy global options into each system
         for sys_name, sys_opt_dict in sys_opts.items():
             for k,v in global_opts.items():
