@@ -82,7 +82,7 @@ else:
             message = record.getMessage()
             self.stream.write(message)
             self.flush()
-            
+
     if "geometric" in __name__:
         # This ensures logging behavior is consistent with the rest of geomeTRIC
         logger = getLogger(__name__)
@@ -862,8 +862,13 @@ def createWorkQueue(wq_port, debug=True, name=package):
         work_queue.set_debug_flag('all')
     WORK_QUEUE = work_queue.WorkQueue(port=wq_port)
     WORK_QUEUE.specify_name(name)
+    # QYD: prefer the worker that is fastest in previous tasks
+    # another choice is first-come-first serve: WORK_QUEUE_SCHEDULE_FCFS
+    WORK_QUEUE.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_TIME)
+    # QYD: We don't want to specify the following extremely long keepalive times
+    # because they will prevent checking "dead" workers, causing the program to wait forever
     #WORK_QUEUE.specify_keepalive_timeout(8640000)
-    WORK_QUEUE.specify_keepalive_interval(8640000)
+    #WORK_QUEUE.specify_keepalive_interval(8640000)
 
 def destroyWorkQueue():
     # Convenience function to destroy the Work Queue objects.
@@ -889,7 +894,6 @@ def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose
     for f in output_files:
         lf = os.path.join(cwd,f)
         task.specify_output_file(lf,f,cache=False)
-    task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     if tag is None: tag = command
     task.specify_tag(tag)
     task.print_time = print_time
@@ -921,7 +925,6 @@ def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None
     for f in output_files:
         # print f[0], f[1]
         task.specify_output_file(f[0],f[1],cache=False)
-    task.specify_algorithm(work_queue.WORK_QUEUE_SCHEDULE_FCFS)
     if tag is None: tag = command
     task.specify_tag(tag)
     task.print_time = print_time
