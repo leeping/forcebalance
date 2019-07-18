@@ -38,7 +38,7 @@ finite_difference_h 0.001
 # (float) Factor for multiplicative penalty function in objective function
 penalty_additive 1.0
 
-trust0 -0.1
+trust0 0.25
 mintrust 0.05
 error_tolerance 1.0
 adaptive_factor 0.2
@@ -49,14 +49,14 @@ normalize_weights no
 constrain_charge false
 
 priors
-    HarmonicBondForce/Bond/k        1.0e+01
-    HarmonicBondForce/Bond/length   1.0e-02
-    HarmonicAngleForce/Angle/k      1.0e+01
-    HarmonicAngleForce/Angle/angle  1.0e+01
-    PeriodicTorsionForce/Proper/k1  1.0e+00
-    NonbondedForce/Atom/epsilon     1.0e-02
-    NonbondedForce/Atom/rmin_half   1.0e-01
-/priors
+   Bonds/Bond/k                         : 1.0e+01
+   Bonds/Bond/length                    : 1.0e-01
+   Angles/Angle/k                       : 1.0e+01
+   Angles/Angle/angle                   : 1.0e+01
+   ProperTorsions/Proper/k              : 1.0e+01
+   vdW/Atom/epsilon                     : 1.0e-01
+   vdW/Atom/rmin_half                   : 1.0e-01
+/priors      
 
 $end
 
