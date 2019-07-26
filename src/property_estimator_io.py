@@ -21,29 +21,21 @@ from propertyestimator.properties import ParameterGradientKey
 logger = getLogger(__name__)
 
 try:
-    # noinspection PyUnresolvedReferences
     import propertyestimator
-    # noinspection PyUnresolvedReferences
     from propertyestimator.client import PropertyEstimatorClient, ConnectionOptions, PropertyEstimatorOptions
-    # noinspection PyUnresolvedReferences
     from propertyestimator.datasets import ThermoMLDataSet, PhysicalPropertyDataSet
-    # noinspection PyUnresolvedReferences
     from propertyestimator.utils.exceptions import PropertyEstimatorException
-    # noinspection PyUnresolvedReferences
     from propertyestimator.utils.serialization import TypedJSONDecoder, TypedJSONEncoder
-    # noinspection PyUnresolvedReferences
     from propertyestimator.workflow import WorkflowOptions
 except ImportError:
     warn_once("Failed to import the propertyestimator package.")
 
 try:
-    # noinspection PyUnresolvedReferences
     from openforcefield.typing.engines import smirnoff
 except ImportError:
     warn_once("Failed to import the openforcefield package.")
 
 try:
-    # noinspection PyUnresolvedReferences
     from simtk import unit
 except ImportError:
     warn_once("Failed to import the openmm package.")
@@ -74,7 +66,8 @@ class PropertyEstimate_SMIRNOFF(Target):
         weights: list of PropertyWeight
             The weighting of each property which will be optimised against.
         denominators: list of PropertyDenominator
-            ???
+            The denominators will be used to remove units from the properties
+            and scale their values.
         """
 
         def __init__(self):
@@ -299,6 +292,73 @@ class PropertyEstimate_SMIRNOFF(Target):
             self._normalised_weights[property_name] = (self._options.weights[property_name] /
                                                        number_of_properties[property_name])
 
+    def _parameter_value_from_gradient_key(self, gradient_key):
+        """Extracts the value of the parameter in the current
+        open force field object pointed to by a given
+        `ParameterGradientKey` object.
+
+        Parameters
+        ----------
+        gradient_key: ParameterGradientKey
+            The gradient key which points to the parameter of interest.
+
+        Returns
+        -------
+        unit.Quantity
+            The value of the parameter.
+        bool
+            Returns True if the parameter is a cosmetic one.
+        """
+
+        parameter_handler = self.FF.openff_forcefield.get_parameter_handler(gradient_key.tag)
+        parameter = parameter_handler.parameters[gradient_key.smirks]
+
+        if hasattr(parameter, gradient_key.attribute):
+            parameter_attribute = gradient_key.attribute
+            parameter_value = getattr(parameter, parameter_attribute)
+        else:
+            attribute_split = re.split(r'(\d+)', gradient_key.attribute)
+
+            assert len(attribute_split) == 2
+            assert hasattr(parameter, attribute_split[0])
+
+            parameter_attribute = attribute_split[0]
+            parameter_index = int(attribute_split[1]) - 1
+
+            parameter_value_list = getattr(parameter, parameter_attribute)
+            parameter_value = parameter_value_list[parameter_index]
+
+        is_cosmetic = False
+
+        if (parameter_attribute not in parameter_handler._REQUIRED_SPEC_ATTRIBS and
+            parameter_attribute not in parameter_handler._OPTIONAL_SPEC_ATTRIBS):
+
+            is_cosmetic = True
+
+        return parameter_value, is_cosmetic
+
+    def _extract_physical_parameter_values(self):
+        """Extracts an array of the values of the physical parameters
+        (which are not cosmetic) from the current `FF.openff_forcefield`
+        object.
+
+        Returns
+        -------
+        np.ndarray
+            The array of values of shape (len(self._gradient_key_mappings),)
+        """
+
+        parameter_values = np.zeros(len(self._gradient_key_mappings))
+
+        for gradient_key, parameter_index in self._gradient_key_mappings.items():
+
+            parameter_value, _ = self._parameter_value_from_gradient_key(gradient_key)
+            expected_unit = self._parameter_units[gradient_key]
+
+            parameter_values[parameter_index] = parameter_value.value_in_unit(expected_unit)
+
+        return parameter_values
+
     def _build_pvals_jacobian(self, mvals, perturbation_amount=1.0e-4):
         """Build the matrix which maps the gradients of properties with
         respect to physical parameters to gradients with respect to
@@ -325,14 +385,20 @@ class PropertyEstimate_SMIRNOFF(Target):
             reverse_mvals = mvals.copy()
             reverse_mvals[index] -= perturbation_amount
 
+            self.FF.make(reverse_mvals)
+            reverse_physical_values = self._extract_physical_parameter_values()
+
             forward_mvals = mvals.copy()
             forward_mvals[index] += perturbation_amount
 
-            reverse_physical_values = self.FF.create_pvals(reverse_mvals)
-            forward_physical_values = self.FF.create_pvals(forward_mvals)
+            self.FF.make(reverse_mvals)
+            forward_physical_values = self._extract_physical_parameter_values()
 
             gradients = (forward_physical_values - reverse_physical_values) / (2.0 * perturbation_amount)
             jacobian_list.append(gradients)
+
+        # Make sure to restore the FF object back to its original state.
+        self.FF.make(mvals)
 
         jacobian = np.array(jacobian_list)
         return jacobian
@@ -373,31 +439,33 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         if AGrad is True:
 
-            for string_key in self.FF.map:
+            index_counter = 0
 
+            for field_list in self.FF.pfields:
+
+                string_key = field_list[0]
                 key_split = string_key.split('/')
 
                 parameter_tag = key_split[0]
                 parameter_smirks = key_split[3]
                 parameter_attribute = key_split[2]
 
+                # Use the full attribute name (e.g. k1) for the gradient key.
                 parameter_gradient_key = ParameterGradientKey(tag=parameter_tag,
                                                               smirks=parameter_smirks,
                                                               attribute=parameter_attribute)
-
-                parameter_gradient_keys.append(parameter_gradient_key)
-                self._gradient_key_mappings[parameter_gradient_key] = string_key
 
                 # Find the unit of the gradient parameter.
                 parameter_handler = force_field.get_parameter_handler(parameter_tag)
                 parameter = parameter_handler.parameters[parameter_smirks]
 
+                attribute_split = re.split(r'(\d+)', parameter_attribute)
+
                 if hasattr(parameter, parameter_attribute):
                     parameter_unit = getattr(parameter, parameter_attribute).unit
-                else:
-                    attribute_split = re.split(r'(\d+)', parameter_attribute)
+                elif len(attribute_split) == 2:
 
-                    assert len(parameter_attribute) == 2
+                    logger.info(f'Split')
                     assert hasattr(parameter, attribute_split[0])
 
                     parameter_attribute = attribute_split[0]
@@ -408,7 +476,18 @@ class PropertyEstimate_SMIRNOFF(Target):
 
                     parameter_unit = parameter_value.unit
 
+                if (parameter_attribute not in parameter_handler._REQUIRED_SPEC_ATTRIBS and
+                    parameter_attribute not in parameter_handler._OPTIONAL_SPEC_ATTRIBS):
+
+                    # We don't wan't gradients w.r.t. cosmetic parameters.
+                    continue
+
+                parameter_gradient_keys.append(parameter_gradient_key)
+
+                self._gradient_key_mappings[parameter_gradient_key] = index_counter
                 self._parameter_units[parameter_gradient_key] = parameter_unit
+
+                index_counter += 1
 
         # Submit the estimation request.
         self._pending_estimate_request = self._client.request_estimate(property_set=self._data_set,
@@ -513,13 +592,13 @@ class PropertyEstimate_SMIRNOFF(Target):
                 state_tuple = (f'{temperature:.6f}', f'{pressure:.6f}')
 
                 if state_tuple not in estimated_gradients[class_name][substance_id]:
-                    estimated_gradients[class_name][substance_id][state_tuple] = np.zeros(len(mvals))
+
+                    estimated_gradients[class_name][substance_id][state_tuple] = \
+                        np.zeros(len(self._gradient_key_mappings))
 
                 for gradient in physical_property.gradients:
 
-                    string_key = self._gradient_key_mappings[gradient.key]
-
-                    parameter_index = self.FF.map[string_key]
+                    parameter_index = self._gradient_key_mappings[gradient.key]
                     gradient_unit = self.default_units[class_name] / self._parameter_units[gradient.key]
 
                     gradient_value = gradient.value.value_in_unit(gradient_unit)
