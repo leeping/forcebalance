@@ -1506,7 +1506,7 @@ class FF(forcebalance.BaseClass):
                     # Arrows point from successors to predecessors in the plot representation
                     self.pTree.add_edge(pid, src_nodes[0])
                 else:
-                    raise RuntimeError('Evaluated parameter refers to a source parameter that does not exist')
+                    raise RuntimeError('Evaluated parameter refers to a source parameter that does not exist:\n%s'%cmd)
                 
         self.pfields.append([pid,fnm,ln,pfld,mult,cmd])
 
