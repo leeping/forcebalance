@@ -163,6 +163,8 @@ def assign_openff_parameter(ff, new_value, pid):
             unit = getattr(parameter, value_name).unit
             # Get the quantity of the parameter in the OpenFF forcefield object
             param_quantity = getattr(parameter, value_name)
+        elif value_name in parameter._cosmetic_attribs:
+            param_quantity = None
         else:
             # If the value name is a periodic attribute (say, k1) then we need to use
             # a regex to split the value name into 'k' and '1', then set the appropriate
@@ -170,7 +172,7 @@ def assign_openff_parameter(ff, new_value, pid):
             attribute_split = re.split(r'(\d+)', value_name)
             # print(attribute_split)
             # assert len(attribute_split) == 2
-            assert hasattr(parameter, attribute_split[0])
+            assert hasattr(parameter, attribute_split[0]), "%s.%s not exist" % (parameter, attribute_split[0])
             # attribute_split[0] is a string such as 'k'
             value_name = attribute_split[0]
             # parameter_index is the position of k1 in the values associated with 'k'
@@ -184,7 +186,8 @@ def assign_openff_parameter(ff, new_value, pid):
     else:
         param_quantity = ff._forcebalance_assign_parameter_map[pid]
     # set new_value directly in the quantity
-    param_quantity._value = new_value
+    if param_quantity != None:
+        param_quantity._value = new_value
 
 class SMIRNOFF(OpenMM):
 
