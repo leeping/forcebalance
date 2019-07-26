@@ -47,5 +47,19 @@ def cached_generate_conformers(self, molecule, n_conformers=1, clear_existing=Tr
     molecule._conformers = TOOLKIT_CACHE_molecule_conformers[cache_key]
 OpenEyeToolkitWrapper.generate_conformers = cached_generate_conformers
 
-
 # final timing: 56s
+
+# cache the ForceField creation (no longer needed since using OpenFF API for parameter modifications)
+
+import hashlib
+from openforcefield.typing.engines.smirnoff import ForceField
+SMIRNOFF_FORCE_FIELD_CACHE = {}
+def getForceField(*ffpaths):
+    hasher = hashlib.md5()
+    for path in ffpaths:
+        with open(path, 'rb') as f:
+            hasher.update(f.read())
+    cache_key = hasher.hexdigest()
+    if cache_key not in SMIRNOFF_FORCE_FIELD_CACHE:
+        SMIRNOFF_FORCE_FIELD_CACHE[cache_key] = ForceField(*ffpaths, allow_cosmetic_attributes=True)
+    return SMIRNOFF_FORCE_FIELD_CACHE[cache_key]

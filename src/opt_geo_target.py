@@ -9,7 +9,7 @@ import shutil
 import numpy as np
 import re
 import subprocess
-from collections import OrderedDict
+from collections import OrderedDict, defaultdict
 from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohr2ang, warn_press_key
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule
@@ -17,7 +17,9 @@ from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
-def periodic_diff(a, b, v_periodic=np.pi*2):
+RADIAN_2_DEGREE = 180 / np.pi
+
+def periodic_diff(a, b, v_periodic):
     ''' convenient function for computing the minimum difference in periodic coordinates
     Parameters
     ----------
@@ -49,7 +51,19 @@ def periodic_diff(a, b, v_periodic=np.pi*2):
     h = 0.5 * v_periodic
     return (a - b + h) % v_periodic - h
 
-
+def compute_rmsd(ref, tar, v_periodic=None):
+    """
+    Compute the RMSD between two arrays, supporting periodic difference
+    """
+    assert len(ref) == len(tar), 'array length must match'
+    n = len(ref)
+    if n == 0: return 0.0
+    if v_periodic is not None:
+        diff = periodic_diff(ref, tar, v_periodic)
+    else:
+        diff = ref - tar
+    rmsd = np.sqrt(np.sum(diff**2) / n)
+    return rmsd
 
 class OptGeoTarget(Target):
     """ Subclass of Target for fitting MM optimized geometries to QM optimized geometries. """
@@ -60,43 +74,20 @@ class OptGeoTarget(Target):
         ## Build keyword dictionaries to pass to engine.
         engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         del engine_args['name']
-        ## Create engine objects.
-        self.engines = OrderedDict()
-        for sysname, sysopt in self.sys_opts.items():
-            if self.engine_.__name__ == 'OpenMM':
-                # path to pdb file
-                pdbpath = os.path.join(self.root, self.tgtdir, sysopt['topology'])
-                # use the PDB file with topology
-                M = Molecule(pdbpath)
-                # replace geometry with values from xyz file for higher presision
-                M0 = Molecule(os.path.join(self.root, self.tgtdir, sysopt['geometry']))
-                M.xyzs = M0.xyzs
-                # here mol=M is given for the purpose of using the topology from the input pdb file
-                # if we don't do this, pdb=top.pdb option will only copy some basic information but not the topology into OpenMM.mol (openmmio.py line 615)
-                self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, pdb=pdbpath, **engine_args)
-            elif self.engine_.__name__ == 'SMIRNOFF':
-                # SMIRNOFF is a subclass of OpenMM engine but it requires the mol2 input
-                # note: OpenMM.mol is a Molecule class instance;  mol2 is a file format.
-                # path to .pdb file
-                pdbpath = os.path.join(self.root, self.tgtdir, sysopt['topology'])
-                # a list of paths to .mol2 files
-                mol2path = [os.path.join(self.root, self.tgtdir, f) for f in sysopt['mol2']]
-                # use the PDB file with topology
-                M = Molecule(os.path.join(self.root, self.tgtdir, sysopt['topology']))
-                # replace geometry with values from xyz file for higher presision
-                M0 = Molecule(os.path.join(self.root, self.tgtdir, sysopt['geometry']))
-                M.xyzs = M0.xyzs
-                # here mol=M is given for the purpose of using the topology from the input pdb file
-                # if we don't do this, pdb=top.pdb option will only copy some basic information but not the topology into OpenMM.mol (openmmio.py line 615)
-                self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, pdb=pdbpath, mol2=mol2path, **engine_args)
+        ## Create engine objects
+        self.create_engines(engine_args)
         ## Create internal coordinates
         self._build_internal_coordinates()
         ## Option for how much data to write to disk.
         self.set_option(tgt_opts,'writelevel','writelevel')
 
-    def parse_optgeo_options(self, filename):
+    def create_engines(self, engine_args):
+        raise NotImplementedError("create_engines() should be implemented in subclass")
+
+    @staticmethod
+    def parse_optgeo_options(filename):
         """ Parse an optgeo_options.txt file into specific OptGeoTarget Target Options"""
-        logger.info("Reading interactions from file: %s\n" % filename)
+        logger.info("Reading optgeo options from file: %s\n" % filename)
         global_opts = OrderedDict()
         sys_opts = OrderedDict()
         section = None
@@ -151,20 +142,20 @@ class OptGeoTarget(Target):
                         # special parsing for mol2 option for SMIRNOFF engine
                         # the value is a list of filenames
                         section_opts[key] = ls[1:]
-            # apply a few default global options
-            global_opts.setdefault('bond_denom', 0.02)
-            global_opts.setdefault('angle_denom', 0.05)
-            global_opts.setdefault('dihedral_denom', 0.2)
-            global_opts.setdefault('improper_denom', 0.2)
-            # copy global options into each system
-            for sys_name, sys_opt_dict in sys_opts.items():
-                for k,v in global_opts.items():
-                    # do not overwrite system options
-                    sys_opt_dict.setdefault(k, v)
-                for k in ['name', 'geometry', 'topology']:
-                    if k not in sys_opt_dict:
-                        warn_press_key("key %s missing in system section named %s" %(k, sys_name))
-            return sys_opts
+        # apply a few default global options
+        global_opts.setdefault('bond_denom', 0.02)
+        global_opts.setdefault('angle_denom', 3)
+        global_opts.setdefault('dihedral_denom', 10.0)
+        global_opts.setdefault('improper_denom', 10.0)
+        # copy global options into each system
+        for sys_name, sys_opt_dict in sys_opts.items():
+            for k,v in global_opts.items():
+                # do not overwrite system options
+                sys_opt_dict.setdefault(k, v)
+            for k in ['name', 'geometry', 'topology']:
+                if k not in sys_opt_dict:
+                    warn_press_key("key %s missing in system section named %s" %(k, sys_name))
+        return sys_opts
 
     def _build_internal_coordinates(self):
         "Build internal coordinates system with geometric.internal.PrimitiveInternalCoordinates"
@@ -175,7 +166,7 @@ class OptGeoTarget(Target):
         for sysname, sysopt in self.sys_opts.items():
             geofile = os.path.join(self.root, self.tgtdir, sysopt['geometry'])
             topfile = os.path.join(self.root, self.tgtdir, sysopt['topology'])
-            logger.info("Building internal coordinates from file: %s\n" % topfile)
+            # logger.info("Building internal coordinates from file: %s\n" % topfile)
             m0 = Molecule(geofile)
             m = Molecule(topfile)
             p_IC = PrimitiveInternalCoordinates(m)
@@ -193,9 +184,9 @@ class OptGeoTarget(Target):
             # compute and store reference values
             pos_ref = m0.xyzs[0]
             vref_bonds = np.array([ic.value(pos_ref) for ic in ic_bonds])
-            vref_angles = np.array([ic.value(pos_ref) for ic in ic_angles])
-            vref_dihedrals = np.array([ic.value(pos_ref) for ic in ic_dihedrals])
-            vref_impropers = np.array([ic.value(pos_ref) for ic in ic_impropers])
+            vref_angles = np.array([ic.value(pos_ref)*RADIAN_2_DEGREE for ic in ic_angles])
+            vref_dihedrals = np.array([ic.value(pos_ref)*RADIAN_2_DEGREE for ic in ic_dihedrals])
+            vref_impropers = np.array([ic.value(pos_ref)*RADIAN_2_DEGREE for ic in ic_impropers])
             self.internal_coordinates[sysname] = {
                 'ic_bonds': ic_bonds,
                 'ic_angles': ic_angles,
@@ -219,14 +210,14 @@ class OptGeoTarget(Target):
             raise NotImplementedError("system_driver() not implemented for %s" % engine.__name__)
         v_ic = {
             'bonds': np.array([ic.value(pos) for ic in ic_dict['ic_bonds']]),
-            'angles': np.array([ic.value(pos) for ic in ic_dict['ic_angles']]),
-            'dihedrals': np.array([ic.value(pos) for ic in ic_dict['ic_dihedrals']]),
-            'impropers': np.array([ic.value(pos) for ic in ic_dict['ic_impropers']]),
+            'angles': np.array([ic.value(pos)*RADIAN_2_DEGREE for ic in ic_dict['ic_angles']]),
+            'dihedrals': np.array([ic.value(pos)*RADIAN_2_DEGREE for ic in ic_dict['ic_dihedrals']]),
+            'impropers': np.array([ic.value(pos)*RADIAN_2_DEGREE for ic in ic_dict['ic_impropers']]),
         }
         return v_ic
 
     def indicate(self):
-        title_str = "Optimized Geometries, Objective = % .5e" % self.objective
+        title_str = "%s, Objective = % .5e" % (self.name, self.objective)
         #QYD: This title is carefully placed to align correctly
         column_head_str1 =  " %-20s %13s     %13s     %15s   %15s   %17s " % ("System", "Bonds", "Angles", "Dihedrals", "Impropers", "Term.")
         column_head_str2 =  " %-20s %9s %7s %9s %7s %9s %7s %9s %7s %17s " % ('', 'RMSD', 'denom', 'RMSD', 'denom', 'RMSD', 'denom', 'RMSD', 'denom', '')
@@ -235,11 +226,27 @@ class OptGeoTarget(Target):
     def get(self, mvals, AGrad=False, AHess=False):
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         self.PrintDict = OrderedDict()
-        def compute(mvals):
+        # enable self.system_mval_masks (supported by OptGeoTarget_SMIRNOFF)
+        enable_system_mval_mask = hasattr(self, 'system_mval_masks')
+        def compute(mvals, p_idx=None):
             ''' Compute total objective value for each system '''
             self.FF.make(mvals)
             v_obj_list = []
             for sysname, sysopt in self.sys_opts.items():
+                # ref values of each type
+                vref_bonds = self.internal_coordinates[sysname]['vref_bonds']
+                vref_angles = self.internal_coordinates[sysname]['vref_angles']
+                vref_dihedrals = self.internal_coordinates[sysname]['vref_dihedrals']
+                vref_impropers = self.internal_coordinates[sysname]['vref_impropers']
+                # counts of each type
+                n_bonds = len(vref_bonds)
+                n_angles = len(vref_angles)
+                n_dihedrals = len(vref_dihedrals)
+                n_impropers = len(vref_impropers)
+                # use self.system_mval_masks to skip evaluations when computing gradients
+                if enable_system_mval_mask and in_fd() and (p_idx is not None) and (self.system_mval_masks[sysname][p_idx] == False):
+                    v_obj_list += [0] * (n_bonds + n_angles + n_dihedrals + n_impropers)
+                    continue
                 # read denominators from system options
                 bond_denom = sysopt['bond_denom']
                 angle_denom = sysopt['angle_denom']
@@ -250,45 +257,46 @@ class OptGeoTarget(Target):
                 scale_angle = 1.0 / angle_denom if angle_denom != 0 else 0.0
                 scale_dihedral = 1.0 / dihedral_denom if dihedral_denom != 0 else 0.0
                 scale_improper = 1.0 / improper_denom if improper_denom != 0 else 0.0
-                # calculate new internal coordinates f
+                # calculate new internal coordinates
                 v_ic = self.system_driver(sysname)
                 # objective contribution from bonds
-                vref_bonds = self.internal_coordinates[sysname]['vref_bonds']
                 vtar_bonds = v_ic['bonds']
-                rmsd_bond = np.sqrt(np.sum((vref_bonds - vtar_bonds)**2)/len(vref_bonds))
+                diff_bond = ((vref_bonds - vtar_bonds) * scale_bond).tolist() if n_bonds > 0 else []
                 # objective contribution from angles
-                vref_angles = self.internal_coordinates[sysname]['vref_angles']
                 vtar_angles = v_ic['angles']
-                rmsd_angle = np.sqrt(np.sum(periodic_diff(vref_angles, vtar_angles)**2)/len(vref_angles))
+                diff_angle = (periodic_diff(vref_angles, vtar_angles, 360) * scale_angle).tolist() if n_angles > 0 else []
                 # objective contribution from dihedrals
-                vref_dihedrals = self.internal_coordinates[sysname]['vref_dihedrals']
                 vtar_dihedrals = v_ic['dihedrals']
-                rmsd_dihedral = np.sqrt(np.sum(periodic_diff(vref_dihedrals, vtar_dihedrals)**2)/len(vref_dihedrals))
+                diff_dihedral = (periodic_diff(vref_dihedrals, vtar_dihedrals, 360) * scale_dihedral).tolist() if n_dihedrals > 0 else []
                 # objective contribution from improper dihedrals
-                vref_impropers = self.internal_coordinates[sysname]['vref_impropers']
                 vtar_impropers = v_ic['impropers']
-                rmsd_improper = np.sqrt(np.sum(periodic_diff(vref_impropers, vtar_impropers)**2)/len(vref_impropers))
-                # add total objective value to result list
-                sys_obj_list = [rmsd_bond * scale_bond, rmsd_angle * scale_angle, \
-                                rmsd_dihedral * scale_dihedral, rmsd_improper * scale_improper]
-                # keep individual objective terms for each property
+                diff_improper = (periodic_diff(vref_impropers, vtar_impropers, 360) * scale_improper).tolist() if n_impropers > 0 else []
+                # combine objective values into a big result list
+                sys_obj_list = diff_bond + diff_angle + diff_dihedral + diff_improper
+                # extend the result v_obj_list by individual terms in this system
                 v_obj_list += sys_obj_list
                 # save print string
                 if not in_fd():
+                    # For printing, we group the RMSD by type
+                    rmsd_bond = compute_rmsd(vref_bonds, vtar_bonds)
+                    rmsd_angle = compute_rmsd(vref_angles, vtar_angles, v_periodic=360)
+                    rmsd_dihedral = compute_rmsd(vref_dihedrals, vtar_dihedrals, v_periodic=360)
+                    rmsd_improper = compute_rmsd(vref_impropers, vtar_impropers, v_periodic=360)
                     obj_total = sum(v**2 for v in sys_obj_list)
                     self.PrintDict[sysname] = "% 9.3f % 7.2f % 9.3f % 7.2f % 9.3f % 7.2f % 9.3f % 7.2f %17.3f" % (rmsd_bond, \
                         bond_denom, rmsd_angle, angle_denom, rmsd_dihedral, dihedral_denom, rmsd_improper, improper_denom, obj_total)
             return np.array(v_obj_list, dtype=float)
 
         V = compute(mvals)
-
+        Answer['X'] = np.dot(V,V)
         # write objective decomposition if wanted
         if self.writelevel > 0:
             # recover mvals
             self.FF.make(mvals)
             with open('rmsd_decomposition.txt', 'w') as fout:
-                fout.write('%-25s %15s %15s %15s\n' % ("Internal Coordinate", "Ref QM Value", "Cur MM Value", "Difference"))
                 for sysname in self.internal_coordinates:
+                    fout.write("\n[ %s ]\n" % sysname)
+                    fout.write('%-25s %15s %15s %15s\n' % ("Internal Coordinate", "Ref QM Value", "Cur MM Value", "Difference"))
                     # reference data
                     sys_data = self.internal_coordinates[sysname]
                     sys_data['ic_bonds']
@@ -301,15 +309,15 @@ class OptGeoTarget(Target):
                         tar_v = v_ic[p]
                         # print each value
                         for ic, v1, v2 in zip(ic_list, ref_v, tar_v):
-                            diff = periodic_diff(v1, v2) if p != 'bonds' else v1-v2
+                            diff = periodic_diff(v1, v2, v_periodic=360) if p != 'bonds' else v1-v2
                             fout.write('%-25s %15.5f %15.5f %+15.3e\n' % (ic, v1, v2, diff))
 
         # compute gradients and hessian
         dV = np.zeros((self.FF.np,len(V)))
         if AGrad or AHess:
             for p in self.pgrad:
-                dV[p,:], _ = f12d3p(fdwrap(compute, mvals, p), h = self.h, f0 = V)
-        Answer['X'] = np.dot(V,V)
+                dV[p,:], _ = f12d3p(fdwrap(compute, mvals, p, p_idx = p), h = self.h, f0 = V)
+
         for p in self.pgrad:
             Answer['G'][p] = 2*np.dot(V, dV[p,:])
             for q in self.pgrad:
