@@ -176,8 +176,6 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         # Get the filename for the property estimator input file.
         self.set_option(tgt_opts, 'prop_est_input', forceprint=True)
-        # Finite difference size for numerical gradients
-        self.set_option(tgt_opts, 'liquid_fdiff_h', forceprint=True)
 
         # Initialize the target.
         self._initialize()
