@@ -313,25 +313,35 @@ class PropertyEstimate_SMIRNOFF(Target):
         parameter_handler = self.FF.openff_forcefield.get_parameter_handler(gradient_key.tag)
         parameter = parameter_handler.parameters[gradient_key.smirks]
 
+        attribute_split = re.split(r'(\d+)', gradient_key.attribute)
+        attribute_split = list(filter(None, attribute_split))
+
+        parameter_attribute = None
+        parameter_value = None
+
         if hasattr(parameter, gradient_key.attribute):
+
             parameter_attribute = gradient_key.attribute
             parameter_value = getattr(parameter, parameter_attribute)
-        else:
-            attribute_split = re.split(r'(\d+)', gradient_key.attribute)
 
-            assert len(attribute_split) == 2
-            assert hasattr(parameter, attribute_split[0])
+        elif len(attribute_split) == 2:
 
             parameter_attribute = attribute_split[0]
-            parameter_index = int(attribute_split[1]) - 1
 
-            parameter_value_list = getattr(parameter, parameter_attribute)
-            parameter_value = parameter_value_list[parameter_index]
+            if hasattr(parameter, parameter_attribute):
+                parameter_index = int(attribute_split[1]) - 1
+
+                parameter_value_list = getattr(parameter, parameter_attribute)
+                parameter_value = parameter_value_list[parameter_index]
 
         is_cosmetic = False
 
-        if (parameter_attribute not in parameter_handler._REQUIRED_SPEC_ATTRIBS and
-            parameter_attribute not in parameter_handler._OPTIONAL_SPEC_ATTRIBS):
+        if parameter_attribute is None:
+            is_cosmetic = True
+
+        elif (parameter_attribute not in parameter._REQUIRED_SPEC_ATTRIBS and
+              parameter_attribute not in parameter._OPTIONAL_SPEC_ATTRIBS and
+              parameter_attribute not in parameter._INDEXED_ATTRIBS):
 
             is_cosmetic = True
 
@@ -366,7 +376,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         Parameters
         ----------
-        mvals: numpy.ndarray
+        mvals: np.ndarray
             The current force balance mathematical parameters.
         perturbation_amount: float
             The amount to perturb the mathematical parameters by
@@ -374,7 +384,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         Returns
         -------
-        numpy.ndarray
+        np.ndarray
             A matrix of d(Physical Parameter)/d(Mathematical Parameter).
         """
 
@@ -391,7 +401,7 @@ class PropertyEstimate_SMIRNOFF(Target):
             forward_mvals = mvals.copy()
             forward_mvals[index] += perturbation_amount
 
-            self.FF.make(reverse_mvals)
+            self.FF.make(forward_mvals)
             forward_physical_values = self._extract_physical_parameter_values()
 
             gradients = (forward_physical_values - reverse_physical_values) / (2.0 * perturbation_amount)
@@ -446,9 +456,9 @@ class PropertyEstimate_SMIRNOFF(Target):
                 string_key = field_list[0]
                 key_split = string_key.split('/')
 
-                parameter_tag = key_split[0]
-                parameter_smirks = key_split[3]
-                parameter_attribute = key_split[2]
+                parameter_tag = key_split[0].strip()
+                parameter_smirks = key_split[3].strip()
+                parameter_attribute = key_split[2].strip()
 
                 # Use the full attribute name (e.g. k1) for the gradient key.
                 parameter_gradient_key = ParameterGradientKey(tag=parameter_tag,
@@ -456,32 +466,13 @@ class PropertyEstimate_SMIRNOFF(Target):
                                                               attribute=parameter_attribute)
 
                 # Find the unit of the gradient parameter.
-                parameter_handler = force_field.get_parameter_handler(parameter_tag)
-                parameter = parameter_handler.parameters[parameter_smirks]
+                parameter_value, is_cosmetic = self._parameter_value_from_gradient_key(parameter_gradient_key)
 
-                attribute_split = re.split(r'(\d+)', parameter_attribute)
-
-                if hasattr(parameter, parameter_attribute):
-                    parameter_unit = getattr(parameter, parameter_attribute).unit
-                elif len(attribute_split) == 2:
-
-                    logger.info(f'Split')
-                    assert hasattr(parameter, attribute_split[0])
-
-                    parameter_attribute = attribute_split[0]
-                    parameter_index = int(attribute_split[1]) - 1
-
-                    parameter_value_list = getattr(parameter, parameter_attribute)
-                    parameter_value = parameter_value_list[parameter_index]
-
-                    parameter_unit = parameter_value.unit
-
-                if (parameter_attribute not in parameter_handler._REQUIRED_SPEC_ATTRIBS and
-                    parameter_attribute not in parameter_handler._OPTIONAL_SPEC_ATTRIBS):
-
+                if parameter_value is None or is_cosmetic:
                     # We don't wan't gradients w.r.t. cosmetic parameters.
                     continue
 
+                parameter_unit = parameter_value.unit
                 parameter_gradient_keys.append(parameter_gradient_key)
 
                 self._gradient_key_mappings[parameter_gradient_key] = index_counter
