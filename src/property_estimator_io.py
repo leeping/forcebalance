@@ -148,7 +148,8 @@ class PropertyEstimate_SMIRNOFF(Target):
     # A dictionary of the units that force balance expects each property in.
     default_units = {
         'Density': unit.kilogram / unit.meter ** 3,
-        'DielectricConstant': unit.dimensionless
+        'DielectricConstant': unit.dimensionless,
+        'EnthalpyOfVaporization': unit.kilojoules_per_mole
     }
 
     def __init__(self, options, tgt_opts, forcefield):
