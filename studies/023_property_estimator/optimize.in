@@ -64,12 +64,12 @@ weight 1.0
 prop_est_input prop_est_input.json
 $end
 
-$target
-name ethanol-torsiondrive
-type AbInitio_SMIRNOFF
-weight 1.0
-mol2 ETH.mol2
-pdb gas.pdb
-coords scan.xyz
-writelevel 1
-$end
+#$target
+#name ethanol-torsiondrive
+#type AbInitio_SMIRNOFF
+#weight 1.0
+#mol2 ETH.mol2
+#pdb gas.pdb
+#coords scan.xyz
+#writelevel 1
+#$end
