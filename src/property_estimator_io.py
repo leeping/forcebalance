@@ -591,7 +591,12 @@ class PropertyEstimate_SMIRNOFF(Target):
                     parameter_index = self._gradient_key_mappings[gradient.key]
                     gradient_unit = self.default_units[class_name] / self._parameter_units[gradient.key]
 
-                    gradient_value = gradient.value.value_in_unit(gradient_unit)
+                    if gradient_unit != unit.dimensionless:
+                        gradient_value = gradient.value.value_in_unit(gradient_unit)
+                    else:
+                        gradient_value = gradient.value
+                        assert isinstance(gradient_value, float)
+
                     estimated_gradients[class_name][substance_id][state_tuple][parameter_index] = gradient_value
 
         for property_type in estimated_gradients:
