@@ -591,6 +591,8 @@ class PropertyEstimate_SMIRNOFF(Target):
                     parameter_index = self._gradient_key_mappings[gradient.key]
                     gradient_unit = self.default_units[class_name] / self._parameter_units[gradient.key]
 
+                    logger.info(f'Gradient Value: {gradient.value} Expected Unit: {gradient_unit}\n')
+
                     if isinstance(gradient.value, unit.Quantity):
                         gradient_value = gradient.value.value_in_unit(gradient_unit)
                     else:
