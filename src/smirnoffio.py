@@ -533,6 +533,7 @@ class AbInitio_SMIRNOFF(AbInitio):
         """
         orig_pgrad_set = set(self.pgrad)
         # smirks to param_idxs map
+        smirks_params_map = defaultdict(list)
         for pname in self.FF.pTree:
             smirks = pname.rsplit('/',maxsplit=1)[-1]
             for pidx in self.FF.get_mathid(pname):
@@ -580,6 +581,7 @@ class Vibration_SMIRNOFF(Vibration):
         """
         orig_pgrad_set = set(self.pgrad)
         # smirks to param_idxs map
+        smirks_params_map = defaultdict(list)
         for pname in self.FF.pTree:
             smirks = pname.rsplit('/',maxsplit=1)[-1]
             for pidx in self.FF.get_mathid(pname):
