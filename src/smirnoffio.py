@@ -533,10 +533,10 @@ class AbInitio_SMIRNOFF(AbInitio):
         """
         orig_pgrad_set = set(self.pgrad)
         # smirks to param_idxs map
-        smirks_params_map = defaultdict(list)
-        for pname, pidx in self.FF.map.items():
+        for pname in self.FF.pTree:
             smirks = pname.rsplit('/',maxsplit=1)[-1]
-            smirks_params_map[smirks].append(pidx)
+            for pidx in self.FF.get_mathid(pname):
+                smirks_params_map[smirks].append(pidx)
         pgrads_set = set()
         # get the smirks for this target, keep only the pidx corresponding to these smirks
         smirks_counter = self.engine.get_smirks_counter()
@@ -562,6 +562,39 @@ class Vibration_SMIRNOFF(Vibration):
         self.engine_ = SMIRNOFF
         ## Initialize base class.
         super(Vibration_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
+
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        # we update the self.pgrads here so it's not overwritten in rtarget.py
+        self.smirnoff_update_pgrads()
+
+    def smirnoff_update_pgrads(self):
+        """
+        Update self.pgrads based on smirks present in mol2 files
+
+        This can greatly improve gradients evaluation in big optimizations
+
+        Note
+        ----
+        1. This function assumes the names of the forcefield parameters has the smirks as the last item
+        2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
+        """
+        orig_pgrad_set = set(self.pgrad)
+        # smirks to param_idxs map
+        for pname in self.FF.pTree:
+            smirks = pname.rsplit('/',maxsplit=1)[-1]
+            for pidx in self.FF.get_mathid(pname):
+                smirks_params_map[smirks].append(pidx)
+        pgrads_set = set()
+        # get the smirks for this target, keep only the pidx corresponding to these smirks
+        smirks_counter = self.engine.get_smirks_counter()
+        for smirks in smirks_counter:
+            if smirks_counter[smirks] > 0:
+                pidx_list = smirks_params_map[smirks]
+                # update the set of parameters present in this target
+                pgrads_set.update(pidx_list)
+        # this ensure we do not add any new items into self.pgrad
+        pgrads_set.intersection_update(orig_pgrad_set)
+        self.pgrad = sorted(list(pgrads_set))
 
 
 class OptGeoTarget_SMIRNOFF(OptGeoTarget):
