@@ -186,7 +186,7 @@ def assign_openff_parameter(ff, new_value, pid):
     else:
         param_quantity = ff._forcebalance_assign_parameter_map[pid]
     # set new_value directly in the quantity
-    if param_quantity != None:
+    if param_quantity is not None:
         param_quantity._value = new_value
 
 class SMIRNOFF(OpenMM):
