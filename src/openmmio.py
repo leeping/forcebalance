@@ -17,6 +17,7 @@ from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
 from forcebalance.vibration import Vibration
 from forcebalance.opt_geo_target import OptGeoTarget
+from forcebalance.torsion_profile import TorsionProfileTarget
 import networkx as nx
 import numpy as np
 import sys
@@ -535,7 +536,7 @@ class OpenMM(Engine):
 
     def __init__(self, name="openmm", **kwargs):
         if not hasattr(self, 'valkwd'):
-            self.valkwd = ['ffxml', 'pdb', 'platname', 'precision', 'mmopts', 'vsite_bonds', 'implicit_solvent']
+            self.valkwd = ['ffxml', 'pdb', 'platname', 'precision', 'mmopts', 'vsite_bonds', 'implicit_solvent', 'restrain_k', 'freeze_atoms']
         super(OpenMM,self).__init__(name=name, **kwargs)
 
     def setopts(self, platname="CUDA", precision="single", **kwargs):
@@ -616,6 +617,9 @@ class OpenMM(Engine):
             for i in ["chain", "atomname", "resid", "resname", "elem"]:
                 self.mol.Data[i] = mpdb.Data[i]
 
+        # Store a separate copy of the molecule for reference restraint positions.
+        self.ref_mol = deepcopy(self.mol)
+        
     def prepare(self, pbc=False, mmopts={}, **kwargs):
 
         """
@@ -656,6 +660,12 @@ class OpenMM(Engine):
 
         ## Are we using AMOEBA?
         self.AMOEBA = any(['Amoeba' in f.__class__.__name__ for f in self.forcefield._forces])
+
+        ## Specify frozen atoms and restraint force constant
+        if 'restrain_k' in kwargs:
+            self.restrain_k = kwargs['restrain_k']
+        if 'freeze_atoms' in kwargs:
+            self.freeze_atoms = kwargs['freeze_atoms'][:]
 
         ## Set system options from ForceBalance force field options.
         if hasattr(self,'FF'):
@@ -721,27 +731,9 @@ class OpenMM(Engine):
             self.mmopts.setdefault('nonbondedMethod', NoCutoff)
             self.mmopts['removeCMMotion'] = False
 
-        ## Generate OpenMM-compatible positions
-        self.xyz_omms = []
-        for I in range(len(self.mol)):
-            xyz = self.mol.xyzs[I]
-            xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
-            # An extra step with adding virtual particles
-            mod = Modeller(self.pdb.topology, xyz_omm)
-            mod.addExtraParticles(self.forcefield)
-            if self.pbc:
-                # Obtain the periodic box
-                if self.mol.boxes[I].alpha != 90.0 or self.mol.boxes[I].beta != 90.0 or self.mol.boxes[I].gamma != 90.0:
-                    logger.error('OpenMM cannot handle nonorthogonal boxes.\n')
-                    raise RuntimeError
-                box_omm = [Vec3(self.mol.boxes[I].a, 0, 0)*angstrom,
-                           Vec3(0, self.mol.boxes[I].b, 0)*angstrom,
-                           Vec3(0, 0, self.mol.boxes[I].c)*angstrom]
-            else:
-                box_omm = None
-            # Finally append it to list.
-            self.xyz_omms.append((mod.getPositions(), box_omm))
-
+        ## Generate list of OpenMM-compatible positions
+        self.generate_xyz_omm(self.mol)
+            
         ## Build a topology and atom lists.
         Top = mod.getTopology()
         Atoms = list(Top.atoms())
@@ -755,6 +747,28 @@ class OpenMM(Engine):
         self.AtomLists['ResidueNumber'] = [a.residue.index for a in Atoms]
         self.AtomMask = [a == 'A' for a in self.AtomLists['ParticleType']]
         self.realAtomIdxs = [i for i, a in enumerate(self.AtomMask) if a is True]
+
+    def generate_xyz_omm(self, mol):
+        ## Generate OpenMM-compatible positions
+        self.xyz_omms = []
+        for I in range(len(mol)):
+            xyz = mol.xyzs[I]
+            xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
+            # An extra step with adding virtual particles
+            mod = Modeller(self.pdb.topology, xyz_omm)
+            mod.addExtraParticles(self.forcefield)
+            if self.pbc:
+                # Obtain the periodic box
+                if mol.boxes[I].alpha != 90.0 or mol.boxes[I].beta != 90.0 or mol.boxes[I].gamma != 90.0:
+                    logger.error('OpenMM cannot handle nonorthogonal boxes.\n')
+                    raise RuntimeError
+                box_omm = [Vec3(mol.boxes[I].a, 0, 0)*angstrom,
+                           Vec3(0, mol.boxes[I].b, 0)*angstrom,
+                           Vec3(0, 0, mol.boxes[I].c)*angstrom]
+            else:
+                box_omm = None
+            # Finally append it to list.
+            self.xyz_omms.append((mod.getPositions(), box_omm))
 
     def create_simulation(self, timestep=1.0, faststep=0.25, temperature=None, pressure=None, anisotropic=False, mts=False, collision=1.0, nbarostat=25, rpmd_beads=0, **kwargs):
 
@@ -801,6 +815,24 @@ class OpenMM(Engine):
         if self.pbc and pressure is not None: self.system.addForce(barostat)
         elif pressure is not None: warn_once("Pressure is ignored because pbc is set to False.")
 
+        # Add a restraint force if we have one.
+        if hasattr(self, 'restrain_k'):
+            restraint_frc = CustomExternalForce("0.5*k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
+            restraint_frc.addGlobalParameter("k", self.restrain_k * kilocalorie_per_mole / angstrom**2)
+            restraint_frc.addPerParticleParameter("x0")
+            restraint_frc.addPerParticleParameter("y0")
+            restraint_frc.addPerParticleParameter("z0")
+            for i, j in enumerate(self.realAtomIdxs):
+                restraint_frc.addParticle(j)
+                restraint_frc.setParticleParameters(i, j, [0.0, 0.0, 0.0])
+            self.system.addForce(restraint_frc)
+
+        # Freeze atoms if we have any.
+        if hasattr(self, 'freeze_atoms'):
+            for i, j in enumerate(self.realAtomIdxs):
+                if i in self.freeze_atoms:
+                    self.system.setParticleMass(j, 0.0)
+                        
         ## Set up for energy component analysis.
         GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce','AmoebaWcaDispersionForce',
                         'CustomNonbondedForce',  'NonbondedForce']
@@ -871,8 +903,7 @@ class OpenMM(Engine):
             if isinstance(i, AmoebaMultipoleForce):
                 if self.SetPME:
                     i.setNonbondedMethod(i.PME)
-
-
+                    
         #----
         # If the virtual site parameters have changed,
         # the simulation object must be remade.
@@ -888,7 +919,27 @@ class OpenMM(Engine):
         else:
             self.create_simulation(**self.simkwargs)
 
-    def set_positions(self, shot=0, traj=None):
+    def set_restraint_positions(self, shot):
+        """
+        Set reference positions for energy restraints.  This may be a different set of positions
+        from the "current" positions that are stored in self.mol and self.xyz_omm.
+        """
+        if hasattr(self, 'restrain_k'):
+            ## Generate OpenMM-compatible positions in nanometers
+            xyz = self.ref_mol.xyzs[shot] / 10.0
+            have_restraint_frc = False
+            for frc in self.simulation.system.getForces():
+                if isinstance(frc, CustomExternalForce):
+                    have_restraint_frc = True
+                    for i, j in enumerate(self.realAtomIdxs):
+                        frc.setParticleParameters(i, j, [xyz[i, 0], xyz[i, 1], xyz[i, 2]])
+                    frc.updateParametersInContext(self.simulation.context)
+            if not have_restraint_frc:
+                raise RuntimeError('Expected a restraint force, but did not find one')
+        else:
+            raise RuntimeError('Asked to set restraint positions, but restrain_k is not set')
+
+    def set_positions(self, shot):
 
         """
         Set the positions and periodic box vectors to one of the
@@ -1026,10 +1077,10 @@ class OpenMM(Engine):
         """
         self.update_simulation()
         if optimize is True:
-            self.optimize(shot=shot, crit=1e-10)
+            self.optimize(shot, crit=1e-10)
         else:
             warn_once("Computing mass-weighted hessian without geometry optimization")
-            self.set_positions(shot=shot)
+            self.set_positions(shot)
         context = self.simulation.context
         pos = context.getState(getPositions=True).getPositions(asNumpy=True)
         # pull real atoms and their mass
@@ -1117,34 +1168,68 @@ class OpenMM(Engine):
         normal_modes = normal_modes[larger_freq_idxs]
         return freqs, normal_modes
 
-    def optimize(self, shot=0, crit=1e-4):
+    def optimize(self, shot, crit=1e-4, disable_vsite=False, align=True, include_restraint_energy=False):
 
-        """ Optimize the geometry and align the optimized geometry to the starting geometry, and return the RMSD. """
+        """ 
+        Optimize the geometry and align the optimized 
+        geometry to the starting geometry.
+        
+        Parameters
+        ----------
+        shot : int
+            The snapshot number to be minimized
+        crit : float
+            Convergence criterion in kJ/mol
+        disable_vsite : bool
+            Disable virtual sites (needed for SMIRNOFF)
+        include_restraint_energy : bool
+            Include energy component from CustomExternalForce
+
+        Returns
+        -------
+        E : float
+            Potential energy of the system
+        rmsd : float
+            RMSD of the system (w/r.t. starting geometry) in Angstrom
+        """
 
         steps = int(max(1, -1*np.log10(crit)))
         self.update_simulation()
         self.set_positions(shot)
+        if hasattr(self, 'restrain_k'):
+            self.set_restraint_positions(shot)
         # Get the previous geometry.
         X0 = np.array([j for i, j in enumerate(self.simulation.context.getState(getPositions=True).getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
+        # printcool_dictionary(energy_components(self.simulation), title='Energy component analysis before minimization, shot %i' % shot)
         # Minimize the energy.  Optimizer works best in "steps".
         for logc in np.linspace(0, np.log10(crit), steps):
-            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole)
+            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=10000)
+        # Remove the restraint energy from the total energy if desired.
+        groups = set(range(32))
+        if hasattr(self, 'restrain_k') and not include_restraint_energy:
+            for frc in self.simulation.system.getForces():
+                if isinstance(frc, CustomExternalForce):
+                    groups.remove(frc.getForceGroup())
+        # printcool_dictionary(energy_components(self.simulation), title='Energy component analysis after minimization, shot %i' % shot)
+        S = self.simulation.context.getState(getPositions=True, getEnergy=True, groups=groups)
         # Get the optimized geometry.
-        S = self.simulation.context.getState(getPositions=True, getEnergy=True)
         X1 = np.array([j for i, j in enumerate(S.getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
         E = S.getPotentialEnergy().value_in_unit(kilocalorie_per_mole)
         # Align to original geometry.
         M = deepcopy(self.mol[0])
         M.xyzs = [X0, X1]
-        if not self.pbc:
+        if not self.pbc and align:
             M.align(center=False)
         X1 = M.xyzs[1]
         # Set geometry in OpenMM, requires some hoops.
         mod = Modeller(self.pdb.topology, [Vec3(i[0],i[1],i[2]) for i in X1]*angstrom)
-        mod.addExtraParticles(self.forcefield)
-        # self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
-        self.simulation.context.setPositions(ResetVirtualSites_fast(mod.getPositions(), self.vsinfo))
-        return E, M.ref_rmsd(0)[1]
+        if disable_vsite:
+            self.simulation.context.setPositions(mod.getPositions())
+        else:
+            mod.addExtraParticles(self.forcefield)
+            # self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
+            self.simulation.context.setPositions(ResetVirtualSites_fast(mod.getPositions(), self.vsinfo))
+        return E, M.ref_rmsd(0)[1], M[1]
 
     def getContextPosition(self, removeVirtual=False):
         """
@@ -1176,10 +1261,7 @@ class OpenMM(Engine):
             logger.error("Polarizability calculation is available in TINKER only.\n")
             raise NotImplementedError
 
-        if self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']:
-            crit = 1e-4
-        else:
-            crit = 1e-6
+        crit = 1e-4 if (self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']) else 1e-6
 
         if optimize: self.optimize(shot, crit=crit)
         else: self.set_positions(shot)
@@ -1199,14 +1281,11 @@ class OpenMM(Engine):
 
         self.update_simulation()
 
-        if self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']:
-            crit = 1e-4
-        else:
-            crit = 1e-6
+        crit = 1e-4 if (self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']) else 1e-6
 
         rmsd = 0.0
         if optimize:
-            E, rmsd = self.optimize(shot, crit=crit)
+            E, rmsd, _ = self.optimize(shot, crit=crit)
         else:
             self.set_positions(shot)
             E = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilocalories_per_mole)
@@ -1283,7 +1362,7 @@ class OpenMM(Engine):
             delattr(self, 'simulation')
 
         self.update_simulation(timestep=timestep, temperature=temperature, pressure=pressure, anisotropic=anisotropic, **kwargs)
-        self.set_positions()
+        self.set_positions(0)
 
         # Minimize the energy.
         if minimize:
@@ -1592,3 +1671,16 @@ class OptGeoTarget_OpenMM(OptGeoTarget):
             # here mol=M is given for the purpose of using the topology from the input pdb file
             # if we don't do this, pdb=top.pdb option will only copy some basic information but not the topology into OpenMM.mol (openmmio.py line 615)
             self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, pdb=pdbpath, **engine_args)
+ 
+class TorsionProfileTarget_OpenMM(TorsionProfileTarget):
+    """ Optimized geometry matching using OpenMM. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'pdb',default="conf.pdb")
+        self.set_option(tgt_opts,'coords',default="scan.xyz")
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.engine_ = OpenMM
+        ## Initialize base class.
+        super(TorsionProfileTarget_OpenMM,self).__init__(options,tgt_opts,forcefield)
+
