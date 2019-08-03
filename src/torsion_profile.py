@@ -1,7 +1,7 @@
-""" @package forcebalance.opt_geo_target Optimized Geometry fitting module.
+""" @package forcebalance.torsion_profile Torsion profile fitting module.
 
-@author Yudong Qiu, Lee-Ping Wang
-@date 03/2019
+@author Lee-Ping Wang
+@date 08/2019
 """
 from __future__ import division
 import os
