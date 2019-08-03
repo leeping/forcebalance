@@ -871,7 +871,7 @@ class GMX(Engine):
                     except: pass
         return energyterms
 
-    def optimize(self, shot=0, crit=1e-4, **kwargs):
+    def optimize(self, shot, crit=1e-4, align=True, **kwargs):
         
         """ Optimize the geometry and align the optimized geometry to the starting geometry. """
 
@@ -903,7 +903,7 @@ class GMX(Engine):
         rmsd = M.ref_rmsd(0)[1]
         M[1].write("%s-min.gro" % self.name)
 
-        return E / 4.184, rmsd
+        return E / 4.184, rmsd, M[1]
 
     def evaluate_(self, force=False, dipole=False, traj=None):
 
@@ -1260,7 +1260,7 @@ class GMX(Engine):
         if minimize:
             min_opts = OrderedDict([("integrator", "steep"), ("emtol", 10.0), ("nsteps", 10000)])
             if verbose: logger.info("Minimizing energy... ")
-            self.optimize(min_opts=min_opts)
+            self.optimize(0, min_opts=min_opts)
             if verbose: logger.info("Done\n")
             gro1="%s-min.gro" % self.name
         else:
