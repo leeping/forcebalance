@@ -512,12 +512,11 @@ class AbInitio_SMIRNOFF(AbInitio):
         1. This function assumes the names of the forcefield parameters has the smirks as the last item
         2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
         """
-        orig_pgrad_set = set(self.pgrad)
-        # smirks to param_idxs map
-        smirks_params_map = defaultdict(list)
-        for pname, pidx in self.FF.map.items():
+        # New code for mapping smirks to mathematical parameter IDs
+        for pname in self.FF.pTree:
             smirks = pname.rsplit('/',maxsplit=1)[-1]
-            smirks_params_map[smirks].append(pidx)
+            for pidx in self.FF.get_mathid(pname):
+                smirks_params_map[smirks].append(pidx)
         pgrads_set = set()
         # get the smirks for this target, keep only the pidx corresponding to these smirks
         smirks_counter = self.engine.get_smirks_counter()
@@ -642,12 +641,11 @@ class TorsionProfileTarget_SMIRNOFF(TorsionProfileTarget):
         1. This function assumes the names of the forcefield parameters has the smirks as the last item
         2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
         """
-        orig_pgrad_set = set(self.pgrad)
-        # smirks to param_idxs map
-        smirks_params_map = defaultdict(list)
-        for pname, pidx in self.FF.map.items():
+        # New code for mapping smirks to mathematical parameter IDs
+        for pname in self.FF.pTree:
             smirks = pname.rsplit('/',maxsplit=1)[-1]
-            smirks_params_map[smirks].append(pidx)
+            for pidx in self.FF.get_mathid(pname):
+                smirks_params_map[smirks].append(pidx)
         pgrads_set = set()
         # get the smirks for this target, keep only the pidx corresponding to these smirks
         smirks_counter = self.engine.get_smirks_counter()

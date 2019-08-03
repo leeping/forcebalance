@@ -31,8 +31,8 @@ class TorsionProfileTarget(Target):
             raise RuntimeError('TorsionProfileTarget needs torsion drive metadata.json file')
         with open(os.path.join(self.tgtdir, 'metadata.json')) as f:
             self.metadata = json.load(f)
-            self.ndim = len(self.metadata['torsion_grid_ids'][0])
-            self.freeze_atoms = sorted(list(set(itertools.chain(*self.metadata['dihedrals']))))
+            self.ndim = len(self.metadata['dihedrals'])
+            self.freeze_atoms = sorted(set(itertools.chain(*self.metadata['dihedrals'])))
         
         ## Read in the coordinate files and get topology information from PDB
         if hasattr(self, 'pdb') and self.pdb is not None:
@@ -56,7 +56,7 @@ class TorsionProfileTarget(Target):
         self.read_reference_data()
         ## Build keyword dictionaries to pass to engine.
         engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
-        del engine_args['name']
+        engine_args.pop('name', None)
         ## Create engine object.
         engine_args['freeze_atoms'] = self.freeze_atoms
         self.engine = self.engine_(target=self, mol=self.mol, **engine_args)
@@ -112,17 +112,15 @@ class TorsionProfileTarget(Target):
 
     def indicate(self):
         title_str = "Torsion Profile: %s, Objective = % .5e, Units = kcal/mol, Angstrom" % (self.name, self.objective)
-        #QYD: This title is carefully placed to align correctly
+        #LPW: This title is carefully placed to align correctly
         column_head_str1 =  "%-50s %-10s %-12s %-18s %-12s %-10s %-11s %-10s" % ("System", "Min(QM)", "Min(MM)", "Range(QM)", "Range(MM)", "Max-RMSD", "Ene-RMSE", "Obj-Fn")
         printcool_dictionary(self.PrintDict,title=title_str + '\n' + column_head_str1, keywidth=50, center=[True,False])
 
     def get(self, mvals, AGrad=False, AHess=False):
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         self.PrintDict = OrderedDict()
-        # enable self.system_mval_masks (still need to implement)
-        enable_system_mval_mask = hasattr(self, 'system_mval_masks')
 
-        def compute(mvals_, p_idx = None, indicate=False):
+        def compute(mvals_, indicate=False):
             self.FF.make(mvals_)
             M_opts = None
             compute.emm = []
@@ -179,7 +177,7 @@ class TorsionProfileTarget(Target):
         dV = np.zeros((self.FF.np,len(V)))
         if AGrad or AHess:
             for p in self.pgrad:
-                dV[p,:], _ = f12d3p(fdwrap(compute, mvals, p, p_idx = p), h = self.h, f0 = V)
+                dV[p,:], _ = f12d3p(fdwrap(compute, mvals, p), h = self.h, f0 = V)
 
         for p in self.pgrad:
             Answer['G'][p] = 2*np.dot(V, dV[p,:])
