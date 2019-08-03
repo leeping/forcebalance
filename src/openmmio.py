@@ -817,7 +817,7 @@ class OpenMM(Engine):
 
         # Add a restraint force if we have one.
         self.restraint_frc_index = None
-        if hasattr(self, 'restrain_k' and self.restrain_k != 0.0):
+        if hasattr(self, 'restrain_k') and self.restrain_k != 0.0:
             restraint_frc = CustomExternalForce("0.5*k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
             restraint_frc.addGlobalParameter("k", self.restrain_k * kilocalorie_per_mole / angstrom**2)
             restraint_frc.addPerParticleParameter("x0")

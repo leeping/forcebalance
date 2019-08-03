@@ -512,6 +512,9 @@ class AbInitio_SMIRNOFF(AbInitio):
         1. This function assumes the names of the forcefield parameters has the smirks as the last item
         2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
         """
+        orig_pgrad_set = set(self.pgrad)
+        # smirks to param_idxs map
+        smirks_params_map = defaultdict(list)
         # New code for mapping smirks to mathematical parameter IDs
         for pname in self.FF.pTree:
             smirks = pname.rsplit('/',maxsplit=1)[-1]
@@ -587,6 +590,7 @@ class OptGeoTarget_SMIRNOFF(OptGeoTarget):
         n_params = len(self.FF.map)
         # default mask with all False
         system_mval_masks = {sysname: np.zeros(n_params, dtype=bool) for sysname in self.sys_opts}
+        orig_pgrad_set = set(self.pgrad)
         # smirks to param_idxs map
         smirks_params_map = defaultdict(list)
         # New code for mapping smirks to mathematical parameter IDs
@@ -641,6 +645,9 @@ class TorsionProfileTarget_SMIRNOFF(TorsionProfileTarget):
         1. This function assumes the names of the forcefield parameters has the smirks as the last item
         2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
         """
+        orig_pgrad_set = set(self.pgrad)
+        # smirks to param_idxs map
+        smirks_params_map = defaultdict(list)
         # New code for mapping smirks to mathematical parameter IDs
         for pname in self.FF.pTree:
             smirks = pname.rsplit('/',maxsplit=1)[-1]
