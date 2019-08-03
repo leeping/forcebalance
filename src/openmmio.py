@@ -1147,16 +1147,8 @@ class OpenMM(Engine):
         negatives = (eigvals >= 0).astype(int) * 2 - 1 # record the negative ones
         freqs = np.sqrt(np.abs(eigvals)) * coef * negatives
         # step 4: convert eigenvectors to normal modes
-        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
-        if not noa == len(massList) == len(eigvecs)/3:
-            error('number of the real atoms not consistent bewteen massList and hessian')
-        # scale the eigenvectors by mass^-1/2
-        normal_modes = (eigvecs.reshape(noa, -1) / np.sqrt(massList)[:, np.newaxis]).reshape(noa*3, noa*3)
         # re-arange to row index and shape
-        normal_modes = normal_modes.T.reshape(noa*3, noa, 3)
-        # nomalize the scaled normal modes
-        norm_factors = np.sqrt(np.sum(np.square(normal_modes), axis=(1,2)))
-        normal_modes /= norm_factors[:, np.newaxis, np.newaxis]
+        normal_modes = eigvecs.T.reshape(noa*3, noa, 3)
         # step 5: remove the 6 freqs with smallest abs value and corresponding normal modes
         n_remove = 5 if len(self.realAtomIdxs) == 2 else 6
         larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])

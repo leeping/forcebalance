@@ -164,6 +164,8 @@ def assign_openff_parameter(ff, new_value, pid):
             unit = getattr(parameter, value_name).unit
             # Get the quantity of the parameter in the OpenFF forcefield object
             param_quantity = getattr(parameter, value_name)
+        elif value_name in parameter._cosmetic_attribs:
+            param_quantity = None
         else:
             # If the value name is a periodic attribute (say, k1) then we need to use
             # a regex to split the value name into 'k' and '1', then set the appropriate
@@ -171,7 +173,7 @@ def assign_openff_parameter(ff, new_value, pid):
             attribute_split = re.split(r'(\d+)', value_name)
             # print(attribute_split)
             # assert len(attribute_split) == 2
-            assert hasattr(parameter, attribute_split[0])
+            assert hasattr(parameter, attribute_split[0]), "%s.%s not exist" % (parameter, attribute_split[0])
             # attribute_split[0] is a string such as 'k'
             value_name = attribute_split[0]
             # parameter_index is the position of k1 in the values associated with 'k'
@@ -185,7 +187,8 @@ def assign_openff_parameter(ff, new_value, pid):
     else:
         param_quantity = ff._forcebalance_assign_parameter_map[pid]
     # set new_value directly in the quantity
-    param_quantity._value = new_value
+    if param_quantity is not None:
+        param_quantity._value = new_value
 
 class SMIRNOFF(OpenMM):
 
@@ -545,6 +548,40 @@ class Vibration_SMIRNOFF(Vibration):
         self.engine_ = SMIRNOFF
         ## Initialize base class.
         super(Vibration_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
+
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        # we update the self.pgrads here so it's not overwritten in rtarget.py
+        self.smirnoff_update_pgrads()
+
+    def smirnoff_update_pgrads(self):
+        """
+        Update self.pgrads based on smirks present in mol2 files
+
+        This can greatly improve gradients evaluation in big optimizations
+
+        Note
+        ----
+        1. This function assumes the names of the forcefield parameters has the smirks as the last item
+        2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
+        """
+        orig_pgrad_set = set(self.pgrad)
+        # smirks to param_idxs map
+        smirks_params_map = defaultdict(list)
+        for pname in self.FF.pTree:
+            smirks = pname.rsplit('/',maxsplit=1)[-1]
+            for pidx in self.FF.get_mathid(pname):
+                smirks_params_map[smirks].append(pidx)
+        pgrads_set = set()
+        # get the smirks for this target, keep only the pidx corresponding to these smirks
+        smirks_counter = self.engine.get_smirks_counter()
+        for smirks in smirks_counter:
+            if smirks_counter[smirks] > 0:
+                pidx_list = smirks_params_map[smirks]
+                # update the set of parameters present in this target
+                pgrads_set.update(pidx_list)
+        # this ensure we do not add any new items into self.pgrad
+        pgrads_set.intersection_update(orig_pgrad_set)
+        self.pgrad = sorted(list(pgrads_set))
 
 
 class OptGeoTarget_SMIRNOFF(OptGeoTarget):
