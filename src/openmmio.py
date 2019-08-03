@@ -1195,7 +1195,7 @@ class OpenMM(Engine):
         if self.restraint_frc_index is not None:
             self.set_restraint_positions(shot)
         # Get the previous geometry.
-        X0 = np.array([j for i, j in enumerate(self.simulation.context.getState(getPositions=True).getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
+        X0 = self.simulation.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(angstrom)[self.realAtomIdxs]
         # printcool_dictionary(energy_components(self.simulation), title='Energy component analysis before minimization, shot %i' % shot)
         # Minimize the energy.  Optimizer works best in "steps".
         for logc in np.linspace(0, np.log10(crit), steps):
