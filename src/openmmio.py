@@ -816,7 +816,8 @@ class OpenMM(Engine):
         elif pressure is not None: warn_once("Pressure is ignored because pbc is set to False.")
 
         # Add a restraint force if we have one.
-        if hasattr(self, 'restrain_k'):
+        self.restraint_frc_index = None
+        if hasattr(self, 'restrain_k' and self.restrain_k != 0.0):
             restraint_frc = CustomExternalForce("0.5*k*((x-x0)^2+(y-y0)^2+(z-z0)^2)")
             restraint_frc.addGlobalParameter("k", self.restrain_k * kilocalorie_per_mole / angstrom**2)
             restraint_frc.addPerParticleParameter("x0")
@@ -825,7 +826,7 @@ class OpenMM(Engine):
             for i, j in enumerate(self.realAtomIdxs):
                 restraint_frc.addParticle(j)
                 restraint_frc.setParticleParameters(i, j, [0.0, 0.0, 0.0])
-            self.system.addForce(restraint_frc)
+            self.restraint_frc_index = self.system.addForce(restraint_frc)
 
         # Freeze atoms if we have any.
         if hasattr(self, 'freeze_atoms'):
@@ -924,20 +925,15 @@ class OpenMM(Engine):
         Set reference positions for energy restraints.  This may be a different set of positions
         from the "current" positions that are stored in self.mol and self.xyz_omm.
         """
-        if hasattr(self, 'restrain_k'):
+        if self.restraint_frc_index is not None:
             ## Generate OpenMM-compatible positions in nanometers
             xyz = self.ref_mol.xyzs[shot] / 10.0
-            have_restraint_frc = False
-            for frc in self.simulation.system.getForces():
-                if isinstance(frc, CustomExternalForce):
-                    have_restraint_frc = True
-                    for i, j in enumerate(self.realAtomIdxs):
-                        frc.setParticleParameters(i, j, [xyz[i, 0], xyz[i, 1], xyz[i, 2]])
-                    frc.updateParametersInContext(self.simulation.context)
-            if not have_restraint_frc:
-                raise RuntimeError('Expected a restraint force, but did not find one')
+            frc = self.simulation.system.getForce(self.restraint_frc_index)
+            for i, j in enumerate(self.realAtomIdxs):
+                frc.setParticleParameters(i, j, xyz[i])
+            frc.updateParametersInContext(self.simulation.context)
         else:
-            raise RuntimeError('Asked to set restraint positions, but restrain_k is not set')
+            raise RuntimeError('Asked to set restraint positions, but no restraint force has been added to the system')
 
     def set_positions(self, shot):
 
@@ -1196,7 +1192,7 @@ class OpenMM(Engine):
         steps = int(max(1, -1*np.log10(crit)))
         self.update_simulation()
         self.set_positions(shot)
-        if hasattr(self, 'restrain_k'):
+        if self.restraint_frc_index is not None:
             self.set_restraint_positions(shot)
         # Get the previous geometry.
         X0 = np.array([j for i, j in enumerate(self.simulation.context.getState(getPositions=True).getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
@@ -1206,14 +1202,13 @@ class OpenMM(Engine):
             self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=10000)
         # Remove the restraint energy from the total energy if desired.
         groups = set(range(32))
-        if hasattr(self, 'restrain_k') and not include_restraint_energy:
-            for frc in self.simulation.system.getForces():
-                if isinstance(frc, CustomExternalForce):
-                    groups.remove(frc.getForceGroup())
+        if self.restraint_frc_index is not None and not include_restraint_energy:
+            frc = self.simulation.system.getForce(self.restraint_frc_index)
+            groups.remove(frc.getForceGroup())
         # printcool_dictionary(energy_components(self.simulation), title='Energy component analysis after minimization, shot %i' % shot)
         S = self.simulation.context.getState(getPositions=True, getEnergy=True, groups=groups)
         # Get the optimized geometry.
-        X1 = np.array([j for i, j in enumerate(S.getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
+        X1 = S.getPositions(asNumpy=True).value_in_unit(angstrom)[self.realAtomIdxs]
         E = S.getPotentialEnergy().value_in_unit(kilocalorie_per_mole)
         # Align to original geometry.
         M = deepcopy(self.mol[0])
@@ -1221,13 +1216,12 @@ class OpenMM(Engine):
         if not self.pbc and align:
             M.align(center=False)
         X1 = M.xyzs[1]
-        # Set geometry in OpenMM, requires some hoops.
-        mod = Modeller(self.pdb.topology, [Vec3(i[0],i[1],i[2]) for i in X1]*angstrom)
         if disable_vsite:
-            self.simulation.context.setPositions(mod.getPositions())
+            self.simulation.context.setPositions(X1 * angstrom)
         else:
+            # Create virtual sites before setting positions
+            mod = Modeller(self.pdb.topology, X1*angstrom)
             mod.addExtraParticles(self.forcefield)
-            # self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
             self.simulation.context.setPositions(ResetVirtualSites_fast(mod.getPositions(), self.vsinfo))
         return E, M.ref_rmsd(0)[1], M[1]
 
