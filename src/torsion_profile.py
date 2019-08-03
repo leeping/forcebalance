@@ -5,21 +5,17 @@
 """
 from __future__ import division
 import os
-import shutil
 import numpy as np
-import re
-import subprocess
 import itertools
 import json
 from copy import deepcopy
-from collections import OrderedDict, defaultdict
-from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohr2ang, warn_press_key
+from collections import OrderedDict
+from forcebalance.nifty import eqcgmx, printcool, printcool_dictionary, warn_press_key
 from forcebalance.target import Target
 from forcebalance.molecule import Molecule
-from forcebalance.finite_difference import fdwrap, f1d2p, f12d3p, in_fd
+from forcebalance.finite_difference import fdwrap, f12d3p, in_fd
 from forcebalance.output import getLogger
 from forcebalance.optimizer import Counter
-from forcebalance.opt_geo_target import periodic_diff
 logger = getLogger(__name__)
 
 class TorsionProfileTarget(Target):
