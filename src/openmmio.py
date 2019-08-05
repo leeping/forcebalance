@@ -1247,7 +1247,10 @@ class OpenMM(Engine):
             logger.error("Polarizability calculation is available in TINKER only.\n")
             raise NotImplementedError
 
-        crit = 1e-4 if (self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']) else 1e-6
+        if (self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']):
+            crit = 1e-4
+        else:
+            crit = 1e-6
 
         if optimize: self.optimize(shot, crit=crit)
         else: self.set_positions(shot)
@@ -1267,7 +1270,10 @@ class OpenMM(Engine):
 
         self.update_simulation()
 
-        crit = 1e-4 if (self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']) else 1e-6
+        if (self.platname in ['CUDA', 'OpenCL'] and self.precision in ['single', 'mixed']):
+            crit = 1e-4
+        else:
+            crit = 1e-6
 
         rmsd = 0.0
         if optimize:
