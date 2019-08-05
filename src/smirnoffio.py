@@ -17,6 +17,7 @@ from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
 from forcebalance.vibration import Vibration
 from forcebalance.opt_geo_target import OptGeoTarget
+from forcebalance.torsion_profile import TorsionProfileTarget
 import networkx as nx
 import numpy as np
 import sys
@@ -194,7 +195,7 @@ class SMIRNOFF(OpenMM):
     """ Derived from Engine object for carrying out OpenMM calculations that use the SMIRNOFF force field. """
 
     def __init__(self, name="openmm", **kwargs):
-        self.valkwd = ['ffxml', 'pdb', 'mol2', 'platname', 'precision', 'mmopts', 'vsite_bonds', 'implicit_solvent']
+        self.valkwd = ['ffxml', 'pdb', 'mol2', 'platname', 'precision', 'mmopts', 'vsite_bonds', 'implicit_solvent', 'restrain_k', 'freeze_atoms']
         super(SMIRNOFF,self).__init__(name=name, **kwargs)
 
     def readsrc(self, **kwargs):
@@ -254,6 +255,9 @@ class SMIRNOFF(OpenMM):
         for i in ["chain", "atomname", "resid", "resname", "elem"]:
             self.mol.Data[i] = mpdb.Data[i]
 
+        # Store a separate copy of the molecule for reference restraint positions.
+        self.ref_mol = deepcopy(self.mol)
+        
     def prepare(self, pbc=False, mmopts={}, **kwargs):
 
         """
@@ -292,6 +296,12 @@ class SMIRNOFF(OpenMM):
         ## OpenMM options for setting up the System.
         self.mmopts = dict(mmopts)
 
+        ## Specify frozen atoms and restraint force constant
+        if 'restrain_k' in kwargs:
+            self.restrain_k = kwargs['restrain_k']
+        if 'freeze_atoms' in kwargs:
+            self.freeze_atoms = kwargs['freeze_atoms'][:]
+
         ## Set system options from ForceBalance force field options.
         fftmp = False
         if hasattr(self,'FF'):
@@ -307,8 +317,6 @@ class SMIRNOFF(OpenMM):
         ## print warning for 'nonbonded_cutoff' keywords
         if 'nonbonded_cutoff' in kwargs:
             logger.warning("nonbonded_cutoff keyword ignored because it's set in the offxml file\n")
-
-
 
         ## Generate OpenMM-compatible positions
         self.xyz_omms = []
@@ -383,40 +391,16 @@ class SMIRNOFF(OpenMM):
         else:
             self.create_simulation(**self.simkwargs)
 
-    def optimize(self, shot=0, crit=1e-4):
-
-        """ Optimize the geometry and align the optimized geometry to the starting geometry, and return the RMSD.
-        We are copying because we need to skip over virtual site stuff.
-        """
-
-        steps = int(max(1, -1*np.log10(crit)))
-        self.update_simulation()
-        self.set_positions(shot)
-        # Get the previous geometry.
-        X0 = np.array([j for i, j in enumerate(self.simulation.context.getState(getPositions=True).getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
-        # Minimize the energy.  Optimizer works best in "steps".
-        for logc in np.linspace(0, np.log10(crit), steps):
-            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=10000)
-        # Get the optimized geometry.
-        S = self.simulation.context.getState(getPositions=True, getEnergy=True)
-        X1 = np.array([j for i, j in enumerate(S.getPositions().value_in_unit(angstrom)) if self.AtomMask[i]])
-        E = S.getPotentialEnergy().value_in_unit(kilocalorie_per_mole)
-        # Align to original geometry.
-        M = deepcopy(self.mol[0])
-        M.xyzs = [X0, X1]
-        if not self.pbc:
-            M.align(center=False)
-        X1 = M.xyzs[1]
-        # Set geometry in OpenMM, requires some hoops.
-        mod = Modeller(self.pdb.topology, [Vec3(i[0],i[1],i[2]) for i in X1]*angstrom)
-        # mod.addExtraParticles(self.forcefield)
-        # self.simulation.context.setPositions(ResetVirtualSites(mod.getPositions(), self.system))
-        self.simulation.context.setPositions(mod.getPositions())
-        return E, M.ref_rmsd(0)[1]
-
+    def optimize(self, shot=0, align=True, crit=1e-4):
+        return super(SMIRNOFF,self).optimize(shot=shot, align=align, crit=crit, disable_vsite=True)
+        
     def interaction_energy(self, fraga, fragb):
 
-        """ Calculate the interaction energy for two fragments. """
+        """ 
+        Calculate the interaction energy for two fragments. 
+        Because this creates two new objects and requires passing in the mol2 argument,
+        the codes are copied and modified from the OpenMM class.
+        """
 
         self.update_simulation()
 
@@ -534,6 +518,7 @@ class AbInitio_SMIRNOFF(AbInitio):
         orig_pgrad_set = set(self.pgrad)
         # smirks to param_idxs map
         smirks_params_map = defaultdict(list)
+        # New code for mapping smirks to mathematical parameter IDs
         for pname in self.FF.pTree:
             smirks = pname.rsplit('/',maxsplit=1)[-1]
             for pidx in self.FF.get_mathid(pname):
@@ -642,6 +627,7 @@ class OptGeoTarget_SMIRNOFF(OptGeoTarget):
         n_params = len(self.FF.map)
         # default mask with all False
         system_mval_masks = {sysname: np.zeros(n_params, dtype=bool) for sysname in self.sys_opts}
+        orig_pgrad_set = set(self.pgrad)
         # smirks to param_idxs map
         smirks_params_map = defaultdict(list)
         # New code for mapping smirks to mathematical parameter IDs
@@ -667,6 +653,55 @@ class OptGeoTarget_SMIRNOFF(OptGeoTarget):
         logger.info("system_mval_masks is built for faster gradient evaluations")
         self.system_mval_masks = system_mval_masks
 
+class TorsionProfileTarget_SMIRNOFF(TorsionProfileTarget):
+    """ Force and energy matching using SMIRKS native Open Force Field (SMIRNOFF). """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'pdb',default="conf.pdb")
+        # List of .mol2 files for SMIRNOFF to set up the system
+        self.set_option(tgt_opts,'mol2',forceprint=True)
+        self.set_option(tgt_opts,'coords',default="scan.xyz")
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.engine_ = SMIRNOFF
+        ## Initialize base class.
+        super(TorsionProfileTarget_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
+
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        # we update the self.pgrads here so it's not overwritten in rtarget.py
+        self.smirnoff_update_pgrads()
+
+    def smirnoff_update_pgrads(self):
+        """
+        Update self.pgrads based on smirks present in mol2 files
+
+        This can greatly improve gradients evaluation in big optimizations
+
+        Note
+        ----
+        1. This function assumes the names of the forcefield parameters has the smirks as the last item
+        2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
+        """
+        orig_pgrad_set = set(self.pgrad)
+        # smirks to param_idxs map
+        smirks_params_map = defaultdict(list)
+        # New code for mapping smirks to mathematical parameter IDs
+        for pname in self.FF.pTree:
+            smirks = pname.rsplit('/',maxsplit=1)[-1]
+            for pidx in self.FF.get_mathid(pname):
+                smirks_params_map[smirks].append(pidx)
+        pgrads_set = set()
+        # get the smirks for this target, keep only the pidx corresponding to these smirks
+        smirks_counter = self.engine.get_smirks_counter()
+        for smirks in smirks_counter:
+            if smirks_counter[smirks] > 0:
+                pidx_list = smirks_params_map[smirks]
+                # update the set of parameters present in this target
+                pgrads_set.update(pidx_list)
+        # this ensure we do not add any new items into self.pgrad
+        pgrads_set.intersection_update(orig_pgrad_set)
+        self.pgrad = sorted(list(pgrads_set))
+        
 # class BindingEnergy_SMIRNOFF(BindingEnergy):
 #     """ Binding energy matching using OpenMM. """
 
