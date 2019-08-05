@@ -420,6 +420,8 @@ def main():
     # This line runs the condensed phase simulation.
     click()
     prop_return = Liquid.molecular_dynamics(**MDOpts["liquid"])
+    if hasattr(Liquid, 'freeze_atoms'):
+        logger.info("Warning: freeze_atoms may result in incorrect system mass and incorrect density calculation\n")
     logger.info("Liquid phase MD simulation took %.3f seconds\n" % click())
     Rhos = prop_return['Rhos']
     Potentials = prop_return['Potentials']

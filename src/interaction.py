@@ -97,7 +97,7 @@ class Interaction(Target):
             logger.info('Fragment 2 is the complement of fragment 1 : %s\n' % (commadash(self.select2)))
         ## Build keyword dictionaries to pass to engine.
         engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
-        del engine_args['name']
+        engine_args.pop('name', None)
         self.engine = self.engine_(target=self, mol=self.mol, **engine_args)
         ## Read in the reference data
         self.read_reference_data()

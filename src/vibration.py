@@ -63,7 +63,7 @@ class Vibration(Target):
         self.read_reference_data()
         ## Build keyword dictionaries to pass to engine.
         engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
-        del engine_args['name']
+        engine_args.pop('name', None)
         ## Create engine object.
         self.engine = self.engine_(target=self, **engine_args)
         if self.FF.rigid_water:

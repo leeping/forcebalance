@@ -31,8 +31,9 @@ Lee-Ping Wang
 Welcome to %ForceBalance! :)
 
 This is a <em> theoretical and computational chemistry </em> program
-primarily developed by Lee-Ping Wang.  The full list of people who
-made this project possible are given in the \ref credits.
+primarily developed by Lee-Ping Wang and the Wang research group
+at UC Davis.  The full list of people who made this project possible
+are given in the \ref credits.
 
 The function of %ForceBalance is <em>automatic force field
 optimization</em>.  Here I will provide some background, which for the
@@ -182,36 +183,51 @@ which can be found on the <a href=https://simtk.org/home/forcebalance/>SimTK web
 
 - Lee-Ping Wang is the principal developer and author.
 
-- Troy Van Voorhis provided scientific guidance and many of
-the central ideas as well as financial support.
-
-- Jiahao Chen contributed the call graph generator, the QTPIE
-fluctuating-charge force field (which Lee-Ping implemented into
-GROMACS), the interface to the MOPAC semiempirical code, and many
-helpful discussions. (Many of these are only in the older ForTune
-code)
+- Yudong Qiu contributed the surface tension target, pure finite-difference
+for thermodynamic property gradients, the optimized geometry target,
+the OpenMM implementation of the vibrational frequency target, and many
+improvements when ForceBalance is used with the SMIRNOFF force field. (2016-2019)
 
 - Arthur Vigil contributed the unit testing framework and many unit tests,
 significant improvements to the automatic documentation generation, 
 logging of output, graphical user interface, and various code improvements.
+(2012-2013)
 
 - Keri McKiernan contributed the lipid bilayer target, starting from
 multiple initial conditions at each thermodynamic phase point, and several
-other features.
+other features. (2012-2015)
 
-- Yudong Qiu contributed the surface tension target, pure finite-difference
-for thermodynamic property gradients, and various other improvements.
-
-- Erik Brandt contributed the general thermodynamic property "Thermo" target.
+- Erik Brandt contributed the general thermodynamic property "Thermo" target. (2014)
 
 - Johnny Israeli contributed the XmlScript functionality that allows
-adjustable parameters to be read from embedded scripts in OpenMM XML files.
+adjustable parameters to be read from embedded scripts in OpenMM XML files. (2012)
 
 - Matt Welborn contributed the parallelization-over-snapshots
-functionality in the general force matching module.
+functionality in the general force matching module (2011, only
+in the older ForTune code).
+
+- Jiahao Chen contributed the call graph generator, the QTPIE
+fluctuating-charge force field (which Lee-Ping implemented into
+GROMACS), the interface to the MOPAC semiempirical code, and many
+helpful discussions in 2009-2011. (Many of these are only in the
+older ForTune code)
+
+- Troy Van Voorhis provided scientific guidance and many of
+the central ideas as well as financial support during the time Lee-Ping
+was a graduate student (2006-2011).
 
 - Vijay Pande provided scientific guidance and financial support,
 and through the SimBios program gave this software a home on the Web
 at the <a href=https://simtk.org/home/forcebalance/>SimTK website</a>.
 
 - Todd Martinez provided scientific guidance and financial support.
+
+@section funding Funding
+
+The development of this code has been supported in part by the following grants and awards:
+
+NIH Grant R01 AI130684-02
+ACS-PRF 58158-DNI6
+NIH Grant U54 GM072970
+Open Force Field Consortium
+

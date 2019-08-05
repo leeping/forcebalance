@@ -193,7 +193,7 @@ class AbInitio(Target):
         self.nparticles  = len(self.mol.elem)
         ## Build keyword dictionaries to pass to engine.
         engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
-        del engine_args['name']
+        engine_args.pop('name', None)
         ## Create engine object.
         self.engine = self.engine_(target=self, mol=self.mol, **engine_args)
         ## Lists of atoms to do net force/torque fitting and excluding virtual sites.
