@@ -29,7 +29,7 @@ class TorsionProfileTarget(Target):
             self.metadata = json.load(f)
             self.ndim = len(self.metadata['dihedrals'])
             self.freeze_atoms = sorted(set(itertools.chain(*self.metadata['dihedrals'])))
-        
+
         ## Read in the coordinate files and get topology information from PDB
         if hasattr(self, 'pdb') and self.pdb is not None:
             self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords),
@@ -135,6 +135,13 @@ class TorsionProfileTarget(Target):
             compute.rmsd = np.array(compute.rmsd)
             if indicate:
                 if self.writelevel > 0:
+                    energy_comparison = np.array([
+                        self.eqm,
+                        compute.emm,
+                        compute.emm - self.eqm,
+                        np.sqrt(self.wts)/self.energy_denom
+                    ]).T
+                    np.savetxt("EnergyCompare.txt", energy_comparison, header="%11s  %12s  %12s  %12s" % ("QMEnergy", "MMEnergy", "Delta(MM-QM)", "Weight"), fmt="% 12.6e")
                     M_opts.write('mm_minimized.xyz')
                     if self.ndim == 1:
                         import matplotlib.pyplot as plt
