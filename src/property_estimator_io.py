@@ -22,9 +22,11 @@ logger = getLogger(__name__)
 
 try:
     import propertyestimator
+    from propertyestimator import unit
     from propertyestimator.client import PropertyEstimatorClient, ConnectionOptions, PropertyEstimatorOptions
     from propertyestimator.datasets import ThermoMLDataSet, PhysicalPropertyDataSet
     from propertyestimator.utils.exceptions import PropertyEstimatorException
+    from propertyestimator.utils.openmm import openmm_quantity_to_pint
     from propertyestimator.utils.serialization import TypedJSONDecoder, TypedJSONEncoder
     from propertyestimator.workflow import WorkflowOptions
 except ImportError:
@@ -34,12 +36,7 @@ try:
     from openforcefield.typing.engines import smirnoff
 except ImportError:
     warn_once("Failed to import the openforcefield package.")
-
-try:
-    from simtk import unit
-except ImportError:
-    warn_once("Failed to import the openmm package.")
-
+    
 
 class PropertyEstimate_SMIRNOFF(Target):
     """A custom optimisation target which employs the propertyestimator
@@ -149,7 +146,7 @@ class PropertyEstimate_SMIRNOFF(Target):
     default_units = {
         'Density': unit.kilogram / unit.meter ** 3,
         'DielectricConstant': unit.dimensionless,
-        'EnthalpyOfVaporization': unit.kilojoules_per_mole
+        'EnthalpyOfVaporization': unit.kilojoules / unit.mole
     }
 
     def __init__(self, options, tgt_opts, forcefield):
@@ -207,15 +204,15 @@ class PropertyEstimate_SMIRNOFF(Target):
 
                 class_name = physical_property.__class__.__name__
 
-                temperature = physical_property.thermodynamic_state.temperature.value_in_unit(unit.kelvin)
-                pressure = physical_property.thermodynamic_state.pressure.value_in_unit(unit.atmosphere)
+                temperature = physical_property.thermodynamic_state.temperature.to(unit.kelvin).magnitude
+                pressure = physical_property.thermodynamic_state.pressure.to(unit.atmosphere).magnitude
 
                 state_tuple = (f'{temperature:.6f}', f'{pressure:.6f}')
 
                 default_unit = PropertyEstimate_SMIRNOFF.default_units[class_name]
 
-                value = physical_property.value.value_in_unit(default_unit)
-                uncertainty = physical_property.uncertainty.value_in_unit(default_unit)
+                value = physical_property.value.to(default_unit).magnitude
+                uncertainty = physical_property.uncertainty.to(default_unit).magnitude
 
                 if class_name not in refactored_properties:
                     refactored_properties[class_name] = {}
@@ -344,7 +341,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
             is_cosmetic = True
 
-        return parameter_value, is_cosmetic
+        return openmm_quantity_to_pint(parameter_value), is_cosmetic
 
     def _extract_physical_parameter_values(self):
         """Extracts an array of the values of the physical parameters
@@ -364,7 +361,7 @@ class PropertyEstimate_SMIRNOFF(Target):
             parameter_value, _ = self._parameter_value_from_gradient_key(gradient_key)
             expected_unit = self._parameter_units[gradient_key]
 
-            parameter_values[parameter_index] = parameter_value.value_in_unit(expected_unit)
+            parameter_values[parameter_index] = parameter_value.to(expected_unit).magnitude
 
         return parameter_values
 
@@ -471,7 +468,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                     # We don't wan't gradients w.r.t. cosmetic parameters.
                     continue
 
-                parameter_unit = parameter_value.unit
+                parameter_unit = parameter_value.units
                 parameter_gradient_keys.append(parameter_gradient_key)
 
                 self._gradient_key_mappings[parameter_gradient_key] = index_counter
@@ -576,8 +573,8 @@ class PropertyEstimate_SMIRNOFF(Target):
                 if substance_id not in estimated_gradients[class_name]:
                     estimated_gradients[class_name][substance_id] = {}
 
-                temperature = physical_property.thermodynamic_state.temperature.value_in_unit(unit.kelvin)
-                pressure = physical_property.thermodynamic_state.pressure.value_in_unit(unit.atmosphere)
+                temperature = physical_property.thermodynamic_state.temperature.to(unit.kelvin).magnitude
+                pressure = physical_property.thermodynamic_state.pressure.to(unit.atmosphere).magnitude
 
                 state_tuple = (f'{temperature:.6f}', f'{pressure:.6f}')
 
@@ -594,7 +591,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                     logger.info(f'Gradient Value: {gradient.value} Expected Unit: {gradient_unit}\n')
 
                     if isinstance(gradient.value, unit.Quantity):
-                        gradient_value = gradient.value.value_in_unit(gradient_unit)
+                        gradient_value = gradient.value.to(gradient_unit).magnitude
                     else:
                         gradient_value = gradient.value
                         assert isinstance(gradient_value, float)
