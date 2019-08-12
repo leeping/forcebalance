@@ -170,7 +170,7 @@ class Objective(forcebalance.BaseClass):
             logger.error("The list of target names is not unique!\n")
             raise RuntimeError
         if enable_smirnoff_prints:
-            smirnoff_analyze_parameter_coverage(forcefield, self.Targets)
+            smirnoff_analyze_parameter_coverage(forcefield, tgt_opts)
         ## The force field (it seems to be everywhere)
         self.FF = forcefield
         ## Initialize the penalty function.
