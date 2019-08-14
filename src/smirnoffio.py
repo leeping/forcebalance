@@ -80,8 +80,8 @@ def smirnoff_analyze_parameter_coverage(forcefield, tgt_opts):
         # analyze SMIRKs terms
         for mol_fnm in mol2_paths:
             # we work with one file at a time to avoid the topology sliently combine "same" molecules
-            openff_mols = [OffMolecule.from_file(mol_fnm)]
-            off_topology = OffTopology.from_molecules(openff_mols)
+            openff_mol = OffMolecule.from_file(mol_fnm)
+            off_topology = OffTopology.from_molecules([openff_mol])
             molecule_force_list = ff.label_molecules(off_topology)
             for mol_idx, mol_forces in enumerate(molecule_force_list):
                 for force_tag, force_dict in mol_forces.items():
