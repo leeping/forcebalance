@@ -6,127 +6,412 @@ author Yudong Qiu, Simon Boothroyd, Lee-Ping Wang
 @date 06/2019
 """
 from __future__ import division, print_function
-import os
-import time
-import json
-import copy
-import numpy as np
 
-from forcebalance.target import Target
+import json
+import os
+import re
+import tempfile
+
+import numpy as np
 from forcebalance.nifty import warn_once, printcool, printcool_dictionary
 from forcebalance.output import getLogger
+from forcebalance.target import Target
+from propertyestimator.properties import ParameterGradientKey
+
 logger = getLogger(__name__)
 
 try:
-    import property_estimator
+    import propertyestimator
+    from propertyestimator import unit
+    from propertyestimator.client import PropertyEstimatorClient, ConnectionOptions, PropertyEstimatorOptions
+    from propertyestimator.datasets import ThermoMLDataSet, PhysicalPropertyDataSet
+    from propertyestimator.utils.exceptions import PropertyEstimatorException
+    from propertyestimator.utils.openmm import openmm_quantity_to_pint
+    from propertyestimator.utils.serialization import TypedJSONDecoder, TypedJSONEncoder
+    from propertyestimator.workflow import WorkflowOptions
 except ImportError:
-    warn_once("Failed to import property_estimator package.")
+    warn_once("Failed to import the propertyestimator package.")
+
+try:
+    from openforcefield.typing.engines import smirnoff
+except ImportError:
+    warn_once("Failed to import the openforcefield package.")
+    
 
 class PropertyEstimate_SMIRNOFF(Target):
-    """ Subclass of Target for property estimator interface """
+    """A custom optimisation target which employs the propertyestimator
+    package to rapidly estimate a collection of condensed phase physical
+    properties at each optimisation epoch."""
 
-    def __init__(self,options,tgt_opts,forcefield):
-        # Initialize base class
-        super(PropertyEstimate_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
-        # get filename for property estimator input file
-        self.set_option(tgt_opts,'prop_est_input',forceprint=True)
-        # Finite difference size for numerical gradients
-        self.set_option(tgt_opts,'liquid_fdiff_h', forceprint=True)
-        # initialize the properties to compute
-        self.init_properties()
+    class OptionsFile:
+        """Represents the set of options that a `PropertyEstimate_SMIRNOFF`
+        target will be run with.
 
-    def init_properties(self):
-        """ read input configure, communicate to property estimator
-        1. Read input file
-        2. create client
-        3. use client to get information about the experimental dataset
+        Attributes
+        ----------
+        connection_options: propertyestimator.client.ConnectionOptions
+            The options for how the `propertyestimator` client should
+            connect to a running server instance.
+        estimation_options: propertyestimator.client.PropertyEstimatorOptions
+            The options for how properties should be estimated by the
+            `propertyestimator` (e.g. the uncertainties to which properties
+            should be estimated).
+        data_set_path: str
+            The path to a JSON serialized PhysicalPropertyDataSet which
+            contains those physical properties which will be optimised
+            against.
+        weights: list of PropertyWeight
+            The weighting of each property which will be optimised against.
+        denominators: list of PropertyDenominator
+            The denominators will be used to remove units from the properties
+            and scale their values.
         """
-        self.prop_est_configure = self.read_prop_est_input()
-        # create a property estimator client
-        ## TO-DO: use real client
-        # self.client = property_estimator.Client.from_config(self.prop_est_configure.get('client_conf'))
-        self.client = "replace this"
-        # specify experimental data using doi
-        ## TO-DO: get real reference data from property estimator, by specifing a list of doi's
-        # prop_est_dataset = self.client.load_reference_dataset_from_doi(self.prop_est_configure['source_doi'])
-        ## mock data
-        prop_est_dataset = {
-            'properties': {
-                'density': {
-                    (298.15, 1.0): 1.0,
-                    (328.15, 1.0): 0.95,
+
+        def __init__(self):
+
+            self.connection_options = ConnectionOptions()
+            self.estimation_options = PropertyEstimatorOptions()
+
+            self.data_set_path = ''
+            self.weights = {}
+            self.denominators = {}
+
+        def to_json(self):
+            """Converts this class into a JSON string.
+
+            Returns
+            -------
+            str
+                The JSON representation of this class.
+            """
+
+            value = {
+                'connection_options': self.connection_options.__getstate__(),
+                'estimation_options': self.estimation_options.__getstate__(),
+
+                'data_set_path': self.data_set_path,
+
+                'weights': {
+                    property_name: self.weights[property_name] for property_name in self.weights
                 },
-                'dielectric': {
-                    (298.15, 1.0): 0.6,
-                    (328.15, 1.0): 0.4,
-                },
-                'Hvap': {
-                    (298.15, 1.0): 0.6,
-                    (328.15, 1.0): 0.4,
+                'denominators': {
+                    property_name: self.denominators[property_name] for property_name in self.denominators
                 }
             }
-        }
-        # put reference data into FB format
-        self.ref_data = {}
-        for property_name, property_data in prop_est_dataset['properties'].items():
-            self.ref_data[property_name] = {}
-            for phase_point, value in property_data.items():
-                temperature, pressure = phase_point
-                # this self.ref_data[property_name][phase_point_key] structure should be kept
-                phase_point_key = (temperature, pressure)
-                self.ref_data[property_name][phase_point_key] = value
-        # print the reference data
-        printcool("Loaded experimental data from property estimator")
-        for property_name, property_data in self.ref_data.items():
-            dict_for_print = {("%.2fK-%.1fatm" % phase_point_key) : ("%f" % value) for phase_point_key, value in property_data.items()}
-            printcool_dictionary(dict_for_print, title="Reference %s data" % property_name)
-        # assign and normalize weights for each phase point (average for now)
-        self.property_weights = {}
-        for property_name in self.ref_data:
-            self.property_weights[property_name] = self.prop_est_configure['weights'][property_name] / len(self.ref_data[property_name])
 
-    def read_prop_est_input(self):
-        """ Load property estimator input configurations
+            return json.dumps(value, sort_keys=True, indent=4, separators=(',', ': '), cls=TypedJSONEncoder)
+
+        @classmethod
+        def from_json(cls, json_source):
+            """Creates this class from a JSON string.
+
+            Parameters
+            -------
+            json_source: str or file-like object
+                The JSON representation of this class.
+            """
+
+            if isinstance(json_source, str):
+                with open(json_source, 'r') as file:
+                    dictionary = json.load(file, cls=TypedJSONDecoder)
+            else:
+                dictionary = json.load(json_source, cls=TypedJSONDecoder)
+
+            assert ('connection_options' in dictionary and
+                    'estimation_options' in dictionary and
+                    'data_set_path' in dictionary and
+                    'weights' in dictionary and
+                    'denominators' in dictionary)
+
+            value = cls()
+
+            value.connection_options = ConnectionOptions()
+            value.connection_options.__setstate__(dictionary['connection_options'])
+
+            value.estimation_options = PropertyEstimatorOptions()
+            value.estimation_options.__setstate__(dictionary['estimation_options'])
+
+            value.data_set_path = dictionary['data_set_path']
+
+            value.weights = {
+                property_name: dictionary['weights'][property_name] for property_name in dictionary['weights']
+            }
+            value.denominators = {
+                property_name: dictionary['denominators'][property_name] for property_name in dictionary['denominators']
+            }
+
+            return value
+
+    # A dictionary of the units that force balance expects each property in.
+    default_units = {
+        'Density': unit.kilogram / unit.meter ** 3,
+        'DielectricConstant': unit.dimensionless,
+        'EnthalpyOfVaporization': unit.kilojoules / unit.mole
+    }
+
+    def __init__(self, options, tgt_opts, forcefield):
+
+        super(PropertyEstimate_SMIRNOFF, self).__init__(options, tgt_opts, forcefield)
+
+        self._options = None  # The options for this target loaded from JSON.
+        self._client = None  # The client object which will communicate with an already spun up server.
+
+        self._data_set = None  # The data set of properties to estimate.
+        self._reference_properties = {}  # The data set in a forcebalance compatible format.
+
+        self._normalised_weights = None  # The normalised weights of the different properties.
+
+        # Store a `Future` like object which can be queried for the results of
+        # a property estimation.
+        self._pending_estimate_request = None
+
+        # Store a mapping between gradient keys and the force balance string representation.
+        self._gradient_key_mappings = {}
+        self._parameter_units = {}
+
+        # Store a copy of the objective function details from the previous optimisation cycle.
+        self._last_obj_details = {}
+
+        # Get the filename for the property estimator input file.
+        self.set_option(tgt_opts, 'prop_est_input', forceprint=True)
+
+        # Initialize the target.
+        self._initialize()
+
+    @staticmethod
+    def _refactor_properties_dictionary(properties):
+        """Refactors a property dictionary of the form
+        `property = dict[substance_id][property_index]` to one of the form
+        `property = dict[property_type][substance_id][state_tuple]['value' or 'uncertainty']` where
+        the state tuple is equal to (temperature in K .6f, pressure in atm .6f).
+
+        Parameters
+        ----------
+        properties: dict of str and list of PhysicalProperty
+            The original dictionary of properties.
+
         Returns
         -------
-        prop_est_configure: dict
-        A dict contains the configuration of property estimation, includes client configure, and weights.
-
-        Example
-        -------
-        >>> self.read_prop_est_input()
-        {
-            'client_conf': {
-                'host': 'localhost',
-                'port': '8301',
-                'user': 'forcebalance'
-            },
-            'source_doi': ['10.123.23910/12891'],
-            'weights': {
-                'density': 1.0,
-                'dielectric': 1.0,
-                'Hvap': 1.0,
-            },
-            'denoms': {
-                'density': 1.0, # kg/m3
-                'dielectric': 2.0,
-                'Hvap': 1.0,
-            },
-        }
+        dict of str and dict of str and dict of tuple and dict of str and float
+            The refactored properties dictionary.
         """
-        ## TO-DO: update content of the configuration to meet the need for property estimater
-        with open(os.path.join(self.tgtdir, self.prop_est_input)) as inputfile:
-            prop_est_configure = json.load(inputfile)
-        # validate the configure
-        assert 'client_conf' in prop_est_configure, 'missing client configure'
-        assert 'source_doi' in prop_est_configure, 'missing source_doi'
-        assert 'weights' in prop_est_configure, 'missing weights'
-        assert 'denoms' in prop_est_configure, 'missing denoms'
-        return prop_est_configure
+
+        refactored_properties = {}
+
+        for substance_id in properties:
+
+            for physical_property in properties[substance_id]:
+
+                class_name = physical_property.__class__.__name__
+
+                temperature = physical_property.thermodynamic_state.temperature.to(unit.kelvin).magnitude
+                pressure = physical_property.thermodynamic_state.pressure.to(unit.atmosphere).magnitude
+
+                state_tuple = (f'{temperature:.6f}', f'{pressure:.6f}')
+
+                default_unit = PropertyEstimate_SMIRNOFF.default_units[class_name]
+
+                value = physical_property.value.to(default_unit).magnitude
+                uncertainty = physical_property.uncertainty.to(default_unit).magnitude
+
+                if class_name not in refactored_properties:
+                    refactored_properties[class_name] = {}
+
+                if substance_id not in refactored_properties[class_name]:
+                    refactored_properties[class_name][substance_id] = {}
+
+                refactored_properties[class_name][substance_id][state_tuple] = {
+                    'value': value,
+                    'uncertainty': uncertainty
+                }
+
+        return refactored_properties
+
+    def _initialize(self):
+        """Initializes the property estimator target from an input json file.
+
+        1. Reads the user specified input file.
+        2. Creates a `propertyestimator` client object.
+        3. Loads in a reference experimental data set.
+        4. Assigns and normalises weights for each property.
+        """
+
+        # Load in the options from a user provided JSON file.
+        print(f'{os.path.join(self.tgtdir, self.prop_est_input)}')
+        options_file_path = os.path.join(self.tgtdir, self.prop_est_input)
+        self._options = self.OptionsFile.from_json(options_file_path)
+
+        # Attempt to create a property estimator client object using the specified
+        # connection options.
+        self._client = PropertyEstimatorClient(connection_options=self._options.connection_options)
+
+        # Load in the experimental data set.
+        data_set_path = os.path.join(self.tgtdir, self._options.data_set_path)
+
+        with open(data_set_path, 'r') as file:
+            self._data_set = PhysicalPropertyDataSet.parse_json(file.read())
+
+        if len(self._data_set.properties) == 0:
+            raise ValueError('The physical property data set to optimise against is empty.')
+
+        # Convert the reference data into a more easily comparable form.
+        self._reference_properties = self._refactor_properties_dictionary(self._data_set.properties)
+
+        # Print the reference data, and count the number of instances of
+        # each property type.
+        printcool("Loaded experimental data from property estimator")
+
+        number_of_properties = {property_name: 0.0 for property_name in self._reference_properties}
+
+        for property_name in self._reference_properties:
+
+            for substance_id in self._reference_properties[property_name]:
+
+                dict_for_print = {}
+
+                for state_tuple in self._reference_properties[property_name][substance_id]:
+
+                    value = self._reference_properties[property_name][substance_id][state_tuple]['value']
+                    uncertainty = self._reference_properties[property_name][substance_id][state_tuple]['uncertainty']
+
+                    dict_for_print["%sK-%satm" % state_tuple] = ("%f+/-%f" % (value, uncertainty))
+
+                    number_of_properties[property_name] += 1.0
+
+                printcool_dictionary(dict_for_print, title="Reference %s (%s) data" % (property_name, substance_id))
+
+        # Assign and normalize weights for each phase point (average for now)
+        self._normalised_weights = {}
+
+        for property_name in self._reference_properties:
+
+            self._normalised_weights[property_name] = (self._options.weights[property_name] /
+                                                       number_of_properties[property_name])
+
+    def _parameter_value_from_gradient_key(self, gradient_key):
+        """Extracts the value of the parameter in the current
+        open force field object pointed to by a given
+        `ParameterGradientKey` object.
+
+        Parameters
+        ----------
+        gradient_key: ParameterGradientKey
+            The gradient key which points to the parameter of interest.
+
+        Returns
+        -------
+        unit.Quantity
+            The value of the parameter.
+        bool
+            Returns True if the parameter is a cosmetic one.
+        """
+
+        parameter_handler = self.FF.openff_forcefield.get_parameter_handler(gradient_key.tag)
+        parameter = parameter_handler.parameters[gradient_key.smirks]
+
+        attribute_split = re.split(r'(\d+)', gradient_key.attribute)
+        attribute_split = list(filter(None, attribute_split))
+
+        parameter_attribute = None
+        parameter_value = None
+
+        if hasattr(parameter, gradient_key.attribute):
+
+            parameter_attribute = gradient_key.attribute
+            parameter_value = getattr(parameter, parameter_attribute)
+
+        elif len(attribute_split) == 2:
+
+            parameter_attribute = attribute_split[0]
+
+            if hasattr(parameter, parameter_attribute):
+                parameter_index = int(attribute_split[1]) - 1
+
+                parameter_value_list = getattr(parameter, parameter_attribute)
+                parameter_value = parameter_value_list[parameter_index]
+
+        is_cosmetic = False
+
+        if parameter_attribute is None:
+            is_cosmetic = True
+
+        elif (parameter_attribute not in parameter._REQUIRED_SPEC_ATTRIBS and
+              parameter_attribute not in parameter._OPTIONAL_SPEC_ATTRIBS and
+              parameter_attribute not in parameter._INDEXED_ATTRIBS):
+
+            is_cosmetic = True
+
+        return openmm_quantity_to_pint(parameter_value), is_cosmetic
+
+    def _extract_physical_parameter_values(self):
+        """Extracts an array of the values of the physical parameters
+        (which are not cosmetic) from the current `FF.openff_forcefield`
+        object.
+
+        Returns
+        -------
+        np.ndarray
+            The array of values of shape (len(self._gradient_key_mappings),)
+        """
+
+        parameter_values = np.zeros(len(self._gradient_key_mappings))
+
+        for gradient_key, parameter_index in self._gradient_key_mappings.items():
+
+            parameter_value, _ = self._parameter_value_from_gradient_key(gradient_key)
+            expected_unit = self._parameter_units[gradient_key]
+
+            parameter_values[parameter_index] = parameter_value.to(expected_unit).magnitude
+
+        return parameter_values
+
+    def _build_pvals_jacobian(self, mvals, perturbation_amount=1.0e-4):
+        """Build the matrix which maps the gradients of properties with
+        respect to physical parameters to gradients with respect to
+        force balance mathematical parameters.
+
+        Parameters
+        ----------
+        mvals: np.ndarray
+            The current force balance mathematical parameters.
+        perturbation_amount: float
+            The amount to perturb the mathematical parameters by
+            when calculating the finite difference gradients.
+
+        Returns
+        -------
+        np.ndarray
+            A matrix of d(Physical Parameter)/d(Mathematical Parameter).
+        """
+
+        jacobian_list = []
+
+        for index in range(len(mvals)):
+
+            reverse_mvals = mvals.copy()
+            reverse_mvals[index] -= perturbation_amount
+
+            self.FF.make(reverse_mvals)
+            reverse_physical_values = self._extract_physical_parameter_values()
+
+            forward_mvals = mvals.copy()
+            forward_mvals[index] += perturbation_amount
+
+            self.FF.make(forward_mvals)
+            forward_physical_values = self._extract_physical_parameter_values()
+
+            gradients = (forward_physical_values - reverse_physical_values) / (2.0 * perturbation_amount)
+            jacobian_list.append(gradients)
+
+        # Make sure to restore the FF object back to its original state.
+        self.FF.make(mvals)
+
+        jacobian = np.array(jacobian_list)
+        return jacobian
 
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
         """
-        submit jobs for evaluating the objective function
+        Submit jobs for evaluating the objective function
 
         Parameters
         ----------
@@ -142,59 +427,189 @@ class PropertyEstimate_SMIRNOFF(Target):
         1. This function is called before wq_complete() and get().
         2. This function should not block.
         """
-        # numerical gradients
-        # create a structure for storing job ids for all perturbations
-        self.prop_est_job_ids = {'0': None, '-h': [], '+h': []}
-        # step 1: submit evalutation with zero perturbation
-        self.prop_est_job_ids['0'] = self.submit_property_estimate(mvals)
-        logger.info('One job submitted to property estimator\n')
-        # step 2: submit evaluation with -h and +h perturbations
-        if AGrad is True:
-            for i_m in range(len(mvals)):
-                for d_h in ['-h', '+h']:
-                    delta_m = -self.liquid_fdiff_h if d_h == '-h' else +self.liquid_fdiff_h
-                    # copy the original mvals and perturb
-                    new_mvals = copy.deepcopy(mvals)
-                    new_mvals[i_m] += delta_m
-                    # submit the single job with perturbation
-                    job_id = self.submit_property_estimate(new_mvals, reweight=True)
-                    # store the job id
-                    self.prop_est_job_ids[d_h].append(job_id)
-            logger.info('%d jobs with +- perturbations and reweight submitted to property estimator\n' % (len(mvals)*2))
-        # create a dictionary to store job data
-        self.prop_est_job_state = {}
-        for job_id in [self.prop_est_job_ids['0']] + self.prop_est_job_ids['-h'] + self.prop_est_job_ids['+h']:
-            self.prop_est_job_state[job_id] = "submitted"
 
-    def submit_property_estimate(self, mvals, reweight=False):
-        """
-        submit a single property estimate job
+        # Make the force field based on the current values of the parameters.
+        self.FF.make(mvals)
+
+        force_field = smirnoff.ForceField(self.FF.offxml, allow_cosmetic_attributes=True)
+
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.offxml') as file:
+            force_field.to_file(file.name, discard_cosmetic_attributes=True)
+            force_field = smirnoff.ForceField(file.name)
+
+        # Determine which gradients (if any) we should be estimating.
+        parameter_gradient_keys = []
+
+        self._gradient_key_mappings = {}
+        self._parameter_units = {}
+
+        if AGrad is True:
+
+            index_counter = 0
+
+            for field_list in self.FF.pfields:
+
+                string_key = field_list[0]
+                key_split = string_key.split('/')
+
+                parameter_tag = key_split[0].strip()
+                parameter_smirks = key_split[3].strip()
+                parameter_attribute = key_split[2].strip()
+
+                # Use the full attribute name (e.g. k1) for the gradient key.
+                parameter_gradient_key = ParameterGradientKey(tag=parameter_tag,
+                                                              smirks=parameter_smirks,
+                                                              attribute=parameter_attribute)
+
+                # Find the unit of the gradient parameter.
+                parameter_value, is_cosmetic = self._parameter_value_from_gradient_key(parameter_gradient_key)
+
+                if parameter_value is None or is_cosmetic:
+                    # We don't wan't gradients w.r.t. cosmetic parameters.
+                    continue
+
+                parameter_unit = parameter_value.units
+                parameter_gradient_keys.append(parameter_gradient_key)
+
+                self._gradient_key_mappings[parameter_gradient_key] = index_counter
+                self._parameter_units[parameter_gradient_key] = parameter_unit
+
+                index_counter += 1
+
+        # Submit the estimation request.
+        self._pending_estimate_request = self._client.request_estimate(property_set=self._data_set,
+                                                                       force_field=force_field,
+                                                                       options=self._options.estimation_options,
+                                                                       parameter_gradient_keys=parameter_gradient_keys)
+
+        logger.info(f'Requesting the estimation of {self._data_set.number_of_properties} properties, and '
+                    f'their gradients with respect to {len(parameter_gradient_keys)} parameters.\n')
+
+        self._pending_estimate_request.results(True)
+
+    @staticmethod
+    def _check_estimation_request(estimation_request):
+        """Checks whether a property estimation request has finished
+        with any exceptions.
 
         Parameters
         ----------
-        mvals: np.ndarray
-            mvals array containing the math values of the parameters
-        reweight: bool
-            use reweight to or not
+        estimation_request: PropertyEstimatorClient.Request
+            The request to check.
+        """
+        results = estimation_request.results()
+
+        if results is None:
+            raise ValueError('Trying to extract the results of an unfinished request.')
+
+        # Check for any exceptions that were raised while estimating
+        # the properties.
+        if isinstance(results, PropertyEstimatorException):
+            raise ValueError(f'An uncaught exception occured within the property '
+                             f'estimator (directory={results.directory}: {results.message}')
+
+        if len(results.unsuccessful_properties) > 0:
+
+            exceptions = '\n'.join(f'{result.directory}: {result.message}'
+                                   for result in results.exceptions)
+
+            raise ValueError(f'Some properties could not be estimated:\n\n{exceptions}.')
+
+        elif len(results.exceptions) > 0:
+
+            exceptions = '\n'.join(f'{result.directory}: {result.message}'
+                                   for result in results.exceptions)
+
+            # In some cases, an exception will be raised when executing a property but
+            # it will not stop the property from being estimated (e.g an error occured
+            # while reweighting so a simulation was used to estimate the property instead).
+            logger.warning(f'A number of non-fatal exceptions occured:\n\n{exceptions}')
+
+    def _extract_property_data(self, estimation_request, mvals, AGrad):
+        """Extract the property estimates #and their gradients#
+        from a relevant property estimator request object.
+
+        Parameters
+        ----------
+        estimation_request: PropertyEstimatorClient.Request
+            The request to extract the data from.
 
         Returns
         -------
-        job_id: str
-            The ID of the submitted job
+        dict of str and dict of str and dict of tuple and dict of str and float
+            The estimated properties in a dictionary of the form
+            `property = dict[property_type][substance_id][state_tuple]['value' or 'uncertainty']`
+        dict of str, Any, optional
+            The estimated gradients in a force balance dictionary.
         """
-        # write a force field file with the current mvals
-        # self.FF.offxml file will be overwritten using new parameters
-        self.FF.make(mvals)
-        ## TO-DO: implement real submit job
-        job_spec = {
-            'offxml': self.FF.offxml, # offxml filename
-            'ref_doi': self.prop_est_configure['source_doi'], # doi string
-            'reweight': reweight,
-        }
-        # job_id = self.client.submit_property_estimate(job_spec)
-        ## mock
-        job_id = '1293791'
-        return job_id
+        # Make sure the request actually finished and was error free.
+        PropertyEstimate_SMIRNOFF._check_estimation_request(estimation_request)
+
+        # Extract the results from the request.
+        results = estimation_request.results()
+
+        estimated_data = PropertyEstimate_SMIRNOFF._refactor_properties_dictionary(results.estimated_properties)
+        estimated_gradients = {}
+
+        if AGrad is False:
+            return estimated_data, estimated_gradients
+
+        jacobian = self._build_pvals_jacobian(mvals)
+
+        # The below snippet will extract any property estimator calculated
+        # gradients.
+        for substance_id in results.estimated_properties:
+
+            for physical_property in results.estimated_properties[substance_id]:
+
+                # Convert the property estimator properties list into
+                # a force balance dictionary.
+                class_name = physical_property.__class__.__name__
+
+                # Pull out any estimated gradients.
+                if class_name not in estimated_gradients:
+                    estimated_gradients[class_name] = {}
+
+                if substance_id not in estimated_gradients[class_name]:
+                    estimated_gradients[class_name][substance_id] = {}
+
+                temperature = physical_property.thermodynamic_state.temperature.to(unit.kelvin).magnitude
+                pressure = physical_property.thermodynamic_state.pressure.to(unit.atmosphere).magnitude
+
+                state_tuple = (f'{temperature:.6f}', f'{pressure:.6f}')
+
+                if state_tuple not in estimated_gradients[class_name][substance_id]:
+
+                    estimated_gradients[class_name][substance_id][state_tuple] = \
+                        np.zeros(len(self._gradient_key_mappings))
+
+                for gradient in physical_property.gradients:
+
+                    parameter_index = self._gradient_key_mappings[gradient.key]
+                    gradient_unit = self.default_units[class_name] / self._parameter_units[gradient.key]
+
+                    logger.info(f'Gradient Value: {gradient.value} Expected Unit: {gradient_unit}\n')
+
+                    if isinstance(gradient.value, unit.Quantity):
+                        gradient_value = gradient.value.to(gradient_unit).magnitude
+                    else:
+                        gradient_value = gradient.value
+                        assert isinstance(gradient_value, float)
+
+                    estimated_gradients[class_name][substance_id][state_tuple][parameter_index] = gradient_value
+
+        for property_type in estimated_gradients:
+
+            for substance_id in estimated_gradients[property_type]:
+
+                for state_tuple in estimated_gradients[property_type][substance_id]:
+
+                    pval_gradients = estimated_gradients[property_type][substance_id][state_tuple]
+                    mval_gradients = np.matmul(jacobian, pval_gradients)
+
+                    estimated_gradients[property_type][substance_id][state_tuple] = mval_gradients
+
+        return estimated_data, estimated_gradients
 
     def wq_complete(self):
         """
@@ -206,74 +621,11 @@ class PropertyEstimate_SMIRNOFF(Target):
         finished: bool
             True if all jobs are finished, False if not
         """
-        # check status of the jobs that are not finished
-        unfinished_job_ids = [job_id for job_id, status in self.prop_est_job_state.items() if status != 'COMPLETE']
-        if len(unfinished_job_ids) == 0:
-            return True
-        else:
-            for job_id in unfinished_job_ids:
-                ## TO-DO: update function below for checking if job finished
-                # status = self.client.check_job_status(job_id)
-                # mock
-                status = 'COMPLETE'
-                self.prop_est_job_state[job_id] = status
-            # check again if all jobs just finished
-            if all(self.prop_est_job_state[job_id] == 'COMPLETE' for job_id in unfinished_job_ids):
-                return True
-            else:
-                logger.info("%d/%d property estimate jobs finished\n" % (len(unfinished_job_ids), len(self.prop_est_job_state)))
-                time.sleep(10)
 
-    def download_property_estimate_data(self, job_id):
-        """
-        download property estimate data from server
+        estimation_results = self._pending_estimate_request.results()
 
-        Parameters
-        ----------
-        job_id: string
-            job_id received when submitting the job
-
-        Returns
-        -------
-        property_data: dict
-            dictionary of property data
-        """
-        ## TO-DO: implement real downlaod data from server
-        # data = self.client.download_data(job_id)
-        ## mock:
-        prop_est_data = {
-            'values': {
-                'density': {
-                    (298.15, 1.0): 1.03,
-                    (328.15, 1.0): 0.95,
-                },
-                'dielectric': {
-                    (298.15, 1.0): 0.64,
-                    (328.15, 1.0): 0.44,
-                },
-                'Hvap': {
-                    (298.15, 1.0): 0.61,
-                    (328.15, 1.0): 0.43,
-                }
-            },
-            'value_errors': {
-                'density': {
-                    (298.15, 1.0): 0.03,
-                    (328.15, 1.0): 0.04,
-                },
-                'dielectric': {
-                    (298.15, 1.0): 0.04,
-                    (328.15, 1.0): 0.05,
-                },
-                'Hvap': {
-                    (298.15, 1.0): 0.06,
-                    (328.15, 1.0): 0.04,
-                }
-            }
-        }
-        return prop_est_data
-
-
+        return (isinstance(estimation_results, PropertyEstimatorException) or
+                len(estimation_results.queued_properties) == 0)
 
     def get(self, mvals, AGrad=True, AHess=True):
         """
@@ -287,7 +639,6 @@ class PropertyEstimate_SMIRNOFF(Target):
             Flag for computing gradients of not
         AHess: bool
             Flag for computing hessian or not
-
 
         Returns
         -------
@@ -303,67 +654,78 @@ class PropertyEstimate_SMIRNOFF(Target):
         2. obj_hess is all zero when AHess == False or AGrad == False, because the hessian estimate
         depends on gradients
         """
-        # downlaod property data for unperturbed simulation
-        job_id_0 = self.prop_est_job_ids['0']
-        prop_est_data = self.download_property_estimate_data(job_id_0)
-        # download purturbed property values and do finite-difference calculations
-        if AGrad is True:
-            assert len(self.prop_est_job_ids['-h']) == self.FF.np, 'number of submitted jobs not consistent'
-            zero_grad = np.zeros(self.FF.np)
-            prop_est_gradients = {}
-            for property_name in self.ref_data:
-                prop_est_gradients[property_name] = {}
-                for phase_point in self.ref_data[property_name]:
-                    prop_est_gradients[property_name][phase_point] = zero_grad
-            for i_m in range(len(mvals)):
-                job_id_minus_h = self.prop_est_job_ids['-h'][i_m]
-                prop_est_data_minus_h = self.download_property_estimate_data(job_id_minus_h)
-                job_id_plus_h = self.prop_est_job_ids['+h'][i_m]
-                prop_est_data_plus_h = self.download_property_estimate_data(job_id_plus_h)
-                for property_name in prop_est_gradients:
-                    for phase_point in prop_est_gradients[property_name]:
-                        value_plus = prop_est_data_plus_h[property_name][phase_point]
-                        value_minus = prop_est_data_minus_h[property_name][phase_point]
-                        # three point formula
-                        grad = (value_plus - value_minus) / (self.liquid_fdiff_h * 2)
-                        prop_est_gradients[property_name][phase_point][i_m] = grad
+
+        # Ensure the input flags are actual booleans.
+        AGrad = bool(AGrad)
+        AHess = bool(AHess)
+
+        # Extract the properties estimated using the unperturbed parameters.
+        estimated_property_data, estimated_gradients = self._extract_property_data(self._pending_estimate_request,
+                                                                                   mvals, AGrad)
+
         # compute objective value
         obj_value = 0.0
         obj_grad = np.zeros(self.FF.np)
-        obj_hess = np.zeros((self.FF.np,self.FF.np))
+        obj_hess = np.zeros((self.FF.np, self.FF.np))
+
         # store details for printing
-        self.last_obj_details = {}
-        for property_name in self.ref_data:
-            self.last_obj_details[property_name] = []
-            denom = self.prop_est_configure['denoms'][property_name]
-            weight = self.property_weights[property_name]
-            for phase_point_key in self.ref_data[property_name]:
-                temperature, pressure = phase_point_key
-                ref_value = self.ref_data[property_name][phase_point_key]
-                ## TO-DO: load computed value and standard error from real data
-                tar_value = prop_est_data['values'][property_name][(temperature, pressure)]
-                tar_error = prop_est_data['value_errors'][property_name][(temperature, pressure)]
-                diff = tar_value - ref_value
-                obj_contrib = weight * (diff / denom)**2
-                obj_value += obj_contrib
-                self.last_obj_details[property_name].append((temperature, pressure, ref_value, tar_value, tar_error, diff, weight, denom, obj_contrib))
-                # compute objective gradient
-                if AGrad is True:
-                    param_names = self.FF.plist
-                    # get gradients in physical unit
-                    grad_array = prop_est_gradients[property_name][phase_point_key]
+        self._last_obj_details = {}
+
+        for property_name in self._reference_properties:
+
+            self._last_obj_details[property_name] = []
+
+            denominator = self._options.denominators[property_name]
+            weight = self._normalised_weights[property_name]
+
+            for substance_id in self._reference_properties[property_name]:
+
+                for phase_point_key in self._reference_properties[property_name][substance_id]:
+
+                    temperature, pressure = phase_point_key
+                    reference_value = self._reference_properties[property_name][substance_id][phase_point_key]['value']
+
+                    target_value = estimated_property_data[property_name][substance_id][phase_point_key]['value']
+                    target_error = estimated_property_data[property_name][substance_id][phase_point_key]['uncertainty']
+
+                    diff = target_value - reference_value
+
+                    obj_contrib = weight * (diff / denominator) ** 2
+                    obj_value += obj_contrib
+
+                    self._last_obj_details[property_name].append((temperature,
+                                                                  pressure,
+                                                                  substance_id,
+                                                                  reference_value,
+                                                                  target_value,
+                                                                  target_error,
+                                                                  diff,
+                                                                  weight,
+                                                                  denominator,
+                                                                  obj_contrib))
+
                     # compute objective gradient
-                    this_obj_grad = 2.0 * weight * diff * grad_array / denom**2
-                    if AHess is True:
-                        obj_hess += 2.0 * weight * (np.outer(grad_array, grad_array)) / denom**2
-        return {'X':obj_value, 'G':obj_grad, 'H':obj_hess}
+                    if AGrad is True:
+
+                        # get gradients in physical unit
+                        grad_array = estimated_gradients[property_name][substance_id][phase_point_key]
+                        # compute objective gradient
+                        obj_grad += 2.0 * weight * diff * grad_array / denominator ** 2
+
+                        if AHess is True:
+                            obj_hess += 2.0 * weight * (np.outer(grad_array, grad_array)) / denominator ** 2
+
+        return {'X': obj_value, 'G': obj_grad, 'H': obj_hess}
 
     def indicate(self):
         """
         print information into the output file about the last objective function evaluated
         This function should be called after get()
         """
-        for property_name, details in self.last_obj_details.items():
-            dict_for_print = {"  %9.2fK %7.1fatm" % detail[:2] : "%9.3f %14.3f +- %-7.3f % 7.3f % 9.5f % 9.5f % 9.5f " % detail[2:] for detail in details}
-            title = '%s %s\nTemperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Denom     Term  ' % (self.name, property_name)
+        for property_name, details in self._last_obj_details.items():
+            dict_for_print = {
+                "  %sK %satm %s" % detail[:3]: "%9.3f %14.3f +- %-7.3f % 7.3f % 9.5f % 9.5f % 9.5f " % detail[3:] for
+                detail in details}
+            title = '%s %s\nTemperature  Pressure Substance  Reference  Calculated +- Stdev     Delta    Weight    ' \
+                    'Denom     Term  ' % (self.name, property_name)
             printcool_dictionary(dict_for_print, title=title, bold=True, color=4, keywidth=15)

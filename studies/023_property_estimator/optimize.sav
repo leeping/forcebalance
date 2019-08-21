@@ -54,6 +54,18 @@ priors
    vdW/Atom/rmin_half                   : 1.0
 /priors      
 
+read_mvals
+   0 [  1.29131856e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [  6.66496944e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [ -2.31633686e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [ -2.40326851e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [ -1.70038375e-02 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [ -3.06355272e-03 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [ -9.66905467e-03 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [ -1.43411169e-02 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [ -5.81495849e-03 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [ -6.96277985e-02 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+/read_mvals
 $end
 
 $target

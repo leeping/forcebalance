@@ -100,11 +100,13 @@ from builtins import range
 import os
 import sys
 import numpy as np
+import networkx as nx
 from numpy import sin, cos, tan, sinh, cosh, tanh, exp, log, sqrt, pi
 from re import match, sub, split
 import forcebalance
 from forcebalance import gmxio, qchemio, tinkerio, custom_io, openmmio, amberio, psi4io, smirnoffio
 from forcebalance.finite_difference import in_fd
+from forcebalance.smirnoffio import assign_openff_parameter
 from forcebalance.nifty import *
 # from string import count
 from copy import deepcopy
@@ -259,6 +261,10 @@ class FF(forcebalance.BaseClass):
         ## force field file, we go to the specific line/field in a given file
         ## and change the number.
         self.pfields     = []
+        ## Improved representation of pfields as a networkx graph
+        self.pTree       = nx.DiGraph()
+        # unit strings that might appear in offxml file
+        self.offxml_unit_strs = defaultdict(str)
         ## List of rescaling factors
         self.rs          = []
         ## The transformation matrix for mathematical -> physical parameters
@@ -448,7 +454,11 @@ class FF(forcebalance.BaseClass):
             if hasattr(self, "offxml"):
                 warn_press_key("There should only be one SMIRNOFF XML file - confused!!")
             else:
+                # OpenFF force field wants parameters to be modified using its API, so we enable that here
+                from openforcefield.typing.engines.smirnoff import ForceField as OpenFF_ForceField
                 self.offxml = ffname
+                self.openff_forcefield = OpenFF_ForceField(os.path.join(self.root, self.ffdir, self.offxml),
+                                                           allow_cosmetic_attributes=True)
 
         self.amber_mol2 = []
         if fftype == "mol2":
@@ -695,7 +705,12 @@ class FF(forcebalance.BaseClass):
                     raise RuntimeError
                 pid = self.Readers[ffname].build_pid(e, p)
                 self.map[pid] = self.np
-                self.assign_p0(self.np,float(e.get(p)))
+                # offxml file later than v0.3 may have unit strings in the field
+                quantity_str = e.get(p)
+                res = re.search(r'^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?', quantity_str)
+                value_str, unit_str = quantity_str[:res.end()], quantity_str[res.end():]
+                self.assign_p0(self.np, float(value_str))
+                self.offxml_unit_strs[pid] = unit_str
                 self.assign_field(self.np,pid,ffname,fflist.index(e),p,1)
                 self.np += 1
                 self.patoms.append([])
@@ -713,6 +728,11 @@ class FF(forcebalance.BaseClass):
                 else:
                     warn_press_key("Warning: You wanted to copy parameter from %s to %s, but the source parameter does not seem to exist!" % (src, dest))
                 self.assign_field(self.map[dest],dest,ffname,fflist.index(e),parameter_name,1)
+                quantity_str = e.get(parameter_name)
+                res = re.search(r'^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?', quantity_str)
+                value_str, unit_str = quantity_str[:res.end()], quantity_str[res.end():]
+                quantity_str = e.get(parameter_name)
+                self.offxml_unit_strs[dest] = unit_str
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
             for field in e.get('parameter_eval').split(','):
@@ -723,6 +743,11 @@ class FF(forcebalance.BaseClass):
                 dest = self.Readers[ffname].build_pid(e, parameter_name)
                 evalcmd  = field.strip().split('=', 1)[1]
                 self.assign_field(None,dest,ffname,fflist.index(e),parameter_name,None,evalcmd)
+                quantity_str = e.get(parameter_name)
+                res = re.search(r'^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?', quantity_str)
+                value_str, unit_str = quantity_str[:res.end()], quantity_str[res.end():]
+                quantity_str = e.get(parameter_name)
+                self.offxml_unit_strs[dest] = unit_str
 
     def make(self,vals=None,use_pvals=False,printdir=None,precision=12):
         """ Create a new force field using provided parameter values.
@@ -741,6 +766,7 @@ class FF(forcebalance.BaseClass):
         stored values in the class state, but I don't think that's a good idea anymore.
         @param[in] use_pvals Switch for whether to bypass the coordinate transformation
         and use physical parameters directly.
+        @param[in] precision Number of decimal points to print out
 
         """
         if type(vals)==np.ndarray and vals.ndim != 1:
@@ -811,7 +837,12 @@ class FF(forcebalance.BaseClass):
             else:
                 wval = mult*pvals[self.map[pid]]
             if self.ffdata_isxml[fnm]:
-                xml_lines[fnm][ln].attrib[fld] = OMMFormat % (wval)
+                # offxml files with version higher than 0.3 may have unit strings in the field
+                xml_lines[fnm][ln].attrib[fld] = OMMFormat % (wval) + self.offxml_unit_strs[pid]
+                # If this is a SMIRNOFF parameter, assign it directly in the openforcefield.ForceField object
+                # as well as writing out the file.
+                if fnm == self.offxml:
+                    assign_openff_parameter(self.openff_forcefield, wval, pid)
                 # list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (wval)
             # Text force fields are a bit harder.
             # Our pointer is given by the line and field number.
@@ -1443,6 +1474,10 @@ class FF(forcebalance.BaseClass):
 
         Note that parameters can have multiple locations because of the repetition functionality.
 
+        LPW 2019-07-08: Build a graph representation of the parameters where each node is a specific parameter
+        in the force field file, and contains attributes such as the mathematical ID, file name, etc.
+        This is an improved representation of the data contained in self.pfields.
+
         @param[in] idx  The (not necessarily unique) index of the parameter.
         @param[in] pid  The unique parameter name.
         @param[in] fnm  The file name of the parameter field.
@@ -1451,7 +1486,52 @@ class FF(forcebalance.BaseClass):
         @param[in] mult The multiplier (this is usually 1.0)
 
         """
+        self.pTree.add_node(pid, param_mathid=idx, file_name=fnm, line_number=ln, field_number=pfld, multiplier=mult, evalcmd=cmd)
+
+        if cmd:
+            # Matches dictionary keys in a string like this: 
+            # Given string: PRM['Bonds/Bond/k/[#6X3:1]-[#6X3:2]']*np.arccos(PRM["[*:1]~[#7X3$(*~[#6X3]):2](~[*:3])~[*:4]"])
+            # Returns: (['Bonds/Bond/k/[#6X3:1]-[#6X3:2]'], ["[*:1]~[#7X3$(*~[#6X3]):2](~[*:3])~[*:4]"])
+            matches = re.findall("\[['\"][^'\"]*['\"]\]", cmd)
+            for word in matches:
+                src_param_name = re.sub("\[['\"]|['\"]\]", "", word)
+                src_nodes = [x for x in self.pTree.nodes() if x==src_param_name]
+                if len(src_nodes) > 1:
+                    raise RuntimeError('Detected multiple nodes in pTree with the same name; this should not happen')
+                elif src_nodes:
+                    if src_nodes[0] == pid:
+                        raise RuntimeError('Evaluated parameter depends on itself')
+                    # This makes a graph where the evaluated parameter is called the "successor"
+                    # and the original parameter is called the "predecessor"
+                    # Arrows point from successors to predecessors in the plot representation
+                    self.pTree.add_edge(pid, src_nodes[0])
+                else:
+                    raise RuntimeError('Evaluated parameter refers to a source parameter that does not exist')
+                
         self.pfields.append([pid,fnm,ln,pfld,mult,cmd])
+
+    def plot_parameter_tree(fnm):
+        ## Save the force field network graph to a PDF file.
+        import matplotlib.pyplot as plt
+        plt.switch_backend('agg')
+        fig, ax = plt.subplots()
+        fig.set_size_inches(12, 8)
+        plt.sca(ax)
+        nx.draw(self.pTree, with_labels=True)
+        fig.savefig(fnm)
+
+    def get_mathid(self, pid):
+        """
+        For a given unique parameter identifier, return all of the mvals that it is connected to.
+        """
+        mathids = []
+        if nx.get_node_attributes(self.pTree, 'param_mathid')[pid] is not None:
+            mathids.append(nx.get_node_attributes(self.pTree, 'param_mathid')[pid])
+        
+        for node in nx.dfs_predecessors(self.pTree, pid).keys():
+            if nx.get_node_attributes(self.pTree, 'param_mathid')[node] is not None:
+                mathids.append(nx.get_node_attributes(self.pTree, 'param_mathid')[node])
+        return mathids
 
     def __eq__(self, other):
         # check equality of forcefields using comparison of pfields and map

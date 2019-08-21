@@ -15,13 +15,13 @@ penalty_type L2
 jobtype optimize
 
 # (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
-forcefield smirnoff99Frosst.offxml
+forcefield smirnoff99Frosst_experimental.offxml
 
 # (int) Maximum number of steps in an optimization
 maxstep 100
 
 # (float) Convergence criterion of step size (just needs to fall below this threshold)
-convergence_step 0.1
+convergence_step 0.01
 
 # (float) Convergence criterion of objective function (in MainOptimizer this is the stdev of x2 over 10 steps)
 convergence_objective 0.1
@@ -49,13 +49,13 @@ normalize_weights no
 constrain_charge false
 
 priors
-    Bonds/Bond/k                    1.0e+01
-    Bonds/Bond/length               1.0e-02
-    Angles/Angle/k                  1.0e+01
-    Angles/Angle/angle              1.0e+01
-    ProperTorsions/Proper/k1        1.0e+00
-    vdW/Atom/epsilon                1.0e-02
-    vdW/Atom/rmin_half              1.0e-01
+   Bonds/Bond/k                         : 1.0e+01
+   Bonds/Bond/length                    : 1.0e-01
+   Angles/Angle/k                       : 1.0e+01
+   Angles/Angle/angle                   : 1.0e+01
+   ProperTorsions/Proper/k              : 1.0e+01
+   vdW/Atom/epsilon                     : 1.0e-01
+   vdW/Atom/rmin_half                   : 1.0e-01
 /priors
 
 $end
@@ -74,7 +74,6 @@ pdb input.pdb
 mol2 9HXanthene.mol2
 weight 1.0
 # (float) Wavenumber tolerance, normalizes the objective function.
-# This is set to a large value only for demo purpose
 wavenumber_tol 200.0
 $end
 
