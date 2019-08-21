@@ -301,8 +301,8 @@ class Hydration(Target):
         """ Calculate HFEs using single point evaluation. """
         hfe = OrderedDict()
         for mnm in self.IDs:
-            eliq, rmsdliq = self.liq_engines[mnm].optimize()
-            egas, rmsdgas = self.gas_engines[mnm].optimize()
+            eliq, rmsdliq, _ = self.liq_engines[mnm].optimize()
+            egas, rmsdgas, _ = self.gas_engines[mnm].optimize()
             hfe[mnm] = eliq - egas
         return hfe
 

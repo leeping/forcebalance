@@ -266,6 +266,7 @@ tgt_opts_types = {
                  "nonbonded_cutoff"  : (None, -1, 'Cutoff for nonbonded interactions (passed to engines).', 'Condensed phase property targets', 'liquid'),
                  "vdw_cutoff"        : (None, -2, 'Cutoff for vdW interactions if different from other nonbonded interactions', 'Condensed phase property targets', 'liquid'),
                  "liquid_fdiff_h" : (1e-2, 0, 'Step size for finite difference derivatives for liquid targets in pure_num_grad', 'Condensed phase property targets', 'liquid'),
+                 "restrain_k"     : (1.0, 0, 'Force constant for harmonic positional energy restraints', 'Torsion profile with MM relaxation target', 'torsionprofile'),
                  },
     'sections': {}
     }

@@ -3273,13 +3273,14 @@ class Molecule(object):
                     thisatomname = line[10:15].strip()
                     atomname.append(thisatomname)
 
-                    pdeci = [i for i, x in enumerate(line) if x == '.']
-                    ndeci = pdeci[1] - pdeci[0] - 5
-
                     thiselem = sline[1]
                     if len(thiselem) > 1:
                         thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
                     elem.append(thiselem)
+
+                if ln == 2:
+                    pdeci = [i for i, x in enumerate(line) if x == '.']
+                    ndeci = pdeci[1] - pdeci[0] - 5
 
                 for i in range(1,4):
                     try:
