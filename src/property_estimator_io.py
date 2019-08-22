@@ -537,11 +537,12 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         Returns
         -------
-        dict of str and dict of str and dict of tuple and dict of str and float
+        estimated_data: dict[str][str][tuple][str] : float
             The estimated properties in a dictionary of the form
-            `property = dict[property_type][substance_id][state_tuple]['value' or 'uncertainty']`
-        dict of str, Any, optional
-            The estimated gradients in a force balance dictionary.
+            `estimated_data = dict[property_type][substance_id][state_tuple]['value' or 'uncertainty']`
+        estimated_gradients: dict[str][str][tuple]: np.array of shape (n_params,)
+            The estimated gradients in a dictionary.
+            `estimated_gradients = dict[property_type][substance_id][state_tuple] = mval_gradients`
         """
         # Make sure the request actually finished and was error free.
         PropertyEstimate_SMIRNOFF._check_estimation_request(estimation_request)
