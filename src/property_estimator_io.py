@@ -36,7 +36,7 @@ try:
     from openforcefield.typing.engines import smirnoff
 except ImportError:
     warn_once("Failed to import the openforcefield package.")
-    
+
 
 class PropertyEstimate_SMIRNOFF(Target):
     """A custom optimisation target which employs the propertyestimator
@@ -192,7 +192,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         Returns
         -------
-        dict of str and dict of str and dict of tuple and dict of str and float
+        refactored_properties: dict[str][str][tuple][str] : float
             The refactored properties dictionary.
         """
 
@@ -433,6 +433,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         force_field = smirnoff.ForceField(self.FF.offxml, allow_cosmetic_attributes=True)
 
+        # strip out cosmetic attributes
         with tempfile.NamedTemporaryFile(mode='w', suffix='.offxml') as file:
             force_field.to_file(file.name, discard_cosmetic_attributes=True)
             force_field = smirnoff.ForceField(file.name)
