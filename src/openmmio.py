@@ -1193,8 +1193,8 @@ class OpenMM(Engine):
         for logc in np.linspace(0, np.log10(crit), steps):
             self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=100000)
         # check if energy minimization is successful
-        # try 10 times as openmm minimizer is not very stable at the tolerance
-        for _ in range(10):
+        # try 1000 times with 10 steps each as openmm minimizer is not very stable at the tolerance
+        for _ in range(1000):
             e_minimized = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
             self.simulation.minimizeEnergy(tolerance=crit*kilojoule_per_mole, maxIterations=10)
             e_new = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
