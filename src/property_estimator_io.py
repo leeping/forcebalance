@@ -16,7 +16,6 @@ import numpy as np
 from forcebalance.nifty import warn_once, printcool, printcool_dictionary
 from forcebalance.output import getLogger
 from forcebalance.target import Target
-from propertyestimator.properties import ParameterGradientKey
 
 logger = getLogger(__name__)
 
@@ -29,6 +28,7 @@ try:
     from propertyestimator.utils.openmm import openmm_quantity_to_pint
     from propertyestimator.utils.serialization import TypedJSONDecoder, TypedJSONEncoder
     from propertyestimator.workflow import WorkflowOptions
+    from propertyestimator.properties import ParameterGradientKey
 except ImportError:
     warn_once("Failed to import the propertyestimator package.")
 
@@ -143,11 +143,13 @@ class PropertyEstimate_SMIRNOFF(Target):
             return value
 
     # A dictionary of the units that force balance expects each property in.
-    default_units = {
-        'Density': unit.kilogram / unit.meter ** 3,
-        'DielectricConstant': unit.dimensionless,
-        'EnthalpyOfVaporization': unit.kilojoules / unit.mole
-    }
+    @property
+    def default_units(self):
+        return {
+            'Density': unit.kilogram / unit.meter ** 3,
+            'DielectricConstant': unit.dimensionless,
+            'EnthalpyOfVaporization': unit.kilojoules / unit.mole
+        }
 
     def __init__(self, options, tgt_opts, forcefield):
 
@@ -178,8 +180,7 @@ class PropertyEstimate_SMIRNOFF(Target):
         # Initialize the target.
         self._initialize()
 
-    @staticmethod
-    def _refactor_properties_dictionary(properties):
+    def _refactor_properties_dictionary(self, properties):
         """Refactors a property dictionary of the form
         `property = dict[substance_id][property_index]` to one of the form
         `property = dict[property_type][substance_id][state_tuple]['value' or 'uncertainty']` where
@@ -209,7 +210,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
                 state_tuple = (f'{temperature:.6f}', f'{pressure:.6f}')
 
-                default_unit = PropertyEstimate_SMIRNOFF.default_units[class_name]
+                default_unit = self.default_units[class_name]
 
                 value = physical_property.value.to(default_unit).magnitude
                 uncertainty = physical_property.uncertainty.to(default_unit).magnitude
