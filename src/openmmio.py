@@ -732,7 +732,7 @@ class OpenMM(Engine):
             self.mmopts['removeCMMotion'] = False
 
         ## Generate list of OpenMM-compatible positions
-        self.generate_xyz_omm(self.mol)
+        mod = self.generate_xyz_omm(self.mol)
             
         ## Build a topology and atom lists.
         Top = mod.getTopology()
@@ -769,6 +769,7 @@ class OpenMM(Engine):
                 box_omm = None
             # Finally append it to list.
             self.xyz_omms.append((mod.getPositions(), box_omm))
+        return mod
 
     def create_simulation(self, timestep=1.0, faststep=0.25, temperature=None, pressure=None, anisotropic=False, mts=False, collision=1.0, nbarostat=25, rpmd_beads=0, **kwargs):
 
