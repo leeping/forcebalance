@@ -222,6 +222,20 @@ def GetVirtualSiteParameters(system):
                 vsprm.append(_openmm.OutOfPlaneSite_getWeightCross(vs))
     return np.array(vsprm)
 
+def GetDrudeParameters(system):
+    drude_particle = []
+    drude_screen = []
+    for f in system.getForces():
+        if f.__class__.__name__ == "DrudeForce":
+            for i in range(f.getNumParticles()):
+                drude_particle.append(f.getParticleParameters(i)[5]._value)
+                drude_particle.append(f.getParticleParameters(i)[6]._value)
+                drude_particle.append(f.getParticleParameters(i)[7])
+                drude_particle.append(f.getParticleParameters(i)[8])
+            for i in range(f.getNumScreenedPairs()):
+                drude_screen.append(f.getScreenedPairParameters(i)[2])
+    return np.array(drude_particle), np.array(drude_screen)
+
 def CopyAmoebaBondParameters(src,dest):
     dest.setAmoebaGlobalBondCubic(src.getAmoebaGlobalBondCubic())
     dest.setAmoebaGlobalBondQuartic(src.getAmoebaGlobalBondQuartic())
@@ -261,6 +275,12 @@ def CopyAmoebaVdwParameters(src, dest):
 def CopyAmoebaMultipoleParameters(src, dest):
     for i in range(src.getNumMultipoles()):
         dest.setMultipoleParameters(i,*src.getMultipoleParameters(i))
+
+def CopyDrudeForceParameters(src, dest):
+    for i in range(src.getNumScreenedPairs()):
+        dest.setScreenedPairParameters(i,*src.getScreenedPairParameters(i))
+    for i in range(src.getNumParticles()):
+        dest.setParticleParameters(i,*src.getParticleParameters(i))
 
 def CopyHarmonicBondParameters(src, dest):
     for i in range(src.getNumBonds()):
@@ -308,6 +328,7 @@ def CopySystemParameters(src,dest):
                'AmoebaInPlaneAngleForce':CopyAmoebaInPlaneAngleParameters,
                'AmoebaVdwForce':CopyAmoebaVdwParameters,
                'AmoebaMultipoleForce':CopyAmoebaMultipoleParameters,
+               'DrudeForce':CopyDrudeForceParameters,
                'HarmonicBondForce':CopyHarmonicBondParameters,
                'HarmonicAngleForce':CopyHarmonicAngleParameters,
                'PeriodicTorsionForce':CopyPeriodicTorsionParameters,
@@ -333,7 +354,6 @@ def UpdateSimulationParameters(src_system, dest_simulation):
                 pName = force.getGlobalParameterName(j)
                 pValue = force.getGlobalParameterDefaultValue(j)
                 dest_simulation.context.setParameter(pName, pValue)
-
 
 def SetAmoebaVirtualExclusions(system):
     if any([f.__class__.__name__ == "AmoebaMultipoleForce" for f in system.getForces()]):
@@ -417,7 +437,7 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
     """
     # Multiple timestep Langevin integrator.
     for i in system.getForces():
-        if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce"]:
+        if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce", "DrudeForce"]:
             # Slow force.
             logger.info(i.__class__.__name__ + " is a Slow Force\n")
             i.setForceGroup(1)
@@ -491,6 +511,7 @@ suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "AmoebaVdwForce" : {"Vdw" : ["class"]},
                 "AmoebaMultipoleForce" : {"Multipole" : ["type","kz","kx"], "Polarize" : ["type"]},
                 "AmoebaUreyBradleyForce" : {"UreyBradley" : ["class1","class2","class3"]},
+                "DrudeForce" : {"Particle" : ["type1","type2"]},
                 "Residues.Residue" : {"VirtualSite" : ["index"]},
                 ## LPW's custom parameter definitions
                 "ForceBalance" : {"GB": ["type"]},
@@ -796,8 +817,10 @@ class OpenMM(Engine):
                     logger.info("Creating RPMD integrator with %i beads.\n" % rpmd_beads)
                     self.tdiv = rpmd_beads
                     integrator = RPMDIntegrator(rpmd_beads, temperature*kelvin, collision/picosecond, timestep*femtosecond)
+                elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeLangevinIntegrator(temperature, 1/picosecond, 1*kelvin, 1/picosecond, 0.1*femtoseconds)
                 else:
                     integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
+        elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeSCFIntegrator(0.001*picoseconds)
         else:
             ## If no temperature control, default to the Verlet integrator.
             if rpmd_beads > 0:
@@ -837,7 +860,7 @@ class OpenMM(Engine):
                         
         ## Set up for energy component analysis.
         GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce','AmoebaWcaDispersionForce',
-                        'CustomNonbondedForce',  'NonbondedForce']
+                        'DrudeForce', 'CustomNonbondedForce',  'NonbondedForce']
         GrpNums = {}
         if not mts:
             for j in self.system.getForces():
@@ -915,6 +938,26 @@ class OpenMM(Engine):
             if hasattr(self, 'simulation'):
                 delattr(self, 'simulation')
         self.vsprm = vsprm.copy()
+
+        #----
+        #Same with the Drude Particles, if the parameters
+        #have changed then the positions must be recomputed and 
+        #the simulation object must be remade.
+        #----
+        if any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]):
+            drude_particle, drude_screen = GetDrudeParameters(self.system)
+            if hasattr(self, 'simulation'):
+                if hasattr(self, 'drude_particle') and len(self.drude_particle)>0 and np.max(np.abs(self.drude_particle - drude_particle)) != 0:
+                    self.xyz_omms = self.drude_initial_positions
+                    self.adjust_drude_positions()
+                elif hasattr(self, 'drude_screen') and len(self.drude_screen)>0 and np.max(np.abs(self.drude_screen - drude_screen)) != 0:
+                    self.xyz_omms = self.drude_initial_positions
+                    self.adjust_drude_positions()
+            else:
+                self.drude_initial_positions = self.xyz_omms
+                self.adjust_drude_positions()
+            self.drude_particle = drude_particle.copy()
+            self.drude_screen = drude_screen.copy() 
 
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)
@@ -1517,6 +1560,39 @@ class OpenMM(Engine):
             new_pos = (residue_positions + center_pos_shift[:,np.newaxis,:]).reshape(-1,3)
             # update this frame
             self.xyz_omms[i] = [new_pos.astype(np.float32)*nanometer, new_box*nanometer]
+
+    def adjust_drude_positions(self):
+        mass = self.zero_mass_system()
+        self.create_simulation(**self.simkwargs)
+        if self.pbc:
+            box_omm = [Vec3(mol.boxes[I].a, 0, 0)*nanometer,
+                        Vec3(0, mol.boxes[I].b, 0)*nanometer,
+                        Vec3(0, 0, mol.boxes[I].c)*nanometer]
+        else:
+            box_omm = None
+
+        for I in range(len(self.xyz_omms)):
+            self.set_positions(I)
+            self.simulation.step(1)
+            pos = self.simulation.context.getState(getPositions=True).getPositions()._value
+            pos = [Vec3(i[0],i[1],i[2]) for i in pos]*nanometer
+            self.xyz_omms[I] = (pos, box_omm)
+        self.remass_system(mass)
+        delattr(self, 'simulation')
+
+    def zero_mass_system(self):
+        """The addExtraParticles() function from the Modeller class puts the positions of Drude particles
+        at the same place as the parent atom, which is incorrect when single-point energies need to be taken.
+        This function sets the system masses to 0 and recreates a simulation object for this 0 mass system."""
+        mass = []
+        for k in range(self.system.getNumParticles()):
+            mass.append(self.system.getParticleMass(k))
+            self.system.setParticleMass(k, 0)
+        return mass
+
+    def remass_system(self, mass):
+        for k in range(self.system.getNumParticles()):
+            self.system.setParticleMass(k,mass[k])
 
 class Liquid_OpenMM(Liquid):
     """ Condensed phase property matching using OpenMM. """
