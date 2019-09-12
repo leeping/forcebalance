@@ -1,0 +1,93 @@
+<ForceField>
+ <Info>
+  <Source>"Polarizable Empirical Force Field for Alkanes Based on the Classical Drude Oscillator
+Model" Igor V. Vorobyov, Victor M. Anisimov, and Alexander D. MacKerell Jr. J. Phys. Chem. B</Source>
+  <DateGenerated>Mon Mar 27 15:18:15 2017</DateGenerated>
+  <Reference/>
+ </Info>
+ <AtomTypes>
+  <Type name="BU-C1" class="CT3" element="C" mass="11.611"/>
+  <Type name="BU-H1" class="HA3" element="H" mass="1.00800"/>
+  <Type name="BU-H2" class="HA3" element="H" mass="1.00800"/>
+  <Type name="BU-H3" class="HA3" element="H" mass="1.00800"/>
+  <Type name="BU-C2" class="CT2" element="C" mass="11.611"/>
+  <Type name="BU-H4" class="HA2" element="H" mass="1.00800"/>
+  <Type name="BU-H5" class="HA2" element="H" mass="1.00800"/>
+  <Type name="BU-C3" class="CT2" element="C" mass="11.611"/>
+  <Type name="BU-H6" class="HA2" element="H" mass="1.00800"/>
+  <Type name="BU-H7" class="HA2" element="H" mass="1.00800"/>
+  <Type name="BU-C4" class="CT3" element="C" mass="11.611"/>
+  <Type name="BU-H8" class="HA3" element="H" mass="1.00800"/>
+  <Type name="BU-H9" class="HA3" element="H" mass="1.00800"/>
+  <Type name="BU-H10" class="HA3" element="H" mass="1.00800"/>
+  <Type name="BU-DC1" class="Sh1" mass="0.4"/>
+  <Type name="BU-DC2" class="Sh2" mass="0.4"/>
+  <Type name="BU-DC3" class="Sh2" mass="0.4"/>
+  <Type name="BU-DC4" class="Sh1" mass="0.4"/>
+ </AtomTypes>
+ <Residues>
+  <Residue name="BU">
+   <Atom name="C1" type="BU-C1"/>
+   <Atom name="C2" type="BU-C2"/>
+   <Atom name="C3" type="BU-C3"/>
+   <Atom name="C4" type="BU-C4"/>
+   <Atom name="H1" type="BU-H1"/>
+   <Atom name="H2" type="BU-H2"/>
+   <Atom name="H3" type="BU-H3"/>
+   <Atom name="H4" type="BU-H4"/>
+   <Atom name="H5" type="BU-H5"/>
+   <Atom name="H6" type="BU-H6"/>
+   <Atom name="H7" type="BU-H7"/>
+   <Atom name="H8" type="BU-H8"/>
+   <Atom name="H9" type="BU-H9"/>
+   <Atom name="H10" type="BU-H10"/>
+   <Atom name="DC1" type="BU-DC1"/>
+   <Atom name="DC2" type="BU-DC2"/>
+   <Atom name="DC3" type="BU-DC3"/>
+   <Atom name="DC4" type="BU-DC4"/>
+   <Bond from="0" to="1"/>
+   <Bond from="0" to="4"/>
+   <Bond from="0" to="5"/>
+   <Bond from="0" to="6"/>
+   <Bond from="1" to="2"/>
+   <Bond from="1" to="7"/>
+   <Bond from="1" to="8"/>
+   <Bond from="2" to="3"/>
+   <Bond from="2" to="9"/>
+   <Bond from="2" to="10"/>
+   <Bond from="3" to="11"/>
+   <Bond from="3" to="12"/>
+   <Bond from="3" to="13"/>
+  </Residue>
+ </Residues>
+ <HarmonicBondForce>
+  <Bond class1="CT3" class2="HA3" length="0.111" k="284512.0" parameterize="length,k"/>
+  <Bond class1="CT2" class2="HA2" length="0.114" k="284512.0" parameterize="length,k"/>
+  <Bond class1="CT3" class2="CT2" length="0.1531" k="224262.4" parameterize="length,k"/>
+  <Bond class1="CT2" class2="CT2" length="0.1531" k="224262.4" parameterize="length,k"/>
+ </HarmonicBondForce>
+ <HarmonicAngleForce>
+  <Angle class1="CT3" class2="CT2" class3="CT2" angle="1.982694" k="694.5" parameterize="angle,k"/>
+  <Angle class1="CT2" class2="CT2" class3="HA2" angle="1.9041542" k="774.9" parameterize="angle,k"/>
+  <Angle class1="HA2" class2="CT2" class3="HA2" angle="1.8744836" k="276.144" parameterize="angle,k"/>
+  <Angle class1="HA3" class2="CT3" class3="HA3" angle="1.8744836" k="276.144" parameterize="angle,k"/>
+  <Angle class1="HA3" class2="CT3" class3="CT2" angle="1.9268435" k="313.8" parameterize="angle,k"/>
+ </HarmonicAngleForce>
+ <PeriodicTorsionForce>
+  <Proper class1="CT3" class2="CT2" class3="CT2" class4="CT3" periodicity1="5" phase1="0" k1="0.8368" periodicity2="4" phase2="0" k2="0.602496" periodicity3="3" phase3="0" k3="0.351456" periodicity4="2" phase4="0" k4="0.527184" parameterize="phase1,k1,phase2,k2,phase3,k3,phase4,k4"/>
+ </PeriodicTorsionForce>
+ <NonbondedForce coulomb14scale="0" lj14scale="0">
+   <Atom class="HA3" charge="0.059" sigma="0.1340" epsilon="0.100416"/>
+   <Atom class="HA2" charge="0.078" sigma="0.1340" epsilon="0.14644"/>
+   <Atom class="CT3" charge="2.308" sigma="0.2040" epsilon="0.326352"/>
+   <Atom class="CT2" charge="2.08" sigma="0.2010" epsilon="0.234304"/>
+   <Atom class="Sh1" charge="-2.485" sigma="1.00" epsilon="0.00"/>
+   <Atom class="Sh2" charge="-2.236" sigma="1.00" epsilon="0.00"/>
+ </NonbondedForce>
+ <DrudeForce>
+  <Particle type1="BU-DC1" type2="BU-C1" charge="-2.485" polarizability="0.002051" thole="1"/>
+  <Particle type1="BU-DC2" type2="BU-C2" charge="-2.236" polarizability="0.001660" thole="1"/>
+  <Particle type1="BU-DC4" type2="BU-C4" charge="-2.485" polarizability="0.002051" thole="1"/>
+  <Particle type1="BU-DC3" type2="BU-C3" charge="-2.236" polarizability="0.001660" thole="1"/>
+ </DrudeForce>
+</ForceField>
