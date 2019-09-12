@@ -1,0 +1,9 @@
+Note: All this does is allow ForceBalance to compute single-point energies 
+for systems with Drude particles correctly in OpenMM, 
+as they are initially placed on top of the parent particle. 
+This means the polarization energy is not being taken into account 
+if the Drude positions are not moved. ForceBalance can now copy the Drude 
+parameters from force field to force field and adjust the positions correctly, 
+but there is no official utility for parameterizing Drudes.
+
+It works analogously to standard ForceBalance parameter optimization jobs.
