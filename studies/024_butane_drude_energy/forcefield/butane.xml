@@ -85,9 +85,9 @@ Model" Igor V. Vorobyov, Victor M. Anisimov, and Alexander D. MacKerell Jr. J. P
    <Atom class="Sh2" charge="-2.236" sigma="1.00" epsilon="0.00"/>
  </NonbondedForce>
  <DrudeForce>
-  <Particle type1="BU-DC1" type2="BU-C1" charge="-2.485" polarizability="0.002051" thole="1"/>
-  <Particle type1="BU-DC2" type2="BU-C2" charge="-2.236" polarizability="0.001660" thole="1"/>
-  <Particle type1="BU-DC4" type2="BU-C4" charge="-2.485" polarizability="0.002051" thole="1"/>
-  <Particle type1="BU-DC3" type2="BU-C3" charge="-2.236" polarizability="0.001660" thole="1"/>
+  <Particle type1="BU-DC1" type2="BU-C1" charge="-2.485" polarizability="0.002051" thole="1" parameterize="charge,polarizability"/>
+  <Particle type1="BU-DC2" type2="BU-C2" charge="-2.236" polarizability="0.001660" thole="1" parameterize="charge,polarizability"/>
+  <Particle type1="BU-DC4" type2="BU-C4" charge="-2.485" polarizability="0.002051" thole="1" parameterize="charge,polarizability"/>
+  <Particle type1="BU-DC3" type2="BU-C3" charge="-2.236" polarizability="0.001660" thole="1" parameterize="charge,polarizability"/>
  </DrudeForce>
 </ForceField>

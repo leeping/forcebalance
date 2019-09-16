@@ -42,6 +42,8 @@ priors
    Proper/k3                            :   100
    Proper/phase4                        :   3.14
    Proper/k4                            :   100
+   Particle/charge                      :   0.2
+   Particle/polarizability              :   0.005 
 /priors
 
 $end
