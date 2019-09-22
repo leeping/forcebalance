@@ -30,18 +30,18 @@ mintrust 0.05
 normalize_weights 0
 
 priors
-   Angle/angle                          :   0.5
-   Angle/k                              :   500
-   Bond/length                          :   0.05
-   Bond/k                               : 500000.0
-   Proper/phase1                        :   3.14
-   Proper/k1                            :   100
-   Proper/phase2                        :   3.14
-   Proper/k2                            :   100
-   Proper/phase3                        :   3.14
-   Proper/k3                            :   100
-   Proper/phase4                        :   3.14
-   Proper/k4                            :   100
+   Angle/angle                          :   0.25
+   Angle/k                              :   100
+   Bond/length                          :   0.01
+   Bond/k                               : 10000.0
+   Proper/phase1                        :   1
+   Proper/k1                            :   10
+   Proper/phase2                        :   1
+   Proper/k2                            :   10
+   Proper/phase3                        :   1
+   Proper/k3                            :   10
+   Proper/phase4                        :   1
+   Proper/k4                            :   10
    Particle/charge                      :   0.2
    Particle/polarizability              :   0.005 
 /priors
@@ -57,8 +57,8 @@ weight 1.0
 w_force 0.1 # Reflects intrinsically small QM force
 force_average # Average force over all atoms
 attenuate
-#energy_denom 5.0
-#energy_upper 20.0
+energy_denom 5.0
+energy_upper 20.0
 writelevel 2
 energy_asymmetry 100.0
 $end
