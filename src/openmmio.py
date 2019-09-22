@@ -1056,7 +1056,7 @@ class OpenMM(Engine):
         self.update_simulation()
 
         # If trajectory flag set to False, perform a single-point calculation.
-        if not traj: return evaluate_one_(force, dipole)
+        if not traj: return self.evaluate_one_(force, dipole)
         Energies = []
         Forces = []
         Dipoles = []
