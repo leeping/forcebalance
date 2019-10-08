@@ -1,0 +1,38 @@
+Reopt.py is a tool used in conjunction with ForceBalance in
+order to identify spurious minima in the potential energy surface 
+of force fields. After a ForceBalance optimization, spurious
+minima are still likely to exist in the force field. 
+This code produces additional targets for another ForceBalance cycle 
+with QM energies for these false minima. This helps the objective 
+function eliminate these structures from the potential energy surface. 
+
+This code works by specifying the path of
+a ForceBalance directory. For example, if you copy the script inside of 
+your FB directory, then all you need to do is:
+
+"python reopt.py ."
+
+or if the script is placed outside of the directory then specify the location of 
+the FB directory. This reads in the ForceBalance input file to obtain information
+about the targets and force field, including which MD engine to use.
+
+This will produce an output directory called "./reopt_results." This will contain
+a temporary directory with each residue name you were parameterizing in the 
+FB directory. Each temporary directory contains MM optimized structures 
+using the force field from the "results" directory, which was produced
+from the FB optimization. The optimized structures are then clustered
+together based off of the RMSD. All non-hydrogen atoms are used for the RMSD,
+but an example .txt file is included in the fb_dir.tar.gz example file that shows the 
+format for entering your own atom indices along with the '--custom_cluster_indices' code
+option.  QM energies and gradients are then calculated on these clustered structures. 
+A "new_targets" directory is then produced, containing
+a new "mmopt" target for each residue. This can then be copied to the existing
+"targets" folder of the FB directory for another ForceBalance optimization.
+
+I tried to make this code as flexible as possible, so there are many options that one
+can use. Use "python reopt.py -h" to see all of the options. Currently, the two 
+clustering algorithms that can be used are hybdrid k_medoids or hierarchial clustering.
+Psi4 is currently the only QM engine supported, while GROMACS and OpenMM are the 
+MD engines currently available. I plan on adding more in the future though.
+For the QM calculations, only MP2 is available for now. Any basis set can be used,
+although you need to use the "--cbs" option for MP2/CBS energies.
