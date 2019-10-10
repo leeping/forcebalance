@@ -14,7 +14,20 @@ from matplotlib import pyplot as plt
 import argparse
 
 def makeWorkQueue(wq_port):
-    #Set up the work_queue structures
+    """
+    Make a Work Queue object.
+
+    Parameter
+    ---------
+    wq_port: Integer 
+        integer for the WQ port
+
+    Returns 
+    ---------
+    wq : Work Queue object
+        object for starting multiple workers
+    """
+
     work_queue.set_debug_flag('all')
     wq = work_queue.WorkQueue(port=wq_port, exclusive=False, shutdown=False)
     wq.specify_keepalive_interval(8640000)
@@ -23,8 +36,23 @@ def makeWorkQueue(wq_port):
     return wq
 
 def getClusterIndices(index_file, res_list):
-    #A file with indices for the RMSD can be provided. This function
-    #looks through this file and returns the indices for each residue.
+    """
+    A file with indices for the RMSD can be provided. This function
+    looks through this file and returns the indices for each residue.
+
+    Parameters
+    ---------
+    index_file : string
+        Filename of the index file containing the atom indices
+    res_list : list
+        List containing residue names
+
+    Returns 
+    ---------
+    indices : dictionary
+        Dictionary containing the atom indices for each residue
+    """
+
     indices = {}
     for line in open(index_file):
         if line.split('\n')[0].strip() in res_list:
@@ -38,6 +66,18 @@ def p_norm(data, p=2):
     """
     Gets pnorm of array, taken from MSMBuilder 2.7 Legacy.
     https://github.com/msmbuilder/msmbuilder-legacy/blob/master/MSMBuilder/clustering.py
+
+    Parameters
+    ----------
+    data : ndarray
+        XYZ coordinates
+    p : {int, "max"}, optional
+        power of p_norm
+
+    Returns
+    -------
+    value : float
+        the answer
     """
 
     if p == "max":
@@ -51,7 +91,27 @@ def kcenters(traj, dist, atom_indices):
     """
     This clustering algorithm is modified from MSMBuilder 2.7 Legacy.
     https://github.com/msmbuilder/msmbuilder-legacy/blob/master/MSMBuilder/clustering.py
+
+    Parameters
+    ----------
+    traj : MDTraj Trajectory object
+        Trajectory that the clustering is performed on
+    dist : float
+        Stop identifying new clusters once the distance of every data to its
+        cluster center falls below this value. Supply either this or `k`
+    atom_indices : list
+        List of atom indices for RMSD
+
+    Returns 
+    -------
+    generator_indices : ndarray
+        indices (with respect to ptraj) of the frames to be considered cluster centers
+    assignments : ndarray
+        the cluster center to which each frame is assigned to (1D)
+    distances : ndarray
+        distance from each of the frames to the cluster center it was assigned to
     """
+
     k = sys.maxsize
     seed = 0
     distance_list = np.inf * np.ones(len(traj), dtype=np.float32)
@@ -73,7 +133,27 @@ def hybrid_kmedoids(traj, dist, atom_indices):
     """
     This clustering algorithm is modified from MSMBuilder 2.7 Legacy.
     https://github.com/msmbuilder/msmbuilder-legacy/blob/master/MSMBuilder/clustering.py
+
+    Parameters
+    ----------
+    traj : MDTraj Trajectory object
+        Trajectory that the clustering is performed on
+    dist : float
+        Stop identifying new clusters once the distance of every data to its
+        cluster center falls below this value. Supply either this or `k`
+    atom_indices : list
+        List of atom indices for RMSD
+
+    Returns 
+    -------
+    generator_indices : ndarray
+        indices (with respect to ptraj) of the frames to be considered cluster centers
+    assignments : ndarray
+        the cluster center to which each frame is assigned to (1D)
+    distances : ndarray
+        distance from each of the frames to the cluster center it was assigned to
     """
+
     initial_medoids, initial_assignments, initial_distance = kcenters(traj, dist, atom_indices)
     assignments = initial_assignments
     distance_to_current = initial_distance
@@ -126,6 +206,20 @@ def hybrid_kmedoids(traj, dist, atom_indices):
     return medoids, assignments, distance_to_current
 
 def isfloat(num):
+    """
+    Check whether input is a float or not
+
+    Parameters
+    ----------
+    num : Object
+        Can in principle be any object, as it is being tested for it being a float or not
+
+    Returns
+    -------
+    bool
+        Returns True or False depending upon whether num is a float or not
+    """
+
     try:
         float(num)
         return True
@@ -133,6 +227,28 @@ def isfloat(num):
         return False
 
 def getChargesMult(target_list, charges_input, mult_input):
+    """
+    Get the charge and multiplicty for each residue for supplying to the QM program
+    If the user has supplied nonzero charges or multiplicites, then get them from
+    their input list. Otherwise, assign the charge and multiplicty to be zero.
+
+    Parameters
+    ----------
+    target_list : list
+        List of target names
+    charges_input : list or NoneType
+        List of residues followed by charge if input to the program, or None otherwise
+    mult_input : list or NoneType
+        List of multiplicities followed by charge if input to the program, or None otherwise
+
+    Returns
+    -------
+    charges : dictionary
+        Dictionary of residues and their charge
+    mult : dictionary
+        Dictionary of residues and their charge
+    """
+
     charges = {}
     mult = {}
     for key in target_list:
@@ -154,6 +270,25 @@ def getChargesMult(target_list, charges_input, mult_input):
     return charges, mult
 
 class MMTask:
+    """
+    Template class for initializing the MM engines
+    
+    Parameters
+    ----------
+    md_engine_opts : dictionary
+        Contains options and values for running the MM code
+    wq : Object
+        WorkQueue object
+    coord_set : dictionary
+        Contains a Molecule object for each residue
+    top_set : dictionary
+        Contains the topology file for each residue
+    ffname : string
+        Location of the actual force field
+    remote_md : string
+        Remote script used for running the MM optimizations with Work Queue
+    """
+
     def __init__(self, md_engine_opts, wq, coord_set, top_set, ffname, remote_md):
         self.md_engine_opts = md_engine_opts
         self.wq = wq
@@ -163,29 +298,66 @@ class MMTask:
         self.remote_md = remote_md
 
     def cluster(self, fnm):
+        """
+        Cluster together the different output trajectories
+        
+        Parameter
+        ---------
+        fnm : string
+            filename of the minimized coordinate files
+        
+        Returns
+        -------
+        traj : MDTraj Trajectory object
+            returns a Trajectory object for use in the clustering part of the code
+        M : Molecule object
+            A Molecule object is returned for other uses besides the clustering
+        """
+
         ext = fnm.split('.')[1]
         _exec('find . -name {0} | sort | xargs cat > mmopt.{1}'.format(fnm, ext))
         traj = md.load('mmopt.{0}'.format(ext))
         M = Molecule('mmopt.{0}'.format(ext))
         return traj, M
 
-class QMTask:
-    def __init__(self, fbdir, qm_method, basis, cbs, grad, nt, mem):
-        self.fbdir = fbdir
-        self.qm_method = qm_method
-        self.basis = basis
-        self.cbs = cbs
-        self.grad = grad
-        self.nt = nt
-        self.mem = mem
-
 class GMXTask(MMTask):
+    """
+    GROMACS specific MM routines
+    """
     def __init__(self, md_engine_opts, wq, coord_set, top_set, ffname, remote_md):
-        #Get the work_queue and coordinates from the main Reopt_MM class
+        """
+        Parameters
+        ----------
+        md_engine_opts : dictionary
+            Contains options and values for running the MM code
+        wq : Object
+            WorkQueue object
+        coord_set : dictionary
+            Contains a Molecule object for each residue
+        top_set : dictionary
+            Contains the topology file for each residue
+        ffname : string
+            Location of the actual force field
+        remote_md : string
+            Remote script used for running the MM optimizations with Work Queue
+        """
+
         super().__init__(md_engine_opts, wq, coord_set, top_set, ffname, remote_md)
 
     def min_grids(self, res, cwd, min_file):
-        #Use specific GROMACS routines for grid minimization.
+        """
+        Perform the first round of MM optimizations from the initial FB target structures
+        
+        Parameters
+        ----------
+        res : string 
+            Name of the specific residue
+        cwd : string
+            current directory path
+        min_file : string
+            Name of the output file containing the minimized coordinates
+        """
+
         with open('topol.top', 'w') as f:
             f.write('#include "{0}"\n'.format(self.ffname.split('/')[-1]))
             for line in open("../../{0}".format(self.top_set[res])):
@@ -223,12 +395,43 @@ class GMXTask(MMTask):
             os.chdir(result_dir)
 
     def cluster(self, fnm):
-        #Cluster structures to provide back to the main code.
-        traj, M = super().cluster(fnm)
-        return traj, M
+        """
+        Assemble the files containing the optimized coordinates into one file
+        This calls a subroutine in the base class.
+
+        Parameter
+        ---------
+        fnm : string
+            Contains the file name that is being collected
+
+        Returns
+        -------
+        traj : MDTraj Trajectory object
+            returns a Trajectory object for use in the clustering part of the code
+        M : Molecule object
+            A Molecule object is returned for other uses besides the clustering
+        """
+
+        return super().cluster(fnm)
 
     def cluster_min_MM(self, pdbfnm, cwd, cmdn, min_file, res):
-        #Use GROMACS utilities to minimize clustered structures.
+        """
+        Perform MM optimizations on the selected clusters
+
+        Parameters
+        ----------
+        pdbfnm : string
+            Name of pdb file being input
+        cwd : string
+            current directory path
+        cdnm : string
+            current job being run
+        min_file : string
+            Name of the output file containing the minimized coordinates
+        res : string
+            Name of the residue that is currently being optimized
+        """
+
         if not os.path.exists(min_file):
             coord = Molecule(os.path.join('../../Clusters', pdbfnm))
             coord[0].write("conf.gro")
@@ -245,14 +448,29 @@ class GMXTask(MMTask):
                 if not os.path.exists("min.mdp"):
                     min_opts = {"integrator" : "l-bfgs", "emtol" : 1e-4, "nstxout" : 0, "nstfout" : 0, "nsteps" : 10000, "nstenergy" : 1}
                     edit_mdp(fin="gmx.mdp", fout="min.mdp", options=min_opts)
-                queue_up_src_dest(self.wq, command="sh rungmx.sh &> min.log", tag=cdnm,
+                queue_up_src_dest(self.wq, command="sh {0} &> min.log".format(self.remote_md), tag=cdnm,
                 input_files = ([(os.path.join(os.getcwd(), i), i) for i in [self.ffname.split('/')[-1], 'conf.gro', 'topol.top', 'min.mdp']] +
-                [(os.path.join(cwd, 'rungmx.sh'), 'rungmx.sh')]),
+                [(os.path.join(cwd, self.remote_md), self.remote_md)]),
                 output_files = [(os.path.join(os.getcwd(), 'min.log'), 'min.log'),
                 (os.path.join(os.getcwd(), min_file), min_file)])
 
     def cluster_singlepoint_MM(self, min_file, res):
-        #Use GROMACS routines to get the energy for a single molecule.
+        """
+        Get the singlepoint energies for the structure
+
+        Parameters
+        ----------
+        min_file : string
+            Name of the file containing hte coordinates
+        res:
+            Name of the current residue
+
+        Returns
+        -------
+        energy : float
+            MM energy 
+        """
+
         self.md_engine_opts['mol'] = Molecule(min_file)
         self.md_engine_opts['gmx_top'] = 'topol.top'
         md = GMX(**self.md_engine_opts)
@@ -260,11 +478,43 @@ class GMXTask(MMTask):
         return energy
 
 class OpenMMTask(MMTask):
+    """
+    OpenMM specific MM routines
+    """
     def __init__(self, md_engine_opts, wq, coord_set, top_set, ffname, remote_md):
-        #Get the work_queue and coordinates from the main Reopt_MM class
+        """
+        Parameters
+        ----------
+        md_engine_opts : dictionary
+            Contains options and values for running the MM code
+        wq : Object
+            WorkQueue object
+        coord_set : dictionary
+            Contains a Molecule object for each residue
+        top_set : dictionary
+            Contains the topology file for each residue
+        ffname : string
+            Location of the actual force field
+        remote_md : string
+            Remote script used for running the MM optimizations with Work Queue
+        """
+
         super().__init__(md_engine_opts, wq, coord_set, top_set, ffname, remote_md)
 
     def min_grids(self, res, cwd, min_file):
+        """
+        Perform the first round of MM optimizations from the initial FB target structures
+
+        Parameters
+        ----------
+        res : string
+            Name of the specific residue
+        cwd : string
+            current directory path
+        min_file : string
+            Name of the output file containing the minimized coordinates
+        """
+
         os.chdir('../')
         result_dir = os.getcwd()
         if not os.path.exists(self.ffname.split('/')[-1]): os.symlink('{0}/{1}'.format(cwd,self.ffname), './{0}'.format(self.ffname.split('/')[-1]))
@@ -291,12 +541,43 @@ class OpenMMTask(MMTask):
             os.chdir(result_dir)
 
     def cluster(self, fnm):
-        #Cluster structures to provide back to the main code.
-        traj, M = super().cluster(fnm)
-        return traj, M
+        """
+        Assemble the files containing the optimized coordinates into one file
+        This calls a subroutine in the base class.
+
+        Parameter
+        ---------
+        fnm : string
+            Contains the file name that is being collected
+
+        Returns
+        -------
+        traj : MDTraj Trajectory object
+            returns a Trajectory object for use in the clustering part of the code
+        M : Molecule object
+            A Molecule object is returned for other uses besides the clustering
+        """
+
+        return super().cluster(fnm)
 
     def cluster_min_MM(self, pdbfnm, cwd, cdnm, min_file, res):
-        #Use OpenMM utilities to minimize clustered structures.
+        """
+        Perform MM optimizations on the selected clusters
+
+        Parameters
+        ----------
+        pdbfnm : string
+            Name of pdb file being input
+        cwd : string
+            current directory path
+        cdnm : string
+            current job being run
+        min_file : string
+            Name of the output file containing the minimized coordinates
+        res : string
+            Name of the residue that is currently being optimized
+        """
+
         if not os.path.exists(min_file):
             coord = Molecule(os.path.join('../../Clusters', pdbfnm))
             coord[0].write("conf.pdb")
@@ -314,7 +595,22 @@ class OpenMMTask(MMTask):
             PDBFile.writeFile(top, pos, open(min_file, 'w'))
 
     def cluster_singlepoint_MM(self, min_file, res):
-        #Use OpenMM routines to get the energy for a single molecule.
+        """
+        Get the singlepoint energies for the structure
+
+        Parameters
+        ----------
+        min_file : string
+            Name of the file containing hte coordinates
+        res:
+            Name of the current residue
+
+        Returns
+        -------
+        energy : float
+            MM energy
+        """
+
         self.md_engine_opts['mol'] = Molecule(min_file)
         self.md_engine_opts['pdb'] = self.top_set[res].split('/')[-1]
         self.md_engine_opts['ffxml'] = self.ffname.split('/')[-1]
@@ -325,7 +621,55 @@ class OpenMMTask(MMTask):
         energy = md.energy_one(0)
         return energy
 
+class QMTask:
+    """
+    Template class for initializing the QM engines
+
+    Parameters
+    ----------
+    fbdir : string
+        Location of the ForceBalance directory
+    qm_method : string
+        Name of the QM calculation method
+    basis : string
+        Name of the basis set
+    cbs : bool
+        Whether to run cbs calculation or not
+    grad : bool
+        Whether to run gradient caculations
+    mem : integer
+        Number of gb of memory to use
+    """
+
+    def __init__(self, fbdir, qm_method, basis, cbs, grad, nt, mem):
+        self.fbdir = fbdir
+        self.qm_method = qm_method
+        self.basis = basis
+        self.cbs = cbs
+        self.grad = grad
+        self.nt = nt
+        self.mem = mem
+
 class Psi4Task(QMTask):
+    """
+    Launches tasks for Psi4
+
+    Parameters
+    ----------
+    fbdir : string
+        Location of the ForceBalance directory
+    qm_method : string
+        Name of the QM calculation method
+    basis : string
+        Name of the basis set
+    cbs : bool
+        Whether to run cbs calculation or not
+    grad : bool
+        Whether to run gradient caculations
+    mem : integer
+        Number of gb of memory to use
+    """
+
     def __init__(self, fbdir, qm_method, basis, cbs, grad, nt, mem):
         super().__init__(fbdir, qm_method, basis, cbs, grad, nt, mem)
         loc = shutil.which("psi4")
@@ -333,6 +677,22 @@ class Psi4Task(QMTask):
             raise Exception("The psi4 executable has not been found. Make sure you have it installed in your path.")
 
     def writeEnergy(self, mol, fnm, charge, mult):
+        """
+        Determines whether a CBS energy calculation is being run. If not,
+        write a standard Psi4 output file
+
+        Parameters
+        ----------
+        mol : Molecule object
+            The Molecule object for the residue being calculated
+        fnm : string
+            The file name to be written out
+        charge : integer
+            Charge for the residue
+        mult : integer
+            Multiplicity for the residue
+        """
+
         if self.cbs is True:
             self.writeCBSenergy(mol, fnm, charge, mult)
         else:
@@ -356,6 +716,22 @@ class Psi4Task(QMTask):
             out.close()
 
     def writeCBSenergy(self, mol, fnm, charge, mult):
+        """
+        Writes out a Psi4 input file for a CBS calculation using Helgaker's two-point 
+        extrapolation.
+
+        Parameters
+        ----------
+        mol : Molecule object
+            The Molecule object for the residue being calculated
+        fnm : string
+            The file name to be written out
+        charge : integer
+            Charge for the residue
+        mult : integer
+            Multiplicity for the residue
+        """
+
         out = open(fnm, 'w')
         out.write("memory {0} gb\n\n".format(self.mem))
         out.write("molecule {\n")
@@ -376,6 +752,12 @@ class Psi4Task(QMTask):
         out.close()
 
     def custom_energy(self, mol, fnm, charge, mult, custom_eng):
+        """
+        I'm testing a current custom energy function where users can supply a Psi4 input file.
+        However, I can't guarantee that it will always work, so it's not called by any of the
+        code currently.
+        """
+
         eng_lines = []
         for line in open(custom_eng):
             eng_lines.append(line)
@@ -400,6 +782,21 @@ class Psi4Task(QMTask):
         out.close()
 
     def writeGrad(self, mol, fnm, charge, mult):
+        """
+        Writes an input file for a gradient calculation.
+
+        Parameters
+        ----------
+        mol : Molecule object
+            The Molecule object for the residue being calculated
+        fnm : string
+            The file name to be written out
+        charge : integer
+            Charge for the residue
+        mult : integer
+            Multiplicity for the residue
+        """
+
         out = open(fnm, 'w')
         out.write("memory {0} gb\n\n".format(self.mem))
         out.write("molecule {\n")
@@ -420,6 +817,16 @@ class Psi4Task(QMTask):
         out.close()
 
     def readEnergy(self, fnm):
+        """
+        Finds the energy in a Psi4 input file and directs to other
+        methods for the specific type of calculation.
+
+        Parameters
+        ----------
+        fnm : string
+            Filename for Psi4 output file
+        """
+
         found_coords = False
         energy = None
         coords = []
@@ -453,6 +860,15 @@ class Psi4Task(QMTask):
         return energy, elem, coords
 
     def readMP2energy(self, fnm):
+        """
+        Finds energy for a MP2 calculation.
+
+        Parameters
+        ----------
+        fnm : string
+            Filename for Psi4 output file
+        """
+
         found_energy = False
         energy = None
         for line in open(fnm):
@@ -465,6 +881,10 @@ class Psi4Task(QMTask):
         return energy
 
     def read_std_energy(self, fnm):
+        """
+        Supposed to read any Psi4 energy output, but I'm not sure if that will work
+        """
+
         found_energy = False
         energy = None
         for line in reversed(open(fnm).readlines()):
@@ -475,6 +895,15 @@ class Psi4Task(QMTask):
         return energy
 
     def readCBSenergy(self, fnm):
+        """
+        Finds energy for a CBS calculation.
+
+        Parameters
+        ----------
+        fnm : string
+            Filename for Psi4 output file
+        """
+
         energy = None
         for line in reversed(open(fnm).readlines()):
             ls = line.split()
@@ -485,6 +914,15 @@ class Psi4Task(QMTask):
         return energy
 
     def readGrad(self, fnm):
+        """
+        Finds gradient in a Psi4 output file.
+
+        Parameters
+        ----------
+        fnm : string
+            Filename for Psi4 output file
+        """
+
         found_grad = False
         found_coords = False
         elem = []
@@ -512,6 +950,19 @@ class Psi4Task(QMTask):
         return np.asarray(grad)
 
     def runCalc(self, fnm, wq, run_script):
+        """
+        Run a Psi4 calculation, either with Work Queue or in serial.
+
+        Parameters
+        ----------
+        fnm : string
+            Filename for Psi4 output file
+        wq : WorkQueue object or NoneType
+            WorkQueue construct for calculations on multiple workers (recommended)
+        run_script : string or NoneType
+            Filename containing options for running Psi4 on clusters (optional)
+        """
+
         pre = fnm.split('.')[0]
         if wq is not None:
             if run_script is None:
@@ -532,7 +983,8 @@ class Psi4Task(QMTask):
 
 class Reopt:
     """
-    This class handles the main functions of the code, including the clustering. 
+    This class handles the main functions of the code, including the clustering.
+    The inputs are kwargs taken from the argparse input.
     """
     def __init__(self, **kwargs):
         #Get all of the user info needed for the code.
@@ -580,9 +1032,11 @@ class Reopt:
         self.output_dir = kwargs.get('outputdir')
 
     def parseFBInput(self):
-        #This reads through the provided ForceBalance directory and sets up
-        #the MD engine and options for the rest of the code. Make sure your input
-        #file contains the ForceBalance input file as a ".in" extension."
+        """
+        This reads through the provided ForceBalance directory and sets up
+        the MD engine and options for the rest of the code. Make sure your input
+        file contains the ForceBalance input file as a ".in" extension.
+        """
         printcool("Reading Grids")
 
         self.target_list = []
@@ -650,8 +1104,10 @@ class Reopt:
             self.min_file = "omm-min.pdb"
 
     def minGrids(self):
-        #Minimizes the grid points by calling the corresponding function
-        #in the md_engine object.
+        """
+        Minimizes the grid points by calling the corresponding function
+        in the md_engine object.
+        """
         printcool("Minimizing Grid Points")
 
         if not os.path.exists(self.output_dir): os.makedirs(self.output_dir)
@@ -664,9 +1120,12 @@ class Reopt:
         if self.wq is not None: wq_wait(self.wq)
 
     def cluster(self):
-        #This part of the code clusters the previously MM-minimized structures
-        #by Scipy's linkage algorithm based off of the RMSD. Edit the fcluster
-        #line fif you need more variation in your clusters.
+        """
+        This part of the code clusters the previously MM-minimized structures
+        by hybrid kmedoids or Scipy's linkage algorithm based off of the RMSD. 
+        Edit the fcluster line if you need more variation in your clusters.
+        """
+
         printcool("Clustering")
 
         if self.index_file is not None:
@@ -719,8 +1178,11 @@ class Reopt:
             os.chdir(cwd)
 
     def clusterMinMM(self):
-        #Minimize the newly formed clusters, again using the corresponding part of the 
-        #code in md_engine.
+        """
+        Minimize the newly formed cluster centers, again using the corresponding part of the 
+        code in md_engine.
+        """
+
         printcool("Cluster Center Minimization")
         cwd = os.getcwd()
         for res in self.coord_set:
@@ -736,7 +1198,15 @@ class Reopt:
         if self.wq is not None: wq_wait(self.wq)
                 
     def clusterSinglepointsMM(self):
-        #Get the singlepoint energy of the MM-optmized clusters.
+        """
+        Get the singlepoint energy of the MM-optmized clusters.
+
+        Returns
+        -------
+        self.mm_energy : dictionary
+            Dictionary containing the set of MM energies for each residue geometry
+        """
+
         printcool("Cluster Center Single Points MM")
         self.mm_energy = {}
         cwd = os.getcwd()
@@ -753,6 +1223,10 @@ class Reopt:
         return self.mm_energy
 
     def clusterSinglepointsQM(self):
+        """
+        Get the QM single point energy
+        """
+
         printcool("Cluster Center Single Points QM")
         if self.qm_engine=="Psi4":
             self.QM = Psi4Task(self.fbdir, self.qm_method, self.basis, self.cbs, self.grad, self.nt, self.mem)
@@ -778,6 +1252,20 @@ class Reopt:
         if self.wq is not None: wq_wait(self.wq)
 
     def readQMEng(self):
+        """
+        Run through the output directories and read the QM energy 
+        outputs.
+
+        Returns
+        -------
+        qm_energy : Dictionary
+            Set of QM energies for each residue
+        qm_grad : Dictionary
+            Set of QM gradients for each residue
+        qm_coords : Dictionary 
+            Set of coordinates for each residue.
+        """
+
         cwd = os.getcwd()
         qm_energy = {}
         qm_coords = {}
@@ -802,12 +1290,49 @@ class Reopt:
         return qm_energy, qm_grad, qm_coords
     
     def writeQMenergy(self, mol, fnm, res):
+        """
+        Write a QM energy input file.
+        
+        Parameters
+        ----------
+        mol : Molecule object
+            Molecule object for the residue 
+        fnm : string
+            output filename
+        res : string
+            dictionary key for the charges and mult dictionaries
+        """
+
         self.QM.writeEnergy(mol, fnm, self.charges[res], self.mult[res])
 
     def writeQMgrad(self, mol, fnm, res):
+        """
+        Write a QM energy input file.
+
+        Parameters
+        ----------
+        mol : Molecule object
+            Molecule object for the residue
+        fnm : string
+            output filename
+        res : string
+            dictionary key for the charges and mult dictionaries
+        """
+
         self.QM.writeGrad(mol, fnm, self.charges[res], self.mult[res])
 
     def pltEnergies(self, mm_energy, qm_energy):
+        """
+        Plot the MM vs QM energies.
+
+        Parameters
+        ----------
+        mm_energy : Dictionary
+            Contains the set of MM energies for each residue
+        qm_energy : Dictionary
+            Contains the set of QM energies for each residue
+        """
+
         if self.plot is True:
             cwd = os.getcwd()
             for res in mm_energy:
@@ -842,7 +1367,19 @@ class Reopt:
                 os.chdir(cwd)
             
     def makeNewTargets(self, qm_energy, qm_coords, qm_grad):
-        #Output the new data as a ForceBalance target.
+        """
+        Output a new ForceBalance "mmopt" target for each residue
+
+        Parameters
+        ----------
+        qm_energy : Dictionary
+            Dictionary containing the qm energies for each residue
+        qm_coords : Dictionary
+            Dictionary containing the coordinates for each residue
+        qm_grad : Dictionary
+            Dictionary containing the gradients for each residue
+        """
+
         home = os.getcwd()
         if not os.path.isdir('{0}/new_targets'.format(self.output_dir)): os.mkdir('{0}/new_targets'.format(self.output_dir))
         os.chdir('{0}/new_targets'.format(self.output_dir))
@@ -867,6 +1404,10 @@ class Reopt:
             os.chdir(cwd)
 
 def run_reopt(**kwargs):
+    """
+    Function for actually running all the code components.
+    """
+
     reopt = Reopt(**kwargs)
     reopt.parseFBInput()
     reopt.minGrids()
