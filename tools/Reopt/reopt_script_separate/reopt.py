@@ -13,7 +13,20 @@ from matplotlib import pyplot as plt
 import argparse
 
 def makeWorkQueue(wq_port):
-    #Set up the work_queue structures
+    """
+    Make a Work Queue object.
+
+    Parameter
+    ---------
+    wq_port: Integer
+        integer for the WQ port
+
+    Returns
+    ---------
+    wq : Work Queue object
+        object for starting multiple workers
+    """
+
     work_queue.set_debug_flag('all')
     wq = work_queue.WorkQueue(port=wq_port, exclusive=False, shutdown=False)
     wq.specify_keepalive_interval(8640000)
@@ -22,8 +35,23 @@ def makeWorkQueue(wq_port):
     return wq
 
 def getClusterIndices(index_file, res_list):
-    #A file with indices for the RMSD can be provided. This function
-    #looks through this file and returns the indices for each residue.
+    """
+    A file with indices for the RMSD can be provided. This function
+    looks through this file and returns the indices for each residue.
+
+    Parameters
+    ---------
+    index_file : string
+        Filename of the index file containing the atom indices
+    res_list : list
+        List containing residue names
+
+    Returns
+    ---------
+    indices : dictionary
+        Dictionary containing the atom indices for each residue
+    """
+
     indices = {}
     for line in open(index_file):
         if line.split('\n')[0].strip() in res_list:
@@ -37,6 +65,18 @@ def p_norm(data, p=2):
     """
     Gets pnorm of array, taken from MSMBuilder 2.7 Legacy.
     https://github.com/msmbuilder/msmbuilder-legacy/blob/master/MSMBuilder/clustering.py
+
+    Parameters
+    ----------
+    data : ndarray
+        XYZ coordinates
+    p : {int, "max"}, optional
+        power of p_norm
+
+    Returns
+    -------
+    value : float
+        the answer
     """
 
     if p == "max":
@@ -50,7 +90,27 @@ def kcenters(traj, dist, atom_indices):
     """
     This clustering algorithm is modified from MSMBuilder 2.7 Legacy.
     https://github.com/msmbuilder/msmbuilder-legacy/blob/master/MSMBuilder/clustering.py
+
+    Parameters
+    ----------
+    traj : MDTraj Trajectory object
+        Trajectory that the clustering is performed on
+    dist : float
+        Stop identifying new clusters once the distance of every data to its
+        cluster center falls below this value. Supply either this or `k`
+    atom_indices : list
+        List of atom indices for RMSD
+
+    Returns
+    -------
+    generator_indices : ndarray
+        indices (with respect to ptraj) of the frames to be considered cluster centers
+    assignments : ndarray
+        the cluster center to which each frame is assigned to (1D)
+    distances : ndarray
+        distance from each of the frames to the cluster center it was assigned to
     """
+
     k = sys.maxsize
     seed = 0
     distance_list = np.inf * np.ones(len(traj), dtype=np.float32)
@@ -72,7 +132,27 @@ def hybrid_kmedoids(traj, dist, atom_indices):
     """
     This clustering algorithm is modified from MSMBuilder 2.7 Legacy.
     https://github.com/msmbuilder/msmbuilder-legacy/blob/master/MSMBuilder/clustering.py
+
+    Parameters
+    ----------
+    traj : MDTraj Trajectory object
+        Trajectory that the clustering is performed on
+    dist : float
+        Stop identifying new clusters once the distance of every data to its
+        cluster center falls below this value. Supply either this or `k`
+    atom_indices : list
+        List of atom indices for RMSD
+
+    Returns
+    -------
+    generator_indices : ndarray
+        indices (with respect to ptraj) of the frames to be considered cluster centers
+    assignments : ndarray
+        the cluster center to which each frame is assigned to (1D)
+    distances : ndarray
+        distance from each of the frames to the cluster center it was assigned to
     """
+
     initial_medoids, initial_assignments, initial_distance = kcenters(traj, dist, atom_indices)
     assignments = initial_assignments
     distance_to_current = initial_distance
@@ -126,7 +206,8 @@ def hybrid_kmedoids(traj, dist, atom_indices):
 
 class Reopt:
     """
-    This class handles the main functions of the code, including the clustering. 
+    This class handles the main functions of the code, including the clustering.
+    The inputs are kwargs taken from the argparse input.
     """
     def __init__(self, **kwargs):
         #Get all of the user info needed for the code.
@@ -174,9 +255,12 @@ class Reopt:
         self.output_dir = kwargs.get('outputdir')
 
     def parseFBInput(self):
-        #This reads through the provided ForceBalance directory and sets up
-        #the MD engine and options for the rest of the code. Make sure your input
-        #file contains the ForceBalance input file as a ".in" extension."
+        """
+        This reads through the provided ForceBalance directory and sets up
+        the MD engine and options for the rest of the code. Make sure your input
+        file contains the ForceBalance input file as a ".in" extension.
+        """
+
         printcool("Reading Grids")
 
         self.target_list = []
@@ -247,8 +331,10 @@ class Reopt:
             self.min_file = "omm-min.pdb"
 
     def minGrids(self):
-        #Minimizes the grid points by calling the corresponding function
-        #in the md_engine object.
+        """
+        Minimizes the grid points by calling the corresponding function
+        in the md_engine object.
+        """
         printcool("Minimizing Grid Points")
 
         if not os.path.exists(self.output_dir): os.makedirs(self.output_dir)
@@ -261,9 +347,12 @@ class Reopt:
         if self.wq is not None: wq_wait(self.wq)
 
     def cluster(self):
-        #This part of the code clusters the previously MM-minimized structures
-        #by Scipy's linkage algorithm based off of the RMSD. Edit the fcluster
-        #line fif you need more variation in your clusters.
+        """
+        This part of the code clusters the previously MM-minimized structures
+        by hybrid kmedoids or Scipy's linkage algorithm based off of the RMSD.
+        Edit the fcluster line if you need more variation in your clusters.
+        """
+
         printcool("Clustering")
 
         if self.index_file is not None:
@@ -316,8 +405,11 @@ class Reopt:
             os.chdir(cwd)
 
     def clusterMinMM(self):
-        #Minimize the newly formed clusters, again using the corresponding part of the 
-        #code in md_engine.
+        """
+        Minimize the newly formed cluster centers, again using the corresponding part of the
+        code in md_engine.
+        """
+
         printcool("Cluster Center Minimization")
         cwd = os.getcwd()
         for res in self.coord_set:
@@ -334,7 +426,15 @@ class Reopt:
         if self.wq is not None: wq_wait(self.wq)
                 
     def clusterSinglepointsMM(self):
-        #Get the singlepoint energy of the MM-optmized clusters.
+        """
+        Get the singlepoint energy of the MM-optmized clusters.
+
+        Returns
+        -------
+        self.mm_energy : dictionary
+            Dictionary containing the set of MM energies for each residue geometry
+        """
+
         printcool("Cluster Center Single Points MM")
         self.mm_energy = {}
         cwd = os.getcwd()
@@ -351,6 +451,10 @@ class Reopt:
         return self.mm_energy
 
     def clusterSinglepointsQM(self):
+        """
+        Get the QM single point energy
+        """
+
         printcool("Cluster Center Single Points QM")
         if self.qm_engine=="Psi4":
             self.QM = Psi4Task(self.fbdir, self.qm_method, self.basis, self.cbs, self.grad, self.nt, self.mem)
@@ -376,6 +480,20 @@ class Reopt:
         if self.wq is not None: wq_wait(self.wq)
 
     def readQMEng(self):
+        """
+        Run through the output directories and read the QM energy
+        outputs.
+
+        Returns
+        -------
+        qm_energy : Dictionary
+            Set of QM energies for each residue
+        qm_grad : Dictionary
+            Set of QM gradients for each residue
+        qm_coords : Dictionary
+            Set of coordinates for each residue.
+        """
+
         cwd = os.getcwd()
         qm_energy = {}
         qm_coords = {}
@@ -400,12 +518,49 @@ class Reopt:
         return qm_energy, qm_grad, qm_coords
     
     def writeQMenergy(self, mol, fnm, res):
+        """
+        Write a QM energy input file.
+
+        Parameters
+        ----------
+        mol : Molecule object
+            Molecule object for the residue
+        fnm : string
+            output filename
+        res : string
+            dictionary key for the charges and mult dictionaries
+        """
+
         self.QM.writeEnergy(mol, fnm, self.charges[res], self.mult[res])
 
     def writeQMgrad(self, mol, fnm, res):
+        """
+        Write a QM energy input file.
+
+        Parameters
+        ----------
+        mol : Molecule object
+            Molecule object for the residue
+        fnm : string
+            output filename
+        res : string
+            dictionary key for the charges and mult dictionaries
+        """
+
         self.QM.writeGrad(mol, fnm, self.charges[res], self.mult[res])
 
     def pltEnergies(self, mm_energy, qm_energy):
+        """
+        Plot the MM vs QM energies.
+
+        Parameters
+        ----------
+        mm_energy : Dictionary
+            Contains the set of MM energies for each residue
+        qm_energy : Dictionary
+            Contains the set of QM energies for each residue
+        """
+
         if self.plot is True:
             cwd = os.getcwd()
             for res in mm_energy:
@@ -440,7 +595,19 @@ class Reopt:
                 os.chdir(cwd)
             
     def makeNewTargets(self, qm_energy, qm_coords, qm_grad):
-        #Output the new data as a ForceBalance target.
+        """
+        Output a new ForceBalance "mmopt" target for each residue
+
+        Parameters
+        ----------
+        qm_energy : Dictionary
+            Dictionary containing the qm energies for each residue
+        qm_coords : Dictionary
+            Dictionary containing the coordinates for each residue
+        qm_grad : Dictionary
+            Dictionary containing the gradients for each residue
+        """
+
         home = os.getcwd()
         if not os.path.isdir('{0}/new_targets'.format(self.output_dir)): os.mkdir('{0}/new_targets'.format(self.output_dir))
         os.chdir('{0}/new_targets'.format(self.output_dir))
@@ -465,6 +632,10 @@ class Reopt:
             os.chdir(cwd)
 
 def run_reopt(**kwargs):
+    """
+    Function for actually running all the code components.
+    """
+
     reopt = Reopt(**kwargs)
     reopt.parseFBInput()
     reopt.minGrids()
