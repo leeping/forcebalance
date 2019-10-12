@@ -619,7 +619,7 @@ class OpenMM(Engine):
 
         # Store a separate copy of the molecule for reference restraint positions.
         self.ref_mol = deepcopy(self.mol)
-        
+
     def prepare(self, pbc=False, mmopts={}, **kwargs):
 
         """
@@ -733,7 +733,6 @@ class OpenMM(Engine):
 
         ## Generate list of OpenMM-compatible positions
         mod = self.generate_xyz_omm(self.mol)
-            
         ## Build a topology and atom lists.
         Top = mod.getTopology()
         Atoms = list(Top.atoms())
@@ -831,10 +830,10 @@ class OpenMM(Engine):
 
         # Freeze atoms if we have any.
         if hasattr(self, 'freeze_atoms'):
-            for i, j in enumerate(self.realAtomIdxs):
-                if i in self.freeze_atoms:
-                    self.system.setParticleMass(j, 0.0)
-                        
+            for i in self.freeze_atoms:
+                j = self.realAtomIdxs[i]
+                self.system.setParticleMass(j, 0.0)
+
         ## Set up for energy component analysis.
         GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce','AmoebaWcaDispersionForce',
                         'CustomNonbondedForce',  'NonbondedForce']
@@ -905,7 +904,7 @@ class OpenMM(Engine):
             if isinstance(i, AmoebaMultipoleForce):
                 if self.SetPME:
                     i.setNonbondedMethod(i.PME)
-                    
+
         #----
         # If the virtual site parameters have changed,
         # the simulation object must be remade.
@@ -1074,7 +1073,7 @@ class OpenMM(Engine):
         """
         self.update_simulation()
         if optimize is True:
-            self.optimize(shot, crit=1e-10)
+            self.optimize(shot, crit=1e-8)
         else:
             warn_once("Computing mass-weighted hessian without geometry optimization")
             self.set_positions(shot)
@@ -1159,10 +1158,10 @@ class OpenMM(Engine):
 
     def optimize(self, shot, crit=1e-4, disable_vsite=False, align=True, include_restraint_energy=False):
 
-        """ 
-        Optimize the geometry and align the optimized 
+        """
+        Optimize the geometry and align the optimized
         geometry to the starting geometry.
-        
+
         Parameters
         ----------
         shot : int
@@ -1192,7 +1191,18 @@ class OpenMM(Engine):
         # printcool_dictionary(energy_components(self.simulation), title='Energy component analysis before minimization, shot %i' % shot)
         # Minimize the energy.  Optimizer works best in "steps".
         for logc in np.linspace(0, np.log10(crit), steps):
-            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=10000)
+            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=100000)
+        # check if energy minimization is successful
+        # try 10 times as openmm minimizer is not very stable at the tolerance
+        for _ in range(10):
+            e_minimized = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
+            self.simulation.minimizeEnergy(tolerance=crit*kilojoule_per_mole, maxIterations=10)
+            e_new = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
+            if abs(e_new - e_minimized) < crit * 10:
+                break
+        else:
+            logger.error("Energy minimization did not converge")
+            raise RuntimeError("Energy minimization did not converge")
         # Remove the restraint energy from the total energy if desired.
         groups = set(range(32))
         if self.restraint_frc_index is not None and not include_restraint_energy:
@@ -1664,7 +1674,7 @@ class OptGeoTarget_OpenMM(OptGeoTarget):
             # here mol=M is given for the purpose of using the topology from the input pdb file
             # if we don't do this, pdb=top.pdb option will only copy some basic information but not the topology into OpenMM.mol (openmmio.py line 615)
             self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, pdb=pdbpath, **engine_args)
- 
+
 class TorsionProfileTarget_OpenMM(TorsionProfileTarget):
     """ Optimized geometry matching using OpenMM. """
     def __init__(self,options,tgt_opts,forcefield):
@@ -1676,4 +1686,3 @@ class TorsionProfileTarget_OpenMM(TorsionProfileTarget):
         self.engine_ = OpenMM
         ## Initialize base class.
         super(TorsionProfileTarget_OpenMM,self).__init__(options,tgt_opts,forcefield)
-
