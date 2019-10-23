@@ -1406,10 +1406,10 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
                     read = ''.encode('utf-8')
                     while True:
                         if read_nbytes == 0:
-                            read += fh.read(rbytes)
+                            read += fh.read1(rbytes)
                             read_nbytes += rbytes
                         else:
-                            read += fh.read(1)
+                            read += fh.read1(1)
                             read_nbytes += 1
                         if read_nbytes > 10+rbytes:
                             raise RuntimeError("Failed to decode stdout from external process.")
@@ -1428,7 +1428,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
                     read = ''.encode('utf-8')
                     while True:
                         if read_nbytes == 0:
-                            read += fh.read(rbytes)
+                            read += fh.read1(rbytes)
                             read_nbytes += rbytes
                         else:
                             read += fh.read(1)
