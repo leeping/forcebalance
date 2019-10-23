@@ -2,7 +2,7 @@ from __future__ import division
 from __future__ import absolute_import
 from builtins import str
 from past.utils import old_div
-from __init__ import ForceBalanceTestCase
+from .__init__ import ForceBalanceTestCase
 import unittest
 import numpy
 import os, re

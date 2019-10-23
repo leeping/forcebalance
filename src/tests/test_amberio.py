@@ -6,8 +6,8 @@ from collections import OrderedDict
 import forcebalance
 import abc
 import numpy
-from __init__ import ForceBalanceTestCase
-from test_target import TargetTests # general targets tests defined in test_target.py
+from .__init__ import ForceBalanceTestCase
+#from test_target import TargetTests # general targets tests defined in test_target.py
 from forcebalance.nifty import *
 from forcebalance.amberio import splitComment, parse_amber_namelist
 
@@ -36,7 +36,7 @@ class TestSplitComment(ForceBalanceTestCase):
 
     def test_parse_amber_mdin(self):
         """ Test if parsing AMBER namelist gives the expected result """
-        datadir = os.path.join(sys.path[0], 'files', 'test_amber_mdin')
+        datadir = os.path.join(sys.path[0], 'src', 'tests','files', 'test_amber_mdin')
         for i in range(1,8):
             fobj = open(os.path.join(datadir, '%i.mdin.txt' % i))
             fstr = fobj.read()

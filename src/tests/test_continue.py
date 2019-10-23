@@ -3,7 +3,7 @@ from builtins import str
 import unittest
 import os, sys
 import tarfile
-from __init__ import ForceBalanceTestCase
+from .__init__ import ForceBalanceTestCase
 from forcebalance.nifty import printcool_dictionary
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
