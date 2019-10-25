@@ -13,30 +13,40 @@ os.chdir(os.path.dirname(__file__) + "/..")
 __all__ = [module[:-3] for module in sorted(os.listdir('tests'))
            if re.match("^test_.*\.py$",module)]
 
-class ForceBalanceTestCase(unittest.TestCase):
-    def __init__(self,methodName='runTest'):
+class ForceBalanceTestCase(object):
+    #def __init__(self,methodName='runTest'):
+    @classmethod
+    def setup_class(cls):
         """Override default test case constructor to set longMessage=True, reset cwd after test
         @override unittest.TestCase.__init(methodName='runTest')"""
 
-        super(ForceBalanceTestCase,self).__init__(methodName)
-        self.longMessage=True
-        self.addCleanup(os.chdir, os.getcwd())  # directory changes shouldn't persist between tests
-        self.addTypeEqualityFunc(numpy.ndarray, self.assertNdArrayEqual)
+        #super(ForceBalanceTestCase,self).__init__(methodName)
+        #self.longMessage=True
+        #self.addCleanup(os.chdir, )  # directory changes shouldn't persist between tests
+        #self.addTypeEqualityFunc(numpy.ndarray, self.assertNdArrayEqual)
 
-        self.logger = forcebalance.output.getLogger('forcebalance.test.' + __name__[5:])
+        cls.logger = forcebalance.output.getLogger('forcebalance.test.' + __name__[5:])
 
         # unset this env to prevent error in mdrun
         if 'OMP_NUM_THREADS' in os.environ:
             os.environ.pop('OMP_NUM_THREADS')
 
-    def shortDescription(self):
-        """Default shortDescription function returns None value if no description
-        is present, but this causes errors when trying to print. Return empty string instead
-        @override unittest.TestCase.shortDescription()"""
+    def setup_method(self, method):
+        self.start_directory = os.getcwd()
 
-        message = super(ForceBalanceTestCase,self).shortDescription()
-        if message: return message
-        else: return self.id()
+
+    def teardown_method(self):
+        os.chdir(self.start_directory)
+
+
+    # def shortDescription(self):
+    #     """Default shortDescription function returns None value if no description
+    #     is present, but this causes errors when trying to print. Return empty string instead
+    #     @override unittest.TestCase.shortDescription()"""
+    #
+    #     message = super(ForceBalanceTestCase,self).shortDescription()
+    #     if message: return message
+    #     else: return self.id()
 
     def assertNdArrayEqual(self, A, B, msg=None, delta=.00001):
         """Provide equality checking for numpy arrays, with informative error messages
@@ -65,18 +75,18 @@ class ForceBalanceTestCase(unittest.TestCase):
             if self.longMessage and msg:
                 reason += msg
             raise self.failureException(reason)
-
-    def assertEqual(self, first, second, msg=None):
-        self.logger.debug(">ASSERT(%s==%s)\n" % (str(first), str(second)))
-        return super(ForceBalanceTestCase,self).assertEqual(first,second,msg)
-
-    def assertNotEqual(self, first, second, msg=None):
-        self.logger.debug(">ASSERT(%s!=%s)\n" % (str(first), str(second)))
-        return super(ForceBalanceTestCase,self).assertNotEqual(first,second,msg)
-
-    def assertTrue(self, expr, msg=None):
-        self.logger.debug(">ASSERT(%s)\n" % (str(expr)))
-        return super(ForceBalanceTestCase,self).assertTrue(expr, msg)
+    #
+    # def assertEqual(self, first, second, msg=None):
+    #     self.logger.debug(">ASSERT(%s==%s)\n" % (str(first), str(second)))
+    #     return super(ForceBalanceTestCase,self).assertEqual(first,second,msg)
+    #
+    # def assertNotEqual(self, first, second, msg=None):
+    #     self.logger.debug(">ASSERT(%s!=%s)\n" % (str(first), str(second)))
+    #     return super(ForceBalanceTestCase,self).assertNotEqual(first,second,msg)
+    #
+    # def assertTrue(self, expr, msg=None):
+    #     self.logger.debug(">ASSERT(%s)\n" % (str(expr)))
+    #     return super(ForceBalanceTestCase,self).assertTrue(expr, msg)
 
 class ForceBalanceTestResult(unittest.TestResult):
     """This manages the reporting of test results as they are run,

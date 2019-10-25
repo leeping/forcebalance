@@ -1,11 +1,10 @@
 from __future__ import absolute_import
 import shutil
 import forcebalance
-
 from forcebalance.nifty import *
-from .test_target import TargetTest # general targets tests defined in test_target.py
+from .test_target import TargetTests # general targets tests defined in test_target.py
 
-class TestInteraction_TINKER(TargetTest):
+class TestInteraction_TINKER(TargetTests):
 
     def setup_method(self, method):
         super().setup_method(method)

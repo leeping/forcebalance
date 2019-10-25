@@ -6,23 +6,28 @@ from builtins import object
 import os
 import forcebalance
 import numpy
+from .__init__ import ForceBalanceTestCase
 
 # class TargetTests(object):
-class TargetTests(object):
+class TargetTests(ForceBalanceTestCase):
 
     def setup_method(self, method):
+        super().setup_method(method)
         self.logger = forcebalance.output.getLogger('forcebalance.test.' + __name__[5:])
         self.logger.debug("\nBuilding options for target...\n")
         self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
         self.ff = None  # Forcefield this target is fitting
-        self.start_directory = os.getcwd()
+        #self.start_directory = os.getcwd()
         self.options.update({'root': os.path.join(os.getcwd(), 'tests', 'files')})
 
         os.chdir(self.options['root'])
 
     def teardown_method(self):
-        os.chdir(self.start_directory)
+        super().teardown_method()
+
+        pass
+        #os.chdir(self.start_directory)
 
     def test_get_function(self):
         """Check target get() function output"""
