@@ -13,7 +13,7 @@ from collections import OrderedDict
 from numpy import array
 
 # class TestWaterTutorial(ForceBalanceTestCase):
-class TestWaterTutirual:
+class TestWaterTutorial:
     # def setUp(self):
     @classmethod
     def setup_class(cls):
