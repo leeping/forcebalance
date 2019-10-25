@@ -33,7 +33,7 @@ class TargetTests(ForceBalanceTestCase):
         """Check target get() function output"""
         os.chdir(self.target.tempdir)
 
-        print("Evaluating objective function for target...\n")
+        self.logger.debug("Evaluating objective function for target...\n")
         objective = self.target.get(self.mvals)
         self.target.indicate()
         print("objective =\n%s" % str(objective))
