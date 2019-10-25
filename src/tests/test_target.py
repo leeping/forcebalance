@@ -3,29 +3,28 @@ from __future__ import absolute_import
 from builtins import str
 from builtins import range
 from builtins import object
-from past.utils import old_div
-# import unittest
-import sys, os, re
+import os
 import forcebalance
-import abc
 import numpy
-# from .__init__ import ForceBalanceTestCase
 
-# class TargetTests(object):
 class TargetTests(object):
-    @classmethod
-    def setup_class(cls):
-        cls.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cls.cwd, 'files'))
-        print("\nBuilding options for target...\n")
-        cls.options=forcebalance.parser.gen_opts_defaults.copy()
-        cls.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
-        cls.ff = None  # Forcefield this target is fitting
-        cls.options.update({'root': os.getcwd()})
+
+    def setup_method(self, method):
+        self.logger = forcebalance.output.getLogger('forcebalance.test.' + __name__[5:])
+        self.logger.debug("\nBuilding options for target...\n")
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
+        self.ff = None  # Forcefield this target is fitting
+        self.start_directory = os.getcwd()
+        self.options.update({'root': os.path.join(os.getcwd(), 'tests', 'files')})
+
+        os.chdir(self.options['root'])
+
+    def teardown_method(self):
+        os.chdir(self.start_directory)
 
     def test_get_function(self):
         """Check target get() function output"""
-        # os.chdir('temp/%s' % self.tgt_opt['name'])
         os.chdir(self.target.tempdir)
 
         print("Evaluating objective function for target...\n")
@@ -46,18 +45,18 @@ class TargetTests(object):
 
         # check objective value types
         print(">ASSERT objective['X'] is a float\n")
-        assert isinstance(objective['X'], float64)
+        assert isinstance(objective['X'], numpy.float64)
         # self.assertEqual(numpy.float64, type(objective['X']))
         print(">ASSERT objective['G'] is a numpy array\n")
-        assert isinstance(objective['G'], float64)
+        assert isinstance(objective['G'], numpy.ndarray)
         # self.assertEqual(numpy.ndarray, type(objective['G']))
         print(">ASSERT objective['H'] is a numpy array\n")
-        assert isinstance(objective['H'], float64)
+        assert isinstance(objective['H'], numpy.ndarray)
         # self.assertEqual(numpy.ndarray, type(objective['H']))
 
         # check array dimensions
         print(">ASSERT size of objective['G'] is a equal to number of forcefield parameters (p)\n")
-        assert objective['G'].size == self.ff.n
+        assert objective['G'].size == self.ff.np
         # self.assertEqual(objective['G'].size, self.ff.np)
         print(">ASSERT size of objective['H'] is a equal to number of forcefield parameters squared (p^2)\n")
         assert objective['H'].size == self.ff.np**2
@@ -107,6 +106,3 @@ class TargetTests(object):
 
         os.chdir('../..')
 
-
-# if __name__ == '__main__':
-#     unittest.main()
