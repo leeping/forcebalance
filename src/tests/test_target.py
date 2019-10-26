@@ -18,7 +18,6 @@ class TargetTests(ForceBalanceTestCase):
         self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
         self.ff = None  # Forcefield this target is fitting
-        #self.start_directory = os.getcwd()
         self.options.update({'root': os.path.join(os.getcwd(), 'tests', 'files')})
 
         os.chdir(self.options['root'])
@@ -27,7 +26,6 @@ class TargetTests(ForceBalanceTestCase):
         super().teardown_method()
 
         pass
-        #os.chdir(self.start_directory)
 
     def test_get_function(self):
         """Check target get() function output"""
