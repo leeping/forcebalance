@@ -26,14 +26,15 @@ class ForceBalanceTestCase(object):
         #self.addTypeEqualityFunc(numpy.ndarray, self.assertNdArrayEqual)
 
         cls.logger = forcebalance.output.getLogger('forcebalance.test.' + __name__[5:])
+        cls.start_directory = os.getcwd()
 
         # unset this env to prevent error in mdrun
         if 'OMP_NUM_THREADS' in os.environ:
             os.environ.pop('OMP_NUM_THREADS')
 
     def setup_method(self, method):
-        self.start_directory = os.getcwd()
-
+        #self.start_directory = os.getcwd()
+        pass
 
     def teardown_method(self):
         os.chdir(self.start_directory)
