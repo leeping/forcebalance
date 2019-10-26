@@ -5,34 +5,35 @@ import os, sys
 import tarfile
 import logging
 import pytest
+from .__init__ import ForceBalanceTestCase
 
 logger = logging.getLogger("test")
 
-class TestOptimizer:
-    @classmethod
-    def setup_class(cls):
-        cls.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cls.cwd, '../../studies/001_water_tutorial'))
-        cls.input_file='very_simple.in'
+class TestOptimizer(ForceBalanceTestCase):
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(self.cwd, '../../studies/001_water_tutorial'))
+        self.input_file='very_simple.in'
         targets = tarfile.open('targets.tar.bz2','r')
         targets.extractall()
         targets.close()
 
-        cls.options, cls.tgt_opts = forcebalance.parser.parse_inputs(cls.input_file)
+        self.options, self.tgt_opts = forcebalance.parser.parse_inputs(self.input_file)
 
-        cls.options.update({'writechk':'checkfile.tmp'})
+        self.options.update({'writechk':'checkfile.tmp'})
 
-        cls.forcefield  = forcebalance.forcefield.FF(cls.options)
-        cls.objective   = forcebalance.objective.Objective(cls.options, cls.tgt_opts, cls.forcefield)
-        try: cls.optimizer   = forcebalance.optimizer.Optimizer(cls.options, cls.objective, cls.forcefield)
+        self.forcefield  = forcebalance.forcefield.FF(self.options)
+        self.objective   = forcebalance.objective.Objective(self.options, self.tgt_opts, self.forcefield)
+        try: self.optimizer   = forcebalance.optimizer.Optimizer(self.options, self.objective, self.forcefield)
         except: pytest.fail("\nCouldn't create optimizer")
 
-    @classmethod
-    def teardown_class(cls):
+    def teardown_method(self):
         os.system('rm -rf result *.bak *.tmp')
+        super().teardown_method()
 
     def test_optimizer(self):
         self.optimizer.writechk()
-        assert os.path.isfile(self.options['writechk']), "Optimizer.writechk() didn't create expected file at %s " % options['writechk']
+        assert os.path.isfile(self.options['writechk']), "Optimizer.writechk() didn't create expected file at %s " % self.options['writechk']
         read = self.optimizer.readchk()
         assert isinstance(read, dict)
