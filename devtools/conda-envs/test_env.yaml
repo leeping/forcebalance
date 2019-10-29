@@ -1,0 +1,27 @@
+name: test
+channels:
+  - conda-forge
+  - omnia
+  - ambermd
+dependencies:
+    # Base depends
+  - python
+  - pip
+
+    # Testing
+  - pytest
+  - pytest-cov
+  - codecov
+  - numpy
+  - scipy
+  - lxml
+  - networkx
+  - swig
+  - future
+  - pymbar
+  - openmm
+  - ambertools
+
+  # Pip-only installs
+  - pip:
+    - codecov
