@@ -39,7 +39,6 @@ before_install:
   - ls
   - pwd
   - uname -a
-  - free -m
   - df -h
   - ulimit -a
   - devtools/travis-ci/before_install.sh
