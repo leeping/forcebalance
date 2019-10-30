@@ -41,7 +41,7 @@ before_install:
   - uname -a
   - df -h
   - ulimit -a
-  - devtools/travis-ci/before_install.sh
+  - source devtools/travis-ci/before_install.sh
   - python -V
 
 install:
