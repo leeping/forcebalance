@@ -29,7 +29,9 @@ class TargetTests(ForceBalanceTestCase):
 
     def test_get_function(self):
         """Check target get() function output"""
-        os.chdir(self.target.tempdir)
+        #os.chdir(self.target.tempdir)
+        os.chdir('temp/%s' % self.tgt_opt['name'])
+
 
         self.logger.debug("Evaluating objective function for target...\n")
         objective = self.target.get(self.mvals)

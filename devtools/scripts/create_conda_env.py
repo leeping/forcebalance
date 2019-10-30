@@ -4,7 +4,10 @@ import re
 import glob
 import shutil
 import subprocess as sp
-from tempfile import TemporaryDirectory
+try:
+    from tempfile import TemporaryDirectory
+except ImportError:
+    import tempfile.mkdtemp as TemporaryDirectory
 from contextlib import contextmanager
 # YAML imports
 try:

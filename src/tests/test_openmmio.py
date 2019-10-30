@@ -2,6 +2,7 @@ from __future__ import absolute_import
 # import unittest
 import sys, os, re
 import forcebalance
+import shutil
 import abc
 import numpy
 # from .__init__ import ForceBalanceTestCase
@@ -31,7 +32,11 @@ class TestLiquid_OpenMM(TargetTests):
 
         self.target = forcebalance.openmmio.Liquid_OpenMM(self.options, self.tgt_opt, self.ff)
         self.target.stage(self.mvals)
-        pytest.addCleanup(os.system, 'rm -rf temp')
+        #pytest.addCleanup(os.system, 'rm -rf temp')
+
+    def teardown_method(self):
+        shutil.rmtree('temp')
+        super().teardown_method()
 
     def shortDescription(self):
         """@override ForceBalanceTestCase.shortDescription()"""
@@ -61,6 +66,7 @@ class TestInteraction_OpenMM(TargetTests):
         self.mvals = [.5]*self.ff.np
 
         self.target = forcebalance.openmmio.Interaction_OpenMM(self.options, self.tgt_opt, self.ff)
+
     def teardown_method(self):
         os.system('rm -rf temp')
         super().teardown_method()
