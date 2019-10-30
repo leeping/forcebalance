@@ -164,7 +164,7 @@ class BindingEnergy(Target):
             logger.info("Repulsive interactions beyond energy_denom will be scaled by 1.0 / ( denom**2 + (reference-denom)**2 )\n")
         ## Build keyword dictionaries to pass to engine.
         engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
-        del engine_args['name']
+        engine_args.pop('name', None)
         ## Create engine objects.
         self.engines = OrderedDict()
         for sysname,sysopt in self.sys_opts.items():

@@ -552,7 +552,7 @@ class TINKER(Engine):
             for f in self.FF.fnms: 
                 os.unlink(f)
 
-    def optimize(self, shot=0, method="newton", crit=1e-4):
+    def optimize(self, shot, method="newton", align=True, crit=1e-4):
 
         """ Optimize the geometry and align the optimized geometry to the starting geometry. """
 
@@ -592,7 +592,7 @@ class TINKER(Engine):
             for line in o:
                 logger.info(str(line) + '\n')
             logger.info("The minimization did not converge in the geometry optimization - printout is above.\n")
-        return E, rmsd
+        return E, rmsd, M12[1]
 
     def evaluate_(self, xyzin, force=False, dipole=False):
 
@@ -805,7 +805,7 @@ class TINKER(Engine):
         # This line actually runs TINKER
         # xyzfnm = sysname+".xyz"
         if optimize:
-            E_, rmsd = self.optimize(shot)
+            E_, rmsd, _ = self.optimize(shot)
             o = self.calltinker("analyze %s.xyz_2 E" % self.name)
             #----
             # Two equivalent ways to get the RMSD, here for reference.
@@ -907,7 +907,7 @@ class TINKER(Engine):
 
         if minimize:
             if verbose: logger.info("Minimizing the energy...")
-            self.optimize(method="bfgs", crit=1)
+            self.optimize(0, method="bfgs", crit=1)
             os.system("mv %s.xyz_2 %s.xyz" % (self.name, self.name))
             if verbose: logger.info("Done\n")
 

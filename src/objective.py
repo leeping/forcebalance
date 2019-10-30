@@ -31,13 +31,13 @@ except:
     logger.warning("Tinker module import failed\n")
 
 try:
-    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM, Hydration_OpenMM, Vibration_OpenMM, OptGeoTarget_OpenMM
+    from forcebalance.openmmio import AbInitio_OpenMM, Liquid_OpenMM, Interaction_OpenMM, BindingEnergy_OpenMM, Moments_OpenMM, Hydration_OpenMM, Vibration_OpenMM, OptGeoTarget_OpenMM, TorsionProfileTarget_OpenMM
 except:
     logger.warning(traceback.format_exc())
     logger.warning("OpenMM module import failed; check OpenMM package\n")
 
 try:
-    from forcebalance.smirnoffio import AbInitio_SMIRNOFF, Liquid_SMIRNOFF, Vibration_SMIRNOFF, OptGeoTarget_SMIRNOFF, smirnoff_analyze_parameter_coverage
+    from forcebalance.smirnoffio import AbInitio_SMIRNOFF, Liquid_SMIRNOFF, Vibration_SMIRNOFF, OptGeoTarget_SMIRNOFF, TorsionProfileTarget_SMIRNOFF, smirnoff_analyze_parameter_coverage
 except:
     logger.warning(traceback.format_exc())
     logger.warning("SMIRNOFF module import failed; check SMIRNOFF package\n")
@@ -106,8 +106,12 @@ Implemented_Targets = {
     'MOMENTS_GMX':Moments_GMX,
     'MOMENTS_OPENMM':Moments_OpenMM,
     'HYDRATION_OPENMM':Hydration_OpenMM,
-    'OPTGEOTARGET_OPENMM': OptGeoTarget_OpenMM,
-    'OPTGEOTARGET_SMIRNOFF': OptGeoTarget_SMIRNOFF,
+    'OPTGEO_OPENMM': OptGeoTarget_OpenMM,
+    'OPTGEO_SMIRNOFF': OptGeoTarget_SMIRNOFF,
+    'OPTGEOTARGET_OPENMM': OptGeoTarget_OpenMM,         # LPW: In the future, the user interface should not include the word 'target' in the target name.
+    'OPTGEOTARGET_SMIRNOFF': OptGeoTarget_SMIRNOFF,     # Keeping these two for compatibility with released FB calculation files.
+    'TORSIONPROFILE_OPENMM': TorsionProfileTarget_OpenMM,
+    'TORSIONPROFILE_SMIRNOFF': TorsionProfileTarget_SMIRNOFF,
     'REMOTE_TARGET':RemoteTarget,
     }
 
@@ -166,7 +170,7 @@ class Objective(forcebalance.BaseClass):
             logger.error("The list of target names is not unique!\n")
             raise RuntimeError
         if enable_smirnoff_prints:
-            smirnoff_analyze_parameter_coverage(forcefield, self.Targets)
+            smirnoff_analyze_parameter_coverage(forcefield, tgt_opts)
         ## The force field (it seems to be everywhere)
         self.FF = forcefield
         ## Initialize the penalty function.

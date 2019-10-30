@@ -841,7 +841,7 @@ class FF(forcebalance.BaseClass):
                 xml_lines[fnm][ln].attrib[fld] = OMMFormat % (wval) + self.offxml_unit_strs[pid]
                 # If this is a SMIRNOFF parameter, assign it directly in the openforcefield.ForceField object
                 # as well as writing out the file.
-                if fnm == self.offxml:
+                if hasattr(self, 'offxml') and fnm == self.offxml:
                     assign_openff_parameter(self.openff_forcefield, wval, pid)
                 # list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (wval)
             # Text force fields are a bit harder.
@@ -1506,7 +1506,7 @@ class FF(forcebalance.BaseClass):
                     # Arrows point from successors to predecessors in the plot representation
                     self.pTree.add_edge(pid, src_nodes[0])
                 else:
-                    raise RuntimeError('Evaluated parameter refers to a source parameter that does not exist')
+                    raise RuntimeError('Evaluated parameter refers to a source parameter that does not exist:\n%s'%cmd)
                 
         self.pfields.append([pid,fnm,ln,pfld,mult,cmd])
 
