@@ -14,7 +14,7 @@ class TestLiquid_OpenMM(TargetTests):
     # def setUp(self):
     def setup_method(self, method):
         # super(TestLiquid_OpenMM, cls).setup_class()
-        # self.skipTest("Needs optimizing to reduce runtime")
+        pytest.skip("Needs optimizing to reduce runtime")
         super().setup_method(method)# .im_func()
         # settings specific to this target
         self.options.update({
