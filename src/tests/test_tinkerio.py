@@ -3,7 +3,9 @@ import shutil
 import forcebalance
 from forcebalance.nifty import *
 from .test_target import TargetTests # general targets tests defined in test_target.py
-
+"""
+The testing functions for this class are located in test_target.py.
+"""
 class TestInteraction_TINKER(TargetTests):
 
     def setup_method(self, method):

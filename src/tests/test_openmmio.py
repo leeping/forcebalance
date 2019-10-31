@@ -9,6 +9,9 @@ import numpy
 from .test_target import TargetTests # general targets tests defined in test_target.py
 import logging
 import pytest
+"""
+The testing functions for this class are located in test_target.py.
+"""
 # class TestLiquid_OpenMM(ForceBalanceTestCase, TargetTests):
 class TestLiquid_OpenMM(TargetTests):
     # def setUp(self):
