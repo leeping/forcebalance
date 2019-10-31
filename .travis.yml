@@ -95,7 +95,7 @@ install:
   - cd build_d
     # Build double precision version
   - echo "Building Gromacs double precision - logs suppressed..."
-  - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=ON -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
+  - cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/opt/gromacs/4.6.7 -DGMX_DOUBLE=ON -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
   - tail -500 config.log
   - make -j 2 &> make.log
   - tail -500 make.log
@@ -106,12 +106,12 @@ install:
   - cd build_s
     # Build double precision version
   - echo "Building Gromacs single precision - log suppressed.."
-  - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=OFF -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
+  - cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/opt/gromacs/4.6.7 -DGMX_DOUBLE=OFF -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
   - make -j 2 &> make.log
   - make install &> install.log
   - tail -500 install.log
   - cd ../..
-  - . /home/travis/opt/gromacs/4.6.7/bin/GMXRC.bash
+  - . $HOME/opt/gromacs/4.6.7/bin/GMXRC.bash
   - which mdrun
   - which mdrun_d
   
