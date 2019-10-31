@@ -12,6 +12,7 @@ from forcebalance.gmxio import GMX
 from forcebalance.tinkerio import TINKER
 from forcebalance.openmmio import OpenMM
 from collections import OrderedDict
+from .__init__ import ForceBalanceTestCase
 
 # Set SAVEDATA to True and run the tests in order to save data
 # to a file for future reference. This is easier to use for troubleshooting
@@ -19,7 +20,7 @@ from collections import OrderedDict
 # which one changed.
 SAVEDATA=False
 
-class TestAmber99SB:
+class TestAmber99SB(ForceBalanceTestCase):
     """ Amber99SB unit test consisting of ten structures of
     ACE-ALA-NME interacting with ACE-GLU-NME.  The tests check for
     whether the OpenMM, GMX, and TINKER Engines produce consistent
@@ -59,8 +60,8 @@ class TestAmber99SB:
     Vibrational frequencies: < 0.5 wavenumber (~ 1e-4 fractional error)
     Vibrational eigenvectors: < 0.01
     """
-    @classmethod
-    def setup_class(cls):
+    def setup_method(self, method):
+        super().setup_method(method)
         """
         setup any state specific to the execution of the given class (which usually contains tests).
         """
@@ -70,40 +71,41 @@ class TestAmber99SB:
         gmxpath = which('mdrun_d') or which('gmx_d')
         gmxsuffix = '_d'
         # self.logger.debug("\nBuilding options for target...\n")
-        cls.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cls.cwd, "files", "amber_alaglu"))
-        if not os.path.exists("temp"):
-            os.makedirs("temp")
-        os.chdir("temp")
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(self.cwd, "files", "amber_alaglu"))
+        tmpfolder = os.path.join(self.cwd, "files", "amber_alaglu", "temp")
+        if not os.path.exists(tmpfolder):
+            os.makedirs(tmpfolder)
+        os.chdir(tmpfolder)
         for i in ["topol.top", "shot.mdp", "a99sb.xml", "a99sb.prm", "all.gro", "all.arc", "AceGluNme.itp", "AceAlaNme.itp", "a99sb.itp"]:
             os.system("ln -fs ../%s" % i)
-        cls.engines = OrderedDict()
+        self.engines = OrderedDict()
         # Set up GMX engine
         if gmxpath != '':
-            cls.engines['GMX'] = GMX(coords="all.gro", gmx_top="topol.top", gmx_mdp="shot.mdp", gmxpath=gmxpath, gmxsuffix=gmxsuffix)
+            self.engines['GMX'] = GMX(coords="all.gro", gmx_top="topol.top", gmx_mdp="shot.mdp", gmxpath=gmxpath, gmxsuffix=gmxsuffix)
         else:
             logger.warn("GROMACS cannot be found, skipping GMX tests.")
         # Set up TINKER engine
         if tinkerpath != '':
-            cls.engines['TINKER'] = TINKER(coords="all.arc", tinker_key="alaglu.key", tinkerpath=tinkerpath)
+            self.engines['TINKER'] = TINKER(coords="all.arc", tinker_key="alaglu.key", tinkerpath=tinkerpath)
         else:
             logger.warn("TINKER cannot be found, skipping TINKER tests.")
         # Set up OpenMM engine
         try:
             import simtk.openmm
-            cls.engines['OpenMM'] = OpenMM(coords="all.gro", pdb="conf.pdb", ffxml="a99sb.xml", platname="Reference", precision="double")
+            self.engines['OpenMM'] = OpenMM(coords="all.gro", pdb="conf.pdb", ffxml="a99sb.xml", platname="Reference", precision="double")
         except:
             logger.warn("OpenMM cannot be imported, skipping OpenMM tests.")
         # the cleanup has been replaced by self.teardown_class
         # self.addCleanup(os.system, 'cd .. ; rm -rf temp')
 
-    @classmethod
-    def teardown_class(cls):
+    def teardown_method(self):
+
         """
         teardown any state that was previously setup with a call to setup_class.
         """
-        os.chdir('..')
-        shutil.rmtree('temp')
+        os.chdir(self.cwd)
+        shutil.rmtree(self.cwd, "files", "amber_alaglu", "temp")
 
     def test_energy_force(self):
         """ Test GMX, OpenMM, and TINKER energy and forces using AMBER force field """
@@ -305,7 +307,7 @@ class TestAmber99SB:
                         np.testing.assert_allclose(m[a], -1.0*mr[a], rtol=0, atol=delta, err_msg="%s normal modes do not match the reference" % Name)
 
 
-class TestAmoebaWater6:
+class TestAmoebaWater6(ForceBalanceTestCase):
     """ AMOEBA unit test consisting of a water hexamer.  The test
     checks for whether the OpenMM and TINKER Engines produce
     consistent results for:
@@ -327,32 +329,33 @@ class TestAmoebaWater6:
     Multipole moments: < 0.001 Debye / Debye Angstrom
     Multipole moments (optimized): < 0.01 Debye / Debye Angstrom
     """
-    @classmethod
-    def setup_class(cls):
+    def setup_method(self, method):
+        super().setup_method(method)
         #self.logger.debug("\nBuilding options for target...\n")
-        cls.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cls.cwd, "files", "amoeba_h2o6"))
-        if not os.path.exists("temp"):
-            os.makedirs("temp")
-        os.chdir("temp")
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(self.cwd, "files", "amoeba_h2o6"))
+        tmpfolder = os.path.join(self.cwd, "files", "amoeba_h2o6", "temp")
+        if not os.path.exists(tmpfolder):
+            os.makedirs(tmpfolder)
+        os.chdir(tmpfolder)
         os.system("ln -s ../prism.pdb")
         os.system("ln -s ../prism.key")
         os.system("ln -s ../hex.arc")
         os.system("ln -s ../water.prm")
         os.system("ln -s ../amoebawater.xml")
-        cls.O = OpenMM(coords="hex.arc", pdb="prism.pdb", ffxml="amoebawater.xml", precision="double", \
+        self.O = OpenMM(coords="hex.arc", pdb="prism.pdb", ffxml="amoebawater.xml", precision="double", \
                             mmopts={'rigidWater':False, 'mutualInducedTargetEpsilon':1e-6})
         tinkerpath = which('testgrad')
         if tinkerpath:
-            cls.T = TINKER(coords="hex.arc", tinker_key="prism.key", tinkerpath=tinkerpath)
+            self.T = TINKER(coords="hex.arc", tinker_key="prism.key", tinkerpath=tinkerpath)
 
     @classmethod
-    def teardown_class(cls):
+    def teardown_class(self):
         """
         teardown any state that was previously setup with a call to setup_class.
         """
-        os.chdir('..')
-        shutil.rmtree('temp')
+        os.chdir(self.cwd)
+        shutil.rmtree(self.cwd, "files", "amoeba_h2o6", "temp")
 
     def test_energy_force(self):
         """ Test OpenMM and TINKER energy and forces with AMOEBA force field """

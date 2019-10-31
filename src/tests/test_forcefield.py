@@ -4,6 +4,7 @@ from builtins import object
 import sys, os
 import forcebalance
 import forcebalance.forcefield as forcefield
+from .__init__ import ForceBalanceTestCase
 import numpy as np
 from copy import deepcopy
 
@@ -14,30 +15,30 @@ class FFTests(object):
 
     def test_FF_yields_consistent_results(self):
         """Check whether multiple calls to FF yield the same result"""
-        print("\nChecking consistency of ForceField constructor\n")
+        self.logger.debug("\nChecking consistency of ForceField constructor\n")
         assert forcefield.FF(self.options) == forcefield.FF(self.options), "Got two different forcefields despite using the same options as input"
 
     def test_make_function_return_value(self):
         """Check that make() return value meets expectation"""
         pvals = self.ff.pvals0
 
-        print("Running forcefield.make() with zero vector should not change pvals... ")
+        self.logger.debug("Running forcefield.make() with zero vector should not change pvals... ")
         new_pvals = np.array(self.ff.make(np.zeros(self.ff.np)))
         assert pvals.size == new_pvals.size
         assert (pvals == new_pvals).all(), "make() should produce unchanged pvals when given zero vector"
-        print("ok\n")
+        self.logger.debug("ok\n")
 
-        print("make() should return different values when passed in nonzero pval matrix... ")
+        self.logger.debug("make() should return different values when passed in nonzero pval matrix... ")
         new_pvals = np.array(self.ff.make(np.ones(self.ff.np)))
         assert pvals.size == new_pvals.size
         # given arbitrary nonzero input, make should return new pvals
         assert not (pvals==new_pvals).all(), "make() returned unchanged pvals even when given nonzero matrix"
-        print("ok\n")
+        self.logger.debug("ok\n")
 
-        print("make(use_pvals=True) should return the same pvals... ")
+        self.logger.debug("make(use_pvals=True) should return the same pvals... ")
         new_pvals = np.array(self.ff.make(np.ones(self.ff.np),use_pvals=True))
         assert (np.ones(self.ff.np) == new_pvals).all(), "make() did not return input pvals with use_pvals=True"
-        print("ok\n")
+        self.logger.debug("ok\n")
 
         os.remove(self.options['root'] + '/' + self.ff.fnms[0])
 
@@ -62,113 +63,117 @@ class FFTests(object):
         os.remove(self.options['ffdir']+'/test_ones.' + self.filetype)
 
 
-class TestWaterFF(FFTests):
+class TestWaterFF(ForceBalanceTestCase, FFTests):
     """Test FF class using water options and forcefield (text forcefield input)
     This test case also acts as a base class for other forcefield test cases.
     Override the setUp() to run tests on a different forcefield"""
-    @classmethod
-    def setup_class(cls):
-        cls.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cls.cwd, 'files'))
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(self.cwd, 'files'))
         # options used in 001_water_tutorial
-        print("\nSetting up options...\n")
-        cls.options=forcebalance.parser.gen_opts_defaults.copy()
-        cls.options.update({
+        self.logger.debug("\nSetting up options...\n")
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.options.update({
                 'root': os.getcwd(),
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
                 'forcefield': ['water.itp']})
-        print(str(cls.options) + '\n')
+        self.logger.debug(str(self.options) + '\n')
 
-        print("Creating forcefield using above options... ")
-        cls.ff = forcefield.FF(cls.options)
-        cls.ffname = cls.options['forcefield'][0][:-3]
-        cls.filetype = cls.options['forcefield'][0][-3:]
-        print("ok\n")
+        self.logger.debug("Creating forcefield using above options... ")
+        self.ff = forcefield.FF(self.options)
+        self.ffname = self.options['forcefield'][0][:-3]
+        self.filetype = self.options['forcefield'][0][-3:]
+        self.logger.debug("ok\n")
 
     def shortDescription(self):
         """Add XML to test descriptions
         @override __init__.ForceBalanceTestCase.shortDescription()"""
         return super(TestWaterFF,self).shortDescription() + " (itp)"
 
-class TestXmlFF(FFTests):
+class TestXmlFF(ForceBalanceTestCase, FFTests):
     """Test FF class using dms.xml forcefield input"""
-    @classmethod
-    def setup_class(cls):
-        cls.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cls.cwd, 'files'))
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(self.cwd, 'files'))
         # options from 2013 tutorial
-        print("Setting up options...\n")
-        cls.options=forcebalance.parser.gen_opts_defaults.copy()
-        cls.options.update({
+        self.logger.debug("Setting up options...\n")
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.options.update({
                 'root': os.getcwd(),
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
                 'forcefield': ['dms.xml']})
-        print(str(cls.options) + '\n')
+        self.logger.debug(str(self.options) + '\n')
 
-        print("Creating forcefield using above options... ")
-        cls.ff = forcefield.FF(cls.options)
-        cls.ffname = cls.options['forcefield'][0][:-3]
-        cls.filetype = cls.options['forcefield'][0][-3:]
-        print("ok\n")
+        self.logger.debug("Creating forcefield using above options... ")
+        self.ff = forcefield.FF(self.options)
+        self.ffname = self.options['forcefield'][0][:-3]
+        self.filetype = self.options['forcefield'][0][-3:]
+        self.logger.debug("ok\n")
 
     def shortDescription(self):
         """Add XML to test descriptions
         @override __init__.ForceBalanceTestCase.shortDescription()"""
         return super(TestXmlFF,self).shortDescription() + " (xml)"
 
-class TestXmlScriptFF:
+class TestXmlScriptFF(ForceBalanceTestCase):
     """Test FF class with XmlScript using TIP3G2w.xml forcefield input"""
-    @classmethod
-    def setup_class(cls):
-        print("Setting up options...\n")
-        cls.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cls.cwd, 'files'))
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.logger.debug("Setting up options...\n")
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(self.cwd, 'files'))
         # Load the base force field file
-        cls.ff = forcefield.FF.fromfile('forcefield/TIP3G2w.xml')
+        self.ff = forcefield.FF.fromfile('forcefield/TIP3G2w.xml')
         # Load mathematical parameter values corresponding to a known output
-        cls.mvals = np.loadtxt('XmlScript_out/mvals.txt')
+        self.mvals = np.loadtxt('XmlScript_out/mvals.txt')
         # Load the known output force field
-        cls.ff_ref = forcefield.FF.fromfile('XmlScript_out/TIP3G2w_out_ref.xml')
+        self.ff_ref = forcefield.FF.fromfile('XmlScript_out/TIP3G2w_out_ref.xml')
 
     # def tearDown(self):
-    def teardown_class(cls):
-        os.system('rm -rf TIP3G2w.xml')
+    def teardown_method(self):
+        tmpfolder = os.path.join(self.cwd, 'files', 'TIP3G2w.xml')
+        if os.path.isdir(tmpfolder):
+            shutil.rmtree(tmpfolder)
+        # os.system('rm -rf TIP3G2w.xml')
+        super().teardown_method()
 
     def test_make_function_output(self):
         """Check make() function creates expected force field file containing XML Script"""
-        os.chdir('XmlScript_out')
+        os.chdir(os.path.join(self.cwd, 'files', 'XmlScript_out'))
         # Create the force field with mathematical parameter values and
         # make sure it matches the known reference
         self.ff.make(self.mvals)
         ff_out = forcefield.FF.fromfile('TIP3G2w.xml')
         assert self.ff_ref == ff_out, "make() produced a different output force field"
 
-class TestGbsFF(FFTests):
+class TestGbsFF(ForceBalanceTestCase, FFTests):
     """Test FF class using gbs forcefield input"""
-    @classmethod
-    def setup_class(cls):
-        cls.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cls.cwd, 'files'))
-        print("Setting up options...\n")
-        cls.options=forcebalance.parser.gen_opts_defaults.copy()
-        cls.options.update({
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(self.cwd, 'files'))
+        self.logger.debug("Setting up options...\n")
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.options.update({
                 'root': os.getcwd(),
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
                 'forcefield': ['cc-pvdz-overlap-original.gbs']})
-        print(str(cls.options) + '\n')
+        self.logger.debug(str(self.options) + '\n')
 
-        print("Creating forcefield using above options... ")
-        cls.ff = forcefield.FF(cls.options)
-        cls.ffname = cls.options['forcefield'][0][:-3]
-        cls.filetype = cls.options['forcefield'][0][-3:]
-        print("ok\n")
+        self.logger.debug("Creating forcefield using above options... ")
+        self.ff = forcefield.FF(self.options)
+        self.ffname = self.options['forcefield'][0][:-3]
+        self.filetype = self.options['forcefield'][0][-3:]
+        self.logger.debug("ok\n")
 
     def test_find_spacings(self):
         """Check find_spacings function"""
-        print("Running forcefield.find_spacings()...\n")
+        self.logger.debug("Running forcefield.find_spacings()...\n")
         spacings = self.ff.find_spacings()
 
         assert (self.ff.np)*(self.ff.np-1)/2 >= len(spacings.keys())

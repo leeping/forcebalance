@@ -6,77 +6,80 @@ import forcebalance
 import abc
 import numpy
 import pytest
+from .__init__ import ForceBalanceTestCase
 
-def test_implemented_targets_derived_from_target():
-    """Check classes listed in Implemented_Targets are derived from Target"""
-    for key in forcebalance.objective.Implemented_Targets.keys():
-        print("Assert %s is subclass of target\n" % str(forcebalance.objective.Implemented_Targets[key]))
-        assert issubclass(forcebalance.objective.Implemented_Targets[key],forcebalance.target.Target)
+class TestImplemented(ForceBalanceTestCase):
+    def test_implemented_targets_derived_from_target(self):
+        """Check classes listed in Implemented_Targets are derived from Target"""
+        for key in forcebalance.objective.Implemented_Targets.keys():
+            self.logger.debug("Assert %s is subclass of target\n" % str(forcebalance.objective.Implemented_Targets[key]))
+            assert issubclass(forcebalance.objective.Implemented_Targets[key],forcebalance.target.Target)
 
-def test_no_unlisted_classes_derived_from_Target():
-    """Check for unknown omissions from Implemented_Targets
+    def test_no_unlisted_classes_derived_from_Target(self):
+        """Check for unknown omissions from Implemented_Targets
 
-    Check to make sure any classes derived from Target are either
-    listed in Implemented_Targets or in the exclusion list in this
-    test case
-    """
-    forcebalance_modules=[module[:-3] for module in os.listdir(forcebalance.__path__[0])
-                 if re.compile(".*\.py$").match(module)
-                 and module not in ["__init__.py"]]
-    for module in forcebalance_modules:
-        # LPW: I don't think dcdlib should be imported this way.
-        print(module)
-        if module == "_dcdlib": continue
-        m = __import__('forcebalance.' + module)
-        objs = dir(eval('m.' + module))
-        print(objs)
-        for obj in objs:
-            obj = eval('m.'+module+'.'+obj)
-            if type(obj) == abc.ABCMeta:
-                implemented = [i for i in forcebalance.objective.Implemented_Targets.values()]
-                # list of documented exceptions
-                # Basically, platform-independent targets are excluded.
-                exclude = ['Target',
-                           'AbInitio',
-                           'Interaction',
-                           'Interaction_GMX',
-                           'Liquid',
-                           'Lipid',
-                           'BindingEnergy',
-                           'LeastSquares',
-                           'Vibration',
-                           'Thermo',
-                           'Hydration',
-                           'Moments']
-                print(obj)
-                if obj not in implemented and obj.__name__ not in exclude:
-                    pytest.fail("Unknown class '%s' not listed in Implemented_Targets" % obj.__name__)
+        Check to make sure any classes derived from Target are either
+        listed in Implemented_Targets or in the exclusion list in this
+        test case
+        """
+        forcebalance_modules=[module[:-3] for module in os.listdir(forcebalance.__path__[0])
+                    if re.compile(".*\.py$").match(module)
+                    and module not in ["__init__.py"]]
+        for module in forcebalance_modules:
+            # LPW: I don't think dcdlib should be imported this way.
+            self.logger.debug(module)
+            if module == "_dcdlib": continue
+            m = __import__('forcebalance.' + module)
+            objs = dir(eval('m.' + module))
+            self.logger.debug(objs)
+            for obj in objs:
+                obj = eval('m.'+module+'.'+obj)
+                if type(obj) == abc.ABCMeta:
+                    implemented = [i for i in forcebalance.objective.Implemented_Targets.values()]
+                    # list of documented exceptions
+                    # Basically, platform-independent targets are excluded.
+                    exclude = ['Target',
+                            'AbInitio',
+                            'Interaction',
+                            'Interaction_GMX',
+                            'Liquid',
+                            'Lipid',
+                            'BindingEnergy',
+                            'LeastSquares',
+                            'Vibration',
+                            'Thermo',
+                            'Hydration',
+                            'Moments', 
+                            'OptGeoTarget']
+                    self.logger.debug(obj)
+                    if obj not in implemented and obj.__name__ not in exclude:
+                        pytest.fail("Unknown class '%s' not listed in Implemented_Targets" % obj.__name__)
 
-class TestPenalty:
-    @classmethod
-    def setup_class(cls):
-        cls.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cls.cwd, 'files'))
-        cls.options=forcebalance.parser.gen_opts_defaults.copy()
-        cls.options.update({
+class TestPenalty(ForceBalanceTestCase):
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(self.cwd, 'files'))
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.options.update({
                 'root': os.getcwd(),
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
                 'forcefield': ['cc-pvdz-overlap-original.gbs']})
-        os.chdir(cls.options['root'])
+        os.chdir(self.options['root'])
 
-        cls.ff = forcebalance.forcefield.FF(cls.options)
-        cls.np=cls.ff.np
+        self.ff = forcebalance.forcefield.FF(self.options)
+        self.np=self.ff.np
 
-        cls.penalties = []
+        self.penalties = []
         for ptype in forcebalance.objective.Penalty.Pen_Names.keys():
             penalty = forcebalance.objective.Penalty(ptype,
-                                cls.ff,
-                                cls.options['penalty_additive'],
-                                cls.options['penalty_multiplicative'],
-                                cls.options['penalty_hyperbolic_b'],
-                                cls.options['penalty_alpha'])
-            cls.penalties.append(penalty)
+                                self.ff,
+                                self.options['penalty_additive'],
+                                self.options['penalty_multiplicative'],
+                                self.options['penalty_hyperbolic_b'],
+                                self.options['penalty_alpha'])
+            self.penalties.append(penalty)
 
     def test_penalty_compute(self):
         """Check penalty computation functions"""
@@ -120,50 +123,50 @@ class ObjectiveTests(object):
         """Check objective.indicate() runs without errors"""
         self.objective.Indicate()
 
-class TestWaterObjective(ObjectiveTests):
-    @classmethod
-    def setup_class(cls):
-        cls.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cls.cwd, 'files'))
-        cls.options=forcebalance.parser.gen_opts_defaults.copy()
-        cls.options.update({
+class TestWaterObjective(ForceBalanceTestCase, ObjectiveTests):
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(self.cwd, 'files'))
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.options.update({
                 'root': os.getcwd(),
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
                 'forcefield': ['water.itp']})
-        os.chdir(cls.options['root'])
+        os.chdir(self.options['root'])
 
-        print("\nUsing the following options:\n%s\n" % str(cls.options))
+        self.logger.debug("\nUsing the following options:\n%s\n" % str(self.options))
 
-        cls.tgt_opts = [ forcebalance.parser.tgt_opts_defaults.copy() ]
-        cls.tgt_opts[0].update({"type" : "ABINITIO_GMX", "name" : "cluster-06"})
-        cls.ff = forcebalance.forcefield.FF(cls.options)
+        self.tgt_opts = [ forcebalance.parser.tgt_opts_defaults.copy() ]
+        self.tgt_opts[0].update({"type" : "ABINITIO_GMX", "name" : "cluster-06"})
+        self.ff = forcebalance.forcefield.FF(self.options)
 
-        cls.objective = forcebalance.objective.Objective(cls.options, cls.tgt_opts,cls.ff)
+        self.objective = forcebalance.objective.Objective(self.options, self.tgt_opts,self.ff)
 
     def shortDescription(self):
         return super(TestWaterObjective, self).shortDescription() + " (AbInitio_GMX target)"
 
-class TestBromineObjective(ObjectiveTests):
-    @classmethod
-    def setup_class(cls):
-        cls.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cls.cwd, 'files'))
-        cls.options=forcebalance.parser.gen_opts_defaults.copy()
-        cls.options.update({
+class TestBromineObjective(ForceBalanceTestCase, ObjectiveTests):
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(self.cwd, 'files'))
+        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.options.update({
                 'root': os.getcwd(),
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
                 'forcefield': ['bro.itp']})
-        os.chdir(cls.options['root'])
+        os.chdir(self.options['root'])
 
-        print("\nUsing the following options:\n%s\n" % str(cls.options))
+        self.logger.debug("\nUsing the following options:\n%s\n" % str(self.options))
 
-        cls.tgt_opts = [ forcebalance.parser.tgt_opts_defaults.copy() ]
-        cls.tgt_opts[0].update({"type" : "LIQUID_GMX", "name" : "LiquidBromine"})
-        cls.ff = forcebalance.forcefield.FF(cls.options)
+        self.tgt_opts = [ forcebalance.parser.tgt_opts_defaults.copy() ]
+        self.tgt_opts[0].update({"type" : "LIQUID_GMX", "name" : "LiquidBromine"})
+        self.ff = forcebalance.forcefield.FF(self.options)
 
-        cls.objective = forcebalance.objective.Objective(cls.options, cls.tgt_opts,cls.ff)
+        self.objective = forcebalance.objective.Objective(self.options, self.tgt_opts,self.ff)
 
     def shortDescription(self):
         return super(TestBromineObjective, self).shortDescription() + " (Liquid_GMX target)"
