@@ -96,7 +96,9 @@ install:
     # Build double precision version
   - echo "Building Gromacs double precision - logs suppressed..."
   - cmake .. -DCMAKE_INSTALL_PREFIX=/home/travis/opt/gromacs/4.6.7 -DGMX_DOUBLE=ON -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
+  - tail -500 config.log
   - make -j 2 &> make.log
+  - tail -500 make.log
   - make install &> install.log
   - tail -500 install.log
   - cd ..
@@ -119,9 +121,9 @@ install:
   #- wget https://dasher.wustl.edu/tinker/downloads/bin-${OS}-8.2.1.tar.gz -O tinker.tar.gz
   - tar xvzf tinker.tar.gz &> untar.log
     # The macos files are also gzipped inside the tarball
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then  gunzip bin-${OS}/*gz; fi ;
   - mkdir -p $HOME/opt/tinker/8.2.1
-  - mv bin-${OS} $HOME/opt/tinker/8.2.1/bin
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then gunzip bin-macos/*gz; mv bin-macos $HOME/opt/tinker/8.2.1/bin; fi ;
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then gunzip bin-linux/*gz; mv bin-linux $HOME/opt/tinker/8.2.1/bin; fi ;
   - export PATH="$HOME/opt/tinker/8.2.1/bin:$PATH"
 
 #    # Amber
