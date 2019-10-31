@@ -142,7 +142,8 @@ install:
   - cd -
 
     # Install ForceBalance
-  - python setup.py develop --no-deps
+  #- python setup.py develop --no-deps
+  -  python setup.py install
 
 
 before_script:
@@ -154,8 +155,9 @@ script:
   - cd studies/001_water_tutorial
   - tar xvjf targets.tar.bz2
   - ForceBalance very_simple.in
-  - cd ..
-  - python test
+  - cd ../src/tests
+  - pytest --cov=forcebalance --cov-config=setup.cfg
+  # - python test
   # - py.test -v --cov=eex/ --durations=5
 
 notifications:
