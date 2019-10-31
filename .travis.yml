@@ -122,8 +122,8 @@ install:
   - tar xvzf tinker.tar.gz &> untar.log
     # The macos files are also gzipped inside the tarball
   - mkdir -p $HOME/opt/tinker/8.2.1
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then gunzip bin-macos/*gz; mv bin-macos/* $HOME/opt/tinker/8.2.1/bin; fi ;
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mv bin-linux64/* $HOME/opt/tinker/8.2.1/bin; fi ;
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then gunzip bin-macos/*gz; mv bin-macos $HOME/opt/tinker/8.2.1/bin; fi ;
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mv bin-linux64 $HOME/opt/tinker/8.2.1/bin; fi ;
   - export PATH="$HOME/opt/tinker/8.2.1/bin:$PATH"
 
 #    # Amber
