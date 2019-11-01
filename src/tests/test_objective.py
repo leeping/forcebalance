@@ -28,7 +28,8 @@ class TestImplemented(ForceBalanceTestCase):
         for module in forcebalance_modules:
             # LPW: I don't think dcdlib should be imported this way.
             self.logger.debug(module)
-            if module == "_dcdlib": continue
+            # Skip over smirnoff_hack because it is not intended to contain any Target implementations.
+            if module in ["_dcdlib", "smirnoff_hack"]: continue
             m = __import__('forcebalance.' + module)
             objs = dir(eval('m.' + module))
             self.logger.debug(objs)
@@ -50,7 +51,8 @@ class TestImplemented(ForceBalanceTestCase):
                             'Thermo',
                             'Hydration',
                             'Moments', 
-                            'OptGeoTarget']
+                            'OptGeoTarget',
+                            'TorsionProfileTarget']
                     self.logger.debug(obj)
                     if obj not in implemented and obj.__name__ not in exclude:
                         pytest.fail("Unknown class '%s' not listed in Implemented_Targets" % obj.__name__)
