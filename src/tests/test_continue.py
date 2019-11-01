@@ -10,6 +10,7 @@ from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer, Counter
 from collections import OrderedDict
 from numpy import array
+import pytest
 
 class TestWaterTutorial(ForceBalanceTestCase):
     def setup_method(self, method):
@@ -39,16 +40,16 @@ class TestWaterTutorial(ForceBalanceTestCase):
 
     def test_continue(self):
         """Check continuation from a previous run"""
-        # if not sys.version_info <= (2,7):
-        #     skipTest("Existing pickle file only works with Python 3")
-        self.logger.debug("Setting input file to 'test_continue.in'")
+        if sys.version_info <= (2,7):
+            pytest.skip("Existing pickle file only works with Python 3")
+        self.logger.debug("\nSetting input file to 'test_continue.in'\n")
         input_file='test_continue.in'
 
         ## The general options and target options that come from parsing the input file
-        self.logger.debug("Parsing inputs...")
+        self.logger.debug("Parsing inputs...\n")
         options, tgt_opts = parse_inputs(input_file)
         options['continue'] = True
-        self.logger.debug("options:%s\ntgt_opts:%s\n" % (str(options), str(tgt_opts)))
+        self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
 
         assert isinstance(options, dict), "Parser gave incorrect type for options"
         assert isinstance(tgt_opts, list), "Parser gave incorrect type for tgt_opts"
@@ -67,13 +68,13 @@ class TestWaterTutorial(ForceBalanceTestCase):
         self.logger.debug("Creating optimizer: ")
         optimizer   = Optimizer(options, objective, forcefield)
         assert isinstance(optimizer, Optimizer), "Expected forcebalance optimizer object"
-        self.logger.debug(str(optimizer))
+        self.logger.debug(str(optimizer)+'\n')
 
         ## Actually run the optimizer.
-        self.logger.debug("Done setting up! Running optimizer...")
+        self.logger.debug("Done setting up! Running optimizer...\n")
         result = optimizer.Run()
-        self.logger.debug("Optimizer finished. Final results:")
-        self.logger.debug(str(result))
+        self.logger.debug("\nOptimizer finished. Final results:\n")
+        self.logger.debug(str(result)+'\n')
 
         assert optimizer.iterinit == 2, "Initial iteration counter is incorrect"
         assert optimizer.iteration == 2, "Final iteration counter is incorrect"
