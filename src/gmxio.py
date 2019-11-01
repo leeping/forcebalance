@@ -1229,9 +1229,16 @@ class GMX(Engine):
         # Default options if not user specified.
         md_defs = OrderedDict()
 
+        # Read the provided mdp_opts file.
+        # This contains information on the number of coupling groups
+        # which affects the proper formatting of ref_t and ref_p
+        mdp_opts = edit_mdp(fin='%s.mdp' % self.name)
+        ref_t_str = ' '.join(["%f" % temperature]*len(mdp_opts.get('tc_grps', 'System').split()))
+        ref_p_str = ' '.join(["%f" % pressure]*len(mdp_opts.get('tc_grps', 'System').split()))
+
         warnings = []
         if temperature is not None:
-            md_opts["ref_t"] = temperature
+            md_opts["ref_t"] = ref_t_str
             md_opts["gen_vel"] = "no"
             md_defs["tc_grps"] = "System"
             md_defs["tcoupl"] = "v-rescale"
@@ -1239,7 +1246,7 @@ class GMX(Engine):
         if self.pbc:
             md_opts["comm_mode"] = "linear"
             if pressure is not None:
-                md_opts["ref_p"] = pressure
+                md_opts["ref_p"] = ref_p_str
                 md_defs["pcoupl"] = "parrinello-rahman"
                 md_defs["tau_p"] = 1.5
         else:
