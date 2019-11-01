@@ -5,6 +5,7 @@ import sys, os, re
 import forcebalance
 import abc
 import numpy
+import inspect
 import pytest
 from .__init__ import ForceBalanceTestCase
 
@@ -35,7 +36,7 @@ class TestImplemented(ForceBalanceTestCase):
             self.logger.debug(objs)
             for obj in objs:
                 obj = eval('m.'+module+'.'+obj)
-                if type(obj) == abc.ABCMeta:
+                if inspect.isclass(obj) and issubclass(obj, forcebalance.target.Target):
                     implemented = [i for i in forcebalance.objective.Implemented_Targets.values()]
                     # list of documented exceptions
                     # Basically, platform-independent targets are excluded.
