@@ -1233,8 +1233,10 @@ class GMX(Engine):
         # This contains information on the number of coupling groups
         # which affects the proper formatting of ref_t and ref_p
         mdp_opts = edit_mdp(fin='%s.mdp' % self.name)
-        ref_t_str = ' '.join(["%f" % temperature]*len(mdp_opts.get('tc_grps', 'System').split()))
-        ref_p_str = ' '.join(["%f" % pressure]*len(mdp_opts.get('tc_grps', 'System').split()))
+        if temperature is not None:
+            ref_t_str = ' '.join(["%f" % temperature]*len(mdp_opts.get('tc_grps', 'System').split()))
+        if pressure is not None:
+            ref_p_str = ' '.join(["%f" % pressure]*len(mdp_opts.get('tc_grps', 'System').split()))
 
         warnings = []
         if temperature is not None:
