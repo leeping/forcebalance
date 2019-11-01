@@ -7,9 +7,11 @@ language: python
 matrix:
   include:
   # Test osx
-  - os: osx
-    language: generic
-    env: PYTHON_VER=2.7
+  # Tinker on mac has some sort of different behavior, which requires using the ByteStream.read1 function to
+  # interface with it. However, python 2.7 doesn't support read1, so this will always fail.
+#  - os: osx
+#    language: generic
+#    env: PYTHON_VER=2.7
   - os: osx
     language: generic
     env: PYTHON_VER=3.5
@@ -34,6 +36,10 @@ matrix:
     language: generic
     env: PYTHON_VER=3.7
 
+env:
+  global:
+  - OE_LICENSE="$HOME/oe_license.txt"
+
 
 before_install:
   - ls
@@ -51,6 +57,9 @@ install:
     # Activate the test environment
   - conda activate test
 
+    # Unencrypt OE license
+  - if [ "$TRAVIS_SECURE_ENV_VARS" == true ]; then openssl aes-256-cbc -K $encrypted_6d5250c3155a_key -iv
+    $encrypted_6d5250c3155a_iv -in devtools/travis-ci/oe_license.txt.enc -out $OE_LICENSE -d; fi
     # swig: for building CCTools
     # future: for builtins
     
@@ -155,7 +164,7 @@ script:
   - cd studies/001_water_tutorial
   - tar xvjf targets.tar.bz2
   - ForceBalance very_simple.in
-  - cd ../src/tests
+  - cd -
   - pytest --cov=forcebalance --cov-config=setup.cfg
   # - python test
   # - py.test -v --cov=eex/ --durations=5
@@ -164,4 +173,4 @@ notifications:
   email: false
 
 after_success:
-  # - codecov
+  - codecov

@@ -1149,6 +1149,12 @@ class OpenMM(Engine):
         # step 4: convert eigenvectors to normal modes
         # re-arange to row index and shape
         normal_modes = eigvecs.T.reshape(noa*3, noa, 3)
+        # step 5: Remove mass weighting from eigenvectors
+        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
+        for i in range(normal_modes.shape[0]):
+            mode = normal_modes[i]
+            mode /= np.sqrt(massList[:,np.newaxis])
+            mode /= np.linalg.norm(mode)
         # step 5: remove the 6 freqs with smallest abs value and corresponding normal modes
         n_remove = 5 if len(self.realAtomIdxs) == 2 else 6
         larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])
