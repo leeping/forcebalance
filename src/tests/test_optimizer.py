@@ -1,18 +1,19 @@
 from __future__ import absolute_import
-from __init__ import ForceBalanceTestCase
-import unittest
 import numpy
 import forcebalance
-import os
+import os, sys
 import tarfile
 import logging
+import pytest
+from .__init__ import ForceBalanceTestCase
 
 logger = logging.getLogger("test")
 
 class TestOptimizer(ForceBalanceTestCase):
-    def setUp(self):
-        super(ForceBalanceTestCase,self).setUp()
-        os.chdir('studies/001_water_tutorial')
+    def setup_method(self, method):
+        super().setup_method(method)
+        self.cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(self.cwd, '../../studies/001_water_tutorial'))
         self.input_file='very_simple.in'
         targets = tarfile.open('targets.tar.bz2','r')
         targets.extractall()
@@ -25,18 +26,14 @@ class TestOptimizer(ForceBalanceTestCase):
         self.forcefield  = forcebalance.forcefield.FF(self.options)
         self.objective   = forcebalance.objective.Objective(self.options, self.tgt_opts, self.forcefield)
         try: self.optimizer   = forcebalance.optimizer.Optimizer(self.options, self.objective, self.forcefield)
-        except: self.fail("\nCouldn't create optimizer")
+        except: pytest.fail("\nCouldn't create optimizer")
 
-    def tearDown(self):
+    def teardown_method(self):
         os.system('rm -rf result *.bak *.tmp')
-        super(ForceBalanceTestCase,self).tearDown()
+        super().teardown_method()
 
-    def runTest(self):
+    def test_optimizer(self):
         self.optimizer.writechk()
-        self.assertTrue(os.path.isfile(self.options['writechk']),
-        msg="\nOptimizer.writechk() didn't create expected file at %s" % self.options['writechk'])
+        assert os.path.isfile(self.options['writechk']), "Optimizer.writechk() didn't create expected file at %s " % self.options['writechk']
         read = self.optimizer.readchk()
-        self.assertEqual(type(read), dict)
-
-if __name__ == '__main__':           
-    unittest.main()
+        assert isinstance(read, dict)
