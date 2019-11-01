@@ -162,6 +162,7 @@ script:
   - cd studies/001_water_tutorial
   - tar xvjf targets.tar.bz2
   - ForceBalance very_simple.in
+  - cd -
   - pytest --cov=forcebalance --cov-config=setup.cfg
   # - python test
   # - py.test -v --cov=eex/ --durations=5
