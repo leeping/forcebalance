@@ -7,9 +7,11 @@ language: python
 matrix:
   include:
   # Test osx
-  - os: osx
-    language: generic
-    env: PYTHON_VER=2.7
+  # Tinker on mac has some sort of different behavior, which requires using the ByteStream.read1 function to
+  # interface with it. However, python 2.7 doesn't support read1, so this will always fail.
+#  - os: osx
+#    language: generic
+#    env: PYTHON_VER=2.7
   - os: osx
     language: generic
     env: PYTHON_VER=3.5
@@ -171,4 +173,4 @@ notifications:
   email: false
 
 after_success:
-  # - codecov
+  - codecov

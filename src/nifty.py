@@ -1401,15 +1401,24 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
         while True:
             to_read, _, _ = select(streams, [], [])
             for fh in to_read:
+                # We want to call fh.read below, but this can lead to a system hang when executing Tinker on mac.
+                # This hang can be avoided by running fh.read1 (with a "1" at the end), however python2.7
+                # doesn't implement ByteStream.read1. So, to enable python3 builds on mac to work, we pick the "best"
+                # fh.read function we can get
+                if hasattr(fh, 'read1'):
+                    fhread = fh.read1
+                else:
+                    fhread = fh.read
+
                 if fh is p.stdout:
                     read_nbytes = 0
                     read = ''.encode('utf-8')
                     while True:
                         if read_nbytes == 0:
-                            read += fh.read1(rbytes)
+                            read += fhread(rbytes)
                             read_nbytes += rbytes
                         else:
-                            read += fh.read1(1)
+                            read += fhread(1)
                             read_nbytes += 1
                         if read_nbytes > 10+rbytes:
                             raise RuntimeError("Failed to decode stdout from external process.")
@@ -1428,10 +1437,10 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
                     read = ''.encode('utf-8')
                     while True:
                         if read_nbytes == 0:
-                            read += fh.read1(rbytes)
+                            read += fhread(rbytes)
                             read_nbytes += rbytes
                         else:
-                            read += fh.read1(1)
+                            read += fhread(1)
                             read_nbytes += 1
                         if read_nbytes > 10+rbytes:
                             raise RuntimeError("Failed to decode stderr from external process.")
