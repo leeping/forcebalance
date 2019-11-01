@@ -56,7 +56,8 @@ install:
   - conda activate test
 
     # Unencrypt OE license
-  - openssl aes-256-cbc -K $encrypted_6d5250c3155a_key -iv $encrypted_6d5250c3155a_iv -in devtools/travis-ci/oe_license.txt.enc -out $OE_LICENSE -d
+  - if [ "$TRAVIS_SECURE_ENV_VARS" == true ]; then openssl aes-256-cbc -K $encrypted_6d5250c3155a_key -iv
+    $encrypted_6d5250c3155a_iv -in devtools/travis-ci/oe_license.txt.enc -out $OE_LICENSE -d; fi
     # swig: for building CCTools
     # future: for builtins
     
