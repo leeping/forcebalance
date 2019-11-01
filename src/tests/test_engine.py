@@ -105,7 +105,7 @@ class TestAmber99SB(ForceBalanceTestCase):
         teardown any state that was previously setup with a call to setup_class.
         """
         os.chdir(self.cwd)
-        shutil.rmtree(self.cwd, "files", "amber_alaglu", "temp")
+        # shutil.rmtree(self.cwd, "files", "amber_alaglu", "temp")
 
     def test_energy_force(self):
         """ Test GMX, OpenMM, and TINKER energy and forces using AMBER force field """
@@ -240,7 +240,7 @@ class TestAmber99SB(ForceBalanceTestCase):
 
     def test_normal_modes(self):
         """ Test GMX TINKER and OpenMM normal modes """
-        printcool("Test GMX and TINKER normal modes")
+        printcool("Test GMX, TINKER, OpenMM normal modes")
         missing_pkgs = []
         for eng in ['TINKER', 'GMX', 'OpenMM']:
             if eng not in self.engines:
@@ -274,7 +274,7 @@ class TestAmber99SB(ForceBalanceTestCase):
 
     def test_normal_modes_optimized(self):
         """ Test GMX TINKER and OpenMM normal modes at optimized geometry """
-        printcool("Test GMX and TINKER normal modes at optimized geometry")
+        printcool("Test GMX, TINKER, OpenMM normal modes at optimized geometry")
         missing_pkgs = []
         for eng in ['TINKER', 'GMX', 'OpenMM']:
             if eng not in self.engines:
@@ -355,7 +355,7 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         teardown any state that was previously setup with a call to setup_class.
         """
         os.chdir(self.cwd)
-        shutil.rmtree(self.cwd, "files", "amoeba_h2o6", "temp")
+        # shutil.rmtree(self.cwd, "files", "amoeba_h2o6", "temp")
 
     def test_energy_force(self):
         """ Test OpenMM and TINKER energy and forces with AMOEBA force field """
