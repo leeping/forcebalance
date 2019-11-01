@@ -34,6 +34,10 @@ matrix:
     language: generic
     env: PYTHON_VER=3.7
 
+env:
+  global:
+  - OE_LICENSE="$HOME/oe_license.txt"
+
 
 before_install:
   - ls
@@ -51,6 +55,8 @@ install:
     # Activate the test environment
   - conda activate test
 
+    # Unencrypt OE license
+  - openssl aes-256-cbc -K $encrypted_6d5250c3155a_key -iv $encrypted_6d5250c3155a_iv -in oe_license.txt.enc -out $OE_LICENSE -d
     # swig: for building CCTools
     # future: for builtins
     
@@ -155,7 +161,6 @@ script:
   - cd studies/001_water_tutorial
   - tar xvjf targets.tar.bz2
   - ForceBalance very_simple.in
-  - cd ../src/tests
   - pytest --cov=forcebalance --cov-config=setup.cfg
   # - python test
   # - py.test -v --cov=eex/ --durations=5

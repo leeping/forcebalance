@@ -3,6 +3,7 @@ channels:
   - conda-forge
   - omnia
   - ambermd
+  - openeye
 dependencies:
     # Base depends
   - python
@@ -21,7 +22,6 @@ dependencies:
   - pymbar
   - openmm
   - ambertools
+  - openforcefield
+  - openeye-toolkits
 
-  # Pip-only installs
-  - pip:
-    - codecov
