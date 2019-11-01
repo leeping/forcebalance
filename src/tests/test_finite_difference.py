@@ -32,7 +32,7 @@ class TestFiniteDifference(ForceBalanceTestCase):
         for func in self.functions:
             msg = "\nfdwrap alters function behavior"
             f=forcebalance.finite_difference.fdwrap(func[0], [0]*3, 0)
-            self.logger.debug("Checking to make sure fdwrap returns a function")
+            self.logger.debug("Checking to make sure fdwrap returns a function\n")
             assert callable(f), "fdwrap did not return a function" #hasattr(f, '__call__'),  "fdwrap did not return a function"
 
             # some test values
@@ -44,7 +44,7 @@ class TestFiniteDifference(ForceBalanceTestCase):
         func = lambda x: x[0]**2
         fd_stencils = [function for function in dir(forcebalance.finite_difference) if re.match('^f..?d.p$',function)]
 
-        self.logger.debug("Comparing fd stencils against some simple functions")
+        self.logger.debug("Comparing fd stencils against some simple functions\n")
         for func in self.functions:
             for p in range(1):
                 for x in range(10):
