@@ -151,7 +151,7 @@ class TestLipidGRO(ForceBalanceTestCase):
         #                         "If this seems reasonable, update EXPECTED_DIHEDRAL_RESULTS in test_molecule.py with these values")
         msg = "\nMeasured dihedral angle has changed from previously calculated values.\n" \
               "If this seems reasonable, update EXPECTED_DIHEDRAL_RESULTS in test_molecule.py with these values"
-        np.testing.assert_array_almost_equal(EXPECTED_DIHEDRAL_RESULTS,result,decimal=0.001, err_msg=msg)
+        np.testing.assert_array_almost_equal(EXPECTED_DIHEDRAL_RESULTS,result,decimal=3, err_msg=msg)
 
 
     def test_lipid_molecules(self):

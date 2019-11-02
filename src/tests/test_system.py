@@ -233,7 +233,7 @@ class TestThermoBromineStudy(ForceBalanceTestCase):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
         msg = "\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values"
-        np.testing.assert_array_almost_equal(EXPECTED_BROMINE_RESULTS,result,decimal=0.02, err_msg=msg)
+        np.testing.assert_array_almost_equal(EXPECTED_BROMINE_RESULTS,result,decimal=2, err_msg=msg)
 
 class TestLipidStudy(ForceBalanceTestCase):
     def setup_method(self, method):
