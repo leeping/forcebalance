@@ -276,13 +276,16 @@ class TestAmber99SB(ForceBalanceTestCase):
                 # Count vibrational modes. Stochastic issue seems to occur for a mode within the lowest 3.
                 if vr < 0: continue# or iv < 3: continue
                 # Frequency tolerance is half a wavenumber.
-                np.testing.assert_allclose(v, vr, rtol=0, atol=0.5, err_msg="%s vibrational frequencies do not match the reference" % Name)
+                np.testing.assert_allclose(v, vr, rtol=0, atol=0.5,
+                                           err_msg="%s vibrational frequencies do not match the reference" % Name)
                 delta = 0.05
                 for a in range(len(m)):
                     try:
-                        np.testing.assert_allclose(m[a], mr[a], rtol=0, atol=delta, err_msg="%s normal modes do not match the reference" % Name)
+                        np.testing.assert_allclose(m[a], mr[a], rtol=0, atol=delta,
+                                                   err_msg="%s normal modes do not match the reference" % Name)
                     except:
-                        np.testing.assert_allclose(m[a], -1.0*mr[a], rtol=0, atol=delta, err_msg="%s normal modes do not match the reference" % Name)
+                        np.testing.assert_allclose(m[a], -1.0*mr[a], rtol=0, atol=delta,
+                                                   err_msg="%s normal modes do not match the reference" % Name)
 
     def test_normal_modes_optimized(self):
         """ Test GMX TINKER and OpenMM normal modes at optimized geometry """
@@ -313,13 +316,16 @@ class TestAmber99SB(ForceBalanceTestCase):
                 # Count vibrational modes. Stochastic issue seems to occur for a mode within the lowest 3.
                 if vr < 0: continue# or iv < 3: continue
                 # Frequency tolerance is half a wavenumber.
-                np.testing.assert_allclose(v, vr, rtol=0, atol=0.5, err_msg="%s vibrational frequencies do not match the reference" % Name)
+                np.testing.assert_allclose(v, vr, rtol=0, atol=0.5,
+                                           err_msg="%s vibrational frequencies do not match the reference" % Name)
                 delta = 0.05
                 for a in range(len(m)):
                     try:
-                        np.testing.assert_allclose(m[a], mr[a], rtol=0, atol=delta, err_msg="%s normal modes do not match the reference" % Name)
+                        np.testing.assert_allclose(m[a], mr[a], rtol=0, atol=delta,
+                                                   err_msg="%s normal modes do not match the reference" % Name)
                     except:
-                        np.testing.assert_allclose(m[a], -1.0*mr[a], rtol=0, atol=delta, err_msg="%s normal modes do not match the reference" % Name)
+                        np.testing.assert_allclose(m[a], -1.0*mr[a], rtol=0, atol=delta,
+                                                   err_msg="%s normal modes do not match the reference" % Name)
 
 
 class TestAmoebaWater6(ForceBalanceTestCase):
@@ -390,11 +396,15 @@ class TestAmoebaWater6(ForceBalanceTestCase):
             np.savetxt(fout, EF_T)
         EF_R = np.loadtxt(os.path.join(datadir, 'test_energy_force.dat'))
         #self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct AMOEBA energy to within 0.001 kJ\n")
-        np.testing.assert_allclose(EF_O[0], EF_R[0], err_msg="OpenMM energy does not match the reference", rtol=0, atol=0.001)
-        np.testing.assert_allclose(EF_T[0], EF_R[0], err_msg="TINKER energy does not match the reference", rtol=0, atol=0.001)
+        np.testing.assert_allclose(EF_O[0], EF_R[0],
+                                   err_msg="OpenMM energy does not match the reference", rtol=0, atol=0.001)
+        np.testing.assert_allclose(EF_T[0], EF_R[0],
+                                   err_msg="TINKER energy does not match the reference", rtol=0, atol=0.001)
         #self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct AMOEBA force to within 0.01 kJ/mol/nm\n")
-        np.testing.assert_allclose(EF_O[1:], EF_R[1:], err_msg="OpenMM forces do not match the reference", rtol=0, atol=0.01)
-        np.testing.assert_allclose(EF_T[1:], EF_R[1:], err_msg="TINKER forces do not match the reference", rtol=0, atol=0.01)
+        np.testing.assert_allclose(EF_O[1:], EF_R[1:],
+                                   err_msg="OpenMM forces do not match the reference", rtol=0, atol=0.01)
+        np.testing.assert_allclose(EF_T[1:], EF_R[1:],
+                                   err_msg="TINKER forces do not match the reference", rtol=0, atol=0.01)
 
     def test_energy_rmsd(self):
         """ Test OpenMM and TINKER optimized geometries with AMOEBA force field """
@@ -413,11 +423,15 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         ERef = RefData[0]
         RRef = RefData[1]
         #self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct minimized energy to within 0.0001 kcal\n")
-        np.testing.assert_allclose(EO, ERef, err_msg="OpenMM minimized energy does not match the reference", rtol=0, atol=0.0001)
-        np.testing.assert_allclose(ET, ERef, err_msg="TINKER minimized energy does not match the reference", rtol=0, atol=0.0001)
+        np.testing.assert_allclose(EO, ERef,
+                                   err_msg="OpenMM minimized energy does not match the reference", rtol=0, atol=0.0001)
+        np.testing.assert_allclose(ET, ERef,
+                                   err_msg="TINKER minimized energy does not match the reference", rtol=0, atol=0.0001)
         #self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct RMSD to starting structure\n")
-        np.testing.assert_allclose(RO, RRef, err_msg="OpenMM RMSD does not match the reference", rtol=0, atol=0.001)
-        np.testing.assert_allclose(RT, RRef, err_msg="TINKER RMSD does not match the reference", rtol=0, atol=0.001)
+        np.testing.assert_allclose(RO, RRef,
+                                   err_msg="OpenMM RMSD does not match the reference", rtol=0, atol=0.001)
+        np.testing.assert_allclose(RT, RRef,
+                                   err_msg="TINKER RMSD does not match the reference", rtol=0, atol=0.001)
 
     def test_interaction_energy(self):
         """ Test OpenMM and TINKER interaction energies with AMOEBA force field """
@@ -433,8 +447,10 @@ class TestAmoebaWater6(ForceBalanceTestCase):
             np.savetxt(fout, np.array([IT]))
         IR = np.loadtxt(os.path.join(datadir, 'test_interaction_energy.dat'))
         #self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct interaction energy\n")
-        np.testing.assert_allclose(IO, IR, err_msg="OpenMM interaction energies do not match the reference", rtol=0, atol=0.0001)
-        np.testing.assert_allclose(IT, IR, err_msg="TINKER interaction energies do not match the reference", rtol=0, atol=0.0001)
+        np.testing.assert_allclose(IO, IR,
+                                   err_msg="OpenMM interaction energies do not match the reference", rtol=0, atol=0.0001)
+        np.testing.assert_allclose(IT, IR,
+                                   err_msg="TINKER interaction energies do not match the reference", rtol=0, atol=0.0001)
 
     def test_multipole_moments(self):
         """ Test OpenMM and TINKER multipole moments with AMOEBA force field """
@@ -457,11 +473,15 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         DR = np.loadtxt(os.path.join(datadir, 'test_multipole_moments.dipole.dat'))
         QR = np.loadtxt(os.path.join(datadir, 'test_multipole_moments.quadrupole.dat'))
         #self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct dipole\n")
-        np.testing.assert_allclose(DO, DR, err_msg="OpenMM dipoles do not match the reference", rtol=0, atol=0.001)
-        np.testing.assert_allclose(DT, DR, err_msg="TINKER dipoles do not match the reference", rtol=0, atol=0.001)
+        np.testing.assert_allclose(DO, DR,
+                                   err_msg="OpenMM dipoles do not match the reference", rtol=0, atol=0.001)
+        np.testing.assert_allclose(DT, DR,
+                                   err_msg="TINKER dipoles do not match the reference", rtol=0, atol=0.001)
         #self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct quadrupole\n")
-        np.testing.assert_allclose(QO, QR, err_msg="OpenMM quadrupoles do not match the reference", rtol=0, atol=0.001)
-        np.testing.assert_allclose(QT, QR, err_msg="TINKER quadrupoles do not match the reference", rtol=0, atol=0.001)
+        np.testing.assert_allclose(QO, QR,
+                                   err_msg="OpenMM quadrupoles do not match the reference", rtol=0, atol=0.001)
+        np.testing.assert_allclose(QT, QR,
+                                   err_msg="TINKER quadrupoles do not match the reference", rtol=0, atol=0.001)
 
     def test_multipole_moments_optimized(self):
         """ Test OpenMM and TINKER multipole moments with AMOEBA force field """
@@ -485,9 +505,13 @@ class TestAmoebaWater6(ForceBalanceTestCase):
         DR1 = np.loadtxt(os.path.join(datadir, 'test_multipole_moments_optimized.dipole.dat'))
         QR1 = np.loadtxt(os.path.join(datadir, 'test_multipole_moments_optimized.quadrupole.dat'))
         #self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct dipole when geometries are optimized\n")
-        np.testing.assert_allclose(DO1, DR1, err_msg="OpenMM dipoles do not match the reference when geometries are optimized", rtol=0, atol=0.001)
-        np.testing.assert_allclose(DT1, DR1, err_msg="TINKER dipoles do not match the reference when geometries are optimized", rtol=0, atol=0.001)
+        np.testing.assert_allclose(DO1, DR1, rtol=0, atol=0.001,
+                                   err_msg="OpenMM dipoles do not match the reference when geometries are optimized")
+        np.testing.assert_allclose(DT1, DR1, rtol=0, atol=0.001,
+                                   err_msg="TINKER dipoles do not match the reference when geometries are optimized")
         #self.logger.debug(">ASSERT OpenMM and TINKER Engines give the correct quadrupole when geometries are optimized\n")
-        np.testing.assert_allclose(QO1, QR1, err_msg="OpenMM quadrupoles do not match the reference when geometries are optimized", rtol=0, atol=0.01)
-        np.testing.assert_allclose(QT1, QR1, err_msg="TINKER quadrupoles do not match the reference when geometries are optimized", rtol=0, atol=0.01)
+        np.testing.assert_allclose(QO1, QR1, rtol=0, atol=0.01,
+                                   err_msg="OpenMM quadrupoles do not match the reference when geometries are optimized")
+        np.testing.assert_allclose(QT1, QR1, rtol=0, atol=0.01,
+                                   err_msg="TINKER quadrupoles do not match the reference when geometries are optimized")
 

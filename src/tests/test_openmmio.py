@@ -71,7 +71,8 @@ class TestInteraction_OpenMM(TargetTests):
         self.target = forcebalance.openmmio.Interaction_OpenMM(self.options, self.tgt_opt, self.ff)
 
     def teardown_method(self):
-        os.system('rm -rf temp')
+        #os.system('rm -rf temp')
+        shutil.rmtree('temp')
         super().teardown_method()
 
 

@@ -72,7 +72,7 @@ class TestPenalty(ForceBalanceTestCase):
         os.chdir(self.options['root'])
 
         self.ff = forcebalance.forcefield.FF(self.options)
-        self.np=self.ff.np
+        self.np = self.ff.np
 
         self.penalties = []
         for ptype in forcebalance.objective.Penalty.Pen_Names.keys():
@@ -90,7 +90,7 @@ class TestPenalty(ForceBalanceTestCase):
          'H': numpy.diag((1,)*9),
          'X': 1}
         for penalty in self.penalties:
-            result=penalty.compute([1]*self.np, objective)
+            result = penalty.compute([1]*self.np, objective)
             assert isinstance(result,tuple)
             # more tests go here
 
@@ -147,8 +147,8 @@ class TestWaterObjective(ForceBalanceTestCase, ObjectiveTests):
 
         self.objective = forcebalance.objective.Objective(self.options, self.tgt_opts,self.ff)
 
-    def shortDescription(self):
-        return super(TestWaterObjective, self).shortDescription() + " (AbInitio_GMX target)"
+    # def shortDescription(self):
+    #     return super(TestWaterObjective, self).shortDescription() + " (AbInitio_GMX target)"
 
 class TestBromineObjective(ForceBalanceTestCase, ObjectiveTests):
     def setup_method(self, method):
@@ -171,5 +171,5 @@ class TestBromineObjective(ForceBalanceTestCase, ObjectiveTests):
 
         self.objective = forcebalance.objective.Objective(self.options, self.tgt_opts,self.ff)
 
-    def shortDescription(self):
-        return super(TestBromineObjective, self).shortDescription() + " (Liquid_GMX target)"
+    # def shortDescription(self):
+    #     return super(TestBromineObjective, self).shortDescription() + " (Liquid_GMX target)"

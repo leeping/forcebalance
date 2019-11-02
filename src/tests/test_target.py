@@ -15,17 +15,12 @@ class TargetTests(ForceBalanceTestCase):
         super().setup_method(method)
         self.logger = forcebalance.output.getLogger('forcebalance.test.' + __name__[5:])
         self.logger.debug("\nBuilding options for target...\n")
-        self.options=forcebalance.parser.gen_opts_defaults.copy()
-        self.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
+        self.options = forcebalance.parser.gen_opts_defaults.copy()
+        self.tgt_opt = forcebalance.parser.tgt_opts_defaults.copy()
         self.ff = None  # Forcefield this target is fitting
         self.options.update({'root': os.path.join(os.getcwd(), 'files')})
 
         os.chdir(self.options['root'])
-
-    def teardown_method(self):
-        super().teardown_method()
-
-        pass
 
     def test_get_function(self):
         """Check target get() function output"""
@@ -93,7 +88,7 @@ class TargetTests(ForceBalanceTestCase):
         X=objective['X']
         G=objective['G']
         print(">ASSERT objective['G'] is not a zero vector\n")
-        assert G.any()
+        assert G.any() # with AGrad=True, G should not be [0]
         # self.assertTrue(G.any())    # with AGrad=True, G should not be [0]
         g=numpy.zeros(self.ff.np)
 

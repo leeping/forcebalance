@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from builtins import str
 from builtins import object
 import sys, os
+import shutil
 import forcebalance
 import forcebalance.forcefield as forcefield
 from .__init__ import ForceBalanceTestCase
@@ -16,7 +17,8 @@ class FFTests(object):
     def test_FF_yields_consistent_results(self):
         """Check whether multiple calls to FF yield the same result"""
         self.logger.debug("\nChecking consistency of ForceField constructor\n")
-        assert forcefield.FF(self.options) == forcefield.FF(self.options), "Got two different forcefields despite using the same options as input"
+        assert forcefield.FF(self.options) == forcefield.FF(self.options), \
+            "Got two different forcefields despite using the same options as input"
 
     def test_make_function_return_value(self):
         """Check that make() return value meets expectation"""
@@ -38,13 +40,13 @@ class FFTests(object):
         self.logger.debug("ok\n")
 
         self.logger.debug("make(use_pvals=True) should return the same pvals... ")
-        new_pvals = np.array(self.ff.make(np.ones(self.ff.np),use_pvals=True))
+        new_pvals = np.array(self.ff.make(np.ones(self.ff.np), use_pvals=True))
         # assert (np.ones(self.ff.np) == new_pvals).all(), "make() did not return input pvals with use_pvals=True"
-        msg="make() did not return input pvals with use_pvals=True"
+        msg = "make() did not return input pvals with use_pvals=True"
         np.testing.assert_array_almost_equal(np.ones(self.ff.np), new_pvals, decimal=5, err_msg=msg)
         self.logger.debug("ok\n")
 
-        os.remove(self.options['root'] + '/' + self.ff.fnms[0])
+        os.remove(os.path.join(self.options['root'], self.ff.fnms[0]))
 
     def test_make_function_output(self):
         """Check make() function creates expected forcefield file"""
@@ -77,7 +79,7 @@ class TestWaterFF(ForceBalanceTestCase, FFTests):
         os.chdir(os.path.join(self.cwd, 'files'))
         # options used in 001_water_tutorial
         self.logger.debug("\nSetting up options...\n")
-        self.options=forcebalance.parser.gen_opts_defaults.copy()
+        self.options = forcebalance.parser.gen_opts_defaults.copy()
         self.options.update({
                 'root': os.getcwd(),
                 'penalty_additive': 0.01,
@@ -90,10 +92,10 @@ class TestWaterFF(ForceBalanceTestCase, FFTests):
         self.filetype = self.options['forcefield'][0][-3:]
         self.logger.debug("ok\n")
 
-    def shortDescription(self):
-        """Add XML to test descriptions
-        @override __init__.ForceBalanceTestCase.shortDescription()"""
-        return super(TestWaterFF,self).shortDescription() + " (itp)"
+    # def shortDescription(self):
+    #     """Add XML to test descriptions
+    #     @override __init__.ForceBalanceTestCase.shortDescription()"""
+    #     return super(TestWaterFF,self).shortDescription() + " (itp)"
 
 class TestXmlFF(ForceBalanceTestCase, FFTests):
     """Test FF class using dms.xml forcefield input"""
@@ -116,10 +118,10 @@ class TestXmlFF(ForceBalanceTestCase, FFTests):
         self.filetype = self.options['forcefield'][0][-3:]
         self.logger.debug("ok\n")
 
-    def shortDescription(self):
-        """Add XML to test descriptions
-        @override __init__.ForceBalanceTestCase.shortDescription()"""
-        return super(TestXmlFF,self).shortDescription() + " (xml)"
+    # def shortDescription(self):
+    #     """Add XML to test descriptions
+    #     @override __init__.ForceBalanceTestCase.shortDescription()"""
+    #     return super(TestXmlFF,self).shortDescription() + " (xml)"
 
 class TestXmlScriptFF(ForceBalanceTestCase):
     """Test FF class with XmlScript using TIP3G2w.xml forcefield input"""
@@ -180,7 +182,7 @@ class TestGbsFF(ForceBalanceTestCase, FFTests):
         assert (self.ff.np)*(self.ff.np-1)/2 >= len(spacings.keys())
         assert isinstance(spacings, dict)
 
-    def shortDescription(self):
-        """Add gbs to test descriptions
-        @override __init__.ForceBalanceTestCase.shortDescription()"""
-        return super(TestGbsFF,self).shortDescription() + " (gbs)"
+    # def shortDescription(self):
+    #     """Add gbs to test descriptions
+    #     @override __init__.ForceBalanceTestCase.shortDescription()"""
+    #     return super(TestGbsFF,self).shortDescription() + " (gbs)"

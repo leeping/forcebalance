@@ -36,11 +36,11 @@ class TestWaterTutorial(ForceBalanceTestCase):
         if sys.version_info <= (2,7):
             pytest.skip("Existing pickle file only works with Python 3")
 
-        self.logger.debug("Setting input file to 'single.in'")
-        input_file='single.in'
+        self.logger.debug("Setting input file to 'single.in'\n")
+        input_file ='single.in'
 
         ## The general options and target options that come from parsing the input file
-        self.logger.debug("Parsing inputs...")
+        self.logger.debug("Parsing inputs...\n")
         options, tgt_opts = parse_inputs(input_file)
         self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
 
@@ -53,7 +53,7 @@ class TestWaterTutorial(ForceBalanceTestCase):
         self.logger.debug(str(optimizer))
 
         ## Actually run the optimizer.
-        self.logger.debug("Done setting up! Running optimizer...")
+        self.logger.debug("\nDone setting up! Running optimizer...")
         result = optimizer.Run()
         self.logger.debug("\nOptimizer finished. Final results:")
         self.logger.debug(str(result))
