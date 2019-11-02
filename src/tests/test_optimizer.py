@@ -13,8 +13,8 @@ class TestOptimizer(ForceBalanceTestCase):
     def setup_method(self, method):
         super().setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(self.cwd, '../../studies/001_water_tutorial'))
-        self.input_file='very_simple.in'
+        os.chdir(os.path.join(self.cwd, '..', '..', 'studies', '001_water_tutorial'))
+        self.input_file = 'very_simple.in'
         targets = tarfile.open('targets.tar.bz2','r')
         targets.extractall()
         targets.close()
@@ -23,10 +23,10 @@ class TestOptimizer(ForceBalanceTestCase):
 
         self.options.update({'writechk':'checkfile.tmp'})
 
-        self.forcefield  = forcebalance.forcefield.FF(self.options)
-        self.objective   = forcebalance.objective.Objective(self.options, self.tgt_opts, self.forcefield)
-        try: self.optimizer   = forcebalance.optimizer.Optimizer(self.options, self.objective, self.forcefield)
-        except: pytest.fail("\nCouldn't create optimizer")
+        self.forcefield = forcebalance.forcefield.FF(self.options)
+        self.objective = forcebalance.objective.Objective(self.options, self.tgt_opts, self.forcefield)
+        try: self.optimizer = forcebalance.optimizer.Optimizer(self.options, self.objective, self.forcefield)
+        except: pytest.fail("Couldn't create optimizer")
 
     def teardown_method(self):
         os.system('rm -rf result *.bak *.tmp')
@@ -34,6 +34,7 @@ class TestOptimizer(ForceBalanceTestCase):
 
     def test_optimizer(self):
         self.optimizer.writechk()
-        assert os.path.isfile(self.options['writechk']), "Optimizer.writechk() didn't create expected file at %s " % self.options['writechk']
+        assert os.path.isfile(self.options['writechk']), \
+            "Optimizer.writechk() didn't create expected file at %s " % self.options['writechk']
         read = self.optimizer.readchk()
         assert isinstance(read, dict)

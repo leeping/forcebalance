@@ -1,9 +1,5 @@
 from __future__ import absolute_import
-import sys, os, re
 import forcebalance
-import abc
-import numpy
-# from .__init__ import ForceBalanceTestCase
 import shutil
 from .test_target import TargetTests # general targets tests defined in test_target.py
 """
@@ -18,7 +14,7 @@ class TestAbInitio_GMX(TargetTests):
                 'forcefield': ['water.itp']})
 
         self.tgt_opt.update({'type':'ABINITIO_GMX',
-            'name':'cluster-02'})
+                             'name':'cluster-02'})
 
         self.ff = forcebalance.forcefield.FF(self.options)
 
@@ -33,6 +29,6 @@ class TestAbInitio_GMX(TargetTests):
         shutil.rmtree('temp')
         super().teardown_method()
 
-    def shortDescription(self):
-        """@override ForceBalanceTestCase.shortDescription()"""
-        return super(TestAbInitio_GMX,self).shortDescription() + " (AbInitio_GMX)"
+    # def shortDescription(self):
+    #     """@override ForceBalanceTestCase.shortDescription()"""
+    #     return super(TestAbInitio_GMX,self).shortDescription() + " (AbInitio_GMX)"

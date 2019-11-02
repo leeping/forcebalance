@@ -23,7 +23,15 @@ class TestNifty(ForceBalanceTestCase):
         #if re.match(".*work_queue.*", self.id().split('.')[-1]) and not work_queue:
         if re.match(".*work_queue.*", method.__name__) and not work_queue:
                 pytest.skip("work_queue module not installed")
-        
+
+        # Maintaining a cleanup_func list allows us to add tasks to the teardown process during the test iteself
+        self.cleanup_funcs = list()
+
+    def teardown_method(self):
+        # Maintaining a cleanup_func list allows us to add tasks to the teardown process during the test iteself
+        for cleanup_func in self.cleanup_funcs:
+            cleanup_func()
+
     def test_nifty_functions(self):
         """Check utility functions in forcebalance.nifty"""
 
@@ -122,9 +130,14 @@ class TestNifty(ForceBalanceTestCase):
             assert wq.stats.tasks_waiting == 1, "Expected queue to have a task waiting"
             
             self.logger.debug("Creating work_queue_worker process... ")
-            worker = subprocess.Popen([os.path.join(worker_program, "work_queue_worker"), "localhost", str(wq.port)], stdout=subprocess.PIPE)
+            worker = subprocess.Popen([os.path.join(worker_program, "work_queue_worker"),
+                                       "localhost",
+                                       str(wq.port)],
+                                      stdout=subprocess.PIPE)
             # TODO: What's the equivalent of this in pytest?
             #self.addCleanup(worker.terminate)
+            pytest.addfinalizer(worker.terminate)
+            self.cleanup_funcs.append(worker.terminate)
             self.logger.debug("Done\nTrying to get task from work queue\n")
             
             self.logger.debug("Calling wq_wait1 to fetch task\n")
@@ -134,7 +147,7 @@ class TestNifty(ForceBalanceTestCase):
             # self.assertEqual(wq.stats.total_tasks_complete, 1, msg = "\nExpected queue to have a task completed")
             assert wq.stats.total_tasks_complete == 1, "Expected queue to have a task completed"
         else:
-            self.logger.debug("work_queue_worker is not in the PATH.")
+            self.logger.debug("work_queue_worker is not in the PATH.\n")
         
         # Destroy the Work Queue object so it doesn't interfere with the rest of the tests.
         destroyWorkQueue()

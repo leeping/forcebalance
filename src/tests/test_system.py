@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 from builtins import str
 import os, sys
+import shutil
 import tarfile
 from .__init__ import ForceBalanceTestCase
 from forcebalance.nifty import printcool_dictionary
@@ -32,13 +33,16 @@ EXPECTED_LIPID_RESULTS = array([-6.7553e-03, -2.4070e-02])
 class ForceBalanceSystemTest(ForceBalanceTestCase):
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
+        #os.remove('results')
+        #shutil.rmtree('*.bak')
+        #shutil.rmtree('*.tmp')
         super().teardown_method()
 
 class TestWaterTutorial(ForceBalanceSystemTest):
     def setup_method(self, method):
         super().setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(self.cwd, '../../studies/001_water_tutorial'))
+        os.chdir(os.path.join(self.cwd, '..','..', 'studies','001_water_tutorial'))
         targets = tarfile.open('targets.tar.bz2','r')
         targets.extractall()
         targets.close()
@@ -283,7 +287,7 @@ class TestLipidStudy(ForceBalanceSystemTest):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
         msg = "\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_LIPID_RESULTS in test_system.py with these values (%s)" % result
-        np.testing.assert_array_almost_equal(EXPECTED_LIPID_RESULTS,result,decimal=0.010, err_msg=msg)
+        np.testing.assert_allclose(EXPECTED_LIPID_RESULTS,result,atol=0.010, err_msg=msg)
 
         # Fail if calculation takes longer than previously to converge
         assert ITERATIONS_TO_CONVERGE >= Counter(), "Calculation took longer than expected to converge (%d iterations vs previous of %d)" %\
@@ -293,7 +297,7 @@ class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         super().setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cwd, '../../studies/012_implicit_solvent_hfe'))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies', '012_implicit_solvent_hfe'))
  
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
@@ -339,4 +343,4 @@ class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
         msg = "Calculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_ETHANOL_RESULTS in test_system.py with these values"
-        np.testing.assert_array_almost_equal(EXPECTED_ETHANOL_RESULTS,result,decimal=0.020, err_msg=msg)
+        np.testing.assert_allclose(EXPECTED_ETHANOL_RESULTS,result,atol=0.020, err_msg=msg)

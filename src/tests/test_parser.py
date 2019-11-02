@@ -27,7 +27,7 @@ class TestParser(ForceBalanceTestCase):
 
     def test_parse_inputs_yields_consistent_results(self):
         """Check parse_inputs() gives consistent results"""
-        os.chdir(os.path.dirname(os.path.realpath(__file__)))
+        #os.chdir(os.path.dirname(os.path.realpath(__file__)))
         output1 = forcebalance.parser.parse_inputs('files/very_simple.in')
         output2 = forcebalance.parser.parse_inputs('files/very_simple.in')
         assert output1 == output2

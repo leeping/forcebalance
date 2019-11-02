@@ -5,6 +5,7 @@ import sys, os, re
 import forcebalance.molecule
 from .__init__ import ForceBalanceTestCase
 import numpy as np
+import shutil
 
 class TestPDBMolecule(ForceBalanceTestCase):
     #def __init__(self, methodName='runTest'):
@@ -26,6 +27,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
 
     def teardown_method(self):
         os.system('rm -rf {name}.xyz {name}.gro {name}.arc'.format(name=self.source[:-4]))
+        #shutil.rmtree('{name}.xyz {name}.gro {name}.arc'.format(name=self.source[:-4]))
         super().teardown_method()
 
     def test_xyz_conversion(self):
@@ -40,10 +42,13 @@ class TestPDBMolecule(ForceBalanceTestCase):
             self.fail("\nConversion to xyz format creates unreadable file")
 
         self.logger.debug("Checking that conversion has not changed molecule spatial coordinates\n")
-        assert (self.molecule.Data['xyzs'][0] == molecule1.Data['xyzs'][0]).all()
+        assert (self.molecule.Data['xyzs'][0] == molecule1.Data['xyzs'][0]).all(), "Conversion from pdb to xyz yields "\
+            "different xyz coordinates\npdb:\n%s\n\ngro:\n%s\n" %(str(self.molecule.Data['xyzs'][0]),
+                                                                  str(molecule1.Data['xyzs'][0]))
+        # (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0]))
         # self.assertEqual(self.molecule.Data['xyzs'][0], molecule1.Data['xyzs'][0],
         # msg = "\nConversion from pdb to xyz yields different xyz coordinates\npdb:\n%s\n\ngro:\n%s\n" %\
-        # (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0])))
+        #         # (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0])))
 
     def test_measure_distances(self):
         """Check measure distance functions"""
@@ -78,7 +83,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
             molecule1 = forcebalance.molecule.Molecule(self.source[:-3] + 'gro', build_topology=False)
             self.logger.debug("ok\n")
         except:
-            self.fail("\nConversion to gro format creates unreadable file")
+            self.fail("Conversion to gro format creates unreadable file")
 
         self.logger.debug("\nChecking that conversion has not changed number of residues\n")
         assert len(self.molecule.Data['resid']) == len(molecule1.Data['resid'])
@@ -86,10 +91,14 @@ class TestPDBMolecule(ForceBalanceTestCase):
         #                msg = "\nConversion from pdb to gro yields different number of residues")
 
         self.logger.debug("Checking that conversion has not changed molecule spatial coordinates\n")
-        self.molecule.Data['xyzs'][0] == molecule1.Data['xyzs'][0]
+        msg = "\nConversion from pdb to gro yields different xyz coordinates\npdb:\n%s\n\ngro:\n" \
+              "%s\n" % (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0]))
+        np.testing.assert_allclose(self.molecule.Data['xyzs'][0],  molecule1.Data['xyzs'][0], rtol=0, atol=0.001,
+                                   err_msg=msg)
+
         # self.assertEqual(self.molecule.Data['xyzs'][0], molecule1.Data['xyzs'][0],
         #                  msg="\nConversion from pdb to gro yields different xyz coordinates\npdb:\n%s\n\ngro:\n%s\n" % \
-        #                      (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0])))
+        #         #                      (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0])))
 
     def test_arc_conversion(self):
         """Check molecule conversion from pdb to arc format"""
@@ -101,14 +110,20 @@ class TestPDBMolecule(ForceBalanceTestCase):
             molecule1 = forcebalance.molecule.Molecule(self.source[:-3] + 'arc',build_topology=False)
             self.logger.debug("ok\n")
         except:
-            self.fail("\nConversion to arc (TINKER) format creates unreadable file")
+            self.fail("Conversion to arc (TINKER) format creates unreadable file")
 
         self.logger.debug("Checking that conversion has not changed molecule spatial coordinates\n")
-        assert len(self.molecule.Data['resid']) == len(molecule1.Data['resid'])
+
+        msg = "Conversion from pdb to arc (TINKER) yields different number of residues"
+        assert len(self.molecule.Data['resid']) == len(molecule1.Data['resid']), msg
         # self.assertEqual(len(self.molecule.Data['resid']), len(molecule1.Data['resid']),
         #                 msg = "\nConversion from pdb to arc (TINKER) yields different number of residues")
 
-        assert (self.molecule.Data['xyzs'][0] == molecule1.Data['xyzs'][0]).all()
+
+        msg = "\nConversion from pdb to arc yields different xyz coordinates" \
+              "\npdb:\n%s\n\narc:\n%s\n" %(str(self.molecule.Data['xyzs'][0]),
+                                           str(molecule1.Data['xyzs'][0]))
+        assert (self.molecule.Data['xyzs'][0] == molecule1.Data['xyzs'][0]).all(), msg
         # self.assertEqual(self.molecule.Data['xyzs'][0],molecule1.Data['xyzs'][0],
         # msg = "\nConversion from pdb to arc yields different xyz coordinates\npdb:\n%s\n\narc:\n%s\n" %\
         # (str(self.molecule.Data['xyzs'][0]), str(molecule1.Data['xyzs'][0])))
@@ -118,11 +133,12 @@ class TestPDBMolecule(ForceBalanceTestCase):
         self.logger.debug("\nTrying to read molecule with topology... ")
         try:
             molecule = forcebalance.molecule.Molecule(self.source, build_topology=True)
-            self.logger.debug("done\nChecking molecule has correct number of residues\n")
+            self.logger.debug("\ndone\nChecking molecule has correct number of residues")
         except:
-            self.fail("\nFailed to load pdb with build_topology=True")
+            self.fail("Failed to load pdb with build_topology=True")
 
-        assert len(self.molecule.Data['resid']) == len(molecule.Data['resid'])
+        assert len(self.molecule.Data['resid']) == len(molecule.Data['resid']), "Topology build yields " \
+                                                                                "different number of residues"
         # self.assertEqual(len(self.molecule.Data['resid']), len(molecule.Data['resid']),
         #                 msg = "\nTopology build yields different number of residues")
 
@@ -140,7 +156,7 @@ class TestLipidGRO(ForceBalanceTestCase):
         except IOError:
             pytest.skip("Input pdb file test/files/%s doesn't exist" % self.source)
         except:
-            pytest.fail("\nUnable to open gro file")
+            pytest.fail("Unable to open gro file")
             
     def test_measure_dihedrals(self):
         """Check measure dihedral functions"""
@@ -158,10 +174,9 @@ class TestLipidGRO(ForceBalanceTestCase):
         """Check for the correct number of molecules in a rectangular cell with broken molecules"""
         self.logger.debug("\nTrying to read lipid conformation... ")
         #self.assertEqual(len(self.molecule.molecules), 3783, msg = "\nIncorrect number of molecules for lipid structure")
-        assert len(self.molecule.molecules) == 3783
+        assert len(self.molecule.molecules) == 3783, "Incorrect number of molecules for lipid structure"
 
 class TestWaterPDB(ForceBalanceTestCase):
-    # def __init__(self, methodName='runTest'):
     @classmethod
     def setup_class(cls):
         super().setup_class()
@@ -174,13 +189,13 @@ class TestWaterPDB(ForceBalanceTestCase):
         except IOError:
             pytest.skip("Input pdb file test/files/%s doesn't exist" % self.source)
         except:
-            pytest.fail("\nUnable to open pdb file")
+            pytest.fail("Unable to open pdb file")
 
     def test_water_molecules(self):
         """Check for the correct number of molecules in a cubic water box"""
         self.logger.debug("\nTrying to read water conformation... ")
         #self.assertEqual(len(self.molecule.molecules), 500, msg="\nIncorrect number of molecules for water structure")
-        assert len(self.molecule.molecules) == 500
+        assert len(self.molecule.molecules) == 500, "Incorrect number of molecules for water structure"
 
 class TestAlaGRO(ForceBalanceTestCase):
     #def __init__(self, methodName='runTest'):
@@ -196,14 +211,14 @@ class TestAlaGRO(ForceBalanceTestCase):
         except IOError:
             pytest.skip("Input gro file test/files/%s doesn't exist" % self.source)
         except:
-            pytest.fail("\nUnable to open gro file")
+            pytest.fail("Unable to open gro file")
 
     def test_ala_molecules(self):
         """Check for the correct number of bonds in a simple molecule"""
         self.logger.debug("\nTrying to read alanine dipeptide conformation... ")
         # self.assertEqual(len(self.molecule.bonds), 21,
         #                  msg="\nIncorrect number of bonds for alanine dipeptide structure")
-        assert len(self.molecule.bonds) == 21
+        assert len(self.molecule.bonds) == 21, "Incorrect number of bonds for alanine dipeptide structure"
 
 
 class TestGalbPNPMol2(ForceBalanceTestCase):
@@ -220,15 +235,15 @@ class TestGalbPNPMol2(ForceBalanceTestCase):
         except IOError:
             pytest.skip("Input gro file test/files/%s doesn't exist" % self.source)
         except:
-            pytest.fail("\nUnable to open mol2 file")
+            pytest.fail("Unable to open mol2 file")
 
     def test_read_galb(self):
         """Check for the correct number of bonds in a simple molecule"""
         self.logger.debug("\nTrying to read alanine dipeptide conformation... ")
         #self.logger.info("%s\n" % str(self.molecule.resname))
         #self.assertEqual(self.molecule.resname, 14 * ['PNP'] + 22 * ['0LB'], msg="\nIncorrect residue names")
-        assert self.molecule.resname == 14 * ['PNP'] + 22 * ['0LB']
+        assert self.molecule.resname == 14 * ['PNP'] + 22 * ['0LB'], "Incorrect residue names"
         #self.assertEqual(self.molecule.elem, ['O', 'N', 'O', 'C', 'C', 'C', 'H', 'H', 'C', 'H', 'C', 'H', 'C', 'O', 'C', 'H', 'O', 'C', 'H', 'C', 'H', 'H', 'O', 'H', 'C', 'H', 'O', 'H', 'C', 'H', 'O', 'H', 'C', 'H', 'O', 'H'], msg="\nIncorrect atomic symbols")
-        assert self.molecule.elem == ['O', 'N', 'O', 'C', 'C', 'C', 'H', 'H', 'C', 'H', 'C', 'H', 'C', 'O', 'C', 'H', 'O', 'C', 'H', 'C', 'H', 'H', 'O', 'H', 'C', 'H', 'O', 'H', 'C', 'H', 'O', 'H', 'C', 'H', 'O', 'H']
+        assert self.molecule.elem == ['O', 'N', 'O', 'C', 'C', 'C', 'H', 'H', 'C', 'H', 'C', 'H', 'C', 'O', 'C', 'H', 'O', 'C', 'H', 'C', 'H', 'H', 'O', 'H', 'C', 'H', 'O', 'H', 'C', 'H', 'O', 'H', 'C', 'H', 'O', 'H'], "Incorrect atomic symbols"
         #self.assertEqual(len(self.molecule.bonds), 37, msg="\nIncorrect number of bonds for pNP-0LB structure")
-        assert len(self.molecule.bonds) == 37
+        assert len(self.molecule.bonds) == 37, "Incorrect number of bonds for pNP-0LB structure"
