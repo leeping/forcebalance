@@ -13,6 +13,7 @@ from collections import OrderedDict
 from numpy import array
 from numpy import absolute
 import numpy as np
+import pytest
 
 # expected results (mvals) taken from previous runs. Update this if it changes and seems reasonable (updated 10/24/13)
 #EXPECTED_WATER_RESULTS = array([3.3192e-02, 4.3287e-02, 5.5072e-03, -4.5933e-02, 1.5499e-02, -3.7655e-01, 2.4720e-03, 1.1914e-02, 1.5066e-01])
@@ -347,6 +348,8 @@ class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
 
 class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
+        pytest.importorskip("openforcefield")
+        pytest.importorskip("openeye.oechem")
         super().setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '../../studies/023_torsion_relaxed'))
