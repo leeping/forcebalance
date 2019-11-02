@@ -29,6 +29,9 @@ ITERATIONS_TO_CONVERGE = 5
 # expected results taken from previous runs. Update this if it changes and seems reasonable (updated 07/23/14)
 EXPECTED_LIPID_RESULTS = array([-6.7553e-03, -2.4070e-02])
 
+# expected results taken from OpenFF torsion profile optimization using OpenFF toolkit 0.4.1 and OpenEye toolkit 2019.10.2. (updated 11/02/19)
+EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([7.3158e-03, -9.4086e-02, 2.0763e-04, 1.7270e-02, -1.3384e-01, 6.0422e-02, 6.7785e-02, -1.4076e-01, -2.2789e-02])
+
 class ForceBalanceSystemTest(ForceBalanceTestCase):
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
@@ -340,3 +343,56 @@ class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
         self.logger.debug(str(result) + '\n')
         msg = "Calculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_ETHANOL_RESULTS in test_system.py with these values"
         np.testing.assert_array_almost_equal(EXPECTED_ETHANOL_RESULTS,result,decimal=0.020, err_msg=msg)
+
+class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
+    def setup_method(self, method):
+        super().setup_method(method)
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(cwd, '../../studies/023_torsion_relaxed'))
+
+    def teardown_method(self):
+        os.system('rm -rf results *.bak *.tmp')
+        super().teardown_method()
+
+    def test_openff_torsionprofile_study(self):
+        """Check OpenFF torsion profile optimization converges to expected results"""
+        self.logger.debug("\nSetting input file to 'options.in'\n")
+        input_file='optimize_minimal.in'
+
+        ## The general options and target options that come from parsing the input file
+        self.logger.debug("Parsing inputs...\n")
+        options, tgt_opts = parse_inputs(input_file)
+        self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
+
+        assert isinstance(options, dict), "Parser gave incorrect type for options"
+        assert isinstance(tgt_opts, list), "Parser gave incorrect type for tgt_opts"
+        for target in tgt_opts:
+            assert isinstance(target, dict), "Parser gave incorrect type for target dict"
+
+        ## The force field component of the project
+        self.logger.debug("Creating forcefield using loaded options: ")
+        forcefield  = FF(options)
+        self.logger.debug(str(forcefield) + "\n")
+        assert isinstance(forcefield, FF), "Expected forcebalance forcefield object"
+
+        ## The objective function
+        self.logger.debug("Creating object using loaded options and forcefield: ")
+        objective   = Objective(options, tgt_opts, forcefield)
+        self.logger.debug(str(objective) + "\n")
+        assert isinstance(objective, Objective), "Expected forcebalance objective object"
+
+        ## The optimizer component of the project
+        self.logger.debug("Creating optimizer: ")
+        optimizer   = Optimizer(options, objective, forcefield)
+        self.logger.debug(str(optimizer) + "\n")
+        assert isinstance(optimizer, Optimizer), "Expected forcebalance optimizer object"
+
+        ## Actually run the optimizer.
+        self.logger.debug("Done setting up! Running optimizer...\n")
+        result = optimizer.Run()
+
+        self.logger.debug("\nOptimizer finished. Final results:\n")
+        self.logger.debug(str(result) + '\n')
+
+        msg="\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_OPENFF_TORSIONPROFILE_RESULTS in test_system.py with these values"
+        np.testing.assert_array_almost_equal(EXPECTED_OPENFF_TORSIONPROFILE_RESULTS,result,decimal=0.001,err_msg=msg)
