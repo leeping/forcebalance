@@ -349,6 +349,9 @@ class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
         super().setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '../../studies/023_torsion_relaxed'))
+        targets = tarfile.open('targets.tar.gz','r')
+        targets.extractall()
+        targets.close()
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
