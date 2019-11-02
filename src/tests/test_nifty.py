@@ -136,7 +136,7 @@ class TestNifty(ForceBalanceTestCase):
                                       stdout=subprocess.PIPE)
             # TODO: What's the equivalent of this in pytest?
             #self.addCleanup(worker.terminate)
-            pytest.addfinalizer(worker.terminate)
+            #pytest.addfinalizer(worker.terminate)
             self.cleanup_funcs.append(worker.terminate)
             self.logger.debug("Done\nTrying to get task from work queue\n")
             
