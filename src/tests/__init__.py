@@ -9,8 +9,8 @@ import forcebalance.output
 
 forcebalance.output.getLogger("forcebalance.test").propagate=False
 
-os.chdir(os.path.dirname(__file__) + "/..")
-__all__ = [module[:-3] for module in sorted(os.listdir('tests'))
+os.chdir(os.path.dirname(__file__))
+__all__ = [module[:-3] for module in sorted(os.listdir('.'))
            if re.match("^test_.*\.py$",module)]
 
 class ForceBalanceTestCase(object):
@@ -38,7 +38,7 @@ class ForceBalanceTestCase(object):
 
     def teardown_method(self):
         os.chdir(self.start_directory)
-
+        
 
     # def shortDescription(self):
     #     """Default shortDescription function returns None value if no description

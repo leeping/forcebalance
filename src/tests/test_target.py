@@ -18,7 +18,7 @@ class TargetTests(ForceBalanceTestCase):
         self.options=forcebalance.parser.gen_opts_defaults.copy()
         self.tgt_opt=forcebalance.parser.tgt_opts_defaults.copy()
         self.ff = None  # Forcefield this target is fitting
-        self.options.update({'root': os.path.join(os.getcwd(), 'tests', 'files')})
+        self.options.update({'root': os.path.join(os.getcwd(), 'files')})
 
         os.chdir(self.options['root'])
 

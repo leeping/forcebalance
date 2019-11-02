@@ -17,7 +17,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
 
     def setup_method(self, method):
         super().setup_method(method)
-        os.chdir('tests/files')
+        os.chdir('files')
         try: self.molecule = forcebalance.molecule.Molecule(self.source, build_topology=False)
         except IOError:
             self.skipTest("Input pdb file test/files/%s doesn't exist" % self.source)
@@ -135,7 +135,7 @@ class TestLipidGRO(ForceBalanceTestCase):
 
     def setup_method(self, method):
         super().setup_method(method)
-        os.chdir('tests/files')
+        os.chdir('files')
         try: self.molecule = forcebalance.molecule.Molecule(self.source, toppbc=True)
         except IOError:
             pytest.skip("Input pdb file test/files/%s doesn't exist" % self.source)
@@ -169,7 +169,7 @@ class TestWaterPDB(ForceBalanceTestCase):
 
     def setup_method(self, method):
         super().setup_method(method)
-        os.chdir('tests/files')
+        os.chdir('files')
         try: self.molecule = forcebalance.molecule.Molecule(self.source, toppbc=True)
         except IOError:
             pytest.skip("Input pdb file test/files/%s doesn't exist" % self.source)
@@ -191,7 +191,7 @@ class TestAlaGRO(ForceBalanceTestCase):
 
     def setup_method(self, method):
         super().setup_method(method)
-        os.chdir('tests/files')
+        os.chdir('files')
         try: self.molecule = forcebalance.molecule.Molecule(self.source)
         except IOError:
             pytest.skip("Input gro file test/files/%s doesn't exist" % self.source)
@@ -215,7 +215,7 @@ class TestGalbPNPMol2(ForceBalanceTestCase):
 
     def setup_method(self, method):
         super().setup_method(method)
-        os.chdir('tests/files')
+        os.chdir('files')
         try: self.molecule = forcebalance.molecule.Molecule(self.source)
         except IOError:
             pytest.skip("Input gro file test/files/%s doesn't exist" % self.source)

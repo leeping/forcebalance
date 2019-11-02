@@ -29,7 +29,12 @@ ITERATIONS_TO_CONVERGE = 5
 # expected results taken from previous runs. Update this if it changes and seems reasonable (updated 07/23/14)
 EXPECTED_LIPID_RESULTS = array([-6.7553e-03, -2.4070e-02])
 
-class TestWaterTutorial(ForceBalanceTestCase):
+class ForceBalanceSystemTest(ForceBalanceTestCase):
+    def teardown_method(self):
+        os.system('rm -rf results *.bak *.tmp')
+        super().teardown_method()
+
+class TestWaterTutorial(ForceBalanceSystemTest):
     def setup_method(self, method):
         super().setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
@@ -37,11 +42,6 @@ class TestWaterTutorial(ForceBalanceTestCase):
         targets = tarfile.open('targets.tar.bz2','r')
         targets.extractall()
         targets.close()
-
-    def teardown_method(self):
-
-        os.system('rm -rf results *.bak *.tmp')
-
 
     def test_water_tutorial(self):
         """Check water tutorial study runs without errors"""
@@ -83,7 +83,7 @@ class TestWaterTutorial(ForceBalanceTestCase):
         assert ITERATIONS_TO_CONVERGE >= Counter(), "Calculation took longer than expected to converge (%d iterations vs previous of %d)" %\
         (ITERATIONS_TO_CONVERGE, Counter())
 
-class TestVoelzStudy(ForceBalanceTestCase):
+class TestVoelzStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         super().setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
@@ -91,6 +91,7 @@ class TestVoelzStudy(ForceBalanceTestCase):
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
+        super().teardown_method()
 
     def test_voelz_study(self):
         """Check voelz study runs without errors"""
@@ -132,7 +133,7 @@ class TestVoelzStudy(ForceBalanceTestCase):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
 
-class TestBromineStudy(ForceBalanceTestCase):
+class TestBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         super().setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
@@ -140,6 +141,7 @@ class TestBromineStudy(ForceBalanceTestCase):
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
+        super().teardown_method()
 
     def test_bromine_study(self):
         """Check liquid bromine study converges to expected results"""
@@ -184,7 +186,7 @@ class TestBromineStudy(ForceBalanceTestCase):
         msg="\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values"
         np.testing.assert_array_almost_equal(EXPECTED_BROMINE_RESULTS,result,decimal=0.02, err_msg=msg)
 
-class TestThermoBromineStudy(ForceBalanceTestCase):
+class TestThermoBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         super().setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
@@ -192,6 +194,7 @@ class TestThermoBromineStudy(ForceBalanceTestCase):
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
+        super().teardown_method()
 
     def test_thermo_bromine_study(self):
         """Check liquid bromine study (Thermo target) converges to expected results"""
@@ -235,7 +238,7 @@ class TestThermoBromineStudy(ForceBalanceTestCase):
         msg = "\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values"
         np.testing.assert_array_almost_equal(EXPECTED_BROMINE_RESULTS,result,decimal=2, err_msg=msg)
 
-class TestLipidStudy(ForceBalanceTestCase):
+class TestLipidStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         super().setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
@@ -243,6 +246,7 @@ class TestLipidStudy(ForceBalanceTestCase):
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
+        super().teardown_method()
 
     def test_lipid_study(self):
         """Check lipid tutorial study runs without errors"""
@@ -285,7 +289,7 @@ class TestLipidStudy(ForceBalanceTestCase):
         assert ITERATIONS_TO_CONVERGE >= Counter(), "Calculation took longer than expected to converge (%d iterations vs previous of %d)" %\
         (ITERATIONS_TO_CONVERGE, Counter())
 
-class TestImplicitSolventHFEStudy(ForceBalanceTestCase):
+class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         super().setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
@@ -293,6 +297,7 @@ class TestImplicitSolventHFEStudy(ForceBalanceTestCase):
  
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
+        super().teardown_method()
 
     def test_implicit_solvent_hfe_study(self):
         """Check implicit hydration free energy study (Hydration target) converges to expected results"""

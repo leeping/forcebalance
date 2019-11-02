@@ -5,9 +5,6 @@ import forcebalance.parser
 from .__init__ import ForceBalanceTestCase
 
 class TestParser(ForceBalanceTestCase):
-    def setup_method(self, method):
-        super().setup_method(method)
-        os.chdir('tests')
 
     def test_parse_inputs_returns_tuple(self):
         """Check parse_inputs() returns type"""
