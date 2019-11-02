@@ -509,7 +509,8 @@ class TINKER(Engine):
         for line in o:
             s = line.split()
             if len(s) == 0: continue
-            if "Atom Type Definition Parameters" in line:
+            # TINKER 8.2.1 -> 8.7.1 changed printout to "Atom Definition Parameters"
+            if "Atom Type Definition Parameters" in line or "Atom Definition Parameters" in line:
                 mode = 1
             if mode == 1:
                 if isint(s[0]): mode = 2
@@ -561,19 +562,34 @@ class TINKER(Engine):
 
         self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
 
+        if self.rigid: optprog = "minrigid"
+        else: optprog = "minimize"
+        if method == "newton":
+            # The "Newton" optimizer uses the BFGS optimizer as an initial step
+            # in an attempt to avoid optimizing to a saddle point
+            first_crit = 1e-2
+        elif method == "bfgs":
+            first_crit = crit
+        else:
+            raise RuntimeError("Incorrect choice of method for TINKER.optimize()")
+
+        # Actually run the minimize program
+        o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, first_crit))
+        
+        # Now call the Newton minimizer from the BFGS result
         if method == "newton":
             if self.rigid: optprog = "optrigid"
             else: optprog = "optimize"
-        elif method == "bfgs":
-            if self.rigid: optprog = "minrigid"
-            else: optprog = "minimize"
-
-        o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, crit))
+            o = self.calltinker("%s %s.xyz_2 %f" % (optprog, self.name, crit))
+            shutil.move("%s.xyz_3" % self.name, "%s.xyz_2" % self.name)
+        
         # Silently align the optimized geometry.
         M12 = Molecule("%s.xyz" % self.name, ftype="tinker") + Molecule("%s.xyz_2" % self.name, ftype="tinker")
         if not self.pbc:
             M12.align(center=False)
         M12[1].write("%s.xyz_2" % self.name, ftype="tinker")
+        # print("LPW copying %s.xyz2" % self.name)
+        # shutil.copy2("%s.xyz_2" % self.name, "bak.xyz")
         rmsd = M12.ref_rmsd(0)[1]
         cnvgd = 0
         mode = 0

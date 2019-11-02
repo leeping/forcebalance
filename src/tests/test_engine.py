@@ -157,6 +157,7 @@ class TestAmber99SB(ForceBalanceTestCase):
         fin = os.path.join(datadir, 'test_optimized_geometries.dat')
         RefData = np.loadtxt(fin)
         for n1 in self.engines.keys():
+            print("%s vs Reference energies:" % n1, Data[n1][0], RefData[0])
             np.testing.assert_allclose(Data[n1][0], RefData[0], rtol=0, atol=0.001,
                                    err_msg="%s optimized energies do not match the reference" % n1)
             np.testing.assert_allclose(Data[n1][1], RefData[1], rtol=0, atol=0.001,

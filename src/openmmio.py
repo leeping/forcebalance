@@ -1221,6 +1221,7 @@ class OpenMM(Engine):
         E = S.getPotentialEnergy().value_in_unit(kilocalorie_per_mole)
         # Align to original geometry.
         M = deepcopy(self.mol[0])
+        M += deepcopy(M)
         M.xyzs = [X0, X1]
         if not self.pbc and align:
             M.align(center=False)
