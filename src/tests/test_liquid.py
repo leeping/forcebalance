@@ -3,6 +3,7 @@ import os
 import sys
 import shutil
 import forcebalance
+import pytest
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
@@ -32,8 +33,8 @@ class TestWaterTutorial(ForceBalanceTestCase):
 
     def test_liquid(self):
         """Check liquid target with existing simulation data"""
-        # if not sys.version_info <= (2,7):
-        #     self.skipTest("Existing pickle file only works with Python 3")
+        if sys.version_info <= (2,7):
+            pytest.skip("Existing pickle file only works with Python 3")
 
         self.logger.debug("Setting input file to 'single.in'")
         input_file='single.in'
