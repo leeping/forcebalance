@@ -562,26 +562,38 @@ class TINKER(Engine):
 
         self.mol[shot].write('%s.xyz' % self.name, ftype="tinker")
 
-        if self.rigid: optprog = "minrigid"
-        else: optprog = "minimize"
-        if method == "newton":
-            # The "Newton" optimizer uses the BFGS optimizer as an initial step
-            # in an attempt to avoid optimizing to a saddle point
-            first_crit = 1e-2
-        elif method == "bfgs":
-            first_crit = crit
-        else:
-            raise RuntimeError("Incorrect choice of method for TINKER.optimize()")
-
-        # Actually run the minimize program
-        o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, first_crit))
-        
-        # Now call the Newton minimizer from the BFGS result
         if method == "newton":
             if self.rigid: optprog = "optrigid"
             else: optprog = "optimize"
-            o = self.calltinker("%s %s.xyz_2 %f" % (optprog, self.name, crit))
-            shutil.move("%s.xyz_3" % self.name, "%s.xyz_2" % self.name)
+        elif method == "bfgs":
+            if self.rigid: optprog = "minrigid"
+            else: optprog = "minimize"
+        else:
+            raise RuntimeError("Incorrect choice of method for TINKER.optimize()")
+        
+        # Actually run the minimize program
+        o = self.calltinker("%s %s.xyz %f" % (optprog, self.name, crit))
+
+        ## TODO: TINKER optimizer has some stochastic behavior for converging to different minima
+        ## This is work in progress and should be revisited in the future, along with taking
+        ## a good look at TINKER's "newton" program.
+        # 
+        # if self.rigid: optprog = "minrigid"
+        # else: optprog = "minimize"
+        # if method == "newton":
+        #     # The "Newton" optimizer uses the BFGS optimizer as an initial step
+        #     # in an attempt to avoid optimizing to a saddle point
+        #     first_crit = 1e-2
+        # elif method == "bfgs":
+        #     first_crit = crit
+        # else:
+        #     raise RuntimeError("Incorrect choice of method for TINKER.optimize()")
+        # # Now call the Newton minimizer from the BFGS result
+        # if method == "newton":
+        #     if self.rigid: optprog = "optrigid"
+        #     else: optprog = "optimize"
+        #     o = self.calltinker("%s %s.xyz_2 %f" % (optprog, self.name, crit))
+        #     shutil.move("%s.xyz_3" % self.name, "%s.xyz_2" % self.name)
         
         # Silently align the optimized geometry.
         M12 = Molecule("%s.xyz" % self.name, ftype="tinker") + Molecule("%s.xyz_2" % self.name, ftype="tinker")

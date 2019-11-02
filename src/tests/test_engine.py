@@ -46,6 +46,8 @@ class TestAmber99SB(ForceBalanceTestCase):
     an ambiguity in the atom ordering which leads to force differences
     - Increase the number of decimal points in the "fudgeQQ" parameter
     in the GROMACS .itp file
+    - Increase two torsional barriers to ensure optimizer converges
+    to the same local minimum consistently
     - Change the "electric" conversion factor in the TINKER .prm file
     - Compile GROMACS in double precision
 
@@ -58,7 +60,7 @@ class TestAmber99SB(ForceBalanceTestCase):
     Multipole moments: < 0.001 Debye / Debye Angstrom
     Multipole moments (optimized): < 0.01 Debye / Debye Angstrom
     Vibrational frequencies: < 0.5 wavenumber (~ 1e-4 fractional error)
-    Vibrational eigenvectors: < 0.01
+    Vibrational eigenvectors: < 0.05 (on 11/2019, updated these)
     """
 
     @classmethod
@@ -158,6 +160,7 @@ class TestAmber99SB(ForceBalanceTestCase):
         RefData = np.loadtxt(fin)
         for n1 in self.engines.keys():
             print("%s vs Reference energies:" % n1, Data[n1][0], RefData[0])
+        for n1 in self.engines.keys():
             np.testing.assert_allclose(Data[n1][0], RefData[0], rtol=0, atol=0.001,
                                    err_msg="%s optimized energies do not match the reference" % n1)
             np.testing.assert_allclose(Data[n1][1], RefData[1], rtol=0, atol=0.001,
@@ -261,7 +264,7 @@ class TestAmber99SB(ForceBalanceTestCase):
             fout = os.path.join(datadir, 'test_normal_modes.freq.dat')
             if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
             np.savetxt(fout, FreqT)
-            fout = os.path.join(datadir, 'test_normal_modes.mode.dat')
+            fout = os.path.join(datadir, 'test_normal_modes.mode.dat.npy')
             # Need to save as binary data since it's a multidimensional array
             np.save(fout, ModeT)
         FreqRef = np.loadtxt(os.path.join(datadir, 'test_normal_modes.freq.dat'))
@@ -271,10 +274,10 @@ class TestAmber99SB(ForceBalanceTestCase):
             for v, vr, m, mr in zip(Freq, FreqRef, Mode, ModeRef):
                 iv += 1
                 # Count vibrational modes. Stochastic issue seems to occur for a mode within the lowest 3.
-                if vr < 0 or iv < 3: continue
+                if vr < 0: continue# or iv < 3: continue
                 # Frequency tolerance is half a wavenumber.
                 np.testing.assert_allclose(v, vr, rtol=0, atol=0.5, err_msg="%s vibrational frequencies do not match the reference" % Name)
-                delta = 0.02 if Name == 'OpenMM' else 0.01
+                delta = 0.05
                 for a in range(len(m)):
                     try:
                         np.testing.assert_allclose(m[a], mr[a], rtol=0, atol=delta, err_msg="%s normal modes do not match the reference" % Name)
@@ -308,10 +311,10 @@ class TestAmber99SB(ForceBalanceTestCase):
             for v, vr, m, mr in zip(Freq, FreqRef, Mode, ModeRef):
                 iv += 1
                 # Count vibrational modes. Stochastic issue seems to occur for a mode within the lowest 3.
-                if vr < 0 or iv < 3: continue
+                if vr < 0: continue# or iv < 3: continue
                 # Frequency tolerance is half a wavenumber.
                 np.testing.assert_allclose(v, vr, rtol=0, atol=0.5, err_msg="%s vibrational frequencies do not match the reference" % Name)
-                delta = 0.02 if Name == 'OpenMM' else 0.01
+                delta = 0.05
                 for a in range(len(m)):
                     try:
                         np.testing.assert_allclose(m[a], mr[a], rtol=0, atol=delta, err_msg="%s normal modes do not match the reference" % Name)

@@ -448,6 +448,8 @@ N   C   N            1   120.000    585.760 ; Added for Urea (same as N2-CA-N2) 
 
 [ dihedraltypes ]
 ;i   j   k   l	   func	
+ CT  CT  C   O2    9       0.0     -8.36800     2  ; LPW tweak
+ H1  CT  N   C     9       0.0      4.18400     3  ; LPW tweak
  CT  CT  OS  CT    9       0.0      1.60247     3  ; 
  CT  CT  OS  CT    9     180.0      0.41840     2  ; 
  C   N   CT  C     9       0.0      1.12968     2  ; new for 99sb
