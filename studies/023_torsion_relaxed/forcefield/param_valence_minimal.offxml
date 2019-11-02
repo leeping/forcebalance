@@ -12,7 +12,7 @@
 	</Angles>
 	<ProperTorsions version="0.3" potential="k*(1+cos(periodicity*theta-phase))" default_idivf="auto">
 		<Proper smirks="[*:1]-[#6X4:2]-[#8X2:3]-[#1:4]" periodicity1="3" phase1="0.0 * degree" k1="0.5 * mole**-1 * kilocalorie" id="t84" idivf1="3.0" />
-		<Proper smirks="[#6X4:1]-[#6X4:2]-[#8X2H1:3]-[#1:4]" periodicity1="3" periodicity2="1" phase1="0.0 * degree" phase2="0.0 * degree" k1="0.16 * mole**-1 * kilocalorie" k2="0.25 * mole**-1 * kilocalorie" id="t85" idivf1="1.0" idivf2="1.0" />
+		<Proper smirks="[*:1]-[#6X4:2]-[#8X2H0:3]-[*:4]" periodicity1="3" phase1="0.0 * degree" k1="1.15 * mole**-1 * kilocalorie" id="t86" idivf1="3.0" parameterize="k1"/>
 		<Proper smirks="[#6X4:1]-[#8X2:2]-[#6X4:3]-[#8X2:4]" periodicity1="3" periodicity2="2" periodicity3="1" phase1="0.0 * degree" phase2="180.0 * degree" phase3="180.0 * degree" k1="0.1 * mole**-1 * kilocalorie" k2="0.85 * mole**-1 * kilocalorie" k3="1.35 * mole**-1 * kilocalorie" id="t89" idivf1="1.0" idivf2="1.0" idivf3="1.0" parameterize="k1,k2,k3" />
 	</ProperTorsions>
 	<vdW version="0.3" potential="Lennard-Jones-12-6" combining_rules="Lorentz-Berthelot" scale12="0.0" scale13="0.0" scale14="0.5" scale15="1.0" switch_width="1.0 * angstrom" cutoff="9.0 * angstrom" method="cutoff">
