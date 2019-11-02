@@ -25,7 +25,9 @@ class FFTests(object):
         self.logger.debug("Running forcefield.make() with zero vector should not change pvals... ")
         new_pvals = np.array(self.ff.make(np.zeros(self.ff.np)))
         assert pvals.size == new_pvals.size
-        assert (pvals == new_pvals).all(), "make() should produce unchanged pvals when given zero vector"
+        # assert (pvals == new_pvals).all(), "make() should produce unchanged pvals when given zero vector"
+        msg="make() should produce unchanged pvals when given zero vector"
+        np.testing.assert_array_almost_equal(pvals, new_pvals, decimal=5, err_msg=msg)
         self.logger.debug("ok\n")
 
         self.logger.debug("make() should return different values when passed in nonzero pval matrix... ")
@@ -37,7 +39,9 @@ class FFTests(object):
 
         self.logger.debug("make(use_pvals=True) should return the same pvals... ")
         new_pvals = np.array(self.ff.make(np.ones(self.ff.np),use_pvals=True))
-        assert (np.ones(self.ff.np) == new_pvals).all(), "make() did not return input pvals with use_pvals=True"
+        # assert (np.ones(self.ff.np) == new_pvals).all(), "make() did not return input pvals with use_pvals=True"
+        msg="make() did not return input pvals with use_pvals=True"
+        np.testing.assert_array_almost_equal(np.ones(self.ff.np), new_pvals, decimal=5, err_msg=msg)
         self.logger.debug("ok\n")
 
         os.remove(self.options['root'] + '/' + self.ff.fnms[0])
@@ -80,7 +84,6 @@ class TestWaterFF(ForceBalanceTestCase, FFTests):
                 'jobtype': 'NEWTON',
                 'forcefield': ['water.itp']})
         self.logger.debug(str(self.options) + '\n')
-
         self.logger.debug("Creating forcefield using above options... ")
         self.ff = forcefield.FF(self.options)
         self.ffname = self.options['forcefield'][0][:-3]
@@ -107,7 +110,6 @@ class TestXmlFF(ForceBalanceTestCase, FFTests):
                 'jobtype': 'NEWTON',
                 'forcefield': ['dms.xml']})
         self.logger.debug(str(self.options) + '\n')
-
         self.logger.debug("Creating forcefield using above options... ")
         self.ff = forcefield.FF(self.options)
         self.ffname = self.options['forcefield'][0][:-3]
@@ -164,7 +166,6 @@ class TestGbsFF(ForceBalanceTestCase, FFTests):
                 'jobtype': 'NEWTON',
                 'forcefield': ['cc-pvdz-overlap-original.gbs']})
         self.logger.debug(str(self.options) + '\n')
-
         self.logger.debug("Creating forcefield using above options... ")
         self.ff = forcefield.FF(self.options)
         self.ffname = self.options['forcefield'][0][:-3]
