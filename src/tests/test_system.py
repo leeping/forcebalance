@@ -339,11 +339,12 @@ class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
         ## Actually run the optimizer.
         self.logger.debug("Done setting up! Running optimizer...\n")
         result = optimizer.Run()
+        result_pval = optimizer.FF.create_pvals(result)
 
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
         msg = "Calculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_ETHANOL_RESULTS in test_system.py with these values"
-        np.testing.assert_allclose(EXPECTED_ETHANOL_RESULTS,result,atol=0.020, err_msg=msg)
+        np.testing.assert_allclose(EXPECTED_ETHANOL_RESULTS,result_pval,atol=0.020, err_msg=msg)
 
 class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
