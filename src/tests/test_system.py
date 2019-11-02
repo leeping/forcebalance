@@ -30,7 +30,7 @@ ITERATIONS_TO_CONVERGE = 5
 EXPECTED_LIPID_RESULTS = array([-6.7553e-03, -2.4070e-02])
 
 # expected results taken from OpenFF torsion profile optimization using OpenFF toolkit 0.4.1 and OpenEye toolkit 2019.10.2. (updated 11/02/19)
-EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([7.3158e-03, -9.4086e-02, 2.0763e-04, 1.7270e-02, -1.3384e-01, 6.0422e-02, 6.7785e-02, -1.4076e-01, -2.2789e-02])
+EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([7.3350e-03, -9.4238e-02, -7.9467e-05, 1.7172e-02, -1.3309e-01, 6.0076e-02, 1.7895e-02, 6.5866e-02, -1.4084e-01, -2.2906e-02])
 
 class ForceBalanceSystemTest(ForceBalanceTestCase):
     def teardown_method(self):
