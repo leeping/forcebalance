@@ -81,6 +81,8 @@ install:
   # Install Work Queue
   - wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
   - bash install-cctools.sh
+  - echo "Checking for Work Queue import; if successful, no message will be printed"
+  - python -c "import work_queue"
   - export PATH="$HOME/opt/cctools/current/bin:$PATH"
   # Hopefully in the future, the customizations that LPW adds in `lpwgroup/cctools`
   # can be folded back into the main repo. Then the cctools install will be as simple as
