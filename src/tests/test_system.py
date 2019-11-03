@@ -288,7 +288,7 @@ class TestLipidStudy(ForceBalanceSystemTest):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
         msg = "\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_LIPID_RESULTS in test_system.py with these values (%s)" % result
-        np.testing.assert_allclose(EXPECTED_LIPID_RESULTS,result,atol=0.010, err_msg=msg)
+        np.testing.assert_allclose(EXPECTED_LIPID_RESULTS,result,atol=0.100, err_msg=msg)
 
         # Fail if calculation takes longer than previously to converge
         assert ITERATIONS_TO_CONVERGE >= Counter(), "Calculation took longer than expected to converge (%d iterations vs previous of %d)" %\
