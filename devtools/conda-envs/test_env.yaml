@@ -23,6 +23,7 @@ dependencies:
   - pymbar
   - openmm
   - ambertools
-  - openforcefield
-  - openeye-toolkits
+  # The following two are not compatible with python 2.7 and 3.5, so they are conditionally installed in .travis.yml
+  #- openforcefield
+  #- openeye-toolkits
 

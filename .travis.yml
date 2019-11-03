@@ -72,6 +72,10 @@ install:
 #    # Update to conda-forge versions of packages
 #  - conda update --yes --all
 
+  # If were using python 3.6 or higher and we're decrypting an OE key, install OFF toolkit and
+  # OETK (there aren't OFFTK packages for python<3.6)
+  - if [ ${PYTHON_VER} != "2.7" ] && [ ${PYTHON_VER} != "3.5" ] && [ "$TRAVIS_SECURE_ENV_VARS" == true ] ; then conda install --yes -c omnia -c openeye openforcefield openeye-toolkits; fi
+
   # Install Work Queue
   - wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
   - bash install-cctools.sh
