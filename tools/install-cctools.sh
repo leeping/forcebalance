@@ -47,7 +47,7 @@ rm -fv $prefix/current
 
 # Download latest version from website.
 echo "== Downloading source. =="
-version="7.0.14"
+version="7.0.15"
 
 # Delete existing archives and extracted folders.
 echo "== Deleting existing source code archive and extracted folders =="
@@ -58,18 +58,23 @@ echo "== Extracting archive. =="
 tar xzf v${version}.tar.gz
 cd cctools-${version}
 
+# sed -i on Mac OS works differently
+if [[ "$OSTYPE" == "darwin"* ]] ; then 
+    sedsuffix="'.original'"
+fi
+
 # Increase all sorts of timeouts.
-sed -i s/"timeout = 5;"/"timeout = 7200;"/g work_queue/src/*.c
-sed -i s/"timeout = 10;"/"timeout = 7200;"/g work_queue/src/*.c
-sed -i s/"timeout = 15;"/"timeout = 7200;"/g work_queue/src/*.c
-sed -i s/"foreman_transfer_timeout = 3600"/"foreman_transfer_timeout = 86400"/g work_queue/src/work_queue.c
-sed -i s/"long_timeout = 3600"/"long_timeout = 86400"/g work_queue/src/work_queue.c
+sed -i$sedsuffix s/"timeout = 5;"/"timeout = 7200;"/g work_queue/src/*.c
+sed -i$sedsuffix s/"timeout = 10;"/"timeout = 7200;"/g work_queue/src/*.c
+sed -i$sedsuffix s/"timeout = 15;"/"timeout = 7200;"/g work_queue/src/*.c
+sed -i$sedsuffix s/"foreman_transfer_timeout = 3600"/"foreman_transfer_timeout = 86400"/g work_queue/src/work_queue.c
+sed -i$sedsuffix s/"long_timeout = 3600"/"long_timeout = 86400"/g work_queue/src/work_queue.c
 
 # Disable perl
-sed -i s/"config_perl_path=auto"/"config_perl_path=no"/g configure
+sed -i$sedsuffix s/"config_perl_path=auto"/"config_perl_path=no"/g configure
 
 # Disable globus
-sed -i s/"config_globus_path=auto"/"config_globus_path=no"/g configure
+sed -i$sedsuffix s/"config_globus_path=auto"/"config_globus_path=no"/g configure
 
 #=======================================#
 #| Step 3 : Build and install library  |#
@@ -80,10 +85,10 @@ PYTHON_VERSION=`python -c 'import sys; print(sys.version_info[0])'`
 if [ "$PYTHON_VERSION" -eq "3" ]
 then
     echo "== Configuring for Python 3 =="
-    ./configure --prefix $prefix/$version --with-python3-path $pypath --with-python-path no --with-swig-path $swgpath --with-perl-path no --with-globus-path no
+    ./configure --prefix $prefix/$version --with-python3-path $pypath --with-python-path no --with-swig-path $swgpath --with-perl-path no --with-globus-path no $zlibsuffix
 else
     echo "== Configuring for Python 2 =="
-    ./configure --prefix $prefix/$version --with-python-path $pypath --with-swig-path $swgpath
+    ./configure --prefix $prefix/$version --with-python-path $pypath --with-swig-path $swgpath $zlibsuffix
 fi
 echo "== Compilation and installation =="
 make && make install && cd work_queue && make install
