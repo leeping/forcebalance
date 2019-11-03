@@ -72,10 +72,10 @@ install:
 #    # Update to conda-forge versions of packages
 #  - conda update --yes --all
 
-    # Install Work Queue
-   - wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
-   - bash install-cctools.sh
-   - export PATH="$HOME/opt/cctools/current:$PATH"
+  # Install Work Queue
+  - wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
+  - bash install-cctools.sh
+  - export PATH="$HOME/opt/cctools/current:$PATH"
 
 #    # Omnia packages
 #  - conda install -c omnia pymbar openmm
