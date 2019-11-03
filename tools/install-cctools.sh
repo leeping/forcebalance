@@ -85,10 +85,10 @@ PYTHON_VERSION=`python -c 'import sys; print(sys.version_info[0])'`
 if [ "$PYTHON_VERSION" -eq "3" ]
 then
     echo "== Configuring for Python 3 =="
-    ./configure --prefix $prefix/$version --with-python3-path $pypath --with-python-path no --with-swig-path $swgpath --with-perl-path no --with-globus-path no $zlibsuffix
+    ./configure --prefix $prefix/$version --with-python3-path $pypath --with-python-path no --with-swig-path $swgpath --with-perl-path no --with-globus-path no
 else
     echo "== Configuring for Python 2 =="
-    ./configure --prefix $prefix/$version --with-python-path $pypath --with-swig-path $swgpath $zlibsuffix
+    ./configure --prefix $prefix/$version --with-python-path $pypath --with-swig-path $swgpath
 fi
 echo "== Compilation and installation =="
 make && make install && cd work_queue && make install
