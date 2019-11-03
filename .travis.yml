@@ -75,7 +75,7 @@ install:
   # Install Work Queue
   - wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
   - bash install-cctools.sh
-  - export PATH="$HOME/opt/cctools/current:$PATH"
+  - export PATH="$HOME/opt/cctools/current/bin:$PATH"
 
 #    # Omnia packages
 #  - conda install -c omnia pymbar openmm
