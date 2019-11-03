@@ -17,6 +17,7 @@ dependencies:
   - scipy
   - lxml
   - networkx
+  - zlib
   - swig
   - future
   - pymbar
