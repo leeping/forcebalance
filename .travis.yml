@@ -53,6 +53,7 @@ before_install:
 install:
 
     # Create test environment for package
+  - echo "Calling create_conda_env.py with PYTHON_VER=$PYTHON_VER"
   - python devtools/scripts/create_conda_env.py -n=test -p=$PYTHON_VER devtools/conda-envs/test_env.yaml
     # Activate the test environment
   - conda activate test
