@@ -76,6 +76,10 @@ install:
   - wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
   - bash install-cctools.sh
   - export PATH="$HOME/opt/cctools/current/bin:$PATH"
+  # Hopefully in the future, the customizations that LPW adds in `lpwgroup/cctools`
+  # can be folded back into the main repo. Then the cctools install will be as simple as
+  # - conda install -c cclnd cctools
+  # More info at https://github.com/cooperative-computing-lab/cctools/issues/1617
 
 #    # Omnia packages
 #  - conda install -c omnia pymbar openmm
