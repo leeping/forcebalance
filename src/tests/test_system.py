@@ -241,7 +241,7 @@ class TestThermoBromineStudy(ForceBalanceSystemTest):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
         msg = "\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values"
-        np.testing.assert_array_almost_equal(EXPECTED_BROMINE_RESULTS,result,decimal=2, err_msg=msg)
+        np.testing.assert_allclose(EXPECTED_BROMINE_RESULTS, result, atol=3e-2, err_msg=msg)
 
 class TestLipidStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
@@ -288,7 +288,7 @@ class TestLipidStudy(ForceBalanceSystemTest):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
         msg = "\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_LIPID_RESULTS in test_system.py with these values (%s)" % result
-        np.testing.assert_allclose(EXPECTED_LIPID_RESULTS,result,atol=0.010, err_msg=msg)
+        np.testing.assert_allclose(EXPECTED_LIPID_RESULTS,result,atol=0.100, err_msg=msg)
 
         # Fail if calculation takes longer than previously to converge
         assert ITERATIONS_TO_CONVERGE >= Counter(), "Calculation took longer than expected to converge (%d iterations vs previous of %d)" %\
@@ -349,7 +349,7 @@ class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
 
 class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
-        pytest.importorskip("openforcefield")
+        pytest.importorskip("openforcefield", minversion="0.4")
         pytest.importorskip("openeye.oechem")
         super().setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
