@@ -93,7 +93,9 @@ install:
 #  - conda install -c omnia pymbar openmm
 
     # Gromacs
-  - wget ftp://ftp.gromacs.org/pub/gromacs/gromacs-4.6.7.tar.gz
+    # GitHub file hosting may be more reliable than Gromacs FTP
+  - wget https://github.com/gromacs/gromacs/archive/v4.6.7.tar.gz -O gromacs-4.6.7.tar.gz
+  # - wget ftp://ftp.gromacs.org/pub/gromacs/gromacs-4.6.7.tar.gz
   - echo "Extracting Gromacs - log suppressed.."
   - tar xvzf gromacs-4.6.7.tar.gz &> untar.log
   - cd gromacs-4.6.7
