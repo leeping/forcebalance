@@ -13,7 +13,7 @@ from .__init__ import ForceBalanceTestCase
 
 class TestWaterTutorial(ForceBalanceTestCase):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestWaterTutorial, self).setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         # copy folder 'files/test_liquid' into a new folder 'files/test_liquid.run'
         os.chdir(os.path.join(self.cwd, 'files'))
@@ -29,7 +29,7 @@ class TestWaterTutorial(ForceBalanceTestCase):
         tmpfolder = os.path.join(self.cwd, 'files', 'test_liquid.run')
         if os.path.isdir(tmpfolder):
             shutil.rmtree(tmpfolder)
-        super().teardown_method()
+        super(TestWaterTutorial, self).teardown_method()
 
     def test_liquid(self):
         """Check liquid target with existing simulation data"""

@@ -56,8 +56,6 @@ parser.add_argument('conda_file',
 
 args = parser.parse_args()
 
-print("PYTHON VERSION FROM ARGS  {}".format(args.python))
-
 # Open the base file
 with open(args.conda_file, "r") as handle:
     yaml_script = loader(handle.read())

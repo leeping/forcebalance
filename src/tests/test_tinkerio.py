@@ -9,7 +9,7 @@ The testing functions for this class are located in test_target.py.
 class TestInteraction_TINKER(TargetTests):
 
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestInteraction_TINKER, self).setup_method(method)
         self.options.update({
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
@@ -38,7 +38,7 @@ class TestInteraction_TINKER(TargetTests):
 
     def teardown_method(self):
         shutil.rmtree('temp')
-        super().teardown_method()
+        super(TestInteraction_TINKER, self).teardown_method()
 
     def shortDescription(self):
         """@override ForceBalanceTestCase.shortDescription()"""

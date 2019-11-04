@@ -10,7 +10,7 @@ import pytest
 class TestFiniteDifference(ForceBalanceTestCase):
     @classmethod
     def setup_class(cls):
-        super().setup_class()
+        super(TestFiniteDifference, cls).setup_class()
         # functions is a list of 3-tuples containing (function p, d/dp, d^2/dp^2)
         cls.functions = []
 

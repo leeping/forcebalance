@@ -7,7 +7,7 @@ The testing functions for this class are located in test_target.py.
 """
 class TestAbInitio_GMX(TargetTests):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestAbInitio_GMX, self).setup_method(method)
         self.options.update({
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
@@ -27,7 +27,7 @@ class TestAbInitio_GMX(TargetTests):
 
     def teardown_method(self):
         shutil.rmtree('temp')
-        super().teardown_method()
+        super(TestAbInitio_GMX, self).teardown_method()
 
     # def shortDescription(self):
     #     """@override ForceBalanceTestCase.shortDescription()"""

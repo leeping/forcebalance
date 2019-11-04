@@ -14,7 +14,7 @@ import pytest
 
 class TestWaterTutorial(ForceBalanceTestCase):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestWaterTutorial, self).setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         # copy folder 'files/test_liquid' into a new folder 'files/test_liquid.run'
         files_folder = os.path.join(self.cwd, 'files')
@@ -36,11 +36,11 @@ class TestWaterTutorial(ForceBalanceTestCase):
         tmpfolder = os.path.join(self.cwd, 'files', 'test_continue.run')
         if os.path.isdir(tmpfolder):
             shutil.rmtree(tmpfolder)
-        super().teardown_method()
+        super(TestWaterTutorial, self).teardown_method()
 
     def test_continue(self):
         """Check continuation from a previous run"""
-        if sys.version_info <= (2,7):
+        if sys.version_info < (3,0):
             pytest.skip("Existing pickle file only works with Python 3")
         self.logger.debug("\nSetting input file to 'test_continue.in'\n")
         input_file='test_continue.in'

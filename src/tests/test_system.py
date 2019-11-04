@@ -37,11 +37,11 @@ EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([7.3350e-03, -9.4238e-02, -7.9467
 class ForceBalanceSystemTest(ForceBalanceTestCase):
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
-        super().teardown_method()
+        super(ForceBalanceSystemTest, self).teardown_method()
 
 class TestWaterTutorial(ForceBalanceSystemTest):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestWaterTutorial, self).setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(self.cwd, '..','..', 'studies','001_water_tutorial'))
         targets = tarfile.open('targets.tar.bz2','r')
@@ -90,13 +90,13 @@ class TestWaterTutorial(ForceBalanceSystemTest):
 
 class TestVoelzStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestVoelzStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '../../studies/009_voelz_nspe'))
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
-        super().teardown_method()
+        super(TestVoelzStudy, self).teardown_method()
 
     def test_voelz_study(self):
         """Check voelz study runs without errors"""
@@ -140,13 +140,13 @@ class TestVoelzStudy(ForceBalanceSystemTest):
 
 class TestBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestBromineStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '../../studies/003_liquid_bromine'))
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
-        super().teardown_method()
+        super(TestBromineStudy, self).teardown_method()
 
     def test_bromine_study(self):
         """Check liquid bromine study converges to expected results"""
@@ -193,13 +193,13 @@ class TestBromineStudy(ForceBalanceSystemTest):
 
 class TestThermoBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestThermoBromineStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '../../studies/004_thermo_liquid_bromine'))
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
-        super().teardown_method()
+        super(TestThermoBromineStudy, self).teardown_method()
 
     def test_thermo_bromine_study(self):
         """Check liquid bromine study (Thermo target) converges to expected results"""
@@ -245,13 +245,13 @@ class TestThermoBromineStudy(ForceBalanceSystemTest):
 
 class TestLipidStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestLipidStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '../../studies/010_lipid_study'))
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
-        super().teardown_method()
+        super(TestLipidStudy, self).teardown_method()
 
     def test_lipid_study(self):
         """Check lipid tutorial study runs without errors"""
@@ -296,13 +296,13 @@ class TestLipidStudy(ForceBalanceSystemTest):
 
 class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestImplicitSolventHFEStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '..', '..', 'studies', '012_implicit_solvent_hfe'))
  
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
-        super().teardown_method()
+        super(TestImplicitSolventHFEStudy, self).teardown_method()
 
     def test_implicit_solvent_hfe_study(self):
         """Check implicit hydration free energy study (Hydration target) converges to expected results"""
@@ -351,7 +351,7 @@ class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         pytest.importorskip("openforcefield", minversion="0.4")
         pytest.importorskip("openeye.oechem")
-        super().setup_method(method)
+        super(TestOpenFFTorsionProfileStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '../../studies/023_torsion_relaxed'))
         targets = tarfile.open('targets.tar.gz','r')
@@ -360,7 +360,7 @@ class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
-        super().teardown_method()
+        super(TestOpenFFTorsionProfileStudy, self).teardown_method()
 
     def test_openff_torsionprofile_study(self):
         """Check OpenFF torsion profile optimization converges to expected results"""
