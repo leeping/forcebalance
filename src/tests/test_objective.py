@@ -60,7 +60,7 @@ class TestImplemented(ForceBalanceTestCase):
 
 class TestPenalty(ForceBalanceTestCase):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestPenalty, self).setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(self.cwd, 'files'))
         self.options=forcebalance.parser.gen_opts_defaults.copy()
@@ -128,7 +128,7 @@ class ObjectiveTests(object):
 
 class TestWaterObjective(ForceBalanceTestCase, ObjectiveTests):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestWaterObjective, self).setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(self.cwd, 'files'))
         self.options=forcebalance.parser.gen_opts_defaults.copy()
@@ -152,7 +152,7 @@ class TestWaterObjective(ForceBalanceTestCase, ObjectiveTests):
 
 class TestBromineObjective(ForceBalanceTestCase, ObjectiveTests):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestBromineObjective, self).setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(self.cwd, 'files'))
         self.options=forcebalance.parser.gen_opts_defaults.copy()

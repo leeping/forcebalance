@@ -18,7 +18,7 @@ except ImportError:
 
 class TestNifty(ForceBalanceTestCase):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestNifty, self).setup_method(method)
         # skip work_queue tests if work_queue could not be imported
         #if re.match(".*work_queue.*", self.id().split('.')[-1]) and not work_queue:
         if re.match(".*work_queue.*", method.__name__) and not work_queue:

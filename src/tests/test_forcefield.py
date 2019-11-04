@@ -74,7 +74,7 @@ class TestWaterFF(ForceBalanceTestCase, FFTests):
     This test case also acts as a base class for other forcefield test cases.
     Override the setUp() to run tests on a different forcefield"""
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestWaterFF, self).setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(self.cwd, 'files'))
         # options used in 001_water_tutorial
@@ -100,7 +100,7 @@ class TestWaterFF(ForceBalanceTestCase, FFTests):
 class TestXmlFF(ForceBalanceTestCase, FFTests):
     """Test FF class using dms.xml forcefield input"""
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestXmlFF, self).setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(self.cwd, 'files'))
         # options from 2013 tutorial
@@ -126,7 +126,7 @@ class TestXmlFF(ForceBalanceTestCase, FFTests):
 class TestXmlScriptFF(ForceBalanceTestCase):
     """Test FF class with XmlScript using TIP3G2w.xml forcefield input"""
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestXmlScriptFF, self).setup_method(method)
         self.logger.debug("Setting up options...\n")
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(self.cwd, 'files'))
@@ -143,7 +143,7 @@ class TestXmlScriptFF(ForceBalanceTestCase):
         if os.path.isdir(tmpfolder):
             shutil.rmtree(tmpfolder)
         # os.system('rm -rf TIP3G2w.xml')
-        super().teardown_method()
+        super(TestXmlScriptFF, self).teardown_method()
 
     def test_make_function_output(self):
         """Check make() function creates expected force field file containing XML Script"""
@@ -157,7 +157,7 @@ class TestXmlScriptFF(ForceBalanceTestCase):
 class TestGbsFF(ForceBalanceTestCase, FFTests):
     """Test FF class using gbs forcefield input"""
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestGbsFF, self).setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(self.cwd, 'files'))
         self.logger.debug("Setting up options...\n")

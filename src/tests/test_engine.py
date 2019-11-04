@@ -68,7 +68,7 @@ class TestAmber99SB(ForceBalanceTestCase):
         """
         setup any state specific to the execution of the given class (which usually contains tests).
         """
-        super().setup_class()
+        super(TestAmber99SB, cls).setup_class()
         tinkerpath = which('testgrad')
         # try to find mdrun_d or gmx_d
         # gmx should be built with config -DGMX_DOUBLE=ON
@@ -352,7 +352,7 @@ class TestAmoebaWater6(ForceBalanceTestCase):
     """
     @classmethod
     def setup_class(cls):
-        super().setup_class()
+        super(TestAmoebaWater6, cls).setup_class()
         #self.logger.debug("\nBuilding options for target...\n")
         cls.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cls.cwd, "files", "amoeba_h2o6"))

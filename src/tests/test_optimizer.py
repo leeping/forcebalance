@@ -11,7 +11,7 @@ logger = logging.getLogger("test")
 
 class TestOptimizer(ForceBalanceTestCase):
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestOptimizer, self).setup_method(method)
         self.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(self.cwd, '..', '..', 'studies', '001_water_tutorial'))
         self.input_file = 'very_simple.in'
@@ -30,7 +30,7 @@ class TestOptimizer(ForceBalanceTestCase):
 
     def teardown_method(self):
         os.system('rm -rf result *.bak *.tmp')
-        super().teardown_method()
+        super(TestOptimizer, self).teardown_method()
 
     def test_optimizer(self):
         self.optimizer.writechk()

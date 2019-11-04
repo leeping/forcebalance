@@ -12,7 +12,7 @@ from .__init__ import ForceBalanceTestCase
 class TargetTests(ForceBalanceTestCase):
 
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TargetTests, self).setup_method(method)
         self.logger = forcebalance.output.getLogger('forcebalance.test.' + __name__[5:])
         self.logger.debug("\nBuilding options for target...\n")
         self.options = forcebalance.parser.gen_opts_defaults.copy()

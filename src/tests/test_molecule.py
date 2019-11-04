@@ -14,7 +14,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
     @classmethod
     def setup_class(cls):
         cls.source = 'dms_conf.pdb'
-        super().setup_class()
+        super(TestPDBMolecule, cls).setup_class()
 
     def setup_method(self, method):
         super().setup_method(method)
@@ -28,7 +28,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
     def teardown_method(self):
         os.system('rm -rf {name}.xyz {name}.gro {name}.arc'.format(name=self.source[:-4]))
         #shutil.rmtree('{name}.xyz {name}.gro {name}.arc'.format(name=self.source[:-4]))
-        super().teardown_method()
+        super(TestPDBMolecule, self).teardown_method()
 
     def test_xyz_conversion(self):
         """Check molecule conversion from pdb to xyz format"""
@@ -146,11 +146,11 @@ class TestLipidGRO(ForceBalanceTestCase):
     #def __init__(self, methodName='runTest'):
     @classmethod
     def setup_class(cls):
-        super().setup_class()
+        super(TestLipidGRO, cls).setup_class()
         cls.source = 'lipid.gro'
 
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestLipidGRO, self).setup_method(method)
         os.chdir('files')
         try: self.molecule = forcebalance.molecule.Molecule(self.source, toppbc=True)
         except IOError:
@@ -179,11 +179,11 @@ class TestLipidGRO(ForceBalanceTestCase):
 class TestWaterPDB(ForceBalanceTestCase):
     @classmethod
     def setup_class(cls):
-        super().setup_class()
+        super(TestWaterPDB, cls).setup_class()
         cls.source = 'waterbox500.pdb'
 
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestWaterPDB, self).setup_method(method)
         os.chdir('files')
         try: self.molecule = forcebalance.molecule.Molecule(self.source, toppbc=True)
         except IOError:
@@ -201,11 +201,11 @@ class TestAlaGRO(ForceBalanceTestCase):
     #def __init__(self, methodName='runTest'):
     @classmethod
     def setup_class(cls):
-        super().setup_class()
+        super(TestAlaGRO, cls).setup_class()
         cls.source = 'ala.gro'
 
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestAlaGRO, self).setup_method(method)
         os.chdir('files')
         try: self.molecule = forcebalance.molecule.Molecule(self.source)
         except IOError:
@@ -225,11 +225,11 @@ class TestGalbPNPMol2(ForceBalanceTestCase):
     #def __init__(self, methodName='runTest'):
     @classmethod
     def setup_class(cls):
-        super().setup_class()
+        super(TestGalbPNPMol2, cls).setup_class()
         cls.source = 'pNP-0LB-tleap.mol2'
 
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestGalbPNPMol2, self).setup_method(method)
         os.chdir('files')
         try: self.molecule = forcebalance.molecule.Molecule(self.source)
         except IOError:
