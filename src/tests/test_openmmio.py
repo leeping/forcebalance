@@ -18,7 +18,7 @@ class TestLiquid_OpenMM(TargetTests):
     def setup_method(self, method):
         # super(TestLiquid_OpenMM, cls).setup_class()
         pytest.skip("Needs optimizing to reduce runtime")
-        super().setup_method(method)# .im_func()
+        super(TestLiquid_OpenMM, self).setup_method(method)# .im_func()
         # settings specific to this target
         self.options.update({
                 'jobtype': 'NEWTON',
@@ -39,7 +39,7 @@ class TestLiquid_OpenMM(TargetTests):
 
     def teardown_method(self):
         shutil.rmtree('temp')
-        super().teardown_method()
+        super(TestLiquid_OpenMM, self).teardown_method()
 
     def shortDescription(self):
         """@override ForceBalanceTestCase.shortDescription()"""
@@ -50,7 +50,7 @@ class TestInteraction_OpenMM(TargetTests):
     # def setUp(self):
 
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestInteraction_OpenMM, self).setup_method(method)
         # TargetTests.setup_class(cls)
         # settings specific to this target
         self.options.update({
@@ -73,7 +73,7 @@ class TestInteraction_OpenMM(TargetTests):
     def teardown_method(self):
         #os.system('rm -rf temp')
         shutil.rmtree('temp')
-        super().teardown_method()
+        super(TestInteraction_OpenMM, self).teardown_method()
 
 
     def shortDescription(self):
