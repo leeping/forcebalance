@@ -126,7 +126,7 @@ install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.2.1.tar.gz -O tinker.tar.gz; fi
   #- wget https://dasher.wustl.edu/tinker/downloads/bin-${OS}-8.2.1.tar.gz -O tinker.tar.gz
   - tar xvzf tinker.tar.gz &> untar.log
-    # The macos files are also gzipped inside the tarball
+    # The macos files are also gzipped inside the tarball.
   - mkdir -p $HOME/opt/tinker/8.2.1
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then gunzip bin-macos/*gz; mv bin-macos $HOME/opt/tinker/8.2.1/bin; fi ;
   - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mv bin-linux64 $HOME/opt/tinker/8.2.1/bin; fi ;
