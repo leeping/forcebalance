@@ -17,7 +17,7 @@ class TestPDBMolecule(ForceBalanceTestCase):
         super(TestPDBMolecule, cls).setup_class()
 
     def setup_method(self, method):
-        super().setup_method(method)
+        super(TestPDBMolecule, self).setup_method(method)
         os.chdir('files')
         try: self.molecule = forcebalance.molecule.Molecule(self.source, build_topology=False)
         except IOError:
