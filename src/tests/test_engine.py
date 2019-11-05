@@ -2,11 +2,6 @@ from __future__ import absolute_import
 from builtins import zip
 from builtins import range
 import pytest
-import sys
-import os
-import shutil
-import forcebalance
-import numpy as np
 from forcebalance.nifty import *
 from forcebalance.gmxio import GMX
 from forcebalance.tinkerio import TINKER
@@ -100,9 +95,7 @@ class TestAmber99SB(ForceBalanceTestCase):
             cls.engines['OpenMM'] = OpenMM(coords="all.gro", pdb="conf.pdb", ffxml="a99sb.xml", platname="Reference", precision="double")
         except:
             logger.warn("OpenMM cannot be imported, skipping OpenMM tests.")
-        # the cleanup has been replaced by self.teardown_class
-        # self.addCleanup(os.system, 'cd .. ; rm -rf temp')
-        
+
     @classmethod
     def teardown_class(cls):
         """

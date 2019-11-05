@@ -1,12 +1,8 @@
 from __future__ import division
 from __future__ import absolute_import
 from builtins import str
-from past.utils import old_div
 from .__init__ import ForceBalanceTestCase
 import pytest
-import numpy
-import os, re
-import subprocess
 import forcebalance
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
@@ -20,7 +16,6 @@ class TestNifty(ForceBalanceTestCase):
     def setup_method(self, method):
         super(TestNifty, self).setup_method(method)
         # skip work_queue tests if work_queue could not be imported
-        #if re.match(".*work_queue.*", self.id().split('.')[-1]) and not work_queue:
         if re.match(".*work_queue.*", method.__name__) and not work_queue:
                 pytest.skip("work_queue module not installed")
 
@@ -102,23 +97,17 @@ class TestNifty(ForceBalanceTestCase):
         
         # Work Queue will no longer be initialized to None
         self.logger.debug("\nChecking Work Queue is initialized to None...\n")
-        # self.assertEqual(forcebalance.nifty.WORK_QUEUE, None,
-        #     msg="\nUnexpected initialization of forcebalance.nifty.WORK_QUEUE to %s" % str(forcebalance.nifty.WORK_QUEUE))
         assert forcebalance.nifty.WORK_QUEUE is None, "Unexpected initialization of forcebalance.nifty.WORK_QUEUE " \
                                                       "to %s" % str(forcebalance.nifty.WORK_QUEUE)
         self.logger.info("\n")
 
         createWorkQueue(9191, debug=False)
         self.logger.debug("Created work queue, verifying...\n")
-        # self.assertEqual(type(forcebalance.nifty.WORK_QUEUE), work_queue.WorkQueue,
-        #     msg="\nExpected forcebalance.nifty.WORK_QUEUE to be a WorkQueue object, but got a %s instead" % str(type(forcebalance.nifty.WORK_QUEUE)))
         assert type(forcebalance.nifty.WORK_QUEUE) is work_queue.WorkQueue, "Expected forcebalance.nifty.WORK_QUEUE to " \
                                                                             "be a WorkQueue object, but got a %s " \
                                                                             "instead" % str(type(forcebalance.nifty.WORK_QUEUE))
         self.logger.debug("Checking that getWorkQueue() returns valid WorkQueue object...\n")
         wq = getWorkQueue()
-        # self.assertEqual(type(wq), work_queue.WorkQueue,
-        #     msg="\nExpected getWorkQueue() to return a WorkQueue object, but got %s instead" % str(type(wq)))
         assert type(wq) is work_queue.WorkQueue, "Expected getWorkQueue() to return a " \
                                                  "WorkQueue object, but got %s instead" % str(type(wq))
         worker_program = which('work_queue_worker')
@@ -126,7 +115,6 @@ class TestNifty(ForceBalanceTestCase):
             self.logger.debug("Submitting test job 'echo work queue test > test.job'\n")
             queue_up(wq, "echo work queue test > test.job", [], ["test.job"], tgt=None, verbose=False)
             self.logger.debug("Verifying that work queue has a task waiting\n")
-            #self.assertEqual(wq.stats.tasks_waiting, 1, msg = "\nExpected queue to have a task waiting")
             assert wq.stats.tasks_waiting == 1, "Expected queue to have a task waiting"
             
             self.logger.debug("Creating work_queue_worker process... ")
@@ -134,9 +122,7 @@ class TestNifty(ForceBalanceTestCase):
                                        "localhost",
                                        str(wq.port)],
                                       stdout=subprocess.PIPE)
-            # TODO: What's the equivalent of this in pytest?
             #self.addCleanup(worker.terminate)
-            #pytest.addfinalizer(worker.terminate)
             self.cleanup_funcs.append(worker.terminate)
             self.logger.debug("Done\nTrying to get task from work queue\n")
             

@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-import numpy
 import forcebalance
 import os, sys
 import tarfile

@@ -1,11 +1,5 @@
 from __future__ import absolute_import
-import sys, os, re
 import json
-from collections import OrderedDict
-import forcebalance
-import abc
-import numpy
-#from test_target import TargetTests # general targets tests defined in test_target.py
 from forcebalance.nifty import *
 from forcebalance.amberio import splitComment, parse_amber_namelist
 

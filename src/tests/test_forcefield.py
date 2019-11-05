@@ -1,13 +1,12 @@
 from __future__ import absolute_import
 from builtins import str
 from builtins import object
-import sys, os
+import os
 import shutil
 import forcebalance
 import forcebalance.forcefield as forcefield
 from .__init__ import ForceBalanceTestCase
 import numpy as np
-from copy import deepcopy
 
 class FFTests(object):
     """Tests common to all forcefields. Note that to prevent this class from being run on its own
@@ -92,11 +91,6 @@ class TestWaterFF(ForceBalanceTestCase, FFTests):
         self.filetype = self.options['forcefield'][0][-3:]
         self.logger.debug("ok\n")
 
-    # def shortDescription(self):
-    #     """Add XML to test descriptions
-    #     @override __init__.ForceBalanceTestCase.shortDescription()"""
-    #     return super(TestWaterFF,self).shortDescription() + " (itp)"
-
 class TestXmlFF(ForceBalanceTestCase, FFTests):
     """Test FF class using dms.xml forcefield input"""
     def setup_method(self, method):
@@ -117,11 +111,6 @@ class TestXmlFF(ForceBalanceTestCase, FFTests):
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
         self.logger.debug("ok\n")
-
-    # def shortDescription(self):
-    #     """Add XML to test descriptions
-    #     @override __init__.ForceBalanceTestCase.shortDescription()"""
-    #     return super(TestXmlFF,self).shortDescription() + " (xml)"
 
 class TestXmlScriptFF(ForceBalanceTestCase):
     """Test FF class with XmlScript using TIP3G2w.xml forcefield input"""
@@ -181,8 +170,3 @@ class TestGbsFF(ForceBalanceTestCase, FFTests):
 
         assert (self.ff.np)*(self.ff.np-1)/2 >= len(spacings.keys())
         assert isinstance(spacings, dict)
-
-    # def shortDescription(self):
-    #     """Add gbs to test descriptions
-    #     @override __init__.ForceBalanceTestCase.shortDescription()"""
-    #     return super(TestGbsFF,self).shortDescription() + " (gbs)"

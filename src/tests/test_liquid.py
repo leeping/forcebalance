@@ -2,13 +2,11 @@ from __future__ import absolute_import
 import os
 import sys
 import shutil
-import forcebalance
 import pytest
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer
-from forcebalance import optimizer as fbopt
 from .__init__ import ForceBalanceTestCase
 
 class TestWaterTutorial(ForceBalanceTestCase):

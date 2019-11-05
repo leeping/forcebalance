@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-import shutil
 import forcebalance
 from forcebalance.nifty import *
 from .test_target import TargetTests # general targets tests defined in test_target.py
@@ -39,7 +38,3 @@ class TestInteraction_TINKER(TargetTests):
     def teardown_method(self):
         shutil.rmtree('temp')
         super(TestInteraction_TINKER, self).teardown_method()
-
-    def shortDescription(self):
-        """@override ForceBalanceTestCase.shortDescription()"""
-        return super(TestInteraction_TINKER,self).shortDescription() + " (Interaction_TINKER)"

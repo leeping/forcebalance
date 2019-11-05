@@ -1,17 +1,13 @@
 from __future__ import absolute_import
 from builtins import str
-import os, sys
-import shutil
+import os
 import tarfile
 from .__init__ import ForceBalanceTestCase
-from forcebalance.nifty import printcool_dictionary
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer, Counter
-from collections import OrderedDict
 from numpy import array
-from numpy import absolute
 import numpy as np
 import pytest
 
@@ -92,7 +88,7 @@ class TestVoelzStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         super(TestVoelzStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cwd, '../../studies/009_voelz_nspe'))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies', '009_voelz_nspe'))
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
@@ -142,7 +138,7 @@ class TestBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         super(TestBromineStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cwd, '../../studies/003_liquid_bromine'))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies', '003_liquid_bromine'))
 
     def teardown_method(self):
         os.system('rm -rf results *.bak *.tmp')
@@ -189,7 +185,7 @@ class TestBromineStudy(ForceBalanceSystemTest):
         self.logger.debug(str(result) + '\n')
 
         msg="\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values"
-        np.testing.assert_array_almost_equal(EXPECTED_BROMINE_RESULTS,result,decimal=0.02, err_msg=msg)
+        np.testing.assert_allclose(EXPECTED_BROMINE_RESULTS, result, atol=0.02, err_msg=msg)
 
 class TestThermoBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
@@ -288,7 +284,7 @@ class TestLipidStudy(ForceBalanceSystemTest):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
         msg = "\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_LIPID_RESULTS in test_system.py with these values (%s)" % result
-        np.testing.assert_allclose(EXPECTED_LIPID_RESULTS,result,atol=0.100, err_msg=msg)
+        np.testing.assert_allclose(EXPECTED_LIPID_RESULTS, result, atol=0.100, err_msg=msg)
 
         # Fail if calculation takes longer than previously to converge
         assert ITERATIONS_TO_CONVERGE >= Counter(), "Calculation took longer than expected to converge (%d iterations vs previous of %d)" %\
@@ -353,7 +349,7 @@ class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
         pytest.importorskip("openeye.oechem")
         super(TestOpenFFTorsionProfileStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cwd, '../../studies/023_torsion_relaxed'))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies', '023_torsion_relaxed'))
         targets = tarfile.open('targets.tar.gz','r')
         targets.extractall()
         targets.close()
@@ -402,5 +398,6 @@ class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
 
-        msg="\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_OPENFF_TORSIONPROFILE_RESULTS in test_system.py with these values"
-        np.testing.assert_array_almost_equal(EXPECTED_OPENFF_TORSIONPROFILE_RESULTS,result,decimal=0.001,err_msg=msg)
+        msg="\nCalculation results have changed from previously calculated values.\n If this seems reasonable, " \
+            "update EXPECTED_OPENFF_TORSIONPROFILE_RESULTS in test_system.py with these values"
+        np.testing.assert_allclose(EXPECTED_OPENFF_TORSIONPROFILE_RESULTS,result,atol=0.001,err_msg=msg)
