@@ -18,7 +18,7 @@ class TargetTests(ForceBalanceTestCase):
         self.ff = None  # Forcefield this target is fitting
         self.options.update({'root': os.path.join(os.getcwd(), 'files')})
 
-        os.chdir(cls.options['root'])
+        os.chdir(self.options['root'])
 
     def test_get_function(self):
         """Check target get() function output"""
