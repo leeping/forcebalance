@@ -208,7 +208,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                 temperature = physical_property.thermodynamic_state.temperature.to(unit.kelvin).magnitude
                 pressure = physical_property.thermodynamic_state.pressure.to(unit.atmosphere).magnitude
 
-                state_tuple = (f'{temperature:.6f}', f'{pressure:.6f}')
+                state_tuple = ('%.6f'%temperature, '%.6f'%pressure)
 
                 default_unit = self.default_units[class_name]
 
@@ -238,7 +238,7 @@ class PropertyEstimate_SMIRNOFF(Target):
         """
 
         # Load in the options from a user provided JSON file.
-        print(f'{os.path.join(self.tgtdir, self.prop_est_input)}')
+        print(os.path.join(self.tgtdir, self.prop_est_input))
         options_file_path = os.path.join(self.tgtdir, self.prop_est_input)
         self._options = self.OptionsFile.from_json(options_file_path)
 
@@ -484,8 +484,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                                                                        options=self._options.estimation_options,
                                                                        parameter_gradient_keys=parameter_gradient_keys)
 
-        logger.info(f'Requesting the estimation of {self._data_set.number_of_properties} properties, and '
-                    f'their gradients with respect to {len(parameter_gradient_keys)} parameters.\n')
+        logger.info('Requesting the estimation of %d properties, and their gradients with respect to %d parameters.\n'%(self._data_set.number_of_properties, len(parameter_gradient_keys)))
 
         self._pending_estimate_request.results(True)
 
@@ -507,25 +506,23 @@ class PropertyEstimate_SMIRNOFF(Target):
         # Check for any exceptions that were raised while estimating
         # the properties.
         if isinstance(results, PropertyEstimatorException):
-            raise ValueError(f'An uncaught exception occured within the property '
-                             f'estimator (directory={results.directory}: {results.message}')
+            raise ValueError('An uncaught exception occured within the property '
+                             'estimator (directory=%s: %s' % (results.directory, results.message))
 
         if len(results.unsuccessful_properties) > 0:
 
-            exceptions = '\n'.join(f'{result.directory}: {result.message}'
-                                   for result in results.exceptions)
+            exceptions = '\n'.join('%s: %s'%(result.directory, result.message) for result in results.exceptions)
 
-            raise ValueError(f'Some properties could not be estimated:\n\n{exceptions}.')
+            raise ValueError('Some properties could not be estimated:\n\n%s.'%exceptions)
 
         elif len(results.exceptions) > 0:
 
-            exceptions = '\n'.join(f'{result.directory}: {result.message}'
-                                   for result in results.exceptions)
+            exceptions = '\n'.join('%s: %s'%(result.directory, result.message) for result in results.exceptions)
 
             # In some cases, an exception will be raised when executing a property but
             # it will not stop the property from being estimated (e.g an error occured
             # while reweighting so a simulation was used to estimate the property instead).
-            logger.warning(f'A number of non-fatal exceptions occured:\n\n{exceptions}')
+            logger.warning('A number of non-fatal exceptions occured:\n\n%s.'%exceptions)
 
     def _extract_property_data(self, estimation_request, mvals, AGrad):
         """Extract the property estimates #and their gradients#
@@ -579,7 +576,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                 temperature = physical_property.thermodynamic_state.temperature.to(unit.kelvin).magnitude
                 pressure = physical_property.thermodynamic_state.pressure.to(unit.atmosphere).magnitude
 
-                state_tuple = (f'{temperature:.6f}', f'{pressure:.6f}')
+                state_tuple = ('%.6f'%temperature, '%.6f'%pressure)
 
                 if state_tuple not in estimated_gradients[class_name][substance_id]:
 
@@ -591,7 +588,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                     parameter_index = self._gradient_key_mappings[gradient.key]
                     gradient_unit = self.default_units[class_name] / self._parameter_units[gradient.key]
 
-                    logger.info(f'Gradient Value: {gradient.value} Expected Unit: {gradient_unit}\n')
+                    logger.info('Gradient Value: %f Expected Unit: %s\n'%(gradient.value, gradient_unit))
 
                     if isinstance(gradient.value, unit.Quantity):
                         gradient_value = gradient.value.to(gradient_unit).magnitude
