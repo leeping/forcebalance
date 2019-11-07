@@ -1,23 +1,14 @@
 from __future__ import absolute_import
-import unittest
-import sys, os, re
 import json
-from collections import OrderedDict
-import forcebalance
-import abc
-import numpy
-from test_target import TargetTests # general targets tests defined in test_target.py
 from forcebalance.nifty import *
 from forcebalance.amberio import splitComment, parse_amber_namelist
 
-class TestSplitComment:
-    # def setUp(self):
-
+class TestSplitComment(object):
     def test_split_comment(self):
         """ Test splitting of comment field in AMBER namelist """
         printcool("Test splitting of comment field in AMBER namelist")
         def test_input_output(a, b):
-            self.assertEqual(splitComment(a, debug=False), b)
+            assert splitComment(a, debug=False) == b
 
         # Exclamation mark outside of quote
         test_input_output(" restraint_wt=0.1, ! Restraint force constant ", " restraint_wt=0.1, ")
@@ -35,37 +26,38 @@ class TestSplitComment:
 
     def test_parse_amber_mdin(self):
         """ Test if parsing AMBER namelist gives the expected result """
-        datadir = os.path.join(sys.path[0], 'files', 'test_amber_mdin')
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        datadir = os.path.join(cwd, 'files', 'test_amber_mdin')
         for i in range(1,8):
             fobj = open(os.path.join(datadir, '%i.mdin.txt' % i))
             fstr = fobj.read()
             fobj.close()
             a1, a2, a3, a4 = json.loads(fstr, object_pairs_hook=OrderedDict)
             b1, b2, b3, b4 = parse_amber_namelist(os.path.join(datadir, '%i.mdin' % i))
-            self.assertEqual(a1, b1)
-            self.assertEqual(a2, b2)
-            self.assertEqual(a3, b3)
-            self.assertEqual(a4, b4)
+            assert a1 == b1
+            assert a2 == b2
+            assert a3 == b3
+            assert a4 == b4
 
-        # missing_pkgs = []
-        # for eng in ['TINKER', 'GMX', 'OpenMM']:
-        #     if eng not in self.engines:
-        #         missing_pkgs.append(eng)
-        # if len(missing_pkgs) > 0:
-        #     self.skipTest("Missing packages: %s" % ', '.join(missing_pkgs))
-        # Data = OrderedDict()
-        # for name, eng in self.engines.items():
-        #     Data[name] = eng.interaction_energy(fraga=list(range(22)), fragb=list(range(22, 49)))
-        # datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
-        # if SAVEDATA:
-        #     fout = os.path.join(datadir, 'test_interaction_energies.dat')
-        #     if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
-        #     np.savetxt(fout, Data[list(self.engines.keys())[0]])
-        # fin = os.path.join(datadir, 'test_interaction_energies.dat')
-        # RefData = np.loadtxt(fin)
-        # for n1 in self.engines.keys():
-        #     self.assertNdArrayEqual(Data[n1], RefData, delta=0.0001,
-        #                             msg="%s interaction energies do not match the reference" % n1)
+            # missing_pkgs = []
+            # for eng in ['TINKER', 'GMX', 'OpenMM']:
+            #     if eng not in self.engines:
+            #         missing_pkgs.append(eng)
+            # if len(missing_pkgs) > 0:
+            #     self.skipTest("Missing packages: %s" % ', '.join(missing_pkgs))
+            # Data = OrderedDict()
+            # for name, eng in self.engines.items():
+            #     Data[name] = eng.interaction_energy(fraga=list(range(22)), fragb=list(range(22, 49)))
+            # datadir = os.path.join(sys.path[0], 'files', 'test_engine', self.__class__.__name__)
+            # if SAVEDATA:
+            #     fout = os.path.join(datadir, 'test_interaction_energies.dat')
+            #     if not os.path.exists(os.path.dirname(fout)): os.makedirs(os.path.dirname(fout))
+            #     np.savetxt(fout, Data[list(self.engines.keys())[0]])
+            # fin = os.path.join(datadir, 'test_interaction_energies.dat')
+            # RefData = np.loadtxt(fin)
+            # for n1 in self.engines.keys():
+            #     self.assertNdArrayEqual(Data[n1], RefData, delta=0.0001,
+            #                             msg="%s interaction energies do not match the reference" % n1)
 
 # class TestAbInitio_GMX(ForceBalanceTestCase, TargetTests):
 #     def setUp(self):
@@ -92,5 +84,5 @@ class TestSplitComment:
 #         """@override ForceBalanceTestCase.shortDescription()"""
 #         return super(TestAbInitio_GMX,self).shortDescription() + " (AbInitio_GMX)"
 
-if __name__ == '__main__':
-    unittest.main()
+# if __name__ == '__main__':
+#     unittest.main()
