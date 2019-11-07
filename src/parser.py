@@ -91,7 +91,7 @@ gen_opts_types = {
                  },
     'bools'   : {"backup"           : (1,  10,  'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, -50,  'Write the checkpoint file at every optimization step'),
-                 "lq_converge"      : (1, -50,  'Allow convergence on "low quality" steps'),
+                 "converge_lowq"    : (0, -50,  'Allow convergence on "low quality" steps'),
                  "have_vsite"       : (0, -150, 'Specify whether there are virtual sites in the simulation (being fitted or not).  Enforces calculation of vsite positions.', 'Experimental feature in ESP fitting', ['ABINITIO']),
                  "constrain_charge" : (0,  10,  'Specify whether to constrain the charges on the molecules.', 'Printing the force field (all calculations)'),
                  "print_gradient"   : (1,  20,  'Print the objective function gradient at every step', 'Main Optimizer'),
