@@ -56,7 +56,7 @@ priors
    ProperTorsions/Proper/k              : 1.0e+01
    vdW/Atom/epsilon                     : 1.0e-01
    vdW/Atom/rmin_half                   : 1.0e-01
-/priors
+/priors      
 
 $end
 
