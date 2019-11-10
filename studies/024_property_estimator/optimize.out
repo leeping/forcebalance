@@ -1,0 +1,602 @@
+#======================================================================#
+#| [1m            Welcome to ForceBalance version 1.6.0! =D             [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Keri A. McKiernan, Yudong Qiu                   [0m |#
+#| [1m           Arthur Vigil, Erik G. Brandt, Johnny Israeli           [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: optimize.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: smirnoff99Frosst-1.1.0.offxml
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  1.5700e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [  1.4870e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [  1.5700e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [  1.3870e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [  5.2700e-05 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [  3.0000e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [  1.0940e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [  1.9080e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [  2.1040e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [  1.7210e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   vdW/Atom/epsilon                     : 1.00000e-01
+   vdW/Atom/rmin_half                   : 1.00000e+00
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    vdW/Atom/epsilon              : 1.00000e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [    vdW/Atom/rmin_half            : 1.00000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [    vdW/Atom/epsilon              : 1.00000e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [    vdW/Atom/rmin_half            : 1.00000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [    vdW/Atom/epsilon              : 1.00000e-01 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [    vdW/Atom/rmin_half            : 1.00000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [    vdW/Atom/epsilon              : 1.00000e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [    vdW/Atom/rmin_half            : 1.00000e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [    vdW/Atom/epsilon              : 1.00000e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [    vdW/Atom/rmin_half            : 1.00000e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['smirnoff99Frosst-1.1.0.offxml'] 
+priors                    OrderedDict([('vdW/Atom/epsilon', 0.1), ('vdW/Atom/rmin_half', 1.0)]) 
+----------------------------------------------------------
+targets/ethanol-property-estimate/prop_est_input.json
+#========================================================#
+#| [92m  Loaded experimental data from property estimator  [0m |#
+#========================================================#
+#========================================================#
+#| [92m       Reference Density (CCO{1.000000}) data       [0m |#
+#========================================================#
+298.150000K-1.000000atm   785.000000+/-0.000000 
+320.030000K-1.000000atm   766.000000+/-0.000000 
+----------------------------------------------------------
+#===========================================================#
+#| [92m Reference EnthalpyOfVaporization (CCO{1.000000}) data [0m |#
+#===========================================================#
+298.150000K-1.000000atm   42.300000+/-0.000000 
+320.030000K-1.000000atm   41.000000+/-0.000000 
+-------------------------------------------------------------
+#========================================================#
+#| [92m    Setup for target ethanol-property-estimate :    [0m |#
+#========================================================#
+name                      ethanol-property-estimate 
+type                      PROPERTYESTIMATE_SMIRNOFF 
+tgtdir                    targets/ethanol-property-estimate 
+prop_est_input            prop_est_input.json 
+----------------------------------------------------------
+#========================================================#
+#| [92m        SMIRNOFF Parameter Coverage Analysis        [0m |#
+#========================================================#
+No smirnoff topology or molecule found for target ethanol-property-estimate
+Force field assignment data written to /lila/data/chodera/boothros/regression_testing/force_balance/property_estimator/all_data_points/smirnoff_parameter_assignments.json
+ idx Parameter                                                                                                   Count
+----------------------------------------------------------------------------------------------------------------------
+   0 vdW/Atom/epsilon/[#1:1]-[#6X4]                                                                       :          0
+   1 vdW/Atom/rmin_half/[#1:1]-[#6X4]                                                                     :          0
+   2 vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]                                                :          0
+   3 vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]                                              :          0
+   4 vdW/Atom/epsilon/[#1:1]-[#8]                                                                         :          0
+   5 vdW/Atom/rmin_half/[#1:1]-[#8]                                                                       :          0
+   6 vdW/Atom/epsilon/[#6X4:1]                                                                            :          0
+   7 vdW/Atom/rmin_half/[#6X4:1]                                                                          :          0
+   8 vdW/Atom/epsilon/[#8X2H1+0:1]                                                                        :          0
+   9 vdW/Atom/rmin_half/[#8X2H1+0:1]                                                                      :          0
+SNIRNOFF Parameter Coverage Analysis result: 0/10 parameters are covered.
+----------------------------------------------------------------------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          1.0 
+normalize_weights         False 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   OPTIMIZE 
+trust0                    0.25 
+mintrust                  0.05 
+eps                       0.01 
+convergence_objective     0.1 
+convergence_step          0.1 
+convergence_gradient      0.1 
+adapt_fac                 0.2 
+adapt_damp                1.0 
+print_hess                True 
+err_tol                   1.0 
+input_file                optimize.in 
+----------------------------------------------------------
+Calculation started at 2019-08-21 12:57 PM
+#========================================================#
+#| [1m                  Main Optimizer                    [0m |#
+#| [1m   Newton-Raphson Method (Adaptive Trust Radius)    [0m |#
+#| [1m                                                    [0m |#
+#| [1m       [0mConvergence criteria (1 of 3 needed):        [0m |#
+#| [1m          [0mObjective Function  : 1.000e-01           [0m |#
+#| [1m          [0mNorm of Gradient    : 1.000e-01           [0m |#
+#| [1m          [0mParameter step size : 1.000e-01           [0m |#
+#========================================================#
+#========================================================#
+#|       Color Key for Objective Function -=X2=-        |#
+#|  [1mBold[0m = Initial step                                 |#
+#|  [92mGreen = Current lowest value of objective function[0m  |#
+#|  [91mRed = Objective function rises, step rejected[0m       |#
+#|  [0mNo color = Not at the lowest value                  |#
+#========================================================#
+#========================================================#
+#| [94m     Iteration 0: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+Requesting the estimation of 4 properties, and their gradients with respect to 10 parameters.
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 2.0821103773173446 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -0.3580907983040619 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 1.0564607023599133 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -0.21591063250357037 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 2.903579674817616 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: 0.00028999648978499245 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 1.727284341151547 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 0.1285396043669476 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: 0.2522638585190169 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -0.2699120331083041 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 293.462593788208 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -7.115557340956413 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 175.43374594435022 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -3.1572218339371307 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 304.4042042195158 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: -0.07950341802268342 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 156.68048426526093 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 26.414516429747188 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: 8.126559706343205 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -60.59288930080028 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 1.6117873937150342 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -0.3926362634781592 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 0.6942697676493639 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -0.2522015223298146 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 2.692293510204623 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: -0.00018446542071630799 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 1.6344782697009734 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 0.0946347989333259 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: 0.1634890902104563 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -0.4477205873906611 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 249.21073055155892 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -10.333792347281161 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 146.19563440435746 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -6.019897053018777 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 342.9776367216014 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: -0.06559110041124813 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 147.4992476092557 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 22.3816764208759 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: 5.136222926327694 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -68.62183727705276 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+
+#=============================================================================================================#
+#| [1;94m                                    ethanol-property-estimate Density                                    [0m |#
+#| [1;94m Temperature  Pressure Substance  Reference  Calculated +- Stdev     Delta    Weight    Denom     Term   [0m |#
+#=============================================================================================================#
+  298.150000K 1.000000atm CCO{1.000000}   785.000        788.349 +- 0.445     3.349   0.50000  30.00000   0.00623  
+  320.030000K 1.000000atm CCO{1.000000}   766.000        762.288 +- 0.315    -3.712   0.50000  30.00000   0.00765  
+---------------------------------------------------------------------------------------------------------------
+
+#=============================================================================================================#
+#| [1;94m                            ethanol-property-estimate EnthalpyOfVaporization                             [0m |#
+#| [1;94m Temperature  Pressure Substance  Reference  Calculated +- Stdev     Delta    Weight    Denom     Term   [0m |#
+#=============================================================================================================#
+  298.150000K 1.000000atm CCO{1.000000}    42.300         37.723 +- 0.179    -4.577   0.50000   3.00000   1.16387  
+  320.030000K 1.000000atm CCO{1.000000}    41.000         36.071 +- 0.125    -4.929   0.50000   3.00000   1.34947  
+---------------------------------------------------------------------------------------------------------------
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+ethanol-property-estimate      2.52722      1.000 [94m     2.52722e+00[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     2.52722e+00[0m 
+----------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     0   0.000e+00   0.000e+00   8.997e+01[1m   2.52722e+00[0m   0.000e+00      0.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -2.84615078e+01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [  9.56437730e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [ -1.68210048e+01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [  5.13887866e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [ -3.42926954e+01 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [  7.81910730e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [ -1.60767893e+01 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [ -2.56019606e+01 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [ -6.68106158e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [  6.92357032e+01 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [94m                   Total Hessian                    [0m |#
+#========================================================#
+ 2.43729672e+02 -2.04974992e+02  1.34559548e+02 -1.22079994e+02  3.09616373e+02 -4.06804763e-01  1.61162820e+02  1.94789718e+02  1.28359463e+01 -5.30213501e+02 
+-2.04974992e+02  3.33260108e+02 -1.02978974e+02  2.05340500e+02 -2.96429306e+02  1.03260370e-01 -1.69354403e+02 -1.39011182e+02 -1.84016976e+01  4.29413282e+02 
+ 1.34559548e+02 -1.02978974e+02  7.77015111e+01 -6.07326203e+01  1.69901735e+02 -2.41707819e-01  8.73850657e+01  1.10234357e+02  6.64076671e+00 -2.95801709e+02 
+-1.22079994e+02  2.05340500e+02 -6.07326203e+01  1.29604145e+02 -1.78721157e+02  5.38836604e-02 -1.02601944e+02 -8.15925503e+01 -1.12618150e+01  2.57369834e+02 
+ 3.09616373e+02 -2.96429306e+02  1.69901735e+02 -1.78721157e+02  4.09875302e+02 -4.80483630e-01  2.13823523e+02  2.44413341e+02  1.77351743e+01 -6.87461656e+02 
+-4.06804763e-01  1.03260370e-01 -2.41707819e-01  5.38836604e-02 -4.80483630e-01  2.00131158e+00 -2.23747281e-01 -3.74432363e-01 -6.14449212e-03  1.04016421e+00 
+ 1.61162820e+02 -1.69354403e+02  8.73850657e+01 -1.02601944e+02  2.13823523e+02 -2.23747281e-01  1.16283451e+02  1.24521659e+02  1.00670779e+01 -3.51060407e+02 
+ 1.94789718e+02 -1.39011182e+02  1.10234357e+02 -8.15925503e+01  2.44413341e+02 -3.74432363e-01  1.24521659e+02  1.63494208e+02  8.98436624e+00 -4.34116329e+02 
+ 1.28359463e+01 -1.84016976e+01  6.64076671e+00 -1.12618150e+01  1.77351743e+01 -6.14449212e-03  1.00670779e+01  8.98436624e+00  3.10675459e+00 -2.50859290e+01 
+-5.30213501e+02  4.29413282e+02 -2.95801709e+02  2.57369834e+02 -6.87461656e+02  1.04016421e+00 -3.51060407e+02 -4.34116329e+02 -2.50859290e+01  1.23683523e+03 
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 1.0018e-01)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  0.0000e+00 + 3.9298e-03 =  3.9298e-03 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [  0.0000e+00 + 5.8641e-02 =  5.8641e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [  0.0000e+00 + 6.9461e-03 =  6.9461e-03 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [  0.0000e+00 + 3.6643e-02 =  3.6643e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [  0.0000e+00 + 1.9193e-02 =  1.9193e-02 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [  0.0000e+00 - 7.9631e-05 = -7.9631e-05 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [  0.0000e+00 - 8.5217e-03 = -8.5217e-03 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [  0.0000e+00 + 1.5030e-02 =  1.5030e-02 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [  0.0000e+00 - 3.6191e-03 = -3.6191e-03 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [  0.0000e+00 - 6.7166e-02 = -6.7166e-02 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  1.5700e-02 + 3.9298e-04 =  1.6093e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [  1.4870e+00 + 5.8641e-02 =  1.5456e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [  1.5700e-02 + 6.9461e-04 =  1.6395e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [  1.3870e+00 + 3.6643e-02 =  1.4236e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [  5.2700e-05 + 1.9193e-03 =  1.9720e-03 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [  3.0000e-01 - 7.9631e-05 =  2.9992e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [  1.0940e-01 - 8.5217e-04 =  1.0855e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [  1.9080e+00 + 1.5030e-02 =  1.9230e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [  2.1040e-01 - 3.6191e-04 =  2.1004e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [  1.7210e+00 - 6.7166e-02 =  1.6538e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 1: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+Requesting the estimation of 4 properties, and their gradients with respect to 10 parameters.
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 0.4694212594362862 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -0.6001442495766593 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 0.8551504122635326 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -0.23166200300471357 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 0.31146672910118267 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: 0.0005241462429633874 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 1.5956633732372325 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 0.0666450908455769 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: 0.19787049904081208 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -0.2161385313457195 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 239.40942556906657 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -12.164768115738566 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 146.29864021357943 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -5.456776041013734 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 26.75216572328758 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: -1.3101681125988605 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 140.70769251604546 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 20.975822231662804 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: -1.4685816319935971 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -72.30556869526623 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 1.486577965000016 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -0.40159257297731504 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 0.8031045703805632 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -0.23401753281554236 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 0.2229431088431156 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: -0.004948190134294655 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 1.5919769390788279 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 0.11755444071468449 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: 0.11736239165929871 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -0.41804420671711784 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 259.6697434438302 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -8.588235902427257 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 162.00075549999764 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -3.865649479581772 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 13.172638405850144 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: -1.8928178279742427 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 144.25604559587765 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 21.942280435363294 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: -9.372990045801464 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -91.46495436538005 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+
+#=============================================================================================================#
+#| [1;94m                                    ethanol-property-estimate Density                                    [0m |#
+#| [1;94m Temperature  Pressure Substance  Reference  Calculated +- Stdev     Delta    Weight    Denom     Term   [0m |#
+#=============================================================================================================#
+  298.150000K 1.000000atm CCO{1.000000}   785.000        781.510 +- 0.388    -3.490   0.50000  30.00000   0.00677  
+  320.030000K 1.000000atm CCO{1.000000}   766.000        758.300 +- 0.415    -7.700   0.50000  30.00000   0.03294  
+---------------------------------------------------------------------------------------------------------------
+
+#=============================================================================================================#
+#| [1;94m                            ethanol-property-estimate EnthalpyOfVaporization                             [0m |#
+#| [1;94m Temperature  Pressure Substance  Reference  Calculated +- Stdev     Delta    Weight    Denom     Term   [0m |#
+#=============================================================================================================#
+  298.150000K 1.000000atm CCO{1.000000}    42.300         43.017 +- 0.129     0.717   0.50000   3.00000   0.02856  
+  320.030000K 1.000000atm CCO{1.000000}    41.000         41.446 +- 0.185     0.446   0.50000   3.00000   0.01106  
+---------------------------------------------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+ethanol-property-estimate      0.07932      1.000 [92m     7.93214e-02[0m ( -2.448e+00 ) 
+Regularization                 0.01004      1.000 [91m     1.00364e-02[0m ( +1.004e-02 ) 
+Total                                             [92m     8.93579e-02[0m ( -2.438e+00 ) 
+-------------------------------------------------------------------------------------
+Creating the directory /lila/data/chodera/boothros/regression_testing/force_balance/property_estimator/all_data_points/result/optimize to print the force field
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     1   1.002e-01   1.002e-01   8.259e+00[92m   8.93579e-02[0m  -2.438e+00      0.969
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  1.74843049e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [  4.48557554e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [  9.63699281e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [  2.34743152e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [  5.28454951e-03 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [ -1.58058416e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [ -1.61810687e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [  1.52460277e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [ -2.42539474e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [ -6.01371895e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [94m                   Total Hessian                    [0m |#
+#========================================================#
+ 1.67608836e+02 -1.54773962e+02  1.03383335e+02 -7.64057733e+01  1.62239672e+01 -9.73635961e+00  1.13668933e+02  1.41999339e+02 -1.24382848e-01 -5.36560769e+02 
+-1.54773962e+02  6.06026281e+02 -1.28092601e+02  2.69964750e+02 -3.55904028e+01  5.43553198e+00 -2.10223606e+02 -1.46185342e+02 -1.73384963e+01  5.15675615e+02 
+ 1.03383335e+02 -1.28092601e+02  7.02334763e+01 -5.87224570e+01  1.16686202e+01 -5.92856260e+00  7.82061044e+01  9.04155681e+01  1.00150017e+00 -3.40013775e+02 
+-7.64057733e+01  2.69964750e+02 -5.87224570e+01  1.27448283e+02 -1.60019712e+01  2.75907211e+00 -9.71944951e+01 -6.98634315e+01 -7.65325466e+00  2.47459371e+02 
+ 1.62239672e+01 -3.55904028e+01  1.16686202e+01 -1.60019712e+01  4.61816478e+00 -7.70914967e-01  1.57595907e+01  1.46649245e+01  7.94663764e-01 -5.27151744e+01 
+-9.73635961e+00  5.43553198e+00 -5.92856260e+00  2.75907211e+00 -7.70914967e-01  2.61632144e+00 -5.86457314e+00 -8.27578806e+00  1.65502978e-01  3.19346319e+01 
+ 1.13668933e+02 -2.10223606e+02  7.82061044e+01 -9.71944951e+01  1.57595907e+01 -5.86457314e+00  1.03570870e+02  1.00573745e+02  3.85219786e+00 -3.71914812e+02 
+ 1.41999339e+02 -1.46185342e+02  9.04155681e+01 -6.98634315e+01  1.46649245e+01 -8.27578806e+00  1.00573745e+02  1.24672771e+02  3.70735485e-01 -4.62121520e+02 
+-1.24382848e-01 -1.73384963e+01  1.00150017e+00 -7.65325466e+00  7.94663764e-01  1.65502978e-01  3.85219786e+00  3.70735485e-01  2.68808481e+00  5.02062968e-01 
+-5.36560769e+02  5.15675615e+02 -3.40013775e+02  2.47459371e+02 -5.27151744e+01  3.19346319e+01 -3.71914812e+02 -4.62121520e+02  5.02062968e-01  1.75852238e+03 
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 8.3228e-02)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  3.9298e-03 + 8.9834e-03 =  1.2913e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [  5.8641e-02 + 8.0082e-03 =  6.6650e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [  6.9461e-03 - 3.0109e-02 = -2.3163e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [  3.6643e-02 - 6.0676e-02 = -2.4033e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [  1.9193e-02 - 3.6197e-02 = -1.7004e-02 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [ -7.9631e-05 - 2.9839e-03 = -3.0636e-03 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [ -8.5217e-03 - 1.1473e-03 = -9.6691e-03 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [  1.5030e-02 - 2.9371e-02 = -1.4341e-02 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [ -3.6191e-03 - 2.1959e-03 = -5.8150e-03 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [ -6.7166e-02 - 2.4623e-03 = -6.9628e-02 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  1.6093e-02 + 8.9834e-04 =  1.6991e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [  1.5456e+00 + 8.0082e-03 =  1.5536e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [  1.6395e-02 - 3.0109e-03 =  1.3384e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [  1.4236e+00 - 6.0676e-02 =  1.3630e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [  1.9720e-03 - 1.9720e-03 =  0.0000e+00 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [  2.9992e-01 - 2.9839e-03 =  2.9694e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [  1.0855e-01 - 1.1473e-04 =  1.0843e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [  1.9230e+00 - 2.9371e-02 =  1.8937e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [  2.1004e-01 - 2.1959e-04 =  2.0982e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [  1.6538e+00 - 2.4623e-03 =  1.6514e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 2: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+Requesting the estimation of 4 properties, and their gradients with respect to 10 parameters.
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 1.8211433537195565 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -0.43668381954804736 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 0.9205460519740696 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -0.1969207076705678 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 0.395662297898447 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: 1.3460129011807818e-10 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 1.6428470177247305 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 0.12772456075760635 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: 0.1021726665634854 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -0.41380150354988754 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 259.7838174833182 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -6.705909933528082 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 159.39287339127736 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -2.461122393916388 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 110.27583524705463 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: -1.8377562810788275e-10 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 136.02157133383628 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 23.848860488630603 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: -10.259928012133887 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -86.10572862681883 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 1.7361985725789475 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -0.42504807669396133 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 1.2208201151450913 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -0.1852187846853592 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 3.444835720369799 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: 4.075427950797367e-10 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 1.638950620398764 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 0.12703390188382016 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: 0.29173231677953476 gram * mole / kilocalorie / milliliter Expected Unit: kilogram * mole / kilocalorie / meter ** 3
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -0.02920459426148664 gram / angstrom / milliliter Expected Unit: kilogram / angstrom / meter ** 3
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=epsilon: 240.00196715661897 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4] attribute=rmin_half: -9.801820515577521 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=epsilon: 165.86343502236952 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35] attribute=rmin_half: -1.5393841095577439 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=epsilon: 140.34165227545927 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#1:1]-[#8] attribute=rmin_half: -4.288097989183931e-10 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#6X4:1] attribute=epsilon: 134.5589326158328 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#6X4:1] attribute=rmin_half: 22.85889891390355 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=epsilon: -3.577586781148516 kilojoule / kilocalorie Expected Unit: kilojoule / kilocalorie
+Gradient tag=vdW smirks=[#8X2H1+0:1] attribute=rmin_half: -72.24841757203747 kilojoule / angstrom / mole Expected Unit: kilojoule / angstrom / mole
+
+#=============================================================================================================#
+#| [1;94m                                    ethanol-property-estimate Density                                    [0m |#
+#| [1;94m Temperature  Pressure Substance  Reference  Calculated +- Stdev     Delta    Weight    Denom     Term   [0m |#
+#=============================================================================================================#
+  298.150000K 1.000000atm CCO{1.000000}   785.000        786.360 +- 0.436     1.360   0.50000  30.00000   0.00103  
+  320.030000K 1.000000atm CCO{1.000000}   766.000        761.790 +- 0.477    -4.210   0.50000  30.00000   0.00985  
+---------------------------------------------------------------------------------------------------------------
+
+#=============================================================================================================#
+#| [1;94m                            ethanol-property-estimate EnthalpyOfVaporization                             [0m |#
+#| [1;94m Temperature  Pressure Substance  Reference  Calculated +- Stdev     Delta    Weight    Denom     Term   [0m |#
+#=============================================================================================================#
+  298.150000K 1.000000atm CCO{1.000000}    42.300         42.461 +- 0.178     0.161   0.50000   3.00000   0.00144  
+  320.030000K 1.000000atm CCO{1.000000}    41.000         40.651 +- 0.136    -0.349   0.50000   3.00000   0.00676  
+---------------------------------------------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+ethanol-property-estimate      0.01908      1.000 [92m     1.90762e-02[0m ( -6.025e-02 ) 
+Regularization                 0.01120      1.000 [91m     1.12026e-02[0m ( +1.166e-03 ) 
+Total                                             [92m     3.02787e-02[0m ( -5.908e-02 ) 
+-------------------------------------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst-1.1.0.offxml -> result/optimize/smirnoff99Frosst-1.1.0_1.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     2   1.058e-01   8.323e-02   2.603e+00[92m   3.02787e-02[0m  -5.908e-02      0.794
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -9.76173695e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [  1.72148412e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [ -8.35745434e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [  5.36358995e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [ -3.40076750e-02 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [ -6.12710714e-03 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [ -8.15710784e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [ -8.88850494e-01 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [ -1.37160471e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [  6.30478478e-01 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [94m                   Total Hessian                    [0m |#
+#========================================================#
+ 2.11331180e+02 -2.15854001e+02  1.32417294e+02 -8.67865473e+01  0.00000000e+00  1.04181972e-07  1.40005165e+02  1.80148187e+02  3.77974657e+00 -5.30573395e+02 
+-2.15854001e+02  4.30292352e+02 -1.32262066e+02  1.86531398e+02  0.00000000e+00 -2.57177708e-07 -1.81904957e+02 -1.64632754e+02 -1.75811676e+01  3.57413451e+02 
+ 1.32417294e+02 -1.32262066e+02  8.67720389e+01 -5.24616321e+01  0.00000000e+00  6.79334988e-08  8.79234201e+01  1.14660141e+02  2.52591446e+00 -3.31930880e+02 
+-8.67865473e+01  1.86531398e+02 -5.24616321e+01  8.41404956e+01  0.00000000e+00 -1.13199025e-07 -7.56961557e+01 -6.45211498e+01 -7.89759968e+00  1.32454227e+02 
+ 0.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00  3.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00  0.00000000e+00 
+ 1.04181972e-07 -2.57177708e-07  6.79334988e-08 -1.13199025e-07  0.00000000e+00  2.00000000e+00  9.78668979e-08  7.50501624e-08  1.47764377e-08 -6.99109354e-08 
+ 1.40005165e+02 -1.81904957e+02  8.79234201e+01 -7.56961557e+01  0.00000000e+00  9.78668979e-08  1.02510032e+02  1.16668562e+02  5.09213493e+00 -3.19007567e+02 
+ 1.80148187e+02 -1.64632754e+02  1.14660141e+02 -6.45211498e+01  0.00000000e+00  7.50501624e-08  1.16668562e+02  1.59312129e+02  1.94034720e+00 -4.74518741e+02 
+ 3.77974657e+00 -1.75811676e+01  2.52591446e+00 -7.89759968e+00  0.00000000e+00  1.47764377e-08  5.09213493e+00  1.94034720e+00  3.19281693e+00  7.04358101e+00 
+-5.30573395e+02  3.57413451e+02 -3.31930880e+02  1.32454227e+02  0.00000000e+00 -6.99109354e-08 -3.19007567e+02 -4.74518741e+02  7.04358101e+00  1.59698625e+03 
+----------------------------------------------------------
+Convergence criterion reached in step size (1.00e-01)
+Convergence criterion reached for objective function (1.00e-01)
+#========================================================#
+#| [92m               [0m[1mOptimization Converged[0m               [0m |#
+#| [92m           Final objective function value           [0m |#
+#| [92m  Full:  3.027873e-02  Un-penalized:  1.907617e-02  [0m |#
+#========================================================#
+#========================================================#
+#| [94m           Final optimization parameters:           [0m |#
+#========================================================#
+   0 [  1.2913e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [  6.6650e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [ -2.3163e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [ -2.4033e-02 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [ -1.7004e-02 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [ -3.0636e-03 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [ -9.6691e-03 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [ -1.4341e-02 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [ -5.8150e-03 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [ -6.9628e-02 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+#========================================================#
+#| [94m             Final physical parameters:             [0m |#
+#========================================================#
+   0 [  1.6991e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+   1 [  1.5536e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+   2 [  1.3384e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   3 [  1.3630e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]-[#7,#8,#9,#16,#17,#35]
+   4 [  0.0000e+00 ] : vdW/Atom/epsilon/[#1:1]-[#8]
+   5 [  2.9694e-01 ] : vdW/Atom/rmin_half/[#1:1]-[#8]
+   6 [  1.0843e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+   7 [  1.8937e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+   8 [  2.0982e-01 ] : vdW/Atom/epsilon/[#8X2H1+0:1]
+   9 [  1.6514e+00 ] : vdW/Atom/rmin_half/[#8X2H1+0:1]
+----------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst-1.1.0.offxml -> result/optimize/smirnoff99Frosst-1.1.0_2.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+Wall time since calculation start: 5032.8 seconds
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#
