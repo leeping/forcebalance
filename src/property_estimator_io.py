@@ -333,13 +333,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         is_cosmetic = False
 
-        if parameter_attribute is None:
-            is_cosmetic = True
-
-        elif (parameter_attribute not in parameter._REQUIRED_SPEC_ATTRIBS and
-              parameter_attribute not in parameter._OPTIONAL_SPEC_ATTRIBS and
-              parameter_attribute not in parameter._INDEXED_ATTRIBS):
-
+        if parameter_attribute is None or parameter_attribute in parameter._cosmetic_attribs:
             is_cosmetic = True
 
         return openmm_quantity_to_pint(parameter_value), is_cosmetic
