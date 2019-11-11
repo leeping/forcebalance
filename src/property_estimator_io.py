@@ -579,12 +579,14 @@ class PropertyEstimate_SMIRNOFF(Target):
                     estimated_gradients[class_name][substance_id][state_tuple] = \
                         np.zeros(len(self._gradient_key_mappings))
 
+                logger.info('Gradients:\n\n')
+
                 for gradient in physical_property.gradients:
 
                     parameter_index = self._gradient_key_mappings[gradient.key]
                     gradient_unit = self.default_units[class_name] / self._parameter_units[gradient.key]
 
-                    logger.info('Gradient Value: %f Expected Unit: %s\n' % (gradient.value, gradient_unit))
+                    logger.info('%s\n' % str(gradient))
 
                     if isinstance(gradient.value, unit.Quantity):
                         gradient_value = gradient.value.to(gradient_unit).magnitude
