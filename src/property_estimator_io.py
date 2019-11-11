@@ -480,7 +480,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         # Submit the estimation request.
         self._pending_estimate_request = self._client.request_estimate(property_set=self._data_set,
-                                                                       force_field=force_field,
+                                                                       force_field_source=force_field,
                                                                        options=self._options.estimation_options,
                                                                        parameter_gradient_keys=parameter_gradient_keys)
 
