@@ -26,7 +26,7 @@ def main(n_workers, cpus_per_worker, gpus_per_worker):
     setup_timestamp_logging()
     logger = logging.getLogger()
 
-    # Ask for an estimation server with access to 2 GPUs.
+    # Set up the directory structure.
     working_directory = 'working_directory'
     storage_directory = 'storage_directory'
 
@@ -34,8 +34,7 @@ def main(n_workers, cpus_per_worker, gpus_per_worker):
     if path.isdir(working_directory):
         shutil.rmtree(working_directory)
 
-    # Set up a backend to run the calculations on. This assume running
-    # on a HPC resources with the LSF queue system installed.
+    # Set up a backend to run the calculations on with the requested resources.
     if gpus_per_worker <= 0:
         worker_resources = ComputeResources(number_of_threads=cpus_per_worker)
     else:
@@ -49,10 +48,10 @@ def main(n_workers, cpus_per_worker, gpus_per_worker):
     # Create a backend to cache simulation files.
     storage_backend = LocalFileStorage(storage_directory)
 
+    # Create an estimation server which will run the calculations.
     logger.info(f'Starting the server with {n_workers} workers, each with '
                 f'{cpus_per_worker} CPUs and {gpus_per_worker} GPUs.')
 
-    # Create an estimation server which will run the calculations.
     server = PropertyEstimatorServer(calculation_backend=calculation_backend,
                                      storage_backend=storage_backend,
                                      working_directory=working_directory,
