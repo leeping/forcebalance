@@ -482,7 +482,12 @@ class PropertyEstimate_SMIRNOFF(Target):
                     'gradients with respect to {} parameters.\n'.format(self._data_set.number_of_properties,
                                                                         len(parameter_gradient_keys)))
 
-        self._pending_estimate_request.results(True)
+        if self._pending_estimate_request.results(True) is None:
+
+            raise RuntimeError('No `PropertyEstimatorServer` could be found to submit the '
+                               'calculations to. Please double check that a server is running, '
+                               'and that the connection settings specified in the input script '
+                               'are correct.')
 
     @staticmethod
     def _check_estimation_request(estimation_request):
