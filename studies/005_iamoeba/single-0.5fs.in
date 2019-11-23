@@ -66,13 +66,16 @@ priors
    GPol/oext       : 2.0e-01
 /priors
 
+# 2019-11-23: Parameters within a line are no longer sorted alphabetically
+# but kept in the order entered. This file has been changed manually to
+# reflect the new ordering.
 read_mvals
-   0 [  1.6314e-02 ] : Bond/k/73.74
-   1 [  1.2047e-02 ] : Bond/length/73.74
+   0 [  1.2047e-02 ] : Bond/length/73.74
+   1 [  1.6314e-02 ] : Bond/k/73.74
    2 [ -4.0348e-01 ] : Angle/angle1/74.73.74
    3 [  3.0494e-02 ] : Angle/k/74.73.74
-   4 [  1.2108e+00 ] : Vdw/epsilon/73
-   5 [  8.0099e-01 ] : Vdw/sigma/73
+   4 [  8.0099e-01 ] : Vdw/sigma/73
+   5 [  1.2108e+00 ] : Vdw/epsilon/73
    6 [ -1.8591e-01 ] : Multipole/c0/380.-381.-381
    7 [ -5.7482e-01 ] : Multipole/d3/380.-381.-381
    8 [ -7.1453e-01 ] : Multipole/q11/380.-381.-381

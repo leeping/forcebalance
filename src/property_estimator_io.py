@@ -208,7 +208,7 @@ class PropertyEstimate_SMIRNOFF(Target):
                 temperature = physical_property.thermodynamic_state.temperature.to(unit.kelvin).magnitude
                 pressure = physical_property.thermodynamic_state.pressure.to(unit.atmosphere).magnitude
 
-                state_tuple = ('%.6f'%temperature, '%.6f'%pressure)
+                state_tuple = ('%.6f' % temperature, '%.6f' % pressure)
 
                 default_unit = self.default_units[class_name]
 
@@ -333,13 +333,7 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         is_cosmetic = False
 
-        if parameter_attribute is None:
-            is_cosmetic = True
-
-        elif (parameter_attribute not in parameter._REQUIRED_SPEC_ATTRIBS and
-              parameter_attribute not in parameter._OPTIONAL_SPEC_ATTRIBS and
-              parameter_attribute not in parameter._INDEXED_ATTRIBS):
-
+        if parameter_attribute is None or parameter_attribute in parameter._cosmetic_attribs:
             is_cosmetic = True
 
         return openmm_quantity_to_pint(parameter_value), is_cosmetic
@@ -480,13 +474,20 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         # Submit the estimation request.
         self._pending_estimate_request = self._client.request_estimate(property_set=self._data_set,
-                                                                       force_field=force_field,
+                                                                       force_field_source=force_field,
                                                                        options=self._options.estimation_options,
                                                                        parameter_gradient_keys=parameter_gradient_keys)
 
-        logger.info('Requesting the estimation of %d properties, and their gradients with respect to %d parameters.\n'%(self._data_set.number_of_properties, len(parameter_gradient_keys)))
+        logger.info('Requesting the estimation of {} properties, and their '
+                    'gradients with respect to {} parameters.\n'.format(self._data_set.number_of_properties,
+                                                                        len(parameter_gradient_keys)))
 
-        self._pending_estimate_request.results(True)
+        if self._pending_estimate_request.results(True) is None:
+
+            raise RuntimeError('No `PropertyEstimatorServer` could be found to submit the '
+                               'calculations to. Please double check that a server is running, '
+                               'and that the connection settings specified in the input script '
+                               'are correct.')
 
     @staticmethod
     def _check_estimation_request(estimation_request):
@@ -511,18 +512,18 @@ class PropertyEstimate_SMIRNOFF(Target):
 
         if len(results.unsuccessful_properties) > 0:
 
-            exceptions = '\n'.join('%s: %s'%(result.directory, result.message) for result in results.exceptions)
+            exceptions = '\n'.join('%s: %s' % (result.directory, result.message) for result in results.exceptions)
 
-            raise ValueError('Some properties could not be estimated:\n\n%s.'%exceptions)
+            raise ValueError('Some properties could not be estimated:\n\n%s.' % exceptions)
 
         elif len(results.exceptions) > 0:
 
-            exceptions = '\n'.join('%s: %s'%(result.directory, result.message) for result in results.exceptions)
+            exceptions = '\n'.join('%s: %s' % (result.directory, result.message) for result in results.exceptions)
 
             # In some cases, an exception will be raised when executing a property but
             # it will not stop the property from being estimated (e.g an error occured
             # while reweighting so a simulation was used to estimate the property instead).
-            logger.warning('A number of non-fatal exceptions occured:\n\n%s.'%exceptions)
+            logger.warning('A number of non-fatal exceptions occured:\n\n%s.' % exceptions)
 
     def _extract_property_data(self, estimation_request, mvals, AGrad):
         """Extract the property estimates #and their gradients#
@@ -548,7 +549,7 @@ class PropertyEstimate_SMIRNOFF(Target):
         # Extract the results from the request.
         results = estimation_request.results()
 
-        estimated_data = PropertyEstimate_SMIRNOFF._refactor_properties_dictionary(results.estimated_properties)
+        estimated_data = self._refactor_properties_dictionary(results.estimated_properties)
         estimated_gradients = {}
 
         if AGrad is False:
@@ -576,19 +577,21 @@ class PropertyEstimate_SMIRNOFF(Target):
                 temperature = physical_property.thermodynamic_state.temperature.to(unit.kelvin).magnitude
                 pressure = physical_property.thermodynamic_state.pressure.to(unit.atmosphere).magnitude
 
-                state_tuple = ('%.6f'%temperature, '%.6f'%pressure)
+                state_tuple = ('%.6f' % temperature, '%.6f' % pressure)
 
                 if state_tuple not in estimated_gradients[class_name][substance_id]:
 
                     estimated_gradients[class_name][substance_id][state_tuple] = \
                         np.zeros(len(self._gradient_key_mappings))
 
+                logger.info('Gradients:\n\n')
+
                 for gradient in physical_property.gradients:
 
                     parameter_index = self._gradient_key_mappings[gradient.key]
                     gradient_unit = self.default_units[class_name] / self._parameter_units[gradient.key]
 
-                    logger.info('Gradient Value: %f Expected Unit: %s\n'%(gradient.value, gradient_unit))
+                    logger.info('%s\n' % str(gradient))
 
                     if isinstance(gradient.value, unit.Quantity):
                         gradient_value = gradient.value.to(gradient_unit).magnitude

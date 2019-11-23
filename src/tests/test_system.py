@@ -1,6 +1,7 @@
 from __future__ import absolute_import
+
 from builtins import str
-import os
+import os, shutil
 import tarfile
 from .__init__ import ForceBalanceTestCase
 from forcebalance.parser import parse_inputs
@@ -28,11 +29,17 @@ ITERATIONS_TO_CONVERGE = 5
 EXPECTED_LIPID_RESULTS = array([-6.7553e-03, -2.4070e-02])
 
 # expected results taken from OpenFF torsion profile optimization using OpenFF toolkit 0.4.1 and OpenEye toolkit 2019.10.2. (updated 11/02/19)
-EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([7.3350e-03, -9.4238e-02, -7.9467e-05, 1.7172e-02, -1.3309e-01, 6.0076e-02, 1.7895e-02, 6.5866e-02, -1.4084e-01, -2.2906e-02])
+EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([-9.4238e-02, 7.3350e-03, -7.9467e-05, 1.7172e-02, -1.3309e-01, 6.0076e-02, 1.7895e-02, 6.5866e-02, -1.4084e-01, -2.2906e-02])
+
+
 
 class ForceBalanceSystemTest(ForceBalanceTestCase):
     def teardown_method(self):
-        os.system('rm -rf results *.bak *.tmp')
+        shutil.rmtree("result")
+        os.remove(self.input_file.replace('.in','.sav'))
+        if os.path.exists(self.input_file.replace('.in','.bak')):
+            shutil.rmtree(self.input_file.replace('.in','.bak'))
+        shutil.rmtree(self.input_file.replace('.in','.tmp'))
         super(ForceBalanceSystemTest, self).teardown_method()
 
 class TestWaterTutorial(ForceBalanceSystemTest):
@@ -43,15 +50,15 @@ class TestWaterTutorial(ForceBalanceSystemTest):
         targets = tarfile.open('targets.tar.bz2','r')
         targets.extractall()
         targets.close()
+        self.input_file='very_simple.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
     def test_water_tutorial(self):
         """Check water tutorial study runs without errors"""
-        self.logger.debug("\nSetting input file to 'very_simple.in'\n")
-        input_file='very_simple.in'
 
         ## The general options and target options that come from parsing the input file
         self.logger.debug("Parsing inputs...\n")
-        options, tgt_opts = parse_inputs(input_file)
+        options, tgt_opts = parse_inputs(self.input_file)
         self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
         assert isinstance(options, dict), "Parser gave incorrect type for options"
         assert isinstance(tgt_opts, list), "Parser gave incorrect type for tgt_opts"
@@ -89,19 +96,15 @@ class TestVoelzStudy(ForceBalanceSystemTest):
         super(TestVoelzStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '..', '..', 'studies', '009_voelz_nspe'))
-
-    def teardown_method(self):
-        os.system('rm -rf results *.bak *.tmp')
-        super(TestVoelzStudy, self).teardown_method()
+        self.input_file='options.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
     def test_voelz_study(self):
         """Check voelz study runs without errors"""
-        self.logger.debug("\nSetting input file to 'options.in'\n")
-        input_file='options.in'
-
+        
         ## The general options and target options that come from parsing the input file
         self.logger.debug("Parsing inputs...\n")
-        options, tgt_opts = parse_inputs(input_file)
+        options, tgt_opts = parse_inputs(self.input_file)
         self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
 
         assert isinstance(options, dict), "Parser gave incorrect type for options"
@@ -135,23 +138,20 @@ class TestVoelzStudy(ForceBalanceSystemTest):
         self.logger.debug(str(result) + '\n')
 
 class TestBromineStudy(ForceBalanceSystemTest):
+
     def setup_method(self, method):
         super(TestBromineStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '..', '..', 'studies', '003_liquid_bromine'))
-
-    def teardown_method(self):
-        os.system('rm -rf results *.bak *.tmp')
-        super(TestBromineStudy, self).teardown_method()
+        self.input_file='optimize.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
     def test_bromine_study(self):
         """Check liquid bromine study converges to expected results"""
-        self.logger.debug("\nSetting input file to 'options.in'\n")
-        input_file='optimize.in'
 
         ## The general options and target options that come from parsing the input file
         self.logger.debug("Parsing inputs...\n")
-        options, tgt_opts = parse_inputs(input_file)
+        options, tgt_opts = parse_inputs(self.input_file)
         self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
 
         assert isinstance(options, dict), "Parser gave incorrect type for options"
@@ -185,26 +185,22 @@ class TestBromineStudy(ForceBalanceSystemTest):
         self.logger.debug(str(result) + '\n')
 
         msg="\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values"
-        np.testing.assert_allclose(EXPECTED_BROMINE_RESULTS, result, atol=0.02, err_msg=msg)
+        np.testing.assert_allclose(EXPECTED_BROMINE_RESULTS, result, atol=0.05, err_msg=msg)
 
 class TestThermoBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         super(TestThermoBromineStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '../../studies/004_thermo_liquid_bromine'))
-
-    def teardown_method(self):
-        os.system('rm -rf results *.bak *.tmp')
-        super(TestThermoBromineStudy, self).teardown_method()
+        self.input_file='optimize.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
     def test_thermo_bromine_study(self):
         """Check liquid bromine study (Thermo target) converges to expected results"""
-        self.logger.debug("\nSetting input file to 'optimize.in'\n")
-        input_file='optimize.in'
 
         ## The general options and target options that come from parsing the input file
         self.logger.debug("Parsing inputs...\n")
-        options, tgt_opts = parse_inputs(input_file)
+        options, tgt_opts = parse_inputs(self.input_file)
         self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
 
         assert isinstance(options, dict), "Parser gave incorrect type for options"
@@ -237,26 +233,90 @@ class TestThermoBromineStudy(ForceBalanceSystemTest):
         self.logger.debug("\nOptimizer finished. Final results:\n")
         self.logger.debug(str(result) + '\n')
         msg = "\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values"
-        np.testing.assert_allclose(EXPECTED_BROMINE_RESULTS, result, atol=3e-2, err_msg=msg)
+        np.testing.assert_allclose(EXPECTED_BROMINE_RESULTS, result, atol=0.05, err_msg=msg)
+
+class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
+    def setup_method(self, method):
+        pytest.importorskip("propertyestimator")
+        super(TestEvaluatorBromineStudy, self).setup_method(method)
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies', '003d_estimator_liquid_bromine'))
+        ## Extract targets archive.
+        targets = tarfile.open('targets.tar.gz','r')
+        targets.extractall()
+        targets.close()
+        ## Start the estimator server.
+        import subprocess, time
+        self.estimator_process = subprocess.Popen([
+            "python", "run_server.py", "-ngpus=0", "-ncpus=1"
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ## Give the server time to start.
+        time.sleep(5)
+        self.input_file='optimize.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
+
+    def teardown_method(self):
+        self.estimator_process.terminate()
+        shutil.rmtree("working_directory")
+        shutil.rmtree("storage_directory")
+        shutil.rmtree("dask-worker-space")
+        super(TestEvaluatorBromineStudy, self).teardown_method()
+
+    def test_bromine_study(self):
+        """Check liquid bromine study converges to expected results"""
+
+        ## The general options and target options that come from parsing the input file
+        self.logger.debug("Parsing inputs...\n")
+        options, tgt_opts = parse_inputs(self.input_file)
+        self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
+
+        assert isinstance(options, dict), "Parser gave incorrect type for options"
+        assert isinstance(tgt_opts, list), "Parser gave incorrect type for tgt_opts"
+        for target in tgt_opts:
+            assert isinstance(target, dict), "Parser gave incorrect type for target dict"
+
+        ## The force field component of the project
+        self.logger.debug("Creating forcefield using loaded options: ")
+        forcefield  = FF(options)
+        self.logger.debug(str(forcefield) + "\n")
+        assert isinstance(forcefield, FF), "Expected forcebalance forcefield object"
+
+        ## The objective function
+        self.logger.debug("Creating object using loaded options and forcefield: ")
+        objective   = Objective(options, tgt_opts, forcefield)
+        self.logger.debug(str(objective) + "\n")
+        assert isinstance(objective, Objective), "Expected forcebalance objective object"
+
+        ## The optimizer component of the project
+        self.logger.debug("Creating optimizer: ")
+        optimizer   = Optimizer(options, objective, forcefield)
+        self.logger.debug(str(optimizer) + "\n")
+        assert isinstance(optimizer, Optimizer), "Expected forcebalance optimizer object"
+
+        ## Actually run the optimizer.
+        self.logger.debug("Done setting up! Running optimizer...\n")
+        result = optimizer.Run()
+
+        self.logger.debug("\nOptimizer finished. Final results:\n")
+        self.logger.debug(str(result) + '\n')
+
+        msg="\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values"
+        np.testing.assert_allclose(EXPECTED_BROMINE_RESULTS, result, atol=0.05, err_msg=msg)
 
 class TestLipidStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         super(TestLipidStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '../../studies/010_lipid_study'))
-
-    def teardown_method(self):
-        os.system('rm -rf results *.bak *.tmp')
-        super(TestLipidStudy, self).teardown_method()
+        self.input_file='simple.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
     def test_lipid_study(self):
         """Check lipid tutorial study runs without errors"""
-        self.logger.debug("\nSetting input file to 'options.in'\n")
-        input_file='simple.in'
 
         ## The general options and target options that come from parsing the input file
         self.logger.debug("Parsing inputs...\n")
-        options, tgt_opts = parse_inputs(input_file)
+        options, tgt_opts = parse_inputs(self.input_file)
         self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
 
         assert isinstance(options, dict), "Parser gave incorrect type for options"
@@ -295,19 +355,15 @@ class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
         super(TestImplicitSolventHFEStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '..', '..', 'studies', '012_implicit_solvent_hfe'))
+        self.input_file='optimize.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
  
-    def teardown_method(self):
-        os.system('rm -rf results *.bak *.tmp')
-        super(TestImplicitSolventHFEStudy, self).teardown_method()
-
     def test_implicit_solvent_hfe_study(self):
         """Check implicit hydration free energy study (Hydration target) converges to expected results"""
-        self.logger.debug("\nSetting input file to 'optimize.in'\n")
-        input_file='optimize.in'
 
         ## The general options and target options that come from parsing the input file
         self.logger.debug("Parsing inputs...\n")
-        options, tgt_opts = parse_inputs(input_file)
+        options, tgt_opts = parse_inputs(self.input_file)
         self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
 
         assert isinstance(options, dict), "Parser gave incorrect type for options"
@@ -353,19 +409,15 @@ class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
         targets = tarfile.open('targets.tar.gz','r')
         targets.extractall()
         targets.close()
-
-    def teardown_method(self):
-        os.system('rm -rf results *.bak *.tmp')
-        super(TestOpenFFTorsionProfileStudy, self).teardown_method()
+        self.input_file='optimize_minimal.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
     def test_openff_torsionprofile_study(self):
         """Check OpenFF torsion profile optimization converges to expected results"""
-        self.logger.debug("\nSetting input file to 'options.in'\n")
-        input_file='optimize_minimal.in'
 
         ## The general options and target options that come from parsing the input file
         self.logger.debug("Parsing inputs...\n")
-        options, tgt_opts = parse_inputs(input_file)
+        options, tgt_opts = parse_inputs(self.input_file)
         self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
 
         assert isinstance(options, dict), "Parser gave incorrect type for options"
