@@ -21,13 +21,13 @@ forcefield bromine.offxml
 maxstep 100
 
 # (float) Convergence criterion of step size (just needs to fall below this threshold)
-convergence_step 0.05
+convergence_step 0.1
 
 # (float) Convergence criterion of objective function (in MainOptimizer this is the stdev of x2 over 10 steps)
-convergence_objective 0.5
+convergence_objective 0.1
 
 # (float) Convergence criterion of gradient norm
-convergence_gradient 0.01
+convergence_gradient 0.1
 
 criteria 1
 
@@ -53,8 +53,8 @@ constrain_charge false
 backup false
 
 priors
-   vdW/Atom/epsilon                     : 5.92481e-01
-   vdW/Atom/rmin_half                   : 5.29177e-01
+   vdW/Atom/epsilon                     : 2.47894e+00
+   vdW/Atom/sigma                       : 5.29177e-02
 /priors
 
 $end
