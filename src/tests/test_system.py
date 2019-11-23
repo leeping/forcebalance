@@ -247,7 +247,16 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '..', '..', 'studies', '003d_estimator_liquid_bromine'))
 
+        ## Start the estimator server.
+        import subprocess, time
+        self.estimator_process = subprocess.Popen([
+            "python", "run_server.py", "-ngpus=0", "-ncpus=1"
+        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ## Give the server time to start.
+        time.sleep(5)
+
     def teardown_method(self):
+        self.estimator_process.terminate()
         os.system('rm -rf results *.bak *.tmp working_directory storage_directory dask-worker-space')
         super(TestEvaluatorBromineStudy, self).teardown_method()
 
@@ -284,10 +293,6 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         self.logger.debug(str(optimizer) + "\n")
         assert isinstance(optimizer, Optimizer), "Expected forcebalance optimizer object"
 
-        ## Start the estimator server.
-        import subprocess
-        estimator_process = subprocess.Popen(["python", "run_server.py", "-ngpus=0", "-ncpus=1"])
-
         ## Actually run the optimizer.
         self.logger.debug("Done setting up! Running optimizer...\n")
         result = optimizer.Run()
@@ -297,9 +302,6 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
 
         msg="\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values"
         np.testing.assert_allclose(EXPECTED_BROMINE_RESULTS, result, atol=0.02, err_msg=msg)
-
-        ## Kill the estimation server.
-        estimator_process.kill()
 
 class TestLipidStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
