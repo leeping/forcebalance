@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+
 from builtins import str
 import os
 import tarfile
@@ -238,6 +239,67 @@ class TestThermoBromineStudy(ForceBalanceSystemTest):
         self.logger.debug(str(result) + '\n')
         msg = "\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values"
         np.testing.assert_allclose(EXPECTED_BROMINE_RESULTS, result, atol=3e-2, err_msg=msg)
+
+class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
+    def setup_method(self, method):
+        pytest.importorskip("propertyestimator")
+        super(TestEvaluatorBromineStudy, self).setup_method(method)
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies', '003d_estimator_liquid_bromine'))
+
+    def teardown_method(self):
+        os.system('rm -rf results *.bak *.tmp working_directory storage_directory dask-worker-space')
+        super(TestEvaluatorBromineStudy, self).teardown_method()
+
+    def test_bromine_study(self):
+        """Check liquid bromine study converges to expected results"""
+        self.logger.debug("\nSetting input file to 'options.in'\n")
+        input_file='optimize.in'
+
+        ## The general options and target options that come from parsing the input file
+        self.logger.debug("Parsing inputs...\n")
+        options, tgt_opts = parse_inputs(input_file)
+        self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
+
+        assert isinstance(options, dict), "Parser gave incorrect type for options"
+        assert isinstance(tgt_opts, list), "Parser gave incorrect type for tgt_opts"
+        for target in tgt_opts:
+            assert isinstance(target, dict), "Parser gave incorrect type for target dict"
+
+        ## The force field component of the project
+        self.logger.debug("Creating forcefield using loaded options: ")
+        forcefield  = FF(options)
+        self.logger.debug(str(forcefield) + "\n")
+        assert isinstance(forcefield, FF), "Expected forcebalance forcefield object"
+
+        ## The objective function
+        self.logger.debug("Creating object using loaded options and forcefield: ")
+        objective   = Objective(options, tgt_opts, forcefield)
+        self.logger.debug(str(objective) + "\n")
+        assert isinstance(objective, Objective), "Expected forcebalance objective object"
+
+        ## The optimizer component of the project
+        self.logger.debug("Creating optimizer: ")
+        optimizer   = Optimizer(options, objective, forcefield)
+        self.logger.debug(str(optimizer) + "\n")
+        assert isinstance(optimizer, Optimizer), "Expected forcebalance optimizer object"
+
+        ## Start the estimator server.
+        import subprocess
+        estimator_process = subprocess.Popen(["python", "run_server.py", "-ngpus=0", "-ncpus=1"])
+
+        ## Actually run the optimizer.
+        self.logger.debug("Done setting up! Running optimizer...\n")
+        result = optimizer.Run()
+
+        self.logger.debug("\nOptimizer finished. Final results:\n")
+        self.logger.debug(str(result) + '\n')
+
+        msg="\nCalculation results have changed from previously calculated values.\n If this seems reasonable, update EXPECTED_BROMINE_RESULTS in test_system.py with these values"
+        np.testing.assert_allclose(EXPECTED_BROMINE_RESULTS, result, atol=0.02, err_msg=msg)
+
+        ## Kill the estimation server.
+        estimator_process.kill()
 
 class TestLipidStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
