@@ -22,8 +22,8 @@ EXPECTED_BROMINE_RESULTS = array([-0.305718, -0.12497])
 # expected objective function from 003d evaluator bromine study. (updated 11/23/19)
 EXPECTED_EVALUATOR_BROMINE_OBJECTIVE = array([1000])
 
-# expected gradient elements from 003d evaluator bromine study. Very large uncertainties of +/- 2500 (updated 11/23/19)
-EXPECTED_EVALUATOR_BROMINE_GRADIENT = array([4000, 4000])
+# expected gradient elements from 003d evaluator bromine study. Very large uncertainties of +/- 2000 (updated 11/23/19)
+EXPECTED_EVALUATOR_BROMINE_GRADIENT = array([4500, 5500])
 
 # expected result (pvals) taken from ethanol GB parameter optimization. Update this if it changes and seems reasonable (updated 09/05/14)
 EXPECTED_ETHANOL_RESULTS = array([1.2286e-01, 8.3624e-01, 1.0014e-01, 8.4533e-01, 1.8740e-01, 6.8820e-01, 1.4606e-01, 8.3518e-01])
@@ -206,7 +206,7 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         msgX="\nCalculated objective function is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_OBJECTIVE in test_system.py with these values"
         np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_OBJECTIVE, X, atol=60, err_msg=msgX)
         msgG="\nCalculated gradient is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_GRADIENT in test_system.py with these values"
-        np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_GRADIENT, G, atol=2500, err_msg=msgG)
+        np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_GRADIENT, G, atol=2000, err_msg=msgG)
 
 class TestLipidStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
