@@ -164,7 +164,7 @@ script:
   - tar xvjf targets.tar.bz2
   - ForceBalance very_simple.in
   - cd -
-  - pytest --cov=forcebalance --cov-config=setup.cfg
+  - travis_wait 30 pytest --cov=forcebalance --cov-config=setup.cfg
   # - python test
   # - py.test -v --cov=eex/ --durations=5
 
