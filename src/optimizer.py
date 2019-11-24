@@ -640,7 +640,7 @@ class Optimizer(forcebalance.BaseClass):
                 if ngd < self.convergence_gradient:
                     logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.convergence_gradient)
                     ncrit += 1
-                if ndx < self.convergence_step and ITERATION > self.iterinit:
+                if ndx < self.convergence_step and ndx >= 0.0 and ITERATION > self.iterinit:
                     logger.info("Convergence criterion reached in step size (%.2e)\n" % self.convergence_step)
                     ncrit += 1
                 if stdfront < self.convergence_objective and len(X_hist) >= self.hist:
