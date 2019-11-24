@@ -12,7 +12,7 @@ ffdir forcefield
 penalty_type L2
 
 # (allcap) The job type, defaults to a single-point evaluation of objective function
-jobtype newton
+jobtype gradient
 
 # (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
 forcefield bromine.offxml
@@ -56,14 +56,7 @@ priors
    vdW/Atom/epsilon                     : 2.47894e+00
    vdW/Atom/sigma                       : 5.29177e-02
 /priors
-
 $end
-
-# Note: Denominators have been changed from the original Gromacs version of the study (003_liquid_bromine)
-# in order to create a unit test for gradients rather than the optimization result.
-# Therefore, optimization results will differ from the Gromacs version.
-# To reproduce results from the Gromacs version, change density and Hvap denominators
-# to 30.0 and 0.3 respectively.
 
 $target
 name LiquidBromine
