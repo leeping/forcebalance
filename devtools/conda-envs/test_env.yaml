@@ -21,7 +21,7 @@ dependencies:
   - swig
   - future
   - pymbar=3.0.3
-  - mdtraj=1.9.1
+  - mdtraj
   - openmm
   - ambertools
   # The following two are not compatible with python 2.7 and 3.5, so they are conditionally installed in .travis.yml
