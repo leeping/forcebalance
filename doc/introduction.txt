@@ -181,12 +181,20 @@ which can be found on the <a href=https://simtk.org/home/forcebalance/>SimTK web
 
 @section credits Credits
 
-- Lee-Ping Wang is the principal developer and author.
+- Lee-Ping Wang is the principal developer and author. (2006-2019)
 
 - Yudong Qiu contributed the surface tension target, pure finite-difference
 for thermodynamic property gradients, the optimized geometry target,
-the OpenMM implementation of the vibrational frequency target, and many
+the OpenMM implementation of the vibrational frequency target,
+the interface to PropertyEstimator, and other
 improvements when ForceBalance is used with the SMIRNOFF force field. (2016-2019)
+
+- Jeffrey Wagner contributed modernized testing infrastructure and continuous integration,
+and assisted with developing the interface to the Open Force Field toolkit. (2019)
+
+- Hyesu Jang contributed modernized testing infrastructure with Jeff Wagner. (2019)
+
+- Simon Boothroyd contributed the interface to PropertyEstimator with Yudong Qiu. (2019)
 
 - Arthur Vigil contributed the unit testing framework and many unit tests,
 significant improvements to the automatic documentation generation, 

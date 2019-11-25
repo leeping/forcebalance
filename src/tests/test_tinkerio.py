@@ -1,16 +1,14 @@
 from __future__ import absolute_import
-import unittest
-import sys, os, re
 import forcebalance
-import abc
-import numpy
-from __init__ import ForceBalanceTestCase
 from forcebalance.nifty import *
-from test_target import TargetTests # general targets tests defined in test_target.py
+from .test_target import TargetTests # general targets tests defined in test_target.py
+"""
+The testing functions for this class are located in test_target.py.
+"""
+class TestInteraction_TINKER(TargetTests):
 
-class TestInteraction_TINKER(ForceBalanceTestCase, TargetTests):
-    def setUp(self):
-        TargetTests.setUp(self)
+    def setup_method(self, method):
+        super(TestInteraction_TINKER, self).setup_method(method)
         self.options.update({
                 'penalty_additive': 0.01,
                 'jobtype': 'NEWTON',
@@ -36,11 +34,7 @@ class TestInteraction_TINKER(ForceBalanceTestCase, TargetTests):
 
         self.logger.debug("Setting up Interaction_TINKER target\n")
         self.target = forcebalance.tinkerio.Interaction_TINKER(self.options, self.tgt_opt, self.ff)
-        self.addCleanup(os.system, 'rm -rf temp')
 
-    def shortDescription(self):
-        """@override ForceBalanceTestCase.shortDescription()"""
-        return super(TestInteraction_TINKER,self).shortDescription() + " (Interaction_TINKER)"
-
-if __name__ == '__main__':           
-    unittest.main()
+    def teardown_method(self):
+        shutil.rmtree('temp')
+        super(TestInteraction_TINKER, self).teardown_method()

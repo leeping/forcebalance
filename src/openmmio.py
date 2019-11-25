@@ -1149,6 +1149,12 @@ class OpenMM(Engine):
         # step 4: convert eigenvectors to normal modes
         # re-arange to row index and shape
         normal_modes = eigvecs.T.reshape(noa*3, noa, 3)
+        # step 5: Remove mass weighting from eigenvectors
+        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
+        for i in range(normal_modes.shape[0]):
+            mode = normal_modes[i]
+            mode /= np.sqrt(massList[:,np.newaxis])
+            mode /= np.linalg.norm(mode)
         # step 5: remove the 6 freqs with smallest abs value and corresponding normal modes
         n_remove = 5 if len(self.realAtomIdxs) == 2 else 6
         larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])
@@ -1193,8 +1199,8 @@ class OpenMM(Engine):
         for logc in np.linspace(0, np.log10(crit), steps):
             self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=100000)
         # check if energy minimization is successful
-        # try 10 times as openmm minimizer is not very stable at the tolerance
-        for _ in range(10):
+        # try 1000 times with 10 steps each as openmm minimizer is not very stable at the tolerance
+        for _ in range(1000):
             e_minimized = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
             self.simulation.minimizeEnergy(tolerance=crit*kilojoule_per_mole, maxIterations=10)
             e_new = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
@@ -1215,6 +1221,7 @@ class OpenMM(Engine):
         E = S.getPotentialEnergy().value_in_unit(kilocalorie_per_mole)
         # Align to original geometry.
         M = deepcopy(self.mol[0])
+        M += deepcopy(M)
         M.xyzs = [X0, X1]
         if not self.pbc and align:
             M.align(center=False)

@@ -8,7 +8,6 @@ include doc/DoxygenLayout.xml
 include doc/*.txt
 include doc/*.py
 recursive-include ext *
-recursive-include test *
 recursive-include tools *
 recursive-include bin *
 recursive-include src *

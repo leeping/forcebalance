@@ -367,7 +367,7 @@ class Optimizer(forcebalance.BaseClass):
         ## Print out final message
         logger.info("Wall time since calculation start: %.1f seconds\n" % (time.time() - t0))
         if self.failmsg:
-            bar = printcool("I have not failed.\nI've just found 10,000 ways that won't work.",ansi="40;97")
+            bar = printcool("It is possible to commit no errors and still lose.\nThat is not a weakness. That is life.",ansi="40;93")
         else:
             bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
 
@@ -632,11 +632,15 @@ class Optimizer(forcebalance.BaseClass):
             #|  Check convergence criteria. |#
             #================================#
             ncrit = 0
-            if self.uncert or self.converge_lowq or Quality > ThreLQ:
+            # Three conditions for checking convergence criteria:
+            # 1) If any of the targets contain statistical uncertainty
+            # 2) If the step quality is above the "low quality" threshold, -or- if we allow convergence on low quality steps
+            # 3) If we continued from a previous run and this is the first objective function evaluation
+            if self.uncert or (self.converge_lowq or Quality > ThreLQ) or (ITERATION == self.iterinit and self.iterinit > 0):
                 if ngd < self.convergence_gradient:
                     logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.convergence_gradient)
                     ncrit += 1
-                if ndx < self.convergence_step and ITERATION > self.iterinit:
+                if ndx < self.convergence_step and ndx >= 0.0 and ITERATION > self.iterinit:
                     logger.info("Convergence criterion reached in step size (%.2e)\n" % self.convergence_step)
                     ncrit += 1
                 if stdfront < self.convergence_objective and len(X_hist) >= self.hist:

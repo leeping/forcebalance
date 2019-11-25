@@ -91,7 +91,7 @@ gen_opts_types = {
                  },
     'bools'   : {"backup"           : (1,  10,  'Write temp directories to backup before wiping them'),
                  "writechk_step"    : (1, -50,  'Write the checkpoint file at every optimization step'),
-                 "lq_converge"      : (1, -50,  'Allow convergence on "low quality" steps'),
+                 "converge_lowq"    : (0, -50,  'Allow convergence on "low quality" steps'),
                  "have_vsite"       : (0, -150, 'Specify whether there are virtual sites in the simulation (being fitted or not).  Enforces calculation of vsite positions.', 'Experimental feature in ESP fitting', ['ABINITIO']),
                  "constrain_charge" : (0,  10,  'Specify whether to constrain the charges on the molecules.', 'Printing the force field (all calculations)'),
                  "print_gradient"   : (1,  20,  'Print the objective function gradient at every step', 'Main Optimizer'),
@@ -167,6 +167,7 @@ tgt_opts_types = {
                  "fitatoms"              : ('0', 0, 'Number of fitting atoms; defaults to all of them.  Use a comma and dash style list (1,2-5), atoms numbered from one, inclusive', 'Energy + Force Matching', 'AbInitio'),
                  "subset"                : (None, 0, 'Specify a subset of molecules to fit.  The rest are used for cross-validation.', 'Hydration free energy target', 'Hydration'),
                  "gmx_eq_barostat"       : ('berendsen', 0, 'Name of the barostat to use for equilibration.', 'Condensed phase property targets, Gromacs only', 'liquid, lipid'),
+                 "prop_est_input"        : ('prop_est_input.json', 0, 'JSON file containing options for PropertyEstimate target. If not provided, will search for a default.', 'PropertyEstimate target', 'PropertyEstimate_SMIRNOFF'),
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')

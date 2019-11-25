@@ -1,17 +1,15 @@
 from __future__ import absolute_import
-import unittest
-import sys, os, re
 import forcebalance
-import abc
-import numpy
-from __init__ import ForceBalanceTestCase
-from test_target import TargetTests # general targets tests defined in test_target.py
-import logging
-
-class TestLiquid_OpenMM(ForceBalanceTestCase, TargetTests):
-    def setUp(self):
-        self.skipTest("Needs optimizing to reduce runtime")
-        TargetTests.setUp(self)
+import shutil
+from .test_target import TargetTests # general targets tests defined in test_target.py
+import pytest
+"""
+The testing functions for this class are located in test_target.py.
+"""
+class TestLiquid_OpenMM(TargetTests):
+    def setup_method(self, method):
+        pytest.skip("Needs optimizing to reduce runtime")
+        super(TestLiquid_OpenMM, self).setup_method(method)
         # settings specific to this target
         self.options.update({
                 'jobtype': 'NEWTON',
@@ -28,15 +26,16 @@ class TestLiquid_OpenMM(ForceBalanceTestCase, TargetTests):
 
         self.target = forcebalance.openmmio.Liquid_OpenMM(self.options, self.tgt_opt, self.ff)
         self.target.stage(self.mvals)
-        self.addCleanup(os.system, 'rm -rf temp')
 
-    def shortDescription(self):
-        """@override ForceBalanceTestCase.shortDescription()"""
-        return super(TestLiquid_OpenMM,self).shortDescription() + " (Liquid_OpenMM)"
+    def teardown_method(self):
+        shutil.rmtree('temp')
+        super(TestLiquid_OpenMM, self).teardown_method()
 
-class TestInteraction_OpenMM(ForceBalanceTestCase, TargetTests):
-    def setUp(self):
-        TargetTests.setUp(self)
+class TestInteraction_OpenMM(TargetTests):
+
+    def setup_method(self, method):
+        super(TestInteraction_OpenMM, self).setup_method(method)
+        # TargetTests.setup_class(cls)
         # settings specific to this target
         self.options.update({
                 'jobtype': 'NEWTON',
@@ -54,11 +53,8 @@ class TestInteraction_OpenMM(ForceBalanceTestCase, TargetTests):
         self.mvals = [.5]*self.ff.np
 
         self.target = forcebalance.openmmio.Interaction_OpenMM(self.options, self.tgt_opt, self.ff)
-        self.addCleanup(os.system, 'rm -rf temp')
 
-    def shortDescription(self):
-        """@override ForceBalanceTestCase.shortDescription()"""
-        return super(TestInteraction_OpenMM,self).shortDescription() + " (Interaction_OpenMM)"
+    def teardown_method(self):
+        shutil.rmtree('temp')
+        super(TestInteraction_OpenMM, self).teardown_method()
 
-if __name__ == '__main__':           
-    unittest.main()

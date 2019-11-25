@@ -15,7 +15,7 @@ penalty_type L2
 jobtype newton
 
 # (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
-forcefield DPPC.itp sigeps.txt
+forcefield sigeps.txt DPPC.itp
 
 # (int) Maximum number of steps in an optimization
 maxstep 1

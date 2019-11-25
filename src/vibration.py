@@ -131,58 +131,54 @@ class Vibration(Target):
             logger.error('Normal mode calculation not supported, try using a different engine\n')
             raise NotImplementedError
 
+    def vib_overlap(self, v1, v2):
+        """
+        Calculate overlap between vibrational modes for two Cartesian displacements.
 
-    def process_vectors(self, vecs, verbose=False, check=False):
-        """ Return a set of normal and mass-weighted eigenvectors such that their outer product is the identity. """
-        mw = np.array(self.engine.AtomLists['Mass'])
-        vecs_mw = vecs.copy()
-        for i in range(len(mw)):
-            vecs_mw[:, i, :] *= mw[i]
-        rnrms = np.array([np.dot(v1.flatten(), v2.flatten()) for v1, v2 in zip(vecs, vecs_mw)])
-        vecs_nrm = vecs.copy()
-        for i in range(len(rnrms)):
-            vecs_nrm[i, :, :] /= np.sqrt(rnrms[i])
-        vecs_nrm_mw = vecs_nrm.copy()
-        for i in range(len(mw)):
-            vecs_nrm_mw[:, i, :] *= mw[i]
-        if verbose:
-            pmat2d(np.array([[np.dot(v1.flatten(), v2.flatten()) for v1 in vecs_nrm] for v2 in vecs_nrm_mw]), precision=3, format="f")
-            logger.info('\n')
-        if check:
-            for i, v1 in enumerate(vecs_nrm):
-                for j, v2 in enumerate(vecs_nrm_mw):
-                    if np.abs(np.dot(v1.flatten(), v2.flatten()) - float(i==j)) > 1e-1:
-                        logger.warn("In modes %i %i, orthonormality violated by %f\n" % (i, j, np.dot(v1.flatten(), v2.flatten()) - float(i==j)))
-        return vecs_nrm, vecs_nrm_mw
+        Parameters
+        ----------
+        v1, v2 : np.ndarray
+            The two sets of Cartesian displacements to compute overlap for,
+            3*N_atoms values each.
+
+        Returns
+        -------
+        float
+            Overlap between mass-weighted eigenvectors
+        """
+        sqrtm = np.sqrt(np.array(self.engine.AtomLists['Mass']))
+        v1m = v1.copy()
+        v1m *= sqrtm[:, np.newaxis]
+        v1m /= np.linalg.norm(v1m)
+        v2m = v2.copy()
+        v2m *= sqrtm[:, np.newaxis]
+        v2m /= np.linalg.norm(v2m)
+        return np.abs(np.dot(v1m.flatten(), v2m.flatten()))
 
     def get(self, mvals, AGrad=False, AHess=False):
         """ Evaluate objective function. """
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
 
-        if not hasattr(self, 'ref_eigvecs_nrm'):
-            self.ref_eigvecs_nrm, self.ref_eigvecs_nrm_mw = self.process_vectors(self.ref_eigvecs)
-        
         def get_eigvals(mvals_):
             self.FF.make(mvals_)
             eigvals, eigvecs = self.vibration_driver()
-            eigvecs_nrm, eigvecs_nrm_mw = self.process_vectors(eigvecs)
-            # The overlap metric may take into account some frequency differences
+            # The overlap metric may take into account some frequency differences.
+            # Here, an element of dev is equal to 2/3 if (for example) the frequencies differ by 1000.
             dev = np.array([[(np.abs(i-j)/1000)/(1.0+np.abs(i-j)/1000) for j in self.ref_eigvals] for i in eigvals])
             for i in range(dev.shape[0]):
                 dev[i, :] /= max(dev[i, :])
 
             if self.reassign in ['permute', 'overlap']:
-                # In the matrix that we constructed, these are the column numbers (reference mode numbers) 
-                # that are mapped to the row numbers (calculated mode numbers)
+                # The elements of "a" matrix are the column numbers (reference mode numbers) 
+                # that are mapped to the row numbers (calculated mode numbers).
+                # Highly similar eigenvectors are assigned small values because
+                # the assignment problem is a cost minimization problem.
+                a = np.array([[(1.0-self.vib_overlap(v1, v2)) for v2 in self.ref_eigvecs] for v1 in eigvecs])
+                a += dev
                 if self.reassign == 'permute':
-                    a = np.array([[int(1e6*(1.0-np.dot(v1.flatten(),v2.flatten())**2)) for v2 in self.ref_eigvecs_nrm] for v1 in eigvecs_nrm_mw])
                     row, c2r = optimize.linear_sum_assignment(a)
-                    # Commented out dependency on assignment code
-                    # c2r = Assign(a)
                     eigvals = eigvals[c2r]
                 elif self.reassign == 'overlap':
-                    a = np.array([[(1.0-np.dot(v1.flatten(),v2.flatten())**2) for v2 in self.ref_eigvecs_nrm] for v1 in eigvecs_nrm_mw])
-                    a += dev
                     c2r = np.argmin(a, axis=0)
                     eigvals_p = []
                     for j in c2r:
@@ -190,14 +186,14 @@ class Vibration(Target):
                     eigvals = np.array(eigvals_p)
             if not in_fd():
                 if self.reassign == 'permute':
-                    eigvecs_nrm_mw = eigvecs_nrm_mw[c2r]
+                    eigvecs = eigvecs[c2r]
                 elif self.reassign == 'overlap':
                     self.c2r = c2r
-                    eigvecs_nrm_mw_p = []
+                    eigvecs_p = []
                     for j in c2r:
-                        eigvecs_nrm_mw_p.append(eigvecs_nrm_mw[j])
-                    eigvecs_nrm_mw = np.array(eigvecs_nrm_mw_p)
-                self.overlaps = np.array([np.abs(np.dot(v1.flatten(),v2.flatten())) for v1, v2 in zip(self.ref_eigvecs_nrm, eigvecs_nrm_mw)])
+                        eigvecs_p.append(eigvecs[j])
+                    eigvecs = np.array(eigvecs_p)
+                self.overlaps = np.array([self.vib_overlap(v1, v2) for v1, v2 in zip(self.ref_eigvecs, eigvecs)])
             return eigvals
 
         calc_eigvals = get_eigvals(mvals)
