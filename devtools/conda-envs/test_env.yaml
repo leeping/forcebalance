@@ -2,6 +2,7 @@ name: test
 channels:
   - conda-forge
   - omnia
+  - ambermd
 dependencies:
     # Base depends
   - python
@@ -20,6 +21,7 @@ dependencies:
   - future
   - pymbar=3.0.3
   - openmm
+  - ambertools
   # The following two are not compatible with python 2.7 and 3.5, so they are conditionally installed in .travis.yml
   #- openforcefield
   #- openeye-toolkits
