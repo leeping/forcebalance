@@ -223,6 +223,15 @@ def GetVirtualSiteParameters(system):
     return np.array(vsprm)
 
 def GetDrudeParameters(system):
+    """This is a similar function as GetVirtualSiteParameters, designed
+    to return all of the parameters associated with the Drude class in 
+    order to test whether any changes have been made by ForceBalance.
+    The drude_particle array contains the charge of the Drude particle,
+    the isotropic polarizability, and the two potential anisotropic polarizabilities.
+    The drude_screen array contains the Thole screening parameter.
+    See OpenMM's DrudeForce class reference for more information.
+    """
+
     drude_particle = []
     drude_screen = []
     for f in system.getForces():
@@ -817,10 +826,10 @@ class OpenMM(Engine):
                     logger.info("Creating RPMD integrator with %i beads.\n" % rpmd_beads)
                     self.tdiv = rpmd_beads
                     integrator = RPMDIntegrator(rpmd_beads, temperature*kelvin, collision/picosecond, timestep*femtosecond)
-                elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeLangevinIntegrator(temperature, 1/picosecond, 1*kelvin, 1/picosecond, 0.1*femtoseconds)
+                elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeLangevinIntegrator(temperature*kelvin, collision/picosecond, 1*kelvin, collision/picosecond, 0.1*femtoseconds)
                 else:
                     integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
-        elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeSCFIntegrator(0.001*picoseconds)
+        elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeSCFIntegrator(0.1*femtoseconds)
         else:
             ## If no temperature control, default to the Verlet integrator.
             if rpmd_beads > 0:
@@ -1562,7 +1571,16 @@ class OpenMM(Engine):
             self.xyz_omms[i] = [new_pos.astype(np.float32)*nanometer, new_box*nanometer]
 
     def adjust_drude_positions(self):
-        mass = self.zero_mass_system()
+        """First zero the mass of the system. This is needed because the Drude positions
+        are on top of the parent atom, giving incorrect polarization energy. Taking a small
+        time step with a zero mass system will "optimize" the Drude particle positions
+        without moving the initial particle positions. The system is then remassed after
+        the positions have been changed."""
+
+        mass = []
+        for k in range(self.system.getNumParticles()):
+            mass.append(self.system.getParticleMass(k))
+            self.system.setParticleMass(k, 0)
         self.create_simulation(**self.simkwargs)
         if self.pbc:
             box_omm = [Vec3(mol.boxes[I].a, 0, 0)*nanometer,
@@ -1570,29 +1588,15 @@ class OpenMM(Engine):
                         Vec3(0, 0, mol.boxes[I].c)*nanometer]
         else:
             box_omm = None
-
         for I in range(len(self.xyz_omms)):
             self.set_positions(I)
             self.simulation.step(1)
             pos = self.simulation.context.getState(getPositions=True).getPositions()._value
             pos = [Vec3(i[0],i[1],i[2]) for i in pos]*nanometer
             self.xyz_omms[I] = (pos, box_omm)
-        self.remass_system(mass)
-        delattr(self, 'simulation')
-
-    def zero_mass_system(self):
-        """The addExtraParticles() function from the Modeller class puts the positions of Drude particles
-        at the same place as the parent atom, which is incorrect when single-point energies need to be taken.
-        This function sets the system masses to 0 and recreates a simulation object for this 0 mass system."""
-        mass = []
-        for k in range(self.system.getNumParticles()):
-            mass.append(self.system.getParticleMass(k))
-            self.system.setParticleMass(k, 0)
-        return mass
-
-    def remass_system(self, mass):
         for k in range(self.system.getNumParticles()):
             self.system.setParticleMass(k,mass[k])
+        delattr(self, 'simulation')
 
 class Liquid_OpenMM(Liquid):
     """ Condensed phase property matching using OpenMM. """
