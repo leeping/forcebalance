@@ -62,149 +62,6 @@ def getClusterIndices(index_file, res_list):
             indices[res].append(int(line.strip().split('\n')[0]))
     return indices
 
-def p_norm(data, p=2):
-    """
-    Gets pnorm of array, taken from MSMBuilder 2.7 Legacy.
-    https://github.com/msmbuilder/msmbuilder-legacy/blob/master/MSMBuilder/clustering.py
-
-    Parameters
-    ----------
-    data : ndarray
-        XYZ coordinates
-    p : {int, "max"}, optional
-        power of p_norm
-
-    Returns
-    -------
-    value : float
-        the answer
-    """
-
-    if p == "max":
-        return data.max()
-    else:
-        p = float(p)
-        n = float(data.shape[0])
-        return ((data**p).sum()/n)**(1.0/p)
-
-def kcenters(traj, dist, atom_indices):
-    """
-    This clustering algorithm is modified from MSMBuilder 2.7 Legacy.
-    https://github.com/msmbuilder/msmbuilder-legacy/blob/master/MSMBuilder/clustering.py
-
-    Parameters
-    ----------
-    traj : MDTraj Trajectory object
-        Trajectory that the clustering is performed on
-    dist : float
-        Stop identifying new clusters once the distance of every data to its
-        cluster center falls below this value. Supply either this or `k`
-    atom_indices : list
-        List of atom indices for RMSD
-
-    Returns 
-    -------
-    generator_indices : ndarray
-        indices (with respect to ptraj) of the frames to be considered cluster centers
-    assignments : ndarray
-        the cluster center to which each frame is assigned to (1D)
-    distances : ndarray
-        distance from each of the frames to the cluster center it was assigned to
-    """
-
-    k = sys.maxsize
-    seed = 0
-    distance_list = np.inf * np.ones(len(traj), dtype=np.float32)
-    assignments = -1 * np.ones(len(traj), dtype=np.int32)
-
-    generator_indices = []
-    for i in range(k):
-        new_ind = seed if i == 0 else np.argmax(distance_list)
-        if distance_list[new_ind] < dist:
-            break
-        new_distance_list = md.rmsd(traj, traj, new_ind, atom_indices=atom_indices)
-        updated_indices = np.where(new_distance_list < distance_list)[0]
-        distance_list[updated_indices] = new_distance_list[updated_indices]
-        assignments[updated_indices] = new_ind
-        generator_indices.append(new_ind)
-    return np.array(generator_indices), assignments, distance_list
-
-def hybrid_kmedoids(traj, dist, atom_indices):
-    """
-    This clustering algorithm is modified from MSMBuilder 2.7 Legacy.
-    https://github.com/msmbuilder/msmbuilder-legacy/blob/master/MSMBuilder/clustering.py
-
-    Parameters
-    ----------
-    traj : MDTraj Trajectory object
-        Trajectory that the clustering is performed on
-    dist : float
-        Stop identifying new clusters once the distance of every data to its
-        cluster center falls below this value. Supply either this or `k`
-    atom_indices : list
-        List of atom indices for RMSD
-
-    Returns 
-    -------
-    generator_indices : ndarray
-        indices (with respect to ptraj) of the frames to be considered cluster centers
-    assignments : ndarray
-        the cluster center to which each frame is assigned to (1D)
-    distances : ndarray
-        distance from each of the frames to the cluster center it was assigned to
-    """
-
-    initial_medoids, initial_assignments, initial_distance = kcenters(traj, dist, atom_indices)
-    assignments = initial_assignments
-    distance_to_current = initial_distance
-    medoids = initial_medoids
-    pgens = traj[medoids]
-    k = len(initial_medoids)
-    norm_exponent = 2.0
-    num_iters = 10
-    too_close_cutoff = 0.0001
-
-    obj_func = p_norm(distance_to_current, p=norm_exponent)
-    max_norm = p_norm(distance_to_current, p='max')
-
-    for iteration in range(num_iters):
-        for medoid_i in range(k):
-            trial_medoid = rd.choice(np.where(assignments == medoids[medoid_i])[0])
-            old_medoid = medoids[medoid_i]
-            if old_medoid == trial_medoid: continue
-            new_medoids = medoids.copy()
-            new_medoids[medoid_i] = trial_medoid 
-            pmedoids = traj[new_medoids]
-
-            new_distances = distance_to_current.copy()
-            new_assignments = assignments.copy()
-            
-            distance_to_trial = md.rmsd(traj, traj, trial_medoid, atom_indices=atom_indices)
-            if distance_to_trial[old_medoid] < too_close_cutoff: continue
-
-            assigned_to_trial = np.where(distance_to_trial < distance_to_current)[0]
-            new_assignments[assigned_to_trial] = trial_medoid
-            new_distances[assigned_to_trial] = distance_to_trial[assigned_to_trial]
-
-            ambiguous = np.where((new_assignments == old_medoid) & (distance_to_trial >= distance_to_current))[0]
-
-            for l in ambiguous:
-                d = md.rmsd(pmedoids, traj, l, atom_indices=atom_indices)
-                argmin = np.argmin(d)
-                new_assignments[l] = new_medoids[argmin]
-                new_distances[l] = d[argmin]
-
-            new_obj_func = p_norm(new_distances, p=norm_exponent)
-            new_max_norm = p_norm(new_distances, p='max')
-
-            if new_obj_func < obj_func and (new_max_norm <= max_norm):
-                medoids = new_medoids 
-                assignments = new_assignments
-                distance_to_current = new_distances
-                obj_func = new_obj_func
-                max_norm = new_max_norm
-    return medoids, assignments, distance_to_current
-
 def isfloat(num):
     """
     Check whether input is a float or not
@@ -1001,7 +858,6 @@ class Reopt:
         #Also get the clustering algorithm and whether structures produced from a 
         #previous version of the code should be deleted.
         self.index_file = kwargs.get('custom_cluster_indices', None)
-        self.cluster_alg = kwargs.get('cluster_algorithm')
         self.redo_clusters = kwargs.get('redo_clusters')
         self.default_cluster_indices = kwargs.get('default_cluster_indices')
 
@@ -1152,29 +1008,19 @@ class Reopt:
                         self.indices[res] = [a.index for a in traj.top.atoms]
                     else:
                         raise Exception("{0} is not a valid option for the default cluster indices.".format(self.default_cluster_indices))
-                if self.cluster_alg == "hybrid":
-                    medoids, assignments, distance_to_current = hybrid_kmedoids(traj, 0.01, self.indices[res])
-                    os.chdir('./Clusters')
-                    for cl in range(len(medoids)):
-                        cl_list = [i for i in range(len(assignments)) if medoids[cl] == assignments[i]]
-                        cluster_traj = M[cl_list]
-                        cluster_traj.write("State_{0}.pdb".format(cl))
-                elif self.cluster_alg == "hierarchial":
-                    RMSD = md.rmsd(traj, traj, atom_indices=self.indices[res])
-                    cluster = linkage(np.reshape(RMSD,(len(RMSD),1)), method="centroid")
-                    clusters = fcluster(cluster, 0.001, "distance")
-                    for i in range(1,max(clusters)+1): cluster_dict[i] = []
-                    os.chdir('./Clusters')
-                    for i in range(1,max(clusters)+1): cluster_dict[i] = []
-                    for i in range(len(clusters)):
-                        clusterNum = clusters[i]
-                        cluster_dict[clusterNum].append(i)
-                    for cl in cluster_dict:
-                        clusterTraj = M[cluster_dict[cl]]
-                        clusterTraj.write("State_{0}.pdb".format(cl))
-                    if not res in self.clusters: self.clusters[res] = cluster_dict
-                else:
-                    raise Exception("Only hybrid k_medoids and hierarchial clustering are offered.")
+                RMSD = md.rmsd(traj, traj, atom_indices=self.indices[res])
+                cluster = linkage(np.reshape(RMSD,(len(RMSD),1)), method="centroid")
+                clusters = fcluster(cluster, 0.001, "distance")
+                for i in range(1,max(clusters)+1): cluster_dict[i] = []
+                os.chdir('./Clusters')
+                for i in range(1,max(clusters)+1): cluster_dict[i] = []
+                for i in range(len(clusters)):
+                    clusterNum = clusters[i]
+                    cluster_dict[clusterNum].append(i)
+                for cl in cluster_dict:
+                    clusterTraj = M[cluster_dict[cl]]
+                    clusterTraj.write("State_{0}.pdb".format(cl))
+                if not res in self.clusters: self.clusters[res] = cluster_dict
             os.chdir(cwd)
 
     def clusterMinMM(self):
@@ -1424,7 +1270,6 @@ def main():
     parser.add_argument('fbdir', type=str, help="The name of the ForceBalance directory containing all of the needed data.")
     parser.add_argument('--outputdir', type=str, default='reopt_result', help="The name of the output directory for the calculation.")
     parser.add_argument('--plot', default=True, action='store_false', help="If true, will make a final plot of the QM vs. MM energies")
-    parser.add_argument('--cluster_algorithm', type=str, default='hybrid', help="Choose the clustering algorithm. Default is hybrid k medoids, eneter 'hierarchial' for hierarchial clustering.")
     parser.add_argument('--custom_cluster_indices', type=str, default=None, help="If custom indices are desired for the clustering, then provide a file with the desired indices for the target you want. An example file is provided in the ForceBalance tools directory.")
     parser.add_argument('--default_cluster_indices', type=str, default='heavy', help="The default clustering code will only pick out heavy atoms. Write 'all' if you want all indices to be used.")
     parser.add_argument('--redo_clusters', default=False, action="store_true", help="If true, then the cluster definitions you provided to the code can be changed without having to redo the whole code. Either provide a new collection of indices or use the program's default")
