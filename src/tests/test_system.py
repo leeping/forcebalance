@@ -173,10 +173,10 @@ class TestThermoBromineStudy(ForceBalanceSystemTest):
 
 class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
-        pytest.importorskip("propertyestimator")
+        pytest.importorskip("evaluator")
         super(TestEvaluatorBromineStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cwd, '..', '..', 'studies', '003d_estimator_liquid_bromine'))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies', '003d_evaluator_liquid_bromine'))
         ## Extract targets archive.
         targets = tarfile.open('targets.tar.gz','r')
         targets.extractall()

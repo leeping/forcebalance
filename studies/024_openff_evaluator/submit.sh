@@ -18,7 +18,13 @@ conda activate forcebalance
 
 # Start the estimation server.
 ./run_server.py &> server_console_output.log &
+echo $! > save_pid.txt
+
 sleep 10
 
 # Run ForceBalance
 ForceBalance.py optimize.in &> force_balance.log
+
+# Kill the server
+kill -9 `cat save_pid.txt`
+rm save_pid.txt
