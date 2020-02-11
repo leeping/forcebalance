@@ -76,8 +76,8 @@ install:
 
   # If were using python 3.6 or higher and we're decrypting an OE key, install OFF toolkit and
   # OETK (there aren't OFFTK packages for python<3.6)
+  - if [ ${PYTHON_VER} != "2.7" ] && [ ${PYTHON_VER} != "3.5" ] && [ ${PYTHON_VER} != "3.6" ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_SECURE_ENV_VARS" == true ] ; then conda install --yes -c omnia/label/beta openff-evaluator; fi
   - if [ ${PYTHON_VER} != "2.7" ] && [ ${PYTHON_VER} != "3.5" ] && [ "$TRAVIS_SECURE_ENV_VARS" == true ] ; then conda install --yes -c omnia -c openeye openforcefield openeye-toolkits; fi
-  - if [ ${PYTHON_VER} != "2.7" ] && [ ${PYTHON_VER} != "3.5" ] && [ ${PYTHON_VER} != "3.7" ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_SECURE_ENV_VARS" == true ] ; then conda install --yes -c omnia/label/beta openff-evaluator; fi
 
   # Install Work Queue
   - wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
