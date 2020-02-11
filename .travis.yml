@@ -76,7 +76,7 @@ install:
 
   # If were using python 3.6 or higher and we're decrypting an OE key, install OFF toolkit and
   # OETK (there aren't OFFTK packages for python<3.6)
-  - if [ ${PYTHON_VER} != "2.7" ] && [ ${PYTHON_VER} != "3.5" ] && [ "$TRAVIS_SECURE_ENV_VARS" == true ] ; then conda install --yes -c omnia -c openeye openforcefield openeye-toolkits; python -c "from openeye import oechem; oechem.OEChemIsLicensed()"; fi
+  - if [ ${PYTHON_VER} != "2.7" ] && [ ${PYTHON_VER} != "3.5" ] && [ "$TRAVIS_SECURE_ENV_VARS" == true ] ; then conda install --yes -c omnia -c openeye openforcefield openeye-toolkits; python -c "from openeye import oechem; assert oechem.OEChemIsLicensed()"; fi
   - if [ ${PYTHON_VER} != "2.7" ] && [ ${PYTHON_VER} != "3.5" ] && [ ${PYTHON_VER} != "3.6" ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_SECURE_ENV_VARS" == true ] ; then conda install --yes -c omnia -c openeye propertyestimator; fi
 
   # Install Work Queue
