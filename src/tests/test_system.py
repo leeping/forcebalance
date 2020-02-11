@@ -194,8 +194,7 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
     def teardown_method(self):
         self.estimator_process.terminate()
         shutil.rmtree("working_directory")
-        shutil.rmtree("storage_directory")
-        shutil.rmtree("dask-worker-space")
+        shutil.rmtree("stored_data")
         super(TestEvaluatorBromineStudy, self).teardown_method()
 
     def test_bromine_study(self):
