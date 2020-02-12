@@ -60,7 +60,7 @@ $end
 
 $target
 name LiquidBromine
-type PropertyEstimate_SMIRNOFF
+type Evaluator_SMIRNOFF
 weight 1.0
-prop_est_input options.json
+evaluator_input options.json
 $end

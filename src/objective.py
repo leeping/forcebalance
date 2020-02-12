@@ -43,10 +43,10 @@ except:
     logger.warning("SMIRNOFF module import failed; check SMIRNOFF package\n")
 
 try:
-    from forcebalance.property_estimator_io import PropertyEstimate_SMIRNOFF
+    from forcebalance.evaluator_io import Evaluator_SMIRNOFF
 except:
     logger.warning(traceback.format_exc())
-    logger.warning("property estimator module import failed\n")
+    logger.warning("openff-evaluator module import failed\n")
 
 try:
     from forcebalance.abinitio_internal import AbInitio_Internal
@@ -118,7 +118,7 @@ Implemented_Targets = {
     'OPTGEOTARGET_SMIRNOFF': OptGeoTarget_SMIRNOFF,     # Keeping these two for compatibility with released FB calculation files.
     'TORSIONPROFILE_OPENMM': TorsionProfileTarget_OpenMM,
     'TORSIONPROFILE_SMIRNOFF': TorsionProfileTarget_SMIRNOFF,
-    'PROPERTYESTIMATE_SMIRNOFF': PropertyEstimate_SMIRNOFF,
+    'EVALUATOR_SMIRNOFF': Evaluator_SMIRNOFF,
     'REMOTE_TARGET':RemoteTarget,
     }
 
