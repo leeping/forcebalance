@@ -43,7 +43,7 @@ except:
     logger.warning("SMIRNOFF module import failed; check SMIRNOFF package\n")
 
 try:
-    from forcebalance.evaluator import Evaluator_SMIRNOFF
+    from forcebalance.evaluator_io import Evaluator_SMIRNOFF
 except:
     logger.warning(traceback.format_exc())
     logger.warning("openff-evaluator module import failed\n")
