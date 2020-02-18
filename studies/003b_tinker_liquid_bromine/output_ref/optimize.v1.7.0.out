@@ -1,0 +1,456 @@
+#======================================================================#
+#| [1m            Welcome to ForceBalance version 1.7.0! =D             [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Yudong Qiu, Keri A. McKiernan                   [0m |#
+#| [1m          Jeffrey R. Wagner, Hyesu Jang, Simon Boothroyd          [0m |#
+#| [1m           Arthur Vigil, Erik G. Brandt, Johnny Israeli           [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: optimize.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: bro.prm
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  3.6700e+00 ] : VDWS/1
+   1 [  5.8950e-01 ] : VDWT/1
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   VDWS                                 : 5.29177e-01
+   VDWT                                 : 2.47894e+00
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    VDWS                          : 5.29177e-01 ] : VDWS/1
+   1 [    VDWT                          : 2.47894e+00 ] : VDWT/1
+----------------------------------------------------------
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['bro.prm'] 
+priors                    OrderedDict([('VDWS', 0.529177), ('VDWT', 2.47894)]) 
+----------------------------------------------------------
+Autodetected 100 molecules with 2 atoms each in liquid coordinates
+#========================================================#
+#| [92m          Setup for target LiquidBromine :          [0m |#
+#========================================================#
+liquid_coords             liquid.xyz 
+gas_coords                gas.xyz 
+name                      LiquidBromine 
+type                      LIQUID_TINKER 
+backup                    False 
+tgtdir                    targets/LiquidBromine 
+w_rho                     1.0 
+w_hvap                    1.0 
+w_alpha                   1.0 
+w_kappa                   1.0 
+w_cp                      1.0 
+w_eps0                    1.0 
+w_normalize               0 
+liquid_eq_steps           50000 
+liquid_md_steps           100000 
+gas_eq_steps              100000 
+gas_md_steps              200000 
+liquid_timestep           5.0 
+liquid_interval           1.0 
+gas_timestep              5.0 
+gas_interval              1.0 
+adapt_errors              True 
+minimize_energy           1 
+self_pol_mu0              0.0 
+self_pol_alpha            0.0 
+anisotropic_box           0 
+w_surf_ten                0.0 
+nvt_eq_steps              10000 
+nvt_md_steps              100000 
+nvt_timestep              1.0 
+nvt_interval              0.1 
+pure_num_grad             0 
+liquid_fdiff_h            0.01 
+rho_denom                 30.0 
+hvap_denom                0.3 
+alpha_denom               1.0 
+kappa_denom               5.0 
+cp_denom                  2.0 
+eps0_denom                2.0 
+use_cvib_intra            False 
+use_cvib_inter            False 
+use_cni                   False 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          1.0 
+normalize_weights         False 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   NEWTON 
+trust0                    1.0 
+mintrust                  0.05 
+eps                       0.01 
+convergence_objective     1.0 
+convergence_step          0.1 
+convergence_gradient      1.0 
+adapt_fac                 0.2 
+adapt_damp                1.0 
+print_hess                True 
+err_tol                   1.0 
+backup                    False 
+input_file                optimize.in 
+----------------------------------------------------------
+Calculation started at 2019-11-25 08:03 AM
+#========================================================#
+#| [1m                  Main Optimizer                    [0m |#
+#| [1m   Newton-Raphson Method (Adaptive Trust Radius)    [0m |#
+#| [1m                                                    [0m |#
+#| [1m       [0mConvergence criteria (1 of 3 needed):        [0m |#
+#| [1m          [0mObjective Function  : 1.000e+00           [0m |#
+#| [1m          [0mNorm of Gradient    : 1.000e+00           [0m |#
+#| [1m          [0mParameter step size : 1.000e-01           [0m |#
+#========================================================#
+#========================================================================#
+#|               Color Key for Objective Function -=X2=-                |#
+#|  [1mBold[0m = Initial step                                                 |#
+#|  [92mGreen = Current lowest value of objective function (best estimate)[0m  |#
+#|  [91mRed = Objective function rises, step rejected[0m                       |#
+#|  [0mNo color = Not at the lowest value                                  |#
+#========================================================================#
+#========================================================#
+#| [94m     Iteration 0: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+#========================================================#
+#|   Target: LiquidBromine - launching MD simulations   |#
+#|         Time steps: 50000 (eq) + 100000 (md)         |#
+#========================================================#
+Running condensed phase simulation locally.
+You may tail -f /home/leeping/src/forcebalance/studies/003b_tinker_liquid_bromine/optimize.tmp/LiquidBromine/iter_0000/298.15K-1.0atm/npt.out in another terminal window
+Executing process: [92m python npt.py tinker 298.150 1.000               [0m Output: npt.out
+Reading information from ./298.15K-1.0atm/npt_result.p
+Weights have been renormalized to 1.0
+Physical quantity Density uses denominator =  30.0000
+Weights have been renormalized to 1.0
+Physical quantity H_vap uses denominator =  0.3000
+#==========================================================================================#
+#| [1;94m                           LiquidBromine Density (kg m^-3)                            [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm  3102.800     2857.805 +- 5.450   -244.995   1.00000  66.69165 
+--------------------------------------------------------------------------------------------
+#========================================================#
+#| [92m  Density objective function:  66.692, Derivative:  [0m |#
+#========================================================#
+   0 [  7.2594e+02 ] : VDWS/1
+   1 [ -1.4875e+03 ] : VDWT/1
+----------------------------------------------------------
+#==========================================================================================#
+#| [1;94m                 LiquidBromine Enthalpy of Vaporization (kJ mol^-1)                   [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm    29.960       36.969 +- 0.157     7.009   1.00000  545.82761 
+--------------------------------------------------------------------------------------------
+#========================================================================#
+#| [92m Enthalpy of Vaporization objective function:  545.828, Derivative: [0m |#
+#========================================================================#
+   0 [ -7.7353e+02 ] : VDWS/1
+   1 [  2.5068e+04 ] : VDWT/1
+--------------------------------------------------------------------------
+#====================================================================#
+#| [94m           LiquidBromine Condensed Phase Properties:            [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+Density                           66.69165    1.000    6.66917e+01 
+Enthalpy of Vaporization         545.82761    1.000    5.45828e+02 
+Total                                                  6.12519e+02 
+----------------------------------------------------------------------
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+LiquidBromine                612.51926      1.000 [94m     6.12519e+02[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     6.12519e+02[0m 
+----------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     0   0.000e+00   0.000e+00   2.358e+04[1m   6.12519e+02[0m   0.000e+00      0.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -4.75930753e+01 ] : VDWS/1
+   1 [  2.35806920e+04 ] : VDWT/1
+----------------------------------------------------------
+#========================================================#
+#| [94m                   Total Hessian                    [0m |#
+#========================================================#
+ 4.50100361e+03 -2.58584984e+04 
+-2.58584984e+04  5.92242207e+05 
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 2.9592e-01)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  0.0000e+00 - 2.9122e-01 = -2.9122e-01 ] : VDWS/1
+   1 [  0.0000e+00 - 5.2531e-02 = -5.2531e-02 ] : VDWT/1
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  3.6700e+00 - 1.5411e-01 =  3.5159e+00 ] : VDWS/1
+   1 [  5.8950e-01 - 1.3022e-01 =  4.5928e-01 ] : VDWT/1
+----------------------------------------------------------
+Backing up optimize.sav -> optimize.bak/optimize_5.sav
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 1: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+#========================================================#
+#|   Target: LiquidBromine - launching MD simulations   |#
+#|         Time steps: 50000 (eq) + 100000 (md)         |#
+#========================================================#
+Copying .dyn file: /home/leeping/src/forcebalance/studies/003b_tinker_liquid_bromine/optimize.tmp/LiquidBromine/iter_0000/298.15K-1.0atm/liquid.dyn to /home/leeping/src/forcebalance/studies/003b_tinker_liquid_bromine/optimize.tmp/LiquidBromine/iter_0001/298.15K-1.0atm/liquid.dyn
+Running condensed phase simulation locally.
+You may tail -f /home/leeping/src/forcebalance/studies/003b_tinker_liquid_bromine/optimize.tmp/LiquidBromine/iter_0001/298.15K-1.0atm/npt.out in another terminal window
+Executing process: [92m python npt.py tinker 298.150 1.000               [0m Output: npt.out
+Reading information from ./298.15K-1.0atm/npt_result.p
+Weights have been renormalized to 1.0
+Physical quantity Density uses denominator =  30.0000
+Weights have been renormalized to 1.0
+Physical quantity H_vap uses denominator =  0.3000
+#==========================================================================================#
+#| [1;94m                           LiquidBromine Density (kg m^-3)                            [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm  3102.800     2898.627 +- 9.221   -204.173   1.00000  46.31852 
+--------------------------------------------------------------------------------------------
+#========================================================#
+#| [92m  Density objective function:  46.319, Derivative:  [0m |#
+#========================================================#
+   0 [  5.0337e+02 ] : VDWS/1
+   1 [ -2.4201e+03 ] : VDWT/1
+----------------------------------------------------------
+#==========================================================================================#
+#| [1;94m                 LiquidBromine Enthalpy of Vaporization (kJ mol^-1)                   [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm    29.960       25.637 +- 0.160    -4.323   1.00000  207.65810 
+--------------------------------------------------------------------------------------------
+#========================================================================#
+#| [92m Enthalpy of Vaporization objective function:  207.658, Derivative: [0m |#
+#========================================================================#
+   0 [  2.2113e+02 ] : VDWS/1
+   1 [ -1.5229e+04 ] : VDWT/1
+--------------------------------------------------------------------------
+#====================================================================#
+#| [94m           LiquidBromine Condensed Phase Properties:            [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+Density                           46.31852    1.000    4.63185e+01 
+Enthalpy of Vaporization         207.65810    1.000    2.07658e+02 
+Total                                                  2.53977e+02 
+----------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+LiquidBromine                253.97662      1.000 [92m     2.53977e+02[0m ( -3.585e+02 ) 
+Regularization                 0.08757      1.000 [91m     8.75691e-02[0m ( +8.757e-02 ) 
+Total                                             [92m     2.54064e+02[0m ( -3.585e+02 ) 
+-------------------------------------------------------------------------------------
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     1   2.959e-01   2.959e-01   1.766e+04[92m   2.54064e+02[0m  -3.585e+02      0.585
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  7.23913404e+02 ] : VDWS/1
+   1 [ -1.76496449e+04 ] : VDWT/1
+----------------------------------------------------------
+#========================================================#
+#| [94m                   Total Hessian                    [0m |#
+#========================================================#
+ 2.85491775e+03 -2.12591180e+04 
+-2.12591180e+04  6.21681143e+05 
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 6.2445e-02)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [ -2.9122e-01 - 5.6563e-02 = -3.4778e-01 ] : VDWS/1
+   1 [ -5.2531e-02 + 2.6456e-02 = -2.6075e-02 ] : VDWT/1
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  3.5159e+00 - 2.9932e-02 =  3.4860e+00 ] : VDWS/1
+   1 [  4.5928e-01 + 6.5583e-02 =  5.2486e-01 ] : VDWT/1
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 2: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+#========================================================#
+#|   Target: LiquidBromine - launching MD simulations   |#
+#|         Time steps: 50000 (eq) + 100000 (md)         |#
+#========================================================#
+Copying .dyn file: /home/leeping/src/forcebalance/studies/003b_tinker_liquid_bromine/optimize.tmp/LiquidBromine/iter_0001/298.15K-1.0atm/liquid.dyn to /home/leeping/src/forcebalance/studies/003b_tinker_liquid_bromine/optimize.tmp/LiquidBromine/iter_0002/298.15K-1.0atm/liquid.dyn
+Running condensed phase simulation locally.
+You may tail -f /home/leeping/src/forcebalance/studies/003b_tinker_liquid_bromine/optimize.tmp/LiquidBromine/iter_0002/298.15K-1.0atm/npt.out in another terminal window
+Executing process: [92m python npt.py tinker 298.150 1.000               [0m Output: npt.out
+Reading information from ./298.15K-1.0atm/npt_result.p
+Weights have been renormalized to 1.0
+Physical quantity Density uses denominator =  30.0000
+Weights have been renormalized to 1.0
+Physical quantity H_vap uses denominator =  0.3000
+#==========================================================================================#
+#| [1;94m                           LiquidBromine Density (kg m^-3)                            [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm  3102.800     3112.970 +- 5.479    10.170   1.00000   0.11491 
+--------------------------------------------------------------------------------------------
+#========================================================#
+#| [92m  Density objective function:  0.115, Derivative:   [0m |#
+#========================================================#
+   0 [ -2.7168e+01 ] : VDWS/1
+   1 [  8.7771e+01 ] : VDWT/1
+----------------------------------------------------------
+#==========================================================================================#
+#| [1;94m                 LiquidBromine Enthalpy of Vaporization (kJ mol^-1)                   [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      298.15      1.0 atm    29.960       30.705 +- 0.148     0.745   1.00000   6.15920 
+--------------------------------------------------------------------------------------------
+#======================================================================#
+#| [92m Enthalpy of Vaporization objective function:  6.159, Derivative: [0m |#
+#======================================================================#
+   0 [ -3.3586e+01 ] : VDWS/1
+   1 [  2.5985e+03 ] : VDWT/1
+------------------------------------------------------------------------
+#====================================================================#
+#| [94m           LiquidBromine Condensed Phase Properties:            [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+Density                            0.11491    1.000    1.14911e-01 
+Enthalpy of Vaporization           6.15920    1.000    6.15920e+00 
+Total                                                  6.27411e+00 
+----------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+LiquidBromine                  6.27411      1.000 [92m     6.27411e+00[0m ( -2.477e+02 ) 
+Regularization                 0.12163      1.000 [91m     1.21634e-01[0m ( +3.406e-02 ) 
+Total                                             [92m     6.39574e+00[0m ( -2.477e+02 ) 
+-------------------------------------------------------------------------------------
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     2   3.488e-01   6.244e-02   2.687e+03[92m   6.39574e+00[0m  -2.477e+02      0.975
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -6.14496882e+01 ] : VDWS/1
+   1 [  2.68622689e+03 ] : VDWT/1
+----------------------------------------------------------
+#========================================================#
+#| [94m                   Total Hessian                    [0m |#
+#========================================================#
+ 3.30518046e+03 -1.74604892e+04 
+-1.74604892e+04  5.81665353e+05 
+----------------------------------------------------------
+Convergence criterion reached in step size (1.00e-01)
+#========================================================#
+#| [92m               [0m[1mOptimization Converged[0m               [0m |#
+#| [92m           Final objective function value           [0m |#
+#| [92m  Full:  6.395745e+00  Un-penalized:  6.274111e+00  [0m |#
+#========================================================#
+#========================================================#
+#| [94m           Final optimization parameters:           [0m |#
+#========================================================#
+   0 [ -3.4778e-01 ] : VDWS/1
+   1 [ -2.6075e-02 ] : VDWT/1
+#========================================================#
+#| [94m             Final physical parameters:             [0m |#
+#========================================================#
+   0 [  3.4860e+00 ] : VDWS/1
+   1 [  5.2486e-01 ] : VDWT/1
+----------------------------------------------------------
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+Wall time since calculation start: 269.5 seconds
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#
