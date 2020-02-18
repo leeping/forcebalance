@@ -1381,14 +1381,17 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     streams = [p.stdout, p.stderr]
     # These are functions that take chunks of lines (read) as inputs.
     def process_out(read):
-        if print_to_screen: sys.stdout.write(str(read.encode('utf-8')))
+        if print_to_screen:
+            # LPW 2019-11-25: We should be writing a string, not a representation of bytes
+            sys.stdout.write(read)#str(read.encode('utf-8')))
         if copy_stdout:
             process_out.stdout.append(read)
             wtf(read)
     process_out.stdout = []
 
     def process_err(read):
-        if print_to_screen: sys.stderr.write(str(read.encode('utf-8')))
+        if print_to_screen:
+            sys.stderr.write(read)#str(read.encode('utf-8')))
         process_err.stderr.append(read)
         if copy_stderr:
             process_out.stdout.append(read)
