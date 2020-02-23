@@ -46,6 +46,16 @@ If you are here to obtain data for a published force field (e.g. AMBER-FB15), yo
 find it in the Products folder.  Please email me at leeping (at) ucdavis (dot) edu
 if you notice anything that should be added.
 
+#=======================#
+#| Citing ForceBalance |#
+#=======================#
+
+Published work that utilizes ForceBalance should include the following references:
+
+Wang L-P, Chen J and Van Voorhis T. "Systematic Parametrization of Polarizable Force Fields from Quantum Chemistry Data." J. Chem. Theory Comput. 2013, 9, 452-460.
+
+Wang L-P, Martinez TJ and Pande VS. "Building Force Fields: An Automatic, Systematic, and Reproducible Approach." J. Phys. Chem. Lett. 2014, 5, 1885-1891.
+
 #===========================#
 #| Funding Acknowledgement |#
 #===========================#
