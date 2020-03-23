@@ -647,6 +647,15 @@ class Optimizer(forcebalance.BaseClass):
                     logger.info("Convergence criterion reached for objective function (%.2e)\n" % self.convergence_objective)
                     ncrit += 1
             if ncrit >= self.criteria: break
+            # Either of these conditions could cause a convergence failure:
+            # Check for whether the maximum number of optimization cycles is reached.
+            if ITERATION == self.maxstep:
+                logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION)
+                break
+            # Check for whether the step size is too small to continue.
+            if ITERATION > self.iterinit and ndx < self.step_lowerbound:
+                logger.info("Step size is too small to continue (%.3e < %.3e)\n" % (ndx, self.step_lowerbound))
+                break
             #================================#
             #| Save optimization variables  |#
             #| before taking the next step. |#
@@ -695,14 +704,6 @@ class Optimizer(forcebalance.BaseClass):
                 self.writechk()           
             outfnm = self.save_mvals_to_input(xk)
             logger.info("Input file with saved parameters: %s\n" % outfnm)
-            # Check for whether the maximum number of optimization cycles is reached.
-            if ITERATION == self.maxstep:
-                logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION)
-                break
-            # Check for whether the step size is too small to continue.
-            if ndx < self.step_lowerbound:
-                logger.info("Step size is too small to continue (%.3e < %.3e)\n" % (ndx, self.step_lowerbound))
-                break
 
         cnvgd = ncrit >= self.criteria
         bar = printcool("\x1b[0m%s\x1b[0m\nFinal objective function value\nFull: % .6e  Un-penalized: % .6e" % 
