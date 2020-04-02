@@ -32,7 +32,7 @@ python setup.py install --prefix=$HOME/.local
 python setup.py install --prefix=/your/favorite/directory
 export PYTHONPATH=/your/favorite/directory
 
-The python packages "setuptools" and "virtualenv" are helpful in setting up a Python environment in your local directory.
+Additionally, the Anaconda/Miniconda distributions are very helpful for setting up a local Python environment.
 
 To turn the package into a distributable .tar.bz2 file:
 

@@ -27,12 +27,12 @@ try:
     from evaluator.utils.serialization import TypedJSONDecoder, TypedJSONEncoder
     from evaluator.forcefield import ParameterGradientKey
 except ImportError:
-    warn_once("Failed to import the evaluator package.")
+    warn_once("Note: Failed to import the optional evaluator package. ")
 
 try:
     from openforcefield.typing.engines import smirnoff
 except ImportError:
-    warn_once("Failed to import the openforcefield package.")
+    warn_once("Note: Failed to import the optional openforcefield package. ")
 
 logger = getLogger(__name__)
 

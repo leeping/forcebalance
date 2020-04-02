@@ -281,7 +281,7 @@ if "forcebalance" in __name__:
             have_dcdlib = True
             break
     if not have_dcdlib:
-        logger.info('The dcdlib module cannot be imported (Cannot read/write DCD files)')
+        logger.info('Note: Failed to import optional dcdlib module, cannot read/write DCD files.\n')
 
     #============================#
     #| PDB read/write functions |#
@@ -289,7 +289,7 @@ if "forcebalance" in __name__:
     try:
         from .PDB import *
     except ImportError:
-        logger.info('The pdb module cannot be imported (Cannot read/write PDB files)')
+        logger.warning('Note: Failed to import optional pdb module, cannot read/write PDB files.\n')
 
     #=============================#
     #| Mol2 read/write functions |#
@@ -297,7 +297,7 @@ if "forcebalance" in __name__:
     try:
         from . import Mol2
     except ImportError:
-        logger.info('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
+        logger.warning('Note: Failed to import optional Mol2 module, cannot read mol2 files.\n')
 
     #==============================#
     #| OpenMM interface functions |#
@@ -307,7 +307,8 @@ if "forcebalance" in __name__:
         from simtk.openmm import *
         from simtk.openmm.app import *
     except ImportError:
-        logger.info('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
+        logger.warning('Note: Failed to import optional OpenMM module, cannot interface with OpenMM.\n')
+
 elif "geometric" in __name__:
     #============================#
     #| PDB read/write functions |#
@@ -315,7 +316,7 @@ elif "geometric" in __name__:
     try:
         from .PDB import *
     except ImportError:
-        logger.info('The pdb module cannot be imported (Cannot read/write PDB files)')
+        logger.warning('Note: Failed to import optional pdb module, cannot read/write PDB files.\n')
     #==============================#
     #| OpenMM interface functions |#
     #==============================#
@@ -324,7 +325,7 @@ elif "geometric" in __name__:
         from simtk.openmm import *
         from simtk.openmm.app import *
     except ImportError:
-        logger.info('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
+        logger.warning('Note: Failed to import optional OpenMM module, cannot interface with OpenMM.\n')
 
 #===========================#
 #| Convenience subroutines |#
@@ -467,7 +468,7 @@ try:
             coors = nx.get_node_attributes(self,'x')
             return np.array([coors[i] for i in self.L()])
 except ImportError:
-    logger.warning("NetworkX cannot be imported (topology tools won't work).  Most functionality should still work though.")
+    logger.warning("Failed to import optional NetworkX module, topology tools won't work\n.")
 
 def TopEqual(mol1, mol2):
     """ For the nanoreactor project: Determine whether two Molecule objects have the same topologies. """
