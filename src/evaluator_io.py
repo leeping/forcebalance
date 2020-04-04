@@ -20,6 +20,7 @@ from forcebalance.target import Target
 
 try:
     from evaluator import unit
+    from evaluator.attributes import UNDEFINED
     from evaluator.client import EvaluatorClient, ConnectionOptions, RequestOptions
     from evaluator.datasets import PhysicalPropertyDataSet
     from evaluator.utils.exceptions import EvaluatorException
@@ -237,9 +238,13 @@ class Evaluator_SMIRNOFF(Target):
                 property_type = physical_property.__class__.__name__
 
                 value = physical_property.value.to(self._default_units[property_type])
-                uncertainty = physical_property.uncertainty.to(
-                    self._default_units[property_type]
-                )
+                uncertainty = np.nan
+
+                if physical_property.uncertainty != UNDEFINED:
+
+                    uncertainty = physical_property.uncertainty.to(
+                        self._default_units[property_type]
+                    )
 
                 tuple_key = (
                     property_type,
@@ -728,9 +733,14 @@ class Evaluator_SMIRNOFF(Target):
                 target_value = target_property.value.to(
                     self._default_units[property_type]
                 ).magnitude
-                target_error = target_property.uncertainty.to(
-                    self._default_units[property_type]
-                ).magnitude
+
+                target_error = np.nan
+
+                if target_property.uncertainty != UNDEFINED:
+
+                    target_error = target_property.uncertainty.to(
+                        self._default_units[property_type]
+                    ).magnitude
 
                 diff = target_value - reference_value
 
