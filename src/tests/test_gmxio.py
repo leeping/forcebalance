@@ -29,6 +29,3 @@ class TestAbInitio_GMX(TargetTests):
         shutil.rmtree('temp')
         super(TestAbInitio_GMX, self).teardown_method()
 
-    # def shortDescription(self):
-    #     """@override ForceBalanceTestCase.shortDescription()"""
-    #     return super(TestAbInitio_GMX,self).shortDescription() + " (AbInitio_GMX)"

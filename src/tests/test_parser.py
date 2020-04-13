@@ -1,4 +1,3 @@
-import sys
 import os
 import shutil
 import forcebalance.parser
@@ -8,7 +7,6 @@ class TestParser(ForceBalanceTestCase):
 
     def test_parse_inputs_returns_tuple(self):
         """Check parse_inputs() returns type"""
-        #os.chdir(os.path.dirname(os.path.realpath(__file__)))
         output = forcebalance.parser.parse_inputs('files/very_simple.in')
         assert isinstance(output, tuple), "\nExpected parse_inputs() to return a tuple, but got a %s instead" % type(output).__name__
         assert isinstance(output[0], dict), "\nExpected parse_inputs()[0] to be an options dictionary, got a %s instead" % type(output).__name__
@@ -27,7 +25,6 @@ class TestParser(ForceBalanceTestCase):
 
     def test_parse_inputs_yields_consistent_results(self):
         """Check parse_inputs() gives consistent results"""
-        #os.chdir(os.path.dirname(os.path.realpath(__file__)))
         output1 = forcebalance.parser.parse_inputs('files/very_simple.in')
         output2 = forcebalance.parser.parse_inputs('files/very_simple.in')
         assert output1 == output2

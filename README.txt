@@ -32,7 +32,7 @@ python setup.py install --prefix=$HOME/.local
 python setup.py install --prefix=/your/favorite/directory
 export PYTHONPATH=/your/favorite/directory
 
-The python packages "setuptools" and "virtualenv" are helpful in setting up a Python environment in your local directory.
+Additionally, the Anaconda/Miniconda distributions are very helpful for setting up a local Python environment.
 
 To turn the package into a distributable .tar.bz2 file:
 
@@ -45,6 +45,21 @@ python setup.py sdist
 If you are here to obtain data for a published force field (e.g. AMBER-FB15), you can
 find it in the Products folder.  Please email me at leeping (at) ucdavis (dot) edu
 if you notice anything that should be added.
+
+#=======================#
+#| Citing ForceBalance |#
+#=======================#
+
+Published work that utilizes ForceBalance should include the following references:
+
+Wang L-P, Chen J and Van Voorhis T. "Systematic Parametrization of Polarizable Force Fields from Quantum Chemistry Data." 
+J. Chem. Theory Comput. 2013, 9, 452-460. DOI: 10.1021/ct300826t
+
+Wang L-P, Martinez TJ and Pande VS. "Building Force Fields: An Automatic, Systematic, and Reproducible Approach." 
+J. Phys. Chem. Lett. 2014, 5, 1885-1891. DOI: 10.1021/jz500737m
+
+Qiu Y, Nerenberg PS, Head-Gordon T and Wang L-P. "Systematic Optimization of Water Models Using Liquid/Vapor Surface Tension Data."
+J. Phys. Chem. B 2019, 123, 7061-7073. DOI: 10.1021/acs.jpcb.9b05455
 
 #===========================#
 #| Funding Acknowledgement |#

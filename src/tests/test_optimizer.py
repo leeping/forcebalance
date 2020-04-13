@@ -1,7 +1,6 @@
 from __future__ import absolute_import
-import numpy
 import forcebalance
-import os, sys
+import os, sys, shutil
 import tarfile
 import logging
 import pytest
@@ -29,7 +28,9 @@ class TestOptimizer(ForceBalanceTestCase):
         except: pytest.fail("Couldn't create optimizer")
 
     def teardown_method(self):
-        os.system('rm -rf result *.bak *.tmp')
+        shutil.rmtree("results", ignore_errors=True)
+        shutil.rmtree("*.bak", ignore_errors=True)
+        shutil.rmtree("*.tmp", ignore_errors=True)
         super(TestOptimizer, self).teardown_method()
 
     def test_optimizer(self):

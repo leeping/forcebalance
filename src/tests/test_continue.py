@@ -1,15 +1,11 @@
 from __future__ import absolute_import
 from builtins import str
 import os, sys, shutil
-import tarfile
 from .__init__ import ForceBalanceTestCase
-from forcebalance.nifty import printcool_dictionary
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer, Counter
-from collections import OrderedDict
-from numpy import array
 import pytest
 
 class TestWaterTutorial(ForceBalanceTestCase):

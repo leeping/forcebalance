@@ -1,9 +1,8 @@
 from __future__ import absolute_import
 from builtins import str
 from builtins import object
-import sys, os, re
+import os, re
 import forcebalance
-import abc
 import numpy
 import inspect
 import pytest
@@ -147,9 +146,6 @@ class TestWaterObjective(ForceBalanceTestCase, ObjectiveTests):
 
         self.objective = forcebalance.objective.Objective(self.options, self.tgt_opts,self.ff)
 
-    # def shortDescription(self):
-    #     return super(TestWaterObjective, self).shortDescription() + " (AbInitio_GMX target)"
-
 class TestBromineObjective(ForceBalanceTestCase, ObjectiveTests):
     def setup_method(self, method):
         super(TestBromineObjective, self).setup_method(method)
@@ -170,6 +166,3 @@ class TestBromineObjective(ForceBalanceTestCase, ObjectiveTests):
         self.ff = forcebalance.forcefield.FF(self.options)
 
         self.objective = forcebalance.objective.Objective(self.options, self.tgt_opts,self.ff)
-
-    # def shortDescription(self):
-    #     return super(TestBromineObjective, self).shortDescription() + " (Liquid_GMX target)"

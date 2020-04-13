@@ -21,15 +21,15 @@ forcefield bro.prm
 maxstep 100
 
 # (float) Convergence criterion of step size (just needs to fall below this threshold)
-convergence_step 0.05
+convergence_step 0.1
 
 # (float) Convergence criterion of objective function (in MainOptimizer this is the stdev of x2 over 10 steps)
-convergence_objective 0.5
+convergence_objective 1.0
 
 # (float) Convergence criterion of gradient norm
-convergence_gradient 0.01
+convergence_gradient 1.0
 
-criteria 2
+criteria 1
 
 # (float) Minimum eigenvalue for applying steepest descent correction in the MainOptimizer
 eig_lowerbound 0.01
@@ -52,19 +52,26 @@ print_hessian
 constrain_charge false
 backup false
 
+# LPW note 2019-11-25:
+# In TINKER, VDWS is given in Angstrom so prior should be multiplied by 10 from default value
+priors
+   VDWS                                 : 5.29177e-01
+   VDWT                                 : 2.47894e+00
+/priors
+
 $end
 
 $target
 name LiquidBromine
 type Liquid_TINKER
 weight 1.0
-liquid_equ_steps      10000
+liquid_equ_steps      50000
 liquid_prod_steps    100000
-liquid_timestep         1.0
-liquid_interval         0.1
-gas_equ_steps         20000
+liquid_timestep         5.0
+liquid_interval         1.0
+gas_equ_steps        100000
 gas_prod_steps       200000
-gas_timestep            0.5
-gas_interval            0.1
+gas_timestep            5.0
+gas_interval            1.0
 adapt_errors
 $end
