@@ -285,7 +285,7 @@ if "forcebalance" in __name__:
             have_dcdlib = True
             break
     if not have_dcdlib:
-        logger.info('Note: Failed to import optional dcdlib module, cannot read/write DCD files.\n')
+        logger.debug('Note: Cannot import optional dcdlib module to read/write DCD files.\n')
 
     #============================#
     #| PDB read/write functions |#
@@ -293,7 +293,7 @@ if "forcebalance" in __name__:
     try:
         from .PDB import *
     except ImportError:
-        logger.warning('Note: Failed to import optional pdb module, cannot read/write PDB files.\n')
+        logger.debug('Note: Cannot import optional pdb module to read/write PDB files.\n')
 
     #=============================#
     #| Mol2 read/write functions |#
@@ -301,7 +301,7 @@ if "forcebalance" in __name__:
     try:
         from . import Mol2
     except ImportError:
-        logger.warning('Note: Failed to import optional Mol2 module, cannot read mol2 files.\n')
+        logger.debug('Note: Cannot import optional Mol2 module to read .mol2 files.\n')
 
     #==============================#
     #| OpenMM interface functions |#
@@ -311,7 +311,7 @@ if "forcebalance" in __name__:
         from simtk.openmm import *
         from simtk.openmm.app import *
     except ImportError:
-        logger.warning('Note: Failed to import optional OpenMM module, cannot interface with OpenMM.\n')
+        logger.debug('Note: Cannot import optional OpenMM module.\n')
 
 elif "geometric" in __name__:
     #============================#
@@ -320,7 +320,7 @@ elif "geometric" in __name__:
     try:
         from .PDB import *
     except ImportError:
-        logger.warning('Note: Failed to import optional pdb module, cannot read/write PDB files.\n')
+        logger.debug('Note: Failed to import optional pdb module to read/write PDB files.\n')
     #==============================#
     #| OpenMM interface functions |#
     #==============================#
@@ -329,7 +329,7 @@ elif "geometric" in __name__:
         from simtk.openmm import *
         from simtk.openmm.app import *
     except ImportError:
-        logger.warning('Note: Failed to import optional OpenMM module, cannot interface with OpenMM.\n')
+        logger.debug('Note: Failed to import optional OpenMM module.\n')
 
 #===========================#
 #| Convenience subroutines |#
@@ -472,7 +472,7 @@ try:
             coors = nx.get_node_attributes(self,'x')
             return np.array([coors[i] for i in self.L()])
 except ImportError:
-    logger.warning("Failed to import optional NetworkX module, topology tools won't work\n.")
+    logger.warning("Cannot import optional NetworkX module, topology tools won't work\n.")
 
 def TopEqual(mol1, mol2):
     """ For the nanoreactor project: Determine whether two Molecule objects have the same topologies. """
@@ -2959,7 +2959,11 @@ class Molecule(object):
             if ln == 0:
                 comms = [line]
             elif ln == 1:
-                na = int(line[:5])
+                # Although is isn't exactly up to spec, 
+                # it seems that some .rst7 files have spaces that precede the "integer"
+                # and others have >99999 atoms
+                # na = int(line[:5])
+                na = int(line.split()[0])
             elif mode == 'x':
                 xyz.append([float(line[:12]), float(line[12:24]), float(line[24:36])])
                 an += 1
@@ -3300,6 +3304,7 @@ class Molecule(object):
                         thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
                     elem.append(thiselem)
 
+                # Different frames may have different decimal precision
                 if ln == 2:
                     pdeci = [i for i, x in enumerate(line) if x == '.']
                     ndeci = pdeci[1] - pdeci[0] - 5
