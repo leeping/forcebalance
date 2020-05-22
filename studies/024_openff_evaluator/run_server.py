@@ -4,10 +4,10 @@ import logging
 import shutil
 from os import path
 
-from evaluator.backends import ComputeResources
-from evaluator.backends.dask import DaskLocalCluster
-from evaluator.server import EvaluatorServer
-from evaluator.utils import setup_timestamp_logging
+from openff.evaluator.backends import ComputeResources
+from openff.evaluator.backends.dask import DaskLocalCluster
+from openff.evaluator.server import EvaluatorServer
+from openff.evaluator.utils import setup_timestamp_logging
 
 
 def main(n_workers, cpus_per_worker, gpus_per_worker):

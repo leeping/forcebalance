@@ -19,16 +19,16 @@ from forcebalance.output import getLogger
 from forcebalance.target import Target
 
 try:
-    from evaluator import unit
-    from evaluator.attributes import UNDEFINED
-    from evaluator.client import EvaluatorClient, ConnectionOptions, RequestOptions
-    from evaluator.datasets import PhysicalPropertyDataSet
-    from evaluator.utils.exceptions import EvaluatorException
-    from evaluator.utils.openmm import openmm_quantity_to_pint
-    from evaluator.utils.serialization import TypedJSONDecoder, TypedJSONEncoder
-    from evaluator.forcefield import ParameterGradientKey
+    from openff.evaluator import unit
+    from openff.evaluator.attributes import UNDEFINED
+    from openff.evaluator.client import EvaluatorClient, ConnectionOptions, RequestOptions
+    from openff.evaluator.datasets import PhysicalPropertyDataSet
+    from openff.evaluator.utils.exceptions import EvaluatorException
+    from openff.evaluator.utils.openmm import openmm_quantity_to_pint
+    from openff.evaluator.utils.serialization import TypedJSONDecoder, TypedJSONEncoder
+    from openff.evaluator.forcefield import ParameterGradientKey
 except ImportError:
-    warn_once("Note: Failed to import the optional evaluator package. ")
+    warn_once("Note: Failed to import the optional openff.evaluator package. ")
 
 try:
     from openforcefield.typing.engines import smirnoff
@@ -49,10 +49,10 @@ class Evaluator_SMIRNOFF(Target):
 
         Attributes
         ----------
-        connection_options: evaluator.client.ConnectionOptions
+        connection_options: openff.evaluator.client.ConnectionOptions
             The options for how the `evaluator` client should
             connect to a running server instance.
-        estimation_options: evaluator.client.RequestOptions
+        estimation_options: openff.evaluator.client.RequestOptions
             The options for how properties should be estimated by the
             `evaluator` (e.g. the uncertainties to which properties
             should be estimated).
@@ -65,6 +65,9 @@ class Evaluator_SMIRNOFF(Target):
         denominators: dict of str and unit.Quantity
             The denominators will be used to remove units from the properties
             and scale their values.
+        polling_interval: float
+            The time interval with which to check whether the evaluator has
+            finished fulfilling the request (in seconds).
         """
 
         def __init__(self):
@@ -75,6 +78,8 @@ class Evaluator_SMIRNOFF(Target):
             self.data_set_path = ""
             self.weights = {}
             self.denominators = {}
+
+            self.polling_interval = 600
 
         def to_json(self):
             """Converts this class into a JSON string.
@@ -97,6 +102,7 @@ class Evaluator_SMIRNOFF(Target):
                     property_name: self.denominators[property_name]
                     for property_name in self.denominators
                 },
+                "polling_interval": self.polling_interval
             }
 
             return json.dumps(
@@ -123,12 +129,16 @@ class Evaluator_SMIRNOFF(Target):
             else:
                 dictionary = json.load(json_source, cls=TypedJSONDecoder)
 
+            if "polling_interval" not in dictionary:
+                dictionary["polling_interval"] = 600
+
             assert (
                 "connection_options" in dictionary
                 and "estimation_options" in dictionary
                 and "data_set_path" in dictionary
                 and "weights" in dictionary
                 and "denominators" in dictionary
+                and "polling_interval" in dictionary
             )
 
             value = cls()
@@ -149,6 +159,8 @@ class Evaluator_SMIRNOFF(Target):
                 property_name: dictionary["denominators"][property_name]
                 for property_name in dictionary["denominators"]
             }
+
+            value.polling_interval = dictionary["polling_interval"]
 
             return value
 
@@ -278,7 +290,7 @@ class Evaluator_SMIRNOFF(Target):
 
         Parameters
         ----------
-        gradient_key: evaluator.forcefield.ParameterGradientKey
+        gradient_key: openff.evaluator.forcefield.ParameterGradientKey
             The gradient key which points to the parameter of interest.
 
         Returns
@@ -484,7 +496,11 @@ class Evaluator_SMIRNOFF(Target):
             )
         )
 
-        if self._pending_estimate_request.results(True)[0] is None:
+        if (
+            self._pending_estimate_request.results(
+                True, polling_interval=self._options.polling_interval
+            )[0] is None
+        ):
 
             raise RuntimeError(
                 "No `EvaluatorServer` could be found to submit the calculations to. "
@@ -498,7 +514,7 @@ class Evaluator_SMIRNOFF(Target):
 
         Parameters
         ----------
-        estimation_request: evaluator.client.Request
+        estimation_request: openff.evaluator.client.Request
             The request to check.
         """
         results, _ = estimation_request.results()
@@ -529,12 +545,12 @@ class Evaluator_SMIRNOFF(Target):
 
         Parameters
         ----------
-        estimation_request: evaluator.client.Request
+        estimation_request: openff.evaluator.client.Request
             The request to extract the data from.
 
         Returns
         -------
-        estimated_data: evaluator.datasets.PhysicalPropertyDataSet
+        estimated_data: openff.evaluator.datasets.PhysicalPropertyDataSet
             The data set of estimated properties.
         estimated_gradients: dict of str and np.array
             The estimated gradients in a dictionary with keys of the estimated

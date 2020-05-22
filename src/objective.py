@@ -46,7 +46,7 @@ try:
     from forcebalance.evaluator_io import Evaluator_SMIRNOFF
 except:
     logger.warning(traceback.format_exc())
-    logger.warning("openff-evaluator module import failed\n")
+    logger.warning("openff.evaluator module import failed\n")
 
 try:
     from forcebalance.abinitio_internal import AbInitio_Internal
