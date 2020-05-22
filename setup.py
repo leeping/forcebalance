@@ -29,7 +29,7 @@ except ImportError:
 #| doc/api_header.tex              |#
 #| bin/ForceBalance.py             |#
 #===================================#
-__version__ = "v1.7.1"
+__version__ = "v1.7.2"
 try:
     # use git to find current version
     git_describe = subprocess.check_output(["git", "describe"]).strip()
