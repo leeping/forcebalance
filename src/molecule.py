@@ -32,6 +32,10 @@ try:
 except NameError:
     pass
 
+# Special error which is thrown when TINKER .arc data is detected in a .xyz file
+class ActuallyArcError(IOError):
+    pass
+
 # ======================================================================#
 # |                                                                    |#
 # |              Chemical file format conversion module                |#
@@ -281,7 +285,7 @@ if "forcebalance" in __name__:
             have_dcdlib = True
             break
     if not have_dcdlib:
-        logger.info('Note: Failed to import optional dcdlib module, cannot read/write DCD files.\n')
+        logger.debug('Note: Cannot import optional dcdlib module to read/write DCD files.\n')
 
     #============================#
     #| PDB read/write functions |#
@@ -289,7 +293,7 @@ if "forcebalance" in __name__:
     try:
         from .PDB import *
     except ImportError:
-        logger.warning('Note: Failed to import optional pdb module, cannot read/write PDB files.\n')
+        logger.debug('Note: Cannot import optional pdb module to read/write PDB files.\n')
 
     #=============================#
     #| Mol2 read/write functions |#
@@ -297,7 +301,7 @@ if "forcebalance" in __name__:
     try:
         from . import Mol2
     except ImportError:
-        logger.warning('Note: Failed to import optional Mol2 module, cannot read mol2 files.\n')
+        logger.debug('Note: Cannot import optional Mol2 module to read .mol2 files.\n')
 
     #==============================#
     #| OpenMM interface functions |#
@@ -307,7 +311,7 @@ if "forcebalance" in __name__:
         from simtk.openmm import *
         from simtk.openmm.app import *
     except ImportError:
-        logger.warning('Note: Failed to import optional OpenMM module, cannot interface with OpenMM.\n')
+        logger.debug('Note: Cannot import optional OpenMM module.\n')
 
 elif "geometric" in __name__:
     #============================#
@@ -316,7 +320,7 @@ elif "geometric" in __name__:
     try:
         from .PDB import *
     except ImportError:
-        logger.warning('Note: Failed to import optional pdb module, cannot read/write PDB files.\n')
+        logger.debug('Note: Failed to import optional pdb module to read/write PDB files.\n')
     #==============================#
     #| OpenMM interface functions |#
     #==============================#
@@ -325,7 +329,7 @@ elif "geometric" in __name__:
         from simtk.openmm import *
         from simtk.openmm.app import *
     except ImportError:
-        logger.warning('Note: Failed to import optional OpenMM module, cannot interface with OpenMM.\n')
+        logger.debug('Note: Failed to import optional OpenMM module.\n')
 
 #===========================#
 #| Convenience subroutines |#
@@ -468,7 +472,7 @@ try:
             coors = nx.get_node_attributes(self,'x')
             return np.array([coors[i] for i in self.L()])
 except ImportError:
-    logger.warning("Failed to import optional NetworkX module, topology tools won't work\n.")
+    logger.warning("Cannot import optional NetworkX module, topology tools won't work\n.")
 
 def TopEqual(mol1, mol2):
     """ For the nanoreactor project: Determine whether two Molecule objects have the same topologies. """
@@ -2834,7 +2838,7 @@ class Molecule(object):
         """ .xyz files can be TINKER formatted which is why we have the try/except here. """
         try:
             return self.read_xyz0(fnm, **kwargs)
-        except:
+        except ActuallyArcError:
             return self.read_arc(fnm, **kwargs)
 
     def read_xyz0(self, fnm, **kwargs):
@@ -2859,11 +2863,28 @@ class Molecule(object):
             if ln == 0:
                 # Skip blank lines.
                 if len(line.strip()) > 0:
-                    na = int(line.strip())
+                    try:
+                        na = int(line.strip())
+                    except:
+                        # If the first line contains a comment, it's a TINKER .arc file
+                        logger.warning("Non-integer detected in first line; will parse as TINKER .arc file.")
+                        raise ActuallyArcError
             elif ln == 1:
+                sline = line.split()
+                if len(sline) == 6 and all([isfloat(word) for word in sline]):
+                    # If the second line contains box data, it's a TINKER .arc file
+                    logger.warning("Tinker box data detected in second line; will parse as TINKER .arc file.")
+                    raise ActuallyArcError
+                elif len(sline) >= 5 and isint(sline[0]) and isfloat(sline[2]) and isfloat(sline[3]) and isfloat(sline[4]):
+                    # If the second line contains coordinate data, it's a TINKER .arc file
+                    logger.warning("Tinker coordinate data detected in second line; will parse as TINKER .arc file.")
+                    raise ActuallyArcError
                 comms.append(line.strip())
             else:
                 line = re.sub(r"([0-9])(-[0-9])", r"\1 \2", line)
+                # Error checking. Slows performance by ~20% when tested on a 200 MB .xyz file
+                if not re.match(r"[A-Z][A-Za-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
+                    raise IOError("Expected coordinates at line %i but got this instead:\n%s" % (absln, line))
                 sline = line.split()
                 xyz.append([float(i) for i in sline[1:]])
                 if len(elem) < na:
@@ -2938,7 +2959,11 @@ class Molecule(object):
             if ln == 0:
                 comms = [line]
             elif ln == 1:
-                na = int(line[:5])
+                # Although is isn't exactly up to spec, 
+                # it seems that some .rst7 files have spaces that precede the "integer"
+                # and others have >99999 atoms
+                # na = int(line[:5])
+                na = int(line.split()[0])
             elif mode == 'x':
                 xyz.append([float(line[:12]), float(line[12:24]), float(line[24:36])])
                 an += 1
@@ -3279,6 +3304,7 @@ class Molecule(object):
                         thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
                     elem.append(thiselem)
 
+                # Different frames may have different decimal precision
                 if ln == 2:
                     pdeci = [i for i, x in enumerate(line) if x == '.']
                     ndeci = pdeci[1] - pdeci[0] - 5

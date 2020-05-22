@@ -203,7 +203,7 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         data      = objective.Full(np.zeros(objective.FF.np),1,verbose=True)
         X, G, H   = data['X'], data['G'], data['H']
         msgX="\nCalculated objective function is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_OBJECTIVE in test_system.py with these values"
-        np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_OBJECTIVE, X, atol=60, err_msg=msgX)
+        np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_OBJECTIVE, X, atol=120, err_msg=msgX)
         msgG="\nCalculated gradient is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_GRADIENT in test_system.py with these values"
         np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_GRADIENT, G, atol=2000, err_msg=msgG)
 
