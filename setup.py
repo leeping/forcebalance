@@ -20,7 +20,7 @@ except ImportError as e:
         "Error importing numpy and scipy but these are required to install ForceBalance.\n"
         "Please make sure the numpy and scipy modules are installed and try again.\n"
     )
-    raise ImportError(msg) from e
+    raise ImportError(msg)
 
 #===================================#
 #|   ForceBalance version number   |#
