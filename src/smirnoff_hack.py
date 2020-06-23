@@ -18,10 +18,10 @@ OpenEyeToolkitWrapper.find_smarts_matches = cached_find_smarts_matches
 from openforcefield.typing.chemistry.environment import ChemicalEnvironment
 original_validate = ChemicalEnvironment.validate
 TOOLKIT_CACHE_ChemicalEnvironment_validate = {}
-def cached_validate(smirks, validate_valence_type=None, toolkit='openeye'):
-    cache_key = hash((smirks, validate_valence_type, toolkit))
+def cached_validate(smirks, validate_valence_type=None, toolkit_registry=OpenEyeToolkitWrapper):
+    cache_key = hash((smirks, validate_valence_type, toolkit_registry))
     if cache_key not in TOOLKIT_CACHE_ChemicalEnvironment_validate:
-        TOOLKIT_CACHE_ChemicalEnvironment_validate[cache_key] = original_validate(smirks, validate_valence_type=None, toolkit=toolkit)
+        TOOLKIT_CACHE_ChemicalEnvironment_validate[cache_key] = original_validate(smirks, validate_valence_type=None, toolkit_registry=toolkit_registry)
     return TOOLKIT_CACHE_ChemicalEnvironment_validate[cache_key]
 ChemicalEnvironment.validate = cached_validate
 
