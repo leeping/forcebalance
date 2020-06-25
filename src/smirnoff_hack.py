@@ -18,10 +18,10 @@ OpenEyeToolkitWrapper.find_smarts_matches = cached_find_smarts_matches
 from openforcefield.typing.chemistry.environment import ChemicalEnvironment
 original_validate = ChemicalEnvironment.validate
 TOOLKIT_CACHE_ChemicalEnvironment_validate = {}
-def cached_validate(smirks, validate_valence_type=None, toolkit_registry=OpenEyeToolkitWrapper):
+def cached_validate(smirks, validate_valence_type=True, toolkit_registry=OpenEyeToolkitWrapper):
     cache_key = hash((smirks, validate_valence_type, toolkit_registry))
     if cache_key not in TOOLKIT_CACHE_ChemicalEnvironment_validate:
-        TOOLKIT_CACHE_ChemicalEnvironment_validate[cache_key] = original_validate(smirks, validate_valence_type=None, toolkit_registry=toolkit_registry)
+        TOOLKIT_CACHE_ChemicalEnvironment_validate[cache_key] = original_validate(smirks, validate_valence_type=validate_valence_type, toolkit_registry=toolkit_registry)
     return TOOLKIT_CACHE_ChemicalEnvironment_validate[cache_key]
 ChemicalEnvironment.validate = cached_validate
 
@@ -29,20 +29,20 @@ ChemicalEnvironment.validate = cached_validate
 # cache for compute_partial_charges_am1bcc (save 69s)
 original_compute_partial_charges_am1bcc = OpenEyeToolkitWrapper.compute_partial_charges_am1bcc
 TOOLKIT_CACHE_compute_partial_charges_am1bcc = {}
-def cached_compute_partial_charges_am1bcc(self, molecule):
-    cache_key = hash(molecule)
+def cached_compute_partial_charges_am1bcc(self, molecule, use_conformers=None, strict_n_conformers=False):
+    cache_key = hash(molecule, use_conformers, strict_n_conformers)
     if cache_key not in TOOLKIT_CACHE_compute_partial_charges_am1bcc:
-        TOOLKIT_CACHE_compute_partial_charges_am1bcc[cache_key] = original_compute_partial_charges_am1bcc(self, molecule)
+        TOOLKIT_CACHE_compute_partial_charges_am1bcc[cache_key] = original_compute_partial_charges_am1bcc(self, molecule, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers)
     return TOOLKIT_CACHE_compute_partial_charges_am1bcc[cache_key]
 OpenEyeToolkitWrapper.compute_partial_charges_am1bcc = cached_compute_partial_charges_am1bcc
 
 # cache the generate_conformers function (save 15s)
 TOOLKIT_CACHE_molecule_conformers = {}
 original_generate_conformers = OpenEyeToolkitWrapper.generate_conformers
-def cached_generate_conformers(self, molecule, n_conformers=1, clear_existing=True):
-    cache_key = hash((molecule, n_conformers, clear_existing))
+def cached_generate_conformers(self, molecule, n_conformers=1, rms_cutoff=None, clear_existing=True):
+    cache_key = hash((molecule, n_conformers, rms_cutoff, clear_existing))
     if cache_key not in TOOLKIT_CACHE_molecule_conformers:
-        original_generate_conformers(self, molecule, n_conformers=n_conformers, clear_existing=clear_existing)
+        original_generate_conformers(self, molecule, n_conformers=n_conformers, rms_cutoff=rms_cutoff, clear_existing=clear_existing)
         TOOLKIT_CACHE_molecule_conformers[cache_key] = molecule._conformers
     molecule._conformers = TOOLKIT_CACHE_molecule_conformers[cache_key]
 OpenEyeToolkitWrapper.generate_conformers = cached_generate_conformers
