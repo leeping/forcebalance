@@ -56,10 +56,8 @@ def oe_cached_assign_partial_charges(self, molecule, partial_charge_method=None,
     cache_key = hash((molecule, partial_charge_method, str(use_conformers), strict_n_conformers))
     if cache_key not in OE_TOOLKIT_CACHE_assign_partial_charges:
         oe_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers)
-        print(cache_key, molecule.partial_charges)
         OE_TOOLKIT_CACHE_assign_partial_charges[cache_key] = molecule.partial_charges
     else:
-        print(cache_key)
         molecule.partial_charges = OE_TOOLKIT_CACHE_assign_partial_charges[cache_key]
     return 
 OpenEyeToolkitWrapper.assign_partial_charges = oe_cached_assign_partial_charges
