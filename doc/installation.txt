@@ -17,7 +17,19 @@ package of your choice.  If you choose to do so, please contact me as
 I would be happy to include your contribution in the main
 distribution.
 
-@section installing_forcebalance Installing ForceBalance
+@section installing_forcebalance Installing ForceBalance using conda package manager
+
+As of version 1.7.4, ForceBalance is available as a package on the conda-forge channel.
+To install the package, make sure you are using an Anaconda/Miniconda Python distribution
+for Python versions 2.7, 3.5, 3.6, or 3.7, then run:
+
+@verbatim python setup.py install @endverbatim
+
+This will install ForceBalance and all of the required dependencies.  It will not install
+optional dependencies such as OpenMM, Gromacs, AMBER, Tinker, CCTools/Work Queue,
+or the Open Force Field toolkit.
+
+@section installing_forcebalance Installing ForceBalance from source
 
 %ForceBalance is packaged as a Python module.  Here are the installation instructions.  
 
