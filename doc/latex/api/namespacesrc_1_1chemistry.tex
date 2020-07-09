@@ -1,0 +1,254 @@
+\hypertarget{namespacesrc_1_1chemistry}{}\subsection{src.\+chemistry Namespace Reference}
+\label{namespacesrc_1_1chemistry}\index{src.\+chemistry@{src.\+chemistry}}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1chemistry_a50b3f355bb12e82be0dbb81daac82e3e}{Lookup\+By\+Mass} (mass)
+\item 
+def \hyperlink{namespacesrc_1_1chemistry_af789b97935f83fc42345ad5b07a11174}{Bond\+Strength\+By\+Length} (\hyperlink{namespacesrc_1_1chemistry_aa6456b6409fde4637bee2fb18999d881}{A}, \hyperlink{namespacesrc_1_1chemistry_a43668732826c79b3179214cf463b5d70}{B}, length, artol=0.\+33, bias=0.\+0)
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1chemistry_ab22cb6334c4383f04c147bcf4adf5374}{Bond\+Energies} = defaultdict(lambda\+:defaultdict(dict))
+\item 
+list \hyperlink{namespacesrc_1_1chemistry_af96fd92a64526125e88e64389117ff77}{Radii}
+\begin{DoxyCompactList}\small\item\em Covalent radii from Cordero et al. \end{DoxyCompactList}\item 
+\hyperlink{namespacesrc_1_1chemistry_a6e4691b3d86c5d03b20ddc39dff30bdb}{Periodic\+Table}
+\item 
+list \hyperlink{namespacesrc_1_1chemistry_ae63d9e3b53970a3c7ba82b78970cb7e2}{Elements}
+\item 
+list \hyperlink{namespacesrc_1_1chemistry_a582e8bcda9bcb269b87a1bda0ea996e1}{Bond\+Chars} = \mbox{[}\textquotesingle{}-\/\textquotesingle{},\textquotesingle{}=\textquotesingle{},\textquotesingle{}3\textquotesingle{}\mbox{]}
+\item 
+string \hyperlink{namespacesrc_1_1chemistry_a3605dbce6b93cc3407bb1030320f5cd0}{data\+\_\+from\+\_\+web}
+\item 
+\hyperlink{namespacesrc_1_1chemistry_a03302cdcc2126738b5aa1dfdc0c8777d}{line} = line.\+expandtabs()
+\item 
+\hyperlink{namespacesrc_1_1chemistry_a4ceca7d8e543e8866c0ad95b5a967551}{BE} = float(line.\+split()\mbox{[}1\mbox{]})
+\item 
+float \hyperlink{namespacesrc_1_1chemistry_ab523d2adfa843021628d784c390fb46f}{L} = float(line.\+split()\mbox{[}2\mbox{]}) $\ast$ 0.\+01
+\item 
+\hyperlink{namespacesrc_1_1chemistry_a92d33a1aa706dcfde71fed97568964de}{atoms} = re.\+split(\textquotesingle{}\mbox{[}-\/=3\mbox{]}\textquotesingle{}, line.\+split()\mbox{[}0\mbox{]})
+\item 
+\hyperlink{namespacesrc_1_1chemistry_aa6456b6409fde4637bee2fb18999d881}{A} = \hyperlink{namespacesrc_1_1chemistry_a92d33a1aa706dcfde71fed97568964de}{atoms}\mbox{[}0\mbox{]}
+\item 
+\hyperlink{namespacesrc_1_1chemistry_a43668732826c79b3179214cf463b5d70}{B} = \hyperlink{namespacesrc_1_1chemistry_a92d33a1aa706dcfde71fed97568964de}{atoms}\mbox{[}1\mbox{]}
+\item 
+list \hyperlink{namespacesrc_1_1chemistry_abeb041126ad140ac88a8260a60a9398f}{bo} = Bond\+Chars.\+index(re.\+findall(\textquotesingle{}\mbox{[}-\/=3\mbox{]}\textquotesingle{}, line.\+split()\mbox{[}0\mbox{]})\mbox{[}0\mbox{]}) + 1
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_af789b97935f83fc42345ad5b07a11174}\label{namespacesrc_1_1chemistry_af789b97935f83fc42345ad5b07a11174}} 
+\index{src\+::chemistry@{src\+::chemistry}!Bond\+Strength\+By\+Length@{Bond\+Strength\+By\+Length}}
+\index{Bond\+Strength\+By\+Length@{Bond\+Strength\+By\+Length}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{Bond\+Strength\+By\+Length()}{BondStrengthByLength()}}
+{\footnotesize\ttfamily def src.\+chemistry.\+Bond\+Strength\+By\+Length (\begin{DoxyParamCaption}\item[{}]{A,  }\item[{}]{B,  }\item[{}]{length,  }\item[{}]{artol = {\ttfamily 0.33},  }\item[{}]{bias = {\ttfamily 0.0} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 169 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_a50b3f355bb12e82be0dbb81daac82e3e}\label{namespacesrc_1_1chemistry_a50b3f355bb12e82be0dbb81daac82e3e}} 
+\index{src\+::chemistry@{src\+::chemistry}!Lookup\+By\+Mass@{Lookup\+By\+Mass}}
+\index{Lookup\+By\+Mass@{Lookup\+By\+Mass}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{Lookup\+By\+Mass()}{LookupByMass()}}
+{\footnotesize\ttfamily def src.\+chemistry.\+Lookup\+By\+Mass (\begin{DoxyParamCaption}\item[{}]{mass }\end{DoxyParamCaption})}
+
+
+
+Definition at line 160 of file chemistry.\+py.
+
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_aa6456b6409fde4637bee2fb18999d881}\label{namespacesrc_1_1chemistry_aa6456b6409fde4637bee2fb18999d881}} 
+\index{src\+::chemistry@{src\+::chemistry}!A@{A}}
+\index{A@{A}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{A}{A}}
+{\footnotesize\ttfamily src.\+chemistry.\+A = \hyperlink{namespacesrc_1_1chemistry_a92d33a1aa706dcfde71fed97568964de}{atoms}\mbox{[}0\mbox{]}}
+
+
+
+Definition at line 154 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_a92d33a1aa706dcfde71fed97568964de}\label{namespacesrc_1_1chemistry_a92d33a1aa706dcfde71fed97568964de}} 
+\index{src\+::chemistry@{src\+::chemistry}!atoms@{atoms}}
+\index{atoms@{atoms}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{atoms}{atoms}}
+{\footnotesize\ttfamily src.\+chemistry.\+atoms = re.\+split(\textquotesingle{}\mbox{[}-\/=3\mbox{]}\textquotesingle{}, line.\+split()\mbox{[}0\mbox{]})}
+
+
+
+Definition at line 153 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_a43668732826c79b3179214cf463b5d70}\label{namespacesrc_1_1chemistry_a43668732826c79b3179214cf463b5d70}} 
+\index{src\+::chemistry@{src\+::chemistry}!B@{B}}
+\index{B@{B}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{B}{B}}
+{\footnotesize\ttfamily src.\+chemistry.\+B = \hyperlink{namespacesrc_1_1chemistry_a92d33a1aa706dcfde71fed97568964de}{atoms}\mbox{[}1\mbox{]}}
+
+
+
+Definition at line 155 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_a4ceca7d8e543e8866c0ad95b5a967551}\label{namespacesrc_1_1chemistry_a4ceca7d8e543e8866c0ad95b5a967551}} 
+\index{src\+::chemistry@{src\+::chemistry}!BE@{BE}}
+\index{BE@{BE}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{BE}{BE}}
+{\footnotesize\ttfamily src.\+chemistry.\+BE = float(line.\+split()\mbox{[}1\mbox{]})}
+
+
+
+Definition at line 151 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_abeb041126ad140ac88a8260a60a9398f}\label{namespacesrc_1_1chemistry_abeb041126ad140ac88a8260a60a9398f}} 
+\index{src\+::chemistry@{src\+::chemistry}!bo@{bo}}
+\index{bo@{bo}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{bo}{bo}}
+{\footnotesize\ttfamily list src.\+chemistry.\+bo = Bond\+Chars.\+index(re.\+findall(\textquotesingle{}\mbox{[}-\/=3\mbox{]}\textquotesingle{}, line.\+split()\mbox{[}0\mbox{]})\mbox{[}0\mbox{]}) + 1}
+
+
+
+Definition at line 156 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_a582e8bcda9bcb269b87a1bda0ea996e1}\label{namespacesrc_1_1chemistry_a582e8bcda9bcb269b87a1bda0ea996e1}} 
+\index{src\+::chemistry@{src\+::chemistry}!Bond\+Chars@{Bond\+Chars}}
+\index{Bond\+Chars@{Bond\+Chars}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{Bond\+Chars}{BondChars}}
+{\footnotesize\ttfamily list src.\+chemistry.\+Bond\+Chars = \mbox{[}\textquotesingle{}-\/\textquotesingle{},\textquotesingle{}=\textquotesingle{},\textquotesingle{}3\textquotesingle{}\mbox{]}}
+
+
+
+Definition at line 51 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_ab22cb6334c4383f04c147bcf4adf5374}\label{namespacesrc_1_1chemistry_ab22cb6334c4383f04c147bcf4adf5374}} 
+\index{src\+::chemistry@{src\+::chemistry}!Bond\+Energies@{Bond\+Energies}}
+\index{Bond\+Energies@{Bond\+Energies}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{Bond\+Energies}{BondEnergies}}
+{\footnotesize\ttfamily src.\+chemistry.\+Bond\+Energies = defaultdict(lambda\+:defaultdict(dict))}
+
+
+
+Definition at line 8 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_a3605dbce6b93cc3407bb1030320f5cd0}\label{namespacesrc_1_1chemistry_a3605dbce6b93cc3407bb1030320f5cd0}} 
+\index{src\+::chemistry@{src\+::chemistry}!data\+\_\+from\+\_\+web@{data\+\_\+from\+\_\+web}}
+\index{data\+\_\+from\+\_\+web@{data\+\_\+from\+\_\+web}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{data\+\_\+from\+\_\+web}{data\_from\_web}}
+{\footnotesize\ttfamily string src.\+chemistry.\+data\+\_\+from\+\_\+web}
+
+
+
+Definition at line 56 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_ae63d9e3b53970a3c7ba82b78970cb7e2}\label{namespacesrc_1_1chemistry_ae63d9e3b53970a3c7ba82b78970cb7e2}} 
+\index{src\+::chemistry@{src\+::chemistry}!Elements@{Elements}}
+\index{Elements@{Elements}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{Elements}{Elements}}
+{\footnotesize\ttfamily list src.\+chemistry.\+Elements}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  [\textcolor{stringliteral}{"None"},\textcolor{stringliteral}{'H'},\textcolor{stringliteral}{'He'},
+2             \textcolor{stringliteral}{'Li'},\textcolor{stringliteral}{'Be'},\textcolor{stringliteral}{'B'},\textcolor{stringliteral}{'C'},\textcolor{stringliteral}{'N'},\textcolor{stringliteral}{'O'},\textcolor{stringliteral}{'F'},\textcolor{stringliteral}{'Ne'},
+3             \textcolor{stringliteral}{'Na'},\textcolor{stringliteral}{'Mg'},\textcolor{stringliteral}{'Al'},\textcolor{stringliteral}{'Si'},\textcolor{stringliteral}{'P'},\textcolor{stringliteral}{'S'},\textcolor{stringliteral}{'Cl'},\textcolor{stringliteral}{'Ar'},
+4             \textcolor{stringliteral}{'K'},\textcolor{stringliteral}{'Ca'},\textcolor{stringliteral}{'Sc'},\textcolor{stringliteral}{'Ti'},\textcolor{stringliteral}{'V'},\textcolor{stringliteral}{'Cr'},\textcolor{stringliteral}{'Mn'},\textcolor{stringliteral}{'Fe'},\textcolor{stringliteral}{'Co'},\textcolor{stringliteral}{'Ni'},\textcolor{stringliteral}{'Cu'},\textcolor{stringliteral}{'Zn'},\textcolor{stringliteral}{'Ga'},\textcolor{stringliteral}{'Ge'},\textcolor{stringliteral}{'As'},\textcolor{stringliteral}{'Se'},\textcolor{stringliteral}{'Br'},\textcolor{stringliteral}{'Kr'},
+5             \textcolor{stringliteral}{'Rb'},\textcolor{stringliteral}{'Sr'},\textcolor{stringliteral}{'Y'},\textcolor{stringliteral}{'Zr'},\textcolor{stringliteral}{'Nb'},\textcolor{stringliteral}{'Mo'},\textcolor{stringliteral}{'Tc'},\textcolor{stringliteral}{'Ru'},\textcolor{stringliteral}{'Rh'},\textcolor{stringliteral}{'Pd'},\textcolor{stringliteral}{'Ag'},\textcolor{stringliteral}{'Cd'},\textcolor{stringliteral}{'In'},\textcolor{stringliteral}{'Sn'},\textcolor{stringliteral}{'Sb'},\textcolor{stringliteral}{'Te'},\textcolor{stringliteral}{'I'},\textcolor{stringliteral}{'Xe'},
+6             \textcolor{stringliteral}{'Cs'},\textcolor{stringliteral}{'Ba'},\textcolor{stringliteral}{'La'},\textcolor{stringliteral}{'Ce'},\textcolor{stringliteral}{'Pr'},\textcolor{stringliteral}{'Nd'},\textcolor{stringliteral}{'Pm'},\textcolor{stringliteral}{'Sm'},\textcolor{stringliteral}{'Eu'},\textcolor{stringliteral}{'Gd'},\textcolor{stringliteral}{'Tb'},\textcolor{stringliteral}{'Dy'},\textcolor{stringliteral}{'Ho'},\textcolor{stringliteral}{'Er'},\textcolor{stringliteral}{'Tm'},\textcolor{stringliteral}{'Yb'},
+7             \textcolor{stringliteral}{'Lu'},\textcolor{stringliteral}{'Hf'},\textcolor{stringliteral}{'Ta'},\textcolor{stringliteral}{'W'},\textcolor{stringliteral}{'Re'},\textcolor{stringliteral}{'Os'},\textcolor{stringliteral}{'Ir'},\textcolor{stringliteral}{'Pt'},\textcolor{stringliteral}{'Au'},\textcolor{stringliteral}{'Hg'},\textcolor{stringliteral}{'Tl'},\textcolor{stringliteral}{'Pb'},\textcolor{stringliteral}{'Bi'},\textcolor{stringliteral}{'Po'},\textcolor{stringliteral}{'At'},\textcolor{stringliteral}{'Rn'},
+8             \textcolor{stringliteral}{'Fr'},\textcolor{stringliteral}{'Ra'},\textcolor{stringliteral}{'Ac'},\textcolor{stringliteral}{'Th'},\textcolor{stringliteral}{'Pa'},\textcolor{stringliteral}{'U','}Np','Pu','Am','Cm','Bk','Cf','Es','Fm','Md','No','Lr','Rf','Db','
+      Sg','Bh','Hs','Mt']
+\end{DoxyCode}
+
+
+Definition at line 42 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_ab523d2adfa843021628d784c390fb46f}\label{namespacesrc_1_1chemistry_ab523d2adfa843021628d784c390fb46f}} 
+\index{src\+::chemistry@{src\+::chemistry}!L@{L}}
+\index{L@{L}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{L}{L}}
+{\footnotesize\ttfamily float src.\+chemistry.\+L = float(line.\+split()\mbox{[}2\mbox{]}) $\ast$ 0.\+01}
+
+
+
+Definition at line 152 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_a03302cdcc2126738b5aa1dfdc0c8777d}\label{namespacesrc_1_1chemistry_a03302cdcc2126738b5aa1dfdc0c8777d}} 
+\index{src\+::chemistry@{src\+::chemistry}!line@{line}}
+\index{line@{line}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{line}{line}}
+{\footnotesize\ttfamily src.\+chemistry.\+line = line.\+expandtabs()}
+
+
+
+Definition at line 150 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_a6e4691b3d86c5d03b20ddc39dff30bdb}\label{namespacesrc_1_1chemistry_a6e4691b3d86c5d03b20ddc39dff30bdb}} 
+\index{src\+::chemistry@{src\+::chemistry}!Periodic\+Table@{Periodic\+Table}}
+\index{Periodic\+Table@{Periodic\+Table}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{Periodic\+Table}{PeriodicTable}}
+{\footnotesize\ttfamily src.\+chemistry.\+Periodic\+Table}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  OrderedDict([(\textcolor{stringliteral}{'H'},1.0079),(\textcolor{stringliteral}{'He'},4.0026),
+2                              (\textcolor{stringliteral}{'Li'},6.941),(\textcolor{stringliteral}{'Be'},9.0122),(\textcolor{stringliteral}{'B'},10.811),(\textcolor{stringliteral}{'C'},12.0107),(\textcolor{stringliteral}{'N'},14.0067),(\textcolor{stringliteral}{'O'},15.99
+      94),(\textcolor{stringliteral}{'F'},18.9984),(\textcolor{stringliteral}{'Ne'},20.1797),
+3                              (\textcolor{stringliteral}{'Na'},22.9897),(\textcolor{stringliteral}{'Mg'},24.305),(\textcolor{stringliteral}{'Al'},26.9815),(\textcolor{stringliteral}{'Si'},28.0855),(\textcolor{stringliteral}{'P'},30.9738),(\textcolor{stringliteral}{'S'},
+      32.065),(\textcolor{stringliteral}{'Cl'},35.453),(\textcolor{stringliteral}{'Ar'},39.948),
+4                              (\textcolor{stringliteral}{'K'},39.0983),(\textcolor{stringliteral}{'Ca'},40.078),(\textcolor{stringliteral}{'Sc'},44.9559),(\textcolor{stringliteral}{'Ti'},47.867),(\textcolor{stringliteral}{'V'},50.9415),(\textcolor{stringliteral}{'Cr'},5
+      1.9961),(\textcolor{stringliteral}{'Mn'},54.938),(\textcolor{stringliteral}{'Fe'},55.845),(\textcolor{stringliteral}{'Co'},58.9332),
+5                              (\textcolor{stringliteral}{'Ni'},58.6934),(\textcolor{stringliteral}{'Cu'},63.546),(\textcolor{stringliteral}{'Zn'},65.39),(\textcolor{stringliteral}{'Ga'},69.723),(\textcolor{stringliteral}{'Ge'},72.64),(\textcolor{stringliteral}{'As'},74.
+      9216),(\textcolor{stringliteral}{'Se'},78.96),(\textcolor{stringliteral}{'Br'},79.904),(\textcolor{stringliteral}{'Kr'},83.8),
+6                              (\textcolor{stringliteral}{'Rb'},85.4678),(\textcolor{stringliteral}{'Sr'},87.62),(\textcolor{stringliteral}{'Y'},88.9059),(\textcolor{stringliteral}{'Zr'},91.224),(\textcolor{stringliteral}{'Nb'},92.9064),(\textcolor{stringliteral}{'Mo'},9
+      5.94),(\textcolor{stringliteral}{'Tc'},98),(\textcolor{stringliteral}{'Ru'},101.07),(\textcolor{stringliteral}{'Rh'},102.9055),
+7                              (\textcolor{stringliteral}{'Pd'},106.42),(\textcolor{stringliteral}{'Ag'},107.8682),(\textcolor{stringliteral}{'Cd'},112.411),(\textcolor{stringliteral}{'In'},114.818),(\textcolor{stringliteral}{'Sn'},118.71),(\textcolor{stringliteral}{'Sb
+      '},121.76),(\textcolor{stringliteral}{'Te'},127.6),(\textcolor{stringliteral}{'I'},126.9045),(\textcolor{stringliteral}{'Xe'},131.293),
+8                              (\textcolor{stringliteral}{'Cs'},132.9055),(\textcolor{stringliteral}{'Ba'},137.327),(\textcolor{stringliteral}{'La'},138.9055),(\textcolor{stringliteral}{'Ce'},140.116),(\textcolor{stringliteral}{'Pr'},140.9077),
+      (\textcolor{stringliteral}{'Nd'},144.24),(\textcolor{stringliteral}{'Pm'},145),(\textcolor{stringliteral}{'Sm'},150.36),
+9                              (\textcolor{stringliteral}{'Eu'},151.964),(\textcolor{stringliteral}{'Gd'},157.25),(\textcolor{stringliteral}{'Tb'},158.9253),(\textcolor{stringliteral}{'Dy'},162.5),(\textcolor{stringliteral}{'Ho'},164.9303),(\textcolor{stringliteral}{'Er
+      '},167.259),(\textcolor{stringliteral}{'Tm'},168.9342),(\textcolor{stringliteral}{'Yb'},173.04),
+10                              (\textcolor{stringliteral}{'Lu'},174.967),(\textcolor{stringliteral}{'Hf'},178.49),(\textcolor{stringliteral}{'Ta'},180.9479),(\textcolor{stringliteral}{'W'},183.84),(\textcolor{stringliteral}{'Re'},186.207),(\textcolor{stringliteral}{'Os'}
+      ,190.23),(\textcolor{stringliteral}{'Ir'},192.217),(\textcolor{stringliteral}{'Pt'},195.078),
+11                              (\textcolor{stringliteral}{'Au'},196.9665),(\textcolor{stringliteral}{'Hg'},200.59),(\textcolor{stringliteral}{'Tl'},204.3833),(\textcolor{stringliteral}{'Pb'},207.2),(\textcolor{stringliteral}{'Bi'},208.9804),(\textcolor{stringliteral}{'
+      Po'},209),(\textcolor{stringliteral}{'At'},210),(\textcolor{stringliteral}{'Rn'},222),
+12                              (\textcolor{stringliteral}{'Fr'},223),(\textcolor{stringliteral}{'Ra'},226),(\textcolor{stringliteral}{'Ac'},227),(\textcolor{stringliteral}{'Th'},232.0381),(\textcolor{stringliteral}{'Pa'},231.0359),(\textcolor{stringliteral}{'U'
+      ,238.0289),('}Np',237),('Pu',244),
+13                              (\textcolor{stringliteral}{'Am'},243),(\textcolor{stringliteral}{'Cm'},247),(\textcolor{stringliteral}{'Bk'},247),(\textcolor{stringliteral}{'Cf'},251),(\textcolor{stringliteral}{'Es'},252),(\textcolor{stringliteral}{'Fm'},257),(\textcolor{stringliteral}{'Md'},258),(\textcolor{stringliteral}{
+      'No'},259),
+14                              (\textcolor{stringliteral}{'Lr'},262),(\textcolor{stringliteral}{'Rf'},261),(\textcolor{stringliteral}{'Db'},262),(\textcolor{stringliteral}{'Sg'},266),(\textcolor{stringliteral}{'Bh'},264),(\textcolor{stringliteral}{'Hs'},277),(\textcolor{stringliteral}{'Mt'},268)])
+\end{DoxyCode}
+
+
+Definition at line 27 of file chemistry.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1chemistry_af96fd92a64526125e88e64389117ff77}\label{namespacesrc_1_1chemistry_af96fd92a64526125e88e64389117ff77}} 
+\index{src\+::chemistry@{src\+::chemistry}!Radii@{Radii}}
+\index{Radii@{Radii}!src\+::chemistry@{src\+::chemistry}}
+\paragraph{\texorpdfstring{Radii}{Radii}}
+{\footnotesize\ttfamily list src.\+chemistry.\+Radii}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  [0.31, 0.28, \textcolor{comment}{# H and He}
+2          1.28, 0.96, 0.84, 0.76, 0.71, 0.66, 0.57, 0.58, \textcolor{comment}{# First row elements}
+3          0.0, 1.41, 1.21, 1.11, 1.07, 1.05, 1.02, 1.06, \textcolor{comment}{# Second row elements}
+4          2.03, 1.76, 1.70, 1.60, 1.53, 1.39, 1.61, 1.52, 1.50, 
+5          1.24, 1.32, 1.22, 1.22, 1.20, 1.19, 1.20, 1.20, 1.16, \textcolor{comment}{# Third row elements, K through Kr}
+6          2.20, 1.95, 1.90, 1.75, 1.64, 1.54, 1.47, 1.46, 1.42, 
+7          1.39, 1.45, 1.44, 1.42, 1.39, 1.39, 1.38, 1.39, 1.40, \textcolor{comment}{# Fourth row elements, Rb through Xe}
+8          2.44, 2.15, 2.07, 2.04, 2.03, 2.01, 1.99, 1.98, 
+9          1.98, 1.96, 1.94, 1.92, 1.92, 1.89, 1.90, 1.87, \textcolor{comment}{# Fifth row elements, s and f blocks}
+10          1.87, 1.75, 1.70, 1.62, 1.51, 1.44, 1.41, 1.36, 
+11          1.36, 1.32, 1.45, 1.46, 1.48, 1.40, 1.50, 1.50, \textcolor{comment}{# Fifth row elements, d and p blocks}
+12          2.60, 2.21, 2.15, 2.06, 2.00, 1.96, 1.90, 1.87, 1.80, 1.69]
+\end{DoxyCode}
+
+
+Covalent radii from Cordero et al. 
+
+\textquotesingle{}Covalent radii revisited\textquotesingle{} Dalton Transactions 2008, 2832-\/2838. Sodium replaced 1.\+66 -\/$>$ 1.\+0. I think ionic radii are more appropriate. 
+
+Definition at line 12 of file chemistry.\+py.
+

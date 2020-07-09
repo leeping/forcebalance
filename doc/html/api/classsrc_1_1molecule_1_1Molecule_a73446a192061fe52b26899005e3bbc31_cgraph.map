@@ -1,0 +1,7 @@
+<map id="src.molecule.Molecule.align_by_moments" name="src.molecule.Molecule.align_by_moments">
+<area shape="rect" id="node2" href="$classsrc_1_1molecule_1_1Molecule.html#abd4e9ae70858f3f3d522ae6149236697" title="src.molecule.Molecule.center\l_of_mass" alt="" coords="258,5,470,47"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1molecule.html#a06bd27c59ccdbde31fbefbdec2daf1ad" title="Pre&#45;aligns molecules to &#39;moment of inertia&#39;. " alt="" coords="256,71,472,98"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1molecule.html#af5506b829909137d2b0b586eb1349c85" title="Computes a &quot;overlap density&quot; from two frames. " alt="" coords="520,71,727,98"/>
+<area shape="rect" id="node5" href="$namespacesrc_1_1molecule.html#a32c3d0fa2efc4d240274218803e1f42b" title="Computes an &#39;overlap&#39; between two molecules based on some fictitious density. " alt="" coords="775,46,993,73"/>
+<area shape="rect" id="node6" href="$namespacesrc_1_1molecule.html#a0b808b0181dfa0aed5879c61f683ec1a" title="Constructs an Euler matrix from three Euler angles. " alt="" coords="1041,71,1224,98"/>
+</map>

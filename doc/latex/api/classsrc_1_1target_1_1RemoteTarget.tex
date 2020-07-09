@@ -1,0 +1,792 @@
+\hypertarget{classsrc_1_1target_1_1RemoteTarget}{}\subsection{src.\+target.\+Remote\+Target Class Reference}
+\label{classsrc_1_1target_1_1RemoteTarget}\index{src.\+target.\+Remote\+Target@{src.\+target.\+Remote\+Target}}
+
+
+Inheritance diagram for src.\+target.\+Remote\+Target\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1RemoteTarget__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+target.\+Remote\+Target\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1RemoteTarget__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1target_1_1RemoteTarget_acc35e5f8e76fa6a54149ff0c930acd6c}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1target_1_1RemoteTarget_ac70aab68b1b0782e053d522dc908eb05}{submit\+\_\+jobs} (self, mvals, A\+Grad=False, A\+Hess=False)
+\item 
+def \hyperlink{classsrc_1_1target_1_1RemoteTarget_a33f52ff218e41fc3c3046af7d8107970}{read} (self, mvals, A\+Grad=False, A\+Hess=False)
+\item 
+def \hyperlink{classsrc_1_1target_1_1RemoteTarget_ad5a26180c653152b879d4cb82798aa23}{get} (self, mvals, A\+Grad=False, A\+Hess=False)
+\item 
+def \hyperlink{classsrc_1_1target_1_1RemoteTarget_abe88774b9f4627698672fb68e8caf057}{indicate} (self)
+\item 
+def \hyperlink{classsrc_1_1target_1_1Target_acd106ed266687c08937944d4c0d17d87}{get\+\_\+X} (self, mvals=None, customdir=None)
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution without any parametric derivatives. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_a606efa8b4e93982266468373c809e36a}{read\+\_\+0grads} (self)
+\begin{DoxyCompactList}\small\item\em Read a file from the target directory containing names of parameters that don\textquotesingle{}t contribute to the gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_af4d54bc36363a73ab3cec203a30d72be}{write\+\_\+0grads} (self, Ans)
+\begin{DoxyCompactList}\small\item\em Write a file to the target directory containing names of parameters that don\textquotesingle{}t contribute to the gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_abd888e5a08e9858fcf72dbad7133d538}{get\+\_\+G} (self, mvals=None, customdir=None)
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_adae73b394ec5a1c22fe57d90265de537}{get\+\_\+H} (self, mvals=None, customdir=None)
+\begin{DoxyCompactList}\small\item\em Computes the objective function contribution and its gradient / Hessian. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_a558b52b23367b475a553567cd3ab5a8f}{link\+\_\+from\+\_\+tempdir} (self, absdestdir)
+\item 
+def \hyperlink{classsrc_1_1target_1_1Target_ad8126429a9b72dff627da96934cd7f5c}{refresh\+\_\+temp\+\_\+directory} (self)
+\begin{DoxyCompactList}\small\item\em Back up the temporary directory if desired, delete it and then create a new one. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_ab38c76271f96279624e9981bc365a082}{check\+\_\+files} (self, there)
+\begin{DoxyCompactList}\small\item\em Check this directory for the presence of readable files when the \textquotesingle{}read\textquotesingle{} option is set. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_ad4a6e0bee35444a8b2c8bc124aac3c46}{absrd} (self, inum=None)
+\begin{DoxyCompactList}\small\item\em Supply the correct directory specified by user\textquotesingle{}s \char`\"{}read\char`\"{} option. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_ac295603ea071c6b6db55b7c2cf89890a}{maxrd} (self)
+\begin{DoxyCompactList}\small\item\em Supply the latest existing temp-\/directory containing valid data. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_a9517cd2799579d5fa5aa407fc79fff44}{maxid} (self)
+\begin{DoxyCompactList}\small\item\em Supply the latest existing temp-\/directory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_a75dc5c4428df625f265e481f61718ec1}{meta\+\_\+indicate} (self, customdir=None)
+\begin{DoxyCompactList}\small\item\em Wrap around the indicate function, so it can print to screen and also to a file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_a14ccb9a63ebc92a83ead58965f13fcc7}{meta\+\_\+get} (self, mvals, A\+Grad=False, A\+Hess=False, customdir=None)
+\begin{DoxyCompactList}\small\item\em Wrapper around the get function. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_af543ca7235b5112aa29018ffa7bc1e1c}{stage} (self, mvals, A\+Grad=False, A\+Hess=False, customdir=None, first\+Iteration=False)
+\begin{DoxyCompactList}\small\item\em Stages the directory for the target, and then launches Work Queue processes if any. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_aeb7582896efcfe1d0316a4ee80fc5634}{wq\+\_\+complete} (self)
+\begin{DoxyCompactList}\small\item\em This method determines whether the Work Queue tasks for the current target have completed. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_aa6d59de5918c58d75a9f23eb1c5bff39}{printcool\+\_\+table} (self, data=Ordered\+Dict(\mbox{[}$\,$\mbox{]}), headings=\mbox{[}$\,$\mbox{]}, banner=None, footnote=None, color=0)
+\begin{DoxyCompactList}\small\item\em Print target information in an organized table format. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1target_1_1Target_a8d05de21b2477b71aa74ea001f4d62b5}{serialize\+\_\+ff} (self, mvals, outside=None)
+\begin{DoxyCompactList}\small\item\em This code writes a force field pickle file to an folder in \char`\"{}job.\+tmp/dnm/forcebalance.\+p\char`\"{}, because it takes time to compress and most targets can simply reuse this file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1target_1_1RemoteTarget_a9b18ed91a6512dd19337fce9514a836d}{r\+\_\+options}
+\item 
+\hyperlink{classsrc_1_1target_1_1RemoteTarget_acbd51c8d6a2b9a6a993c0bf2340ffc63}{r\+\_\+tgt\+\_\+opts}
+\item 
+\hyperlink{classsrc_1_1target_1_1RemoteTarget_adfedcf928644b8e2df960bc06f8a3276}{remote\+\_\+indicate}
+\item 
+\hyperlink{classsrc_1_1target_1_1RemoteTarget_aafe08c71569bff42587c214d9ab973cc}{read\+\_\+indicate}
+\item 
+\hyperlink{classsrc_1_1target_1_1RemoteTarget_a1cd6b1fe76d7d69a6d26fd305fce8920}{write\+\_\+indicate}
+\item 
+\hyperlink{classsrc_1_1target_1_1RemoteTarget_a3b0391aefc69b38f4bc76c7168a60fe5}{write\+\_\+objective}
+\item 
+\hyperlink{classsrc_1_1target_1_1Target_af85bc6ed8a95bc598f2e72a7213b972e}{rd}
+\begin{DoxyCompactList}\small\item\em Root directory of the whole project. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1target_1_1Target_a5eb45ee670449762fb6a9885db9889aa}{pgrad}
+\begin{DoxyCompactList}\small\item\em Iteration where we turn on zero-\/gradient skipping. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1target_1_1Target_ae182b033fbe054ff2daa7659e69a7957}{tempbase}
+\begin{DoxyCompactList}\small\item\em Relative directory of target. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1target_1_1Target_a7cc95b1ec34fa75172c81469ff6e5d1d}{tempdir}
+\item 
+\hyperlink{classsrc_1_1target_1_1Target_a9f47e2d3fd02ea26469e880350bdb976}{rundir}
+\begin{DoxyCompactList}\small\item\em self.\+tempdir = os.\+path.\+join(\textquotesingle{}temp\textquotesingle{},self.\+name) The directory in which the simulation is running -\/ this can be updated. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1target_1_1Target_a64e2f22daa347019ca8beb482c4b59f6}{FF}
+\begin{DoxyCompactList}\small\item\em Need the forcefield (here for now) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1target_1_1Target_a399fd456592279c108753f3694950620}{xct}
+\begin{DoxyCompactList}\small\item\em mol2 files that are stored in the forcefield folder need to be included in the list of mol2 files for the target \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1target_1_1Target_a12d4d43cc0344c23e687941c6df7c1c7}{gct}
+\begin{DoxyCompactList}\small\item\em Counts how often the gradient was computed. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1target_1_1Target_a7964ee4d0c5d7c249b50aa97bcafc73e}{hct}
+\begin{DoxyCompactList}\small\item\em Counts how often the Hessian was computed. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1target_1_1Target_a0d3f766725247a90dc1b4ab8ec89e1c9}{read\+\_\+objective}
+\begin{DoxyCompactList}\small\item\em Whether to read objective.\+p from file when restarting an aborted run. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1target_1_1Target_a49df3701811acb53bcabb298a101ac2b}{evaluated}
+\begin{DoxyCompactList}\small\item\em Create a new temp directory. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1target_1_1Target_a60944e53d96d66201273a52027896abb}{goodstep}
+\begin{DoxyCompactList}\small\item\em This flag specifies whether the previous optimization step was good. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1target_1_1Target_a48209401694b7ab1cd207f9f214caa7a}{ffpd}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 778 of file target.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1target_1_1RemoteTarget_acc35e5f8e76fa6a54149ff0c930acd6c}\label{classsrc_1_1target_1_1RemoteTarget_acc35e5f8e76fa6a54149ff0c930acd6c}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+target.\+Remote\+Target.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 779 of file target.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_ad4a6e0bee35444a8b2c8bc124aac3c46}\label{classsrc_1_1target_1_1Target_ad4a6e0bee35444a8b2c8bc124aac3c46}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!absrd@{absrd}}
+\index{absrd@{absrd}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{absrd()}{absrd()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+absrd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{inum = {\ttfamily None} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Supply the correct directory specified by user\textquotesingle{}s \char`\"{}read\char`\"{} option. 
+
+
+
+Definition at line 434 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1Target_ad4a6e0bee35444a8b2c8bc124aac3c46_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_ab38c76271f96279624e9981bc365a082}\label{classsrc_1_1target_1_1Target_ab38c76271f96279624e9981bc365a082}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!check\+\_\+files@{check\+\_\+files}}
+\index{check\+\_\+files@{check\+\_\+files}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{check\+\_\+files()}{check\_files()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+check\+\_\+files (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{there }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Check this directory for the presence of readable files when the \textquotesingle{}read\textquotesingle{} option is set. 
+
+
+
+Definition at line 406 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1RemoteTarget_ad5a26180c653152b879d4cb82798aa23}\label{classsrc_1_1target_1_1RemoteTarget_ad5a26180c653152b879d4cb82798aa23}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!get@{get}}
+\index{get@{get}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+target.\+Remote\+Target.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 842 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1RemoteTarget_ad5a26180c653152b879d4cb82798aa23_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_abd888e5a08e9858fcf72dbad7133d538}\label{classsrc_1_1target_1_1Target_abd888e5a08e9858fcf72dbad7133d538}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!get\+\_\+G@{get\+\_\+G}}
+\index{get\+\_\+G@{get\+\_\+G}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{get\+\_\+\+G()}{get\_G()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+get\+\_\+G (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals = {\ttfamily None},  }\item[{}]{customdir = {\ttfamily None} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Computes the objective function contribution and its gradient. 
+
+First the low-\/level \textquotesingle{}get\textquotesingle{} method is called with the analytic gradient switch turned on. Then we loop through the fd1\+\_\+pids and compute the corresponding elements of the gradient by finite difference, if the \textquotesingle{}fdgrad\textquotesingle{} switch is turned on. Alternately we can compute the gradient elements and diagonal Hessian elements at the same time using central difference if \textquotesingle{}fdhessdiag\textquotesingle{} is turned on.
+
+In this function we also record which parameters cause a nonzero change in the objective function contribution. Parameters which do not change the objective function will not be differentiated in subsequent calculations. This is recorded in a text file in the targets directory. 
+
+Definition at line 301 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1Target_abd888e5a08e9858fcf72dbad7133d538_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_adae73b394ec5a1c22fe57d90265de537}\label{classsrc_1_1target_1_1Target_adae73b394ec5a1c22fe57d90265de537}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!get\+\_\+H@{get\+\_\+H}}
+\index{get\+\_\+H@{get\+\_\+H}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{get\+\_\+\+H()}{get\_H()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+get\+\_\+H (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals = {\ttfamily None},  }\item[{}]{customdir = {\ttfamily None} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Computes the objective function contribution and its gradient / Hessian. 
+
+First the low-\/level \textquotesingle{}get\textquotesingle{} method is called with the analytic gradient and Hessian both turned on. Then we loop through the fd1\+\_\+pids and compute the corresponding elements of the gradient by finite difference, if the \textquotesingle{}fdgrad\textquotesingle{} switch is turned on.
+
+This is followed by looping through the fd2\+\_\+pids and computing the corresponding Hessian elements by finite difference. Forward finite difference is used throughout for the sake of speed. 
+
+Definition at line 326 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1Target_adae73b394ec5a1c22fe57d90265de537_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_acd106ed266687c08937944d4c0d17d87}\label{classsrc_1_1target_1_1Target_acd106ed266687c08937944d4c0d17d87}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!get\+\_\+X@{get\+\_\+X}}
+\index{get\+\_\+X@{get\+\_\+X}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{get\+\_\+\+X()}{get\_X()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+get\+\_\+X (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals = {\ttfamily None},  }\item[{}]{customdir = {\ttfamily None} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Computes the objective function contribution without any parametric derivatives. 
+
+
+
+Definition at line 203 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1Target_acd106ed266687c08937944d4c0d17d87_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1RemoteTarget_abe88774b9f4627698672fb68e8caf057}\label{classsrc_1_1target_1_1RemoteTarget_abe88774b9f4627698672fb68e8caf057}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+target.\+Remote\+Target.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 849 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a558b52b23367b475a553567cd3ab5a8f}\label{classsrc_1_1target_1_1Target_a558b52b23367b475a553567cd3ab5a8f}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!link\+\_\+from\+\_\+tempdir@{link\+\_\+from\+\_\+tempdir}}
+\index{link\+\_\+from\+\_\+tempdir@{link\+\_\+from\+\_\+tempdir}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{link\+\_\+from\+\_\+tempdir()}{link\_from\_tempdir()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+link\+\_\+from\+\_\+tempdir (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{absdestdir }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 346 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=327pt]{classsrc_1_1target_1_1Target_a558b52b23367b475a553567cd3ab5a8f_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a9517cd2799579d5fa5aa407fc79fff44}\label{classsrc_1_1target_1_1Target_a9517cd2799579d5fa5aa407fc79fff44}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!maxid@{maxid}}
+\index{maxid@{maxid}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{maxid()}{maxid()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+maxid (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Supply the latest existing temp-\/directory. 
+
+
+
+Definition at line 509 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_ac295603ea071c6b6db55b7c2cf89890a}\label{classsrc_1_1target_1_1Target_ac295603ea071c6b6db55b7c2cf89890a}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!maxrd@{maxrd}}
+\index{maxrd@{maxrd}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{maxrd()}{maxrd()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+maxrd (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Supply the latest existing temp-\/directory containing valid data. 
+
+
+
+Definition at line 494 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1Target_ac295603ea071c6b6db55b7c2cf89890a_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a14ccb9a63ebc92a83ead58965f13fcc7}\label{classsrc_1_1target_1_1Target_a14ccb9a63ebc92a83ead58965f13fcc7}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!meta\+\_\+get@{meta\+\_\+get}}
+\index{meta\+\_\+get@{meta\+\_\+get}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{meta\+\_\+get()}{meta\_get()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+meta\+\_\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False},  }\item[{}]{customdir = {\ttfamily None} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Wrapper around the get function. 
+
+Create the directory for the target, and then calls \textquotesingle{}get\textquotesingle{}. If we are reading existing data, go into the appropriate read directory and call \hyperlink{classsrc_1_1target_1_1RemoteTarget_a33f52ff218e41fc3c3046af7d8107970}{read()} instead. The \textquotesingle{}get\textquotesingle{} method should not worry about the directory that it\textquotesingle{}s running in. 
+
+Definition at line 570 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1Target_a14ccb9a63ebc92a83ead58965f13fcc7_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a75dc5c4428df625f265e481f61718ec1}\label{classsrc_1_1target_1_1Target_a75dc5c4428df625f265e481f61718ec1}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!meta\+\_\+indicate@{meta\+\_\+indicate}}
+\index{meta\+\_\+indicate@{meta\+\_\+indicate}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{meta\+\_\+indicate()}{meta\_indicate()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+meta\+\_\+indicate (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{customdir = {\ttfamily None} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Wrap around the indicate function, so it can print to screen and also to a file. 
+
+If reading from checkpoint file, don\textquotesingle{}t call the \hyperlink{classsrc_1_1target_1_1RemoteTarget_abe88774b9f4627698672fb68e8caf057}{indicate()} function, instead just print the file contents to the screen. 
+
+Definition at line 526 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1Target_a75dc5c4428df625f265e481f61718ec1_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_aa6d59de5918c58d75a9f23eb1c5bff39}\label{classsrc_1_1target_1_1Target_aa6d59de5918c58d75a9f23eb1c5bff39}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!printcool\+\_\+table@{printcool\+\_\+table}}
+\index{printcool\+\_\+table@{printcool\+\_\+table}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{printcool\+\_\+table()}{printcool\_table()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+printcool\+\_\+table (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{data = {\ttfamily OrderedDict(\mbox{[}\mbox{]})},  }\item[{}]{headings = {\ttfamily \mbox{[}\mbox{]}},  }\item[{}]{banner = {\ttfamily None},  }\item[{}]{footnote = {\ttfamily None},  }\item[{}]{color = {\ttfamily 0} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Print target information in an organized table format. 
+
+Implemented 6/30 because multiple targets are already printing out tabulated information in very similar ways. This method is a simple wrapper around printcool\+\_\+dictionary.
+
+The input should be something like\+:
+
+
+\begin{DoxyParams}{Parameters}
+{\em data} & Column contents in the form of an Ordered\+Dict, with string keys and list vals. The key is printed in the leftmost column and the vals are printed in the other columns. If non-\/strings are passed, they will be converted to strings (not recommended).\\
+\hline
+{\em headings} & Column headings in the form of a list. It must be equal to the number to the list length for each of the \char`\"{}vals\char`\"{} in Ordered\+Dict, plus one. Use \char`\"{}\textbackslash{}n\char`\"{} characters to specify long column names that may take up more than one line.\\
+\hline
+{\em banner} & Optional heading line, which will be printed at the top in the title. \\
+\hline
+{\em footnote} & Optional footnote line, which will be printed at the bottom. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 701 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1Target_aa6d59de5918c58d75a9f23eb1c5bff39_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1RemoteTarget_a33f52ff218e41fc3c3046af7d8107970}\label{classsrc_1_1target_1_1RemoteTarget_a33f52ff218e41fc3c3046af7d8107970}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!read@{read}}
+\index{read@{read}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily def src.\+target.\+Remote\+Target.\+read (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 839 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1RemoteTarget_a33f52ff218e41fc3c3046af7d8107970_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a606efa8b4e93982266468373c809e36a}\label{classsrc_1_1target_1_1Target_a606efa8b4e93982266468373c809e36a}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!read\+\_\+0grads@{read\+\_\+0grads}}
+\index{read\+\_\+0grads@{read\+\_\+0grads}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{read\+\_\+0grads()}{read\_0grads()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+read\+\_\+0grads (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Read a file from the target directory containing names of parameters that don\textquotesingle{}t contribute to the gradient. 
+
+{\itshape Note} that we are checking the derivatives of the objective function, and not the derivatives of the quantities that go into building the objective function. However, it is the quantities that we actually differentiate. Since there is a simple chain rule relationship, the parameters that do/don\textquotesingle{}t contribute to the objective function/quantities are the same.
+
+However, property gradients do contribute to objective function Hessian elements, so we cannot use the same mechanism for excluding the calculation of property Hessians. This is mostly fine since we rarely if ever calculate an explicit property Hessian. 
+
+Definition at line 226 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_ad8126429a9b72dff627da96934cd7f5c}\label{classsrc_1_1target_1_1Target_ad8126429a9b72dff627da96934cd7f5c}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!refresh\+\_\+temp\+\_\+directory@{refresh\+\_\+temp\+\_\+directory}}
+\index{refresh\+\_\+temp\+\_\+directory@{refresh\+\_\+temp\+\_\+directory}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{refresh\+\_\+temp\+\_\+directory()}{refresh\_temp\_directory()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+refresh\+\_\+temp\+\_\+directory (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Back up the temporary directory if desired, delete it and then create a new one. 
+
+
+
+Definition at line 352 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1Target_ad8126429a9b72dff627da96934cd7f5c_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a8d05de21b2477b71aa74ea001f4d62b5}\label{classsrc_1_1target_1_1Target_a8d05de21b2477b71aa74ea001f4d62b5}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!serialize\+\_\+ff@{serialize\+\_\+ff}}
+\index{serialize\+\_\+ff@{serialize\+\_\+ff}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{serialize\+\_\+ff()}{serialize\_ff()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+serialize\+\_\+ff (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{outside = {\ttfamily None} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+This code writes a force field pickle file to an folder in \char`\"{}job.\+tmp/dnm/forcebalance.\+p\char`\"{}, because it takes time to compress and most targets can simply reuse this file. 
+
+Inputs\+: mvals = Mathematical parameter values outside = Write this file outside the targets directory 
+
+Definition at line 755 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_af543ca7235b5112aa29018ffa7bc1e1c}\label{classsrc_1_1target_1_1Target_af543ca7235b5112aa29018ffa7bc1e1c}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!stage@{stage}}
+\index{stage@{stage}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{stage()}{stage()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+stage (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False},  }\item[{}]{customdir = {\ttfamily None},  }\item[{}]{first\+Iteration = {\ttfamily False} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Stages the directory for the target, and then launches Work Queue processes if any. 
+
+The \textquotesingle{}get\textquotesingle{} method should not worry about the directory that it\textquotesingle{}s running in. 
+
+Definition at line 625 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1Target_af543ca7235b5112aa29018ffa7bc1e1c_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1RemoteTarget_ac70aab68b1b0782e053d522dc908eb05}\label{classsrc_1_1target_1_1RemoteTarget_ac70aab68b1b0782e053d522dc908eb05}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!submit\+\_\+jobs@{submit\+\_\+jobs}}
+\index{submit\+\_\+jobs@{submit\+\_\+jobs}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{submit\+\_\+jobs()}{submit\_jobs()}}
+{\footnotesize\ttfamily def src.\+target.\+Remote\+Target.\+submit\+\_\+jobs (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 806 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1RemoteTarget_ac70aab68b1b0782e053d522dc908eb05_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_aeb7582896efcfe1d0316a4ee80fc5634}\label{classsrc_1_1target_1_1Target_aeb7582896efcfe1d0316a4ee80fc5634}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!wq\+\_\+complete@{wq\+\_\+complete}}
+\index{wq\+\_\+complete@{wq\+\_\+complete}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{wq\+\_\+complete()}{wq\_complete()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+wq\+\_\+complete (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+This method determines whether the Work Queue tasks for the current target have completed. 
+
+
+
+Definition at line 665 of file target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1target_1_1Target_aeb7582896efcfe1d0316a4ee80fc5634_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_af4d54bc36363a73ab3cec203a30d72be}\label{classsrc_1_1target_1_1Target_af4d54bc36363a73ab3cec203a30d72be}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!write\+\_\+0grads@{write\+\_\+0grads}}
+\index{write\+\_\+0grads@{write\+\_\+0grads}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{write\+\_\+0grads()}{write\_0grads()}}
+{\footnotesize\ttfamily def src.\+target.\+Target.\+write\+\_\+0grads (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{Ans }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Write a file to the target directory containing names of parameters that don\textquotesingle{}t contribute to the gradient. 
+
+
+
+Definition at line 254 of file target.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a49df3701811acb53bcabb298a101ac2b}\label{classsrc_1_1target_1_1Target_a49df3701811acb53bcabb298a101ac2b}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!evaluated@{evaluated}}
+\index{evaluated@{evaluated}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{evaluated}{evaluated}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+evaluated\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Create a new temp directory. 
+
+This flag specifies whether the target has been evaluated yet. 
+
+Definition at line 197 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a64e2f22daa347019ca8beb482c4b59f6}\label{classsrc_1_1target_1_1Target_a64e2f22daa347019ca8beb482c4b59f6}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!FF@{FF}}
+\index{FF@{FF}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{FF}{FF}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+FF\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Need the forcefield (here for now) 
+
+
+
+Definition at line 168 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a48209401694b7ab1cd207f9f214caa7a}\label{classsrc_1_1target_1_1Target_a48209401694b7ab1cd207f9f214caa7a}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!ffpd@{ffpd}}
+\index{ffpd@{ffpd}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{ffpd}{ffpd}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+ffpd\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 758 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a12d4d43cc0344c23e687941c6df7c1c7}\label{classsrc_1_1target_1_1Target_a12d4d43cc0344c23e687941c6df7c1c7}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!gct@{gct}}
+\index{gct@{gct}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{gct}{gct}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+gct\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Counts how often the gradient was computed. 
+
+
+
+Definition at line 179 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a60944e53d96d66201273a52027896abb}\label{classsrc_1_1target_1_1Target_a60944e53d96d66201273a52027896abb}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!goodstep@{goodstep}}
+\index{goodstep@{goodstep}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{goodstep}{goodstep}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+goodstep\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+This flag specifies whether the previous optimization step was good. 
+
+
+
+Definition at line 199 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a7964ee4d0c5d7c249b50aa97bcafc73e}\label{classsrc_1_1target_1_1Target_a7964ee4d0c5d7c249b50aa97bcafc73e}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!hct@{hct}}
+\index{hct@{hct}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{hct}{hct}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+hct\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Counts how often the Hessian was computed. 
+
+
+
+Definition at line 181 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a5eb45ee670449762fb6a9885db9889aa}\label{classsrc_1_1target_1_1Target_a5eb45ee670449762fb6a9885db9889aa}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!pgrad@{pgrad}}
+\index{pgrad@{pgrad}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{pgrad}{pgrad}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+pgrad\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Iteration where we turn on zero-\/gradient skipping. 
+
+Gradient norm below which we skip. Dictionary of whether to call the derivatives. 
+
+Definition at line 134 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1RemoteTarget_a9b18ed91a6512dd19337fce9514a836d}\label{classsrc_1_1target_1_1RemoteTarget_a9b18ed91a6512dd19337fce9514a836d}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!r\+\_\+options@{r\+\_\+options}}
+\index{r\+\_\+options@{r\+\_\+options}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{r\+\_\+options}{r\_options}}
+{\footnotesize\ttfamily src.\+target.\+Remote\+Target.\+r\+\_\+options}
+
+
+
+Definition at line 782 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1RemoteTarget_acbd51c8d6a2b9a6a993c0bf2340ffc63}\label{classsrc_1_1target_1_1RemoteTarget_acbd51c8d6a2b9a6a993c0bf2340ffc63}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!r\+\_\+tgt\+\_\+opts@{r\+\_\+tgt\+\_\+opts}}
+\index{r\+\_\+tgt\+\_\+opts@{r\+\_\+tgt\+\_\+opts}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{r\+\_\+tgt\+\_\+opts}{r\_tgt\_opts}}
+{\footnotesize\ttfamily src.\+target.\+Remote\+Target.\+r\+\_\+tgt\+\_\+opts}
+
+
+
+Definition at line 787 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_af85bc6ed8a95bc598f2e72a7213b972e}\label{classsrc_1_1target_1_1Target_af85bc6ed8a95bc598f2e72a7213b972e}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!rd@{rd}}
+\index{rd@{rd}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{rd}{rd}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+rd\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Root directory of the whole project. 
+
+Name of the target Type of target Relative weight of the target Switch for finite difference gradients Switch for finite difference Hessians Switch for FD gradients + Hessian diagonals How many seconds to sleep (if any) Parameter types that trigger FD gradient elements Parameter types that trigger FD Hessian elements Finite difference step size Whether to make backup files Directory to read data from. 
+
+Definition at line 128 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1RemoteTarget_aafe08c71569bff42587c214d9ab973cc}\label{classsrc_1_1target_1_1RemoteTarget_aafe08c71569bff42587c214d9ab973cc}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!read\+\_\+indicate@{read\+\_\+indicate}}
+\index{read\+\_\+indicate@{read\+\_\+indicate}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{read\+\_\+indicate}{read\_indicate}}
+{\footnotesize\ttfamily src.\+target.\+Remote\+Target.\+read\+\_\+indicate}
+
+
+
+Definition at line 802 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a0d3f766725247a90dc1b4ab8ec89e1c9}\label{classsrc_1_1target_1_1Target_a0d3f766725247a90dc1b4ab8ec89e1c9}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!read\+\_\+objective@{read\+\_\+objective}}
+\index{read\+\_\+objective@{read\+\_\+objective}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{read\+\_\+objective}{read\_objective}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+read\+\_\+objective\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Whether to read objective.\+p from file when restarting an aborted run. 
+
+
+
+Definition at line 187 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1RemoteTarget_adfedcf928644b8e2df960bc06f8a3276}\label{classsrc_1_1target_1_1RemoteTarget_adfedcf928644b8e2df960bc06f8a3276}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!remote\+\_\+indicate@{remote\+\_\+indicate}}
+\index{remote\+\_\+indicate@{remote\+\_\+indicate}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{remote\+\_\+indicate}{remote\_indicate}}
+{\footnotesize\ttfamily src.\+target.\+Remote\+Target.\+remote\+\_\+indicate}
+
+
+
+Definition at line 794 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a9f47e2d3fd02ea26469e880350bdb976}\label{classsrc_1_1target_1_1Target_a9f47e2d3fd02ea26469e880350bdb976}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!rundir@{rundir}}
+\index{rundir@{rundir}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{rundir}{rundir}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+rundir\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+self.\+tempdir = os.\+path.\+join(\textquotesingle{}temp\textquotesingle{},self.\+name) The directory in which the simulation is running -\/ this can be updated. 
+
+Directory of the current iteration; if not None, then the simulation runs under temp/target\+\_\+name/iteration\+\_\+number The \textquotesingle{}customdir\textquotesingle{} is customizable and can go below anything.
+
+Not expecting more than ten thousand iterations Go into the directory where \hyperlink{classsrc_1_1target_1_1RemoteTarget_ad5a26180c653152b879d4cb82798aa23}{get()} will be executed. Write mathematical parameters to file; will be used to checkpoint calculation. Read in file that specifies which derivatives may be skipped. 
+
+Definition at line 166 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_ae182b033fbe054ff2daa7659e69a7957}\label{classsrc_1_1target_1_1Target_ae182b033fbe054ff2daa7659e69a7957}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!tempbase@{tempbase}}
+\index{tempbase@{tempbase}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{tempbase}{tempbase}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+tempbase\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Relative directory of target. 
+
+Temporary (working) directory; it is temp/(target\+\_\+name) Used for storing temporary variables that don\textquotesingle{}t change through the course of the optimization 
+
+Definition at line 160 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a7cc95b1ec34fa75172c81469ff6e5d1d}\label{classsrc_1_1target_1_1Target_a7cc95b1ec34fa75172c81469ff6e5d1d}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!tempdir@{tempdir}}
+\index{tempdir@{tempdir}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{tempdir}{tempdir}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+tempdir\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 163 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1RemoteTarget_a1cd6b1fe76d7d69a6d26fd305fce8920}\label{classsrc_1_1target_1_1RemoteTarget_a1cd6b1fe76d7d69a6d26fd305fce8920}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!write\+\_\+indicate@{write\+\_\+indicate}}
+\index{write\+\_\+indicate@{write\+\_\+indicate}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{write\+\_\+indicate}{write\_indicate}}
+{\footnotesize\ttfamily src.\+target.\+Remote\+Target.\+write\+\_\+indicate}
+
+
+
+Definition at line 803 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1RemoteTarget_a3b0391aefc69b38f4bc76c7168a60fe5}\label{classsrc_1_1target_1_1RemoteTarget_a3b0391aefc69b38f4bc76c7168a60fe5}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!write\+\_\+objective@{write\+\_\+objective}}
+\index{write\+\_\+objective@{write\+\_\+objective}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{write\+\_\+objective}{write\_objective}}
+{\footnotesize\ttfamily src.\+target.\+Remote\+Target.\+write\+\_\+objective}
+
+
+
+Definition at line 804 of file target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1target_1_1Target_a399fd456592279c108753f3694950620}\label{classsrc_1_1target_1_1Target_a399fd456592279c108753f3694950620}} 
+\index{src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}!xct@{xct}}
+\index{xct@{xct}!src\+::target\+::\+Remote\+Target@{src\+::target\+::\+Remote\+Target}}
+\paragraph{\texorpdfstring{xct}{xct}}
+{\footnotesize\ttfamily src.\+target.\+Target.\+xct\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+mol2 files that are stored in the forcefield folder need to be included in the list of mol2 files for the target 
+
+Counts how often the objective function was computed 
+
+Definition at line 177 of file target.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{target_8py}{target.\+py}\end{DoxyCompactItemize}

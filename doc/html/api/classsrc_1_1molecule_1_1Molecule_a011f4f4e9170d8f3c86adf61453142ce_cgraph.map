@@ -1,0 +1,6 @@
+<map id="src.molecule.Molecule.rotate_check_clash" name="src.molecule.Molecule.rotate_check_clash">
+<area shape="rect" id="node2" href="$classsrc_1_1molecule_1_1Molecule.html#ae8aa53ace87ec66daf8264b2add069c3" title="Return a new Molecule object containing the selected frame plus a number of frames where the selected..." alt="" coords="264,5,513,32"/>
+<area shape="rect" id="node5" href="$classsrc_1_1molecule_1_1Molecule.html#a1969b621b7e6e65722ec245b74518cfe" title="src.molecule.Molecule.append" alt="" coords="279,56,498,83"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1molecule.html#a18b08895867e37ef3cb86a3d4456c775" title="Given a rotation axis and angle, return the corresponding 3x3 rotation matrix, which will rotate a (N..." alt="" coords="561,5,740,32"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1molecule.html#a593b80c51a439f35789c16ad5fbcbfec" title="Given a quaternion p, form a rotation matrix from it. " alt="" coords="788,5,953,32"/>
+</map>

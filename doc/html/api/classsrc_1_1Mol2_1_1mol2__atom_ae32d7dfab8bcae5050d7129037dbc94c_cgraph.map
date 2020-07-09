@@ -1,0 +1,10 @@
+<map id="src.Mol2.mol2_atom.parse" name="src.Mol2.mol2_atom.parse">
+<area shape="rect" id="node2" href="$classsrc_1_1Mol2_1_1mol2__atom.html#a25cff4aebd3f1f50ae4946602a47467e" title="atom identifier (integer, starting from 1) " alt="" coords="265,5,443,47"/>
+<area shape="rect" id="node3" href="$classsrc_1_1Mol2_1_1mol2__atom.html#a54d21f9992f0b3344129d7dc5b767fac" title="The name of the atom (string) " alt="" coords="265,71,443,112"/>
+<area shape="rect" id="node4" href="$classsrc_1_1Mol2_1_1mol2__atom.html#ae6f5843df04daaed5ec208b4ef6bc8a5" title="the coordinates of the atom " alt="" coords="248,137,460,163"/>
+<area shape="rect" id="node5" href="$classsrc_1_1Mol2_1_1mol2__atom.html#a57b9746cd3505288885f5595a16f24d3" title="The mol2 type of the atom. " alt="" coords="265,188,443,229"/>
+<area shape="rect" id="node6" href="$classsrc_1_1Mol2_1_1mol2__atom.html#ad594fb8ce376d0d52d9aca4ce221b92f" title="substructure identifier " alt="" coords="265,253,443,295"/>
+<area shape="rect" id="node7" href="$classsrc_1_1Mol2_1_1mol2__atom.html#a09ce74333db903bbc0bed9f70fab5eb2" title="substructure name " alt="" coords="265,319,443,360"/>
+<area shape="rect" id="node8" href="$classsrc_1_1Mol2_1_1mol2__atom.html#a846b915ceaa2da59962cf5a3ff35db36" title="atomic charge " alt="" coords="265,384,443,425"/>
+<area shape="rect" id="node9" href="$classsrc_1_1Mol2_1_1mol2__atom.html#aff9e7682fa89d21231f89653f5032c17" title="Never to use (in theory) " alt="" coords="265,449,443,491"/>
+</map>

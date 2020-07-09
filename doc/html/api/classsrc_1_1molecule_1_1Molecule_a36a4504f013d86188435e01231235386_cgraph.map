@@ -1,0 +1,8 @@
+<map id="src.molecule.Molecule.read_xyz" name="src.molecule.Molecule.read_xyz">
+<area shape="rect" id="node2" href="$classsrc_1_1molecule_1_1Molecule.html#a4b84ec657b8c89c34674bb205f7eb1b2" title="Parse a .xyz file which contains several xyz coordinates, and return their elements. " alt="" coords="284,31,523,57"/>
+<area shape="rect" id="node5" href="$classsrc_1_1molecule_1_1Molecule.html#a7e4057a5d9f4bb4a62cef21680f91327" title="Read a TINKER .arc file. " alt="" coords="290,81,517,108"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1molecule.html#ac2056d27322c6ee6dff0bef3755f2ed3" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="589,5,739,32"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1molecule.html#a651f6c6d23932f5a2151784c992e94a8" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="595,56,733,83"/>
+<area shape="rect" id="node6" href="$namespacesrc_1_1molecule.html#a037d06bd9038517f2784bce4e0ad6d86" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="571,107,757,149"/>
+<area shape="rect" id="node7" href="$namespacesrc_1_1molecule.html#a4638e3bec89d2fa20ba340988456a1ac" title="Given an atom name, attempt to get the element in most cases. " alt="" coords="574,173,754,214"/>
+</map>

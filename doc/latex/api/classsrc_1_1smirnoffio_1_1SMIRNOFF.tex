@@ -1,0 +1,494 @@
+\hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF}{}\subsection{src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+FF Class Reference}
+\label{classsrc_1_1smirnoffio_1_1SMIRNOFF}\index{src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+FF@{src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+FF}}
+
+
+Derived from Engine object for carrying out Open\+MM calculations that use the \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF}{S\+M\+I\+R\+N\+O\+FF} force field.  
+
+
+
+
+Inheritance diagram for src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+FF\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classsrc_1_1smirnoffio_1_1SMIRNOFF__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+FF\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classsrc_1_1smirnoffio_1_1SMIRNOFF__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_aafab5a9cbe68264712637919eaa4c191}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a11542ad6ce7fca3d8e201d3977bf8379}{name}=\char`\"{}openmm\char`\"{}, kwargs)
+\item 
+def \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a3429bb5ae44273ea911ce3889df8990e}{readsrc} (self, kwargs)
+\begin{DoxyCompactList}\small\item\em \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF}{S\+M\+I\+R\+N\+O\+FF} simulations always require the following passed in via kwargs\+: \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_aec97b6c7793cb75a0c653e5e2b393799}{prepare} (self, \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a10129110be75721cbb8fb7b612dc8468}{pbc}=False, \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac24dace8bbb369246c19f85dfc4b5b92}{mmopts}=\{\}, kwargs)
+\begin{DoxyCompactList}\small\item\em Prepare the calculation. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a73f2a7957b55c4ee6c63a7c1c185c528}{update\+\_\+simulation} (self, kwargs)
+\begin{DoxyCompactList}\small\item\em Create the simulation object, or update the force field parameters in the existing simulation object. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_aae8b084d595c6779e535519abf4718c2}{optimize} (self, shot=0, align=True, crit=1e-\/4)
+\item 
+def \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a64a07cbc61134660c4c6d97337b1e785}{interaction\+\_\+energy} (self, fraga, fragb)
+\begin{DoxyCompactList}\small\item\em Calculate the interaction energy for two fragments. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a328bfae882bfe603e397ebe74a2455e9}{get\+\_\+smirks\+\_\+counter} (self)
+\begin{DoxyCompactList}\small\item\em Get a counter for the time of appreance of each S\+M\+I\+R\+KS. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a512326b17c315ad466f59b0c85f7b686}{valkwd}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a3eef2c258d9d92b6440192fbb5c74975}{mol}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a4997efa6f2926b3d4c267f3cc0ca295a}{mol2}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a0938e9434777f90456058d4371a04460}{abspdb}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_aa094e87c94b86e457af67837acceff85}{ref\+\_\+mol}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac503aa0501017274fcc6a4b9acf9f065}{pdb}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_af990e39412c8a1cee1badc6be35e28cb}{offxml}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a09780bd53ef235921d497194a4a86e51}{forcefield}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a861db9f0c2b1c000b7c74363eef1a643}{off\+\_\+topology}
+\begin{DoxyCompactList}\small\item\em Load mol2 files for smirnoff topology. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a06280a367037b587147b2883404c6f00}{mod}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac24dace8bbb369246c19f85dfc4b5b92}{mmopts}
+\begin{DoxyCompactList}\small\item\em Open\+MM options for setting up the System. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_ab6dbfd45c6f21672599ccd962460e133}{restrain\+\_\+k}
+\begin{DoxyCompactList}\small\item\em Specify frozen atoms and restraint force constant. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a20b0d7610a183e1c47128b578f125261}{freeze\+\_\+atoms}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a10129110be75721cbb8fb7b612dc8468}{pbc}
+\begin{DoxyCompactList}\small\item\em Set system options from \hyperlink{namespaceForceBalance}{Force\+Balance} force field options. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a817c140385e54c6610e28166c7baccdd}{xyz\+\_\+omms}
+\begin{DoxyCompactList}\small\item\em print warning for \textquotesingle{}nonbonded\+\_\+cutoff\textquotesingle{} keywords \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac75ac9d6176cbb7e474ef0a6e01e5e4d}{Atom\+Lists}
+\begin{DoxyCompactList}\small\item\em Build a topology and atom lists. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_ae1c87f695e734850c13d227f0410174c}{Atom\+Mask}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac7da05e21b9c53ee04a79bcda5f8b9ed}{real\+Atom\+Idxs}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_aa474d005cacb738837ed098a6024e582}{simkwargs}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_ab212ed1ecf62ddce046e82bc2f7cef32}{system}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a44b71ccf421005d312de6f13914fa248}{nbcharges}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a11542ad6ce7fca3d8e201d3977bf8379}{name}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_a02a7b33ed3283d2b953f5aad2b896e83}{A}
+\item 
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF_ab25be3fd5727b04f5f98eab653e9823a}{B}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Derived from Engine object for carrying out Open\+MM calculations that use the \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF}{S\+M\+I\+R\+N\+O\+FF} force field. 
+
+
+
+Definition at line 192 of file smirnoffio.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_aafab5a9cbe68264712637919eaa4c191}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_aafab5a9cbe68264712637919eaa4c191}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{name = {\ttfamily \char`\"{}openmm\char`\"{}},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 195 of file smirnoffio.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a328bfae882bfe603e397ebe74a2455e9}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a328bfae882bfe603e397ebe74a2455e9}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!get\+\_\+smirks\+\_\+counter@{get\+\_\+smirks\+\_\+counter}}
+\index{get\+\_\+smirks\+\_\+counter@{get\+\_\+smirks\+\_\+counter}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{get\+\_\+smirks\+\_\+counter()}{get\_smirks\_counter()}}
+{\footnotesize\ttfamily def src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+get\+\_\+smirks\+\_\+counter (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Get a counter for the time of appreance of each S\+M\+I\+R\+KS. 
+
+
+
+Definition at line 436 of file smirnoffio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1smirnoffio_1_1SMIRNOFF_a328bfae882bfe603e397ebe74a2455e9_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a64a07cbc61134660c4c6d97337b1e785}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a64a07cbc61134660c4c6d97337b1e785}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!interaction\+\_\+energy@{interaction\+\_\+energy}}
+\index{interaction\+\_\+energy@{interaction\+\_\+energy}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{interaction\+\_\+energy()}{interaction\_energy()}}
+{\footnotesize\ttfamily def src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+interaction\+\_\+energy (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fraga,  }\item[{}]{fragb }\end{DoxyParamCaption})}
+
+
+
+Calculate the interaction energy for two fragments. 
+
+Because this creates two new objects and requires passing in the mol2 argument, the codes are copied and modified from the Open\+MM class. 
+
+Definition at line 404 of file smirnoffio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1smirnoffio_1_1SMIRNOFF_a64a07cbc61134660c4c6d97337b1e785_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_aae8b084d595c6779e535519abf4718c2}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_aae8b084d595c6779e535519abf4718c2}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!optimize@{optimize}}
+\index{optimize@{optimize}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{optimize()}{optimize()}}
+{\footnotesize\ttfamily def src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+optimize (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot = {\ttfamily 0},  }\item[{}]{align = {\ttfamily True},  }\item[{}]{crit = {\ttfamily 1e-\/4} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 395 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_aec97b6c7793cb75a0c653e5e2b393799}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_aec97b6c7793cb75a0c653e5e2b393799}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!prepare@{prepare}}
+\index{prepare@{prepare}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{prepare()}{prepare()}}
+{\footnotesize\ttfamily def src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+prepare (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{pbc = {\ttfamily False},  }\item[{}]{mmopts = {\ttfamily \{\}},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Prepare the calculation. 
+
+Note that we don\textquotesingle{}t create the Simulation object yet, because that may depend on MD integrator parameters, thermostat, barostat etc.
+
+This is mostly copied and modified from \hyperlink{openmmio_8py}{openmmio.\+py}\textquotesingle{}s Open\+M\+M.\+prepare(), but we are calling Force\+Field() from the Open\+FF toolkit and ignoring A\+M\+O\+E\+BA stuff. 
+
+Definition at line 270 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a3429bb5ae44273ea911ce3889df8990e}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a3429bb5ae44273ea911ce3889df8990e}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!readsrc@{readsrc}}
+\index{readsrc@{readsrc}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{readsrc()}{readsrc()}}
+{\footnotesize\ttfamily def src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+readsrc (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF}{S\+M\+I\+R\+N\+O\+FF} simulations always require the following passed in via kwargs\+: 
+
+\paragraph*{Parameters }
+
+pdb \+: string Name of a .pdb file containing the topology of the system mol2 \+: list A list of .mol2 file names containing the molecule/residue templates of the system
+
+Also provide 1 of the following, containing the coordinates to be used\+: mol \+: Molecule forcebalance.\+Molecule object coords \+: string Name of a file (readable by forcebalance.\+Molecule) This could be the same as the pdb argument from above. 
+
+Definition at line 217 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a73f2a7957b55c4ee6c63a7c1c185c528}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a73f2a7957b55c4ee6c63a7c1c185c528}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!update\+\_\+simulation@{update\+\_\+simulation}}
+\index{update\+\_\+simulation@{update\+\_\+simulation}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{update\+\_\+simulation()}{update\_simulation()}}
+{\footnotesize\ttfamily def src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+update\+\_\+simulation (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Create the simulation object, or update the force field parameters in the existing simulation object. 
+
+This should be run when we write a new force field X\+ML file. 
+
+Definition at line 364 of file smirnoffio.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a02a7b33ed3283d2b953f5aad2b896e83}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a02a7b33ed3283d2b953f5aad2b896e83}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!A@{A}}
+\index{A@{A}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{A}{A}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+A}
+
+
+
+Definition at line 416 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a0938e9434777f90456058d4371a04460}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a0938e9434777f90456058d4371a04460}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!abspdb@{abspdb}}
+\index{abspdb@{abspdb}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{abspdb}{abspdb}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+abspdb}
+
+
+
+Definition at line 252 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac75ac9d6176cbb7e474ef0a6e01e5e4d}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac75ac9d6176cbb7e474ef0a6e01e5e4d}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!Atom\+Lists@{Atom\+Lists}}
+\index{Atom\+Lists@{Atom\+Lists}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{Atom\+Lists}{AtomLists}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+Atom\+Lists}
+
+
+
+Build a topology and atom lists. 
+
+
+
+Definition at line 348 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_ae1c87f695e734850c13d227f0410174c}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_ae1c87f695e734850c13d227f0410174c}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!Atom\+Mask@{Atom\+Mask}}
+\index{Atom\+Mask@{Atom\+Mask}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{Atom\+Mask}{AtomMask}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+Atom\+Mask}
+
+
+
+Definition at line 352 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_ab25be3fd5727b04f5f98eab653e9823a}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_ab25be3fd5727b04f5f98eab653e9823a}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!B@{B}}
+\index{B@{B}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{B}{B}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+B}
+
+
+
+Definition at line 418 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a09780bd53ef235921d497194a4a86e51}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a09780bd53ef235921d497194a4a86e51}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!forcefield@{forcefield}}
+\index{forcefield@{forcefield}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{forcefield}{forcefield}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+forcefield}
+
+
+
+Definition at line 277 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a20b0d7610a183e1c47128b578f125261}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a20b0d7610a183e1c47128b578f125261}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!freeze\+\_\+atoms@{freeze\+\_\+atoms}}
+\index{freeze\+\_\+atoms@{freeze\+\_\+atoms}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{freeze\+\_\+atoms}{freeze\_atoms}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+freeze\+\_\+atoms}
+
+
+
+Definition at line 303 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac24dace8bbb369246c19f85dfc4b5b92}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac24dace8bbb369246c19f85dfc4b5b92}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!mmopts@{mmopts}}
+\index{mmopts@{mmopts}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{mmopts}{mmopts}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+mmopts}
+
+
+
+Open\+MM options for setting up the System. 
+
+
+
+Definition at line 297 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a06280a367037b587147b2883404c6f00}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a06280a367037b587147b2883404c6f00}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!mod@{mod}}
+\index{mod@{mod}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{mod}{mod}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+mod}
+
+
+
+Definition at line 294 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a3eef2c258d9d92b6440192fbb5c74975}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a3eef2c258d9d92b6440192fbb5c74975}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!mol@{mol}}
+\index{mol@{mol}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{mol}{mol}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+mol}
+
+
+
+Definition at line 228 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a4997efa6f2926b3d4c267f3cc0ca295a}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a4997efa6f2926b3d4c267f3cc0ca295a}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!mol2@{mol2}}
+\index{mol2@{mol2}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{mol2}{mol2}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+mol2}
+
+
+
+Definition at line 242 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a11542ad6ce7fca3d8e201d3977bf8379}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a11542ad6ce7fca3d8e201d3977bf8379}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!name@{name}}
+\index{name@{name}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+name}
+
+
+
+Definition at line 409 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a44b71ccf421005d312de6f13914fa248}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a44b71ccf421005d312de6f13914fa248}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!nbcharges@{nbcharges}}
+\index{nbcharges@{nbcharges}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{nbcharges}{nbcharges}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+nbcharges}
+
+
+
+Definition at line 378 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a861db9f0c2b1c000b7c74363eef1a643}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a861db9f0c2b1c000b7c74363eef1a643}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!off\+\_\+topology@{off\+\_\+topology}}
+\index{off\+\_\+topology@{off\+\_\+topology}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{off\+\_\+topology}{off\_topology}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+off\+\_\+topology}
+
+
+
+Load mol2 files for smirnoff topology. 
+
+
+
+Definition at line 291 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_af990e39412c8a1cee1badc6be35e28cb}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_af990e39412c8a1cee1badc6be35e28cb}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!offxml@{offxml}}
+\index{offxml@{offxml}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{offxml}{offxml}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+offxml}
+
+
+
+Definition at line 276 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a10129110be75721cbb8fb7b612dc8468}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a10129110be75721cbb8fb7b612dc8468}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!pbc@{pbc}}
+\index{pbc@{pbc}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{pbc}{pbc}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+pbc}
+
+
+
+Set system options from \hyperlink{namespaceForceBalance}{Force\+Balance} force field options. 
+
+Set system options from periodic boundary conditions. 
+
+Definition at line 316 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac503aa0501017274fcc6a4b9acf9f065}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac503aa0501017274fcc6a4b9acf9f065}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!pdb@{pdb}}
+\index{pdb@{pdb}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{pdb}{pdb}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+pdb}
+
+
+
+Definition at line 272 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac7da05e21b9c53ee04a79bcda5f8b9ed}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_ac7da05e21b9c53ee04a79bcda5f8b9ed}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!real\+Atom\+Idxs@{real\+Atom\+Idxs}}
+\index{real\+Atom\+Idxs@{real\+Atom\+Idxs}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{real\+Atom\+Idxs}{realAtomIdxs}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+real\+Atom\+Idxs}
+
+
+
+Definition at line 353 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_aa094e87c94b86e457af67837acceff85}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_aa094e87c94b86e457af67837acceff85}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!ref\+\_\+mol@{ref\+\_\+mol}}
+\index{ref\+\_\+mol@{ref\+\_\+mol}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{ref\+\_\+mol}{ref\_mol}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+ref\+\_\+mol}
+
+
+
+Definition at line 258 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_ab6dbfd45c6f21672599ccd962460e133}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_ab6dbfd45c6f21672599ccd962460e133}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!restrain\+\_\+k@{restrain\+\_\+k}}
+\index{restrain\+\_\+k@{restrain\+\_\+k}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{restrain\+\_\+k}{restrain\_k}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+restrain\+\_\+k}
+
+
+
+Specify frozen atoms and restraint force constant. 
+
+
+
+Definition at line 301 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_aa474d005cacb738837ed098a6024e582}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_aa474d005cacb738837ed098a6024e582}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!simkwargs@{simkwargs}}
+\index{simkwargs@{simkwargs}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{simkwargs}{simkwargs}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+simkwargs}
+
+
+
+Definition at line 367 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_ab212ed1ecf62ddce046e82bc2f7cef32}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_ab212ed1ecf62ddce046e82bc2f7cef32}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!system@{system}}
+\index{system@{system}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{system}{system}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+system}
+
+
+
+Definition at line 372 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a512326b17c315ad466f59b0c85f7b686}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a512326b17c315ad466f59b0c85f7b686}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!valkwd@{valkwd}}
+\index{valkwd@{valkwd}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{valkwd}{valkwd}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+valkwd}
+
+
+
+Definition at line 196 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1smirnoffio_1_1SMIRNOFF_a817c140385e54c6610e28166c7baccdd}\label{classsrc_1_1smirnoffio_1_1SMIRNOFF_a817c140385e54c6610e28166c7baccdd}} 
+\index{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}!xyz\+\_\+omms@{xyz\+\_\+omms}}
+\index{xyz\+\_\+omms@{xyz\+\_\+omms}!src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF@{src\+::smirnoffio\+::\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{xyz\+\_\+omms}{xyz\_omms}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+S\+M\+I\+R\+N\+O\+F\+F.\+xyz\+\_\+omms}
+
+
+
+print warning for \textquotesingle{}nonbonded\+\_\+cutoff\textquotesingle{} keywords 
+
+Generate Open\+M\+M-\/compatible positions 
+
+Definition at line 322 of file smirnoffio.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{smirnoffio_8py}{smirnoffio.\+py}\end{DoxyCompactItemize}

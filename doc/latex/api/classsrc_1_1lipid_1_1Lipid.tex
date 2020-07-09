@@ -1,0 +1,664 @@
+\hypertarget{classsrc_1_1lipid_1_1Lipid}{}\subsection{src.\+lipid.\+Lipid Class Reference}
+\label{classsrc_1_1lipid_1_1Lipid}\index{src.\+lipid.\+Lipid@{src.\+lipid.\+Lipid}}
+
+
+Subclass of Target for lipid property matching.  
+
+
+
+
+Inheritance diagram for src.\+lipid.\+Lipid\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=161pt]{classsrc_1_1lipid_1_1Lipid__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+lipid.\+Lipid\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=161pt]{classsrc_1_1lipid_1_1Lipid__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1lipid_1_1Lipid_a3ee96b07d26ea757f06f2b51fd8f68c8}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1lipid_1_1Lipid_a0571b5cf5b10a169eb7afee468dd3a61}{prepare\+\_\+temp\+\_\+directory} (self)
+\begin{DoxyCompactList}\small\item\em Prepare the temporary directory by copying in important files. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1lipid_1_1Lipid_a3b13700c93a2c711749c535a04f59008}{read\+\_\+data} (self)
+\item 
+def \hyperlink{classsrc_1_1lipid_1_1Lipid_a552b527d87a715fc0e5bba641bfaef4d}{check\+\_\+files} (self, there)
+\item 
+def \hyperlink{classsrc_1_1lipid_1_1Lipid_acc748653a328afae3ab3c61d7e69314d}{npt\+\_\+simulation} (self, temperature, pressure, simnum)
+\begin{DoxyCompactList}\small\item\em Submit a N\+PT simulation to the Work Queue. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1lipid_1_1Lipid_a1f3a778454c17956bee3e2fbc82ed41d}{polarization\+\_\+correction} (self, mvals)
+\item 
+def \hyperlink{classsrc_1_1lipid_1_1Lipid_a1568b7a3ac5e2bbc5b0893feb174e9bd}{indicate} (self)
+\item 
+def \hyperlink{classsrc_1_1lipid_1_1Lipid_a6c3b17049534baa97adc428f2e60c4d7}{objective\+\_\+term} (self, points, expname, calc, err, grad, name=\char`\"{}Quantity\char`\"{}, Sub\+Average=False)
+\item 
+def \hyperlink{classsrc_1_1lipid_1_1Lipid_add85e5fe4603baf97f3f2d0ef2647d0e}{submit\+\_\+jobs} (self, mvals, A\+Grad=True, A\+Hess=True)
+\item 
+def \hyperlink{classsrc_1_1lipid_1_1Lipid_abee27b196cebb83890d15359ef80e1e6}{get} (self, mvals, A\+Grad=True, A\+Hess=True)
+\begin{DoxyCompactList}\small\item\em Fitting of lipid bulk properties. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_aeaca091353262fa28170883792b04460}{do\+\_\+self\+\_\+pol}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a8c379d95998c085bc82a8764de7008b3}{loop\+\_\+over\+\_\+snapshots}
+\begin{DoxyCompactList}\small\item\em L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_ab753d9fe970adb234eac32bdf4c09c38}{last\+\_\+traj}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_aa2d38f30dafffb10d902b553b59e4ac2}{extra\+\_\+output}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a6d4de24b752f8ac3e11d9ac8e6332b9a}{lipid\+\_\+mols}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a344f6388ad76552816eac50602433e70}{lipid\+\_\+mols\+\_\+new}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a3336141dd3d85ad4889052d99b8f9497}{lipid\+\_\+mol}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a1db61e137707f5926a5276bc76a76e93}{gas\+\_\+engine}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a626604645e52807b937034703b9e0aed}{read\+\_\+indicate}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_acbb3ad5561e4ae774e191e4970607272}{write\+\_\+indicate}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_ae9dcd7e5f17cf200cfd1ca2c75e35402}{read\+\_\+objective}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_aba2be5f781c35d1d91895b824e229908}{Saved\+M\+Val}
+\begin{DoxyCompactList}\small\item\em Saved force field mvals for all iterations. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_aaff6ba231857cb620916cfc6e2bd2609}{Saved\+Traj}
+\begin{DoxyCompactList}\small\item\em Saved trajectories for all iterations and all temperatures. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_adc50926fa3f5698c8d768740b6d9cb49}{M\+Bar\+Energy}
+\begin{DoxyCompactList}\small\item\em Evaluated energies for all trajectories (i.\+e. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a604f2edcb3ac498ba3e629052504b333}{Ref\+Data}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a794c683725397ff740b466f99fd12905}{Phase\+Points}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a5cb87a7c5004c42609d6b7bd8d51f407}{Labels}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_aed42ab281c31f39ba57cb440a58d73d5}{engname}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a60d969be860474902ccbd8b68e4434bc}{w\+\_\+rho}
+\begin{DoxyCompactList}\small\item\em Density. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a449f1bc6993ba265010ea358579d8183}{w\+\_\+alpha}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a2d464b09fb3d8d3e411a8c94adab9180}{w\+\_\+kappa}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a2b4875588d2a511cacb1594143eda6a8}{w\+\_\+cp}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a5b93b4476dd3abefd8d7d4ca7d937d16}{w\+\_\+eps0}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a8fbf8d54c0efc903909b4913d508f894}{w\+\_\+al}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a68af5aa1f97716955bf72ba233b56811}{w\+\_\+scd}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a3888d275433d526c0840e3af9db0fddf}{w\+\_\+lkappa}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a02523ee95002c8fb8174399dd0ae67e5}{Xp}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_af7eb177f313db998be837975c373bdf8}{Wp}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_afd79ccf35fa4beeddb4a6c4a57abda2c}{Pp}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a7bc29fbe5076108dc9098ffb7b88bd55}{Gp}
+\item 
+\hyperlink{classsrc_1_1lipid_1_1Lipid_a15e12437b3f2db86445b1e62f447c20d}{Objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for lipid property matching. 
+
+
+
+Definition at line 57 of file lipid.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a3ee96b07d26ea757f06f2b51fd8f68c8}\label{classsrc_1_1lipid_1_1Lipid_a3ee96b07d26ea757f06f2b51fd8f68c8}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+lipid.\+Lipid.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 60 of file lipid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1lipid_1_1Lipid_a3ee96b07d26ea757f06f2b51fd8f68c8_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a552b527d87a715fc0e5bba641bfaef4d}\label{classsrc_1_1lipid_1_1Lipid_a552b527d87a715fc0e5bba641bfaef4d}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!check\+\_\+files@{check\+\_\+files}}
+\index{check\+\_\+files@{check\+\_\+files}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{check\+\_\+files()}{check\_files()}}
+{\footnotesize\ttfamily def src.\+lipid.\+Lipid.\+check\+\_\+files (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{there }\end{DoxyParamCaption})}
+
+
+
+Definition at line 307 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_abee27b196cebb83890d15359ef80e1e6}\label{classsrc_1_1lipid_1_1Lipid_abee27b196cebb83890d15359ef80e1e6}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!get@{get}}
+\index{get@{get}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+lipid.\+Lipid.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Fitting of lipid bulk properties. 
+
+This is the current major direction of development for \hyperlink{namespaceForceBalance}{Force\+Balance}. Basically, fitting the QM energies / forces alone does not always give us the best simulation behavior. In many cases it makes more sense to try and reproduce some experimentally known data as well.
+
+In order to reproduce experimentally known data, we need to run a simulation and compare the simulation result to experiment. The main challenge here is that the simulations are computationally intensive (i.\+e. they require energy and force evaluations), and furthermore the results are noisy. We need to run the simulations automatically and remotely (i.\+e. on clusters) and a good way to calculate the derivatives of the simulation results with respect to the parameter values.
+
+This function contains some experimentally known values of the density and enthalpy of vaporization (Hvap) of lipid water. It launches the density and Hvap calculations on the cluster, and gathers the results / derivatives. The actual calculation of results / derivatives is done in a separate file.
+
+After the results come back, they are gathered together to form an objective function.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mvals} & Mathematical parameter values \\
+\hline
+\mbox{\tt in}  & {\em A\+Grad} & Switch to turn on analytic gradient \\
+\hline
+\mbox{\tt in}  & {\em A\+Hess} & Switch to turn on analytic Hessian \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Answer Contribution to the objective function Fill in the weight matrix with M\+B\+AR weights where M\+B\+AR was run, and equal weights otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line 550 of file lipid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1lipid_1_1Lipid_abee27b196cebb83890d15359ef80e1e6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a1568b7a3ac5e2bbc5b0893feb174e9bd}\label{classsrc_1_1lipid_1_1Lipid_a1568b7a3ac5e2bbc5b0893feb174e9bd}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+lipid.\+Lipid.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 353 of file lipid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1lipid_1_1Lipid_a1568b7a3ac5e2bbc5b0893feb174e9bd_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_acc748653a328afae3ab3c61d7e69314d}\label{classsrc_1_1lipid_1_1Lipid_acc748653a328afae3ab3c61d7e69314d}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!npt\+\_\+simulation@{npt\+\_\+simulation}}
+\index{npt\+\_\+simulation@{npt\+\_\+simulation}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{npt\+\_\+simulation()}{npt\_simulation()}}
+{\footnotesize\ttfamily def src.\+lipid.\+Lipid.\+npt\+\_\+simulation (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{temperature,  }\item[{}]{pressure,  }\item[{}]{simnum }\end{DoxyParamCaption})}
+
+
+
+Submit a N\+PT simulation to the Work Queue. 
+
+
+
+Definition at line 321 of file lipid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=346pt]{classsrc_1_1lipid_1_1Lipid_acc748653a328afae3ab3c61d7e69314d_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a6c3b17049534baa97adc428f2e60c4d7}\label{classsrc_1_1lipid_1_1Lipid_a6c3b17049534baa97adc428f2e60c4d7}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!objective\+\_\+term@{objective\+\_\+term}}
+\index{objective\+\_\+term@{objective\+\_\+term}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{objective\+\_\+term()}{objective\_term()}}
+{\footnotesize\ttfamily def src.\+lipid.\+Lipid.\+objective\+\_\+term (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{points,  }\item[{}]{expname,  }\item[{}]{calc,  }\item[{}]{err,  }\item[{}]{grad,  }\item[{}]{name = {\ttfamily \char`\"{}Quantity\char`\"{}},  }\item[{}]{Sub\+Average = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 381 of file lipid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1lipid_1_1Lipid_a6c3b17049534baa97adc428f2e60c4d7_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a1f3a778454c17956bee3e2fbc82ed41d}\label{classsrc_1_1lipid_1_1Lipid_a1f3a778454c17956bee3e2fbc82ed41d}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!polarization\+\_\+correction@{polarization\+\_\+correction}}
+\index{polarization\+\_\+correction@{polarization\+\_\+correction}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{polarization\+\_\+correction()}{polarization\_correction()}}
+{\footnotesize\ttfamily def src.\+lipid.\+Lipid.\+polarization\+\_\+correction (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals }\end{DoxyParamCaption})}
+
+
+
+Definition at line 337 of file lipid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1lipid_1_1Lipid_a1f3a778454c17956bee3e2fbc82ed41d_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a0571b5cf5b10a169eb7afee468dd3a61}\label{classsrc_1_1lipid_1_1Lipid_a0571b5cf5b10a169eb7afee468dd3a61}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!prepare\+\_\+temp\+\_\+directory@{prepare\+\_\+temp\+\_\+directory}}
+\index{prepare\+\_\+temp\+\_\+directory@{prepare\+\_\+temp\+\_\+directory}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{prepare\+\_\+temp\+\_\+directory()}{prepare\_temp\_directory()}}
+{\footnotesize\ttfamily def src.\+lipid.\+Lipid.\+prepare\+\_\+temp\+\_\+directory (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Prepare the temporary directory by copying in important files. 
+
+
+
+Definition at line 189 of file lipid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1lipid_1_1Lipid_a0571b5cf5b10a169eb7afee468dd3a61_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a3b13700c93a2c711749c535a04f59008}\label{classsrc_1_1lipid_1_1Lipid_a3b13700c93a2c711749c535a04f59008}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!read\+\_\+data@{read\+\_\+data}}
+\index{read\+\_\+data@{read\+\_\+data}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{read\+\_\+data()}{read\_data()}}
+{\footnotesize\ttfamily def src.\+lipid.\+Lipid.\+read\+\_\+data (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 196 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_add85e5fe4603baf97f3f2d0ef2647d0e}\label{classsrc_1_1lipid_1_1Lipid_add85e5fe4603baf97f3f2d0ef2647d0e}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!submit\+\_\+jobs@{submit\+\_\+jobs}}
+\index{submit\+\_\+jobs@{submit\+\_\+jobs}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{submit\+\_\+jobs()}{submit\_jobs()}}
+{\footnotesize\ttfamily def src.\+lipid.\+Lipid.\+submit\+\_\+jobs (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 465 of file lipid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1lipid_1_1Lipid_add85e5fe4603baf97f3f2d0ef2647d0e_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_aeaca091353262fa28170883792b04460}\label{classsrc_1_1lipid_1_1Lipid_aeaca091353262fa28170883792b04460}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!do\+\_\+self\+\_\+pol@{do\+\_\+self\+\_\+pol}}
+\index{do\+\_\+self\+\_\+pol@{do\+\_\+self\+\_\+pol}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{do\+\_\+self\+\_\+pol}{do\_self\_pol}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+do\+\_\+self\+\_\+pol}
+
+
+
+Definition at line 112 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_aed42ab281c31f39ba57cb440a58d73d5}\label{classsrc_1_1lipid_1_1Lipid_aed42ab281c31f39ba57cb440a58d73d5}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!engname@{engname}}
+\index{engname@{engname}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{engname}{engname}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+engname}
+
+
+
+Definition at line 326 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_aa2d38f30dafffb10d902b553b59e4ac2}\label{classsrc_1_1lipid_1_1Lipid_aa2d38f30dafffb10d902b553b59e4ac2}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!extra\+\_\+output@{extra\+\_\+output}}
+\index{extra\+\_\+output@{extra\+\_\+output}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{extra\+\_\+output}{extra\_output}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+extra\+\_\+output}
+
+
+
+Definition at line 127 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a1db61e137707f5926a5276bc76a76e93}\label{classsrc_1_1lipid_1_1Lipid_a1db61e137707f5926a5276bc76a76e93}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!gas\+\_\+engine@{gas\+\_\+engine}}
+\index{gas\+\_\+engine@{gas\+\_\+engine}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{gas\+\_\+engine}{gas\_engine}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+gas\+\_\+engine}
+
+
+
+Definition at line 168 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a7bc29fbe5076108dc9098ffb7b88bd55}\label{classsrc_1_1lipid_1_1Lipid_a7bc29fbe5076108dc9098ffb7b88bd55}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!Gp@{Gp}}
+\index{Gp@{Gp}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{Gp}{Gp}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+Gp}
+
+
+
+Definition at line 839 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a5cb87a7c5004c42609d6b7bd8d51f407}\label{classsrc_1_1lipid_1_1Lipid_a5cb87a7c5004c42609d6b7bd8d51f407}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!Labels@{Labels}}
+\index{Labels@{Labels}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{Labels}{Labels}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+Labels}
+
+
+
+Definition at line 297 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_ab753d9fe970adb234eac32bdf4c09c38}\label{classsrc_1_1lipid_1_1Lipid_ab753d9fe970adb234eac32bdf4c09c38}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!last\+\_\+traj@{last\+\_\+traj}}
+\index{last\+\_\+traj@{last\+\_\+traj}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{last\+\_\+traj}{last\_traj}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+last\+\_\+traj}
+
+
+
+Definition at line 125 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a3336141dd3d85ad4889052d99b8f9497}\label{classsrc_1_1lipid_1_1Lipid_a3336141dd3d85ad4889052d99b8f9497}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!lipid\+\_\+mol@{lipid\+\_\+mol}}
+\index{lipid\+\_\+mol@{lipid\+\_\+mol}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{lipid\+\_\+mol}{lipid\_mol}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+lipid\+\_\+mol}
+
+
+
+Definition at line 155 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a6d4de24b752f8ac3e11d9ac8e6332b9a}\label{classsrc_1_1lipid_1_1Lipid_a6d4de24b752f8ac3e11d9ac8e6332b9a}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!lipid\+\_\+mols@{lipid\+\_\+mols}}
+\index{lipid\+\_\+mols@{lipid\+\_\+mols}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{lipid\+\_\+mols}{lipid\_mols}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+lipid\+\_\+mols}
+
+
+
+Definition at line 135 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a344f6388ad76552816eac50602433e70}\label{classsrc_1_1lipid_1_1Lipid_a344f6388ad76552816eac50602433e70}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!lipid\+\_\+mols\+\_\+new@{lipid\+\_\+mols\+\_\+new}}
+\index{lipid\+\_\+mols\+\_\+new@{lipid\+\_\+mols\+\_\+new}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{lipid\+\_\+mols\+\_\+new}{lipid\_mols\_new}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+lipid\+\_\+mols\+\_\+new}
+
+
+
+Definition at line 136 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a8c379d95998c085bc82a8764de7008b3}\label{classsrc_1_1lipid_1_1Lipid_a8c379d95998c085bc82a8764de7008b3}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}}
+\index{loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{loop\+\_\+over\+\_\+snapshots}{loop\_over\_snapshots}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+loop\+\_\+over\+\_\+snapshots}
+
+
+
+L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. 
+
+
+
+Definition at line 123 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_adc50926fa3f5698c8d768740b6d9cb49}\label{classsrc_1_1lipid_1_1Lipid_adc50926fa3f5698c8d768740b6d9cb49}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!M\+Bar\+Energy@{M\+Bar\+Energy}}
+\index{M\+Bar\+Energy@{M\+Bar\+Energy}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{M\+Bar\+Energy}{MBarEnergy}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+M\+Bar\+Energy}
+
+
+
+Evaluated energies for all trajectories (i.\+e. 
+
+all iterations and all temperatures), using all mvals 
+
+Definition at line 185 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a15e12437b3f2db86445b1e62f447c20d}\label{classsrc_1_1lipid_1_1Lipid_a15e12437b3f2db86445b1e62f447c20d}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!Objective@{Objective}}
+\index{Objective@{Objective}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{Objective}{Objective}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+Objective}
+
+
+
+Definition at line 841 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a794c683725397ff740b466f99fd12905}\label{classsrc_1_1lipid_1_1Lipid_a794c683725397ff740b466f99fd12905}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!Phase\+Points@{Phase\+Points}}
+\index{Phase\+Points@{Phase\+Points}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{Phase\+Points}{PhasePoints}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+Phase\+Points}
+
+
+
+Definition at line 292 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_afd79ccf35fa4beeddb4a6c4a57abda2c}\label{classsrc_1_1lipid_1_1Lipid_afd79ccf35fa4beeddb4a6c4a57abda2c}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!Pp@{Pp}}
+\index{Pp@{Pp}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{Pp}{Pp}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+Pp}
+
+
+
+Definition at line 836 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a626604645e52807b937034703b9e0aed}\label{classsrc_1_1lipid_1_1Lipid_a626604645e52807b937034703b9e0aed}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!read\+\_\+indicate@{read\+\_\+indicate}}
+\index{read\+\_\+indicate@{read\+\_\+indicate}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{read\+\_\+indicate}{read\_indicate}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+read\+\_\+indicate}
+
+
+
+Definition at line 170 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_ae9dcd7e5f17cf200cfd1ca2c75e35402}\label{classsrc_1_1lipid_1_1Lipid_ae9dcd7e5f17cf200cfd1ca2c75e35402}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!read\+\_\+objective@{read\+\_\+objective}}
+\index{read\+\_\+objective@{read\+\_\+objective}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{read\+\_\+objective}{read\_objective}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+read\+\_\+objective}
+
+
+
+Definition at line 173 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a604f2edcb3ac498ba3e629052504b333}\label{classsrc_1_1lipid_1_1Lipid_a604f2edcb3ac498ba3e629052504b333}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!Ref\+Data@{Ref\+Data}}
+\index{Ref\+Data@{Ref\+Data}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{Ref\+Data}{RefData}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+Ref\+Data}
+
+
+
+Definition at line 207 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_aba2be5f781c35d1d91895b824e229908}\label{classsrc_1_1lipid_1_1Lipid_aba2be5f781c35d1d91895b824e229908}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!Saved\+M\+Val@{Saved\+M\+Val}}
+\index{Saved\+M\+Val@{Saved\+M\+Val}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{Saved\+M\+Val}{SavedMVal}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+Saved\+M\+Val}
+
+
+
+Saved force field mvals for all iterations. 
+
+
+
+Definition at line 181 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_aaff6ba231857cb620916cfc6e2bd2609}\label{classsrc_1_1lipid_1_1Lipid_aaff6ba231857cb620916cfc6e2bd2609}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!Saved\+Traj@{Saved\+Traj}}
+\index{Saved\+Traj@{Saved\+Traj}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{Saved\+Traj}{SavedTraj}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+Saved\+Traj}
+
+
+
+Saved trajectories for all iterations and all temperatures. 
+
+
+
+Definition at line 183 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a8fbf8d54c0efc903909b4913d508f894}\label{classsrc_1_1lipid_1_1Lipid_a8fbf8d54c0efc903909b4913d508f894}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!w\+\_\+al@{w\+\_\+al}}
+\index{w\+\_\+al@{w\+\_\+al}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{w\+\_\+al}{w\_al}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+w\+\_\+al}
+
+
+
+Definition at line 808 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a449f1bc6993ba265010ea358579d8183}\label{classsrc_1_1lipid_1_1Lipid_a449f1bc6993ba265010ea358579d8183}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!w\+\_\+alpha@{w\+\_\+alpha}}
+\index{w\+\_\+alpha@{w\+\_\+alpha}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{w\+\_\+alpha}{w\_alpha}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+w\+\_\+alpha}
+
+
+
+Definition at line 804 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a2b4875588d2a511cacb1594143eda6a8}\label{classsrc_1_1lipid_1_1Lipid_a2b4875588d2a511cacb1594143eda6a8}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!w\+\_\+cp@{w\+\_\+cp}}
+\index{w\+\_\+cp@{w\+\_\+cp}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{w\+\_\+cp}{w\_cp}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+w\+\_\+cp}
+
+
+
+Definition at line 806 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a5b93b4476dd3abefd8d7d4ca7d937d16}\label{classsrc_1_1lipid_1_1Lipid_a5b93b4476dd3abefd8d7d4ca7d937d16}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!w\+\_\+eps0@{w\+\_\+eps0}}
+\index{w\+\_\+eps0@{w\+\_\+eps0}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{w\+\_\+eps0}{w\_eps0}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+w\+\_\+eps0}
+
+
+
+Definition at line 807 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a2d464b09fb3d8d3e411a8c94adab9180}\label{classsrc_1_1lipid_1_1Lipid_a2d464b09fb3d8d3e411a8c94adab9180}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!w\+\_\+kappa@{w\+\_\+kappa}}
+\index{w\+\_\+kappa@{w\+\_\+kappa}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{w\+\_\+kappa}{w\_kappa}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+w\+\_\+kappa}
+
+
+
+Definition at line 805 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a3888d275433d526c0840e3af9db0fddf}\label{classsrc_1_1lipid_1_1Lipid_a3888d275433d526c0840e3af9db0fddf}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!w\+\_\+lkappa@{w\+\_\+lkappa}}
+\index{w\+\_\+lkappa@{w\+\_\+lkappa}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{w\+\_\+lkappa}{w\_lkappa}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+w\+\_\+lkappa}
+
+
+
+Definition at line 810 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a60d969be860474902ccbd8b68e4434bc}\label{classsrc_1_1lipid_1_1Lipid_a60d969be860474902ccbd8b68e4434bc}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!w\+\_\+rho@{w\+\_\+rho}}
+\index{w\+\_\+rho@{w\+\_\+rho}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{w\+\_\+rho}{w\_rho}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+w\+\_\+rho}
+
+
+
+Density. 
+
+Ignore enthalpy. Thermal expansion coefficient. Isothermal compressibility. Isobaric heat capacity. Static dielectric constant. Average area per lipid Bilayer Isothermal compressibility. Deuterium order parameter Estimation of errors. 
+
+Definition at line 803 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a68af5aa1f97716955bf72ba233b56811}\label{classsrc_1_1lipid_1_1Lipid_a68af5aa1f97716955bf72ba233b56811}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!w\+\_\+scd@{w\+\_\+scd}}
+\index{w\+\_\+scd@{w\+\_\+scd}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{w\+\_\+scd}{w\_scd}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+w\+\_\+scd}
+
+
+
+Definition at line 809 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_af7eb177f313db998be837975c373bdf8}\label{classsrc_1_1lipid_1_1Lipid_af7eb177f313db998be837975c373bdf8}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!Wp@{Wp}}
+\index{Wp@{Wp}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{Wp}{Wp}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+Wp}
+
+
+
+Definition at line 834 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_acbb3ad5561e4ae774e191e4970607272}\label{classsrc_1_1lipid_1_1Lipid_acbb3ad5561e4ae774e191e4970607272}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!write\+\_\+indicate@{write\+\_\+indicate}}
+\index{write\+\_\+indicate@{write\+\_\+indicate}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{write\+\_\+indicate}{write\_indicate}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+write\+\_\+indicate}
+
+
+
+Definition at line 171 of file lipid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1lipid_1_1Lipid_a02523ee95002c8fb8174399dd0ae67e5}\label{classsrc_1_1lipid_1_1Lipid_a02523ee95002c8fb8174399dd0ae67e5}} 
+\index{src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}!Xp@{Xp}}
+\index{Xp@{Xp}!src\+::lipid\+::\+Lipid@{src\+::lipid\+::\+Lipid}}
+\paragraph{\texorpdfstring{Xp}{Xp}}
+{\footnotesize\ttfamily src.\+lipid.\+Lipid.\+Xp}
+
+
+
+Definition at line 832 of file lipid.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{lipid_8py}{lipid.\+py}\end{DoxyCompactItemize}

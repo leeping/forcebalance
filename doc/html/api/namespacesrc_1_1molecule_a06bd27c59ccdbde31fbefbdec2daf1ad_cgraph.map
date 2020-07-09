@@ -1,0 +1,5 @@
+<map id="src.molecule.AlignToMoments" name="src.molecule.AlignToMoments">
+<area shape="rect" id="node2" href="$namespacesrc_1_1molecule.html#af5506b829909137d2b0b586eb1349c85" title="Computes a &quot;overlap density&quot; from two frames. " alt="" coords="269,31,476,57"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1molecule.html#a32c3d0fa2efc4d240274218803e1f42b" title="Computes an &#39;overlap&#39; between two molecules based on some fictitious density. " alt="" coords="524,5,743,32"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1molecule.html#a0b808b0181dfa0aed5879c61f683ec1a" title="Constructs an Euler matrix from three Euler angles. " alt="" coords="791,31,973,57"/>
+</map>

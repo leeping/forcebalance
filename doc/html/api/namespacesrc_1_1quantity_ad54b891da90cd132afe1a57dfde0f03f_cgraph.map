@@ -1,0 +1,4 @@
+<map id="src.quantity.energy_derivatives" name="src.quantity.energy_derivatives">
+<area shape="rect" id="node2" href="$namespacesrc_1_1finite__difference.html#a32a990bb791a59853130d9d71387822d" title="A three&#45;point finite difference stencil. " alt="" coords="200,5,399,32"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1finite__difference.html#af3a9d7a4fc96a7057679fa5f3af73fe0" title="A function wrapper for finite difference designed for differentiating &#39;get&#39;&#45;type functions. " alt="" coords="200,56,399,83"/>
+</map>

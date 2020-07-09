@@ -1,0 +1,239 @@
+\hypertarget{classsrc_1_1objective_1_1Objective}{}\subsection{src.\+objective.\+Objective Class Reference}
+\label{classsrc_1_1objective_1_1Objective}\index{src.\+objective.\+Objective@{src.\+objective.\+Objective}}
+
+
+\hyperlink{classsrc_1_1objective_1_1Objective}{Objective} function.  
+
+
+
+
+Inheritance diagram for src.\+objective.\+Objective\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classsrc_1_1objective_1_1Objective__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+objective.\+Objective\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=216pt]{classsrc_1_1objective_1_1Objective__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1objective_1_1Objective_a3477b29b852f883a0c7c2d7d33681e81}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1objective_1_1Objective_a3e048f9ef39a1be74237d609ba012b32}{Target\+\_\+\+Terms} (self, mvals, Order=0, verbose=False, customdir=None)
+\item 
+def \hyperlink{classsrc_1_1objective_1_1Objective_a18701bc88cb55e89b195a2dba2e6fca2}{Indicate} (self)
+\begin{DoxyCompactList}\small\item\em Print objective function contributions. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1objective_1_1Objective_a187f9fbe63483e6aa6bbf5c546d983e5}{Full} (self, vals, Order=0, verbose=False, customdir=None)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1objective_1_1Objective_a13eee4f9a973a4126cf621a71cf9458d}{Targets}
+\begin{DoxyCompactList}\small\item\em Work Queue Port (The specific target itself may or may not actually use this.) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1objective_1_1Objective_ab20f8204a337e3f62cc812dfc74fecd0}{FF}
+\begin{DoxyCompactList}\small\item\em The force field (it seems to be everywhere) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1objective_1_1Objective_ad5ca5b9e6cc7d044db4ff26e02ae0ad3}{Penalty}
+\begin{DoxyCompactList}\small\item\em Initialize the penalty function. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1objective_1_1Objective_aa9804c666636ac4eb64869cf03ca5a19}{W\+Tot}
+\begin{DoxyCompactList}\small\item\em Obtain the denominator. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1objective_1_1Objective_a3a7e624a7c5a6cca8002a10deb6b624f}{Obj\+Dict}
+\item 
+\hyperlink{classsrc_1_1objective_1_1Objective_a8e1f80418dd2002b233cf74c9b6c3670}{Obj\+Dict\+\_\+\+Last}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classsrc_1_1objective_1_1Objective}{Objective} function. 
+
+The objective function is a combination of contributions from the different fitting targets. Basically, it loops through the targets, gets their contributions to the objective function and then sums all of them (although more elaborate schemes are conceivable). The return value is the same data type as calling the target itself\+: a dictionary containing the objective function, the gradient and the Hessian.
+
+The penalty function is also computed here; it keeps the parameters from straying too far from their initial values.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mvals} & The mathematical parameters that enter into computing the objective function \\
+\hline
+\mbox{\tt in}  & {\em Order} & The requested order of differentiation \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 146 of file objective.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Objective_a3477b29b852f883a0c7c2d7d33681e81}\label{classsrc_1_1objective_1_1Objective_a3477b29b852f883a0c7c2d7d33681e81}} 
+\index{src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+objective.\+Objective.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 147 of file objective.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1objective_1_1Objective_a3477b29b852f883a0c7c2d7d33681e81_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Objective_a187f9fbe63483e6aa6bbf5c546d983e5}\label{classsrc_1_1objective_1_1Objective_a187f9fbe63483e6aa6bbf5c546d983e5}} 
+\index{src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}!Full@{Full}}
+\index{Full@{Full}!src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}}
+\paragraph{\texorpdfstring{Full()}{Full()}}
+{\footnotesize\ttfamily def src.\+objective.\+Objective.\+Full (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{vals,  }\item[{}]{Order = {\ttfamily 0},  }\item[{}]{verbose = {\ttfamily False},  }\item[{}]{customdir = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 308 of file objective.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1objective_1_1Objective_a187f9fbe63483e6aa6bbf5c546d983e5_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Objective_a18701bc88cb55e89b195a2dba2e6fca2}\label{classsrc_1_1objective_1_1Objective_a18701bc88cb55e89b195a2dba2e6fca2}} 
+\index{src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}!Indicate@{Indicate}}
+\index{Indicate@{Indicate}!src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}}
+\paragraph{\texorpdfstring{Indicate()}{Indicate()}}
+{\footnotesize\ttfamily def src.\+objective.\+Objective.\+Indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Print objective function contributions. 
+
+
+
+Definition at line 269 of file objective.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1objective_1_1Objective_a18701bc88cb55e89b195a2dba2e6fca2_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Objective_a3e048f9ef39a1be74237d609ba012b32}\label{classsrc_1_1objective_1_1Objective_a3e048f9ef39a1be74237d609ba012b32}} 
+\index{src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}!Target\+\_\+\+Terms@{Target\+\_\+\+Terms}}
+\index{Target\+\_\+\+Terms@{Target\+\_\+\+Terms}!src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}}
+\paragraph{\texorpdfstring{Target\+\_\+\+Terms()}{Target\_Terms()}}
+{\footnotesize\ttfamily def src.\+objective.\+Objective.\+Target\+\_\+\+Terms (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{Order = {\ttfamily 0},  }\item[{}]{verbose = {\ttfamily False},  }\item[{}]{customdir = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 206 of file objective.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1objective_1_1Objective_a3e048f9ef39a1be74237d609ba012b32_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Objective_ab20f8204a337e3f62cc812dfc74fecd0}\label{classsrc_1_1objective_1_1Objective_ab20f8204a337e3f62cc812dfc74fecd0}} 
+\index{src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}!FF@{FF}}
+\index{FF@{FF}!src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}}
+\paragraph{\texorpdfstring{FF}{FF}}
+{\footnotesize\ttfamily src.\+objective.\+Objective.\+FF}
+
+
+
+The force field (it seems to be everywhere) 
+
+
+
+Definition at line 185 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Objective_a3a7e624a7c5a6cca8002a10deb6b624f}\label{classsrc_1_1objective_1_1Objective_a3a7e624a7c5a6cca8002a10deb6b624f}} 
+\index{src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}!Obj\+Dict@{Obj\+Dict}}
+\index{Obj\+Dict@{Obj\+Dict}!src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}}
+\paragraph{\texorpdfstring{Obj\+Dict}{ObjDict}}
+{\footnotesize\ttfamily src.\+objective.\+Objective.\+Obj\+Dict}
+
+
+
+Definition at line 195 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Objective_a8e1f80418dd2002b233cf74c9b6c3670}\label{classsrc_1_1objective_1_1Objective_a8e1f80418dd2002b233cf74c9b6c3670}} 
+\index{src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}!Obj\+Dict\+\_\+\+Last@{Obj\+Dict\+\_\+\+Last}}
+\index{Obj\+Dict\+\_\+\+Last@{Obj\+Dict\+\_\+\+Last}!src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}}
+\paragraph{\texorpdfstring{Obj\+Dict\+\_\+\+Last}{ObjDict\_Last}}
+{\footnotesize\ttfamily src.\+objective.\+Objective.\+Obj\+Dict\+\_\+\+Last}
+
+
+
+Definition at line 196 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Objective_ad5ca5b9e6cc7d044db4ff26e02ae0ad3}\label{classsrc_1_1objective_1_1Objective_ad5ca5b9e6cc7d044db4ff26e02ae0ad3}} 
+\index{src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}!Penalty@{Penalty}}
+\index{Penalty@{Penalty}!src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}}
+\paragraph{\texorpdfstring{Penalty}{Penalty}}
+{\footnotesize\ttfamily src.\+objective.\+Objective.\+Penalty}
+
+
+
+Initialize the penalty function. 
+
+
+
+Definition at line 187 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Objective_a13eee4f9a973a4126cf621a71cf9458d}\label{classsrc_1_1objective_1_1Objective_a13eee4f9a973a4126cf621a71cf9458d}} 
+\index{src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}!Targets@{Targets}}
+\index{Targets@{Targets}!src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}}
+\paragraph{\texorpdfstring{Targets}{Targets}}
+{\footnotesize\ttfamily src.\+objective.\+Objective.\+Targets}
+
+
+
+Work Queue Port (The specific target itself may or may not actually use this.) 
+
+Asynchronous objective function evaluation (i.\+e. execute Work Queue and local objective concurrently.) The list of fitting targets 
+
+Definition at line 163 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Objective_aa9804c666636ac4eb64869cf03ca5a19}\label{classsrc_1_1objective_1_1Objective_aa9804c666636ac4eb64869cf03ca5a19}} 
+\index{src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}!W\+Tot@{W\+Tot}}
+\index{W\+Tot@{W\+Tot}!src\+::objective\+::\+Objective@{src\+::objective\+::\+Objective}}
+\paragraph{\texorpdfstring{W\+Tot}{WTot}}
+{\footnotesize\ttfamily src.\+objective.\+Objective.\+W\+Tot}
+
+
+
+Obtain the denominator. 
+
+
+
+Definition at line 192 of file objective.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{objective_8py}{objective.\+py}\end{DoxyCompactItemize}

@@ -1,0 +1,17 @@
+<map id="src._version.get_versions" name="src._version.get_versions">
+<area shape="rect" id="node2" href="$namespacesrc_1_1__version.html#af28ed90f44f99213d839ab63b92be972" title="Create, populate and return the VersioneerConfig() object. " alt="" coords="252,5,423,32"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1__version.html#af7c030b0c688642e46d34ee86979d5b1" title="Get version information from git keywords. " alt="" coords="246,57,429,98"/>
+<area shape="rect" id="node6" href="$namespacesrc_1_1__version.html#afdd5bbfefc2bef0d88e1406709fe7541" title="Get the keywords needed to look up the version information. " alt="" coords="240,123,435,149"/>
+<area shape="rect" id="node7" href="$namespacesrc_1_1__version.html#a7f961ca0bf593256fdbc850f707dadca" title="Get version from &#39;git describe&#39; in the root of the source tree. " alt="" coords="252,239,423,281"/>
+<area shape="rect" id="node8" href="$namespacesrc_1_1__version.html#a993e064384f8f9986d0ef6f48f7e967c" title="Render the given version pieces into the requested style. " alt="" coords="264,371,411,397"/>
+<area shape="rect" id="node16" href="$namespacesrc_1_1__version.html#a8ab6a4b8a5612bba9d90c884f50fce13" title="Try to determine the version from the parent directory name. " alt="" coords="258,174,417,215"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1__version.html#a0477040e1e7a9284f041925048d8757d" title="Decorator to mark a method as the handler for a particular VCS. " alt="" coords="483,115,637,157"/>
+<area shape="rect" id="node5" href="$namespacesrc_1_1__version.html#a07869f13dacbb2c9659c38961e969824" title="Call the given command(s). " alt="" coords="685,152,883,179"/>
+<area shape="rect" id="node9" href="$namespacesrc_1_1__version.html#a08b184a852fca45124c31efad07ae91d" title="Build up version string, with post&#45;release &quot;local version identifier&quot;. " alt="" coords="487,233,633,274"/>
+<area shape="rect" id="node11" href="$namespacesrc_1_1__version.html#a966d7d904289700bc6bbc20d64bd5c6e" title="TAG[.post.devDISTANCE] – No &#45;dirty. " alt="" coords="487,298,633,339"/>
+<area shape="rect" id="node12" href="$namespacesrc_1_1__version.html#a2553edd494b07cc780e662bbb2467b66" title="TAG[.postDISTANCE[.dev0]+gHEX] . " alt="" coords="487,363,633,405"/>
+<area shape="rect" id="node13" href="$namespacesrc_1_1__version.html#a04e18593f1d130a8f2609ebb4520faf3" title="TAG[.postDISTANCE[.dev0]] . " alt="" coords="487,429,633,470"/>
+<area shape="rect" id="node14" href="$namespacesrc_1_1__version.html#afab0479c00019cd66c0000ffb3fcba2f" title="TAG[&#45;DISTANCE&#45;gHEX][&#45;dirty]. " alt="" coords="487,494,633,535"/>
+<area shape="rect" id="node15" href="$namespacesrc_1_1__version.html#aefa841fcd557dd2ff3594846803f1e58" title="TAG&#45;DISTANCE&#45;gHEX[&#45;dirty]. " alt="" coords="487,559,633,601"/>
+<area shape="rect" id="node10" href="$namespacesrc_1_1__version.html#a21c3be02b22ff9893ddf1de4b4609066" title="Return a + if we don&#39;t already have one, else return a . " alt="" coords="695,305,873,332"/>
+</map>

@@ -1,0 +1,298 @@
+\hypertarget{classsrc_1_1gmxio_1_1ITP__Reader}{}\subsection{src.\+gmxio.\+I\+T\+P\+\_\+\+Reader Class Reference}
+\label{classsrc_1_1gmxio_1_1ITP__Reader}\index{src.\+gmxio.\+I\+T\+P\+\_\+\+Reader@{src.\+gmxio.\+I\+T\+P\+\_\+\+Reader}}
+
+
+Finite state machine for parsing G\+R\+O\+M\+A\+CS force field files.  
+
+
+
+
+Inheritance diagram for src.\+gmxio.\+I\+T\+P\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{classsrc_1_1gmxio_1_1ITP__Reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+gmxio.\+I\+T\+P\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=202pt]{classsrc_1_1gmxio_1_1ITP__Reader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_a5c347e28bb395ac06f1471ad3bf1bda9}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, fnm)
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_ad77cbfb59fb27a9dc29aef06b0ef9d85}{feed} (self, line)
+\begin{DoxyCompactList}\small\item\em Given a line, determine the interaction type and the atoms involved (the suffix). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_a039afd7965f898a4982d68418fc5789f}{sec}
+\begin{DoxyCompactList}\small\item\em The current section that we\textquotesingle{}re in. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_ab966f47084cbfd5b2b92f665e1cf0abd}{nbtype}
+\begin{DoxyCompactList}\small\item\em Nonbonded type. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_af4eb334ecb67464f7cccef526b50cace}{mol}
+\begin{DoxyCompactList}\small\item\em The current molecule (set by the moleculetype keyword) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_abd110480676315a10d158a16055f9112}{pdict}
+\begin{DoxyCompactList}\small\item\em The parameter dictionary (defined in this file) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_a05c07b194eb70ef0bb902e1c0b564b0d}{atomnames}
+\begin{DoxyCompactList}\small\item\em Listing of all atom names in the file, (probably unnecessary) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_a07503bb3ca6d969f3198dfad1c554fd0}{atomtypes}
+\begin{DoxyCompactList}\small\item\em Listing of all atom types in the file, (probably unnecessary) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_aa2d64bc0d85487e04c8dbd8e7600f3cb}{atomtype\+\_\+to\+\_\+mass}
+\begin{DoxyCompactList}\small\item\em A dictionary of atomic masses. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_aaaafaaf937397d5d543678d8eca71f56}{itype}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_a42d099927c66be494198125649c1fc08}{overpfx}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_a10bf4a140a281780b8430b3ceb4402e4}{oversfx}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_af4b9cf536091bc0a1d784f8e17905838}{suffix}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1ITP__Reader_a6b20408a9084dfa267bfa297a42c0468}{molatom}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Finite state machine for parsing G\+R\+O\+M\+A\+CS force field files. 
+
+We open the force field file and read all of its lines. As we loop through the force field file, we look for two types of tags\+: (1) section markers, in \hyperlink{classsrc_1_1gmxio_1_1GMX}{G\+MX} indicated by \mbox{[} section\+\_\+name \mbox{]}, which allows us to determine the section, and (2) parameter tags, indicated by the \textquotesingle{}P\+RM\textquotesingle{} or \textquotesingle{}R\+PT\textquotesingle{} keywords.
+
+As we go through the file, we figure out the atoms involved in the interaction described on each line.
+
+When a \textquotesingle{}P\+RM\textquotesingle{} keyword is indicated, it is followed by a number which is the field in the line to be modified, starting with zero. Based on the field number and the section name, we can figure out the parameter type. With the parameter type and the atoms in hand, we construct a \textquotesingle{}parameter identifier\textquotesingle{} or pid which uniquely identifies that parameter. We also store the physical parameter value in an array called \textquotesingle{}pvals0\textquotesingle{} and the precise location of that parameter (by filename, line number, and field number) in a list called \textquotesingle{}pfields\textquotesingle{}.
+
+An example\+: Suppose in \textquotesingle{}my\+\_\+ff.\+itp\textquotesingle{} I encounter the following on lines 146 and 147\+:
+
+
+\begin{DoxyCode}
+[ angletypes ]
+CA   CB   O   1   109.47  350.00  ; PRM 4 5
+\end{DoxyCode}
+
+
+From reading {\ttfamily \mbox{[} angletypes \mbox{]}} I know I\textquotesingle{}m in the \textquotesingle{}angletypes\textquotesingle{} section.
+
+On the next line, I notice two parameters on fields 4 and 5.
+
+From the atom types, section type and field number I know the parameter I\+Ds are {\ttfamily \textquotesingle{}A\+N\+G\+L\+E\+S\+B\+C\+A\+C\+BO\textquotesingle{}} and {\ttfamily \textquotesingle{}A\+N\+G\+L\+E\+S\+K\+C\+A\+C\+BO\textquotesingle{}}.
+
+After building {\ttfamily map=\{\textquotesingle{}A\+N\+G\+L\+E\+S\+B\+C\+A\+C\+BO\textquotesingle{}\+:1,\textquotesingle{}A\+N\+G\+L\+E\+S\+K\+C\+A\+C\+BO\textquotesingle{}\+:2\}}, I store the values in an array\+: {\ttfamily pvals0=array(\mbox{[}109.\+47,350.\+00\mbox{]})}, and I put the parameter locations in pfields\+: {\ttfamily pfields=\mbox{[}\mbox{[}\textquotesingle{}my\+\_\+ff.\+itp\textquotesingle{},147,4,1.\+0\mbox{]},\mbox{[}\textquotesingle{}my\+\_\+ff.\+itp\textquotesingle{},146,5,1.\+0\mbox{]}\mbox{]}}. The 1.\+0 is a \textquotesingle{}multiplier\textquotesingle{} and I will explain it below.
+
+Note that in the creation of parameter I\+Ds, we run into the issue that the atoms involved in the interaction may be labeled in reverse order (e.\+g. {\ttfamily O\+C\+A\+CB}). Thus, we store both the normal and the reversed parameter ID in the map.
+
+Parameter repetition and multiplier\+:
+
+If {\ttfamily \textquotesingle{}R\+PT\textquotesingle{}} is encountered in the line, it is always in the syntax\+: {\ttfamily \textquotesingle{}R\+PT 4 A\+N\+G\+L\+E\+S\+B\+C\+A\+C\+AH 5 M\+I\+N\+U\+S\+\_\+\+A\+N\+G\+L\+E\+S\+K\+C\+A\+C\+AH /\+R\+PT\textquotesingle{}}. In this case, field 4 is replaced by the stored parameter value corresponding to {\ttfamily A\+N\+G\+L\+E\+S\+B\+C\+A\+C\+AH} and field 5 is replaced by -\/1 times the stored value of {\ttfamily A\+N\+G\+L\+E\+S\+K\+C\+A\+C\+AH}. Now I just picked this as an example, I don\textquotesingle{}t think people actually want a negative angle force constant .. \+:) the {\ttfamily M\+I\+N\+US} keyword does come in handy for assigning atomic charges and virtual site positions. In order to achieve this, a multiplier of -\/1.\+0 is stored into pfields instead of 1.\+0.
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000010}{Todo}]Note that I can also create the opposite virtual site position by changing the atom labeling, woo!\end{DoxyRefDesc}
+
+
+Definition at line 362 of file gmxio.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_a5c347e28bb395ac06f1471ad3bf1bda9}\label{classsrc_1_1gmxio_1_1ITP__Reader_a5c347e28bb395ac06f1471ad3bf1bda9}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm }\end{DoxyParamCaption})}
+
+
+
+Definition at line 365 of file gmxio.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_ad77cbfb59fb27a9dc29aef06b0ef9d85}\label{classsrc_1_1gmxio_1_1ITP__Reader_ad77cbfb59fb27a9dc29aef06b0ef9d85}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!feed@{feed}}
+\index{feed@{feed}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{feed()}{feed()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+feed (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Given a line, determine the interaction type and the atoms involved (the suffix). 
+
+For example, we want ~\newline
+ {\ttfamily  H O H 5 1.\+231258497536e+02 4.\+269161426840e+02 -\/1.\+033397697685e-\/02 1.\+304674117410e+04 ; P\+RM 4 5 6 7 } ~\newline
+ to give us itype = \textquotesingle{}U\+R\+E\+Y\+\_\+\+B\+R\+A\+D\+L\+EY\textquotesingle{} and suffix = \textquotesingle{}H\+OH\textquotesingle{}
+
+If we are in a Type\+Section, it returns a list of atom types; ~\newline
+ If we are in a Topol\+Section, it returns a list of atom names.
+
+The section is essentially a case statement that picks out the appropriate interaction type and makes a list of the atoms involved
+
+Note that we can call gmxdump for this as well, but I prefer to read the force field file directly.
+
+To\+Do\+: \mbox{[} atoms \mbox{]} section might need to be more flexible to accommodate optional fields 
+
+Definition at line 403 of file gmxio.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_a05c07b194eb70ef0bb902e1c0b564b0d}\label{classsrc_1_1gmxio_1_1ITP__Reader_a05c07b194eb70ef0bb902e1c0b564b0d}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!atomnames@{atomnames}}
+\index{atomnames@{atomnames}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{atomnames}{atomnames}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+atomnames}
+
+
+
+Listing of all atom names in the file, (probably unnecessary) 
+
+
+
+Definition at line 377 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_aa2d64bc0d85487e04c8dbd8e7600f3cb}\label{classsrc_1_1gmxio_1_1ITP__Reader_aa2d64bc0d85487e04c8dbd8e7600f3cb}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!atomtype\+\_\+to\+\_\+mass@{atomtype\+\_\+to\+\_\+mass}}
+\index{atomtype\+\_\+to\+\_\+mass@{atomtype\+\_\+to\+\_\+mass}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{atomtype\+\_\+to\+\_\+mass}{atomtype\_to\_mass}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+atomtype\+\_\+to\+\_\+mass}
+
+
+
+A dictionary of atomic masses. 
+
+
+
+Definition at line 381 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_a07503bb3ca6d969f3198dfad1c554fd0}\label{classsrc_1_1gmxio_1_1ITP__Reader_a07503bb3ca6d969f3198dfad1c554fd0}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!atomtypes@{atomtypes}}
+\index{atomtypes@{atomtypes}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{atomtypes}{atomtypes}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+atomtypes}
+
+
+
+Listing of all atom types in the file, (probably unnecessary) 
+
+
+
+Definition at line 379 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_aaaafaaf937397d5d543678d8eca71f56}\label{classsrc_1_1gmxio_1_1ITP__Reader_aaaafaaf937397d5d543678d8eca71f56}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!itype@{itype}}
+\index{itype@{itype}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{itype}{itype}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+itype}
+
+
+
+Definition at line 406 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_af4eb334ecb67464f7cccef526b50cace}\label{classsrc_1_1gmxio_1_1ITP__Reader_af4eb334ecb67464f7cccef526b50cace}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!mol@{mol}}
+\index{mol@{mol}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{mol}{mol}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+mol}
+
+
+
+The current molecule (set by the moleculetype keyword) 
+
+
+
+Definition at line 373 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_a6b20408a9084dfa267bfa297a42c0468}\label{classsrc_1_1gmxio_1_1ITP__Reader_a6b20408a9084dfa267bfa297a42c0468}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!molatom@{molatom}}
+\index{molatom@{molatom}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{molatom}{molatom}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+molatom}
+
+
+
+Definition at line 522 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_ab966f47084cbfd5b2b92f665e1cf0abd}\label{classsrc_1_1gmxio_1_1ITP__Reader_ab966f47084cbfd5b2b92f665e1cf0abd}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!nbtype@{nbtype}}
+\index{nbtype@{nbtype}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{nbtype}{nbtype}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+nbtype}
+
+
+
+Nonbonded type. 
+
+
+
+Definition at line 371 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_a42d099927c66be494198125649c1fc08}\label{classsrc_1_1gmxio_1_1ITP__Reader_a42d099927c66be494198125649c1fc08}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!overpfx@{overpfx}}
+\index{overpfx@{overpfx}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{overpfx}{overpfx}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+overpfx}
+
+
+
+Definition at line 412 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_a10bf4a140a281780b8430b3ceb4402e4}\label{classsrc_1_1gmxio_1_1ITP__Reader_a10bf4a140a281780b8430b3ceb4402e4}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!oversfx@{oversfx}}
+\index{oversfx@{oversfx}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{oversfx}{oversfx}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+oversfx}
+
+
+
+Definition at line 413 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_abd110480676315a10d158a16055f9112}\label{classsrc_1_1gmxio_1_1ITP__Reader_abd110480676315a10d158a16055f9112}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{pdict}{pdict}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+pdict}
+
+
+
+The parameter dictionary (defined in this file) 
+
+
+
+Definition at line 375 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_a039afd7965f898a4982d68418fc5789f}\label{classsrc_1_1gmxio_1_1ITP__Reader_a039afd7965f898a4982d68418fc5789f}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!sec@{sec}}
+\index{sec@{sec}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{sec}{sec}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+sec}
+
+
+
+The current section that we\textquotesingle{}re in. 
+
+
+
+Definition at line 369 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1ITP__Reader_af4b9cf536091bc0a1d784f8e17905838}\label{classsrc_1_1gmxio_1_1ITP__Reader_af4b9cf536091bc0a1d784f8e17905838}} 
+\index{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader@{src\+::gmxio\+::\+I\+T\+P\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{suffix}{suffix}}
+{\footnotesize\ttfamily src.\+gmxio.\+I\+T\+P\+\_\+\+Reader.\+suffix}
+
+
+
+Definition at line 517 of file gmxio.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{gmxio_8py}{gmxio.\+py}\end{DoxyCompactItemize}

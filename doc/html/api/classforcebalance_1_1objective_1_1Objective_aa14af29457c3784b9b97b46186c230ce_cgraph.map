@@ -1,6 +1,0 @@
-<map id="forcebalance.objective.Objective.Target_Terms" name="forcebalance.objective.Objective.Target_Terms">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1finite__difference.html#ad84d3e385db1190e7d8ef58bc08a6c52" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="311,5,449,51"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1nifty.html#ac37d4fe58ef70ed546ebfc45d12f7a5d" title="forcebalance.nifty.getWork\lQueue" alt="" coords="287,74,473,121"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1nifty.html#a576de8c5b6f236280e07e73e39b2ab7c" title="This function waits until the work queue is completely empty. " alt="" coords="287,144,473,173"/>
-<area shape="rect" id="node9" href="$namespaceforcebalance_1_1nifty.html#a374aac2ef003be02fab49b20ff0a82f0" title="This function waits ten seconds to see if a task in the Work Queue has finished. " alt="" coords="523,135,677,182"/>
-</map>

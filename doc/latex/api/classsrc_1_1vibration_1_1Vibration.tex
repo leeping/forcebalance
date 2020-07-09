@@ -1,0 +1,318 @@
+\hypertarget{classsrc_1_1vibration_1_1Vibration}{}\subsection{src.\+vibration.\+Vibration Class Reference}
+\label{classsrc_1_1vibration_1_1Vibration}\index{src.\+vibration.\+Vibration@{src.\+vibration.\+Vibration}}
+
+
+Subclass of Target for fitting force fields to vibrational spectra (from experiment or theory).  
+
+
+
+
+Inheritance diagram for src.\+vibration.\+Vibration\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsrc_1_1vibration_1_1Vibration__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+vibration.\+Vibration\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsrc_1_1vibration_1_1Vibration__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1vibration_1_1Vibration_adada8dc93aaa34ec4b07f017808ec7d5}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\begin{DoxyCompactList}\small\item\em Initialization. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1vibration_1_1Vibration_a3e59c6a1f71154e1beb9c492f9eb753d}{read\+\_\+reference\+\_\+data} (self)
+\begin{DoxyCompactList}\small\item\em Read the reference vibrational data from a file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1vibration_1_1Vibration_a3d6d6f59937c5be9abc1455a9a9ca359}{indicate} (self)
+\begin{DoxyCompactList}\small\item\em Print qualitative indicator. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1vibration_1_1Vibration_aa7455f8e79497db19104240d75caec63}{vibration\+\_\+driver} (self)
+\item 
+def \hyperlink{classsrc_1_1vibration_1_1Vibration_a313f115cc437be87ece62c496ff8b7a5}{vib\+\_\+overlap} (self, v1, v2)
+\begin{DoxyCompactList}\small\item\em Calculate overlap between vibrational modes for two Cartesian displacements. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1vibration_1_1Vibration_a362a0f5c538ba08e63234019fdec3057}{get} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em Evaluate objective function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1vibration_1_1Vibration_a9550e67b0f5a4293a3b77dd4ff34945f}{loop\+\_\+over\+\_\+snapshots}
+\begin{DoxyCompactList}\small\item\em L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1vibration_1_1Vibration_a60cba0b90b62589d1b1f35a0f5f999d5}{vfnm}
+\begin{DoxyCompactList}\small\item\em The vdata.\+txt file that contains the vibrations. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1vibration_1_1Vibration_adb69becc218ed026150e7de7b06d7134}{engine}
+\begin{DoxyCompactList}\small\item\em Read in the reference data. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1vibration_1_1Vibration_a7ecc404f51442afb3cd0e4e4b15967dd}{na}
+\begin{DoxyCompactList}\small\item\em Number of atoms. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1vibration_1_1Vibration_a914808ec757925eedf7167114d87b3bb}{ref\+\_\+eigvals}
+\item 
+\hyperlink{classsrc_1_1vibration_1_1Vibration_a3b72a781b0fa1b08f9f6d8d5e345cc04}{ref\+\_\+eigvecs}
+\item 
+\hyperlink{classsrc_1_1vibration_1_1Vibration_a2c93d67c9bb6ac55094159ee85b12442}{reassign}
+\item 
+\hyperlink{classsrc_1_1vibration_1_1Vibration_a0cf6ea114a083a6d6dae49454465594e}{c2r}
+\item 
+\hyperlink{classsrc_1_1vibration_1_1Vibration_af76259c44c5a83bfba233c90cb22fd12}{overlaps}
+\item 
+\hyperlink{classsrc_1_1vibration_1_1Vibration_a223ca8d13062917e5166415e624a5ae3}{calc\+\_\+eigvals}
+\item 
+\hyperlink{classsrc_1_1vibration_1_1Vibration_a9ce5c92b056995dc03653a5c4f590fbf}{objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for fitting force fields to vibrational spectra (from experiment or theory). 
+
+Currently Tinker is supported. 
+
+Definition at line 40 of file vibration.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_adada8dc93aaa34ec4b07f017808ec7d5}\label{classsrc_1_1vibration_1_1Vibration_adada8dc93aaa34ec4b07f017808ec7d5}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+vibration.\+Vibration.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Initialization. 
+
+
+
+Definition at line 45 of file vibration.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1vibration_1_1Vibration_adada8dc93aaa34ec4b07f017808ec7d5_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a362a0f5c538ba08e63234019fdec3057}\label{classsrc_1_1vibration_1_1Vibration_a362a0f5c538ba08e63234019fdec3057}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!get@{get}}
+\index{get@{get}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+vibration.\+Vibration.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Evaluate objective function. 
+
+
+
+Definition at line 166 of file vibration.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1vibration_1_1Vibration_a362a0f5c538ba08e63234019fdec3057_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a3d6d6f59937c5be9abc1455a9a9ca359}\label{classsrc_1_1vibration_1_1Vibration_a3d6d6f59937c5be9abc1455a9a9ca359}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+vibration.\+Vibration.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Print qualitative indicator. 
+
+
+
+Definition at line 124 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a3e59c6a1f71154e1beb9c492f9eb753d}\label{classsrc_1_1vibration_1_1Vibration_a3e59c6a1f71154e1beb9c492f9eb753d}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}}
+\index{read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{read\+\_\+reference\+\_\+data()}{read\_reference\_data()}}
+{\footnotesize\ttfamily def src.\+vibration.\+Vibration.\+read\+\_\+reference\+\_\+data (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Read the reference vibrational data from a file. 
+
+
+
+Definition at line 78 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a313f115cc437be87ece62c496ff8b7a5}\label{classsrc_1_1vibration_1_1Vibration_a313f115cc437be87ece62c496ff8b7a5}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!vib\+\_\+overlap@{vib\+\_\+overlap}}
+\index{vib\+\_\+overlap@{vib\+\_\+overlap}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{vib\+\_\+overlap()}{vib\_overlap()}}
+{\footnotesize\ttfamily def src.\+vibration.\+Vibration.\+vib\+\_\+overlap (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{v1,  }\item[{}]{v2 }\end{DoxyParamCaption})}
+
+
+
+Calculate overlap between vibrational modes for two Cartesian displacements. 
+
+\paragraph*{Parameters }
+
+v1, v2 \+: np.\+ndarray The two sets of Cartesian displacements to compute overlap for, 3$\ast$\+N\+\_\+atoms values each.
+
+\paragraph*{Returns }
+
+float Overlap between mass-\/weighted eigenvectors 
+
+Definition at line 154 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_aa7455f8e79497db19104240d75caec63}\label{classsrc_1_1vibration_1_1Vibration_aa7455f8e79497db19104240d75caec63}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!vibration\+\_\+driver@{vibration\+\_\+driver}}
+\index{vibration\+\_\+driver@{vibration\+\_\+driver}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{vibration\+\_\+driver()}{vibration\_driver()}}
+{\footnotesize\ttfamily def src.\+vibration.\+Vibration.\+vibration\+\_\+driver (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 132 of file vibration.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a0cf6ea114a083a6d6dae49454465594e}\label{classsrc_1_1vibration_1_1Vibration_a0cf6ea114a083a6d6dae49454465594e}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!c2r@{c2r}}
+\index{c2r@{c2r}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{c2r}{c2r}}
+{\footnotesize\ttfamily src.\+vibration.\+Vibration.\+c2r}
+
+
+
+Definition at line 198 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a223ca8d13062917e5166415e624a5ae3}\label{classsrc_1_1vibration_1_1Vibration_a223ca8d13062917e5166415e624a5ae3}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!calc\+\_\+eigvals@{calc\+\_\+eigvals}}
+\index{calc\+\_\+eigvals@{calc\+\_\+eigvals}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{calc\+\_\+eigvals}{calc\_eigvals}}
+{\footnotesize\ttfamily src.\+vibration.\+Vibration.\+calc\+\_\+eigvals}
+
+
+
+Definition at line 218 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_adb69becc218ed026150e7de7b06d7134}\label{classsrc_1_1vibration_1_1Vibration_adb69becc218ed026150e7de7b06d7134}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!engine@{engine}}
+\index{engine@{engine}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{engine}{engine}}
+{\footnotesize\ttfamily src.\+vibration.\+Vibration.\+engine}
+
+
+
+Read in the reference data. 
+
+Build keyword dictionaries to pass to engine. Create engine object. 
+
+Definition at line 71 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a9550e67b0f5a4293a3b77dd4ff34945f}\label{classsrc_1_1vibration_1_1Vibration_a9550e67b0f5a4293a3b77dd4ff34945f}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}}
+\index{loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{loop\+\_\+over\+\_\+snapshots}{loop\_over\_snapshots}}
+{\footnotesize\ttfamily src.\+vibration.\+Vibration.\+loop\+\_\+over\+\_\+snapshots}
+
+
+
+L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. 
+
+
+
+Definition at line 62 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a7ecc404f51442afb3cd0e4e4b15967dd}\label{classsrc_1_1vibration_1_1Vibration_a7ecc404f51442afb3cd0e4e4b15967dd}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!na@{na}}
+\index{na@{na}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{na}{na}}
+{\footnotesize\ttfamily src.\+vibration.\+Vibration.\+na}
+
+
+
+Number of atoms. 
+
+
+
+Definition at line 80 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a9ce5c92b056995dc03653a5c4f590fbf}\label{classsrc_1_1vibration_1_1Vibration_a9ce5c92b056995dc03653a5c4f590fbf}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!objective@{objective}}
+\index{objective@{objective}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{objective}{objective}}
+{\footnotesize\ttfamily src.\+vibration.\+Vibration.\+objective}
+
+
+
+Definition at line 219 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_af76259c44c5a83bfba233c90cb22fd12}\label{classsrc_1_1vibration_1_1Vibration_af76259c44c5a83bfba233c90cb22fd12}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!overlaps@{overlaps}}
+\index{overlaps@{overlaps}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{overlaps}{overlaps}}
+{\footnotesize\ttfamily src.\+vibration.\+Vibration.\+overlaps}
+
+
+
+Definition at line 203 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a2c93d67c9bb6ac55094159ee85b12442}\label{classsrc_1_1vibration_1_1Vibration_a2c93d67c9bb6ac55094159ee85b12442}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!reassign@{reassign}}
+\index{reassign@{reassign}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{reassign}{reassign}}
+{\footnotesize\ttfamily src.\+vibration.\+Vibration.\+reassign}
+
+
+
+Definition at line 125 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a914808ec757925eedf7167114d87b3bb}\label{classsrc_1_1vibration_1_1Vibration_a914808ec757925eedf7167114d87b3bb}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!ref\+\_\+eigvals@{ref\+\_\+eigvals}}
+\index{ref\+\_\+eigvals@{ref\+\_\+eigvals}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{ref\+\_\+eigvals}{ref\_eigvals}}
+{\footnotesize\ttfamily src.\+vibration.\+Vibration.\+ref\+\_\+eigvals}
+
+
+
+Definition at line 81 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a3b72a781b0fa1b08f9f6d8d5e345cc04}\label{classsrc_1_1vibration_1_1Vibration_a3b72a781b0fa1b08f9f6d8d5e345cc04}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!ref\+\_\+eigvecs@{ref\+\_\+eigvecs}}
+\index{ref\+\_\+eigvecs@{ref\+\_\+eigvecs}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{ref\+\_\+eigvecs}{ref\_eigvecs}}
+{\footnotesize\ttfamily src.\+vibration.\+Vibration.\+ref\+\_\+eigvecs}
+
+
+
+Definition at line 82 of file vibration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1vibration_1_1Vibration_a60cba0b90b62589d1b1f35a0f5f999d5}\label{classsrc_1_1vibration_1_1Vibration_a60cba0b90b62589d1b1f35a0f5f999d5}} 
+\index{src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}!vfnm@{vfnm}}
+\index{vfnm@{vfnm}!src\+::vibration\+::\+Vibration@{src\+::vibration\+::\+Vibration}}
+\paragraph{\texorpdfstring{vfnm}{vfnm}}
+{\footnotesize\ttfamily src.\+vibration.\+Vibration.\+vfnm}
+
+
+
+The vdata.\+txt file that contains the vibrations. 
+
+
+
+Definition at line 64 of file vibration.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{vibration_8py}{vibration.\+py}\end{DoxyCompactItemize}

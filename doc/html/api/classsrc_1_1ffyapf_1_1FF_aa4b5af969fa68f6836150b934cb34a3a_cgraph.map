@@ -1,0 +1,5 @@
+<map id="src.ffyapf.FF.create_mvals" name="src.ffyapf.FF.create_mvals">
+<area shape="rect" id="node2" href="$namespacesrc_1_1nifty.html#ac5b7efc0b11b4fcbb7d0c37c97c4399d" title="Given any list, array, or matrix, return a single&#45;index array. " alt="" coords="219,5,318,32"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1nifty.html#a0943d024bad450c0f5aa277edcfb72ba" title="Invert a matrix using singular value decomposition. " alt="" coords="196,56,341,83"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1nifty.html#a9548285fa85a369d98169ec25abe974c" title="Given any list, array, or matrix, return a 1&#45;column 2D array. " alt="" coords="221,107,317,133"/>
+</map>

@@ -1,0 +1,211 @@
+\hypertarget{classsrc_1_1engine_1_1Engine}{}\subsection{src.\+engine.\+Engine Class Reference}
+\label{classsrc_1_1engine_1_1Engine}\index{src.\+engine.\+Engine@{src.\+engine.\+Engine}}
+
+
+Base class for all engines.  
+
+
+
+
+Inheritance diagram for src.\+engine.\+Engine\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=183pt]{classsrc_1_1engine_1_1Engine__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+engine.\+Engine\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=183pt]{classsrc_1_1engine_1_1Engine__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1engine_1_1Engine_a11d96735ebad9424597ce5bcc136ecf4}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, \hyperlink{classsrc_1_1engine_1_1Engine_a267f7ef994287a9c445d23a027b0e34d}{name}=\char`\"{}engine\char`\"{}, kwargs)
+\item 
+def \hyperlink{classsrc_1_1engine_1_1Engine_a6dbde4ed7e5e4955a87515a6fe9f7519}{setopts} (self, kwargs)
+\item 
+def \hyperlink{classsrc_1_1engine_1_1Engine_acd90b56501fd1e0ea541ecc7398ba55b}{readsrc} (self, kwargs)
+\item 
+def \hyperlink{classsrc_1_1engine_1_1Engine_a0ce6a2db9589fcbb740758f1c942029a}{prepare} (self, kwargs)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1engine_1_1Engine_a267f7ef994287a9c445d23a027b0e34d}{name}
+\item 
+\hyperlink{classsrc_1_1engine_1_1Engine_a6326b913644ba439cfe65522d07e963b}{verbose}
+\item 
+\hyperlink{classsrc_1_1engine_1_1Engine_afb0e130791ea1088dbc5386b2ea01811}{target}
+\begin{DoxyCompactList}\small\item\em Engines can get properties from the Target that creates them. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1engine_1_1Engine_aa9d5440600744dfb9cc728400635664d}{root}
+\item 
+\hyperlink{classsrc_1_1engine_1_1Engine_abf2834da51abf75377353cc0a37dbaa2}{srcdir}
+\item 
+\hyperlink{classsrc_1_1engine_1_1Engine_a26eb38a46966e497df7b8f414d760a41}{tempdir}
+\item 
+\hyperlink{classsrc_1_1engine_1_1Engine_a0473b94a475e233e89eac181516c929c}{FF}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Base class for all engines. 
+
+
+\begin{DoxyEnumerate}
+\item Introduction
+\end{DoxyEnumerate}
+
+In \hyperlink{namespaceForceBalance}{Force\+Balance} an \hyperlink{classsrc_1_1engine_1_1Engine}{Engine} represents a molecular dynamics code and the calculations that may be carried out with that code.
+
+
+\begin{DoxyEnumerate}
+\item Purpose
+\end{DoxyEnumerate}
+
+Previously system calls to MD software have been made by the Target. Duplication of code was occurring, because different Targets were carrying out the same type of calculation.
+
+
+\begin{DoxyEnumerate}
+\item Also
+\end{DoxyEnumerate}
+
+Target objects should contain \hyperlink{classsrc_1_1engine_1_1Engine}{Engine} objects, because Open\+MM \hyperlink{classsrc_1_1engine_1_1Engine}{Engine} objects need to be initialized at the start of a calculation. 
+
+Definition at line 41 of file engine.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1engine_1_1Engine_a11d96735ebad9424597ce5bcc136ecf4}\label{classsrc_1_1engine_1_1Engine_a11d96735ebad9424597ce5bcc136ecf4}} 
+\index{src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+engine.\+Engine.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{name = {\ttfamily \char`\"{}engine\char`\"{}},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 44 of file engine.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1engine_1_1Engine_a0ce6a2db9589fcbb740758f1c942029a}\label{classsrc_1_1engine_1_1Engine_a0ce6a2db9589fcbb740758f1c942029a}} 
+\index{src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}!prepare@{prepare}}
+\index{prepare@{prepare}!src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}}
+\paragraph{\texorpdfstring{prepare()}{prepare()}}
+{\footnotesize\ttfamily def src.\+engine.\+Engine.\+prepare (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 95 of file engine.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1engine_1_1Engine_acd90b56501fd1e0ea541ecc7398ba55b}\label{classsrc_1_1engine_1_1Engine_acd90b56501fd1e0ea541ecc7398ba55b}} 
+\index{src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}!readsrc@{readsrc}}
+\index{readsrc@{readsrc}!src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}}
+\paragraph{\texorpdfstring{readsrc()}{readsrc()}}
+{\footnotesize\ttfamily def src.\+engine.\+Engine.\+readsrc (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 92 of file engine.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1engine_1_1Engine_a6dbde4ed7e5e4955a87515a6fe9f7519}\label{classsrc_1_1engine_1_1Engine_a6dbde4ed7e5e4955a87515a6fe9f7519}} 
+\index{src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}!setopts@{setopts}}
+\index{setopts@{setopts}!src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}}
+\paragraph{\texorpdfstring{setopts()}{setopts()}}
+{\footnotesize\ttfamily def src.\+engine.\+Engine.\+setopts (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 89 of file engine.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1engine_1_1Engine_a0473b94a475e233e89eac181516c929c}\label{classsrc_1_1engine_1_1Engine_a0473b94a475e233e89eac181516c929c}} 
+\index{src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}!FF@{FF}}
+\index{FF@{FF}!src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}}
+\paragraph{\texorpdfstring{FF}{FF}}
+{\footnotesize\ttfamily src.\+engine.\+Engine.\+FF}
+
+
+
+Definition at line 65 of file engine.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1engine_1_1Engine_a267f7ef994287a9c445d23a027b0e34d}\label{classsrc_1_1engine_1_1Engine_a267f7ef994287a9c445d23a027b0e34d}} 
+\index{src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}!name@{name}}
+\index{name@{name}!src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}}
+\paragraph{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily src.\+engine.\+Engine.\+name}
+
+
+
+Definition at line 48 of file engine.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1engine_1_1Engine_aa9d5440600744dfb9cc728400635664d}\label{classsrc_1_1engine_1_1Engine_aa9d5440600744dfb9cc728400635664d}} 
+\index{src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}!root@{root}}
+\index{root@{root}!src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}}
+\paragraph{\texorpdfstring{root}{root}}
+{\footnotesize\ttfamily src.\+engine.\+Engine.\+root}
+
+
+
+Definition at line 56 of file engine.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1engine_1_1Engine_abf2834da51abf75377353cc0a37dbaa2}\label{classsrc_1_1engine_1_1Engine_abf2834da51abf75377353cc0a37dbaa2}} 
+\index{src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}!srcdir@{srcdir}}
+\index{srcdir@{srcdir}!src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}}
+\paragraph{\texorpdfstring{srcdir}{srcdir}}
+{\footnotesize\ttfamily src.\+engine.\+Engine.\+srcdir}
+
+
+
+Definition at line 57 of file engine.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1engine_1_1Engine_afb0e130791ea1088dbc5386b2ea01811}\label{classsrc_1_1engine_1_1Engine_afb0e130791ea1088dbc5386b2ea01811}} 
+\index{src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}!target@{target}}
+\index{target@{target}!src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}}
+\paragraph{\texorpdfstring{target}{target}}
+{\footnotesize\ttfamily src.\+engine.\+Engine.\+target}
+
+
+
+Engines can get properties from the Target that creates them. 
+
+
+
+Definition at line 55 of file engine.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1engine_1_1Engine_a26eb38a46966e497df7b8f414d760a41}\label{classsrc_1_1engine_1_1Engine_a26eb38a46966e497df7b8f414d760a41}} 
+\index{src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}!tempdir@{tempdir}}
+\index{tempdir@{tempdir}!src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}}
+\paragraph{\texorpdfstring{tempdir}{tempdir}}
+{\footnotesize\ttfamily src.\+engine.\+Engine.\+tempdir}
+
+
+
+Definition at line 58 of file engine.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1engine_1_1Engine_a6326b913644ba439cfe65522d07e963b}\label{classsrc_1_1engine_1_1Engine_a6326b913644ba439cfe65522d07e963b}} 
+\index{src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}!verbose@{verbose}}
+\index{verbose@{verbose}!src\+::engine\+::\+Engine@{src\+::engine\+::\+Engine}}
+\paragraph{\texorpdfstring{verbose}{verbose}}
+{\footnotesize\ttfamily src.\+engine.\+Engine.\+verbose}
+
+
+
+Definition at line 50 of file engine.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{engine_8py}{engine.\+py}\end{DoxyCompactItemize}

@@ -1,31 +1,56 @@
-\hypertarget{amberio_8py}{\subsection{amberio.\-py File Reference}
-\label{amberio_8py}\index{amberio.\-py@{amberio.\-py}}
-}
+\hypertarget{amberio_8py}{}\subsection{amberio.\+py File Reference}
+\label{amberio_8py}\index{amberio.\+py@{amberio.\+py}}
 \subsubsection*{Classes}
 \begin{DoxyCompactItemize}
 \item 
-class \hyperlink{classforcebalance_1_1amberio_1_1Mol2__Reader}{forcebalance.\-amberio.\-Mol2\-\_\-\-Reader}
-\begin{DoxyCompactList}\small\item\em Finite state machine for parsing \hyperlink{namespaceforcebalance_1_1Mol2}{Mol2} force field file. \end{DoxyCompactList}\item 
-class \hyperlink{classforcebalance_1_1amberio_1_1FrcMod__Reader}{forcebalance.\-amberio.\-Frc\-Mod\-\_\-\-Reader}
-\begin{DoxyCompactList}\small\item\em Finite state machine for parsing Frc\-Mod force field file. \end{DoxyCompactList}\item 
-class \hyperlink{classforcebalance_1_1amberio_1_1AbInitio__AMBER}{forcebalance.\-amberio.\-Ab\-Initio\-\_\-\-A\-M\-B\-E\-R}
-\begin{DoxyCompactList}\small\item\em Subclass of Target for force and energy matching using A\-M\-B\-E\-R. \end{DoxyCompactList}\end{DoxyCompactItemize}
+class \hyperlink{classsrc_1_1amberio_1_1Mol2__Reader}{src.\+amberio.\+Mol2\+\_\+\+Reader}
+\begin{DoxyCompactList}\small\item\em Finite state machine for parsing \hyperlink{namespacesrc_1_1Mol2}{Mol2} force field file. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader}{src.\+amberio.\+Frc\+Mod\+\_\+\+Reader}
+\begin{DoxyCompactList}\small\item\em Finite state machine for parsing Frc\+Mod force field file. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader}{src.\+amberio.\+Prmtop\+Loader}
+\begin{DoxyCompactList}\small\item\em Parsed \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} prmtop file. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1AMBER}{src.\+amberio.\+A\+M\+B\+ER}
+\begin{DoxyCompactList}\small\item\em Engine for carrying out general purpose \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} calculations. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1AbInitio__AMBER}{src.\+amberio.\+Ab\+Initio\+\_\+\+A\+M\+B\+ER}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for force and energy matching using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1Interaction__AMBER}{src.\+amberio.\+Interaction\+\_\+\+A\+M\+B\+ER}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for calculating and matching ineraction energies using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1Vibration__AMBER}{src.\+amberio.\+Vibration\+\_\+\+A\+M\+B\+ER}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for calculating and matching vibrational modes using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1Liquid__AMBER}{src.\+amberio.\+Liquid\+\_\+\+A\+M\+B\+ER}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for calculating and matching liquid properties using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsubsection*{Namespaces}
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{namespaceforcebalance_1_1amberio}{forcebalance.\-amberio}
-\begin{DoxyCompactList}\small\item\em A\-M\-B\-E\-R force field input/output. \end{DoxyCompactList}\end{DoxyCompactItemize}
+ \hyperlink{namespacesrc_1_1amberio}{src.\+amberio}
+\item 
+ \hyperlink{namespaceforcebalance_1_1amberio}{forcebalance.\+amberio}
+\begin{DoxyCompactList}\small\item\em A\+M\+B\+ER force field input/output. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-def \hyperlink{namespaceforcebalance_1_1amberio_af59589a24e815a11db69dcaa21c51659}{forcebalance.\-amberio.\-is\-\_\-mol2\-\_\-atom}
-\end{DoxyCompactItemize}
+def \hyperlink{namespacesrc_1_1amberio_abe9d4cfc536441837882e79989079f52}{src.\+amberio.\+is\+\_\+mol2\+\_\+atom} (line)
+\item 
+def \hyperlink{namespacesrc_1_1amberio_ac5df3fe728e9cc0536e1abc7ce6c982d}{src.\+amberio.\+write\+\_\+leap} (fnm, mol2=\mbox{[}$\,$\mbox{]}, frcmod=\mbox{[}$\,$\mbox{]}, pdb=None, prefix=\textquotesingle{}amber\textquotesingle{}, spath=\mbox{[}$\,$\mbox{]}, delcheck=False)
+\begin{DoxyCompactList}\small\item\em Parse and edit an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} L\+EaP input file. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1amberio_ab145e7dc869bc06009b5f5cf0208bb77}{src.\+amberio.\+split\+Comment} (mystr, debug=False)
+\begin{DoxyCompactList}\small\item\em Remove the comment from a line in an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} namelist. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1amberio_a526ac77cde3d083631db82b2d229d2db}{src.\+amberio.\+parse\+\_\+amber\+\_\+namelist} (fin)
+\begin{DoxyCompactList}\small\item\em Parse a file containing an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} namelist (only significantly tested for sander input). \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1amberio_aa3b1df1e806f3b06b41bcaabe3873998}{src.\+amberio.\+write\+\_\+mdin} (calctype, fout=None, nsteps=None, timestep=None, nsave=None, pbc=False, temperature=None, pressure=None, mdin\+\_\+orig=None)
+\begin{DoxyCompactList}\small\item\em Write an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} .mdin file to carry out a calculation using sander or pmemd.\+cuda. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsubsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
-tuple \hyperlink{namespaceforcebalance_1_1amberio_a83e0daca87d51461c74be86337502ed5}{forcebalance.\-amberio.\-logger} = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)
+\hyperlink{namespacesrc_1_1amberio_a393fcac75c6f7641bc423b74d54be7c4}{src.\+amberio.\+logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
 \item 
-dictionary \hyperlink{namespaceforcebalance_1_1amberio_a84f51a0ccf50d3442cefb90f948653b0}{forcebalance.\-amberio.\-mol2\-\_\-pdict} = \{'C\-O\-U\-L'\-:\{'Atom'\-:\mbox{[}1\mbox{]}, 8\-:''\}\}
+float \hyperlink{namespacesrc_1_1amberio_acbb6d6c182cf67d8aac7feb23092d430}{src.\+amberio.\+kb\+\_\+kcal} = 0.\+0019872041
 \item 
-dictionary \hyperlink{namespaceforcebalance_1_1amberio_a7d8a1776c628e73cc2f4fb6eba17030a}{forcebalance.\-amberio.\-frcmod\-\_\-pdict}
+dictionary \hyperlink{namespacesrc_1_1amberio_a2c5ebd63f79b3c6412150fd76f0951ae}{src.\+amberio.\+mol2\+\_\+pdict} = \{\textquotesingle{}C\+O\+UL\textquotesingle{}\+:\{\textquotesingle{}Atom\textquotesingle{}\+:\mbox{[}1\mbox{]}, 8\+:\textquotesingle{}\textquotesingle{}\}\}
+\item 
+dictionary \hyperlink{namespacesrc_1_1amberio_a5c0a9d5f44c2ea9fdd2f3ebecd2f0e1e}{src.\+amberio.\+frcmod\+\_\+pdict}
+\item 
+string \hyperlink{namespacesrc_1_1amberio_a310fef0f53ae182324b5e25efe513646}{src.\+amberio.\+P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+LS}
+\item 
+string \hyperlink{namespacesrc_1_1amberio_a846cab198dce2c2fea591135f041ee2e}{src.\+amberio.\+P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+L\+\_\+\+L\+I\+ST} = P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+L\+S.\+replace(\textquotesingle{},\textquotesingle{}, \textquotesingle{}\textquotesingle{}).split()
 \end{DoxyCompactItemize}

@@ -1,3 +1,17 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classforcebalance_1_1Mol2_1_1mol2.html" title="This is to manage one mol2 series of lines on the form: " alt="" coords="7,5,180,35"/>
+<area shape="rect" id="node2" href="$classsrc_1_1abinitio_1_1AbInitio.html" title="Subclass of Target for fitting force fields to ab initio data. " alt="" coords="151,5,299,32"/>
+<area shape="rect" id="node3" href="$classsrc_1_1binding_1_1BindingEnergy.html" title="Improved subclass of Target for fitting force fields to binding energies. " alt="" coords="130,56,321,83"/>
+<area shape="rect" id="node4" href="$classsrc_1_1counterpoise_1_1Counterpoise.html" title="Target subclass for matching the counterpoise correction. " alt="" coords="116,107,335,133"/>
+<area shape="rect" id="node5" href="$classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF.html" title="A custom optimisation target which employs the openff&#45;evaluator package to rapidly estimate a collect..." alt="" coords="129,158,321,199"/>
+<area shape="rect" id="node6" href="$classsrc_1_1hydration_1_1Hydration.html" title="Subclass of Target for fitting force fields to hydration free energies. " alt="" coords="138,224,313,251"/>
+<area shape="rect" id="node7" href="$classsrc_1_1interaction_1_1Interaction.html" title="Subclass of Target for fitting force fields to interaction energies. " alt="" coords="131,275,320,301"/>
+<area shape="rect" id="node8" href="$classsrc_1_1leastsq_1_1LeastSquares.html" title="Subclass of Target for general least squares fitting. " alt="" coords="134,325,317,352"/>
+<area shape="rect" id="node9" href="$classsrc_1_1lipid_1_1Lipid.html" title="Subclass of Target for lipid property matching. " alt="" coords="171,376,279,403"/>
+<area shape="rect" id="node10" href="$classsrc_1_1liquid_1_1Liquid.html" title="Subclass of Target for liquid property matching. " alt="" coords="163,427,287,453"/>
+<area shape="rect" id="node11" href="$classsrc_1_1moments_1_1Moments.html" title="Subclass of Target for fitting force fields to multipole moments (from experiment or theory)..." alt="" coords="140,477,311,504"/>
+<area shape="rect" id="node12" href="$classsrc_1_1opt__geo__target_1_1OptGeoTarget.html" title="Subclass of Target for fitting MM optimized geometries to QM optimized geometries. " alt="" coords="127,529,323,570"/>
+<area shape="rect" id="node13" href="$classsrc_1_1psi4io_1_1RDVR3__Psi4.html" title="Subclass of Target for R&#45;DVR3 grid fitting. " alt="" coords="142,595,309,621"/>
+<area shape="rect" id="node14" href="$classsrc_1_1thermo_1_1Thermo.html" title="A target for fitting general experimental data sets. " alt="" coords="152,645,299,672"/>
+<area shape="rect" id="node15" href="$classsrc_1_1torsion__profile_1_1TorsionProfileTarget.html" title="Subclass of Target for fitting MM optimized geometries to QM optimized geometries. " alt="" coords="131,697,319,738"/>
+<area shape="rect" id="node16" href="$classsrc_1_1vibration_1_1Vibration.html" title="Subclass of Target for fitting force fields to vibrational spectra (from experiment or theory)..." alt="" coords="142,763,309,789"/>
 </map>

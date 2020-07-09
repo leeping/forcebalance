@@ -1,0 +1,932 @@
+\hypertarget{classsrc_1_1gmxio_1_1GMX}{}\subsection{src.\+gmxio.\+G\+MX Class Reference}
+\label{classsrc_1_1gmxio_1_1GMX}\index{src.\+gmxio.\+G\+MX@{src.\+gmxio.\+G\+MX}}
+
+
+Derived from Engine object for carrying out general purpose G\+R\+O\+M\+A\+CS calculations.  
+
+
+
+
+Inheritance diagram for src.\+gmxio.\+G\+MX\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=170pt]{classsrc_1_1gmxio_1_1GMX__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+gmxio.\+G\+MX\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=170pt]{classsrc_1_1gmxio_1_1GMX__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_aa29d0675a8429d93d3a9ebf5b9634c32}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, name=\char`\"{}gmx\char`\"{}, kwargs)
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a585636f44e08bca144cadbe8755f37f2}{setopts} (self, kwargs)
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; Set G\+R\+O\+M\+A\+C\+S-\/specific options. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a276bb887f884865956c49592b21d8f1f}{readsrc} (self, kwargs)
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; read files from the source directory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_ab8b789bb8fb56f2cab0ba4dff7c5deb0}{prepare} (self, \hyperlink{classsrc_1_1gmxio_1_1GMX_a73bfde9773109c13b0f11eadd215cc1e}{pbc}=False, kwargs)
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; prepare the temp directory and figure out the topology. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_ab8c1d39bda1b3d7060b9348fe8a1b074}{get\+\_\+charges} (self)
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a3f0267ba817464cc778e6fe4a50e8440}{links} (self)
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a9cd8a8dde96ee479107dd2933922235d}{callgmx} (self, command, stdin=None, print\+\_\+to\+\_\+screen=False, print\+\_\+command=False, kwargs)
+\begin{DoxyCompactList}\small\item\em Call G\+R\+O\+M\+A\+CS; prepend the gmxpath to the call to the G\+R\+O\+M\+A\+CS program. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a24343e631722ec863df94641493128a9}{warngmx} (self, command, warnings=\mbox{[}$\,$\mbox{]}, maxwarn=1, kwargs)
+\begin{DoxyCompactList}\small\item\em Call gromacs and allow for certain expected warnings. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_aa2907fefccf0791846d2bc87f38ef5fe}{energy\+\_\+termnames} (self, edrfile=None)
+\begin{DoxyCompactList}\small\item\em Get a list of energy term names from the .edr file by parsing a system call to g\+\_\+energy. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a92d0a874a4b720617b984cfb3f3117cf}{optimize} (self, shot, crit=1e-\/4, align=\+True, kwargs)
+\begin{DoxyCompactList}\small\item\em Optimize the geometry and align the optimized geometry to the starting geometry. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_aece1608d0fc0b3a2a121edb09ac30f75}{evaluate\+\_\+} (self, force=False, dipole=False, traj=None)
+\begin{DoxyCompactList}\small\item\em Utility function for computing energy, and (optionally) forces and dipoles using G\+R\+O\+M\+A\+CS. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_ac5273754ebbd61d4798b4acc4f4479bc}{evaluate\+\_\+snapshot} (self, shot, force=False, dipole=False)
+\begin{DoxyCompactList}\small\item\em Evaluate variables (energies, force and/or dipole) using G\+R\+O\+M\+A\+CS for a single snapshot. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_ab183586fa000692169f9904269add851}{evaluate\+\_\+trajectory} (self, force=False, dipole=False, traj=None)
+\begin{DoxyCompactList}\small\item\em Evaluate variables (energies, force and/or dipole) using G\+R\+O\+M\+A\+CS over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a359787564e21019ed5baa7e436f0e523}{make\+\_\+gro\+\_\+trajectory} (self, fout=None)
+\begin{DoxyCompactList}\small\item\em Return the MD trajectory as a Molecule object. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_ae025c413d18359468ccaeb5e86eaf130}{energy\+\_\+one} (self, shot)
+\begin{DoxyCompactList}\small\item\em Compute the energy using G\+R\+O\+M\+A\+CS for a snapshot. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a1d9129c7e9e4e081ee985256338ec663}{energy\+\_\+force\+\_\+one} (self, shot)
+\begin{DoxyCompactList}\small\item\em Compute the energy and force using G\+R\+O\+M\+A\+CS for a single snapshot; interfaces with Ab\+Initio target. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_ab777a6e6ad8f1cfb8b7d3f5ced60838e}{energy} (self, traj=None)
+\begin{DoxyCompactList}\small\item\em Compute the energy using G\+R\+O\+M\+A\+CS over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_afc3071aab6e7a737e0baada5f9b1f292}{energy\+\_\+force} (self, force=True, traj=None)
+\begin{DoxyCompactList}\small\item\em Compute the energy and force using G\+R\+O\+M\+A\+CS over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a19fc55e4c5bc5d3bf300070cdb1a49a7}{energy\+\_\+dipole} (self, traj=None)
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_ab545f644dac9947905b0b8c64d5f9c6d}{energy\+\_\+rmsd} (self, shot, \hyperlink{classsrc_1_1gmxio_1_1GMX_a92d0a874a4b720617b984cfb3f3117cf}{optimize}=True)
+\begin{DoxyCompactList}\small\item\em Calculate energy of the selected structure (optionally minimize and return the minimized energy and R\+M\+SD). \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a1374e65cac6409dfde7e90b110f4c599}{interaction\+\_\+energy} (self, fraga, fragb)
+\begin{DoxyCompactList}\small\item\em Computes the interaction energy between two fragments over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a28111ac260dc9abee6f9f9e9bfaa8332}{multipole\+\_\+moments} (self, shot=0, \hyperlink{classsrc_1_1gmxio_1_1GMX_a92d0a874a4b720617b984cfb3f3117cf}{optimize}=True, polarizability=False)
+\begin{DoxyCompactList}\small\item\em Return the multipole moments of the 1st snapshot in Debye and Buckingham units. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_adbb731b653e4f79880ee97a67d128805}{normal\+\_\+modes} (self, shot=0, \hyperlink{classsrc_1_1gmxio_1_1GMX_a92d0a874a4b720617b984cfb3f3117cf}{optimize}=True)
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a414ad54bca72f823dee0cb5239cc8e58}{generate\+\_\+positions} (self)
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a1dd15e453829991f85a8cc4798425813}{n\+\_\+snaps} (self, nsteps, step\+\_\+interval, timestep)
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a8aeaf687eee94c8da3fb33c1e22802d6}{scd\+\_\+persnap} (self, ndx, timestep, final\+\_\+frame)
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a1dfcbef267b12f239d0670ecbe1f41d8}{calc\+\_\+scd} (self, n\+\_\+snap, timestep)
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a6a18f06050c5b64ef2c88fc8ee40d107}{n\+\_\+nonwater} (self, structure\+\_\+file)
+\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_abab1e48b2b3d25277b9f4392807938ae}{molecular\+\_\+dynamics} (self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=0, minimize=True, threads=None, verbose=False, bilayer=False, kwargs)
+\begin{DoxyCompactList}\small\item\em Method for running a molecular dynamics simulation. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1gmxio_1_1GMX_a3133906ca908cb9a5e6fc816460ec498}{md} (self, nsteps=0, nequil=0, verbose=False, deffnm=None, kwargs)
+\begin{DoxyCompactList}\small\item\em Method for running a molecular dynamics simulation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a73bfdd122081f5fa7bd1b969f8c0992b}{valkwd}
+\begin{DoxyCompactList}\small\item\em Valid G\+R\+O\+M\+A\+C\+S-\/specific keywords. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a0a5328567ebce344ddc08d82789b2d01}{gmxsuffix}
+\begin{DoxyCompactList}\small\item\em Disable some optimizations. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a92135a30fa70b53aafdcb5984c3479a8}{gmx\+\_\+eq\+\_\+barostat}
+\begin{DoxyCompactList}\small\item\em Barostat keyword for equilibration. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a28ec53794f4ef9449e39029677e5114c}{gmxpath}
+\begin{DoxyCompactList}\small\item\em The directory containing G\+R\+O\+M\+A\+CS executables (e.\+g. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a8c2ec3cee34d56ee3e77d60990a8185e}{gmxversion}
+\begin{DoxyCompactList}\small\item\em Figure out the G\+R\+O\+M\+A\+CS version -\/ it will determine how programs are called. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_acc200558ac0436547d74efde5f057964}{top}
+\begin{DoxyCompactList}\small\item\em Attempt to determine file names of .gro, .top, and .mdp files. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_af9738ed7d8f41cbf3287e2688bcb708d}{mdp}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_aefbef8e64c33b07808f14733780712a2}{mol}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a4739a21d2bd0b02f69e4fa2c3d831849}{gmx\+\_\+defs}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a73bfde9773109c13b0f11eadd215cc1e}{pbc}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a9f08fa57b1b204a3e7c77b01aae38989}{have\+\_\+constraints}
+\begin{DoxyCompactList}\small\item\em Link files into the temp directory. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a3554ea6c9cab32e582a5ebeeb48b94da}{double}
+\begin{DoxyCompactList}\small\item\em Write out the trajectory coordinates to a .gro file. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a23a0c5f383f369b3d45a85f600d42757}{Atom\+Mask}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a6d192dedcf63a9d71896f18813131ebd}{Atom\+Lists}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a9a7a0b53e21750c13600ec30b70d69fe}{mdtraj}
+\item 
+\hyperlink{classsrc_1_1gmxio_1_1GMX_a9480881bb53654a82cf1b9abf736b123}{mdene}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Derived from Engine object for carrying out general purpose G\+R\+O\+M\+A\+CS calculations. 
+
+
+
+Definition at line 533 of file gmxio.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_aa29d0675a8429d93d3a9ebf5b9634c32}\label{classsrc_1_1gmxio_1_1GMX_aa29d0675a8429d93d3a9ebf5b9634c32}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{name = {\ttfamily \char`\"{}gmx\char`\"{}},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 536 of file gmxio.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a1dfcbef267b12f239d0670ecbe1f41d8}\label{classsrc_1_1gmxio_1_1GMX_a1dfcbef267b12f239d0670ecbe1f41d8}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!calc\+\_\+scd@{calc\+\_\+scd}}
+\index{calc\+\_\+scd@{calc\+\_\+scd}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{calc\+\_\+scd()}{calc\_scd()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+calc\+\_\+scd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{n\+\_\+snap,  }\item[{}]{timestep }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1194 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a1dfcbef267b12f239d0670ecbe1f41d8_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a9cd8a8dde96ee479107dd2933922235d}\label{classsrc_1_1gmxio_1_1GMX_a9cd8a8dde96ee479107dd2933922235d}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!callgmx@{callgmx}}
+\index{callgmx@{callgmx}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{callgmx()}{callgmx()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+callgmx (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{command,  }\item[{}]{stdin = {\ttfamily None},  }\item[{}]{print\+\_\+to\+\_\+screen = {\ttfamily False},  }\item[{}]{print\+\_\+command = {\ttfamily False},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Call G\+R\+O\+M\+A\+CS; prepend the gmxpath to the call to the G\+R\+O\+M\+A\+CS program. 
+
+
+
+Definition at line 793 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a9cd8a8dde96ee479107dd2933922235d_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_ab777a6e6ad8f1cfb8b7d3f5ced60838e}\label{classsrc_1_1gmxio_1_1GMX_ab777a6e6ad8f1cfb8b7d3f5ced60838e}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!energy@{energy}}
+\index{energy@{energy}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{energy()}{energy()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+energy (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{traj = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Compute the energy using G\+R\+O\+M\+A\+CS over a trajectory. 
+
+
+
+Definition at line 1015 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_ab777a6e6ad8f1cfb8b7d3f5ced60838e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a19fc55e4c5bc5d3bf300070cdb1a49a7}\label{classsrc_1_1gmxio_1_1GMX_a19fc55e4c5bc5d3bf300070cdb1a49a7}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!energy\+\_\+dipole@{energy\+\_\+dipole}}
+\index{energy\+\_\+dipole@{energy\+\_\+dipole}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{energy\+\_\+dipole()}{energy\_dipole()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+energy\+\_\+dipole (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{traj = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1028 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a19fc55e4c5bc5d3bf300070cdb1a49a7_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_afc3071aab6e7a737e0baada5f9b1f292}\label{classsrc_1_1gmxio_1_1GMX_afc3071aab6e7a737e0baada5f9b1f292}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!energy\+\_\+force@{energy\+\_\+force}}
+\index{energy\+\_\+force@{energy\+\_\+force}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{energy\+\_\+force()}{energy\_force()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+energy\+\_\+force (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{force = {\ttfamily True},  }\item[{}]{traj = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Compute the energy and force using G\+R\+O\+M\+A\+CS over a trajectory. 
+
+
+
+Definition at line 1022 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_afc3071aab6e7a737e0baada5f9b1f292_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a1d9129c7e9e4e081ee985256338ec663}\label{classsrc_1_1gmxio_1_1GMX_a1d9129c7e9e4e081ee985256338ec663}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!energy\+\_\+force\+\_\+one@{energy\+\_\+force\+\_\+one}}
+\index{energy\+\_\+force\+\_\+one@{energy\+\_\+force\+\_\+one}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{energy\+\_\+force\+\_\+one()}{energy\_force\_one()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+energy\+\_\+force\+\_\+one (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot }\end{DoxyParamCaption})}
+
+
+
+Compute the energy and force using G\+R\+O\+M\+A\+CS for a single snapshot; interfaces with Ab\+Initio target. 
+
+
+
+Definition at line 1007 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a1d9129c7e9e4e081ee985256338ec663_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_ae025c413d18359468ccaeb5e86eaf130}\label{classsrc_1_1gmxio_1_1GMX_ae025c413d18359468ccaeb5e86eaf130}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!energy\+\_\+one@{energy\+\_\+one}}
+\index{energy\+\_\+one@{energy\+\_\+one}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{energy\+\_\+one()}{energy\_one()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+energy\+\_\+one (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot }\end{DoxyParamCaption})}
+
+
+
+Compute the energy using G\+R\+O\+M\+A\+CS for a snapshot. 
+
+
+
+Definition at line 1000 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_ae025c413d18359468ccaeb5e86eaf130_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_ab545f644dac9947905b0b8c64d5f9c6d}\label{classsrc_1_1gmxio_1_1GMX_ab545f644dac9947905b0b8c64d5f9c6d}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!energy\+\_\+rmsd@{energy\+\_\+rmsd}}
+\index{energy\+\_\+rmsd@{energy\+\_\+rmsd}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{energy\+\_\+rmsd()}{energy\_rmsd()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+energy\+\_\+rmsd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot,  }\item[{}]{optimize = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Calculate energy of the selected structure (optionally minimize and return the minimized energy and R\+M\+SD). 
+
+In kcal/mol. 
+
+Definition at line 1034 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_ab545f644dac9947905b0b8c64d5f9c6d_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_aa2907fefccf0791846d2bc87f38ef5fe}\label{classsrc_1_1gmxio_1_1GMX_aa2907fefccf0791846d2bc87f38ef5fe}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!energy\+\_\+termnames@{energy\+\_\+termnames}}
+\index{energy\+\_\+termnames@{energy\+\_\+termnames}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{energy\+\_\+termnames()}{energy\_termnames()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+energy\+\_\+termnames (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{edrfile = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Get a list of energy term names from the .edr file by parsing a system call to g\+\_\+energy. 
+
+
+
+Definition at line 857 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_aa2907fefccf0791846d2bc87f38ef5fe_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_aece1608d0fc0b3a2a121edb09ac30f75}\label{classsrc_1_1gmxio_1_1GMX_aece1608d0fc0b3a2a121edb09ac30f75}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!evaluate\+\_\+@{evaluate\+\_\+}}
+\index{evaluate\+\_\+@{evaluate\+\_\+}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{evaluate\+\_\+()}{evaluate\_()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+evaluate\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{force = {\ttfamily False},  }\item[{}]{dipole = {\ttfamily False},  }\item[{}]{traj = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Utility function for computing energy, and (optionally) forces and dipoles using G\+R\+O\+M\+A\+CS. 
+
+Inputs\+: force\+: Switch for calculating the force. dipole\+: Switch for calculating the dipole. traj\+: Trajectory file name. If present, will loop over these snapshots. Otherwise will do a single point evaluation at the current geometry.
+
+Outputs\+: Result\+: Dictionary containing energies, forces and/or dipoles. 
+
+Definition at line 935 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_aece1608d0fc0b3a2a121edb09ac30f75_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_ac5273754ebbd61d4798b4acc4f4479bc}\label{classsrc_1_1gmxio_1_1GMX_ac5273754ebbd61d4798b4acc4f4479bc}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!evaluate\+\_\+snapshot@{evaluate\+\_\+snapshot}}
+\index{evaluate\+\_\+snapshot@{evaluate\+\_\+snapshot}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{evaluate\+\_\+snapshot()}{evaluate\_snapshot()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+evaluate\+\_\+snapshot (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot,  }\item[{}]{force = {\ttfamily False},  }\item[{}]{dipole = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Evaluate variables (energies, force and/or dipole) using G\+R\+O\+M\+A\+CS for a single snapshot. 
+
+
+
+Definition at line 968 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_ac5273754ebbd61d4798b4acc4f4479bc_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_ab183586fa000692169f9904269add851}\label{classsrc_1_1gmxio_1_1GMX_ab183586fa000692169f9904269add851}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!evaluate\+\_\+trajectory@{evaluate\+\_\+trajectory}}
+\index{evaluate\+\_\+trajectory@{evaluate\+\_\+trajectory}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{evaluate\+\_\+trajectory()}{evaluate\_trajectory()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+evaluate\+\_\+trajectory (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{force = {\ttfamily False},  }\item[{}]{dipole = {\ttfamily False},  }\item[{}]{traj = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Evaluate variables (energies, force and/or dipole) using G\+R\+O\+M\+A\+CS over a trajectory. 
+
+
+
+Definition at line 977 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_ab183586fa000692169f9904269add851_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a414ad54bca72f823dee0cb5239cc8e58}\label{classsrc_1_1gmxio_1_1GMX_a414ad54bca72f823dee0cb5239cc8e58}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!generate\+\_\+positions@{generate\+\_\+positions}}
+\index{generate\+\_\+positions@{generate\+\_\+positions}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{generate\+\_\+positions()}{generate\_positions()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+generate\+\_\+positions (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1172 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a414ad54bca72f823dee0cb5239cc8e58_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_ab8c1d39bda1b3d7060b9348fe8a1b074}\label{classsrc_1_1gmxio_1_1GMX_ab8c1d39bda1b3d7060b9348fe8a1b074}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!get\+\_\+charges@{get\+\_\+charges}}
+\index{get\+\_\+charges@{get\+\_\+charges}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{get\+\_\+charges()}{get\_charges()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+get\+\_\+charges (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 769 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_ab8c1d39bda1b3d7060b9348fe8a1b074_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a1374e65cac6409dfde7e90b110f4c599}\label{classsrc_1_1gmxio_1_1GMX_a1374e65cac6409dfde7e90b110f4c599}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!interaction\+\_\+energy@{interaction\+\_\+energy}}
+\index{interaction\+\_\+energy@{interaction\+\_\+energy}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{interaction\+\_\+energy()}{interaction\_energy()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+interaction\+\_\+energy (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fraga,  }\item[{}]{fragb }\end{DoxyParamCaption})}
+
+
+
+Computes the interaction energy between two fragments over a trajectory. 
+
+
+
+Definition at line 1049 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a1374e65cac6409dfde7e90b110f4c599_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a3f0267ba817464cc778e6fe4a50e8440}\label{classsrc_1_1gmxio_1_1GMX_a3f0267ba817464cc778e6fe4a50e8440}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!links@{links}}
+\index{links@{links}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{links()}{links()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+links (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 785 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a3f0267ba817464cc778e6fe4a50e8440_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a359787564e21019ed5baa7e436f0e523}\label{classsrc_1_1gmxio_1_1GMX_a359787564e21019ed5baa7e436f0e523}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!make\+\_\+gro\+\_\+trajectory@{make\+\_\+gro\+\_\+trajectory}}
+\index{make\+\_\+gro\+\_\+trajectory@{make\+\_\+gro\+\_\+trajectory}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{make\+\_\+gro\+\_\+trajectory()}{make\_gro\_trajectory()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+make\+\_\+gro\+\_\+trajectory (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fout = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Return the MD trajectory as a Molecule object. 
+
+
+
+Definition at line 990 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a359787564e21019ed5baa7e436f0e523_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a3133906ca908cb9a5e6fc816460ec498}\label{classsrc_1_1gmxio_1_1GMX_a3133906ca908cb9a5e6fc816460ec498}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!md@{md}}
+\index{md@{md}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{md()}{md()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+md (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{nsteps = {\ttfamily 0},  }\item[{}]{nequil = {\ttfamily 0},  }\item[{}]{verbose = {\ttfamily False},  }\item[{}]{deffnm = {\ttfamily None},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Method for running a molecular dynamics simulation. 
+
+A little different than molecular\+\_\+dynamics (for \hyperlink{thermo_8py}{thermo.\+py}) \begin{DoxyVerb}   Required arguments:
+
+   nsteps = (int) Number of total time steps
+
+   nequil = (int) Number of additional time steps at the beginning
+   for equilibration
+
+   verbose = (bool) Be loud and noisy
+
+   deffnm = (string) default names for simulation output files
+
+   The simulation data is written to the working directory.\end{DoxyVerb}
+ 
+
+Definition at line 1406 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a3133906ca908cb9a5e6fc816460ec498_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_abab1e48b2b3d25277b9f4392807938ae}\label{classsrc_1_1gmxio_1_1GMX_abab1e48b2b3d25277b9f4392807938ae}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!molecular\+\_\+dynamics@{molecular\+\_\+dynamics}}
+\index{molecular\+\_\+dynamics@{molecular\+\_\+dynamics}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{molecular\+\_\+dynamics()}{molecular\_dynamics()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+molecular\+\_\+dynamics (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{nsteps,  }\item[{}]{timestep,  }\item[{}]{temperature = {\ttfamily None},  }\item[{}]{pressure = {\ttfamily None},  }\item[{}]{nequil = {\ttfamily 0},  }\item[{}]{nsave = {\ttfamily 0},  }\item[{}]{minimize = {\ttfamily True},  }\item[{}]{threads = {\ttfamily None},  }\item[{}]{verbose = {\ttfamily False},  }\item[{}]{bilayer = {\ttfamily False},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Method for running a molecular dynamics simulation. 
+
+Required arguments\+: nsteps = (int) Number of total time steps timestep = (float) Time step in F\+E\+M\+T\+O\+S\+E\+C\+O\+N\+DS temperature = (float) Temperature control (Kelvin) pressure = (float) Pressure control (atmospheres) nequil = (int) Number of additional time steps at the beginning for equilibration nsave = (int) Step interval for saving data minimize = (bool) Perform an energy minimization prior to dynamics threads = (int) Number of M\+P\+I-\/threads
+
+Returns simulation data\+: Rhos = (array) Density in kilogram m$^\wedge$-\/3 Potentials = (array) Potential energies Kinetics = (array) Kinetic energies Volumes = (array) Box volumes Dips = (3xN array) Dipole moments E\+Comps = (dict) Energy components Als = (array) Average area per lipid in nm$^\wedge$2 Scds = (Nx28 array) Deuterium order parameter 
+
+Definition at line 1241 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_abab1e48b2b3d25277b9f4392807938ae_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a28111ac260dc9abee6f9f9e9bfaa8332}\label{classsrc_1_1gmxio_1_1GMX_a28111ac260dc9abee6f9f9e9bfaa8332}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!multipole\+\_\+moments@{multipole\+\_\+moments}}
+\index{multipole\+\_\+moments@{multipole\+\_\+moments}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{multipole\+\_\+moments()}{multipole\_moments()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+multipole\+\_\+moments (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot = {\ttfamily 0},  }\item[{}]{optimize = {\ttfamily True},  }\item[{}]{polarizability = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Return the multipole moments of the 1st snapshot in Debye and Buckingham units. 
+
+
+
+Definition at line 1085 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a28111ac260dc9abee6f9f9e9bfaa8332_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a6a18f06050c5b64ef2c88fc8ee40d107}\label{classsrc_1_1gmxio_1_1GMX_a6a18f06050c5b64ef2c88fc8ee40d107}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!n\+\_\+nonwater@{n\+\_\+nonwater}}
+\index{n\+\_\+nonwater@{n\+\_\+nonwater}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{n\+\_\+nonwater()}{n\_nonwater()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+n\+\_\+nonwater (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{structure\+\_\+file }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1211 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a1dd15e453829991f85a8cc4798425813}\label{classsrc_1_1gmxio_1_1GMX_a1dd15e453829991f85a8cc4798425813}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!n\+\_\+snaps@{n\+\_\+snaps}}
+\index{n\+\_\+snaps@{n\+\_\+snaps}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{n\+\_\+snaps()}{n\_snaps()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+n\+\_\+snaps (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{nsteps,  }\item[{}]{step\+\_\+interval,  }\item[{}]{timestep }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1180 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_adbb731b653e4f79880ee97a67d128805}\label{classsrc_1_1gmxio_1_1GMX_adbb731b653e4f79880ee97a67d128805}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!normal\+\_\+modes@{normal\+\_\+modes}}
+\index{normal\+\_\+modes@{normal\+\_\+modes}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{normal\+\_\+modes()}{normal\_modes()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+normal\+\_\+modes (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot = {\ttfamily 0},  }\item[{}]{optimize = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1136 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_adbb731b653e4f79880ee97a67d128805_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a92d0a874a4b720617b984cfb3f3117cf}\label{classsrc_1_1gmxio_1_1GMX_a92d0a874a4b720617b984cfb3f3117cf}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!optimize@{optimize}}
+\index{optimize@{optimize}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{optimize()}{optimize()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+optimize (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot,  }\item[{}]{crit = {\ttfamily 1e-\/4},  }\item[{}]{align = {\ttfamily True},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Optimize the geometry and align the optimized geometry to the starting geometry. 
+
+
+
+Definition at line 889 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a92d0a874a4b720617b984cfb3f3117cf_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_ab8b789bb8fb56f2cab0ba4dff7c5deb0}\label{classsrc_1_1gmxio_1_1GMX_ab8b789bb8fb56f2cab0ba4dff7c5deb0}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!prepare@{prepare}}
+\index{prepare@{prepare}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{prepare()}{prepare()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+prepare (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{pbc = {\ttfamily False},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Called by {\bfseries init} ; prepare the temp directory and figure out the topology. 
+
+
+
+Definition at line 608 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a276bb887f884865956c49592b21d8f1f}\label{classsrc_1_1gmxio_1_1GMX_a276bb887f884865956c49592b21d8f1f}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!readsrc@{readsrc}}
+\index{readsrc@{readsrc}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{readsrc()}{readsrc()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+readsrc (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Called by {\bfseries init} ; read files from the source directory. 
+
+
+
+Definition at line 596 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a8aeaf687eee94c8da3fb33c1e22802d6}\label{classsrc_1_1gmxio_1_1GMX_a8aeaf687eee94c8da3fb33c1e22802d6}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!scd\+\_\+persnap@{scd\+\_\+persnap}}
+\index{scd\+\_\+persnap@{scd\+\_\+persnap}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{scd\+\_\+persnap()}{scd\_persnap()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+scd\+\_\+persnap (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{ndx,  }\item[{}]{timestep,  }\item[{}]{final\+\_\+frame }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1183 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a8aeaf687eee94c8da3fb33c1e22802d6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a585636f44e08bca144cadbe8755f37f2}\label{classsrc_1_1gmxio_1_1GMX_a585636f44e08bca144cadbe8755f37f2}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!setopts@{setopts}}
+\index{setopts@{setopts}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{setopts()}{setopts()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+setopts (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Called by {\bfseries init} ; Set G\+R\+O\+M\+A\+C\+S-\/specific options. 
+
+
+
+Definition at line 543 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a24343e631722ec863df94641493128a9}\label{classsrc_1_1gmxio_1_1GMX_a24343e631722ec863df94641493128a9}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!warngmx@{warngmx}}
+\index{warngmx@{warngmx}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{warngmx()}{warngmx()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+G\+M\+X.\+warngmx (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{command,  }\item[{}]{warnings = {\ttfamily \mbox{[}\mbox{]}},  }\item[{}]{maxwarn = {\ttfamily 1},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Call gromacs and allow for certain expected warnings. 
+
+
+
+Definition at line 815 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1gmxio_1_1GMX_a24343e631722ec863df94641493128a9_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a6d192dedcf63a9d71896f18813131ebd}\label{classsrc_1_1gmxio_1_1GMX_a6d192dedcf63a9d71896f18813131ebd}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!Atom\+Lists@{Atom\+Lists}}
+\index{Atom\+Lists@{Atom\+Lists}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{Atom\+Lists}{AtomLists}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+Atom\+Lists}
+
+
+
+Definition at line 737 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a23a0c5f383f369b3d45a85f600d42757}\label{classsrc_1_1gmxio_1_1GMX_a23a0c5f383f369b3d45a85f600d42757}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!Atom\+Mask@{Atom\+Mask}}
+\index{Atom\+Mask@{Atom\+Mask}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{Atom\+Mask}{AtomMask}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+Atom\+Mask}
+
+
+
+Definition at line 736 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a3554ea6c9cab32e582a5ebeeb48b94da}\label{classsrc_1_1gmxio_1_1GMX_a3554ea6c9cab32e582a5ebeeb48b94da}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!double@{double}}
+\index{double@{double}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{double}{double}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+double}
+
+
+
+Write out the trajectory coordinates to a .gro file. 
+
+At this point, we could have gotten a .mdp file from the target folder or as part of the force field. If it still missing, then we may write a default. Call grompp followed by gmxdump to read the trajectory 
+
+Definition at line 731 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a4739a21d2bd0b02f69e4fa2c3d831849}\label{classsrc_1_1gmxio_1_1GMX_a4739a21d2bd0b02f69e4fa2c3d831849}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!gmx\+\_\+defs@{gmx\+\_\+defs}}
+\index{gmx\+\_\+defs@{gmx\+\_\+defs}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{gmx\+\_\+defs}{gmx\_defs}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+gmx\+\_\+defs}
+
+
+
+Definition at line 610 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a92135a30fa70b53aafdcb5984c3479a8}\label{classsrc_1_1gmxio_1_1GMX_a92135a30fa70b53aafdcb5984c3479a8}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!gmx\+\_\+eq\+\_\+barostat@{gmx\+\_\+eq\+\_\+barostat}}
+\index{gmx\+\_\+eq\+\_\+barostat@{gmx\+\_\+eq\+\_\+barostat}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{gmx\+\_\+eq\+\_\+barostat}{gmx\_eq\_barostat}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+gmx\+\_\+eq\+\_\+barostat}
+
+
+
+Barostat keyword for equilibration. 
+
+
+
+Definition at line 560 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a28ec53794f4ef9449e39029677e5114c}\label{classsrc_1_1gmxio_1_1GMX_a28ec53794f4ef9449e39029677e5114c}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!gmxpath@{gmxpath}}
+\index{gmxpath@{gmxpath}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{gmxpath}{gmxpath}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+gmxpath}
+
+
+
+The directory containing G\+R\+O\+M\+A\+CS executables (e.\+g. 
+
+mdrun) 
+
+Definition at line 565 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a0a5328567ebce344ddc08d82789b2d01}\label{classsrc_1_1gmxio_1_1GMX_a0a5328567ebce344ddc08d82789b2d01}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!gmxsuffix@{gmxsuffix}}
+\index{gmxsuffix@{gmxsuffix}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{gmxsuffix}{gmxsuffix}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+gmxsuffix}
+
+
+
+Disable some optimizations. 
+
+The suffix to G\+R\+O\+M\+A\+CS executables, e.\+g. \textquotesingle{}\+\_\+d\textquotesingle{} for double precision. 
+
+Definition at line 553 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a8c2ec3cee34d56ee3e77d60990a8185e}\label{classsrc_1_1gmxio_1_1GMX_a8c2ec3cee34d56ee3e77d60990a8185e}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!gmxversion@{gmxversion}}
+\index{gmxversion@{gmxversion}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{gmxversion}{gmxversion}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+gmxversion}
+
+
+
+Figure out the G\+R\+O\+M\+A\+CS version -\/ it will determine how programs are called. 
+
+Always, always remove backup files.
+
+Create symbolic links (mainly for the case of .top and .mdp files which don\textquotesingle{}t exist at object creation) Call a G\+R\+O\+M\+A\+CS program as you would from the command line. 
+
+Definition at line 570 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a9f08fa57b1b204a3e7c77b01aae38989}\label{classsrc_1_1gmxio_1_1GMX_a9f08fa57b1b204a3e7c77b01aae38989}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!have\+\_\+constraints@{have\+\_\+constraints}}
+\index{have\+\_\+constraints@{have\+\_\+constraints}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{have\+\_\+constraints}{have\_constraints}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+have\+\_\+constraints}
+
+
+
+Link files into the temp directory. 
+
+Write the appropriate coordinate files.
+
+Read the .mdp file to determine if there are constraints.
+
+Definition at line 616 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a9480881bb53654a82cf1b9abf736b123}\label{classsrc_1_1gmxio_1_1GMX_a9480881bb53654a82cf1b9abf736b123}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!mdene@{mdene}}
+\index{mdene@{mdene}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{mdene}{mdene}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+mdene}
+
+
+
+Definition at line 1459 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_af9738ed7d8f41cbf3287e2688bcb708d}\label{classsrc_1_1gmxio_1_1GMX_af9738ed7d8f41cbf3287e2688bcb708d}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!mdp@{mdp}}
+\index{mdp@{mdp}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{mdp}{mdp}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+mdp}
+
+
+
+Definition at line 600 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a9a7a0b53e21750c13600ec30b70d69fe}\label{classsrc_1_1gmxio_1_1GMX_a9a7a0b53e21750c13600ec30b70d69fe}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!mdtraj@{mdtraj}}
+\index{mdtraj@{mdtraj}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{mdtraj}{mdtraj}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+mdtraj}
+
+
+
+Definition at line 1327 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_aefbef8e64c33b07808f14733780712a2}\label{classsrc_1_1gmxio_1_1GMX_aefbef8e64c33b07808f14733780712a2}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!mol@{mol}}
+\index{mol@{mol}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{mol}{mol}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+mol}
+
+
+
+Definition at line 602 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a73bfde9773109c13b0f11eadd215cc1e}\label{classsrc_1_1gmxio_1_1GMX_a73bfde9773109c13b0f11eadd215cc1e}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!pbc@{pbc}}
+\index{pbc@{pbc}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{pbc}{pbc}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+pbc}
+
+
+
+Definition at line 615 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_acc200558ac0436547d74efde5f057964}\label{classsrc_1_1gmxio_1_1GMX_acc200558ac0436547d74efde5f057964}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!top@{top}}
+\index{top@{top}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{top}{top}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+top}
+
+
+
+Attempt to determine file names of .gro, .top, and .mdp files. 
+
+
+
+Definition at line 599 of file gmxio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1gmxio_1_1GMX_a73bfdd122081f5fa7bd1b969f8c0992b}\label{classsrc_1_1gmxio_1_1GMX_a73bfdd122081f5fa7bd1b969f8c0992b}} 
+\index{src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}!valkwd@{valkwd}}
+\index{valkwd@{valkwd}!src\+::gmxio\+::\+G\+MX@{src\+::gmxio\+::\+G\+MX}}
+\paragraph{\texorpdfstring{valkwd}{valkwd}}
+{\footnotesize\ttfamily src.\+gmxio.\+G\+M\+X.\+valkwd}
+
+
+
+Valid G\+R\+O\+M\+A\+C\+S-\/specific keywords. 
+
+
+
+Definition at line 538 of file gmxio.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{gmxio_8py}{gmxio.\+py}\end{DoxyCompactItemize}

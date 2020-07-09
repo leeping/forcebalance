@@ -1,0 +1,1272 @@
+\hypertarget{classsrc_1_1optimizer_1_1Optimizer}{}\subsection{src.\+optimizer.\+Optimizer Class Reference}
+\label{classsrc_1_1optimizer_1_1Optimizer}\index{src.\+optimizer.\+Optimizer@{src.\+optimizer.\+Optimizer}}
+
+
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer}{Optimizer} class.  
+
+
+
+
+Inheritance diagram for src.\+optimizer.\+Optimizer\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{classsrc_1_1optimizer_1_1Optimizer__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+optimizer.\+Optimizer\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{classsrc_1_1optimizer_1_1Optimizer__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_acdeb46fca44a2f74dad4e3ae1fa9bebf}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, \hyperlink{classsrc_1_1optimizer_1_1Optimizer_ab2a3d627b6f6cb2f76f22e97c9a2ef40}{Objective}, \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a4bbc39a0dc533c4d9caeb5516030dd26}{FF})
+\begin{DoxyCompactList}\small\item\em Create an \hyperlink{classsrc_1_1optimizer_1_1Optimizer}{Optimizer} object. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_af63201bdb35965f56f59d1c2a859e9d1}{recover} (self)
+\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_abb29ac2f8b4bd4fca545eb3f6b0470fe}{set\+\_\+goodstep} (self, val)
+\begin{DoxyCompactList}\small\item\em Mark in each target that the previous optimization step was good or bad. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_ad9b6a3c28ccacbbe26504e1e7676b244}{save\+\_\+mvals\+\_\+to\+\_\+input} (self, vals, priors=None, jobtype=None)
+\begin{DoxyCompactList}\small\item\em Write a new input file (s\+\_\+save.\+in) containing the current mathematical parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_adddfd056a9bc782ac5313590a82733e3}{Run} (self)
+\begin{DoxyCompactList}\small\item\em Call the appropriate optimizer. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a7ec731011adb2f1b994dfa112e364e7d}{adjh} (self, trust)
+\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a30443d919712b0f3529de3c7d62619ca}{Main\+Optimizer} (self, b\+\_\+\+B\+F\+GS=0)
+\begin{DoxyCompactList}\small\item\em The main \hyperlink{namespaceForceBalance}{Force\+Balance} adaptive trust-\/radius pseudo-\/\+Newton optimizer. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_ad8a296a7a624707234b4c9fc949c5dbd}{step} (self, xk, data, trust)
+\begin{DoxyCompactList}\small\item\em Computes the next step in the parameter space. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_aee3a09f71220a784ef9541ce54270711}{Newton\+Raphson} (self)
+\begin{DoxyCompactList}\small\item\em Optimize the force field parameters using the Newton-\/\+Raphson method (. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a8cdd2f557dca05f63ffd1893916fd4ca}{B\+F\+GS} (self)
+\begin{DoxyCompactList}\small\item\em Optimize the force field parameters using the B\+F\+GS method; currently the recommended choice (. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a1e616a4c920b3e8935ca19e208b1c3be}{Scipy\+Optimizer} (self, Algorithm=\char`\"{}None\char`\"{})
+\begin{DoxyCompactList}\small\item\em Driver for Sci\+Py optimizations. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a3948891ba042abccf4c6e111f3ce50be}{Genetic\+Algorithm} (self)
+\begin{DoxyCompactList}\small\item\em Genetic algorithm, under development. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a1265cbe1250d67e385e9ed5ca9c946ea}{Simplex} (self)
+\begin{DoxyCompactList}\small\item\em Use Sci\+Py\textquotesingle{}s built-\/in simplex algorithm to optimize the parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_aba1d50ad4756203f83a5be844972f0a2}{Powell} (self)
+\begin{DoxyCompactList}\small\item\em Use Sci\+Py\textquotesingle{}s built-\/in Powell direction-\/set algorithm to optimize the parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a6a7b8b8996d2b054d0cfa24c88e7d0f4}{Anneal} (self)
+\begin{DoxyCompactList}\small\item\em Use Sci\+Py\textquotesingle{}s built-\/in simulated annealing algorithm to optimize the parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a6b8bc81ae670b40040d07ae09ccdb7a2}{Conjugate\+Gradient} (self)
+\begin{DoxyCompactList}\small\item\em Use Sci\+Py\textquotesingle{}s built-\/in conjugate gradient algorithm to optimize the parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_aff37f4cc60afa2eced61c258e4eed859}{Scipy\+\_\+\+B\+F\+GS} (self)
+\begin{DoxyCompactList}\small\item\em Use Sci\+Py\textquotesingle{}s built-\/in B\+F\+GS algorithm to optimize the parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a5ba1a8a4ea6dd488697e647b8aa2228a}{Basin\+Hopping} (self)
+\begin{DoxyCompactList}\small\item\em Use Sci\+Py\textquotesingle{}s built-\/in basin hopping algorithm to optimize the parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_aba52ed682c83784e4523223c0bbb018b}{Truncated\+Newton} (self)
+\begin{DoxyCompactList}\small\item\em Use Sci\+Py\textquotesingle{}s built-\/in truncated Newton (fmin\+\_\+tnc) algorithm to optimize the parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_aa1a6d36bfd020d4eb2d0fb238777d369}{Newton\+CG} (self)
+\begin{DoxyCompactList}\small\item\em Use Sci\+Py\textquotesingle{}s built-\/in Newton-\/\+CG (fmin\+\_\+ncg) algorithm to optimize the parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a98e20ccc6c2d2cf5f6c611a0441e14bb}{Scan\+\_\+\+Values} (self, Math\+Phys=1)
+\begin{DoxyCompactList}\small\item\em Scan through parameter values. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a23cdd9fad58bbc9a6f5659ed3bbededc}{Scan\+M\+Vals} (self)
+\begin{DoxyCompactList}\small\item\em Scan through the mathematical parameter space. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_ad139c2963ecdfbf3abbce6027dfb9ac9}{Scan\+P\+Vals} (self)
+\begin{DoxyCompactList}\small\item\em Scan through the physical parameter space. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_afe5c560532731458954ae6e9093b8376}{Single\+Point} (self)
+\begin{DoxyCompactList}\small\item\em A single-\/point objective function computation. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_af36709d05d137d77d4b8e0957b3c807e}{Gradient} (self)
+\begin{DoxyCompactList}\small\item\em A single-\/point gradient computation. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_ac844fd676b7e9d08c0c9bca811838c3a}{Hessian} (self)
+\begin{DoxyCompactList}\small\item\em A single-\/point Hessian computation. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a372e02cecc05914c0fea61baf5ea2b28}{Precondition} (self)
+\begin{DoxyCompactList}\small\item\em An experimental method to determine the parameter scale factors that results in the best conditioned Hessian. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_aca89ff4f0813ce420ea0dcaab14c22d9}{F\+D\+CheckG} (self)
+\begin{DoxyCompactList}\small\item\em Finite-\/difference checker for the objective function gradient. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a9e68121016fa389cc2517d05e4286a6e}{F\+D\+CheckH} (self)
+\begin{DoxyCompactList}\small\item\em Finite-\/difference checker for the objective function Hessian. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_ab57aa047acdc3aedfbe0f292c80e3d18}{readchk} (self)
+\begin{DoxyCompactList}\small\item\em Read the checkpoint file for the main optimizer. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1optimizer_1_1Optimizer_a30bd3b593b783f2e49e15d84d45927c3}{writechk} (self)
+\begin{DoxyCompactList}\small\item\em Write the checkpoint file for the main optimizer. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_aecea79940c8171606998ef0acbc276b3}{Opt\+Tab}
+\begin{DoxyCompactList}\small\item\em A list of all the things we can ask the optimizer to do. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_aca8aba40ee48e50e42eaabfe5bf883cf}{mvals\+\_\+bak}
+\begin{DoxyCompactList}\small\item\em The root directory. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a3d5d6e52049a6d6714ee94239a7a5df5}{failmsg}
+\begin{DoxyCompactList}\small\item\em Print a special message on failure. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a034bcb3171a630aaab2e928886a67cbd}{goodstep}
+\begin{DoxyCompactList}\small\item\em Specify whether the previous optimization step was good or bad. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_ac7f1840fe54ce8f959a27f02ebccd406}{iterinit}
+\begin{DoxyCompactList}\small\item\em The initial iteration number (nonzero if we restart a previous run.) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_adddc631b1dc8efe874323c3d0c7b7b2f}{iteration}
+\begin{DoxyCompactList}\small\item\em The current iteration number. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_ab2a3d627b6f6cb2f76f22e97c9a2ef40}{Objective}
+\begin{DoxyCompactList}\small\item\em reset the global variable \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_aef24b36c1ff90fb15a372e2b0e0548a7}{bhyp}
+\begin{DoxyCompactList}\small\item\em Whether the penalty function is hyperbolic. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a4bbc39a0dc533c4d9caeb5516030dd26}{FF}
+\begin{DoxyCompactList}\small\item\em The force field itself. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_aa75c8d8660bf183bd4177227a9d4e698}{uncert}
+\begin{DoxyCompactList}\small\item\em Target types which introduce uncertainty into the objective function. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a19f27eb029d508ab0d559ed78c0864dc}{bakdir}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_adbf584d06545ac2417ea8d161ec33b88}{resdir}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a84a28baeab6921fa32b5d41e477f6acb}{excision}
+\begin{DoxyCompactList}\small\item\em The indices to be excluded from the Hessian update. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_aa88255b5af98339a1f3a3a5f8e40aaef}{np}
+\begin{DoxyCompactList}\small\item\em Number of parameters. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a05096b5b576287250088e3883597fd09}{mvals0}
+\begin{DoxyCompactList}\small\item\em The original parameter values. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a373fa24d60747446426864a4112246f0}{read\+\_\+mvals}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a5d39927fdc1835e26cf274608334993c}{h}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a2d0160ffbd25b572fd0e4b26114a5d2b}{chk}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_aac43d13edf51e56a9af840c4edeb41c9}{H}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a08e193bf17fa05764a4e3a5f68134bf2}{dx}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_af55d853379aa9f712413c0b65db94b30}{Val}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a74c7a2eb94230c0c77f64b918a79268a}{Grad}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_aa04d94365b7c6e6a8339d069fbd2493a}{Hess}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_ad0448061fef8846bece7e5c9a40d2380}{Penalty}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_ac5d3b97806c50722bee5f42481cd241f}{iter}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a516d6f709220615ab7f7d17d768b695d}{prev\+\_\+bad}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_ab64002970e3058166b25dc54cb16a426}{xk\+\_\+prev}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_aa744302d95dc8b20bdf80209385e059e}{x\+\_\+prev}
+\item 
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a55944d77d9551e824c198aa4556f2b85}{x\+\_\+best}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer}{Optimizer} class. 
+
+Contains several methods for numerical optimization.
+
+For various reasons, the optimizer depends on the force field and fitting targets (i.\+e. we cannot treat it as a fully independent numerical optimizer). The dependency is rather weak which suggests that I can remove it someday. 
+
+Definition at line 46 of file optimizer.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_acdeb46fca44a2f74dad4e3ae1fa9bebf}\label{classsrc_1_1optimizer_1_1Optimizer_acdeb46fca44a2f74dad4e3ae1fa9bebf}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{Objective,  }\item[{}]{FF }\end{DoxyParamCaption})}
+
+
+
+Create an \hyperlink{classsrc_1_1optimizer_1_1Optimizer}{Optimizer} object. 
+
+The optimizer depends on both the FF and the fitting targets so there is a chain of dependencies\+: FF --$>$ Fit\+Sim --$>$ \hyperlink{classsrc_1_1optimizer_1_1Optimizer}{Optimizer}, and FF --$>$ \hyperlink{classsrc_1_1optimizer_1_1Optimizer}{Optimizer}
+
+Here\textquotesingle{}s what we do\+:
+\begin{DoxyItemize}
+\item Take options from the parser
+\item Pass in the objective function, force field, all fitting targets 
+\end{DoxyItemize}
+
+Definition at line 59 of file optimizer.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a7ec731011adb2f1b994dfa112e364e7d}\label{classsrc_1_1optimizer_1_1Optimizer_a7ec731011adb2f1b994dfa112e364e7d}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!adjh@{adjh}}
+\index{adjh@{adjh}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{adjh()}{adjh()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+adjh (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{trust }\end{DoxyParamCaption})}
+
+
+
+Definition at line 382 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a6a7b8b8996d2b054d0cfa24c88e7d0f4}\label{classsrc_1_1optimizer_1_1Optimizer_a6a7b8b8996d2b054d0cfa24c88e7d0f4}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Anneal@{Anneal}}
+\index{Anneal@{Anneal}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Anneal()}{Anneal()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Anneal (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Use Sci\+Py\textquotesingle{}s built-\/in simulated annealing algorithm to optimize the parameters. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a1e616a4c920b3e8935ca19e208b1c3be}{Optimizer\+::\+Scipy\+Optimizer} 
+\end{DoxySeeAlso}
+
+
+Definition at line 1208 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_a6a7b8b8996d2b054d0cfa24c88e7d0f4_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a5ba1a8a4ea6dd488697e647b8aa2228a}\label{classsrc_1_1optimizer_1_1Optimizer_a5ba1a8a4ea6dd488697e647b8aa2228a}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Basin\+Hopping@{Basin\+Hopping}}
+\index{Basin\+Hopping@{Basin\+Hopping}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Basin\+Hopping()}{BasinHopping()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Basin\+Hopping (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Use Sci\+Py\textquotesingle{}s built-\/in basin hopping algorithm to optimize the parameters. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a1e616a4c920b3e8935ca19e208b1c3be}{Optimizer\+::\+Scipy\+Optimizer} 
+\end{DoxySeeAlso}
+
+
+Definition at line 1223 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_a5ba1a8a4ea6dd488697e647b8aa2228a_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a8cdd2f557dca05f63ffd1893916fd4ca}\label{classsrc_1_1optimizer_1_1Optimizer_a8cdd2f557dca05f63ffd1893916fd4ca}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!B\+F\+GS@{B\+F\+GS}}
+\index{B\+F\+GS@{B\+F\+GS}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{B\+F\+G\+S()}{BFGS()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+B\+F\+GS (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Optimize the force field parameters using the B\+F\+GS method; currently the recommended choice (. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a30443d919712b0f3529de3c7d62619ca}{Main\+Optimizer}) 
+\end{DoxySeeAlso}
+
+
+Definition at line 956 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_a8cdd2f557dca05f63ffd1893916fd4ca_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a6b8bc81ae670b40040d07ae09ccdb7a2}\label{classsrc_1_1optimizer_1_1Optimizer_a6b8bc81ae670b40040d07ae09ccdb7a2}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Conjugate\+Gradient@{Conjugate\+Gradient}}
+\index{Conjugate\+Gradient@{Conjugate\+Gradient}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Conjugate\+Gradient()}{ConjugateGradient()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Conjugate\+Gradient (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Use Sci\+Py\textquotesingle{}s built-\/in conjugate gradient algorithm to optimize the parameters. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a1e616a4c920b3e8935ca19e208b1c3be}{Optimizer\+::\+Scipy\+Optimizer} 
+\end{DoxySeeAlso}
+
+
+Definition at line 1213 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_a6b8bc81ae670b40040d07ae09ccdb7a2_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aca89ff4f0813ce420ea0dcaab14c22d9}\label{classsrc_1_1optimizer_1_1Optimizer_aca89ff4f0813ce420ea0dcaab14c22d9}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!F\+D\+CheckG@{F\+D\+CheckG}}
+\index{F\+D\+CheckG@{F\+D\+CheckG}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{F\+D\+Check\+G()}{FDCheckG()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+F\+D\+CheckG (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Finite-\/difference checker for the objective function gradient. 
+
+For each element in the gradient, use a five-\/point finite difference stencil to compute a finite-\/difference derivative, and compare it to the analytic result. 
+
+Definition at line 1530 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_aca89ff4f0813ce420ea0dcaab14c22d9_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a9e68121016fa389cc2517d05e4286a6e}\label{classsrc_1_1optimizer_1_1Optimizer_a9e68121016fa389cc2517d05e4286a6e}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!F\+D\+CheckH@{F\+D\+CheckH}}
+\index{F\+D\+CheckH@{F\+D\+CheckH}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{F\+D\+Check\+H()}{FDCheckH()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+F\+D\+CheckH (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Finite-\/difference checker for the objective function Hessian. 
+
+For each element in the Hessian, use a five-\/point stencil in both parameter indices to compute a finite-\/difference derivative, and compare it to the analytic result.
+
+This is meant to be a foolproof checker, so it is pretty slow. We could write a faster checker if we assumed we had accurate first derivatives, but it\textquotesingle{}s better to not make that assumption.
+
+The second derivative is computed by double-\/wrapping the objective function via the \textquotesingle{}wrap2\textquotesingle{} function. 
+
+Definition at line 1562 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_a9e68121016fa389cc2517d05e4286a6e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a3948891ba042abccf4c6e111f3ce50be}\label{classsrc_1_1optimizer_1_1Optimizer_a3948891ba042abccf4c6e111f3ce50be}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Genetic\+Algorithm@{Genetic\+Algorithm}}
+\index{Genetic\+Algorithm@{Genetic\+Algorithm}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Genetic\+Algorithm()}{GeneticAlgorithm()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Genetic\+Algorithm (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Genetic algorithm, under development. 
+
+It currently works but a genetic algorithm is more like a concept; i.\+e. there is no single way to implement it.
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000012}{Todo}]Massive parallelization hasn\textquotesingle{}t been implemented yet\end{DoxyRefDesc}
+
+
+Definition at line 1105 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_af36709d05d137d77d4b8e0957b3c807e}\label{classsrc_1_1optimizer_1_1Optimizer_af36709d05d137d77d4b8e0957b3c807e}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Gradient@{Gradient}}
+\index{Gradient@{Gradient}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Gradient()}{Gradient()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Gradient (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+A single-\/point gradient computation. 
+
+
+
+Definition at line 1322 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_af36709d05d137d77d4b8e0957b3c807e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_ac844fd676b7e9d08c0c9bca811838c3a}\label{classsrc_1_1optimizer_1_1Optimizer_ac844fd676b7e9d08c0c9bca811838c3a}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Hessian@{Hessian}}
+\index{Hessian@{Hessian}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Hessian()}{Hessian()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Hessian (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+A single-\/point Hessian computation. 
+
+
+
+Definition at line 1330 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_ac844fd676b7e9d08c0c9bca811838c3a_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a30443d919712b0f3529de3c7d62619ca}\label{classsrc_1_1optimizer_1_1Optimizer_a30443d919712b0f3529de3c7d62619ca}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Main\+Optimizer@{Main\+Optimizer}}
+\index{Main\+Optimizer@{Main\+Optimizer}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Main\+Optimizer()}{MainOptimizer()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Main\+Optimizer (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{b\+\_\+\+B\+F\+GS = {\ttfamily 0} }\end{DoxyParamCaption})}
+
+
+
+The main \hyperlink{namespaceForceBalance}{Force\+Balance} adaptive trust-\/radius pseudo-\/\+Newton optimizer. 
+
+Tried and true in many situations. \+:) \begin{DoxyVerb}   Usually this function is called with the BFGS or NewtonRaphson
+   method.  The NewtonRaphson method is consistently the best
+   method I have, because I always provide at least an
+   approximate Hessian to the objective function.  The BFGS
+   method works well, but if gradients are cheap the SciPy_BFGS
+   method also works nicely.
+
+   The method adaptively changes the step size.  If the step is
+   sufficiently good (i.e. the objective function goes down by a
+   large fraction of the predicted decrease), then the step size
+   is increased; if the step is bad, then it rejects the step and
+   tries again.
+
+   The optimization is terminated after either a function value or
+   step size tolerance is reached.
+
+   @param[in] b_BFGS Switch to use BFGS (True) or Newton-Raphson (False)\end{DoxyVerb}
+ 
+
+Definition at line 416 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_a30443d919712b0f3529de3c7d62619ca_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aa1a6d36bfd020d4eb2d0fb238777d369}\label{classsrc_1_1optimizer_1_1Optimizer_aa1a6d36bfd020d4eb2d0fb238777d369}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Newton\+CG@{Newton\+CG}}
+\index{Newton\+CG@{Newton\+CG}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Newton\+C\+G()}{NewtonCG()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Newton\+CG (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Use Sci\+Py\textquotesingle{}s built-\/in Newton-\/\+CG (fmin\+\_\+ncg) algorithm to optimize the parameters. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a1e616a4c920b3e8935ca19e208b1c3be}{Optimizer\+::\+Scipy\+Optimizer} 
+\end{DoxySeeAlso}
+
+
+Definition at line 1233 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_aa1a6d36bfd020d4eb2d0fb238777d369_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aee3a09f71220a784ef9541ce54270711}\label{classsrc_1_1optimizer_1_1Optimizer_aee3a09f71220a784ef9541ce54270711}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Newton\+Raphson@{Newton\+Raphson}}
+\index{Newton\+Raphson@{Newton\+Raphson}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Newton\+Raphson()}{NewtonRaphson()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Newton\+Raphson (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Optimize the force field parameters using the Newton-\/\+Raphson method (. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a30443d919712b0f3529de3c7d62619ca}{Main\+Optimizer}) 
+\end{DoxySeeAlso}
+
+
+Definition at line 951 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_aee3a09f71220a784ef9541ce54270711_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aba1d50ad4756203f83a5be844972f0a2}\label{classsrc_1_1optimizer_1_1Optimizer_aba1d50ad4756203f83a5be844972f0a2}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Powell@{Powell}}
+\index{Powell@{Powell}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Powell()}{Powell()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Powell (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Use Sci\+Py\textquotesingle{}s built-\/in Powell direction-\/set algorithm to optimize the parameters. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a1e616a4c920b3e8935ca19e208b1c3be}{Optimizer\+::\+Scipy\+Optimizer} 
+\end{DoxySeeAlso}
+
+
+Definition at line 1203 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_aba1d50ad4756203f83a5be844972f0a2_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a372e02cecc05914c0fea61baf5ea2b28}\label{classsrc_1_1optimizer_1_1Optimizer_a372e02cecc05914c0fea61baf5ea2b28}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Precondition@{Precondition}}
+\index{Precondition@{Precondition}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Precondition()}{Precondition()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Precondition (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+An experimental method to determine the parameter scale factors that results in the best conditioned Hessian. 
+
+Condition number function to be optimized. \begin{DoxyVerb}       Parameters
+       ----------
+       logrskeys : np.ndarray
+           Logarithms of the rescaling factor of each parameter type.
+           The optimization is done in the log space.
+       multiply : bool
+           If set to True, then the exponentiated logrskeys will
+           multiply the existing rescaling factors defined in the force field.
+
+       Returns
+       -------
+       float
+           Condition number of the Hessian matrix.\end{DoxyVerb}
+ 
+
+Definition at line 1342 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_a372e02cecc05914c0fea61baf5ea2b28_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_ab57aa047acdc3aedfbe0f292c80e3d18}\label{classsrc_1_1optimizer_1_1Optimizer_ab57aa047acdc3aedfbe0f292c80e3d18}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!readchk@{readchk}}
+\index{readchk@{readchk}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{readchk()}{readchk()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+readchk (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Read the checkpoint file for the main optimizer. 
+
+
+
+Definition at line 1590 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_af63201bdb35965f56f59d1c2a859e9d1}\label{classsrc_1_1optimizer_1_1Optimizer_af63201bdb35965f56f59d1c2a859e9d1}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!recover@{recover}}
+\index{recover@{recover}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{recover()}{recover()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+recover (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 210 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_af63201bdb35965f56f59d1c2a859e9d1_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_adddfd056a9bc782ac5313590a82733e3}\label{classsrc_1_1optimizer_1_1Optimizer_adddfd056a9bc782ac5313590a82733e3}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Run@{Run}}
+\index{Run@{Run}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Run()}{Run()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Run (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Call the appropriate optimizer. 
+
+This is the method we might want to call from an executable. 
+
+Definition at line 321 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_adddfd056a9bc782ac5313590a82733e3_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_ad9b6a3c28ccacbbe26504e1e7676b244}\label{classsrc_1_1optimizer_1_1Optimizer_ad9b6a3c28ccacbbe26504e1e7676b244}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!save\+\_\+mvals\+\_\+to\+\_\+input@{save\+\_\+mvals\+\_\+to\+\_\+input}}
+\index{save\+\_\+mvals\+\_\+to\+\_\+input@{save\+\_\+mvals\+\_\+to\+\_\+input}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{save\+\_\+mvals\+\_\+to\+\_\+input()}{save\_mvals\_to\_input()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+save\+\_\+mvals\+\_\+to\+\_\+input (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{vals,  }\item[{}]{priors = {\ttfamily None},  }\item[{}]{jobtype = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Write a new input file (s\+\_\+save.\+in) containing the current mathematical parameters. 
+
+
+
+Definition at line 254 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=348pt]{classsrc_1_1optimizer_1_1Optimizer_ad9b6a3c28ccacbbe26504e1e7676b244_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a98e20ccc6c2d2cf5f6c611a0441e14bb}\label{classsrc_1_1optimizer_1_1Optimizer_a98e20ccc6c2d2cf5f6c611a0441e14bb}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Scan\+\_\+\+Values@{Scan\+\_\+\+Values}}
+\index{Scan\+\_\+\+Values@{Scan\+\_\+\+Values}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Scan\+\_\+\+Values()}{Scan\_Values()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Scan\+\_\+\+Values (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{Math\+Phys = {\ttfamily 1} }\end{DoxyParamCaption})}
+
+
+
+Scan through parameter values. 
+
+This option is activated using the inputs\+:
+
+
+\begin{DoxyCode}
+scan[mp]vals
+scan\_vals low:hi:nsteps
+scan\_idxnum (number) -\textcolor{keywordflow}{or}-
+scan\_idxname (name)
+\end{DoxyCode}
+
+
+This method goes to the specified parameter indices and scans through the supplied values, evaluating the objective function at every step.
+
+I hope this method will be useful for people who just want to look at changing one or two parameters and seeing how it affects the force field performance.
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000013}{Todo}]Maybe a multidimensional grid can be done. \end{DoxyRefDesc}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em Math\+Phys} & Switch to use mathematical (True) or physical (False) parameters. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1259 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_a98e20ccc6c2d2cf5f6c611a0441e14bb_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a23cdd9fad58bbc9a6f5659ed3bbededc}\label{classsrc_1_1optimizer_1_1Optimizer_a23cdd9fad58bbc9a6f5659ed3bbededc}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Scan\+M\+Vals@{Scan\+M\+Vals}}
+\index{Scan\+M\+Vals@{Scan\+M\+Vals}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Scan\+M\+Vals()}{ScanMVals()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Scan\+M\+Vals (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Scan through the mathematical parameter space. 
+
+\begin{DoxySeeAlso}{See also}
+Optimizer\+::\+Scan\+Values 
+\end{DoxySeeAlso}
+
+
+Definition at line 1306 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_a23cdd9fad58bbc9a6f5659ed3bbededc_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_ad139c2963ecdfbf3abbce6027dfb9ac9}\label{classsrc_1_1optimizer_1_1Optimizer_ad139c2963ecdfbf3abbce6027dfb9ac9}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Scan\+P\+Vals@{Scan\+P\+Vals}}
+\index{Scan\+P\+Vals@{Scan\+P\+Vals}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Scan\+P\+Vals()}{ScanPVals()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Scan\+P\+Vals (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Scan through the physical parameter space. 
+
+\begin{DoxySeeAlso}{See also}
+Optimizer\+::\+Scan\+Values 
+\end{DoxySeeAlso}
+
+
+Definition at line 1311 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_ad139c2963ecdfbf3abbce6027dfb9ac9_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aff37f4cc60afa2eced61c258e4eed859}\label{classsrc_1_1optimizer_1_1Optimizer_aff37f4cc60afa2eced61c258e4eed859}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Scipy\+\_\+\+B\+F\+GS@{Scipy\+\_\+\+B\+F\+GS}}
+\index{Scipy\+\_\+\+B\+F\+GS@{Scipy\+\_\+\+B\+F\+GS}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Scipy\+\_\+\+B\+F\+G\+S()}{Scipy\_BFGS()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Scipy\+\_\+\+B\+F\+GS (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Use Sci\+Py\textquotesingle{}s built-\/in B\+F\+GS algorithm to optimize the parameters. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a1e616a4c920b3e8935ca19e208b1c3be}{Optimizer\+::\+Scipy\+Optimizer} 
+\end{DoxySeeAlso}
+
+
+Definition at line 1218 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_aff37f4cc60afa2eced61c258e4eed859_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a1e616a4c920b3e8935ca19e208b1c3be}\label{classsrc_1_1optimizer_1_1Optimizer_a1e616a4c920b3e8935ca19e208b1c3be}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Scipy\+Optimizer@{Scipy\+Optimizer}}
+\index{Scipy\+Optimizer@{Scipy\+Optimizer}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Scipy\+Optimizer()}{ScipyOptimizer()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Scipy\+Optimizer (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{Algorithm = {\ttfamily \char`\"{}None\char`\"{}} }\end{DoxyParamCaption})}
+
+
+
+Driver for Sci\+Py optimizations. 
+
+Using any of the Sci\+Py optimizers requires that Sci\+Py is installed. This method first defines several wrappers around the objective function that the Sci\+Py optimizers can use. Then it calls the algorith mitself.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em Algorithm} & The optimization algorithm to use, for example \textquotesingle{}powell\textquotesingle{}, \textquotesingle{}simplex\textquotesingle{} or \textquotesingle{}anneal\textquotesingle{} \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 969 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_abb29ac2f8b4bd4fca545eb3f6b0470fe}\label{classsrc_1_1optimizer_1_1Optimizer_abb29ac2f8b4bd4fca545eb3f6b0470fe}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!set\+\_\+goodstep@{set\+\_\+goodstep}}
+\index{set\+\_\+goodstep@{set\+\_\+goodstep}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{set\+\_\+goodstep()}{set\_goodstep()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+set\+\_\+goodstep (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{val }\end{DoxyParamCaption})}
+
+
+
+Mark in each target that the previous optimization step was good or bad. 
+
+
+
+Definition at line 247 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a1265cbe1250d67e385e9ed5ca9c946ea}\label{classsrc_1_1optimizer_1_1Optimizer_a1265cbe1250d67e385e9ed5ca9c946ea}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Simplex@{Simplex}}
+\index{Simplex@{Simplex}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Simplex()}{Simplex()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Simplex (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Use Sci\+Py\textquotesingle{}s built-\/in simplex algorithm to optimize the parameters. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a1e616a4c920b3e8935ca19e208b1c3be}{Optimizer\+::\+Scipy\+Optimizer} 
+\end{DoxySeeAlso}
+
+
+Definition at line 1198 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_a1265cbe1250d67e385e9ed5ca9c946ea_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_afe5c560532731458954ae6e9093b8376}\label{classsrc_1_1optimizer_1_1Optimizer_afe5c560532731458954ae6e9093b8376}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Single\+Point@{Single\+Point}}
+\index{Single\+Point@{Single\+Point}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Single\+Point()}{SinglePoint()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Single\+Point (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+A single-\/point objective function computation. 
+
+
+
+Definition at line 1316 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_afe5c560532731458954ae6e9093b8376_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_ad8a296a7a624707234b4c9fc949c5dbd}\label{classsrc_1_1optimizer_1_1Optimizer_ad8a296a7a624707234b4c9fc949c5dbd}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!step@{step}}
+\index{step@{step}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{step()}{step()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+step (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{xk,  }\item[{}]{data,  }\item[{}]{trust }\end{DoxyParamCaption})}
+
+
+
+Computes the next step in the parameter space. 
+
+There are lots of tricks here that I will document later. \begin{DoxyVerb}   @param[in] G The gradient
+   @param[in] H The Hessian
+   @param[in] trust The trust radius\end{DoxyVerb}
+ 
+
+Definition at line 745 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_ad8a296a7a624707234b4c9fc949c5dbd_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aba52ed682c83784e4523223c0bbb018b}\label{classsrc_1_1optimizer_1_1Optimizer_aba52ed682c83784e4523223c0bbb018b}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Truncated\+Newton@{Truncated\+Newton}}
+\index{Truncated\+Newton@{Truncated\+Newton}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Truncated\+Newton()}{TruncatedNewton()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+Truncated\+Newton (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Use Sci\+Py\textquotesingle{}s built-\/in truncated Newton (fmin\+\_\+tnc) algorithm to optimize the parameters. 
+
+\begin{DoxySeeAlso}{See also}
+\hyperlink{classsrc_1_1optimizer_1_1Optimizer_a1e616a4c920b3e8935ca19e208b1c3be}{Optimizer\+::\+Scipy\+Optimizer} 
+\end{DoxySeeAlso}
+
+
+Definition at line 1228 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_aba52ed682c83784e4523223c0bbb018b_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a30bd3b593b783f2e49e15d84d45927c3}\label{classsrc_1_1optimizer_1_1Optimizer_a30bd3b593b783f2e49e15d84d45927c3}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!writechk@{writechk}}
+\index{writechk@{writechk}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{writechk()}{writechk()}}
+{\footnotesize\ttfamily def src.\+optimizer.\+Optimizer.\+writechk (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Write the checkpoint file for the main optimizer. 
+
+
+
+Definition at line 1602 of file optimizer.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1optimizer_1_1Optimizer_a30bd3b593b783f2e49e15d84d45927c3_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a19f27eb029d508ab0d559ed78c0864dc}\label{classsrc_1_1optimizer_1_1Optimizer_a19f27eb029d508ab0d559ed78c0864dc}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!bakdir@{bakdir}}
+\index{bakdir@{bakdir}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{bakdir}{bakdir}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+bakdir}
+
+
+
+Definition at line 182 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aef24b36c1ff90fb15a372e2b0e0548a7}\label{classsrc_1_1optimizer_1_1Optimizer_aef24b36c1ff90fb15a372e2b0e0548a7}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!bhyp@{bhyp}}
+\index{bhyp@{bhyp}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{bhyp}{bhyp}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+bhyp}
+
+
+
+Whether the penalty function is hyperbolic. 
+
+
+
+Definition at line 176 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a2d0160ffbd25b572fd0e4b26114a5d2b}\label{classsrc_1_1optimizer_1_1Optimizer_a2d0160ffbd25b572fd0e4b26114a5d2b}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!chk@{chk}}
+\index{chk@{chk}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{chk}{chk}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+chk}
+
+
+
+Definition at line 541 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a08e193bf17fa05764a4e3a5f68134bf2}\label{classsrc_1_1optimizer_1_1Optimizer_a08e193bf17fa05764a4e3a5f68134bf2}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!dx@{dx}}
+\index{dx@{dx}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{dx}{dx}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+dx}
+
+
+
+Definition at line 774 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a84a28baeab6921fa32b5d41e477f6acb}\label{classsrc_1_1optimizer_1_1Optimizer_a84a28baeab6921fa32b5d41e477f6acb}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!excision@{excision}}
+\index{excision@{excision}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{excision}{excision}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+excision}
+
+
+
+The indices to be excluded from the Hessian update. 
+
+
+
+Definition at line 189 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a3d5d6e52049a6d6714ee94239a7a5df5}\label{classsrc_1_1optimizer_1_1Optimizer_a3d5d6e52049a6d6714ee94239a7a5df5}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!failmsg@{failmsg}}
+\index{failmsg@{failmsg}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{failmsg}{failmsg}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+failmsg}
+
+
+
+Print a special message on failure. 
+
+
+
+Definition at line 160 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a4bbc39a0dc533c4d9caeb5516030dd26}\label{classsrc_1_1optimizer_1_1Optimizer_a4bbc39a0dc533c4d9caeb5516030dd26}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!FF@{FF}}
+\index{FF@{FF}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{FF}{FF}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+FF}
+
+
+
+The force field itself. 
+
+
+
+Definition at line 178 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a034bcb3171a630aaab2e928886a67cbd}\label{classsrc_1_1optimizer_1_1Optimizer_a034bcb3171a630aaab2e928886a67cbd}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!goodstep@{goodstep}}
+\index{goodstep@{goodstep}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{goodstep}{goodstep}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+goodstep}
+
+
+
+Specify whether the previous optimization step was good or bad. 
+
+
+
+Definition at line 162 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a74c7a2eb94230c0c77f64b918a79268a}\label{classsrc_1_1optimizer_1_1Optimizer_a74c7a2eb94230c0c77f64b918a79268a}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Grad@{Grad}}
+\index{Grad@{Grad}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Grad}{Grad}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+Grad}
+
+
+
+Definition at line 776 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a5d39927fdc1835e26cf274608334993c}\label{classsrc_1_1optimizer_1_1Optimizer_a5d39927fdc1835e26cf274608334993c}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!h@{h}}
+\index{h@{h}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{h}{h}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+h}
+
+
+
+Definition at line 387 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aac43d13edf51e56a9af840c4edeb41c9}\label{classsrc_1_1optimizer_1_1Optimizer_aac43d13edf51e56a9af840c4edeb41c9}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!H@{H}}
+\index{H@{H}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{H}{H}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+H}
+
+
+
+Definition at line 773 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aa04d94365b7c6e6a8339d069fbd2493a}\label{classsrc_1_1optimizer_1_1Optimizer_aa04d94365b7c6e6a8339d069fbd2493a}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Hess@{Hess}}
+\index{Hess@{Hess}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Hess}{Hess}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+Hess}
+
+
+
+Definition at line 777 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_ac5d3b97806c50722bee5f42481cd241f}\label{classsrc_1_1optimizer_1_1Optimizer_ac5d3b97806c50722bee5f42481cd241f}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!iter@{iter}}
+\index{iter@{iter}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{iter}{iter}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+iter}
+
+
+
+Definition at line 779 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_adddc631b1dc8efe874323c3d0c7b7b2f}\label{classsrc_1_1optimizer_1_1Optimizer_adddc631b1dc8efe874323c3d0c7b7b2f}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!iteration@{iteration}}
+\index{iteration@{iteration}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{iteration}{iteration}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+iteration}
+
+
+
+The current iteration number. 
+
+
+
+Definition at line 166 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_ac7f1840fe54ce8f959a27f02ebccd406}\label{classsrc_1_1optimizer_1_1Optimizer_ac7f1840fe54ce8f959a27f02ebccd406}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!iterinit@{iterinit}}
+\index{iterinit@{iterinit}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{iterinit}{iterinit}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+iterinit}
+
+
+
+The initial iteration number (nonzero if we restart a previous run.) 
+
+This will be invoked if we quit R\+I\+G\+HT at the start of an iteration (i.\+e.
+
+jobs were launched but none were finished) If data exists in the temp-\/dir corresponding to the highest iteration number, read the data. 
+
+Definition at line 164 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a05096b5b576287250088e3883597fd09}\label{classsrc_1_1optimizer_1_1Optimizer_a05096b5b576287250088e3883597fd09}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!mvals0@{mvals0}}
+\index{mvals0@{mvals0}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{mvals0}{mvals0}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+mvals0}
+
+
+
+The original parameter values. 
+
+Check derivatives by finite difference after the optimization is over (for good measure)
+
+Don\textquotesingle{}t print a \char`\"{}result\char`\"{} force field if it\textquotesingle{}s the same as the input.
+
+Determine the save file name.
+
+Parse the save file for mvals, if exist.
+
+The \char`\"{}precondition\char`\"{} job type takes care of its own output files. 
+
+Definition at line 196 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aca8aba40ee48e50e42eaabfe5bf883cf}\label{classsrc_1_1optimizer_1_1Optimizer_aca8aba40ee48e50e42eaabfe5bf883cf}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!mvals\+\_\+bak@{mvals\+\_\+bak}}
+\index{mvals\+\_\+bak@{mvals\+\_\+bak}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{mvals\+\_\+bak}{mvals\_bak}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+mvals\+\_\+bak}
+
+
+
+The root directory. 
+
+Determine the output file name.
+
+The job type Initial step size trust radius Minimum trust radius (for noisy objective functions) Lower bound on Hessian eigenvalue (below this, we add in steepest descent) Lower bound on step size (will fail below this) Guess value for Brent Step size for numerical finite difference When the trust radius get smaller, the finite difference step might need to get smaller. Number of steps to average over Function value convergence threshold Step size convergence threshold Gradient convergence threshold Allow convergence on low quality steps Maximum number of optimization steps For scan\mbox{[}mp\mbox{]}vals\+: The parameter index to scan over For scan\mbox{[}mp\mbox{]}vals\+: The parameter name to scan over, it just looks up an index For scan\mbox{[}mp\mbox{]}vals\+: The values that are fed into the scanner Name of the checkpoint file that we\textquotesingle{}re reading in Name of the checkpoint file that we\textquotesingle{}re writing out Whether to write the checkpoint file at every step Adaptive trust radius adjustment factor Adaptive trust radius adjustment damping Whether to print gradient during each step of the optimization Whether to print Hessian during each step of the optimization Whether to print parameters during each step of the optimization Error tolerance (if objective function rises by less than this, then the optimizer will forge ahead!) Search tolerance (The Hessian diagonal search will stop if the change is below this threshold) Whether to make backup files Name of the original input file Number of convergence criteria that must be met Only backup the \char`\"{}mvals\char`\"{} input file once per calculation.
+
+Clone the input file to the output, 
+
+Definition at line 158 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aa88255b5af98339a1f3a3a5f8e40aaef}\label{classsrc_1_1optimizer_1_1Optimizer_aa88255b5af98339a1f3a3a5f8e40aaef}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!np@{np}}
+\index{np@{np}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{np}{np}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+np}
+
+
+
+Number of parameters. 
+
+
+
+Definition at line 192 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_ab2a3d627b6f6cb2f76f22e97c9a2ef40}\label{classsrc_1_1optimizer_1_1Optimizer_ab2a3d627b6f6cb2f76f22e97c9a2ef40}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Objective@{Objective}}
+\index{Objective@{Objective}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Objective}{Objective}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+Objective}
+
+
+
+reset the global variable 
+
+The objective function (needs to pass in when I instantiate) 
+
+Definition at line 174 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aecea79940c8171606998ef0acbc276b3}\label{classsrc_1_1optimizer_1_1Optimizer_aecea79940c8171606998ef0acbc276b3}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Opt\+Tab@{Opt\+Tab}}
+\index{Opt\+Tab@{Opt\+Tab}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Opt\+Tab}{OptTab}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+Opt\+Tab}
+
+
+
+A list of all the things we can ask the optimizer to do. 
+
+
+
+Definition at line 63 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_ad0448061fef8846bece7e5c9a40d2380}\label{classsrc_1_1optimizer_1_1Optimizer_ad0448061fef8846bece7e5c9a40d2380}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Penalty@{Penalty}}
+\index{Penalty@{Penalty}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Penalty}{Penalty}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+Penalty}
+
+
+
+Definition at line 778 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a516d6f709220615ab7f7d17d768b695d}\label{classsrc_1_1optimizer_1_1Optimizer_a516d6f709220615ab7f7d17d768b695d}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!prev\+\_\+bad@{prev\+\_\+bad}}
+\index{prev\+\_\+bad@{prev\+\_\+bad}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{prev\+\_\+bad}{prev\_bad}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+prev\+\_\+bad}
+
+
+
+Definition at line 972 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a373fa24d60747446426864a4112246f0}\label{classsrc_1_1optimizer_1_1Optimizer_a373fa24d60747446426864a4112246f0}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!read\+\_\+mvals@{read\+\_\+mvals}}
+\index{read\+\_\+mvals@{read\+\_\+mvals}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{read\+\_\+mvals}{read\_mvals}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+read\+\_\+mvals}
+
+
+
+Definition at line 223 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_adbf584d06545ac2417ea8d161ec33b88}\label{classsrc_1_1optimizer_1_1Optimizer_adbf584d06545ac2417ea8d161ec33b88}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!resdir@{resdir}}
+\index{resdir@{resdir}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{resdir}{resdir}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+resdir}
+
+
+
+Definition at line 183 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aa75c8d8660bf183bd4177227a9d4e698}\label{classsrc_1_1optimizer_1_1Optimizer_aa75c8d8660bf183bd4177227a9d4e698}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!uncert@{uncert}}
+\index{uncert@{uncert}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{uncert}{uncert}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+uncert}
+
+
+
+Target types which introduce uncertainty into the objective function. 
+
+Will re-\/evaluate the objective function when an optimization step is rejected 
+
+Definition at line 181 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_af55d853379aa9f712413c0b65db94b30}\label{classsrc_1_1optimizer_1_1Optimizer_af55d853379aa9f712413c0b65db94b30}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!Val@{Val}}
+\index{Val@{Val}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{Val}{Val}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+Val}
+
+
+
+Definition at line 775 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_a55944d77d9551e824c198aa4556f2b85}\label{classsrc_1_1optimizer_1_1Optimizer_a55944d77d9551e824c198aa4556f2b85}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!x\+\_\+best@{x\+\_\+best}}
+\index{x\+\_\+best@{x\+\_\+best}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{x\+\_\+best}{x\_best}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+x\+\_\+best}
+
+
+
+Definition at line 975 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_aa744302d95dc8b20bdf80209385e059e}\label{classsrc_1_1optimizer_1_1Optimizer_aa744302d95dc8b20bdf80209385e059e}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!x\+\_\+prev@{x\+\_\+prev}}
+\index{x\+\_\+prev@{x\+\_\+prev}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{x\+\_\+prev}{x\_prev}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+x\+\_\+prev}
+
+
+
+Definition at line 974 of file optimizer.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1optimizer_1_1Optimizer_ab64002970e3058166b25dc54cb16a426}\label{classsrc_1_1optimizer_1_1Optimizer_ab64002970e3058166b25dc54cb16a426}} 
+\index{src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}!xk\+\_\+prev@{xk\+\_\+prev}}
+\index{xk\+\_\+prev@{xk\+\_\+prev}!src\+::optimizer\+::\+Optimizer@{src\+::optimizer\+::\+Optimizer}}
+\paragraph{\texorpdfstring{xk\+\_\+prev}{xk\_prev}}
+{\footnotesize\ttfamily src.\+optimizer.\+Optimizer.\+xk\+\_\+prev}
+
+
+
+Definition at line 973 of file optimizer.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{optimizer_8py}{optimizer.\+py}\end{DoxyCompactItemize}

@@ -1,0 +1,596 @@
+\hypertarget{classsrc_1_1amberio_1_1PrmtopLoader}{}\subsection{src.\+amberio.\+Prmtop\+Loader Class Reference}
+\label{classsrc_1_1amberio_1_1PrmtopLoader}\index{src.\+amberio.\+Prmtop\+Loader@{src.\+amberio.\+Prmtop\+Loader}}
+
+
+Parsed \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} prmtop file.  
+
+
+
+
+Inheritance diagram for src.\+amberio.\+Prmtop\+Loader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classsrc_1_1amberio_1_1PrmtopLoader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+amberio.\+Prmtop\+Loader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classsrc_1_1amberio_1_1PrmtopLoader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a5090d17f6ee0ee8f323b1b3c5ee68181}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, in\+Filename)
+\begin{DoxyCompactList}\small\item\em Create a \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader}{Prmtop\+Loader} object from an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} prmtop file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_ab1f407476fadeeafa5875158140bdd37}{get\+Num\+Atoms} (self)
+\begin{DoxyCompactList}\small\item\em Return the number of atoms in the system. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_ab5fd1aa3c74924b90c4582cc7e15a7ab}{get\+Num\+Types} (self)
+\begin{DoxyCompactList}\small\item\em Return the number of \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} atoms types in the system. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a7a05c20f7bf19b7138bd626a5199aab0}{get\+If\+Box} (self)
+\begin{DoxyCompactList}\small\item\em Return True if the system was build with periodic boundary conditions (P\+BC) \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_aa6d06c4f57b4eb15a5d0b82c616aab96}{get\+If\+Cap} (self)
+\begin{DoxyCompactList}\small\item\em Return True if the system was build with the cap option) \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a3273e9dae8c7ed212344f9a76f05e473}{get\+If\+Pert} (self)
+\begin{DoxyCompactList}\small\item\em Return True if the system was build with the perturbation parameters) \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a5692d84029e2fd6395a6438b1ae20437}{get\+Masses} (self)
+\begin{DoxyCompactList}\small\item\em Return a list of atomic masses in the system. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a7dae0918b1f2fb6c956c044198bba7a6}{get\+Charges} (self)
+\begin{DoxyCompactList}\small\item\em Return a list of atomic charges in the system. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_aea4f3d9a8ea0133d6dbb40539ed00eee}{get\+Atom\+Name} (self, i\+Atom)
+\begin{DoxyCompactList}\small\item\em Return the atom name for i\+Atom. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_ac95dc64ec362f33810c3a830675b3f8a}{get\+Atom\+Names} (self)
+\begin{DoxyCompactList}\small\item\em Return the list of the system atom names. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_ab3640ff8568112edfc9d4b135e405ce7}{get\+Atom\+Type} (self, i\+Atom)
+\begin{DoxyCompactList}\small\item\em Return the \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} atom type for i\+Atom. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a584354ca99dcfbd2de370e97cf121a6c}{get\+Atom\+Types} (self)
+\begin{DoxyCompactList}\small\item\em Return the list of the \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} atom types. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a1c394f5a4a11ba80786832824b71d6a7}{get\+Residue\+Number} (self, i\+Atom)
+\begin{DoxyCompactList}\small\item\em Return i\+Atom\textquotesingle{}s residue number. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a75f9c306f8321358b533f67d5354f1b1}{get\+Residue\+Label} (self, i\+Atom=None, i\+Res=None)
+\begin{DoxyCompactList}\small\item\em Return residue label for i\+Atom OR i\+Res. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a23d0b10c76fb39e206cf6841ff6f56ce}{get\+Nonbond\+Terms} (self)
+\begin{DoxyCompactList}\small\item\em Return list of all r\+Vdw, epsilon pairs for each atom. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_ab75f7fa3f828685a1959e8c0f270f3ec}{get\+Bonds\+WithH} (self)
+\begin{DoxyCompactList}\small\item\em Return list of bonded atom pairs, K, and Rmin for each bond with a hydrogen. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_af8e39923b6f949eb7db0264b4e26a2c5}{get\+Bonds\+NoH} (self)
+\begin{DoxyCompactList}\small\item\em Return list of bonded atom pairs, K, and Rmin for each bond with no hydrogen. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a1dd2758d21107eae79a1766e55c33708}{get\+Angles} (self)
+\begin{DoxyCompactList}\small\item\em Return list of atom triplets, K, and Theta\+Min for each bond angle. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a24dfb8d7303f2e04a6617589ce59d7c2}{get\+Dihedrals} (self)
+\begin{DoxyCompactList}\small\item\em Return list of atom quads, K, phase and periodicity for each dihedral angle. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a854cac838bde307ba4c069ba58b71cb6}{get14\+Interactions} (self)
+\begin{DoxyCompactList}\small\item\em Return list of atom pairs, charge\+Product, r\+Min and epsilon for each 1-\/4 interaction. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a386295fa291f134fe5d5358a139097b2}{get\+Excluded\+Atoms} (self)
+\begin{DoxyCompactList}\small\item\em Return list of lists, giving all pairs of atoms that should have no non-\/bond interactions. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a66a7271794489b104927997a25a5d6f8}{get\+G\+B\+Parms} (self, symbls=None)
+\begin{DoxyCompactList}\small\item\em Return list giving GB params, Radius and screening factor. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_ae2075caa02525b6e4b2cded2ed7e7a3d}{get\+Box\+Beta\+And\+Dimensions} (self)
+\begin{DoxyCompactList}\small\item\em Return periodic boundary box beta angle and dimensions. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1PrmtopLoader_a3bfd794a547cf87923949354cd07c844}{residue\+Pointer\+Dict}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Parsed \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} prmtop file. 
+
+Parmtop\+Loader reads, parses and manages content from a \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} prmtop file.
+
+E\+X\+A\+M\+P\+L\+ES
+
+Parse a prmtop file of alanine dipeptide in implicit solvent.
+
+\begin{quote}
+\begin{quote}
+\begin{quote}
+import os, os.\+path directory = os.\+path.\+join(os.\+getenv(\textquotesingle{}Y\+A\+N\+K\+\_\+\+I\+N\+S\+T\+A\+L\+L\+\_\+\+D\+IR\textquotesingle{}), \textquotesingle{}test\textquotesingle{}, \textquotesingle{}systems\textquotesingle{}, \textquotesingle{}alanine-\/dipeptide-\/gbsa\textquotesingle{}) prmtop\+\_\+filename = os.\+path.\+join(directory, \textquotesingle{}alanine-\/dipeptide.\+prmtop\textquotesingle{}) prmtop = Prmtop\+Loader(prmtop\+\_\+filename) \end{quote}
+\end{quote}
+\end{quote}
+\begin{DoxyVerb} Parse a prmtop file of alanine dipeptide in explicit solvent.
+\end{DoxyVerb}
+
+
+\begin{quote}
+\begin{quote}
+\begin{quote}
+import os, os.\+path directory = os.\+path.\+join(os.\+getenv(\textquotesingle{}Y\+A\+N\+K\+\_\+\+I\+N\+S\+T\+A\+L\+L\+\_\+\+D\+IR\textquotesingle{}), \textquotesingle{}test\textquotesingle{}, \textquotesingle{}systems\textquotesingle{}, \textquotesingle{}alanine-\/dipeptide-\/explicit\textquotesingle{}) prmtop\+\_\+filename = os.\+path.\+join(directory, \textquotesingle{}alanine-\/dipeptide.\+prmtop\textquotesingle{}) prmtop = Prmtop\+Loader(prmtop\+\_\+filename) \end{quote}
+\end{quote}
+\end{quote}
+
+
+Definition at line 696 of file amberio.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a5090d17f6ee0ee8f323b1b3c5ee68181}\label{classsrc_1_1amberio_1_1PrmtopLoader_a5090d17f6ee0ee8f323b1b3c5ee68181}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{in\+Filename }\end{DoxyParamCaption})}
+
+
+
+Create a \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader}{Prmtop\+Loader} object from an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} prmtop file. 
+
+A\+R\+G\+U\+M\+E\+N\+TS
+
+in\+Filename (string) -\/ \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} \textquotesingle{}new-\/style\textquotesingle{} prmtop file, probably generated with one of the \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} tleap/xleap/sleap 
+
+Definition at line 706 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_a5090d17f6ee0ee8f323b1b3c5ee68181_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a854cac838bde307ba4c069ba58b71cb6}\label{classsrc_1_1amberio_1_1PrmtopLoader_a854cac838bde307ba4c069ba58b71cb6}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get14\+Interactions@{get14\+Interactions}}
+\index{get14\+Interactions@{get14\+Interactions}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get14\+Interactions()}{get14Interactions()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get14\+Interactions (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return list of atom pairs, charge\+Product, r\+Min and epsilon for each 1-\/4 interaction. 
+
+
+
+Definition at line 1044 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_a854cac838bde307ba4c069ba58b71cb6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a1dd2758d21107eae79a1766e55c33708}\label{classsrc_1_1amberio_1_1PrmtopLoader_a1dd2758d21107eae79a1766e55c33708}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Angles@{get\+Angles}}
+\index{get\+Angles@{get\+Angles}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Angles()}{getAngles()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Angles (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return list of atom triplets, K, and Theta\+Min for each bond angle. 
+
+
+
+Definition at line 984 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_aea4f3d9a8ea0133d6dbb40539ed00eee}\label{classsrc_1_1amberio_1_1PrmtopLoader_aea4f3d9a8ea0133d6dbb40539ed00eee}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Atom\+Name@{get\+Atom\+Name}}
+\index{get\+Atom\+Name@{get\+Atom\+Name}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Atom\+Name()}{getAtomName()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Atom\+Name (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i\+Atom }\end{DoxyParamCaption})}
+
+
+
+Return the atom name for i\+Atom. 
+
+
+
+Definition at line 847 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_aea4f3d9a8ea0133d6dbb40539ed00eee_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_ac95dc64ec362f33810c3a830675b3f8a}\label{classsrc_1_1amberio_1_1PrmtopLoader_ac95dc64ec362f33810c3a830675b3f8a}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Atom\+Names@{get\+Atom\+Names}}
+\index{get\+Atom\+Names@{get\+Atom\+Names}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Atom\+Names()}{getAtomNames()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Atom\+Names (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return the list of the system atom names. 
+
+
+
+Definition at line 853 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_ab3640ff8568112edfc9d4b135e405ce7}\label{classsrc_1_1amberio_1_1PrmtopLoader_ab3640ff8568112edfc9d4b135e405ce7}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Atom\+Type@{get\+Atom\+Type}}
+\index{get\+Atom\+Type@{get\+Atom\+Type}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Atom\+Type()}{getAtomType()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Atom\+Type (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i\+Atom }\end{DoxyParamCaption})}
+
+
+
+Return the \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} atom type for i\+Atom. 
+
+
+
+Definition at line 868 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_ab3640ff8568112edfc9d4b135e405ce7_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a584354ca99dcfbd2de370e97cf121a6c}\label{classsrc_1_1amberio_1_1PrmtopLoader_a584354ca99dcfbd2de370e97cf121a6c}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Atom\+Types@{get\+Atom\+Types}}
+\index{get\+Atom\+Types@{get\+Atom\+Types}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Atom\+Types()}{getAtomTypes()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Atom\+Types (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return the list of the \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} atom types. 
+
+
+
+Definition at line 874 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_af8e39923b6f949eb7db0264b4e26a2c5}\label{classsrc_1_1amberio_1_1PrmtopLoader_af8e39923b6f949eb7db0264b4e26a2c5}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Bonds\+NoH@{get\+Bonds\+NoH}}
+\index{get\+Bonds\+NoH@{get\+Bonds\+NoH}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Bonds\+No\+H()}{getBondsNoH()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Bonds\+NoH (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return list of bonded atom pairs, K, and Rmin for each bond with no hydrogen. 
+
+
+
+Definition at line 973 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_af8e39923b6f949eb7db0264b4e26a2c5_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_ab75f7fa3f828685a1959e8c0f270f3ec}\label{classsrc_1_1amberio_1_1PrmtopLoader_ab75f7fa3f828685a1959e8c0f270f3ec}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Bonds\+WithH@{get\+Bonds\+WithH}}
+\index{get\+Bonds\+WithH@{get\+Bonds\+WithH}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Bonds\+With\+H()}{getBondsWithH()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Bonds\+WithH (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return list of bonded atom pairs, K, and Rmin for each bond with a hydrogen. 
+
+
+
+Definition at line 961 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_ab75f7fa3f828685a1959e8c0f270f3ec_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_ae2075caa02525b6e4b2cded2ed7e7a3d}\label{classsrc_1_1amberio_1_1PrmtopLoader_ae2075caa02525b6e4b2cded2ed7e7a3d}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Box\+Beta\+And\+Dimensions@{get\+Box\+Beta\+And\+Dimensions}}
+\index{get\+Box\+Beta\+And\+Dimensions@{get\+Box\+Beta\+And\+Dimensions}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Box\+Beta\+And\+Dimensions()}{getBoxBetaAndDimensions()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Box\+Beta\+And\+Dimensions (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return periodic boundary box beta angle and dimensions. 
+
+
+
+Definition at line 1118 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a7dae0918b1f2fb6c956c044198bba7a6}\label{classsrc_1_1amberio_1_1PrmtopLoader_a7dae0918b1f2fb6c956c044198bba7a6}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Charges@{get\+Charges}}
+\index{get\+Charges@{get\+Charges}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Charges()}{getCharges()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Charges (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return a list of atomic charges in the system. 
+
+
+
+Definition at line 832 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_a7dae0918b1f2fb6c956c044198bba7a6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a24dfb8d7303f2e04a6617589ce59d7c2}\label{classsrc_1_1amberio_1_1PrmtopLoader_a24dfb8d7303f2e04a6617589ce59d7c2}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Dihedrals@{get\+Dihedrals}}
+\index{get\+Dihedrals@{get\+Dihedrals}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Dihedrals()}{getDihedrals()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Dihedrals (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return list of atom quads, K, phase and periodicity for each dihedral angle. 
+
+
+
+Definition at line 1013 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a386295fa291f134fe5d5358a139097b2}\label{classsrc_1_1amberio_1_1PrmtopLoader_a386295fa291f134fe5d5358a139097b2}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Excluded\+Atoms@{get\+Excluded\+Atoms}}
+\index{get\+Excluded\+Atoms@{get\+Excluded\+Atoms}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Excluded\+Atoms()}{getExcludedAtoms()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Excluded\+Atoms (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return list of lists, giving all pairs of atoms that should have no non-\/bond interactions. 
+
+
+
+Definition at line 1064 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_a386295fa291f134fe5d5358a139097b2_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a66a7271794489b104927997a25a5d6f8}\label{classsrc_1_1amberio_1_1PrmtopLoader_a66a7271794489b104927997a25a5d6f8}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+G\+B\+Parms@{get\+G\+B\+Parms}}
+\index{get\+G\+B\+Parms@{get\+G\+B\+Parms}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+G\+B\+Parms()}{getGBParms()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+G\+B\+Parms (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{symbls = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Return list giving GB params, Radius and screening factor. 
+
+
+
+Definition at line 1088 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a7a05c20f7bf19b7138bd626a5199aab0}\label{classsrc_1_1amberio_1_1PrmtopLoader_a7a05c20f7bf19b7138bd626a5199aab0}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+If\+Box@{get\+If\+Box}}
+\index{get\+If\+Box@{get\+If\+Box}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+If\+Box()}{getIfBox()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+If\+Box (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return True if the system was build with periodic boundary conditions (P\+BC) 
+
+
+
+Definition at line 802 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_a7a05c20f7bf19b7138bd626a5199aab0_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_aa6d06c4f57b4eb15a5d0b82c616aab96}\label{classsrc_1_1amberio_1_1PrmtopLoader_aa6d06c4f57b4eb15a5d0b82c616aab96}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+If\+Cap@{get\+If\+Cap}}
+\index{get\+If\+Cap@{get\+If\+Cap}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+If\+Cap()}{getIfCap()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+If\+Cap (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return True if the system was build with the cap option) 
+
+
+
+Definition at line 807 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_aa6d06c4f57b4eb15a5d0b82c616aab96_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a3273e9dae8c7ed212344f9a76f05e473}\label{classsrc_1_1amberio_1_1PrmtopLoader_a3273e9dae8c7ed212344f9a76f05e473}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+If\+Pert@{get\+If\+Pert}}
+\index{get\+If\+Pert@{get\+If\+Pert}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+If\+Pert()}{getIfPert()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+If\+Pert (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return True if the system was build with the perturbation parameters) 
+
+
+
+Definition at line 812 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_a3273e9dae8c7ed212344f9a76f05e473_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a5692d84029e2fd6395a6438b1ae20437}\label{classsrc_1_1amberio_1_1PrmtopLoader_a5692d84029e2fd6395a6438b1ae20437}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Masses@{get\+Masses}}
+\index{get\+Masses@{get\+Masses}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Masses()}{getMasses()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Masses (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return a list of atomic masses in the system. 
+
+
+
+Definition at line 817 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_a5692d84029e2fd6395a6438b1ae20437_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a23d0b10c76fb39e206cf6841ff6f56ce}\label{classsrc_1_1amberio_1_1PrmtopLoader_a23d0b10c76fb39e206cf6841ff6f56ce}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Nonbond\+Terms@{get\+Nonbond\+Terms}}
+\index{get\+Nonbond\+Terms@{get\+Nonbond\+Terms}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Nonbond\+Terms()}{getNonbondTerms()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Nonbond\+Terms (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return list of all r\+Vdw, epsilon pairs for each atom. 
+
+Work in the \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} unit system. 
+
+Definition at line 912 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_a23d0b10c76fb39e206cf6841ff6f56ce_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_ab1f407476fadeeafa5875158140bdd37}\label{classsrc_1_1amberio_1_1PrmtopLoader_ab1f407476fadeeafa5875158140bdd37}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Num\+Atoms@{get\+Num\+Atoms}}
+\index{get\+Num\+Atoms@{get\+Num\+Atoms}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Num\+Atoms()}{getNumAtoms()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Num\+Atoms (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return the number of atoms in the system. 
+
+
+
+Definition at line 792 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_ab1f407476fadeeafa5875158140bdd37_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_ab5fd1aa3c74924b90c4582cc7e15a7ab}\label{classsrc_1_1amberio_1_1PrmtopLoader_ab5fd1aa3c74924b90c4582cc7e15a7ab}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Num\+Types@{get\+Num\+Types}}
+\index{get\+Num\+Types@{get\+Num\+Types}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Num\+Types()}{getNumTypes()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Num\+Types (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return the number of \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} atoms types in the system. 
+
+
+
+Definition at line 797 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_ab5fd1aa3c74924b90c4582cc7e15a7ab_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a75f9c306f8321358b533f67d5354f1b1}\label{classsrc_1_1amberio_1_1PrmtopLoader_a75f9c306f8321358b533f67d5354f1b1}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Residue\+Label@{get\+Residue\+Label}}
+\index{get\+Residue\+Label@{get\+Residue\+Label}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Residue\+Label()}{getResidueLabel()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Residue\+Label (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i\+Atom = {\ttfamily None},  }\item[{}]{i\+Res = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Return residue label for i\+Atom OR i\+Res. 
+
+
+
+Definition at line 884 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_a75f9c306f8321358b533f67d5354f1b1_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a1c394f5a4a11ba80786832824b71d6a7}\label{classsrc_1_1amberio_1_1PrmtopLoader_a1c394f5a4a11ba80786832824b71d6a7}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!get\+Residue\+Number@{get\+Residue\+Number}}
+\index{get\+Residue\+Number@{get\+Residue\+Number}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{get\+Residue\+Number()}{getResidueNumber()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Prmtop\+Loader.\+get\+Residue\+Number (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i\+Atom }\end{DoxyParamCaption})}
+
+
+
+Return i\+Atom\textquotesingle{}s residue number. 
+
+
+
+Definition at line 879 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1PrmtopLoader_a1c394f5a4a11ba80786832824b71d6a7_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1PrmtopLoader_a3bfd794a547cf87923949354cd07c844}\label{classsrc_1_1amberio_1_1PrmtopLoader_a3bfd794a547cf87923949354cd07c844}} 
+\index{src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}!residue\+Pointer\+Dict@{residue\+Pointer\+Dict}}
+\index{residue\+Pointer\+Dict@{residue\+Pointer\+Dict}!src\+::amberio\+::\+Prmtop\+Loader@{src\+::amberio\+::\+Prmtop\+Loader}}
+\paragraph{\texorpdfstring{residue\+Pointer\+Dict}{residuePointerDict}}
+{\footnotesize\ttfamily src.\+amberio.\+Prmtop\+Loader.\+residue\+Pointer\+Dict}
+
+
+
+Definition at line 899 of file amberio.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{amberio_8py}{amberio.\+py}\end{DoxyCompactItemize}

@@ -1,0 +1,205 @@
+\hypertarget{classsrc_1_1psi4io_1_1GBS__Reader}{}\subsection{src.\+psi4io.\+G\+B\+S\+\_\+\+Reader Class Reference}
+\label{classsrc_1_1psi4io_1_1GBS__Reader}\index{src.\+psi4io.\+G\+B\+S\+\_\+\+Reader@{src.\+psi4io.\+G\+B\+S\+\_\+\+Reader}}
+
+
+Interaction type -\/$>$ Parameter Dictionary.  
+
+
+
+
+Inheritance diagram for src.\+psi4io.\+G\+B\+S\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsrc_1_1psi4io_1_1GBS__Reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+psi4io.\+G\+B\+S\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsrc_1_1psi4io_1_1GBS__Reader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1GBS__Reader_a901ed27550f388599362cba17422d34c}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, fnm=None)
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1GBS__Reader_a3fe8a2cd7730bab06ba2fda9dd11cf6d}{build\+\_\+pid} (self, pfld)
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1GBS__Reader_a66aa5de319783c2cd7337d436e6a64de}{feed} (self, line, linindep=False)
+\begin{DoxyCompactList}\small\item\em Feed in a line. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1GBS__Reader_ae3b9e16a6ec2c8bd4a8dbb9c73a6e344}{element}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1GBS__Reader_a53d49061d48c5774301a1e7af0f35567}{amom}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1GBS__Reader_a4e6461f91b1a71d9287537c746d5117b}{last\+\_\+amom}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1GBS__Reader_a3eb1a527ce59df64b659c7304df8114b}{basis\+\_\+number}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1GBS__Reader_a0e7c54314202d03e6ecd728a87985da5}{contraction\+\_\+number}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1GBS__Reader_ad5401ec91a009c2e9d1131340f2d310b}{adict}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1GBS__Reader_a2e3d80828bae7b82a292e4d54c90881e}{isdata}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1GBS__Reader_ab9667b5604854f7bb371635ce2e60db2}{destroy}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Interaction type -\/$>$ Parameter Dictionary. 
+
+pdict = \{\textquotesingle{}Exponent\textquotesingle{}\+:\{0\+:\textquotesingle{}A\textquotesingle{}, 1\+:\textquotesingle{}C\textquotesingle{}\}, \textquotesingle{}B\+A\+S\+SP\textquotesingle{} \+:\{0\+:\textquotesingle{}A\textquotesingle{}, 1\+:\textquotesingle{}B\textquotesingle{}, 2\+:\textquotesingle{}C\textquotesingle{}\} \} Finite state machine for parsing basis set files. 
+
+Definition at line 39 of file psi4io.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1GBS__Reader_a901ed27550f388599362cba17422d34c}\label{classsrc_1_1psi4io_1_1GBS__Reader_a901ed27550f388599362cba17422d34c}} 
+\index{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+G\+B\+S\+\_\+\+Reader.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 41 of file psi4io.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1GBS__Reader_a3fe8a2cd7730bab06ba2fda9dd11cf6d}\label{classsrc_1_1psi4io_1_1GBS__Reader_a3fe8a2cd7730bab06ba2fda9dd11cf6d}} 
+\index{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}!build\+\_\+pid@{build\+\_\+pid}}
+\index{build\+\_\+pid@{build\+\_\+pid}!src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{build\+\_\+pid()}{build\_pid()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+G\+B\+S\+\_\+\+Reader.\+build\+\_\+pid (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{pfld }\end{DoxyParamCaption})}
+
+
+
+Definition at line 52 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1GBS__Reader_a66aa5de319783c2cd7337d436e6a64de}\label{classsrc_1_1psi4io_1_1GBS__Reader_a66aa5de319783c2cd7337d436e6a64de}} 
+\index{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}!feed@{feed}}
+\index{feed@{feed}!src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{feed()}{feed()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+G\+B\+S\+\_\+\+Reader.\+feed (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line,  }\item[{}]{linindep = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Feed in a line. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em line} & The line of data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 65 of file psi4io.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1psi4io_1_1GBS__Reader_a66aa5de319783c2cd7337d436e6a64de_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1GBS__Reader_ad5401ec91a009c2e9d1131340f2d310b}\label{classsrc_1_1psi4io_1_1GBS__Reader_ad5401ec91a009c2e9d1131340f2d310b}} 
+\index{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}!adict@{adict}}
+\index{adict@{adict}!src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{adict}{adict}}
+{\footnotesize\ttfamily src.\+psi4io.\+G\+B\+S\+\_\+\+Reader.\+adict}
+
+
+
+Definition at line 48 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1GBS__Reader_a53d49061d48c5774301a1e7af0f35567}\label{classsrc_1_1psi4io_1_1GBS__Reader_a53d49061d48c5774301a1e7af0f35567}} 
+\index{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}!amom@{amom}}
+\index{amom@{amom}!src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{amom}{amom}}
+{\footnotesize\ttfamily src.\+psi4io.\+G\+B\+S\+\_\+\+Reader.\+amom}
+
+
+
+Definition at line 44 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1GBS__Reader_a3eb1a527ce59df64b659c7304df8114b}\label{classsrc_1_1psi4io_1_1GBS__Reader_a3eb1a527ce59df64b659c7304df8114b}} 
+\index{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}!basis\+\_\+number@{basis\+\_\+number}}
+\index{basis\+\_\+number@{basis\+\_\+number}!src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{basis\+\_\+number}{basis\_number}}
+{\footnotesize\ttfamily src.\+psi4io.\+G\+B\+S\+\_\+\+Reader.\+basis\+\_\+number}
+
+
+
+Definition at line 46 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1GBS__Reader_a0e7c54314202d03e6ecd728a87985da5}\label{classsrc_1_1psi4io_1_1GBS__Reader_a0e7c54314202d03e6ecd728a87985da5}} 
+\index{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}!contraction\+\_\+number@{contraction\+\_\+number}}
+\index{contraction\+\_\+number@{contraction\+\_\+number}!src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{contraction\+\_\+number}{contraction\_number}}
+{\footnotesize\ttfamily src.\+psi4io.\+G\+B\+S\+\_\+\+Reader.\+contraction\+\_\+number}
+
+
+
+Definition at line 47 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1GBS__Reader_ab9667b5604854f7bb371635ce2e60db2}\label{classsrc_1_1psi4io_1_1GBS__Reader_ab9667b5604854f7bb371635ce2e60db2}} 
+\index{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}!destroy@{destroy}}
+\index{destroy@{destroy}!src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{destroy}{destroy}}
+{\footnotesize\ttfamily src.\+psi4io.\+G\+B\+S\+\_\+\+Reader.\+destroy}
+
+
+
+Definition at line 50 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1GBS__Reader_ae3b9e16a6ec2c8bd4a8dbb9c73a6e344}\label{classsrc_1_1psi4io_1_1GBS__Reader_ae3b9e16a6ec2c8bd4a8dbb9c73a6e344}} 
+\index{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}!element@{element}}
+\index{element@{element}!src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{element}{element}}
+{\footnotesize\ttfamily src.\+psi4io.\+G\+B\+S\+\_\+\+Reader.\+element}
+
+
+
+Definition at line 43 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1GBS__Reader_a2e3d80828bae7b82a292e4d54c90881e}\label{classsrc_1_1psi4io_1_1GBS__Reader_a2e3d80828bae7b82a292e4d54c90881e}} 
+\index{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}!isdata@{isdata}}
+\index{isdata@{isdata}!src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{isdata}{isdata}}
+{\footnotesize\ttfamily src.\+psi4io.\+G\+B\+S\+\_\+\+Reader.\+isdata}
+
+
+
+Definition at line 49 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1GBS__Reader_a4e6461f91b1a71d9287537c746d5117b}\label{classsrc_1_1psi4io_1_1GBS__Reader_a4e6461f91b1a71d9287537c746d5117b}} 
+\index{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}!last\+\_\+amom@{last\+\_\+amom}}
+\index{last\+\_\+amom@{last\+\_\+amom}!src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader@{src\+::psi4io\+::\+G\+B\+S\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{last\+\_\+amom}{last\_amom}}
+{\footnotesize\ttfamily src.\+psi4io.\+G\+B\+S\+\_\+\+Reader.\+last\+\_\+amom}
+
+
+
+Definition at line 45 of file psi4io.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{psi4io_8py}{psi4io.\+py}\end{DoxyCompactItemize}

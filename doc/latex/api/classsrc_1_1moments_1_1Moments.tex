@@ -1,0 +1,296 @@
+\hypertarget{classsrc_1_1moments_1_1Moments}{}\subsection{src.\+moments.\+Moments Class Reference}
+\label{classsrc_1_1moments_1_1Moments}\index{src.\+moments.\+Moments@{src.\+moments.\+Moments}}
+
+
+Subclass of Target for fitting force fields to multipole moments (from experiment or theory).  
+
+
+
+
+Inheritance diagram for src.\+moments.\+Moments\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classsrc_1_1moments_1_1Moments__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+moments.\+Moments\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=208pt]{classsrc_1_1moments_1_1Moments__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1moments_1_1Moments_a19bb50056e254cd95ed28c3665585327}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\begin{DoxyCompactList}\small\item\em Initialization. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1moments_1_1Moments_a3801c9b06ff63421d27ef6119ead1854}{read\+\_\+reference\+\_\+data} (self)
+\begin{DoxyCompactList}\small\item\em Read the reference data from a file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1moments_1_1Moments_ac12f3ed1e870ec611264267f391752be}{indicate} (self)
+\begin{DoxyCompactList}\small\item\em Print qualitative indicator. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1moments_1_1Moments_afedc403680af7392e1b626f40efb4667}{unpack\+\_\+moments} (self, moment\+\_\+dict)
+\item 
+def \hyperlink{classsrc_1_1moments_1_1Moments_ab922ad13aa4aebf311918e1996555a80}{get} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em Evaluate objective function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1moments_1_1Moments_a6653db1a4be8eeea6fd2c96e78fd2b01}{denoms}
+\item 
+\hyperlink{classsrc_1_1moments_1_1Moments_a39ad9d5899f0865d6776c0319021add6}{loop\+\_\+over\+\_\+snapshots}
+\begin{DoxyCompactList}\small\item\em L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1moments_1_1Moments_abfe7bfc989f78323b9fecd71292b8b57}{mfnm}
+\begin{DoxyCompactList}\small\item\em The mdata.\+txt file that contains the moments. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1moments_1_1Moments_a5df511eabdedb11fb6302bfb6efe0332}{ref\+\_\+moments}
+\begin{DoxyCompactList}\small\item\em Dictionary of reference multipole moments. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1moments_1_1Moments_ae3486cce343d676ffabf9c0f0f2bd7ca}{engine}
+\begin{DoxyCompactList}\small\item\em Read in the reference data. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1moments_1_1Moments_a5c0ccb084bf420546b9d5fb7c0981732}{na}
+\begin{DoxyCompactList}\small\item\em Number of atoms. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1moments_1_1Moments_aff18e7be56567cb922f0d4677ae30253}{ref\+\_\+eigvals}
+\item 
+\hyperlink{classsrc_1_1moments_1_1Moments_aade44568e6eff2bc201eb75dc0b9f188}{ref\+\_\+eigvecs}
+\item 
+\hyperlink{classsrc_1_1moments_1_1Moments_adb3b92e1b5ae0a0debe08195a141623f}{calc\+\_\+moments}
+\item 
+\hyperlink{classsrc_1_1moments_1_1Moments_affeb4f69b09900393e42829a349d735f}{objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for fitting force fields to multipole moments (from experiment or theory). 
+
+Currently Tinker is supported. 
+
+Definition at line 32 of file moments.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_a19bb50056e254cd95ed28c3665585327}\label{classsrc_1_1moments_1_1Moments_a19bb50056e254cd95ed28c3665585327}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+moments.\+Moments.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Initialization. 
+
+
+
+Definition at line 37 of file moments.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1moments_1_1Moments_a19bb50056e254cd95ed28c3665585327_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_ab922ad13aa4aebf311918e1996555a80}\label{classsrc_1_1moments_1_1Moments_ab922ad13aa4aebf311918e1996555a80}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!get@{get}}
+\index{get@{get}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+moments.\+Moments.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Evaluate objective function. 
+
+
+
+Definition at line 177 of file moments.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1moments_1_1Moments_ab922ad13aa4aebf311918e1996555a80_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_ac12f3ed1e870ec611264267f391752be}\label{classsrc_1_1moments_1_1Moments_ac12f3ed1e870ec611264267f391752be}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+moments.\+Moments.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Print qualitative indicator. 
+
+
+
+Definition at line 145 of file moments.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1moments_1_1Moments_ac12f3ed1e870ec611264267f391752be_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_a3801c9b06ff63421d27ef6119ead1854}\label{classsrc_1_1moments_1_1Moments_a3801c9b06ff63421d27ef6119ead1854}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}}
+\index{read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{read\+\_\+reference\+\_\+data()}{read\_reference\_data()}}
+{\footnotesize\ttfamily def src.\+moments.\+Moments.\+read\+\_\+reference\+\_\+data (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Read the reference data from a file. 
+
+
+
+Definition at line 75 of file moments.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_afedc403680af7392e1b626f40efb4667}\label{classsrc_1_1moments_1_1Moments_afedc403680af7392e1b626f40efb4667}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!unpack\+\_\+moments@{unpack\+\_\+moments}}
+\index{unpack\+\_\+moments@{unpack\+\_\+moments}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{unpack\+\_\+moments()}{unpack\_moments()}}
+{\footnotesize\ttfamily def src.\+moments.\+Moments.\+unpack\+\_\+moments (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{moment\+\_\+dict }\end{DoxyParamCaption})}
+
+
+
+Definition at line 171 of file moments.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_adb3b92e1b5ae0a0debe08195a141623f}\label{classsrc_1_1moments_1_1Moments_adb3b92e1b5ae0a0debe08195a141623f}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!calc\+\_\+moments@{calc\+\_\+moments}}
+\index{calc\+\_\+moments@{calc\+\_\+moments}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{calc\+\_\+moments}{calc\_moments}}
+{\footnotesize\ttfamily src.\+moments.\+Moments.\+calc\+\_\+moments}
+
+
+
+Definition at line 204 of file moments.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_a6653db1a4be8eeea6fd2c96e78fd2b01}\label{classsrc_1_1moments_1_1Moments_a6653db1a4be8eeea6fd2c96e78fd2b01}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!denoms@{denoms}}
+\index{denoms@{denoms}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{denoms}{denoms}}
+{\footnotesize\ttfamily src.\+moments.\+Moments.\+denoms}
+
+
+
+Definition at line 50 of file moments.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_ae3486cce343d676ffabf9c0f0f2bd7ca}\label{classsrc_1_1moments_1_1Moments_ae3486cce343d676ffabf9c0f0f2bd7ca}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!engine@{engine}}
+\index{engine@{engine}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{engine}{engine}}
+{\footnotesize\ttfamily src.\+moments.\+Moments.\+engine}
+
+
+
+Read in the reference data. 
+
+Build keyword dictionaries to pass to engine. Create engine object. 
+
+Definition at line 71 of file moments.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_a39ad9d5899f0865d6776c0319021add6}\label{classsrc_1_1moments_1_1Moments_a39ad9d5899f0865d6776c0319021add6}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}}
+\index{loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{loop\+\_\+over\+\_\+snapshots}{loop\_over\_snapshots}}
+{\footnotesize\ttfamily src.\+moments.\+Moments.\+loop\+\_\+over\+\_\+snapshots}
+
+
+
+L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. 
+
+
+
+Definition at line 60 of file moments.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_abfe7bfc989f78323b9fecd71292b8b57}\label{classsrc_1_1moments_1_1Moments_abfe7bfc989f78323b9fecd71292b8b57}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!mfnm@{mfnm}}
+\index{mfnm@{mfnm}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{mfnm}{mfnm}}
+{\footnotesize\ttfamily src.\+moments.\+Moments.\+mfnm}
+
+
+
+The mdata.\+txt file that contains the moments. 
+
+
+
+Definition at line 62 of file moments.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_a5c0ccb084bf420546b9d5fb7c0981732}\label{classsrc_1_1moments_1_1Moments_a5c0ccb084bf420546b9d5fb7c0981732}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!na@{na}}
+\index{na@{na}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{na}{na}}
+{\footnotesize\ttfamily src.\+moments.\+Moments.\+na}
+
+
+
+Number of atoms. 
+
+
+
+Definition at line 77 of file moments.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_affeb4f69b09900393e42829a349d735f}\label{classsrc_1_1moments_1_1Moments_affeb4f69b09900393e42829a349d735f}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!objective@{objective}}
+\index{objective@{objective}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{objective}{objective}}
+{\footnotesize\ttfamily src.\+moments.\+Moments.\+objective}
+
+
+
+Definition at line 205 of file moments.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_aff18e7be56567cb922f0d4677ae30253}\label{classsrc_1_1moments_1_1Moments_aff18e7be56567cb922f0d4677ae30253}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!ref\+\_\+eigvals@{ref\+\_\+eigvals}}
+\index{ref\+\_\+eigvals@{ref\+\_\+eigvals}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{ref\+\_\+eigvals}{ref\_eigvals}}
+{\footnotesize\ttfamily src.\+moments.\+Moments.\+ref\+\_\+eigvals}
+
+
+
+Definition at line 78 of file moments.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_aade44568e6eff2bc201eb75dc0b9f188}\label{classsrc_1_1moments_1_1Moments_aade44568e6eff2bc201eb75dc0b9f188}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!ref\+\_\+eigvecs@{ref\+\_\+eigvecs}}
+\index{ref\+\_\+eigvecs@{ref\+\_\+eigvecs}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{ref\+\_\+eigvecs}{ref\_eigvecs}}
+{\footnotesize\ttfamily src.\+moments.\+Moments.\+ref\+\_\+eigvecs}
+
+
+
+Definition at line 79 of file moments.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1moments_1_1Moments_a5df511eabdedb11fb6302bfb6efe0332}\label{classsrc_1_1moments_1_1Moments_a5df511eabdedb11fb6302bfb6efe0332}} 
+\index{src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}!ref\+\_\+moments@{ref\+\_\+moments}}
+\index{ref\+\_\+moments@{ref\+\_\+moments}!src\+::moments\+::\+Moments@{src\+::moments\+::\+Moments}}
+\paragraph{\texorpdfstring{ref\+\_\+moments}{ref\_moments}}
+{\footnotesize\ttfamily src.\+moments.\+Moments.\+ref\+\_\+moments}
+
+
+
+Dictionary of reference multipole moments. 
+
+
+
+Definition at line 64 of file moments.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{moments_8py}{moments.\+py}\end{DoxyCompactItemize}

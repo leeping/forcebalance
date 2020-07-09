@@ -1,0 +1,183 @@
+\hypertarget{classsrc_1_1qchemio_1_1QCIn__Reader}{}\subsection{src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader Class Reference}
+\label{classsrc_1_1qchemio_1_1QCIn__Reader}\index{src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader@{src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader}}
+
+
+Finite state machine for parsing Q-\/\+Chem input files.  
+
+
+
+
+Inheritance diagram for src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{classsrc_1_1qchemio_1_1QCIn__Reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{classsrc_1_1qchemio_1_1QCIn__Reader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1qchemio_1_1QCIn__Reader_a927758b19f88fe6e3bdef301cb46a74d}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, fnm)
+\item 
+def \hyperlink{classsrc_1_1qchemio_1_1QCIn__Reader_a21931c7c857f2497bdf3c4031a464ddf}{feed} (self, line)
+\begin{DoxyCompactList}\small\item\em Feed in a line. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1qchemio_1_1QCIn__Reader_a05c4ce2f859233dece0971c87650cd37}{atom}
+\item 
+\hyperlink{classsrc_1_1qchemio_1_1QCIn__Reader_a1910683ed769b0f3cf81f9af5f9bfa2d}{snum}
+\item 
+\hyperlink{classsrc_1_1qchemio_1_1QCIn__Reader_a0ad7983bdfe4ac600a799be449440636}{cnum}
+\item 
+\hyperlink{classsrc_1_1qchemio_1_1QCIn__Reader_af158d3d3738b2e29909a24922e06de8e}{shell}
+\item 
+\hyperlink{classsrc_1_1qchemio_1_1QCIn__Reader_aeb3eb1ac64595e77c0425c773b05ad49}{pdict}
+\item 
+\hyperlink{classsrc_1_1qchemio_1_1QCIn__Reader_aba4ef6d28b0424987d04669425fb66bc}{sec}
+\item 
+\hyperlink{classsrc_1_1qchemio_1_1QCIn__Reader_abd38c3f4eff3b247ffc7af1cecae0590}{itype}
+\item 
+\hyperlink{classsrc_1_1qchemio_1_1QCIn__Reader_a4ebe889e7d9eaeb9169d139b33455087}{suffix}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Finite state machine for parsing Q-\/\+Chem input files. 
+
+Definition at line 33 of file qchemio.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1qchemio_1_1QCIn__Reader_a927758b19f88fe6e3bdef301cb46a74d}\label{classsrc_1_1qchemio_1_1QCIn__Reader_a927758b19f88fe6e3bdef301cb46a74d}} 
+\index{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm }\end{DoxyParamCaption})}
+
+
+
+Definition at line 35 of file qchemio.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1qchemio_1_1QCIn__Reader_a21931c7c857f2497bdf3c4031a464ddf}\label{classsrc_1_1qchemio_1_1QCIn__Reader_a21931c7c857f2497bdf3c4031a464ddf}} 
+\index{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}!feed@{feed}}
+\index{feed@{feed}!src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{feed()}{feed()}}
+{\footnotesize\ttfamily def src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader.\+feed (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Feed in a line. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em line} & The line of data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 50 of file qchemio.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1qchemio_1_1QCIn__Reader_a05c4ce2f859233dece0971c87650cd37}\label{classsrc_1_1qchemio_1_1QCIn__Reader_a05c4ce2f859233dece0971c87650cd37}} 
+\index{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}!atom@{atom}}
+\index{atom@{atom}!src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{atom}{atom}}
+{\footnotesize\ttfamily src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader.\+atom}
+
+
+
+Definition at line 38 of file qchemio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1qchemio_1_1QCIn__Reader_a0ad7983bdfe4ac600a799be449440636}\label{classsrc_1_1qchemio_1_1QCIn__Reader_a0ad7983bdfe4ac600a799be449440636}} 
+\index{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}!cnum@{cnum}}
+\index{cnum@{cnum}!src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{cnum}{cnum}}
+{\footnotesize\ttfamily src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader.\+cnum}
+
+
+
+Definition at line 40 of file qchemio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1qchemio_1_1QCIn__Reader_abd38c3f4eff3b247ffc7af1cecae0590}\label{classsrc_1_1qchemio_1_1QCIn__Reader_abd38c3f4eff3b247ffc7af1cecae0590}} 
+\index{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}!itype@{itype}}
+\index{itype@{itype}!src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{itype}{itype}}
+{\footnotesize\ttfamily src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader.\+itype}
+
+
+
+Definition at line 69 of file qchemio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1qchemio_1_1QCIn__Reader_aeb3eb1ac64595e77c0425c773b05ad49}\label{classsrc_1_1qchemio_1_1QCIn__Reader_aeb3eb1ac64595e77c0425c773b05ad49}} 
+\index{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{pdict}{pdict}}
+{\footnotesize\ttfamily src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader.\+pdict}
+
+
+
+Definition at line 42 of file qchemio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1qchemio_1_1QCIn__Reader_aba4ef6d28b0424987d04669425fb66bc}\label{classsrc_1_1qchemio_1_1QCIn__Reader_aba4ef6d28b0424987d04669425fb66bc}} 
+\index{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}!sec@{sec}}
+\index{sec@{sec}!src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{sec}{sec}}
+{\footnotesize\ttfamily src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader.\+sec}
+
+
+
+Definition at line 60 of file qchemio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1qchemio_1_1QCIn__Reader_af158d3d3738b2e29909a24922e06de8e}\label{classsrc_1_1qchemio_1_1QCIn__Reader_af158d3d3738b2e29909a24922e06de8e}} 
+\index{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}!shell@{shell}}
+\index{shell@{shell}!src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{shell}{shell}}
+{\footnotesize\ttfamily src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader.\+shell}
+
+
+
+Definition at line 41 of file qchemio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1qchemio_1_1QCIn__Reader_a1910683ed769b0f3cf81f9af5f9bfa2d}\label{classsrc_1_1qchemio_1_1QCIn__Reader_a1910683ed769b0f3cf81f9af5f9bfa2d}} 
+\index{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}!snum@{snum}}
+\index{snum@{snum}!src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{snum}{snum}}
+{\footnotesize\ttfamily src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader.\+snum}
+
+
+
+Definition at line 39 of file qchemio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1qchemio_1_1QCIn__Reader_a4ebe889e7d9eaeb9169d139b33455087}\label{classsrc_1_1qchemio_1_1QCIn__Reader_a4ebe889e7d9eaeb9169d139b33455087}} 
+\index{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader@{src\+::qchemio\+::\+Q\+C\+In\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{suffix}{suffix}}
+{\footnotesize\ttfamily src.\+qchemio.\+Q\+C\+In\+\_\+\+Reader.\+suffix}
+
+
+
+Definition at line 74 of file qchemio.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{qchemio_8py}{qchemio.\+py}\end{DoxyCompactItemize}

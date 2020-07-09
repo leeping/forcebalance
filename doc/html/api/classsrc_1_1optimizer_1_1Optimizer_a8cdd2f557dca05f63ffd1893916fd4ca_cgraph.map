@@ -1,0 +1,7 @@
+<map id="src.optimizer.Optimizer.BFGS" name="src.optimizer.Optimizer.BFGS">
+<area shape="rect" id="node2" href="$classsrc_1_1optimizer_1_1Optimizer.html#a30443d919712b0f3529de3c7d62619ca" title="The main ForceBalance adaptive trust&#45;radius pseudo&#45;Newton optimizer. " alt="" coords="264,78,441,119"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1nifty.html#a9bda70a78d0f5d31e10dfffaf85803c9" title="Cool&#45;looking printout for slick formatting of output. " alt="" coords="525,5,659,32"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1nifty.html#a6ae2951ba2a22420a11abda6be7e5454" title="src.nifty.warn_press_key" alt="" coords="743,31,925,57"/>
+<area shape="rect" id="node5" href="$classsrc_1_1optimizer_1_1Optimizer.html#abb29ac2f8b4bd4fca545eb3f6b0470fe" title="Mark in each target that the previous optimization step was good or bad. " alt="" coords="493,107,691,149"/>
+<area shape="rect" id="node6" href="$classsrc_1_1optimizer_1_1Optimizer.html#a7ec731011adb2f1b994dfa112e364e7d" title="src.optimizer.Optimizer.adjh" alt="" coords="489,173,695,200"/>
+</map>

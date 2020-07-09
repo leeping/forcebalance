@@ -1,0 +1,5 @@
+<map id="src.target.RemoteTarget.submit_jobs" name="src.target.RemoteTarget.submit_jobs">
+<area shape="rect" id="node2" href="$namespacesrc_1_1optimizer.html#abd36f93a9b1e0d51b4d693687b9a8f33" title="src.optimizer.Counter" alt="" coords="335,5,497,32"/>
+<area shape="rect" id="node3" href="$classsrc_1_1target_1_1Target.html#a8d05de21b2477b71aa74ea001f4d62b5" title="This code writes a force field pickle file to an folder in &quot;job.tmp/dnm/forcebalance.p&quot;, because it takes time to compress and most targets can simply reuse this file. " alt="" coords="315,56,517,83"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1nifty.html#aa26be058ed4503aa168d81f9076aefc3" title="src.nifty.getWorkQueue" alt="" coords="329,107,503,133"/>
+</map>

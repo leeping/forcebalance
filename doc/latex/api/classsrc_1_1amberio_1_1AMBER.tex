@@ -1,0 +1,732 @@
+\hypertarget{classsrc_1_1amberio_1_1AMBER}{}\subsection{src.\+amberio.\+A\+M\+B\+ER Class Reference}
+\label{classsrc_1_1amberio_1_1AMBER}\index{src.\+amberio.\+A\+M\+B\+ER@{src.\+amberio.\+A\+M\+B\+ER}}
+
+
+Engine for carrying out general purpose \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} calculations.  
+
+
+
+
+Inheritance diagram for src.\+amberio.\+A\+M\+B\+ER\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classsrc_1_1amberio_1_1AMBER__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+amberio.\+A\+M\+B\+ER\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=192pt]{classsrc_1_1amberio_1_1AMBER__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a4f65d618112f743df7dcba8fe71d9945}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, name=\char`\"{}amber\char`\"{}, kwargs)
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a8fc5f8ce6499e190eda5cc527d844b47}{setopts} (self, kwargs)
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; Set A\+M\+B\+E\+R-\/specific options. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a8b829208dde4cb5d071db96f2ea420ac}{readsrc} (self, kwargs)
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; read files from the source directory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a4fa14e4e3ccc8936084020563bf86e53}{callamber} (self, command, stdin=None, print\+\_\+to\+\_\+screen=False, print\+\_\+command=False, kwargs)
+\begin{DoxyCompactList}\small\item\em Call \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}; prepend amberhome to calling the appropriate ambertools program. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a305ddd7d694a342b08e337aa3ab35a5f}{prepare} (self, \hyperlink{classsrc_1_1amberio_1_1AMBER_a7ec48c73aad9abedc968cdd627fde680}{pbc}=False, kwargs)
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; prepare the temp directory and figure out the topology. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a8cb2d1848fd4fa90dd2998e38592a21e}{leap} (self, read\+\_\+prmtop=False, count\+\_\+mols=False, name=None, delcheck=False)
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a07b9d708ccb41ff3253f253a38aa0d8f}{get\+\_\+charges} (self)
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_aaa5d9969b50621ec9288caf56d45c3d2}{evaluate\+\_\+sander} (self, \hyperlink{classsrc_1_1amberio_1_1AMBER_a8cb2d1848fd4fa90dd2998e38592a21e}{leap}=True, traj\+\_\+fnm=None, snapshots=None)
+\begin{DoxyCompactList}\small\item\em Utility function for computing energy and forces using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a6b67c489b262f485c3c71664ae241759}{energy\+\_\+force\+\_\+one} (self, shot)
+\begin{DoxyCompactList}\small\item\em Computes the energy and force using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} for one snapshot. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a7d4ea449a1f78e9795b323547734a217}{energy} (self)
+\begin{DoxyCompactList}\small\item\em Computes the energy using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_ab2237300f0b314b61e034c1d43504d2c}{energy\+\_\+force} (self)
+\begin{DoxyCompactList}\small\item\em Computes the energy and force using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_aebf6805d55d195578926031a77282daf}{evaluate\+\_\+cpptraj} (self, \hyperlink{classsrc_1_1amberio_1_1AMBER_a8cb2d1848fd4fa90dd2998e38592a21e}{leap}=True, traj\+\_\+fnm=None, potential=False)
+\begin{DoxyCompactList}\small\item\em Use cpptraj to evaluate properties over a trajectory file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_ad7c82d0258dc29e9326b0ee188097fca}{kinetic\+E\+\_\+cpptraj} (self, \hyperlink{classsrc_1_1amberio_1_1AMBER_a8cb2d1848fd4fa90dd2998e38592a21e}{leap}=False, traj\+\_\+fnm=None)
+\begin{DoxyCompactList}\small\item\em Evaluate the kinetic energy of each frame in a trajectory using cpptraj. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_ad1b30b32523e26cb14482970359d0e61}{energy\+\_\+dipole} (self)
+\begin{DoxyCompactList}\small\item\em Computes the energy and dipole using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_ade6dad11e3a95b62a2d708b1ac2b6456}{interaction\+\_\+energy} (self, fraga, fragb)
+\begin{DoxyCompactList}\small\item\em Calculate the interaction energy for two fragments. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a8fa5737ac517637eeb8b53426eba46dd}{molecular\+\_\+dynamics} (self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, threads=1, verbose=False, kwargs)
+\begin{DoxyCompactList}\small\item\em Method for running a molecular dynamics simulation. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a6ca7af7847306ec7c8e62eddf1900f93}{normal\+\_\+modes} (self, shot=0, \hyperlink{classsrc_1_1amberio_1_1AMBER_a51ec039c6c984fa79e83be0d0c71a5b7}{optimize}=True)
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a9f9f42962721c5cf9b62f80eaffe58c1}{multipole\+\_\+moments} (self, shot=0, \hyperlink{classsrc_1_1amberio_1_1AMBER_a51ec039c6c984fa79e83be0d0c71a5b7}{optimize}=True, polarizability=False)
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a51ec039c6c984fa79e83be0d0c71a5b7}{optimize} (self, shot=0, method=\char`\"{}newton\char`\"{}, crit=1e-\/4)
+\begin{DoxyCompactList}\small\item\em Optimize the geometry and align the optimized geometry to the starting geometry. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1AMBER_a65250844e95082487cc7507785103e83}{energy\+\_\+rmsd} (self, shot=0, \hyperlink{classsrc_1_1amberio_1_1AMBER_a51ec039c6c984fa79e83be0d0c71a5b7}{optimize}=True)
+\begin{DoxyCompactList}\small\item\em Calculate energy of the selected structure (optionally minimize and return the minimized energy and R\+M\+SD). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a411fdc3f6b0124021a79e3462a16a308}{valkwd}
+\begin{DoxyCompactList}\small\item\em Keyword args that aren\textquotesingle{}t in this list are filtered out. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_aedf94e9d30f478ddb2e6751a62700864}{amberhome}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a82af4dfb560d3ec29435a601ef3f3224}{have\+\_\+pmemd\+\_\+cuda}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a88fbca717ef71fce9b2c77edfe2c68c2}{spath}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a6217910dccd41b6d63b1c3c114ab8621}{leapcmd}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_aef12e74e4e6d5939b5107dd6e74907f6}{mdin}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a44d0917803f3f77fddbcde1ebe107f9e}{absleap}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a29bf1d4ca3af2ef18f6a697ab33ac345}{absmdin}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a3d4513742ce30e7b7d79e2e309308add}{mname}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a77ac445727cac52d979a47be2ca1c631}{mol}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_acadf27ac38535422b107653050702c8c}{abspdb}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_abadb419e20cba244751168104f3074f4}{Atom\+Lists}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a7ec48c73aad9abedc968cdd627fde680}{pbc}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a3ee3ba8a6d17157797bc023b8e1f7597}{mol2}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a544a3fd7955991d698aec937759f6977}{frcmod}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a679773e12ab5d968cc77a55e6c6d9cfd}{absmol2}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_acc5d83dd7827792a36daa13af036b38a}{absfrcmod}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a9959c435e77f19b16ddda113fd5b19a5}{qmatoms}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_aafd7c68a0df54ff8bfe015282794a7cb}{natoms}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a6297c9429e3c41164676bcf829c5bfb1}{Atom\+Mask}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_aeacbed02cfd157b9afd05d39a5939863}{A}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a1f880bacfdb1dc940daa486ee854e476}{B}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1AMBER_a5296863cab305fa3adc68de60fa593b7}{trajectory}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Engine for carrying out general purpose \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} calculations. 
+
+
+
+Definition at line 1127 of file amberio.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a4f65d618112f743df7dcba8fe71d9945}\label{classsrc_1_1amberio_1_1AMBER_a4f65d618112f743df7dcba8fe71d9945}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{name = {\ttfamily \char`\"{}amber\char`\"{}},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1130 of file amberio.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a4fa14e4e3ccc8936084020563bf86e53}\label{classsrc_1_1amberio_1_1AMBER_a4fa14e4e3ccc8936084020563bf86e53}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!callamber@{callamber}}
+\index{callamber@{callamber}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{callamber()}{callamber()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+callamber (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{command,  }\item[{}]{stdin = {\ttfamily None},  }\item[{}]{print\+\_\+to\+\_\+screen = {\ttfamily False},  }\item[{}]{print\+\_\+command = {\ttfamily False},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Call \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}; prepend amberhome to calling the appropriate ambertools program. 
+
+
+
+Definition at line 1224 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a7d4ea449a1f78e9795b323547734a217}\label{classsrc_1_1amberio_1_1AMBER_a7d4ea449a1f78e9795b323547734a217}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!energy@{energy}}
+\index{energy@{energy}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{energy()}{energy()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+energy (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Computes the energy using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} over a trajectory. 
+
+
+
+Definition at line 1459 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1AMBER_a7d4ea449a1f78e9795b323547734a217_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_ad1b30b32523e26cb14482970359d0e61}\label{classsrc_1_1amberio_1_1AMBER_ad1b30b32523e26cb14482970359d0e61}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!energy\+\_\+dipole@{energy\+\_\+dipole}}
+\index{energy\+\_\+dipole@{energy\+\_\+dipole}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{energy\+\_\+dipole()}{energy\_dipole()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+energy\+\_\+dipole (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Computes the energy and dipole using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} over a trajectory. 
+
+
+
+Definition at line 1561 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1AMBER_ad1b30b32523e26cb14482970359d0e61_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_ab2237300f0b314b61e034c1d43504d2c}\label{classsrc_1_1amberio_1_1AMBER_ab2237300f0b314b61e034c1d43504d2c}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!energy\+\_\+force@{energy\+\_\+force}}
+\index{energy\+\_\+force@{energy\+\_\+force}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{energy\+\_\+force()}{energy\_force()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+energy\+\_\+force (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Computes the energy and force using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} over a trajectory. 
+
+
+
+Definition at line 1464 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1AMBER_ab2237300f0b314b61e034c1d43504d2c_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a6b67c489b262f485c3c71664ae241759}\label{classsrc_1_1amberio_1_1AMBER_a6b67c489b262f485c3c71664ae241759}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!energy\+\_\+force\+\_\+one@{energy\+\_\+force\+\_\+one}}
+\index{energy\+\_\+force\+\_\+one@{energy\+\_\+force\+\_\+one}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{energy\+\_\+force\+\_\+one()}{energy\_force\_one()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+energy\+\_\+force\+\_\+one (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot }\end{DoxyParamCaption})}
+
+
+
+Computes the energy and force using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} for one snapshot. 
+
+
+
+Definition at line 1453 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1AMBER_a6b67c489b262f485c3c71664ae241759_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a65250844e95082487cc7507785103e83}\label{classsrc_1_1amberio_1_1AMBER_a65250844e95082487cc7507785103e83}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!energy\+\_\+rmsd@{energy\+\_\+rmsd}}
+\index{energy\+\_\+rmsd@{energy\+\_\+rmsd}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{energy\+\_\+rmsd()}{energy\_rmsd()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+energy\+\_\+rmsd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot = {\ttfamily 0},  }\item[{}]{optimize = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Calculate energy of the selected structure (optionally minimize and return the minimized energy and R\+M\+SD). 
+
+In kcal/mol. 
+
+Definition at line 1830 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_aebf6805d55d195578926031a77282daf}\label{classsrc_1_1amberio_1_1AMBER_aebf6805d55d195578926031a77282daf}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!evaluate\+\_\+cpptraj@{evaluate\+\_\+cpptraj}}
+\index{evaluate\+\_\+cpptraj@{evaluate\+\_\+cpptraj}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{evaluate\+\_\+cpptraj()}{evaluate\_cpptraj()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+evaluate\+\_\+cpptraj (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{leap = {\ttfamily True},  }\item[{}]{traj\+\_\+fnm = {\ttfamily None},  }\item[{}]{potential = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Use cpptraj to evaluate properties over a trajectory file. 
+
+
+
+Definition at line 1470 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1AMBER_aebf6805d55d195578926031a77282daf_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_aaa5d9969b50621ec9288caf56d45c3d2}\label{classsrc_1_1amberio_1_1AMBER_aaa5d9969b50621ec9288caf56d45c3d2}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!evaluate\+\_\+sander@{evaluate\+\_\+sander}}
+\index{evaluate\+\_\+sander@{evaluate\+\_\+sander}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{evaluate\+\_\+sander()}{evaluate\_sander()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+evaluate\+\_\+sander (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{leap = {\ttfamily True},  }\item[{}]{traj\+\_\+fnm = {\ttfamily None},  }\item[{}]{snapshots = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Utility function for computing energy and forces using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}. 
+
+Coordinates (and boxes, if pbc) are obtained from the Molecule object stored internally
+
+\paragraph*{Parameters }
+
+snapshots \+: None or list If a list is provided, only compute energies / forces for snapshots listed.
+
+Outputs\+: Result\+: Dictionary containing energies and forces. 
+
+Definition at line 1374 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1AMBER_aaa5d9969b50621ec9288caf56d45c3d2_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a07b9d708ccb41ff3253f253a38aa0d8f}\label{classsrc_1_1amberio_1_1AMBER_a07b9d708ccb41ff3253f253a38aa0d8f}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!get\+\_\+charges@{get\+\_\+charges}}
+\index{get\+\_\+charges@{get\+\_\+charges}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{get\+\_\+charges()}{get\_charges()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+get\+\_\+charges (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1356 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1AMBER_a07b9d708ccb41ff3253f253a38aa0d8f_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_ade6dad11e3a95b62a2d708b1ac2b6456}\label{classsrc_1_1amberio_1_1AMBER_ade6dad11e3a95b62a2d708b1ac2b6456}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!interaction\+\_\+energy@{interaction\+\_\+energy}}
+\index{interaction\+\_\+energy@{interaction\+\_\+energy}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{interaction\+\_\+energy()}{interaction\_energy()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+interaction\+\_\+energy (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fraga,  }\item[{}]{fragb }\end{DoxyParamCaption})}
+
+
+
+Calculate the interaction energy for two fragments. 
+
+
+
+Definition at line 1567 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_ad7c82d0258dc29e9326b0ee188097fca}\label{classsrc_1_1amberio_1_1AMBER_ad7c82d0258dc29e9326b0ee188097fca}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!kinetic\+E\+\_\+cpptraj@{kinetic\+E\+\_\+cpptraj}}
+\index{kinetic\+E\+\_\+cpptraj@{kinetic\+E\+\_\+cpptraj}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{kinetic\+E\+\_\+cpptraj()}{kineticE\_cpptraj()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+kinetic\+E\+\_\+cpptraj (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{leap = {\ttfamily False},  }\item[{}]{traj\+\_\+fnm = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Evaluate the kinetic energy of each frame in a trajectory using cpptraj. 
+
+This requires a netcdf-\/formatted trajectory containing velocities, which is generated using ntwv=-\/1 and ioutfm=1. 
+
+Definition at line 1534 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1AMBER_ad7c82d0258dc29e9326b0ee188097fca_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a8cb2d1848fd4fa90dd2998e38592a21e}\label{classsrc_1_1amberio_1_1AMBER_a8cb2d1848fd4fa90dd2998e38592a21e}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!leap@{leap}}
+\index{leap@{leap}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{leap()}{leap()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+leap (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{read\+\_\+prmtop = {\ttfamily False},  }\item[{}]{count\+\_\+mols = {\ttfamily False},  }\item[{}]{name = {\ttfamily None},  }\item[{}]{delcheck = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1308 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1AMBER_a8cb2d1848fd4fa90dd2998e38592a21e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a8fa5737ac517637eeb8b53426eba46dd}\label{classsrc_1_1amberio_1_1AMBER_a8fa5737ac517637eeb8b53426eba46dd}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!molecular\+\_\+dynamics@{molecular\+\_\+dynamics}}
+\index{molecular\+\_\+dynamics@{molecular\+\_\+dynamics}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{molecular\+\_\+dynamics()}{molecular\_dynamics()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+molecular\+\_\+dynamics (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{nsteps,  }\item[{}]{timestep,  }\item[{}]{temperature = {\ttfamily None},  }\item[{}]{pressure = {\ttfamily None},  }\item[{}]{nequil = {\ttfamily 0},  }\item[{}]{nsave = {\ttfamily 1000},  }\item[{}]{minimize = {\ttfamily True},  }\item[{}]{anisotropic = {\ttfamily False},  }\item[{}]{threads = {\ttfamily 1},  }\item[{}]{verbose = {\ttfamily False},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Method for running a molecular dynamics simulation. 
+
+Required arguments\+: nsteps = (int) Number of total time steps timestep = (float) Time step in F\+E\+M\+T\+O\+S\+E\+C\+O\+N\+DS temperature = (float) Temperature control (Kelvin) pressure = (float) Pressure control (atmospheres) nequil = (int) Number of additional time steps at the beginning for equilibration nsave = (int) Step interval for saving and printing data minimize = (bool) Perform an energy minimization prior to dynamics threads = (int) Specify how many Open\+MP threads to use
+
+Returns simulation data\+: Rhos = (array) Density in kilogram m$^\wedge$-\/3 Potentials = (array) Potential energies Kinetics = (array) Kinetic energies Volumes = (array) Box volumes Dips = (3xN array) Dipole moments E\+Comps = (dict) Energy components 
+
+Definition at line 1598 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1AMBER_a8fa5737ac517637eeb8b53426eba46dd_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a9f9f42962721c5cf9b62f80eaffe58c1}\label{classsrc_1_1amberio_1_1AMBER_a9f9f42962721c5cf9b62f80eaffe58c1}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!multipole\+\_\+moments@{multipole\+\_\+moments}}
+\index{multipole\+\_\+moments@{multipole\+\_\+moments}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{multipole\+\_\+moments()}{multipole\_moments()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+multipole\+\_\+moments (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot = {\ttfamily 0},  }\item[{}]{optimize = {\ttfamily True},  }\item[{}]{polarizability = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1719 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a6ca7af7847306ec7c8e62eddf1900f93}\label{classsrc_1_1amberio_1_1AMBER_a6ca7af7847306ec7c8e62eddf1900f93}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!normal\+\_\+modes@{normal\+\_\+modes}}
+\index{normal\+\_\+modes@{normal\+\_\+modes}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{normal\+\_\+modes()}{normal\_modes()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+normal\+\_\+modes (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot = {\ttfamily 0},  }\item[{}]{optimize = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1652 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1amberio_1_1AMBER_a6ca7af7847306ec7c8e62eddf1900f93_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a51ec039c6c984fa79e83be0d0c71a5b7}\label{classsrc_1_1amberio_1_1AMBER_a51ec039c6c984fa79e83be0d0c71a5b7}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!optimize@{optimize}}
+\index{optimize@{optimize}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{optimize()}{optimize()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+optimize (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot = {\ttfamily 0},  }\item[{}]{method = {\ttfamily \char`\"{}newton\char`\"{}},  }\item[{}]{crit = {\ttfamily 1e-\/4} }\end{DoxyParamCaption})}
+
+
+
+Optimize the geometry and align the optimized geometry to the starting geometry. 
+
+
+
+Definition at line 1786 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a305ddd7d694a342b08e337aa3ab35a5f}\label{classsrc_1_1amberio_1_1AMBER_a305ddd7d694a342b08e337aa3ab35a5f}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!prepare@{prepare}}
+\index{prepare@{prepare}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{prepare()}{prepare()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+prepare (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{pbc = {\ttfamily False},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Called by {\bfseries init} ; prepare the temp directory and figure out the topology. 
+
+
+
+Definition at line 1238 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a8b829208dde4cb5d071db96f2ea420ac}\label{classsrc_1_1amberio_1_1AMBER_a8b829208dde4cb5d071db96f2ea420ac}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!readsrc@{readsrc}}
+\index{readsrc@{readsrc}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{readsrc()}{readsrc()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+readsrc (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Called by {\bfseries init} ; read files from the source directory. 
+
+
+
+Definition at line 1172 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a8fc5f8ce6499e190eda5cc527d844b47}\label{classsrc_1_1amberio_1_1AMBER_a8fc5f8ce6499e190eda5cc527d844b47}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!setopts@{setopts}}
+\index{setopts@{setopts}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{setopts()}{setopts()}}
+{\footnotesize\ttfamily def src.\+amberio.\+A\+M\+B\+E\+R.\+setopts (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Called by {\bfseries init} ; Set A\+M\+B\+E\+R-\/specific options. 
+
+
+
+Definition at line 1137 of file amberio.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_aeacbed02cfd157b9afd05d39a5939863}\label{classsrc_1_1amberio_1_1AMBER_aeacbed02cfd157b9afd05d39a5939863}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!A@{A}}
+\index{A@{A}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{A}{A}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+A}
+
+
+
+Definition at line 1570 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_acc5d83dd7827792a36daa13af036b38a}\label{classsrc_1_1amberio_1_1AMBER_acc5d83dd7827792a36daa13af036b38a}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!absfrcmod@{absfrcmod}}
+\index{absfrcmod@{absfrcmod}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{absfrcmod}{absfrcmod}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+absfrcmod}
+
+
+
+Definition at line 1280 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a44d0917803f3f77fddbcde1ebe107f9e}\label{classsrc_1_1amberio_1_1AMBER_a44d0917803f3f77fddbcde1ebe107f9e}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!absleap@{absleap}}
+\index{absleap@{absleap}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{absleap}{absleap}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+absleap}
+
+
+
+Definition at line 1177 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a29bf1d4ca3af2ef18f6a697ab33ac345}\label{classsrc_1_1amberio_1_1AMBER_a29bf1d4ca3af2ef18f6a697ab33ac345}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!absmdin@{absmdin}}
+\index{absmdin@{absmdin}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{absmdin}{absmdin}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+absmdin}
+
+
+
+Definition at line 1179 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a679773e12ab5d968cc77a55e6c6d9cfd}\label{classsrc_1_1amberio_1_1AMBER_a679773e12ab5d968cc77a55e6c6d9cfd}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!absmol2@{absmol2}}
+\index{absmol2@{absmol2}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{absmol2}{absmol2}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+absmol2}
+
+
+
+Definition at line 1275 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_acadf27ac38535422b107653050702c8c}\label{classsrc_1_1amberio_1_1AMBER_acadf27ac38535422b107653050702c8c}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!abspdb@{abspdb}}
+\index{abspdb@{abspdb}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{abspdb}{abspdb}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+abspdb}
+
+
+
+Definition at line 1215 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_aedf94e9d30f478ddb2e6751a62700864}\label{classsrc_1_1amberio_1_1AMBER_aedf94e9d30f478ddb2e6751a62700864}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!amberhome@{amberhome}}
+\index{amberhome@{amberhome}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{amberhome}{amberhome}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+amberhome}
+
+
+
+Definition at line 1141 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_abadb419e20cba244751168104f3074f4}\label{classsrc_1_1amberio_1_1AMBER_abadb419e20cba244751168104f3074f4}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!Atom\+Lists@{Atom\+Lists}}
+\index{Atom\+Lists@{Atom\+Lists}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{Atom\+Lists}{AtomLists}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+Atom\+Lists}
+
+
+
+Definition at line 1241 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a6297c9429e3c41164676bcf829c5bfb1}\label{classsrc_1_1amberio_1_1AMBER_a6297c9429e3c41164676bcf829c5bfb1}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!Atom\+Mask@{Atom\+Mask}}
+\index{Atom\+Mask@{Atom\+Mask}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{Atom\+Mask}{AtomMask}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+Atom\+Mask}
+
+
+
+Definition at line 1336 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a1f880bacfdb1dc940daa486ee854e476}\label{classsrc_1_1amberio_1_1AMBER_a1f880bacfdb1dc940daa486ee854e476}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!B@{B}}
+\index{B@{B}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{B}{B}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+B}
+
+
+
+Definition at line 1571 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a544a3fd7955991d698aec937759f6977}\label{classsrc_1_1amberio_1_1AMBER_a544a3fd7955991d698aec937759f6977}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!frcmod@{frcmod}}
+\index{frcmod@{frcmod}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{frcmod}{frcmod}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+frcmod}
+
+
+
+Definition at line 1245 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a82af4dfb560d3ec29435a601ef3f3224}\label{classsrc_1_1amberio_1_1AMBER_a82af4dfb560d3ec29435a601ef3f3224}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!have\+\_\+pmemd\+\_\+cuda@{have\+\_\+pmemd\+\_\+cuda}}
+\index{have\+\_\+pmemd\+\_\+cuda@{have\+\_\+pmemd\+\_\+cuda}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{have\+\_\+pmemd\+\_\+cuda}{have\_pmemd\_cuda}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+have\+\_\+pmemd\+\_\+cuda}
+
+
+
+Definition at line 1151 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a6217910dccd41b6d63b1c3c114ab8621}\label{classsrc_1_1amberio_1_1AMBER_a6217910dccd41b6d63b1c3c114ab8621}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!leapcmd@{leapcmd}}
+\index{leapcmd@{leapcmd}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{leapcmd}{leapcmd}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+leapcmd}
+
+
+
+Definition at line 1175 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_aef12e74e4e6d5939b5107dd6e74907f6}\label{classsrc_1_1amberio_1_1AMBER_aef12e74e4e6d5939b5107dd6e74907f6}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!mdin@{mdin}}
+\index{mdin@{mdin}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{mdin}{mdin}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+mdin}
+
+
+
+Definition at line 1176 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a3d4513742ce30e7b7d79e2e309308add}\label{classsrc_1_1amberio_1_1AMBER_a3d4513742ce30e7b7d79e2e309308add}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!mname@{mname}}
+\index{mname@{mname}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{mname}{mname}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+mname}
+
+
+
+Definition at line 1182 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a77ac445727cac52d979a47be2ca1c631}\label{classsrc_1_1amberio_1_1AMBER_a77ac445727cac52d979a47be2ca1c631}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!mol@{mol}}
+\index{mol@{mol}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{mol}{mol}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+mol}
+
+
+
+Definition at line 1197 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a3ee3ba8a6d17157797bc023b8e1f7597}\label{classsrc_1_1amberio_1_1AMBER_a3ee3ba8a6d17157797bc023b8e1f7597}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!mol2@{mol2}}
+\index{mol2@{mol2}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{mol2}{mol2}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+mol2}
+
+
+
+Definition at line 1244 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_aafd7c68a0df54ff8bfe015282794a7cb}\label{classsrc_1_1amberio_1_1AMBER_aafd7c68a0df54ff8bfe015282794a7cb}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!natoms@{natoms}}
+\index{natoms@{natoms}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{natoms}{natoms}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+natoms}
+
+
+
+Definition at line 1328 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a7ec48c73aad9abedc968cdd627fde680}\label{classsrc_1_1amberio_1_1AMBER_a7ec48c73aad9abedc968cdd627fde680}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!pbc@{pbc}}
+\index{pbc@{pbc}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{pbc}{pbc}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+pbc}
+
+
+
+Definition at line 1242 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a9959c435e77f19b16ddda113fd5b19a5}\label{classsrc_1_1amberio_1_1AMBER_a9959c435e77f19b16ddda113fd5b19a5}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!qmatoms@{qmatoms}}
+\index{qmatoms@{qmatoms}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{qmatoms}{qmatoms}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+qmatoms}
+
+
+
+Definition at line 1296 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a88fbca717ef71fce9b2c77edfe2c68c2}\label{classsrc_1_1amberio_1_1AMBER_a88fbca717ef71fce9b2c77edfe2c68c2}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!spath@{spath}}
+\index{spath@{spath}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{spath}{spath}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+spath}
+
+
+
+Definition at line 1164 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a5296863cab305fa3adc68de60fa593b7}\label{classsrc_1_1amberio_1_1AMBER_a5296863cab305fa3adc68de60fa593b7}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!trajectory@{trajectory}}
+\index{trajectory@{trajectory}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{trajectory}{trajectory}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+trajectory}
+
+
+
+Definition at line 1639 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1AMBER_a411fdc3f6b0124021a79e3462a16a308}\label{classsrc_1_1amberio_1_1AMBER_a411fdc3f6b0124021a79e3462a16a308}} 
+\index{src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}!valkwd@{valkwd}}
+\index{valkwd@{valkwd}!src\+::amberio\+::\+A\+M\+B\+ER@{src\+::amberio\+::\+A\+M\+B\+ER}}
+\paragraph{\texorpdfstring{valkwd}{valkwd}}
+{\footnotesize\ttfamily src.\+amberio.\+A\+M\+B\+E\+R.\+valkwd}
+
+
+
+Keyword args that aren\textquotesingle{}t in this list are filtered out. 
+
+
+
+Definition at line 1132 of file amberio.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{amberio_8py}{amberio.\+py}\end{DoxyCompactItemize}

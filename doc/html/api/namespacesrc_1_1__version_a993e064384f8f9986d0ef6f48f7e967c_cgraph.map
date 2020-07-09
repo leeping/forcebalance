@@ -1,0 +1,9 @@
+<map id="src._version.render" name="src._version.render">
+<area shape="rect" id="node2" href="$namespacesrc_1_1__version.html#a08b184a852fca45124c31efad07ae91d" title="Build up version string, with post&#45;release &quot;local version identifier&quot;. " alt="" coords="200,5,347,47"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1__version.html#a966d7d904289700bc6bbc20d64bd5c6e" title="TAG[.post.devDISTANCE] – No &#45;dirty. " alt="" coords="200,71,347,112"/>
+<area shape="rect" id="node5" href="$namespacesrc_1_1__version.html#a2553edd494b07cc780e662bbb2467b66" title="TAG[.postDISTANCE[.dev0]+gHEX] . " alt="" coords="200,136,347,177"/>
+<area shape="rect" id="node6" href="$namespacesrc_1_1__version.html#a04e18593f1d130a8f2609ebb4520faf3" title="TAG[.postDISTANCE[.dev0]] . " alt="" coords="200,201,347,243"/>
+<area shape="rect" id="node7" href="$namespacesrc_1_1__version.html#afab0479c00019cd66c0000ffb3fcba2f" title="TAG[&#45;DISTANCE&#45;gHEX][&#45;dirty]. " alt="" coords="200,267,347,308"/>
+<area shape="rect" id="node8" href="$namespacesrc_1_1__version.html#aefa841fcd557dd2ff3594846803f1e58" title="TAG&#45;DISTANCE&#45;gHEX[&#45;dirty]. " alt="" coords="200,332,347,373"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1__version.html#a21c3be02b22ff9893ddf1de4b4609066" title="Return a + if we don&#39;t already have one, else return a . " alt="" coords="395,78,573,105"/>
+</map>

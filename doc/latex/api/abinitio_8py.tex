@@ -1,27 +1,28 @@
-\hypertarget{abinitio_8py}{\subsection{abinitio.\-py File Reference}
-\label{abinitio_8py}\index{abinitio.\-py@{abinitio.\-py}}
-}
+\hypertarget{abinitio_8py}{}\subsection{abinitio.\+py File Reference}
+\label{abinitio_8py}\index{abinitio.\+py@{abinitio.\+py}}
 \subsubsection*{Classes}
 \begin{DoxyCompactItemize}
 \item 
-class \hyperlink{classforcebalance_1_1abinitio_1_1AbInitio}{forcebalance.\-abinitio.\-Ab\-Initio}
+class \hyperlink{classsrc_1_1abinitio_1_1AbInitio}{src.\+abinitio.\+Ab\+Initio}
 \begin{DoxyCompactList}\small\item\em Subclass of Target for fitting force fields to ab initio data. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsubsection*{Namespaces}
 \begin{DoxyCompactItemize}
 \item 
-\hyperlink{namespaceforcebalance_1_1abinitio}{forcebalance.\-abinitio}
+ \hyperlink{namespacesrc_1_1abinitio}{src.\+abinitio}
+\item 
+ \hyperlink{namespaceforcebalance_1_1abinitio}{forcebalance.\+abinitio}
 \begin{DoxyCompactList}\small\item\em Ab-\/initio fitting module (energies, forces, resp). \end{DoxyCompactList}\end{DoxyCompactItemize}
 \subsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
-def \hyperlink{namespaceforcebalance_1_1abinitio_aba970cb59bab95eec79027ea05655110}{forcebalance.\-abinitio.\-weighted\-\_\-variance}
-\begin{DoxyCompactList}\small\item\em A more generalized version of build\-\_\-objective which is callable for derivatives, but the covariance is not there anymore. \end{DoxyCompactList}\item 
-def \hyperlink{namespaceforcebalance_1_1abinitio_ab9554761125a4ec7c3c13d6ae4ea537d}{forcebalance.\-abinitio.\-weighted\-\_\-variance2}
-\begin{DoxyCompactList}\small\item\em A bit of a hack, since we have to subtract out two mean quantities to get Hessian elements. \end{DoxyCompactList}\item 
-def \hyperlink{namespaceforcebalance_1_1abinitio_aadd1d6c5a34c82d495d6be7380b73601}{forcebalance.\-abinitio.\-build\-\_\-objective}
-\begin{DoxyCompactList}\small\item\em This function builds an objective function (number) from the complicated polytensor and covariance matrices. \end{DoxyCompactList}\end{DoxyCompactItemize}
+def \hyperlink{namespacesrc_1_1abinitio_ae5e4372a8a2b6ae643c954f1717761a5}{src.\+abinitio.\+norm2} (arr, a=0, n=None, step=3)
+\begin{DoxyCompactList}\small\item\em Given a one-\/dimensional array, return the norm-\/squared of every \char`\"{}step\char`\"{} elements, starting at \textquotesingle{}a\textquotesingle{} and computing \textquotesingle{}n\textquotesingle{} total elements (so arr\mbox{[}a\+:a+step$\ast$n\mbox{]} must be valid). \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1abinitio_ace4aca44aab54100556205a5aeab3cad}{src.\+abinitio.\+compute\+\_\+objective\+\_\+part} (S\+PX, Q\+Q0, Q0, Z, a, n, energy=False, subtract\+\_\+mean=False, divide=1, L=None, R=None, L2=None, R2=None)
+\item 
+def \hyperlink{namespacesrc_1_1abinitio_a15ff594ec7734a01ef603b9bb780d966}{src.\+abinitio.\+plot\+\_\+qm\+\_\+vs\+\_\+mm} (Q, M, M\+\_\+orig=None, title=\textquotesingle{}\textquotesingle{})
+\end{DoxyCompactItemize}
 \subsubsection*{Variables}
 \begin{DoxyCompactItemize}
 \item 
-tuple \hyperlink{namespaceforcebalance_1_1abinitio_a338e08128cae5bd4135a9ffb19f78f14}{forcebalance.\-abinitio.\-logger} = get\-Logger(\-\_\-\-\_\-name\-\_\-\-\_\-)
+\hyperlink{namespacesrc_1_1abinitio_a5f31a5792044a3fac63afc0cf112ac9c}{src.\+abinitio.\+logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
 \end{DoxyCompactItemize}

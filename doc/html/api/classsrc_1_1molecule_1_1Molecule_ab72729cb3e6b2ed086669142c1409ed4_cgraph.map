@@ -1,0 +1,4 @@
+<map id="src.molecule.Molecule.require_boxes" name="src.molecule.Molecule.require_boxes">
+<area shape="rect" id="node2" href="$namespacesrc_1_1molecule.html#a037d06bd9038517f2784bce4e0ad6d86" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="271,5,457,47"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1molecule.html#a49fbd57aae59219cb5fb85c22362b1f3" title="This function takes in three lattice vectors and tries to return a complete box specification. " alt="" coords="271,71,457,112"/>
+</map>

@@ -1,0 +1,95 @@
+\hypertarget{namespacesrc_1_1smirnoffio}{}\subsection{src.\+smirnoffio Namespace Reference}
+\label{namespacesrc_1_1smirnoffio}\index{src.\+smirnoffio@{src.\+smirnoffio}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1smirnoffio_1_1AbInitio__SMIRNOFF}{Ab\+Initio\+\_\+\+S\+M\+I\+R\+N\+O\+FF}
+\begin{DoxyCompactList}\small\item\em Force and energy matching using Open\+MM. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1smirnoffio_1_1Liquid__SMIRNOFF}{Liquid\+\_\+\+S\+M\+I\+R\+N\+O\+FF}
+\begin{DoxyCompactList}\small\item\em Condensed phase property matching using Open\+MM. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1smirnoffio_1_1OptGeoTarget__SMIRNOFF}{Opt\+Geo\+Target\+\_\+\+S\+M\+I\+R\+N\+O\+FF}
+\begin{DoxyCompactList}\small\item\em Optimized geometry fitting using \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF}{S\+M\+I\+R\+N\+O\+FF} format powered by Open\+MM. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF}{S\+M\+I\+R\+N\+O\+FF}
+\begin{DoxyCompactList}\small\item\em Derived from Engine object for carrying out Open\+MM calculations that use the \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF}{S\+M\+I\+R\+N\+O\+FF} force field. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF__Reader}{S\+M\+I\+R\+N\+O\+F\+F\+\_\+\+Reader}
+\begin{DoxyCompactList}\small\item\em Class for parsing Open\+MM force field files. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1smirnoffio_1_1TorsionProfileTarget__SMIRNOFF}{Torsion\+Profile\+Target\+\_\+\+S\+M\+I\+R\+N\+O\+FF}
+\begin{DoxyCompactList}\small\item\em Force and energy matching using S\+M\+I\+R\+KS native Open Force Field (\hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF}{S\+M\+I\+R\+N\+O\+FF}). \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1smirnoffio_1_1Vibration__SMIRNOFF}{Vibration\+\_\+\+S\+M\+I\+R\+N\+O\+FF}
+\begin{DoxyCompactList}\small\item\em Vibrational frequency matching using T\+I\+N\+K\+ER. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1smirnoffio_a993b4343db1c9de5ef6358de38bc6493}{smirnoff\+\_\+analyze\+\_\+parameter\+\_\+coverage} (forcefield, tgt\+\_\+opts)
+\item 
+def \hyperlink{namespacesrc_1_1smirnoffio_aa6131a8e15712415535410609a0c9900}{assign\+\_\+openff\+\_\+parameter} (ff, new\+\_\+value, pid)
+\begin{DoxyCompactList}\small\item\em Assign a \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF}{S\+M\+I\+R\+N\+O\+FF} parameter given the openforcefield.\+Force\+Field object, the desired parameter value, and the parameter\textquotesingle{}s unique ID. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1smirnoffio_a1515611165a2fddb1dd339b81aa5ce66}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\item 
+string \hyperlink{namespacesrc_1_1smirnoffio_a505ffb180d62c1a425d1a1feadc4e290}{pdict} = \char`\"{}X\+M\+L\+\_\+\+Override\char`\"{}
+\begin{DoxyCompactList}\small\item\em pdict is a useless variable if the force field is X\+ML. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1smirnoffio_aa6131a8e15712415535410609a0c9900}\label{namespacesrc_1_1smirnoffio_aa6131a8e15712415535410609a0c9900}} 
+\index{src\+::smirnoffio@{src\+::smirnoffio}!assign\+\_\+openff\+\_\+parameter@{assign\+\_\+openff\+\_\+parameter}}
+\index{assign\+\_\+openff\+\_\+parameter@{assign\+\_\+openff\+\_\+parameter}!src\+::smirnoffio@{src\+::smirnoffio}}
+\paragraph{\texorpdfstring{assign\+\_\+openff\+\_\+parameter()}{assign\_openff\_parameter()}}
+{\footnotesize\ttfamily def src.\+smirnoffio.\+assign\+\_\+openff\+\_\+parameter (\begin{DoxyParamCaption}\item[{}]{ff,  }\item[{}]{new\+\_\+value,  }\item[{}]{pid }\end{DoxyParamCaption})}
+
+
+
+Assign a \hyperlink{classsrc_1_1smirnoffio_1_1SMIRNOFF}{S\+M\+I\+R\+N\+O\+FF} parameter given the openforcefield.\+Force\+Field object, the desired parameter value, and the parameter\textquotesingle{}s unique ID. 
+
+
+
+Definition at line 142 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1smirnoffio_a993b4343db1c9de5ef6358de38bc6493}\label{namespacesrc_1_1smirnoffio_a993b4343db1c9de5ef6358de38bc6493}} 
+\index{src\+::smirnoffio@{src\+::smirnoffio}!smirnoff\+\_\+analyze\+\_\+parameter\+\_\+coverage@{smirnoff\+\_\+analyze\+\_\+parameter\+\_\+coverage}}
+\index{smirnoff\+\_\+analyze\+\_\+parameter\+\_\+coverage@{smirnoff\+\_\+analyze\+\_\+parameter\+\_\+coverage}!src\+::smirnoffio@{src\+::smirnoffio}}
+\paragraph{\texorpdfstring{smirnoff\+\_\+analyze\+\_\+parameter\+\_\+coverage()}{smirnoff\_analyze\_parameter\_coverage()}}
+{\footnotesize\ttfamily def src.\+smirnoffio.\+smirnoff\+\_\+analyze\+\_\+parameter\+\_\+coverage (\begin{DoxyParamCaption}\item[{}]{forcefield,  }\item[{}]{tgt\+\_\+opts }\end{DoxyParamCaption})}
+
+
+
+Definition at line 66 of file smirnoffio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1smirnoffio_a993b4343db1c9de5ef6358de38bc6493_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1smirnoffio_a1515611165a2fddb1dd339b81aa5ce66}\label{namespacesrc_1_1smirnoffio_a1515611165a2fddb1dd339b81aa5ce66}} 
+\index{src\+::smirnoffio@{src\+::smirnoffio}!logger@{logger}}
+\index{logger@{logger}!src\+::smirnoffio@{src\+::smirnoffio}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+smirnoffio.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 39 of file smirnoffio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1smirnoffio_a505ffb180d62c1a425d1a1feadc4e290}\label{namespacesrc_1_1smirnoffio_a505ffb180d62c1a425d1a1feadc4e290}} 
+\index{src\+::smirnoffio@{src\+::smirnoffio}!pdict@{pdict}}
+\index{pdict@{pdict}!src\+::smirnoffio@{src\+::smirnoffio}}
+\paragraph{\texorpdfstring{pdict}{pdict}}
+{\footnotesize\ttfamily string src.\+smirnoffio.\+pdict = \char`\"{}X\+M\+L\+\_\+\+Override\char`\"{}}
+
+
+
+pdict is a useless variable if the force field is X\+ML. 
+
+
+
+Definition at line 64 of file smirnoffio.\+py.
+

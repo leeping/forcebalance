@@ -1,0 +1,73 @@
+\hypertarget{namespacesrc_1_1abinitio}{}\subsection{src.\+abinitio Namespace Reference}
+\label{namespacesrc_1_1abinitio}\index{src.\+abinitio@{src.\+abinitio}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1abinitio_1_1AbInitio}{Ab\+Initio}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for fitting force fields to ab initio data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1abinitio_ae5e4372a8a2b6ae643c954f1717761a5}{norm2} (arr, a=0, n=None, step=3)
+\begin{DoxyCompactList}\small\item\em Given a one-\/dimensional array, return the norm-\/squared of every \char`\"{}step\char`\"{} elements, starting at \textquotesingle{}a\textquotesingle{} and computing \textquotesingle{}n\textquotesingle{} total elements (so arr\mbox{[}a\+:a+step$\ast$n\mbox{]} must be valid). \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1abinitio_ace4aca44aab54100556205a5aeab3cad}{compute\+\_\+objective\+\_\+part} (S\+PX, Q\+Q0, Q0, Z, a, n, energy=False, subtract\+\_\+mean=False, divide=1, L=None, R=None, L2=None, R2=None)
+\item 
+def \hyperlink{namespacesrc_1_1abinitio_a15ff594ec7734a01ef603b9bb780d966}{plot\+\_\+qm\+\_\+vs\+\_\+mm} (Q, M, M\+\_\+orig=None, title=\textquotesingle{}\textquotesingle{})
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1abinitio_a5f31a5792044a3fac63afc0cf112ac9c}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1abinitio_ace4aca44aab54100556205a5aeab3cad}\label{namespacesrc_1_1abinitio_ace4aca44aab54100556205a5aeab3cad}} 
+\index{src\+::abinitio@{src\+::abinitio}!compute\+\_\+objective\+\_\+part@{compute\+\_\+objective\+\_\+part}}
+\index{compute\+\_\+objective\+\_\+part@{compute\+\_\+objective\+\_\+part}!src\+::abinitio@{src\+::abinitio}}
+\paragraph{\texorpdfstring{compute\+\_\+objective\+\_\+part()}{compute\_objective\_part()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+compute\+\_\+objective\+\_\+part (\begin{DoxyParamCaption}\item[{}]{S\+PX,  }\item[{}]{Q\+Q0,  }\item[{}]{Q0,  }\item[{}]{Z,  }\item[{}]{a,  }\item[{}]{n,  }\item[{}]{energy = {\ttfamily False},  }\item[{}]{subtract\+\_\+mean = {\ttfamily False},  }\item[{}]{divide = {\ttfamily 1},  }\item[{}]{L = {\ttfamily None},  }\item[{}]{R = {\ttfamily None},  }\item[{}]{L2 = {\ttfamily None},  }\item[{}]{R2 = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1114 of file abinitio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1abinitio_ae5e4372a8a2b6ae643c954f1717761a5}\label{namespacesrc_1_1abinitio_ae5e4372a8a2b6ae643c954f1717761a5}} 
+\index{src\+::abinitio@{src\+::abinitio}!norm2@{norm2}}
+\index{norm2@{norm2}!src\+::abinitio@{src\+::abinitio}}
+\paragraph{\texorpdfstring{norm2()}{norm2()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+norm2 (\begin{DoxyParamCaption}\item[{}]{arr,  }\item[{}]{a = {\ttfamily 0},  }\item[{}]{n = {\ttfamily None},  }\item[{}]{step = {\ttfamily 3} }\end{DoxyParamCaption})}
+
+
+
+Given a one-\/dimensional array, return the norm-\/squared of every \char`\"{}step\char`\"{} elements, starting at \textquotesingle{}a\textquotesingle{} and computing \textquotesingle{}n\textquotesingle{} total elements (so arr\mbox{[}a\+:a+step$\ast$n\mbox{]} must be valid). 
+
+\paragraph*{Parameters }
+
+arr \+: np.\+ndarray One-\/dimensional array to be normed a \+: int, default=0 The starting index n \+: int, or None The number of norms to calculate (in intervals of step) step \+: int, default=3 The number of elements in each norm calculation (this is usually 3) 
+
+Definition at line 47 of file abinitio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1abinitio_a15ff594ec7734a01ef603b9bb780d966}\label{namespacesrc_1_1abinitio_a15ff594ec7734a01ef603b9bb780d966}} 
+\index{src\+::abinitio@{src\+::abinitio}!plot\+\_\+qm\+\_\+vs\+\_\+mm@{plot\+\_\+qm\+\_\+vs\+\_\+mm}}
+\index{plot\+\_\+qm\+\_\+vs\+\_\+mm@{plot\+\_\+qm\+\_\+vs\+\_\+mm}!src\+::abinitio@{src\+::abinitio}}
+\paragraph{\texorpdfstring{plot\+\_\+qm\+\_\+vs\+\_\+mm()}{plot\_qm\_vs\_mm()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+plot\+\_\+qm\+\_\+vs\+\_\+mm (\begin{DoxyParamCaption}\item[{}]{Q,  }\item[{}]{M,  }\item[{}]{M\+\_\+orig = {\ttfamily None},  }\item[{}]{title = {\ttfamily \textquotesingle{}\textquotesingle{}} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1145 of file abinitio.\+py.
+
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1abinitio_a5f31a5792044a3fac63afc0cf112ac9c}\label{namespacesrc_1_1abinitio_a5f31a5792044a3fac63afc0cf112ac9c}} 
+\index{src\+::abinitio@{src\+::abinitio}!logger@{logger}}
+\index{logger@{logger}!src\+::abinitio@{src\+::abinitio}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+abinitio.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 28 of file abinitio.\+py.
+

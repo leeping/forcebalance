@@ -1,0 +1,273 @@
+\hypertarget{namespacesrc_1_1amberio}{}\subsection{src.\+amberio Namespace Reference}
+\label{namespacesrc_1_1amberio}\index{src.\+amberio@{src.\+amberio}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1amberio_1_1AbInitio__AMBER}{Ab\+Initio\+\_\+\+A\+M\+B\+ER}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for force and energy matching using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}
+\begin{DoxyCompactList}\small\item\em Engine for carrying out general purpose \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} calculations. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader}{Frc\+Mod\+\_\+\+Reader}
+\begin{DoxyCompactList}\small\item\em Finite state machine for parsing Frc\+Mod force field file. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1Interaction__AMBER}{Interaction\+\_\+\+A\+M\+B\+ER}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for calculating and matching ineraction energies using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1Liquid__AMBER}{Liquid\+\_\+\+A\+M\+B\+ER}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for calculating and matching liquid properties using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1Mol2__Reader}{Mol2\+\_\+\+Reader}
+\begin{DoxyCompactList}\small\item\em Finite state machine for parsing \hyperlink{namespacesrc_1_1Mol2}{Mol2} force field file. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1PrmtopLoader}{Prmtop\+Loader}
+\begin{DoxyCompactList}\small\item\em Parsed \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} prmtop file. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1amberio_1_1Vibration__AMBER}{Vibration\+\_\+\+A\+M\+B\+ER}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for calculating and matching vibrational modes using \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1amberio_abe9d4cfc536441837882e79989079f52}{is\+\_\+mol2\+\_\+atom} (line)
+\item 
+def \hyperlink{namespacesrc_1_1amberio_ac5df3fe728e9cc0536e1abc7ce6c982d}{write\+\_\+leap} (fnm, mol2=\mbox{[}$\,$\mbox{]}, frcmod=\mbox{[}$\,$\mbox{]}, pdb=None, prefix=\textquotesingle{}amber\textquotesingle{}, spath=\mbox{[}$\,$\mbox{]}, delcheck=False)
+\begin{DoxyCompactList}\small\item\em Parse and edit an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} L\+EaP input file. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1amberio_ab145e7dc869bc06009b5f5cf0208bb77}{split\+Comment} (mystr, debug=False)
+\begin{DoxyCompactList}\small\item\em Remove the comment from a line in an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} namelist. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1amberio_a526ac77cde3d083631db82b2d229d2db}{parse\+\_\+amber\+\_\+namelist} (fin)
+\begin{DoxyCompactList}\small\item\em Parse a file containing an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} namelist (only significantly tested for sander input). \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1amberio_aa3b1df1e806f3b06b41bcaabe3873998}{write\+\_\+mdin} (calctype, fout=None, nsteps=None, timestep=None, nsave=None, pbc=False, temperature=None, pressure=None, mdin\+\_\+orig=None)
+\begin{DoxyCompactList}\small\item\em Write an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} .mdin file to carry out a calculation using sander or pmemd.\+cuda. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1amberio_a393fcac75c6f7641bc423b74d54be7c4}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\item 
+float \hyperlink{namespacesrc_1_1amberio_acbb6d6c182cf67d8aac7feb23092d430}{kb\+\_\+kcal} = 0.\+0019872041
+\item 
+dictionary \hyperlink{namespacesrc_1_1amberio_a2c5ebd63f79b3c6412150fd76f0951ae}{mol2\+\_\+pdict} = \{\textquotesingle{}C\+O\+UL\textquotesingle{}\+:\{\textquotesingle{}Atom\textquotesingle{}\+:\mbox{[}1\mbox{]}, 8\+:\textquotesingle{}\textquotesingle{}\}\}
+\item 
+dictionary \hyperlink{namespacesrc_1_1amberio_a5c0a9d5f44c2ea9fdd2f3ebecd2f0e1e}{frcmod\+\_\+pdict}
+\item 
+string \hyperlink{namespacesrc_1_1amberio_a310fef0f53ae182324b5e25efe513646}{P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+LS}
+\item 
+string \hyperlink{namespacesrc_1_1amberio_a846cab198dce2c2fea591135f041ee2e}{P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+L\+\_\+\+L\+I\+ST} = P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+L\+S.\+replace(\textquotesingle{},\textquotesingle{}, \textquotesingle{}\textquotesingle{}).split()
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1amberio_abe9d4cfc536441837882e79989079f52}\label{namespacesrc_1_1amberio_abe9d4cfc536441837882e79989079f52}} 
+\index{src\+::amberio@{src\+::amberio}!is\+\_\+mol2\+\_\+atom@{is\+\_\+mol2\+\_\+atom}}
+\index{is\+\_\+mol2\+\_\+atom@{is\+\_\+mol2\+\_\+atom}!src\+::amberio@{src\+::amberio}}
+\paragraph{\texorpdfstring{is\+\_\+mol2\+\_\+atom()}{is\_mol2\_atom()}}
+{\footnotesize\ttfamily def src.\+amberio.\+is\+\_\+mol2\+\_\+atom (\begin{DoxyParamCaption}\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Definition at line 59 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1amberio_abe9d4cfc536441837882e79989079f52_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1amberio_a526ac77cde3d083631db82b2d229d2db}\label{namespacesrc_1_1amberio_a526ac77cde3d083631db82b2d229d2db}} 
+\index{src\+::amberio@{src\+::amberio}!parse\+\_\+amber\+\_\+namelist@{parse\+\_\+amber\+\_\+namelist}}
+\index{parse\+\_\+amber\+\_\+namelist@{parse\+\_\+amber\+\_\+namelist}!src\+::amberio@{src\+::amberio}}
+\paragraph{\texorpdfstring{parse\+\_\+amber\+\_\+namelist()}{parse\_amber\_namelist()}}
+{\footnotesize\ttfamily def src.\+amberio.\+parse\+\_\+amber\+\_\+namelist (\begin{DoxyParamCaption}\item[{}]{fin }\end{DoxyParamCaption})}
+
+
+
+Parse a file containing an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} namelist (only significantly tested for sander input). 
+
+\paragraph*{Parameters }
+
+fin \+: str Name of file containing the namelist
+
+\paragraph*{Returns }
+
+comments (list) of lines) List of lines containing comments before first namelist names (list) List of names of each namelist (e.\+g. cntrl, ewald) block\+\_\+dicts (list) List of ordered dictionaries containing variable names and values for each namelist suffixes (list) List of list of lines coming after the \char`\"{}slash\char`\"{} for each suffix 
+
+Definition at line 206 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1amberio_a526ac77cde3d083631db82b2d229d2db_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1amberio_ab145e7dc869bc06009b5f5cf0208bb77}\label{namespacesrc_1_1amberio_ab145e7dc869bc06009b5f5cf0208bb77}} 
+\index{src\+::amberio@{src\+::amberio}!split\+Comment@{split\+Comment}}
+\index{split\+Comment@{split\+Comment}!src\+::amberio@{src\+::amberio}}
+\paragraph{\texorpdfstring{split\+Comment()}{splitComment()}}
+{\footnotesize\ttfamily def src.\+amberio.\+split\+Comment (\begin{DoxyParamCaption}\item[{}]{mystr,  }\item[{}]{debug = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Remove the comment from a line in an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} namelist. 
+
+Had to write a separate function because I couldn\textquotesingle{}t get regex to work
+
+\paragraph*{Parameters }
+
+mystr \+: str Input string such as\+: restraintmask=\textquotesingle{}!\+:W\+AT,NA\&!=\textquotesingle{}, ! Restraint mask for non-\/water, non-\/ions
+
+\paragraph*{Returns }
+
+str Output string with comment removed (but keeping leading and trailing whitespace) such as\+: restraintmask=\textquotesingle{}!\+:W\+AT,NA\&!=\textquotesingle{}, 
+
+Definition at line 150 of file amberio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1amberio_ac5df3fe728e9cc0536e1abc7ce6c982d}\label{namespacesrc_1_1amberio_ac5df3fe728e9cc0536e1abc7ce6c982d}} 
+\index{src\+::amberio@{src\+::amberio}!write\+\_\+leap@{write\+\_\+leap}}
+\index{write\+\_\+leap@{write\+\_\+leap}!src\+::amberio@{src\+::amberio}}
+\paragraph{\texorpdfstring{write\+\_\+leap()}{write\_leap()}}
+{\footnotesize\ttfamily def src.\+amberio.\+write\+\_\+leap (\begin{DoxyParamCaption}\item[{}]{fnm,  }\item[{}]{mol2 = {\ttfamily \mbox{[}\mbox{]}},  }\item[{}]{frcmod = {\ttfamily \mbox{[}\mbox{]}},  }\item[{}]{pdb = {\ttfamily None},  }\item[{}]{prefix = {\ttfamily \textquotesingle{}amber\textquotesingle{}},  }\item[{}]{spath = {\ttfamily \mbox{[}\mbox{]}},  }\item[{}]{delcheck = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Parse and edit an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} L\+EaP input file. 
+
+Output file is written to inputfile\+\_\+ (with trailing underscore.) 
+
+Definition at line 67 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1amberio_ac5df3fe728e9cc0536e1abc7ce6c982d_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1amberio_aa3b1df1e806f3b06b41bcaabe3873998}\label{namespacesrc_1_1amberio_aa3b1df1e806f3b06b41bcaabe3873998}} 
+\index{src\+::amberio@{src\+::amberio}!write\+\_\+mdin@{write\+\_\+mdin}}
+\index{write\+\_\+mdin@{write\+\_\+mdin}!src\+::amberio@{src\+::amberio}}
+\paragraph{\texorpdfstring{write\+\_\+mdin()}{write\_mdin()}}
+{\footnotesize\ttfamily def src.\+amberio.\+write\+\_\+mdin (\begin{DoxyParamCaption}\item[{}]{calctype,  }\item[{}]{fout = {\ttfamily None},  }\item[{}]{nsteps = {\ttfamily None},  }\item[{}]{timestep = {\ttfamily None},  }\item[{}]{nsave = {\ttfamily None},  }\item[{}]{pbc = {\ttfamily False},  }\item[{}]{temperature = {\ttfamily None},  }\item[{}]{pressure = {\ttfamily None},  }\item[{}]{mdin\+\_\+orig = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Write an \hyperlink{classsrc_1_1amberio_1_1AMBER}{A\+M\+B\+ER} .mdin file to carry out a calculation using sander or pmemd.\+cuda. 
+
+\paragraph*{Parameters }
+
+calctype \+: str The type of calculation being performed \textquotesingle{}min\textquotesingle{} \+: minimization \textquotesingle{}eq\textquotesingle{} \+: equilibration \textquotesingle{}md\textquotesingle{} \+: (production) MD \textquotesingle{}sp\textquotesingle{} \+: Single-\/point calculation
+
+fout \+: str If provided, file name that the .mdin file should be written to. Each variable within a namelist will occupy one line. Comments within namelist are not written to output.
+
+timestep \+: float Time step in picoseconds. For minimizations or single-\/point calculations, this is not needed
+
+nsteps \+: int How many MD or minimization steps to take For single-\/point calculations, this is not needed
+
+nsave \+: int How often to write trajectory and velocity frames (only production MD writes velocities) For single-\/point calculations, this is not needed
+
+pbc \+: bool Whether to use periodic boundary conditions
+
+temperature \+: float If not None, the simulation temperature
+
+pressure \+: float If not None, the simulation pressure
+
+mdin\+\_\+orig \+: str, optional Custom mdin file provided by the user. Non-\/\&cntrl blocks will be written to output. Top-\/of-\/file comments will be written to output.
+
+\paragraph*{Returns }
+
+Ordered\+Dict key \+: value pairs in the \&cntrl namelist, useful for passing to cpptraj or sander/cpptraj Python A\+P\+Is in the future. 
+
+Definition at line 316 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1amberio_aa3b1df1e806f3b06b41bcaabe3873998_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1amberio_a5c0a9d5f44c2ea9fdd2f3ebecd2f0e1e}\label{namespacesrc_1_1amberio_a5c0a9d5f44c2ea9fdd2f3ebecd2f0e1e}} 
+\index{src\+::amberio@{src\+::amberio}!frcmod\+\_\+pdict@{frcmod\+\_\+pdict}}
+\index{frcmod\+\_\+pdict@{frcmod\+\_\+pdict}!src\+::amberio@{src\+::amberio}}
+\paragraph{\texorpdfstring{frcmod\+\_\+pdict}{frcmod\_pdict}}
+{\footnotesize\ttfamily dictionary src.\+amberio.\+frcmod\+\_\+pdict}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  \{\textcolor{stringliteral}{'BONDS'}: \{\textcolor{stringliteral}{'Atom'}:[0], 1:\textcolor{stringliteral}{'K'}, 2:\textcolor{stringliteral}{'B'}\},
+2                 \textcolor{stringliteral}{'ANGLES'}:\{\textcolor{stringliteral}{'Atom'}:[0], 1:\textcolor{stringliteral}{'K'}, 2:\textcolor{stringliteral}{'B'}\},
+3                 \textcolor{stringliteral}{'PDIHS1'}:\{\textcolor{stringliteral}{'Atom'}:[0], 2:\textcolor{stringliteral}{'K'}, 3:\textcolor{stringliteral}{'B'}\},
+4                 \textcolor{stringliteral}{'PDIHS2'}:\{\textcolor{stringliteral}{'Atom'}:[0], 2:\textcolor{stringliteral}{'K'}, 3:\textcolor{stringliteral}{'B'}\},
+5                 \textcolor{stringliteral}{'PDIHS3'}:\{\textcolor{stringliteral}{'Atom'}:[0], 2:\textcolor{stringliteral}{'K'}, 3:\textcolor{stringliteral}{'B'}\},
+6                 \textcolor{stringliteral}{'PDIHS4'}:\{\textcolor{stringliteral}{'Atom'}:[0], 2:\textcolor{stringliteral}{'K'}, 3:\textcolor{stringliteral}{'B'}\},
+7                 \textcolor{stringliteral}{'PDIHS5'}:\{\textcolor{stringliteral}{'Atom'}:[0], 2:\textcolor{stringliteral}{'K'}, 3:\textcolor{stringliteral}{'B'}\},
+8                 \textcolor{stringliteral}{'PDIHS6'}:\{\textcolor{stringliteral}{'Atom'}:[0], 2:\textcolor{stringliteral}{'K'}, 3:\textcolor{stringliteral}{'B'}\},
+9                 \textcolor{stringliteral}{'IDIHS'} :\{\textcolor{stringliteral}{'Atom'}:[0], 1:\textcolor{stringliteral}{'K'}, 2:\textcolor{stringliteral}{'B'}\},
+10                 \textcolor{stringliteral}{'VDW'}:\{\textcolor{stringliteral}{'Atom'}:[0], 1:\textcolor{stringliteral}{'S'}, 2:\textcolor{stringliteral}{'T'}\}
+11                 \}
+\end{DoxyCode}
+
+
+Definition at line 47 of file amberio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1amberio_acbb6d6c182cf67d8aac7feb23092d430}\label{namespacesrc_1_1amberio_acbb6d6c182cf67d8aac7feb23092d430}} 
+\index{src\+::amberio@{src\+::amberio}!kb\+\_\+kcal@{kb\+\_\+kcal}}
+\index{kb\+\_\+kcal@{kb\+\_\+kcal}!src\+::amberio@{src\+::amberio}}
+\paragraph{\texorpdfstring{kb\+\_\+kcal}{kb\_kcal}}
+{\footnotesize\ttfamily float src.\+amberio.\+kb\+\_\+kcal = 0.\+0019872041}
+
+
+
+Definition at line 43 of file amberio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1amberio_a393fcac75c6f7641bc423b74d54be7c4}\label{namespacesrc_1_1amberio_a393fcac75c6f7641bc423b74d54be7c4}} 
+\index{src\+::amberio@{src\+::amberio}!logger@{logger}}
+\index{logger@{logger}!src\+::amberio@{src\+::amberio}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+amberio.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 40 of file amberio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1amberio_a2c5ebd63f79b3c6412150fd76f0951ae}\label{namespacesrc_1_1amberio_a2c5ebd63f79b3c6412150fd76f0951ae}} 
+\index{src\+::amberio@{src\+::amberio}!mol2\+\_\+pdict@{mol2\+\_\+pdict}}
+\index{mol2\+\_\+pdict@{mol2\+\_\+pdict}!src\+::amberio@{src\+::amberio}}
+\paragraph{\texorpdfstring{mol2\+\_\+pdict}{mol2\_pdict}}
+{\footnotesize\ttfamily dictionary src.\+amberio.\+mol2\+\_\+pdict = \{\textquotesingle{}C\+O\+UL\textquotesingle{}\+:\{\textquotesingle{}Atom\textquotesingle{}\+:\mbox{[}1\mbox{]}, 8\+:\textquotesingle{}\textquotesingle{}\}\}}
+
+
+
+Definition at line 45 of file amberio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1amberio_a846cab198dce2c2fea591135f041ee2e}\label{namespacesrc_1_1amberio_a846cab198dce2c2fea591135f041ee2e}} 
+\index{src\+::amberio@{src\+::amberio}!P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+L\+\_\+\+L\+I\+ST@{P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+L\+\_\+\+L\+I\+ST}}
+\index{P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+L\+\_\+\+L\+I\+ST@{P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+L\+\_\+\+L\+I\+ST}!src\+::amberio@{src\+::amberio}}
+\paragraph{\texorpdfstring{P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+L\+\_\+\+L\+I\+ST}{POINTER\_LABEL\_LIST}}
+{\footnotesize\ttfamily string src.\+amberio.\+P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+L\+\_\+\+L\+I\+ST = P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+L\+S.\+replace(\textquotesingle{},\textquotesingle{}, \textquotesingle{}\textquotesingle{}).split()}
+
+
+
+Definition at line 672 of file amberio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1amberio_a310fef0f53ae182324b5e25efe513646}\label{namespacesrc_1_1amberio_a310fef0f53ae182324b5e25efe513646}} 
+\index{src\+::amberio@{src\+::amberio}!P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+LS@{P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+LS}}
+\index{P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+LS@{P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+LS}!src\+::amberio@{src\+::amberio}}
+\paragraph{\texorpdfstring{P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+LS}{POINTER\_LABELS}}
+{\footnotesize\ttfamily string src.\+amberio.\+P\+O\+I\+N\+T\+E\+R\+\_\+\+L\+A\+B\+E\+LS}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  \textcolor{stringliteral}{"""}
+2 \textcolor{stringliteral}{              NATOM,  NTYPES, NBONH,  MBONA,  NTHETH, MTHETA,}
+3 \textcolor{stringliteral}{              NPHIH,  MPHIA,  NHPARM, NPARM,  NEXT,   NRES,}
+4 \textcolor{stringliteral}{              NBONA,  NTHETA, NPHIA,  NUMBND, NUMANG, NPTRA,}
+5 \textcolor{stringliteral}{              NATYP,  NPHB,   IFPERT, NBPER,  NGPER,  NDPER,}
+6 \textcolor{stringliteral}{              MBPER,  MGPER,  MDPER,  IFBOX,  NMXRS,  IFCAP}
+7 \textcolor{stringliteral}{"""}
+\end{DoxyCode}
+
+
+Definition at line 663 of file amberio.\+py.
+

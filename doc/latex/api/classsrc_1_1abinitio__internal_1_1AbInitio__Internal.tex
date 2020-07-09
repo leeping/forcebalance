@@ -1,0 +1,125 @@
+\hypertarget{classsrc_1_1abinitio__internal_1_1AbInitio__Internal}{}\subsection{src.\+abinitio\+\_\+internal.\+Ab\+Initio\+\_\+\+Internal Class Reference}
+\label{classsrc_1_1abinitio__internal_1_1AbInitio__Internal}\index{src.\+abinitio\+\_\+internal.\+Ab\+Initio\+\_\+\+Internal@{src.\+abinitio\+\_\+internal.\+Ab\+Initio\+\_\+\+Internal}}
+
+
+Subclass of Target for force and energy matching using an internal implementation.  
+
+
+
+
+Inheritance diagram for src.\+abinitio\+\_\+internal.\+Ab\+Initio\+\_\+\+Internal\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=209pt]{classsrc_1_1abinitio__internal_1_1AbInitio__Internal__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+abinitio\+\_\+internal.\+Ab\+Initio\+\_\+\+Internal\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=209pt]{classsrc_1_1abinitio__internal_1_1AbInitio__Internal__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a51e97c29918e5b7cedf4cffbc4ccb675}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a0711007b1a7bcb9c64c01bf68ff1e3c0}{energy\+\_\+force\+\_\+driver\+\_\+all} (self)
+\begin{DoxyCompactList}\small\item\em Here we actually compute the interactions and return the energies and forces. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a1b4e68c1db6ca2b90883340aa40cdf46}{loop\+\_\+over\+\_\+snapshots}
+\begin{DoxyCompactList}\small\item\em L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a8cb292fcebe9baf4dfa6e6566a472048}{coords}
+\begin{DoxyCompactList}\small\item\em Name of the trajectory, we need this B\+E\+F\+O\+RE initializing the Super\+Class. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for force and energy matching using an internal implementation. 
+
+Implements the prepare and energy\+\_\+force\+\_\+driver methods. The get method is in the superclass.
+
+The purpose of this class is to provide an extremely simple test case that does not require the user to install any external software. It only runs with one of the included sample test calculations (internal\+\_\+tip3p), and the objective function is energy matching.
+
+\begin{DoxyWarning}{Warning}
+This class is only intended to work with a very specific test case (internal\+\_\+tip3p). This is because the topology and ordering of the atoms is hard-\/coded (12 water molecules with 3 atoms each).
+
+This class does energy matching only (no forces) 
+\end{DoxyWarning}
+
+
+Definition at line 39 of file abinitio\+\_\+internal.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a51e97c29918e5b7cedf4cffbc4ccb675}\label{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a51e97c29918e5b7cedf4cffbc4ccb675}} 
+\index{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal@{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal@{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+abinitio\+\_\+internal.\+Ab\+Initio\+\_\+\+Internal.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 42 of file abinitio\+\_\+internal.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a0711007b1a7bcb9c64c01bf68ff1e3c0}\label{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a0711007b1a7bcb9c64c01bf68ff1e3c0}} 
+\index{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal@{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal}!energy\+\_\+force\+\_\+driver\+\_\+all@{energy\+\_\+force\+\_\+driver\+\_\+all}}
+\index{energy\+\_\+force\+\_\+driver\+\_\+all@{energy\+\_\+force\+\_\+driver\+\_\+all}!src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal@{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal}}
+\paragraph{\texorpdfstring{energy\+\_\+force\+\_\+driver\+\_\+all()}{energy\_force\_driver\_all()}}
+{\footnotesize\ttfamily def src.\+abinitio\+\_\+internal.\+Ab\+Initio\+\_\+\+Internal.\+energy\+\_\+force\+\_\+driver\+\_\+all (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Here we actually compute the interactions and return the energies and forces. 
+
+I verified this to give the same answer as G\+R\+O\+M\+A\+CS. 
+
+Definition at line 55 of file abinitio\+\_\+internal.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a8cb292fcebe9baf4dfa6e6566a472048}\label{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a8cb292fcebe9baf4dfa6e6566a472048}} 
+\index{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal@{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal}!coords@{coords}}
+\index{coords@{coords}!src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal@{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal}}
+\paragraph{\texorpdfstring{coords}{coords}}
+{\footnotesize\ttfamily src.\+abinitio\+\_\+internal.\+Ab\+Initio\+\_\+\+Internal.\+coords}
+
+
+
+Name of the trajectory, we need this B\+E\+F\+O\+RE initializing the Super\+Class. 
+
+
+
+Definition at line 47 of file abinitio\+\_\+internal.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a1b4e68c1db6ca2b90883340aa40cdf46}\label{classsrc_1_1abinitio__internal_1_1AbInitio__Internal_a1b4e68c1db6ca2b90883340aa40cdf46}} 
+\index{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal@{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal}!loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}}
+\index{loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}!src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal@{src\+::abinitio\+\_\+internal\+::\+Ab\+Initio\+\_\+\+Internal}}
+\paragraph{\texorpdfstring{loop\+\_\+over\+\_\+snapshots}{loop\_over\_snapshots}}
+{\footnotesize\ttfamily src.\+abinitio\+\_\+internal.\+Ab\+Initio\+\_\+\+Internal.\+loop\+\_\+over\+\_\+snapshots}
+
+
+
+L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. 
+
+
+
+Definition at line 45 of file abinitio\+\_\+internal.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{abinitio__internal_8py}{abinitio\+\_\+internal.\+py}\end{DoxyCompactItemize}

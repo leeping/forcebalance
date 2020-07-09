@@ -1,0 +1,11 @@
+<map id="src.optimizer.Optimizer.Run" name="src.optimizer.Optimizer.Run">
+<area shape="rect" id="node2" href="$classsrc_1_1optimizer_1_1Optimizer.html#aca89ff4f0813ce420ea0dcaab14c22d9" title="Finite&#45;difference checker for the objective function gradient. " alt="" coords="283,54,460,95"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1nifty.html#a9bda70a78d0f5d31e10dfffaf85803c9" title="Cool&#45;looking printout for slick formatting of output. " alt="" coords="568,5,703,32"/>
+<area shape="rect" id="node7" href="$namespacesrc_1_1nifty.html#a4b61f227cf823453229a7c1b98c24e5d" title="src.nifty.bak" alt="" coords="585,171,686,197"/>
+<area shape="rect" id="node8" href="$classsrc_1_1optimizer_1_1Optimizer.html#ad9b6a3c28ccacbbe26504e1e7676b244" title="Write a new input file (s_save.in) containing the current mathematical parameters. " alt="" coords="267,171,475,213"/>
+<area shape="rect" id="node9" href="$classsrc_1_1optimizer_1_1Optimizer.html#a30bd3b593b783f2e49e15d84d45927c3" title="Write the checkpoint file for the main optimizer. " alt="" coords="255,237,488,264"/>
+<area shape="rect" id="node5" href="$namespacesrc_1_1finite__difference.html#a49f3f0fa01ca9196dc99d73fd3dadf5a" title="A highly accurate seven&#45;point finite difference stencil for computing derivatives of a function..." alt="" coords="540,60,731,87"/>
+<area shape="rect" id="node6" href="$namespacesrc_1_1finite__difference.html#af3a9d7a4fc96a7057679fa5f3af73fe0" title="A function wrapper for finite difference designed for differentiating &#39;get&#39;&#45;type functions. " alt="" coords="536,111,735,137"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1nifty.html#a6ae2951ba2a22420a11abda6be7e5454" title="src.nifty.warn_press_key" alt="" coords="783,5,965,32"/>
+<area shape="rect" id="node10" href="$namespacesrc_1_1nifty.html#a82f89e3045bdeed09a928bb9ce8b0dc1" title="If trying to write to a symbolic link, remove it first. " alt="" coords="575,237,695,264"/>
+</map>

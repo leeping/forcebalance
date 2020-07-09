@@ -1,0 +1,600 @@
+\hypertarget{classsrc_1_1tinkerio_1_1TINKER}{}\subsection{src.\+tinkerio.\+T\+I\+N\+K\+ER Class Reference}
+\label{classsrc_1_1tinkerio_1_1TINKER}\index{src.\+tinkerio.\+T\+I\+N\+K\+ER@{src.\+tinkerio.\+T\+I\+N\+K\+ER}}
+
+
+Engine for carrying out general purpose \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} calculations.  
+
+
+
+
+Inheritance diagram for src.\+tinkerio.\+T\+I\+N\+K\+ER\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{classsrc_1_1tinkerio_1_1TINKER__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+tinkerio.\+T\+I\+N\+K\+ER\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{classsrc_1_1tinkerio_1_1TINKER__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_afe031bd299b6941e37eb30cd1f267f0b}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, name=\char`\"{}tinker\char`\"{}, kwargs)
+\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a896aacb11fbb0f3eb03268d5ad08cbae}{setopts} (self, kwargs)
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; Set T\+I\+N\+K\+E\+R-\/specific options. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_afb70e7572374ef07483aacd2d14195b1}{readsrc} (self, kwargs)
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; read files from the source directory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_ace7003bc50f5ccdc1b2b065fb886b457}{calltinker} (self, command, stdin=None, print\+\_\+to\+\_\+screen=False, print\+\_\+command=False, kwargs)
+\begin{DoxyCompactList}\small\item\em Call \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER}; prepend the tinkerpath to calling the \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} program. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_ae792345131bcdde1062bec5ab20ff7ea}{prepare} (self, \hyperlink{classsrc_1_1tinkerio_1_1TINKER_ac4f3fc8871832348c61e63d9ef5862a2}{pbc}=False, kwargs)
+\begin{DoxyCompactList}\small\item\em Called by {\bfseries init} ; prepare the temp directory and figure out the topology. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a925601bd948f7a34dd0a229da9b16f0a}{optimize} (self, shot, method=\char`\"{}newton\char`\"{}, align=True, crit=1e-\/4)
+\begin{DoxyCompactList}\small\item\em Optimize the geometry and align the optimized geometry to the starting geometry. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a49a7d06296ee436a170ebc13e518e7f6}{evaluate\+\_\+} (self, xyzin, force=False, dipole=False)
+\begin{DoxyCompactList}\small\item\em Utility function for computing energy, and (optionally) forces and dipoles using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER}. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a56287fffe8be5d965974fa252347bf2c}{get\+\_\+charges} (self)
+\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a99b420aae7470e1fb25ba0837ee7ef16}{energy\+\_\+force\+\_\+one} (self, shot)
+\begin{DoxyCompactList}\small\item\em Computes the energy and force using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} for one snapshot. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_abf1dfcbc000d41955ceed37115c8591b}{energy} (self)
+\begin{DoxyCompactList}\small\item\em Computes the energy using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_aaa2119b507c4840ed931f1987a133222}{energy\+\_\+force} (self)
+\begin{DoxyCompactList}\small\item\em Computes the energy and force using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_ad288fa120351fbcb05201072f57d4022}{energy\+\_\+dipole} (self)
+\begin{DoxyCompactList}\small\item\em Computes the energy and dipole using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} over a trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a6b6cbb8118a36e0537210de0d9e91122}{normal\+\_\+modes} (self, shot=0, \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a925601bd948f7a34dd0a229da9b16f0a}{optimize}=True)
+\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_aef7b87a4751dbf7365e0615a6c9f15ee}{multipole\+\_\+moments} (self, shot=0, \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a925601bd948f7a34dd0a229da9b16f0a}{optimize}=True, polarizability=False)
+\begin{DoxyCompactList}\small\item\em Return the multipole moments of the 1st snapshot in Debye and Buckingham units. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a4aa91827c8809aa5f1d8a07ef66482d6}{energy\+\_\+rmsd} (self, shot=0, \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a925601bd948f7a34dd0a229da9b16f0a}{optimize}=True)
+\begin{DoxyCompactList}\small\item\em Calculate energy of the selected structure (optionally minimize and return the minimized energy and R\+M\+SD). \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a16f711409a34ee914ac3c9561907bc58}{interaction\+\_\+energy} (self, fraga, fragb)
+\begin{DoxyCompactList}\small\item\em Calculate the interaction energy for two fragments. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1TINKER_a337833adac99202891b64a14bf92a7c2}{molecular\+\_\+dynamics} (self, nsteps, timestep, temperature=None, pressure=None, nequil=0, nsave=1000, minimize=True, anisotropic=False, threads=1, verbose=False, kwargs)
+\begin{DoxyCompactList}\small\item\em Method for running a molecular dynamics simulation. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_a5e0c3f1a0834a4c6f3239a59901cd040}{valkwd}
+\begin{DoxyCompactList}\small\item\em Keyword args that aren\textquotesingle{}t in this list are filtered out. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_a504b2ebca5c7f2797aa213c5a38002af}{warn\+\_\+vn}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_a8625afea305c83c9a8505f42c0f045ae}{tinkerpath}
+\begin{DoxyCompactList}\small\item\em The directory containing \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} executables (e.\+g. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_aa1186969c31ca79849f82fe4fd6babc5}{key}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_aaffe954cc7e2c94ec3aa8cffd62710d2}{prm}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_a7e289d80130b39f2974f5b896cb4f695}{mol}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_add22ce1946dd0ae635ce0a86e7f69818}{rigid}
+\begin{DoxyCompactList}\small\item\em Attempt to set some \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} options. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_ac4f3fc8871832348c61e63d9ef5862a2}{pbc}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_af443c0094aa207f8d58dded4cc2b5d06}{abskey}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_ac2bb4920677bde45915c43096ea3663a}{Atom\+Mask}
+\begin{DoxyCompactList}\small\item\em If the coordinates do not come with \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} suffixes then throw an error. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_a0843c5091e79e2c1cf334d0ad0f4f6cc}{Atom\+Lists}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_ab2f12e3543609cadec30abf362e0c883}{A}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_a331d0a44302cacd6a0034524f06c01ab}{B}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER_a558cb6da144aa7afa7bf780b6236790e}{md\+\_\+trajectory}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Engine for carrying out general purpose \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} calculations. 
+
+
+
+Definition at line 313 of file tinkerio.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_afe031bd299b6941e37eb30cd1f267f0b}\label{classsrc_1_1tinkerio_1_1TINKER_afe031bd299b6941e37eb30cd1f267f0b}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{name = {\ttfamily \char`\"{}tinker\char`\"{}},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 316 of file tinkerio.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_ace7003bc50f5ccdc1b2b065fb886b457}\label{classsrc_1_1tinkerio_1_1TINKER_ace7003bc50f5ccdc1b2b065fb886b457}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!calltinker@{calltinker}}
+\index{calltinker@{calltinker}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{calltinker()}{calltinker()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+calltinker (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{command,  }\item[{}]{stdin = {\ttfamily None},  }\item[{}]{print\+\_\+to\+\_\+screen = {\ttfamily False},  }\item[{}]{print\+\_\+command = {\ttfamily False},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Call \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER}; prepend the tinkerpath to calling the \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} program. 
+
+
+
+Definition at line 354 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_ace7003bc50f5ccdc1b2b065fb886b457_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_abf1dfcbc000d41955ceed37115c8591b}\label{classsrc_1_1tinkerio_1_1TINKER_abf1dfcbc000d41955ceed37115c8591b}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!energy@{energy}}
+\index{energy@{energy}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{energy()}{energy()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+energy (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Computes the energy using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} over a trajectory. 
+
+
+
+Definition at line 709 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_abf1dfcbc000d41955ceed37115c8591b_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_ad288fa120351fbcb05201072f57d4022}\label{classsrc_1_1tinkerio_1_1TINKER_ad288fa120351fbcb05201072f57d4022}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!energy\+\_\+dipole@{energy\+\_\+dipole}}
+\index{energy\+\_\+dipole@{energy\+\_\+dipole}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{energy\+\_\+dipole()}{energy\_dipole()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+energy\+\_\+dipole (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Computes the energy and dipole using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} over a trajectory. 
+
+
+
+Definition at line 734 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_ad288fa120351fbcb05201072f57d4022_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_aaa2119b507c4840ed931f1987a133222}\label{classsrc_1_1tinkerio_1_1TINKER_aaa2119b507c4840ed931f1987a133222}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!energy\+\_\+force@{energy\+\_\+force}}
+\index{energy\+\_\+force@{energy\+\_\+force}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{energy\+\_\+force()}{energy\_force()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+energy\+\_\+force (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Computes the energy and force using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} over a trajectory. 
+
+
+
+Definition at line 721 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_aaa2119b507c4840ed931f1987a133222_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a99b420aae7470e1fb25ba0837ee7ef16}\label{classsrc_1_1tinkerio_1_1TINKER_a99b420aae7470e1fb25ba0837ee7ef16}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!energy\+\_\+force\+\_\+one@{energy\+\_\+force\+\_\+one}}
+\index{energy\+\_\+force\+\_\+one@{energy\+\_\+force\+\_\+one}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{energy\+\_\+force\+\_\+one()}{energy\_force\_one()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+energy\+\_\+force\+\_\+one (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot }\end{DoxyParamCaption})}
+
+
+
+Computes the energy and force using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} for one snapshot. 
+
+
+
+Definition at line 700 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_a99b420aae7470e1fb25ba0837ee7ef16_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a4aa91827c8809aa5f1d8a07ef66482d6}\label{classsrc_1_1tinkerio_1_1TINKER_a4aa91827c8809aa5f1d8a07ef66482d6}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!energy\+\_\+rmsd@{energy\+\_\+rmsd}}
+\index{energy\+\_\+rmsd@{energy\+\_\+rmsd}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{energy\+\_\+rmsd()}{energy\_rmsd()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+energy\+\_\+rmsd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot = {\ttfamily 0},  }\item[{}]{optimize = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Calculate energy of the selected structure (optionally minimize and return the minimized energy and R\+M\+SD). 
+
+In kcal/mol. 
+
+Definition at line 846 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_a4aa91827c8809aa5f1d8a07ef66482d6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a49a7d06296ee436a170ebc13e518e7f6}\label{classsrc_1_1tinkerio_1_1TINKER_a49a7d06296ee436a170ebc13e518e7f6}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!evaluate\+\_\+@{evaluate\+\_\+}}
+\index{evaluate\+\_\+@{evaluate\+\_\+}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{evaluate\+\_\+()}{evaluate\_()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+evaluate\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{xyzin,  }\item[{}]{force = {\ttfamily False},  }\item[{}]{dipole = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Utility function for computing energy, and (optionally) forces and dipoles using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER}. 
+
+Inputs\+: xyzin\+: \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} .xyz file name. force\+: Switch for calculating the force. dipole\+: Switch for calculating the dipole.
+
+Outputs\+: Result\+: Dictionary containing energies, forces and/or dipoles. 
+
+Definition at line 647 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_a49a7d06296ee436a170ebc13e518e7f6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a56287fffe8be5d965974fa252347bf2c}\label{classsrc_1_1tinkerio_1_1TINKER_a56287fffe8be5d965974fa252347bf2c}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!get\+\_\+charges@{get\+\_\+charges}}
+\index{get\+\_\+charges@{get\+\_\+charges}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{get\+\_\+charges()}{get\_charges()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+get\+\_\+charges (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 694 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a16f711409a34ee914ac3c9561907bc58}\label{classsrc_1_1tinkerio_1_1TINKER_a16f711409a34ee914ac3c9561907bc58}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!interaction\+\_\+energy@{interaction\+\_\+energy}}
+\index{interaction\+\_\+energy@{interaction\+\_\+energy}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{interaction\+\_\+energy()}{interaction\_energy()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+interaction\+\_\+energy (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fraga,  }\item[{}]{fragb }\end{DoxyParamCaption})}
+
+
+
+Calculate the interaction energy for two fragments. 
+
+
+
+Definition at line 885 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a337833adac99202891b64a14bf92a7c2}\label{classsrc_1_1tinkerio_1_1TINKER_a337833adac99202891b64a14bf92a7c2}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!molecular\+\_\+dynamics@{molecular\+\_\+dynamics}}
+\index{molecular\+\_\+dynamics@{molecular\+\_\+dynamics}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{molecular\+\_\+dynamics()}{molecular\_dynamics()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+molecular\+\_\+dynamics (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{nsteps,  }\item[{}]{timestep,  }\item[{}]{temperature = {\ttfamily None},  }\item[{}]{pressure = {\ttfamily None},  }\item[{}]{nequil = {\ttfamily 0},  }\item[{}]{nsave = {\ttfamily 1000},  }\item[{}]{minimize = {\ttfamily True},  }\item[{}]{anisotropic = {\ttfamily False},  }\item[{}]{threads = {\ttfamily 1},  }\item[{}]{verbose = {\ttfamily False},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Method for running a molecular dynamics simulation. 
+
+Required arguments\+: nsteps = (int) Number of total time steps timestep = (float) Time step in F\+E\+M\+T\+O\+S\+E\+C\+O\+N\+DS temperature = (float) Temperature control (Kelvin) pressure = (float) Pressure control (atmospheres) nequil = (int) Number of additional time steps at the beginning for equilibration nsave = (int) Step interval for saving and printing data minimize = (bool) Perform an energy minimization prior to dynamics threads = (int) Specify how many Open\+MP threads to use
+
+Returns simulation data\+: Rhos = (array) Density in kilogram m$^\wedge$-\/3 Potentials = (array) Potential energies Kinetics = (array) Kinetic energies Volumes = (array) Box volumes Dips = (3xN array) Dipole moments E\+Comps = (dict) Energy components 
+
+Definition at line 916 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_a337833adac99202891b64a14bf92a7c2_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_aef7b87a4751dbf7365e0615a6c9f15ee}\label{classsrc_1_1tinkerio_1_1TINKER_aef7b87a4751dbf7365e0615a6c9f15ee}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!multipole\+\_\+moments@{multipole\+\_\+moments}}
+\index{multipole\+\_\+moments@{multipole\+\_\+moments}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{multipole\+\_\+moments()}{multipole\_moments()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+multipole\+\_\+moments (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot = {\ttfamily 0},  }\item[{}]{optimize = {\ttfamily True},  }\item[{}]{polarizability = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Return the multipole moments of the 1st snapshot in Debye and Buckingham units. 
+
+
+
+Definition at line 783 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_aef7b87a4751dbf7365e0615a6c9f15ee_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a6b6cbb8118a36e0537210de0d9e91122}\label{classsrc_1_1tinkerio_1_1TINKER_a6b6cbb8118a36e0537210de0d9e91122}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!normal\+\_\+modes@{normal\+\_\+modes}}
+\index{normal\+\_\+modes@{normal\+\_\+modes}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{normal\+\_\+modes()}{normal\_modes()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+normal\+\_\+modes (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot = {\ttfamily 0},  }\item[{}]{optimize = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 745 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_a6b6cbb8118a36e0537210de0d9e91122_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a925601bd948f7a34dd0a229da9b16f0a}\label{classsrc_1_1tinkerio_1_1TINKER_a925601bd948f7a34dd0a229da9b16f0a}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!optimize@{optimize}}
+\index{optimize@{optimize}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{optimize()}{optimize()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+optimize (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{shot,  }\item[{}]{method = {\ttfamily \char`\"{}newton\char`\"{}},  }\item[{}]{align = {\ttfamily True},  }\item[{}]{crit = {\ttfamily 1e-\/4} }\end{DoxyParamCaption})}
+
+
+
+Optimize the geometry and align the optimized geometry to the starting geometry. 
+
+
+
+Definition at line 567 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_a925601bd948f7a34dd0a229da9b16f0a_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_ae792345131bcdde1062bec5ab20ff7ea}\label{classsrc_1_1tinkerio_1_1TINKER_ae792345131bcdde1062bec5ab20ff7ea}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!prepare@{prepare}}
+\index{prepare@{prepare}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{prepare()}{prepare()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+prepare (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{pbc = {\ttfamily False},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Called by {\bfseries init} ; prepare the temp directory and figure out the topology. 
+
+
+
+Definition at line 398 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1tinkerio_1_1TINKER_ae792345131bcdde1062bec5ab20ff7ea_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_afb70e7572374ef07483aacd2d14195b1}\label{classsrc_1_1tinkerio_1_1TINKER_afb70e7572374ef07483aacd2d14195b1}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!readsrc@{readsrc}}
+\index{readsrc@{readsrc}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{readsrc()}{readsrc()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+readsrc (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Called by {\bfseries init} ; read files from the source directory. 
+
+
+
+Definition at line 341 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a896aacb11fbb0f3eb03268d5ad08cbae}\label{classsrc_1_1tinkerio_1_1TINKER_a896aacb11fbb0f3eb03268d5ad08cbae}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!setopts@{setopts}}
+\index{setopts@{setopts}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{setopts()}{setopts()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+setopts (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Called by {\bfseries init} ; Set T\+I\+N\+K\+E\+R-\/specific options. 
+
+
+
+Definition at line 324 of file tinkerio.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_ab2f12e3543609cadec30abf362e0c883}\label{classsrc_1_1tinkerio_1_1TINKER_ab2f12e3543609cadec30abf362e0c883}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!A@{A}}
+\index{A@{A}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{A}{A}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+A}
+
+
+
+Definition at line 888 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_af443c0094aa207f8d58dded4cc2b5d06}\label{classsrc_1_1tinkerio_1_1TINKER_af443c0094aa207f8d58dded4cc2b5d06}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!abskey@{abskey}}
+\index{abskey@{abskey}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{abskey}{abskey}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+abskey}
+
+
+
+Definition at line 502 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a0843c5091e79e2c1cf334d0ad0f4f6cc}\label{classsrc_1_1tinkerio_1_1TINKER_a0843c5091e79e2c1cf334d0ad0f4f6cc}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!Atom\+Lists@{Atom\+Lists}}
+\index{Atom\+Lists@{Atom\+Lists}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{Atom\+Lists}{AtomLists}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+Atom\+Lists}
+
+
+
+Definition at line 515 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_ac2bb4920677bde45915c43096ea3663a}\label{classsrc_1_1tinkerio_1_1TINKER_ac2bb4920677bde45915c43096ea3663a}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!Atom\+Mask@{Atom\+Mask}}
+\index{Atom\+Mask@{Atom\+Mask}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{Atom\+Mask}{AtomMask}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+Atom\+Mask}
+
+
+
+If the coordinates do not come with \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} suffixes then throw an error. 
+
+Call analyze to read information needed to build the atom lists. Parse the output of analyze. 
+
+Definition at line 514 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a331d0a44302cacd6a0034524f06c01ab}\label{classsrc_1_1tinkerio_1_1TINKER_a331d0a44302cacd6a0034524f06c01ab}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!B@{B}}
+\index{B@{B}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{B}{B}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+B}
+
+
+
+Definition at line 889 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_aa1186969c31ca79849f82fe4fd6babc5}\label{classsrc_1_1tinkerio_1_1TINKER_aa1186969c31ca79849f82fe4fd6babc5}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!key@{key}}
+\index{key@{key}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{key}{key}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+key}
+
+
+
+Definition at line 344 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a558cb6da144aa7afa7bf780b6236790e}\label{classsrc_1_1tinkerio_1_1TINKER_a558cb6da144aa7afa7bf780b6236790e}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!md\+\_\+trajectory@{md\+\_\+trajectory}}
+\index{md\+\_\+trajectory@{md\+\_\+trajectory}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{md\+\_\+trajectory}{md\_trajectory}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+md\+\_\+trajectory}
+
+
+
+Definition at line 985 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a7e289d80130b39f2974f5b896cb4f695}\label{classsrc_1_1tinkerio_1_1TINKER_a7e289d80130b39f2974f5b896cb4f695}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!mol@{mol}}
+\index{mol@{mol}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{mol}{mol}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+mol}
+
+
+
+Definition at line 347 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_ac4f3fc8871832348c61e63d9ef5862a2}\label{classsrc_1_1tinkerio_1_1TINKER_ac4f3fc8871832348c61e63d9ef5862a2}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!pbc@{pbc}}
+\index{pbc@{pbc}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{pbc}{pbc}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+pbc}
+
+
+
+Definition at line 466 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_aaffe954cc7e2c94ec3aa8cffd62710d2}\label{classsrc_1_1tinkerio_1_1TINKER_aaffe954cc7e2c94ec3aa8cffd62710d2}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!prm@{prm}}
+\index{prm@{prm}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{prm}{prm}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+prm}
+
+
+
+Definition at line 345 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_add22ce1946dd0ae635ce0a86e7f69818}\label{classsrc_1_1tinkerio_1_1TINKER_add22ce1946dd0ae635ce0a86e7f69818}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!rigid@{rigid}}
+\index{rigid@{rigid}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{rigid}{rigid}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+rigid}
+
+
+
+Attempt to set some \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} options. 
+
+
+
+Definition at line 404 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a8625afea305c83c9a8505f42c0f045ae}\label{classsrc_1_1tinkerio_1_1TINKER_a8625afea305c83c9a8505f42c0f045ae}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!tinkerpath@{tinkerpath}}
+\index{tinkerpath@{tinkerpath}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{tinkerpath}{tinkerpath}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+tinkerpath}
+
+
+
+The directory containing \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} executables (e.\+g. 
+
+dynamic) 
+
+Definition at line 329 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a5e0c3f1a0834a4c6f3239a59901cd040}\label{classsrc_1_1tinkerio_1_1TINKER_a5e0c3f1a0834a4c6f3239a59901cd040}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!valkwd@{valkwd}}
+\index{valkwd@{valkwd}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{valkwd}{valkwd}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+valkwd}
+
+
+
+Keyword args that aren\textquotesingle{}t in this list are filtered out. 
+
+
+
+Definition at line 318 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1TINKER_a504b2ebca5c7f2797aa213c5a38002af}\label{classsrc_1_1tinkerio_1_1TINKER_a504b2ebca5c7f2797aa213c5a38002af}} 
+\index{src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}!warn\+\_\+vn@{warn\+\_\+vn}}
+\index{warn\+\_\+vn@{warn\+\_\+vn}!src\+::tinkerio\+::\+T\+I\+N\+K\+ER@{src\+::tinkerio\+::\+T\+I\+N\+K\+ER}}
+\paragraph{\texorpdfstring{warn\+\_\+vn}{warn\_vn}}
+{\footnotesize\ttfamily src.\+tinkerio.\+T\+I\+N\+K\+E\+R.\+warn\+\_\+vn}
+
+
+
+Definition at line 319 of file tinkerio.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{tinkerio_8py}{tinkerio.\+py}\end{DoxyCompactItemize}

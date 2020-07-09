@@ -1,0 +1,576 @@
+\hypertarget{classsrc_1_1hydration_1_1Hydration}{}\subsection{src.\+hydration.\+Hydration Class Reference}
+\label{classsrc_1_1hydration_1_1Hydration}\index{src.\+hydration.\+Hydration@{src.\+hydration.\+Hydration}}
+
+
+Subclass of Target for fitting force fields to hydration free energies.  
+
+
+
+
+Inheritance diagram for src.\+hydration.\+Hydration\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{classsrc_1_1hydration_1_1Hydration__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+hydration.\+Hydration\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=211pt]{classsrc_1_1hydration_1_1Hydration__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_a367023ded700f1b67e3b26d3869c6c7b}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\begin{DoxyCompactList}\small\item\em Initialization. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_ae5cf28d296c63f8cbd125880fbf8d123}{read\+\_\+reference\+\_\+data} (self)
+\begin{DoxyCompactList}\small\item\em Read the reference hydrational data from a file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_a6125922f50fa7e55aece75245d4b3cfb}{run\+\_\+simulation} (self, label, liq, A\+Grad=True)
+\begin{DoxyCompactList}\small\item\em Submit a simulation to the Work Queue or run it locally. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_a7eb7a345cb235a28828b51fc092902c2}{submit\+\_\+liq\+\_\+gas} (self, mvals, A\+Grad=True)
+\begin{DoxyCompactList}\small\item\em Set up and submit/run sampling simulations in the liquid and gas phases. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_a09b7d661320caa13bf94b198e4293156}{submit\+\_\+jobs} (self, mvals, A\+Grad=True, A\+Hess=True)
+\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_a8da7e34334a6872393258829726d2407}{build\+\_\+engines} (self)
+\begin{DoxyCompactList}\small\item\em Create a list of engines which are used to calculate H\+F\+Es using single point evaluation. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_adbe65779ff1ec23208f16ee0a7392a97}{indicate} (self)
+\begin{DoxyCompactList}\small\item\em Print qualitative indicator. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_a5de8c3c6f83356cacbaf95c8514f1eb1}{hydration\+\_\+driver\+\_\+sp} (self)
+\begin{DoxyCompactList}\small\item\em Calculate H\+F\+Es using single point evaluation. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_aedb0b81f516f946514ec4e1bc4c0f689}{get\+\_\+sp} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em Get the hydration free energy and first parameteric derivatives using single point energy evaluations. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_a4f0f4e2131130f0c59b1ace29eb78001}{get\+\_\+exp} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em Get the hydration free energy using the Zwanzig formula. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_a38cd994b0a967cae32096b80c4e630a9}{get\+\_\+ti2} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em Get the hydration free energy using two-\/point thermodynamic integration. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1hydration_1_1Hydration_adecf668bde832dee5cbb038873bcce57}{get} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em Evaluate objective function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_aa01ef107124d5ceaf4b37b4aa3ce24ea}{last\+\_\+traj}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a82b277dcc04c151770a4d19c391e5643}{extra\+\_\+output}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_ad83fb8ec772c28e7bd851fa01ebea5e8}{loop\+\_\+over\+\_\+snapshots}
+\begin{DoxyCompactList}\small\item\em L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a06f258414131a1e0abd30a2a4152f60d}{datafile}
+\begin{DoxyCompactList}\small\item\em The vdata.\+txt file that contains the hydrations. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a89c98ff979b976c89ca6e50390133b17}{engine\+\_\+opts}
+\begin{DoxyCompactList}\small\item\em Scripts to be copied from the \hyperlink{namespaceForceBalance}{Force\+Balance} installation directory. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a8053e79c16d43bbfba4f2def46fb8aad}{I\+Ds}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a92fe873f2e1ee179471186e7d3baf0ca}{expval}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_adceb5d1a7918ff9778ad33de0ce0b6ce}{experr}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a721881a1e18fc304f04ef00f2611985f}{nicknames}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a5aebe5836c3b10532e0c9e563aa2c6ef}{have\+\_\+nicks}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_af800dc1689f06da18223710de5cd987c}{have\+\_\+experr}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_ab0f66321c4a27282ea77585d41690938}{molecules}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_ab5c9e3135020a9cfbb6e40932d52d939}{whfe}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a161aab5e098f13ac8006ea8415814580}{engines}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a1efd13384f5ae61c3d124b4a60919f20}{liq\+\_\+engines}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a55f0671efcada5ea131aff966f43b5df}{gas\+\_\+engines}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_afe9e88569404d2b0b336cd5d4556e735}{hfe\+\_\+dict}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a0ba698316e9f13844f33a2d536e96fa5}{hfe\+\_\+err}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a5059eb3df02b9115866760fbc77927bc}{hfemode}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a094fd3625680a572a4de38011818eefb}{calc}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a3e5f36ed28f145dc611c3b156942c144}{calc\+\_\+err}
+\item 
+\hyperlink{classsrc_1_1hydration_1_1Hydration_a30d497d5cfd6b84611b5a4dbfe702ef8}{objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for fitting force fields to hydration free energies. 
+
+
+
+Definition at line 26 of file hydration.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a367023ded700f1b67e3b26d3869c6c7b}\label{classsrc_1_1hydration_1_1Hydration_a367023ded700f1b67e3b26d3869c6c7b}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Initialization. 
+
+
+
+Definition at line 31 of file hydration.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1hydration_1_1Hydration_a367023ded700f1b67e3b26d3869c6c7b_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a8da7e34334a6872393258829726d2407}\label{classsrc_1_1hydration_1_1Hydration_a8da7e34334a6872393258829726d2407}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!build\+\_\+engines@{build\+\_\+engines}}
+\index{build\+\_\+engines@{build\+\_\+engines}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{build\+\_\+engines()}{build\_engines()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+build\+\_\+engines (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Create a list of engines which are used to calculate H\+F\+Es using single point evaluation. 
+
+
+
+Definition at line 266 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_adecf668bde832dee5cbb038873bcce57}\label{classsrc_1_1hydration_1_1Hydration_adecf668bde832dee5cbb038873bcce57}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!get@{get}}
+\index{get@{get}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Evaluate objective function. 
+
+
+
+Definition at line 438 of file hydration.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1hydration_1_1Hydration_adecf668bde832dee5cbb038873bcce57_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a4f0f4e2131130f0c59b1ace29eb78001}\label{classsrc_1_1hydration_1_1Hydration_a4f0f4e2131130f0c59b1ace29eb78001}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!get\+\_\+exp@{get\+\_\+exp}}
+\index{get\+\_\+exp@{get\+\_\+exp}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{get\+\_\+exp()}{get\_exp()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+get\+\_\+exp (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Get the hydration free energy using the Zwanzig formula. 
+
+We will obtain two different estimates along with their uncertainties. 
+
+Definition at line 335 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_aedb0b81f516f946514ec4e1bc4c0f689}\label{classsrc_1_1hydration_1_1Hydration_aedb0b81f516f946514ec4e1bc4c0f689}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!get\+\_\+sp@{get\+\_\+sp}}
+\index{get\+\_\+sp@{get\+\_\+sp}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{get\+\_\+sp()}{get\_sp()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+get\+\_\+sp (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Get the hydration free energy and first parameteric derivatives using single point energy evaluations. 
+
+
+
+Definition at line 320 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a38cd994b0a967cae32096b80c4e630a9}\label{classsrc_1_1hydration_1_1Hydration_a38cd994b0a967cae32096b80c4e630a9}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!get\+\_\+ti2@{get\+\_\+ti2}}
+\index{get\+\_\+ti2@{get\+\_\+ti2}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{get\+\_\+ti2()}{get\_ti2()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+get\+\_\+ti2 (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Get the hydration free energy using two-\/point thermodynamic integration. 
+
+
+
+Definition at line 403 of file hydration.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1hydration_1_1Hydration_a38cd994b0a967cae32096b80c4e630a9_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a5de8c3c6f83356cacbaf95c8514f1eb1}\label{classsrc_1_1hydration_1_1Hydration_a5de8c3c6f83356cacbaf95c8514f1eb1}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!hydration\+\_\+driver\+\_\+sp@{hydration\+\_\+driver\+\_\+sp}}
+\index{hydration\+\_\+driver\+\_\+sp@{hydration\+\_\+driver\+\_\+sp}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{hydration\+\_\+driver\+\_\+sp()}{hydration\_driver\_sp()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+hydration\+\_\+driver\+\_\+sp (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Calculate H\+F\+Es using single point evaluation. 
+
+
+
+Definition at line 310 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_adbe65779ff1ec23208f16ee0a7392a97}\label{classsrc_1_1hydration_1_1Hydration_adbe65779ff1ec23208f16ee0a7392a97}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Print qualitative indicator. 
+
+
+
+Definition at line 277 of file hydration.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1hydration_1_1Hydration_adbe65779ff1ec23208f16ee0a7392a97_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_ae5cf28d296c63f8cbd125880fbf8d123}\label{classsrc_1_1hydration_1_1Hydration_ae5cf28d296c63f8cbd125880fbf8d123}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}}
+\index{read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{read\+\_\+reference\+\_\+data()}{read\_reference\_data()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+read\+\_\+reference\+\_\+data (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Read the reference hydrational data from a file. 
+
+
+
+Definition at line 114 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a6125922f50fa7e55aece75245d4b3cfb}\label{classsrc_1_1hydration_1_1Hydration_a6125922f50fa7e55aece75245d4b3cfb}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!run\+\_\+simulation@{run\+\_\+simulation}}
+\index{run\+\_\+simulation@{run\+\_\+simulation}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{run\+\_\+simulation()}{run\_simulation()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+run\+\_\+simulation (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{label,  }\item[{}]{liq,  }\item[{}]{A\+Grad = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Submit a simulation to the Work Queue or run it locally. 
+
+Inputs\+: label = The name of the molecule (and hopefully the folder name that you\textquotesingle{}re running in) liq = True/false flag indicating whether to run in liquid or gas phase 
+
+Definition at line 169 of file hydration.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1hydration_1_1Hydration_a6125922f50fa7e55aece75245d4b3cfb_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a09b7d661320caa13bf94b198e4293156}\label{classsrc_1_1hydration_1_1Hydration_a09b7d661320caa13bf94b198e4293156}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!submit\+\_\+jobs@{submit\+\_\+jobs}}
+\index{submit\+\_\+jobs@{submit\+\_\+jobs}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{submit\+\_\+jobs()}{submit\_jobs()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+submit\+\_\+jobs (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 253 of file hydration.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1hydration_1_1Hydration_a09b7d661320caa13bf94b198e4293156_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a7eb7a345cb235a28828b51fc092902c2}\label{classsrc_1_1hydration_1_1Hydration_a7eb7a345cb235a28828b51fc092902c2}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!submit\+\_\+liq\+\_\+gas@{submit\+\_\+liq\+\_\+gas}}
+\index{submit\+\_\+liq\+\_\+gas@{submit\+\_\+liq\+\_\+gas}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{submit\+\_\+liq\+\_\+gas()}{submit\_liq\_gas()}}
+{\footnotesize\ttfamily def src.\+hydration.\+Hydration.\+submit\+\_\+liq\+\_\+gas (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Set up and submit/run sampling simulations in the liquid and gas phases. 
+
+
+
+Definition at line 227 of file hydration.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1hydration_1_1Hydration_a7eb7a345cb235a28828b51fc092902c2_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a094fd3625680a572a4de38011818eefb}\label{classsrc_1_1hydration_1_1Hydration_a094fd3625680a572a4de38011818eefb}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!calc@{calc}}
+\index{calc@{calc}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{calc}{calc}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+calc}
+
+
+
+Definition at line 452 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a3e5f36ed28f145dc611c3b156942c144}\label{classsrc_1_1hydration_1_1Hydration_a3e5f36ed28f145dc611c3b156942c144}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!calc\+\_\+err@{calc\+\_\+err}}
+\index{calc\+\_\+err@{calc\+\_\+err}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{calc\+\_\+err}{calc\_err}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+calc\+\_\+err}
+
+
+
+Definition at line 454 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a06f258414131a1e0abd30a2a4152f60d}\label{classsrc_1_1hydration_1_1Hydration_a06f258414131a1e0abd30a2a4152f60d}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!datafile@{datafile}}
+\index{datafile@{datafile}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{datafile}{datafile}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+datafile}
+
+
+
+The vdata.\+txt file that contains the hydrations. 
+
+
+
+Definition at line 81 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a89c98ff979b976c89ca6e50390133b17}\label{classsrc_1_1hydration_1_1Hydration_a89c98ff979b976c89ca6e50390133b17}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!engine\+\_\+opts@{engine\+\_\+opts}}
+\index{engine\+\_\+opts@{engine\+\_\+opts}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{engine\+\_\+opts}{engine\_opts}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+engine\+\_\+opts}
+
+
+
+Scripts to be copied from the \hyperlink{namespaceForceBalance}{Force\+Balance} installation directory. 
+
+Read in the reference data Set engname in Option\+Dict, which gets printed to disk. This is far from an ideal solution... Copy target options into engine options. 
+
+Definition at line 90 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a161aab5e098f13ac8006ea8415814580}\label{classsrc_1_1hydration_1_1Hydration_a161aab5e098f13ac8006ea8415814580}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!engines@{engines}}
+\index{engines@{engines}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{engines}{engines}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+engines}
+
+
+
+Definition at line 267 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_adceb5d1a7918ff9778ad33de0ce0b6ce}\label{classsrc_1_1hydration_1_1Hydration_adceb5d1a7918ff9778ad33de0ce0b6ce}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!experr@{experr}}
+\index{experr@{experr}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{experr}{experr}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+experr}
+
+
+
+Definition at line 118 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a92fe873f2e1ee179471186e7d3baf0ca}\label{classsrc_1_1hydration_1_1Hydration_a92fe873f2e1ee179471186e7d3baf0ca}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!expval@{expval}}
+\index{expval@{expval}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{expval}{expval}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+expval}
+
+
+
+Definition at line 117 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a82b277dcc04c151770a4d19c391e5643}\label{classsrc_1_1hydration_1_1Hydration_a82b277dcc04c151770a4d19c391e5643}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!extra\+\_\+output@{extra\+\_\+output}}
+\index{extra\+\_\+output@{extra\+\_\+output}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{extra\+\_\+output}{extra\_output}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+extra\+\_\+output}
+
+
+
+Definition at line 72 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a55f0671efcada5ea131aff966f43b5df}\label{classsrc_1_1hydration_1_1Hydration_a55f0671efcada5ea131aff966f43b5df}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!gas\+\_\+engines@{gas\+\_\+engines}}
+\index{gas\+\_\+engines@{gas\+\_\+engines}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{gas\+\_\+engines}{gas\_engines}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+gas\+\_\+engines}
+
+
+
+Definition at line 269 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_af800dc1689f06da18223710de5cd987c}\label{classsrc_1_1hydration_1_1Hydration_af800dc1689f06da18223710de5cd987c}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!have\+\_\+experr@{have\+\_\+experr}}
+\index{have\+\_\+experr@{have\+\_\+experr}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{have\+\_\+experr}{have\_experr}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+have\+\_\+experr}
+
+
+
+Definition at line 125 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a5aebe5836c3b10532e0c9e563aa2c6ef}\label{classsrc_1_1hydration_1_1Hydration_a5aebe5836c3b10532e0c9e563aa2c6ef}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!have\+\_\+nicks@{have\+\_\+nicks}}
+\index{have\+\_\+nicks@{have\+\_\+nicks}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{have\+\_\+nicks}{have\_nicks}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+have\+\_\+nicks}
+
+
+
+Definition at line 123 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_afe9e88569404d2b0b336cd5d4556e735}\label{classsrc_1_1hydration_1_1Hydration_afe9e88569404d2b0b336cd5d4556e735}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!hfe\+\_\+dict@{hfe\+\_\+dict}}
+\index{hfe\+\_\+dict@{hfe\+\_\+dict}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{hfe\+\_\+dict}{hfe\_dict}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+hfe\+\_\+dict}
+
+
+
+Definition at line 323 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a0ba698316e9f13844f33a2d536e96fa5}\label{classsrc_1_1hydration_1_1Hydration_a0ba698316e9f13844f33a2d536e96fa5}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!hfe\+\_\+err@{hfe\+\_\+err}}
+\index{hfe\+\_\+err@{hfe\+\_\+err}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{hfe\+\_\+err}{hfe\_err}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+hfe\+\_\+err}
+
+
+
+Definition at line 337 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a5059eb3df02b9115866760fbc77927bc}\label{classsrc_1_1hydration_1_1Hydration_a5059eb3df02b9115866760fbc77927bc}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!hfemode@{hfemode}}
+\index{hfemode@{hfemode}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{hfemode}{hfemode}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+hfemode}
+
+
+
+Definition at line 379 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a8053e79c16d43bbfba4f2def46fb8aad}\label{classsrc_1_1hydration_1_1Hydration_a8053e79c16d43bbfba4f2def46fb8aad}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!I\+Ds@{I\+Ds}}
+\index{I\+Ds@{I\+Ds}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{I\+Ds}{IDs}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+I\+Ds}
+
+
+
+Definition at line 116 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_aa01ef107124d5ceaf4b37b4aa3ce24ea}\label{classsrc_1_1hydration_1_1Hydration_aa01ef107124d5ceaf4b37b4aa3ce24ea}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!last\+\_\+traj@{last\+\_\+traj}}
+\index{last\+\_\+traj@{last\+\_\+traj}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{last\+\_\+traj}{last\_traj}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+last\+\_\+traj}
+
+
+
+Definition at line 70 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a1efd13384f5ae61c3d124b4a60919f20}\label{classsrc_1_1hydration_1_1Hydration_a1efd13384f5ae61c3d124b4a60919f20}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!liq\+\_\+engines@{liq\+\_\+engines}}
+\index{liq\+\_\+engines@{liq\+\_\+engines}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{liq\+\_\+engines}{liq\_engines}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+liq\+\_\+engines}
+
+
+
+Definition at line 268 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_ad83fb8ec772c28e7bd851fa01ebea5e8}\label{classsrc_1_1hydration_1_1Hydration_ad83fb8ec772c28e7bd851fa01ebea5e8}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}}
+\index{loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{loop\+\_\+over\+\_\+snapshots}{loop\_over\_snapshots}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+loop\+\_\+over\+\_\+snapshots}
+
+
+
+L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. 
+
+
+
+Definition at line 79 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_ab0f66321c4a27282ea77585d41690938}\label{classsrc_1_1hydration_1_1Hydration_ab0f66321c4a27282ea77585d41690938}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!molecules@{molecules}}
+\index{molecules@{molecules}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{molecules}{molecules}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+molecules}
+
+
+
+Definition at line 150 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a721881a1e18fc304f04ef00f2611985f}\label{classsrc_1_1hydration_1_1Hydration_a721881a1e18fc304f04ef00f2611985f}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!nicknames@{nicknames}}
+\index{nicknames@{nicknames}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{nicknames}{nicknames}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+nicknames}
+
+
+
+Definition at line 119 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_a30d497d5cfd6b84611b5a4dbfe702ef8}\label{classsrc_1_1hydration_1_1Hydration_a30d497d5cfd6b84611b5a4dbfe702ef8}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!objective@{objective}}
+\index{objective@{objective}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{objective}{objective}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+objective}
+
+
+
+Definition at line 455 of file hydration.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1hydration_1_1Hydration_ab5c9e3135020a9cfbb6e40932d52d939}\label{classsrc_1_1hydration_1_1Hydration_ab5c9e3135020a9cfbb6e40932d52d939}} 
+\index{src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}!whfe@{whfe}}
+\index{whfe@{whfe}!src\+::hydration\+::\+Hydration@{src\+::hydration\+::\+Hydration}}
+\paragraph{\texorpdfstring{whfe}{whfe}}
+{\footnotesize\ttfamily src.\+hydration.\+Hydration.\+whfe}
+
+
+
+Definition at line 157 of file hydration.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{hydration_8py}{hydration.\+py}\end{DoxyCompactItemize}

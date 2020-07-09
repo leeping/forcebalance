@@ -1,0 +1,229 @@
+\hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4}{}\subsection{src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4 Class Reference}
+\label{classsrc_1_1psi4io_1_1THCDF__Psi4}\index{src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+
+
+Inheritance diagram for src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsrc_1_1psi4io_1_1THCDF__Psi4__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsrc_1_1psi4io_1_1THCDF__Psi4__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_a7d4a0b9b75eb7caa84888df5d1903f04}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_a3201f4428d75dd17f9fed6e726117da6}{prepare\+\_\+temp\+\_\+directory} (self, options, tgt\+\_\+opts)
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_ac1e457fe0a426c122707e8f8937b3379}{indicate} (self)
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_a4fb94880d038f875460abd67e18bdf43}{write\+\_\+nested\+\_\+destroy} (self, fnm, linedestroy)
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_a88a67530b2c9d2a292fc4422930475a1}{driver} (self)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_ad6c23d45f1ef61411786511a93ba7915}{Molecules}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_ac96b467db68c670a676f358a3d638803}{throw\+\_\+outs}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_a82c2668ab89ffba239e31582ac903aa2}{Elements}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_aea313365961c9298848ea616d9c4848f}{G\+B\+Sfnm}
+\begin{DoxyCompactList}\small\item\em Psi4 basis set file. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_a25b5e4a9c2d9d771d419fcdf0803a08a}{D\+A\+Tfnm}
+\begin{DoxyCompactList}\small\item\em Psi4 input file for calculation of linear dependencies This is actually a file in \textquotesingle{}forcefield\textquotesingle{} until we can figure out a better system. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_af2a60fba0aa2ed33acb19569b1e2c32e}{M\+P2\+\_\+\+Energy}
+\begin{DoxyCompactList}\small\item\em Actually run P\+S\+I4. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1psi4io_1_1THCDF__Psi4_a9991811b534a0015ad2eb6e5a2b4f477}{D\+F\+\_\+\+Energy}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+
+
+Definition at line 101 of file psi4io.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_a7d4a0b9b75eb7caa84888df5d1903f04}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_a7d4a0b9b75eb7caa84888df5d1903f04}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 103 of file psi4io.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_a88a67530b2c9d2a292fc4422930475a1}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_a88a67530b2c9d2a292fc4422930475a1}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!driver@{driver}}
+\index{driver@{driver}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{driver()}{driver()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+driver (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 179 of file psi4io.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1psi4io_1_1THCDF__Psi4_a88a67530b2c9d2a292fc4422930475a1_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_ac1e457fe0a426c122707e8f8937b3379}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_ac1e457fe0a426c122707e8f8937b3379}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 159 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_a3201f4428d75dd17f9fed6e726117da6}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_a3201f4428d75dd17f9fed6e726117da6}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!prepare\+\_\+temp\+\_\+directory@{prepare\+\_\+temp\+\_\+directory}}
+\index{prepare\+\_\+temp\+\_\+directory@{prepare\+\_\+temp\+\_\+directory}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{prepare\+\_\+temp\+\_\+directory()}{prepare\_temp\_directory()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+prepare\+\_\+temp\+\_\+directory (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts }\end{DoxyParamCaption})}
+
+
+
+Definition at line 148 of file psi4io.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1psi4io_1_1THCDF__Psi4_a3201f4428d75dd17f9fed6e726117da6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_a4fb94880d038f875460abd67e18bdf43}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_a4fb94880d038f875460abd67e18bdf43}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!write\+\_\+nested\+\_\+destroy@{write\+\_\+nested\+\_\+destroy}}
+\index{write\+\_\+nested\+\_\+destroy@{write\+\_\+nested\+\_\+destroy}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{write\+\_\+nested\+\_\+destroy()}{write\_nested\_destroy()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+write\+\_\+nested\+\_\+destroy (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{linedestroy }\end{DoxyParamCaption})}
+
+
+
+Definition at line 164 of file psi4io.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1psi4io_1_1THCDF__Psi4_a4fb94880d038f875460abd67e18bdf43_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_a25b5e4a9c2d9d771d419fcdf0803a08a}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_a25b5e4a9c2d9d771d419fcdf0803a08a}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!D\+A\+Tfnm@{D\+A\+Tfnm}}
+\index{D\+A\+Tfnm@{D\+A\+Tfnm}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{D\+A\+Tfnm}{DATfnm}}
+{\footnotesize\ttfamily src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+D\+A\+Tfnm}
+
+
+
+Psi4 input file for calculation of linear dependencies This is actually a file in \textquotesingle{}forcefield\textquotesingle{} until we can figure out a better system. 
+
+
+
+Definition at line 144 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_a9991811b534a0015ad2eb6e5a2b4f477}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_a9991811b534a0015ad2eb6e5a2b4f477}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!D\+F\+\_\+\+Energy@{D\+F\+\_\+\+Energy}}
+\index{D\+F\+\_\+\+Energy@{D\+F\+\_\+\+Energy}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{D\+F\+\_\+\+Energy}{DF\_Energy}}
+{\footnotesize\ttfamily src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+D\+F\+\_\+\+Energy}
+
+
+
+Definition at line 245 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_a82c2668ab89ffba239e31582ac903aa2}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_a82c2668ab89ffba239e31582ac903aa2}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!Elements@{Elements}}
+\index{Elements@{Elements}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{Elements}{Elements}}
+{\footnotesize\ttfamily src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+Elements}
+
+
+
+Definition at line 121 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_aea313365961c9298848ea616d9c4848f}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_aea313365961c9298848ea616d9c4848f}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!G\+B\+Sfnm@{G\+B\+Sfnm}}
+\index{G\+B\+Sfnm@{G\+B\+Sfnm}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{G\+B\+Sfnm}{GBSfnm}}
+{\footnotesize\ttfamily src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+G\+B\+Sfnm}
+
+
+
+Psi4 basis set file. 
+
+
+
+Definition at line 137 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_ad6c23d45f1ef61411786511a93ba7915}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_ad6c23d45f1ef61411786511a93ba7915}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!Molecules@{Molecules}}
+\index{Molecules@{Molecules}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{Molecules}{Molecules}}
+{\footnotesize\ttfamily src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+Molecules}
+
+
+
+Definition at line 109 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_af2a60fba0aa2ed33acb19569b1e2c32e}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_af2a60fba0aa2ed33acb19569b1e2c32e}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!M\+P2\+\_\+\+Energy@{M\+P2\+\_\+\+Energy}}
+\index{M\+P2\+\_\+\+Energy@{M\+P2\+\_\+\+Energy}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{M\+P2\+\_\+\+Energy}{MP2\_Energy}}
+{\footnotesize\ttfamily src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+M\+P2\+\_\+\+Energy}
+
+
+
+Actually run P\+S\+I4. 
+
+Read in the commented linindep.\+gbs file and ensure that these same lines are commented in the new .gbs file Now build a \char`\"{}\+Frankenstein\char`\"{} .gbs file composed of the original .gbs file but with data from the linindep.\+gbs file! 
+
+Definition at line 243 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1THCDF__Psi4_ac96b467db68c670a676f358a3d638803}\label{classsrc_1_1psi4io_1_1THCDF__Psi4_ac96b467db68c670a676f358a3d638803}} 
+\index{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}!throw\+\_\+outs@{throw\+\_\+outs}}
+\index{throw\+\_\+outs@{throw\+\_\+outs}!src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4@{src\+::psi4io\+::\+T\+H\+C\+D\+F\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{throw\+\_\+outs}{throw\_outs}}
+{\footnotesize\ttfamily src.\+psi4io.\+T\+H\+C\+D\+F\+\_\+\+Psi4.\+throw\+\_\+outs}
+
+
+
+Definition at line 110 of file psi4io.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{psi4io_8py}{psi4io.\+py}\end{DoxyCompactItemize}

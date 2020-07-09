@@ -1,0 +1,234 @@
+\hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader}{}\subsection{src.\+amberio.\+Frc\+Mod\+\_\+\+Reader Class Reference}
+\label{classsrc_1_1amberio_1_1FrcMod__Reader}\index{src.\+amberio.\+Frc\+Mod\+\_\+\+Reader@{src.\+amberio.\+Frc\+Mod\+\_\+\+Reader}}
+
+
+Finite state machine for parsing Frc\+Mod force field file.  
+
+
+
+
+Inheritance diagram for src.\+amberio.\+Frc\+Mod\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{classsrc_1_1amberio_1_1FrcMod__Reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+amberio.\+Frc\+Mod\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{classsrc_1_1amberio_1_1FrcMod__Reader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_ae02ce386979c358fc0d787aeba26b075}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, fnm)
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_ab518c55f9e66b28b63cdda98b8cc0326}{Split} (self, line)
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_a3921bf9a63d89bc3b9b325e2bf89a260}{Whites} (self, line)
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_a63c8983b5014ae23c3b0fdc0ab4cf551}{build\+\_\+pid} (self, pfld)
+\begin{DoxyCompactList}\small\item\em Returns the parameter type (e.\+g. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_af04da824acce802babb9dca8efc01468}{feed} (self, line)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_a092ccdf66bcdb2cbe7055976f8c28692}{pdict}
+\begin{DoxyCompactList}\small\item\em The parameter dictionary (defined in this file) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_a65e6938b4f227e59d70fa7396d0f886c}{atom}
+\begin{DoxyCompactList}\small\item\em The atom numbers in the interaction (stored in the parser) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_ae060143c69c47c451a2672207fa3897f}{dihe}
+\begin{DoxyCompactList}\small\item\em Whether we\textquotesingle{}re inside the dihedral section. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_a82b9c0b5a62702f5dfee3c184fc53c3a}{adict}
+\begin{DoxyCompactList}\small\item\em The frcmod file never has any atoms in it. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_a20700e7532ced1e35920d60fd427cfc6}{itype}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_a8a520334a1ed4fdbea0796e4e22420f0}{have\+Atom\+Line}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1FrcMod__Reader_a1dec6c8365204e03c9dc27b9fa07bfa6}{suffix}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Finite state machine for parsing Frc\+Mod force field file. 
+
+
+
+Definition at line 556 of file amberio.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_ae02ce386979c358fc0d787aeba26b075}\label{classsrc_1_1amberio_1_1FrcMod__Reader_ae02ce386979c358fc0d787aeba26b075}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm }\end{DoxyParamCaption})}
+
+
+
+Definition at line 558 of file amberio.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_a63c8983b5014ae23c3b0fdc0ab4cf551}\label{classsrc_1_1amberio_1_1FrcMod__Reader_a63c8983b5014ae23c3b0fdc0ab4cf551}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!build\+\_\+pid@{build\+\_\+pid}}
+\index{build\+\_\+pid@{build\+\_\+pid}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{build\+\_\+pid()}{build\_pid()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+build\+\_\+pid (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{pfld }\end{DoxyParamCaption})}
+
+
+
+Returns the parameter type (e.\+g. 
+
+K in B\+O\+N\+D\+SK) based on the current interaction type.
+
+Both the \textquotesingle{}pdict\textquotesingle{} dictionary (see \hyperlink{namespacesrc_1_1gmxio_ad55e036d51846e3440a373c57439dffa}{gmxio.\+pdict}) and the interaction type \textquotesingle{}state\textquotesingle{} (here, B\+O\+N\+DS) are needed to get the parameter type.
+
+If, however, \textquotesingle{}pdict\textquotesingle{} does not contain the ptype value, a suitable substitute is simply the field number.
+
+Note that if the interaction type state is not set, then it defaults to the file name, so a generic parameter ID is \textquotesingle{}filename.\+line\+\_\+num.\+field\+\_\+num\textquotesingle{} 
+
+Definition at line 592 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_af04da824acce802babb9dca8efc01468}\label{classsrc_1_1amberio_1_1FrcMod__Reader_af04da824acce802babb9dca8efc01468}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!feed@{feed}}
+\index{feed@{feed}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{feed()}{feed()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+feed (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Definition at line 603 of file amberio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=343pt]{classsrc_1_1amberio_1_1FrcMod__Reader_af04da824acce802babb9dca8efc01468_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_ab518c55f9e66b28b63cdda98b8cc0326}\label{classsrc_1_1amberio_1_1FrcMod__Reader_ab518c55f9e66b28b63cdda98b8cc0326}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!Split@{Split}}
+\index{Split@{Split}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{Split()}{Split()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+Split (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Definition at line 570 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_a3921bf9a63d89bc3b9b325e2bf89a260}\label{classsrc_1_1amberio_1_1FrcMod__Reader_a3921bf9a63d89bc3b9b325e2bf89a260}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!Whites@{Whites}}
+\index{Whites@{Whites}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{Whites()}{Whites()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+Whites (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Definition at line 573 of file amberio.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_a82b9c0b5a62702f5dfee3c184fc53c3a}\label{classsrc_1_1amberio_1_1FrcMod__Reader_a82b9c0b5a62702f5dfee3c184fc53c3a}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!adict@{adict}}
+\index{adict@{adict}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{adict}{adict}}
+{\footnotesize\ttfamily src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+adict}
+
+
+
+The frcmod file never has any atoms in it. 
+
+
+
+Definition at line 568 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_a65e6938b4f227e59d70fa7396d0f886c}\label{classsrc_1_1amberio_1_1FrcMod__Reader_a65e6938b4f227e59d70fa7396d0f886c}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!atom@{atom}}
+\index{atom@{atom}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{atom}{atom}}
+{\footnotesize\ttfamily src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+atom}
+
+
+
+The atom numbers in the interaction (stored in the parser) 
+
+
+
+Definition at line 564 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_ae060143c69c47c451a2672207fa3897f}\label{classsrc_1_1amberio_1_1FrcMod__Reader_ae060143c69c47c451a2672207fa3897f}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!dihe@{dihe}}
+\index{dihe@{dihe}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{dihe}{dihe}}
+{\footnotesize\ttfamily src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+dihe}
+
+
+
+Whether we\textquotesingle{}re inside the dihedral section. 
+
+
+
+Definition at line 566 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_a8a520334a1ed4fdbea0796e4e22420f0}\label{classsrc_1_1amberio_1_1FrcMod__Reader_a8a520334a1ed4fdbea0796e4e22420f0}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!have\+Atom\+Line@{have\+Atom\+Line}}
+\index{have\+Atom\+Line@{have\+Atom\+Line}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{have\+Atom\+Line}{haveAtomLine}}
+{\footnotesize\ttfamily src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+have\+Atom\+Line}
+
+
+
+Definition at line 638 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_a20700e7532ced1e35920d60fd427cfc6}\label{classsrc_1_1amberio_1_1FrcMod__Reader_a20700e7532ced1e35920d60fd427cfc6}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!itype@{itype}}
+\index{itype@{itype}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{itype}{itype}}
+{\footnotesize\ttfamily src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+itype}
+
+
+
+Definition at line 614 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_a092ccdf66bcdb2cbe7055976f8c28692}\label{classsrc_1_1amberio_1_1FrcMod__Reader_a092ccdf66bcdb2cbe7055976f8c28692}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{pdict}{pdict}}
+{\footnotesize\ttfamily src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+pdict}
+
+
+
+The parameter dictionary (defined in this file) 
+
+
+
+Definition at line 562 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1FrcMod__Reader_a1dec6c8365204e03c9dc27b9fa07bfa6}\label{classsrc_1_1amberio_1_1FrcMod__Reader_a1dec6c8365204e03c9dc27b9fa07bfa6}} 
+\index{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader@{src\+::amberio\+::\+Frc\+Mod\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{suffix}{suffix}}
+{\footnotesize\ttfamily src.\+amberio.\+Frc\+Mod\+\_\+\+Reader.\+suffix}
+
+
+
+Definition at line 653 of file amberio.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{amberio_8py}{amberio.\+py}\end{DoxyCompactItemize}

@@ -1,0 +1,307 @@
+\hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4}{}\subsection{src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4 Class Reference}
+\label{classsrc_1_1psi4io_1_1RDVR3__Psi4}\index{src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4@{src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4}}
+
+
+Subclass of Target for R-\/\+D\+V\+R3 grid fitting.  
+
+
+
+
+Inheritance diagram for src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsrc_1_1psi4io_1_1RDVR3__Psi4__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsrc_1_1psi4io_1_1RDVR3__Psi4__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_a53e16387e30639e452ed481c17e185c4}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_ae085fa527303ce6edea37e8312b4e349}{indicate} (self)
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_ac43c586173ba9bff909a1584862961ad}{submit\+\_\+jobs} (self, mvals, A\+Grad=True, A\+Hess=True)
+\begin{DoxyCompactList}\small\item\em Create a grid file and a psi4 input file in the absolute path and submit it to the work queue. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_a27e2839718816408337e0a2422add630}{driver} (self, mvals, d)
+\item 
+def \hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_a6addfdcc8d67ff8adcd99a03e30b8283}{get} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em L\+PW 04-\/17-\/2013. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_ad85ec673d9220de23817e40075f5d2be}{objfiles}
+\begin{DoxyCompactList}\small\item\em Which parameters are differentiated? \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_a60c43d0d5a864d47421fd3d184815400}{objvals}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_a783dcf33c771f9b91e59b02c86992d15}{elements}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_ae81122d2379aa7662e497bf7b297a806}{molecules}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_a969d0c1166f45a193539b831b191dfb4}{callderivs}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_a9142db3047f520ef90e452755e12cbd2}{factor}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_a843184b4cd705906a731bcb93b860f5a}{bidirect}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_a2648992726bc3635d52c3902c11990f8}{tdir}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_ae0fbbdcbde04025b429f2cf9a1a91d02}{objd}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_a659934765e7695acc592eb8da60cb4de}{gradd}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_ad47e40b30c3e97feb1b9933fedc78432}{hdiagd}
+\item 
+\hyperlink{classsrc_1_1psi4io_1_1RDVR3__Psi4_aee6a9ac7c958ce091beff18edcfb4c72}{objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for R-\/\+D\+V\+R3 grid fitting. 
+
+Main features\+:
+\begin{DoxyItemize}
+\item Multiple molecules are treated as a single target.
+\item R-\/\+D\+V\+R3 can only print out the objective function, it cannot print out the residual vector.
+\item We should be smart enough to mask derivatives. 
+\end{DoxyItemize}
+
+Definition at line 303 of file psi4io.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_a53e16387e30639e452ed481c17e185c4}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_a53e16387e30639e452ed481c17e185c4}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 306 of file psi4io.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_a27e2839718816408337e0a2422add630}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_a27e2839718816408337e0a2422add630}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!driver@{driver}}
+\index{driver@{driver}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{driver()}{driver()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+driver (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{d }\end{DoxyParamCaption})}
+
+
+
+Definition at line 419 of file psi4io.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1psi4io_1_1RDVR3__Psi4_a27e2839718816408337e0a2422add630_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_a6addfdcc8d67ff8adcd99a03e30b8283}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_a6addfdcc8d67ff8adcd99a03e30b8283}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!get@{get}}
+\index{get@{get}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+L\+PW 04-\/17-\/2013. 
+
+This subroutine builds the objective function from Psi4.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mvals} & Mathematical parameter values \\
+\hline
+\mbox{\tt in}  & {\em A\+Grad} & Switch to turn on analytic gradient \\
+\hline
+\mbox{\tt in}  & {\em A\+Hess} & Switch to turn on analytic Hessian \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Answer Contribution to the objective function 
+\end{DoxyReturn}
+
+
+Definition at line 456 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_ae085fa527303ce6edea37e8312b4e349}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_ae085fa527303ce6edea37e8312b4e349}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 346 of file psi4io.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1psi4io_1_1RDVR3__Psi4_ae085fa527303ce6edea37e8312b4e349_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_ac43c586173ba9bff909a1584862961ad}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_ac43c586173ba9bff909a1584862961ad}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!submit\+\_\+jobs@{submit\+\_\+jobs}}
+\index{submit\+\_\+jobs@{submit\+\_\+jobs}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{submit\+\_\+jobs()}{submit\_jobs()}}
+{\footnotesize\ttfamily def src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+submit\+\_\+jobs (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Create a grid file and a psi4 input file in the absolute path and submit it to the work queue. 
+
+
+
+Definition at line 355 of file psi4io.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_a843184b4cd705906a731bcb93b860f5a}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_a843184b4cd705906a731bcb93b860f5a}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!bidirect@{bidirect}}
+\index{bidirect@{bidirect}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{bidirect}{bidirect}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+bidirect}
+
+
+
+Definition at line 318 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_a969d0c1166f45a193539b831b191dfb4}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_a969d0c1166f45a193539b831b191dfb4}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!callderivs@{callderivs}}
+\index{callderivs@{callderivs}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{callderivs}{callderivs}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+callderivs}
+
+
+
+Definition at line 316 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_a783dcf33c771f9b91e59b02c86992d15}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_a783dcf33c771f9b91e59b02c86992d15}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!elements@{elements}}
+\index{elements@{elements}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{elements}{elements}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+elements}
+
+
+
+Definition at line 314 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_a9142db3047f520ef90e452755e12cbd2}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_a9142db3047f520ef90e452755e12cbd2}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!factor@{factor}}
+\index{factor@{factor}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{factor}{factor}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+factor}
+
+
+
+Definition at line 317 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_a659934765e7695acc592eb8da60cb4de}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_a659934765e7695acc592eb8da60cb4de}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!gradd@{gradd}}
+\index{gradd@{gradd}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{gradd}{gradd}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+gradd}
+
+
+
+Definition at line 466 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_ad47e40b30c3e97feb1b9933fedc78432}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_ad47e40b30c3e97feb1b9933fedc78432}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!hdiagd@{hdiagd}}
+\index{hdiagd@{hdiagd}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{hdiagd}{hdiagd}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+hdiagd}
+
+
+
+Definition at line 467 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_ae81122d2379aa7662e497bf7b297a806}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_ae81122d2379aa7662e497bf7b297a806}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!molecules@{molecules}}
+\index{molecules@{molecules}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{molecules}{molecules}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+molecules}
+
+
+
+Definition at line 315 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_ae0fbbdcbde04025b429f2cf9a1a91d02}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_ae0fbbdcbde04025b429f2cf9a1a91d02}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!objd@{objd}}
+\index{objd@{objd}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{objd}{objd}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+objd}
+
+
+
+Definition at line 465 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_aee6a9ac7c958ce091beff18edcfb4c72}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_aee6a9ac7c958ce091beff18edcfb4c72}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!objective@{objective}}
+\index{objective@{objective}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{objective}{objective}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+objective}
+
+
+
+Definition at line 542 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_ad85ec673d9220de23817e40075f5d2be}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_ad85ec673d9220de23817e40075f5d2be}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!objfiles@{objfiles}}
+\index{objfiles@{objfiles}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{objfiles}{objfiles}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+objfiles}
+
+
+
+Which parameters are differentiated? 
+
+
+
+Definition at line 312 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_a60c43d0d5a864d47421fd3d184815400}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_a60c43d0d5a864d47421fd3d184815400}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!objvals@{objvals}}
+\index{objvals@{objvals}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{objvals}{objvals}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+objvals}
+
+
+
+Definition at line 313 of file psi4io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1psi4io_1_1RDVR3__Psi4_a2648992726bc3635d52c3902c11990f8}\label{classsrc_1_1psi4io_1_1RDVR3__Psi4_a2648992726bc3635d52c3902c11990f8}} 
+\index{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}!tdir@{tdir}}
+\index{tdir@{tdir}!src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4@{src\+::psi4io\+::\+R\+D\+V\+R3\+\_\+\+Psi4}}
+\paragraph{\texorpdfstring{tdir}{tdir}}
+{\footnotesize\ttfamily src.\+psi4io.\+R\+D\+V\+R3\+\_\+\+Psi4.\+tdir}
+
+
+
+Definition at line 359 of file psi4io.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{psi4io_8py}{psi4io.\+py}\end{DoxyCompactItemize}

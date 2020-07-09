@@ -1,0 +1,192 @@
+\hypertarget{classsrc_1_1amberio_1_1Mol2__Reader}{}\subsection{src.\+amberio.\+Mol2\+\_\+\+Reader Class Reference}
+\label{classsrc_1_1amberio_1_1Mol2__Reader}\index{src.\+amberio.\+Mol2\+\_\+\+Reader@{src.\+amberio.\+Mol2\+\_\+\+Reader}}
+
+
+Finite state machine for parsing \hyperlink{namespacesrc_1_1Mol2}{Mol2} force field file.  
+
+
+
+
+Inheritance diagram for src.\+amberio.\+Mol2\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{classsrc_1_1amberio_1_1Mol2__Reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+amberio.\+Mol2\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=220pt]{classsrc_1_1amberio_1_1Mol2__Reader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1Mol2__Reader_a8ad64cfe46a30caa9cbc89473b9e72b5}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, fnm)
+\item 
+def \hyperlink{classsrc_1_1amberio_1_1Mol2__Reader_a1c4c0c9d26152464dcb3a45498f3417e}{feed} (self, line)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1Mol2__Reader_ab3bdb2a19829da102c022571071b6fe7}{pdict}
+\begin{DoxyCompactList}\small\item\em The parameter dictionary (defined in this file) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1amberio_1_1Mol2__Reader_a2de3ca5f954f0589ca409b63d6b54647}{atom}
+\begin{DoxyCompactList}\small\item\em The atom numbers in the interaction (stored in the parser) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1amberio_1_1Mol2__Reader_aa6167c3fa2450ab7e777e62662a0a074}{atomnames}
+\begin{DoxyCompactList}\small\item\em The mol2 file provides a list of atom names. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1amberio_1_1Mol2__Reader_ad998286e913c58648a6b0517adab70c7}{section}
+\begin{DoxyCompactList}\small\item\em The section that we\textquotesingle{}re in. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1amberio_1_1Mol2__Reader_ab577377b90a80b0708f647415a65a709}{mol}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1Mol2__Reader_a364bcccbbdca6d894b8329b6f8434010}{itype}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1Mol2__Reader_af3c71592f1021771b3529bf76ca19a98}{suffix}
+\item 
+\hyperlink{classsrc_1_1amberio_1_1Mol2__Reader_ac8eda87d78836d40c3df24d2f40d8958}{molatom}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Finite state machine for parsing \hyperlink{namespacesrc_1_1Mol2}{Mol2} force field file. 
+
+(just for parameterizing the charges) 
+
+Definition at line 500 of file amberio.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1Mol2__Reader_a8ad64cfe46a30caa9cbc89473b9e72b5}\label{classsrc_1_1amberio_1_1Mol2__Reader_a8ad64cfe46a30caa9cbc89473b9e72b5}} 
+\index{src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Mol2\+\_\+\+Reader.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm }\end{DoxyParamCaption})}
+
+
+
+Definition at line 502 of file amberio.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1Mol2__Reader_a1c4c0c9d26152464dcb3a45498f3417e}\label{classsrc_1_1amberio_1_1Mol2__Reader_a1c4c0c9d26152464dcb3a45498f3417e}} 
+\index{src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}!feed@{feed}}
+\index{feed@{feed}!src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{feed()}{feed()}}
+{\footnotesize\ttfamily def src.\+amberio.\+Mol2\+\_\+\+Reader.\+feed (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Definition at line 516 of file amberio.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1Mol2__Reader_a2de3ca5f954f0589ca409b63d6b54647}\label{classsrc_1_1amberio_1_1Mol2__Reader_a2de3ca5f954f0589ca409b63d6b54647}} 
+\index{src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}!atom@{atom}}
+\index{atom@{atom}!src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{atom}{atom}}
+{\footnotesize\ttfamily src.\+amberio.\+Mol2\+\_\+\+Reader.\+atom}
+
+
+
+The atom numbers in the interaction (stored in the parser) 
+
+
+
+Definition at line 508 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1Mol2__Reader_aa6167c3fa2450ab7e777e62662a0a074}\label{classsrc_1_1amberio_1_1Mol2__Reader_aa6167c3fa2450ab7e777e62662a0a074}} 
+\index{src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}!atomnames@{atomnames}}
+\index{atomnames@{atomnames}!src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{atomnames}{atomnames}}
+{\footnotesize\ttfamily src.\+amberio.\+Mol2\+\_\+\+Reader.\+atomnames}
+
+
+
+The mol2 file provides a list of atom names. 
+
+
+
+Definition at line 510 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1Mol2__Reader_a364bcccbbdca6d894b8329b6f8434010}\label{classsrc_1_1amberio_1_1Mol2__Reader_a364bcccbbdca6d894b8329b6f8434010}} 
+\index{src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}!itype@{itype}}
+\index{itype@{itype}!src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{itype}{itype}}
+{\footnotesize\ttfamily src.\+amberio.\+Mol2\+\_\+\+Reader.\+itype}
+
+
+
+Definition at line 521 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1Mol2__Reader_ab577377b90a80b0708f647415a65a709}\label{classsrc_1_1amberio_1_1Mol2__Reader_ab577377b90a80b0708f647415a65a709}} 
+\index{src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}!mol@{mol}}
+\index{mol@{mol}!src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{mol}{mol}}
+{\footnotesize\ttfamily src.\+amberio.\+Mol2\+\_\+\+Reader.\+mol}
+
+
+
+Definition at line 514 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1Mol2__Reader_ac8eda87d78836d40c3df24d2f40d8958}\label{classsrc_1_1amberio_1_1Mol2__Reader_ac8eda87d78836d40c3df24d2f40d8958}} 
+\index{src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}!molatom@{molatom}}
+\index{molatom@{molatom}!src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{molatom}{molatom}}
+{\footnotesize\ttfamily src.\+amberio.\+Mol2\+\_\+\+Reader.\+molatom}
+
+
+
+Definition at line 552 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1Mol2__Reader_ab3bdb2a19829da102c022571071b6fe7}\label{classsrc_1_1amberio_1_1Mol2__Reader_ab3bdb2a19829da102c022571071b6fe7}} 
+\index{src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{pdict}{pdict}}
+{\footnotesize\ttfamily src.\+amberio.\+Mol2\+\_\+\+Reader.\+pdict}
+
+
+
+The parameter dictionary (defined in this file) 
+
+
+
+Definition at line 506 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1Mol2__Reader_ad998286e913c58648a6b0517adab70c7}\label{classsrc_1_1amberio_1_1Mol2__Reader_ad998286e913c58648a6b0517adab70c7}} 
+\index{src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}!section@{section}}
+\index{section@{section}!src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{section}{section}}
+{\footnotesize\ttfamily src.\+amberio.\+Mol2\+\_\+\+Reader.\+section}
+
+
+
+The section that we\textquotesingle{}re in. 
+
+
+
+Definition at line 512 of file amberio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1amberio_1_1Mol2__Reader_af3c71592f1021771b3529bf76ca19a98}\label{classsrc_1_1amberio_1_1Mol2__Reader_af3c71592f1021771b3529bf76ca19a98}} 
+\index{src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!src\+::amberio\+::\+Mol2\+\_\+\+Reader@{src\+::amberio\+::\+Mol2\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{suffix}{suffix}}
+{\footnotesize\ttfamily src.\+amberio.\+Mol2\+\_\+\+Reader.\+suffix}
+
+
+
+Definition at line 550 of file amberio.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{amberio_8py}{amberio.\+py}\end{DoxyCompactItemize}

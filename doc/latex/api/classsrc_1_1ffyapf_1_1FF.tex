@@ -1,0 +1,1091 @@
+\hypertarget{classsrc_1_1ffyapf_1_1FF}{}\subsection{src.\+ffyapf.\+FF Class Reference}
+\label{classsrc_1_1ffyapf_1_1FF}\index{src.\+ffyapf.\+FF@{src.\+ffyapf.\+FF}}
+
+
+Force field class.  
+
+
+
+
+Inheritance diagram for src.\+ffyapf.\+FF\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=155pt]{classsrc_1_1ffyapf_1_1FF__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+ffyapf.\+FF\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=155pt]{classsrc_1_1ffyapf_1_1FF__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a7a0ef2ed603c05f3566c07eb1ec26708}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, verbose=True, printopt=True)
+\begin{DoxyCompactList}\small\item\em Instantiation of force field class. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a3e573d0affb542431a364190cf2136b0}{fromfile} (cls, fnm)
+\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a60075ec7331e05aca1e04683fde42abc}{\+\_\+\+\_\+getstate\+\_\+\+\_\+} (self)
+\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a69027ebe91edbaa531ed1df2e0d91f1b}{\+\_\+\+\_\+setstate\+\_\+\+\_\+} (self, state)
+\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_afffd561460e3fbf6216709f63efa103f}{addff} (self, ffname, xml\+Script=False)
+\begin{DoxyCompactList}\small\item\em Parse a force field file and add it to the class. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_ab59231fa39e29bfdc70466871c4ec8be}{check\+\_\+dupes} (self, pid, ffname, ln, pfld)
+\begin{DoxyCompactList}\small\item\em Check to see whether a given parameter ID already exists, and provide an alternate if needed. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_ac25a6ff72cab072dadff7b9538e5d5b2}{addff\+\_\+txt} (self, ffname, fftype, xml\+Script)
+\begin{DoxyCompactList}\small\item\em Parse a text force field and create several important instance variables. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_af943ddc128da40ca3007e78ac2cadfd9}{addff\+\_\+xml} (self, ffname)
+\begin{DoxyCompactList}\small\item\em Parse an X\+ML force field file and create important instance variables. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a18a97385107b6be7f56315516208bb68}{make} (self, vals=None, use\+\_\+pvals=False, printdir=None, precision=12)
+\begin{DoxyCompactList}\small\item\em Create a new force field using provided parameter values. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a6223213f69e13dc5af90501cf4e0a877}{make\+\_\+redirect} (self, mvals)
+\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a32548a67fd22b1016dfa37b4289000e8}{find\+\_\+spacings} (self)
+\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a349f2f0f401834f86f9361d8ec32ad0a}{create\+\_\+pvals} (self, mvals)
+\begin{DoxyCompactList}\small\item\em Converts mathematical to physical parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_aa4b5af969fa68f6836150b934cb34a3a}{create\+\_\+mvals} (self, pvals)
+\begin{DoxyCompactList}\small\item\em Converts physical to mathematical parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a392d73844890c87025d9a5ee2e24dc80}{rsmake} (self, printfacs=True)
+\begin{DoxyCompactList}\small\item\em Create the rescaling factors for the coordinate transformation in parameter space. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a36882a524f5c6a89284d3d6a97233c3f}{make\+\_\+rescale} (self, scales, mvals=None, G=None, H=None, multiply=True, verbose=False)
+\begin{DoxyCompactList}\small\item\em Obtain rescaled versions of the inputs according to dictionary values in \char`\"{}scales\char`\"{} (i.\+e. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_ab540e44d9ab8dccb60048694e460c4fc}{mktransmat} (self)
+\begin{DoxyCompactList}\small\item\em Create the transformation matrix to rescale and rotate the mathematical parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a9efa0ddaab2f43cd5f0d2de090fc9f2e}{list\+\_\+map} (self)
+\begin{DoxyCompactList}\small\item\em Create the plist, which is like a reversed version of the parameter map. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a1f2342882083a5b59d8d76d13d6f666d}{print\+\_\+map} (self, vals=None, precision=4)
+\begin{DoxyCompactList}\small\item\em Prints out the (physical or mathematical) parameter indices, I\+Ds and values in a visually appealing way. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_abca757d27cae3ee019e0b79f70ffd853}{sprint\+\_\+map} (self, vals=None, precision=4)
+\begin{DoxyCompactList}\small\item\em Prints out the (physical or mathematical) parameter indices, I\+Ds and values to a string. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a45405387da443c3cccedf420539f0f34}{assign\+\_\+p0} (self, idx, val)
+\begin{DoxyCompactList}\small\item\em Assign physical parameter values to the \textquotesingle{}pvals0\textquotesingle{} array. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a30c65ab08a53066ebd3be85de9f2dfba}{assign\+\_\+field} (self, idx, pid, fnm, ln, pfld, mult, cmd=None)
+\begin{DoxyCompactList}\small\item\em Record the locations of a parameter in a txt file; \mbox{[}\mbox{[}file name, line number, field number, and multiplier\mbox{]}\mbox{]}. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1ffyapf_1_1FF_a31f154cb493aa2c1683da570ba1f8f0a}{\+\_\+\+\_\+eq\+\_\+\+\_\+} (self, other)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a68a3599d8d9a86173693142888875a75}{ffdata}
+\begin{DoxyCompactList}\small\item\em As these options proliferate, the force field class becomes less standalone. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_afdfcd362bdd2bee8c34193f0dda5aa3b}{ffdata\+\_\+isxml}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_ac0187f2700fff8b52387d1a9461bfacf}{map}
+\begin{DoxyCompactList}\small\item\em The mapping of interaction type -\/$>$ parameter number. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a600c53e8b497f3cd6033ad04697fb40c}{plist}
+\begin{DoxyCompactList}\small\item\em The listing of parameter number -\/$>$ interaction types. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a2e0e0f75682e55de01b54713d854528f}{patoms}
+\begin{DoxyCompactList}\small\item\em A listing of parameter number -\/$>$ atoms involved. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a3a2bea7c7c3ecf63bb3cd98828c0fd58}{pfields}
+\begin{DoxyCompactList}\small\item\em A list where pfields\mbox{[}i\mbox{]} = \mbox{[}pid,\textquotesingle{}file\textquotesingle{},line,field,mult,cmd\mbox{]}, basically a new way to modify force field files; when we modify the force field file, we go to the specific line/field in a given file and change the number. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a3ae060d14ad1de53e459619dfc738d65}{rs}
+\begin{DoxyCompactList}\small\item\em List of rescaling factors. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_ad1fce7db160144f58504671f0a7dd3d6}{tm}
+\begin{DoxyCompactList}\small\item\em The transformation matrix for mathematical -\/$>$ physical parameters. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a1cb1c9305460432c3503ba9b7394acc5}{tmI}
+\begin{DoxyCompactList}\small\item\em The transpose of the transformation matrix. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_acdf033be42f6827dbd150984f52f4076}{excision}
+\begin{DoxyCompactList}\small\item\em Indices to exclude from optimization / Hessian inversion. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a29e74447e815d30b95c0fdb6beb56bbb}{np}
+\begin{DoxyCompactList}\small\item\em The total number of parameters. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_af59602ddb21a54c130b0b732e99eae67}{pvals0}
+\begin{DoxyCompactList}\small\item\em Initial value of physical parameters. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a1ec5e078dd2f588a788164f7c8999e4d}{Readers}
+\begin{DoxyCompactList}\small\item\em A dictionary of force field reader classes. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_acf7da953fc17d47f0980400b8053712b}{atomnames}
+\begin{DoxyCompactList}\small\item\em A list of atom names (this is new, for E\+SP fitting) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a978f71c36052e6e8d93da8baeef6c3d1}{F\+F\+Atom\+Types}
+\begin{DoxyCompactList}\small\item\em W\+O\+RK IN P\+R\+O\+G\+R\+E\+SS \#\# This is a dictionary of \{\textquotesingle{}Atom\+Type\textquotesingle{}\+:\{\textquotesingle{}Mass\textquotesingle{} \+: float, \textquotesingle{}Charge\textquotesingle{} \+: float, \textquotesingle{}Particle\+Type\textquotesingle{} \+: string (\textquotesingle{}A\textquotesingle{}, \textquotesingle{}S\textquotesingle{}, or \textquotesingle{}D\textquotesingle{}), \textquotesingle{}Atomic\+Number\textquotesingle{} \+: int\}\}. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_afee4ac5d39a026fc88efa63d3e82b105}{F\+F\+Molecules}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a605dfe868e2fb26f2e15b4478f7b6eeb}{redirect}
+\begin{DoxyCompactList}\small\item\em Creates plist from map. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a7bf885d5ba1489b97bb4b90dc689f252}{linedestroy\+\_\+save}
+\begin{DoxyCompactList}\small\item\em Destruction dictionary (experimental). \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_abb8aab8aafc7bfe637d5fcf226debaad}{prmdestroy\+\_\+save}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a045adc994f0b33cfe27ec9e07faef38f}{linedestroy\+\_\+this}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a75537037c3d897b85f7d54b45dbca014}{prmdestroy\+\_\+this}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a8ed82b69537dcbc5f0b436e20689dc22}{tinkerprm}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a4d47f2447aecbbbc5b49f64eecd51cff}{openmmxml}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a65543d043d27378c63ac7d6ab4e4ba32}{offxml}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a4367fddb00f17b504ded233b3324a2f3}{amber\+\_\+mol2}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_acba0e3b93ce2a36e03e56bcb63e9645b}{amber\+\_\+frcmod}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a4a23c7867d6cc24c86f77fff3ce056e0}{rs\+\_\+ord}
+\begin{DoxyCompactList}\small\item\em Takes the dictionary \textquotesingle{}B\+O\+N\+DS\textquotesingle{}\+:\{3\+:\textquotesingle{}B\textquotesingle{}, 4\+:\textquotesingle{}K\textquotesingle{}\}, \textquotesingle{}V\+DW\textquotesingle{}\+:\{4\+:\textquotesingle{}S\textquotesingle{}, 5\+:\textquotesingle{}T\textquotesingle{}\}, and turns it into a list of term types \mbox{[}\textquotesingle{}B\+O\+N\+D\+SB\textquotesingle{},\textquotesingle{}B\+O\+N\+D\+SK\textquotesingle{},\textquotesingle{}V\+D\+WS\textquotesingle{},\textquotesingle{}V\+D\+WT\textquotesingle{}\mbox{]}. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a7299d76bfff2489099eb88b4b5479245}{rs\+\_\+type}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a52a4a2d74424530171a1bf5cae4f8ad9}{qmap}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a59eed571d6673a73cabc156bc82dc73b}{qid}
+\item 
+\hyperlink{classsrc_1_1ffyapf_1_1FF_a7a77e7aeb6678815e269096d33080842}{qid2}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Force field class. 
+
+This class contains all methods for force field manipulation. To create an instance of this class, an input file is required containing the list of force field file names. Everything else inside this class pertaining to force field generation is self-\/contained.
+
+For details on force field parsing, see the detailed documentation for addff. 
+
+Definition at line 226 of file ffyapf.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a7a0ef2ed603c05f3566c07eb1ec26708}\label{classsrc_1_1ffyapf_1_1FF_a7a0ef2ed603c05f3566c07eb1ec26708}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{verbose = {\ttfamily True},  }\item[{}]{printopt = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Instantiation of force field class. 
+
+Many variables here are initialized to zero, but they are filled out by methods like addff, rsmake, and mktransmat. 
+
+Definition at line 235 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1ffyapf_1_1FF_a7a0ef2ed603c05f3566c07eb1ec26708_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a31f154cb493aa2c1683da570ba1f8f0a}\label{classsrc_1_1ffyapf_1_1FF_a31f154cb493aa2c1683da570ba1f8f0a}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!\+\_\+\+\_\+eq\+\_\+\+\_\+@{\+\_\+\+\_\+eq\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+eq\+\_\+\+\_\+@{\+\_\+\+\_\+eq\+\_\+\+\_\+}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+eq\+\_\+\+\_\+()}{\_\_eq\_\_()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+\_\+\+\_\+eq\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1639 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a60075ec7331e05aca1e04683fde42abc}\label{classsrc_1_1ffyapf_1_1FF_a60075ec7331e05aca1e04683fde42abc}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!\+\_\+\+\_\+getstate\+\_\+\+\_\+@{\+\_\+\+\_\+getstate\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+getstate\+\_\+\+\_\+@{\+\_\+\+\_\+getstate\+\_\+\+\_\+}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+getstate\+\_\+\+\_\+()}{\_\_getstate\_\_()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+\_\+\+\_\+getstate\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 374 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a69027ebe91edbaa531ed1df2e0d91f1b}\label{classsrc_1_1ffyapf_1_1FF_a69027ebe91edbaa531ed1df2e0d91f1b}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!\+\_\+\+\_\+setstate\+\_\+\+\_\+@{\+\_\+\+\_\+setstate\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+setstate\+\_\+\+\_\+@{\+\_\+\+\_\+setstate\+\_\+\+\_\+}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+setstate\+\_\+\+\_\+()}{\_\_setstate\_\_()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+\_\+\+\_\+setstate\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{state }\end{DoxyParamCaption})}
+
+
+
+Definition at line 383 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_afffd561460e3fbf6216709f63efa103f}\label{classsrc_1_1ffyapf_1_1FF_afffd561460e3fbf6216709f63efa103f}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!addff@{addff}}
+\index{addff@{addff}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{addff()}{addff()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+addff (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{ffname,  }\item[{}]{xml\+Script = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Parse a force field file and add it to the class. 
+
+First, figure out the type of force field file. This is done either by explicitly specifying the type using for example, {\ttfamily  ffname force\+\_\+field.\+xml\+:openmm } or we figure it out by looking at the file extension.
+
+Next, parse the file. Currently we support two classes of files -\/ text and X\+ML. The two types are treated very differently; for X\+ML we use the parsers in libxml (via the python lxml module), and for text files we have our own in-\/house parsing class. Within text files, there is also a specialized G\+R\+O\+M\+A\+CS and T\+I\+N\+K\+ER parser as well as a generic text parser.
+
+The job of the parser is to determine the following things\+: 1) Read the user-\/specified selection of parameters being fitted 2) Build a mapping (dictionary) of {\ttfamily  parameter identifier -\/$>$ index in parameter vector } 3) Build a list of physical parameter values 4) Figure out where to replace the parameter values in the force field file when the values are changed 5) Figure out which parameters need to be repeated or sign-\/flipped
+
+Generally speaking, each parameter value in the force field file has a {\ttfamily  unique parameter identifier {\ttfamily . The identifier consists of three parts -\/ the interaction type, the parameter subtype (within that interaction type), and the atoms involved.}}
+
+{\ttfamily {\ttfamily  --- If X\+ML\+: ---}}
+
+{\ttfamily {\ttfamily  The force field file is read in using the lxml Python module. Specify which parameter you want to fit using by adding a \textquotesingle{}parameterize\textquotesingle{} element to the end of the force field X\+ML file, like so.}}
+
+{\ttfamily {\ttfamily 
+\begin{DoxyCode}
+<AmoebaVdwForce type=\textcolor{stringliteral}{"BUFFERED-14-7"}>
+   <Vdw \textcolor{keyword}{class}=\textcolor{stringliteral}{"74"} sigma=\textcolor{stringliteral}{"0.2655"} epsilon=\textcolor{stringliteral}{"0.056484"} reduction=\textcolor{stringliteral}{"0.910"} parameterize=\textcolor{stringliteral}{"sigma, epsilon,
+       reduction"} />
+\end{DoxyCode}
+}}
+
+{\ttfamily {\ttfamily  In this example, the parameter identifier would look like {\ttfamily  Vdw/74/epsilon }.}}
+
+{\ttfamily {\ttfamily  --- If G\+R\+O\+M\+A\+CS (.itp) or T\+I\+N\+K\+ER (.prm) \+: ---}}
+
+{\ttfamily {\ttfamily  Follow the rules in the I\+T\+P\+\_\+\+Reader or Tinker\+\_\+\+Reader derived class. Read the documentation in the class documentation or the \textquotesingle{}feed\textquotesingle{} method to learn more. In all cases the parameter is tagged using {\ttfamily  \# P\+RM 3 } (where \# denotes a comment, the word P\+RM stays the same, and 3 is the field number starting from zero.)}}
+
+{\ttfamily {\ttfamily  --- If normal text \+: ---}}
+
+{\ttfamily {\ttfamily  The parameter identifier is simply built using the file name, line number, and field. Thus, the identifier is unique but completely noninformative (which is not ideal for our purposes, but it works.)}}
+
+{\ttfamily {\ttfamily  --- Endif ---}}
+
+{\ttfamily {\ttfamily  \begin{DoxyWarning}{Warning}
+My program currently assumes that we are only using one MM program per job. If we use C\+H\+A\+R\+MM and G\+R\+O\+M\+A\+CS to perform simulations as part of the same T\+A\+R\+G\+ET, we will get messed up. Maybe this needs to be fixed in the future, with program prefixes to parameters like C\+\_\+ , G\+\_\+ .. or simply unit conversions, you get the idea.
+
+I don\textquotesingle{}t think the multiplier actually works for analytic derivatives unless the interaction calculator knows the multiplier as well. I\textquotesingle{}m sure I can make this work in the future if necessary.
+\end{DoxyWarning}
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em ffname} & Name of the force field file \\
+\hline
+\end{DoxyParams}
+}}
+
+Definition at line 462 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1ffyapf_1_1FF_afffd561460e3fbf6216709f63efa103f_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_ac25a6ff72cab072dadff7b9538e5d5b2}\label{classsrc_1_1ffyapf_1_1FF_ac25a6ff72cab072dadff7b9538e5d5b2}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!addff\+\_\+txt@{addff\+\_\+txt}}
+\index{addff\+\_\+txt@{addff\+\_\+txt}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{addff\+\_\+txt()}{addff\_txt()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+addff\+\_\+txt (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{ffname,  }\item[{}]{fftype,  }\item[{}]{xml\+Script }\end{DoxyParamCaption})}
+
+
+
+Parse a text force field and create several important instance variables. 
+
+Each line is processed using the \textquotesingle{}feed\textquotesingle{} method as implemented in the reader class. This essentially allows us to create the correct parameter identifier (pid), because the pid comes from more than the current line, it also depends on the section that we\textquotesingle{}re in.
+
+When \textquotesingle{}P\+RM\textquotesingle{} or \textquotesingle{}R\+PT\textquotesingle{} is encountered, we do several things\+:
+\begin{DoxyItemize}
+\item Build the parameter identifier and insert it into the map
+\item Point to the file name, line number, and field where the parameter may be modified
+\end{DoxyItemize}
+
+Additionally, when \textquotesingle{}P\+RM\textquotesingle{} is encountered\+:
+\begin{DoxyItemize}
+\item Store the physical parameter value (this is permanent; it\textquotesingle{}s the original value)
+\item Increment the total number of parameters
+\end{DoxyItemize}
+
+When \textquotesingle{}R\+PT\textquotesingle{} is encountered we don\textquotesingle{}t expand the parameter vector because this parameter is a copy of an existing one. If the parameter identifier is preceded by M\+I\+N\+U\+S\+\_\+, we chop off the prefix but remember that the sign needs to be flipped. 
+
+Definition at line 594 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1ffyapf_1_1FF_ac25a6ff72cab072dadff7b9538e5d5b2_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_af943ddc128da40ca3007e78ac2cadfd9}\label{classsrc_1_1ffyapf_1_1FF_af943ddc128da40ca3007e78ac2cadfd9}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!addff\+\_\+xml@{addff\+\_\+xml}}
+\index{addff\+\_\+xml@{addff\+\_\+xml}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{addff\+\_\+xml()}{addff\_xml()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+addff\+\_\+xml (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{ffname }\end{DoxyParamCaption})}
+
+
+
+Parse an X\+ML force field file and create important instance variables. 
+
+This was modeled after addff\+\_\+txt, but X\+ML and text files are fundamentally different, necessitating two different methods.
+
+We begin with an \+\_\+\+Element\+Tree object. We search through the tree for the \textquotesingle{}parameterize\textquotesingle{} and \textquotesingle{}parameter\+\_\+repeat\textquotesingle{} keywords. Each time the keyword is encountered, we do the same four actions that I describe in addff\+\_\+txt.
+
+It\textquotesingle{}s hard to specify precisely the location in an X\+ML file to change a force field parameter. I can create a list of tree elements (essentially pointers to elements within a tree), but this method breaks down when I copy the tree because I have no way to refer to the copied tree elements. Fortunately, lxml gives me a way to represent a tree using a flat list, and my X\+ML file \textquotesingle{}locations\textquotesingle{} are represented using the positions in the list.
+
+\begin{DoxyWarning}{Warning}
+The sign-\/flip hasn\textquotesingle{}t been implemented yet. This shouldn\textquotesingle{}t matter unless your calculation contains repeated parameters with opposite sign. 
+\end{DoxyWarning}
+
+
+Definition at line 730 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1ffyapf_1_1FF_af943ddc128da40ca3007e78ac2cadfd9_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a30c65ab08a53066ebd3be85de9f2dfba}\label{classsrc_1_1ffyapf_1_1FF_a30c65ab08a53066ebd3be85de9f2dfba}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!assign\+\_\+field@{assign\+\_\+field}}
+\index{assign\+\_\+field@{assign\+\_\+field}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{assign\+\_\+field()}{assign\_field()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+assign\+\_\+field (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{idx,  }\item[{}]{pid,  }\item[{}]{fnm,  }\item[{}]{ln,  }\item[{}]{pfld,  }\item[{}]{mult,  }\item[{}]{cmd = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Record the locations of a parameter in a txt file; \mbox{[}\mbox{[}file name, line number, field number, and multiplier\mbox{]}\mbox{]}. 
+
+Note that parameters can have multiple locations because of the repetition functionality.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em idx} & The (not necessarily unique) index of the parameter. \\
+\hline
+\mbox{\tt in}  & {\em pid} & The unique parameter name. \\
+\hline
+\mbox{\tt in}  & {\em fnm} & The file name of the parameter field. \\
+\hline
+\mbox{\tt in}  & {\em ln} & The line number within the file (or the node index in the flattened xml) \\
+\hline
+\mbox{\tt in}  & {\em pfld} & The field within the line (or the name of the attribute in the xml) \\
+\hline
+\mbox{\tt in}  & {\em mult} & The multiplier (this is usually 1.\+0) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1636 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a45405387da443c3cccedf420539f0f34}\label{classsrc_1_1ffyapf_1_1FF_a45405387da443c3cccedf420539f0f34}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!assign\+\_\+p0@{assign\+\_\+p0}}
+\index{assign\+\_\+p0@{assign\+\_\+p0}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{assign\+\_\+p0()}{assign\_p0()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+assign\+\_\+p0 (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{idx,  }\item[{}]{val }\end{DoxyParamCaption})}
+
+
+
+Assign physical parameter values to the \textquotesingle{}pvals0\textquotesingle{} array. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em idx} & The index to which we assign the parameter value. \\
+\hline
+\mbox{\tt in}  & {\em val} & The parameter value to be inserted. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1617 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_ab59231fa39e29bfdc70466871c4ec8be}\label{classsrc_1_1ffyapf_1_1FF_ab59231fa39e29bfdc70466871c4ec8be}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!check\+\_\+dupes@{check\+\_\+dupes}}
+\index{check\+\_\+dupes@{check\+\_\+dupes}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{check\+\_\+dupes()}{check\_dupes()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+check\+\_\+dupes (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{pid,  }\item[{}]{ffname,  }\item[{}]{ln,  }\item[{}]{pfld }\end{DoxyParamCaption})}
+
+
+
+Check to see whether a given parameter ID already exists, and provide an alternate if needed. 
+
+
+
+Definition at line 538 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_aa4b5af969fa68f6836150b934cb34a3a}\label{classsrc_1_1ffyapf_1_1FF_aa4b5af969fa68f6836150b934cb34a3a}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!create\+\_\+mvals@{create\+\_\+mvals}}
+\index{create\+\_\+mvals@{create\+\_\+mvals}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{create\+\_\+mvals()}{create\_mvals()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+create\+\_\+mvals (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{pvals }\end{DoxyParamCaption})}
+
+
+
+Converts physical to mathematical parameters. 
+
+We create the inverse transformation matrix using S\+VD.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em pvals} & The physical parameters \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+mvals The mathematical parameters 
+\end{DoxyReturn}
+
+
+Definition at line 1122 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=332pt]{classsrc_1_1ffyapf_1_1FF_aa4b5af969fa68f6836150b934cb34a3a_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a349f2f0f401834f86f9361d8ec32ad0a}\label{classsrc_1_1ffyapf_1_1FF_a349f2f0f401834f86f9361d8ec32ad0a}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!create\+\_\+pvals@{create\+\_\+pvals}}
+\index{create\+\_\+pvals@{create\+\_\+pvals}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{create\+\_\+pvals()}{create\_pvals()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+create\+\_\+pvals (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals }\end{DoxyParamCaption})}
+
+
+
+Converts mathematical to physical parameters. 
+
+First, mathematical parameters are rescaled and rotated by multiplying by the transformation matrix, followed by adding the original physical parameters.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mvals} & The mathematical parameters \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+pvals The physical parameters 
+\end{DoxyReturn}
+
+
+Definition at line 1083 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=297pt]{classsrc_1_1ffyapf_1_1FF_a349f2f0f401834f86f9361d8ec32ad0a_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a32548a67fd22b1016dfa37b4289000e8}\label{classsrc_1_1ffyapf_1_1FF_a32548a67fd22b1016dfa37b4289000e8}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!find\+\_\+spacings@{find\+\_\+spacings}}
+\index{find\+\_\+spacings@{find\+\_\+spacings}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{find\+\_\+spacings()}{find\_spacings()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+find\+\_\+spacings (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1033 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1ffyapf_1_1FF_a32548a67fd22b1016dfa37b4289000e8_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a3e573d0affb542431a364190cf2136b0}\label{classsrc_1_1ffyapf_1_1FF_a3e573d0affb542431a364190cf2136b0}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!fromfile@{fromfile}}
+\index{fromfile@{fromfile}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{fromfile()}{fromfile()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+fromfile (\begin{DoxyParamCaption}\item[{}]{cls,  }\item[{}]{fnm }\end{DoxyParamCaption})}
+
+
+
+Definition at line 364 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a9efa0ddaab2f43cd5f0d2de090fc9f2e}\label{classsrc_1_1ffyapf_1_1FF_a9efa0ddaab2f43cd5f0d2de090fc9f2e}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!list\+\_\+map@{list\+\_\+map}}
+\index{list\+\_\+map@{list\+\_\+map}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{list\+\_\+map()}{list\_map()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+list\+\_\+map (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Create the plist, which is like a reversed version of the parameter map. 
+
+More convenient for printing. 
+
+Definition at line 1567 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1ffyapf_1_1FF_a9efa0ddaab2f43cd5f0d2de090fc9f2e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a18a97385107b6be7f56315516208bb68}\label{classsrc_1_1ffyapf_1_1FF_a18a97385107b6be7f56315516208bb68}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!make@{make}}
+\index{make@{make}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{make()}{make()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+make (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{vals = {\ttfamily None},  }\item[{}]{use\+\_\+pvals = {\ttfamily False},  }\item[{}]{printdir = {\ttfamily None},  }\item[{}]{precision = {\ttfamily 12} }\end{DoxyParamCaption})}
+
+
+
+Create a new force field using provided parameter values. 
+
+This big kahuna does a number of things\+: 1) Creates the physical parameters from the mathematical parameters 2) Creates force fields with physical parameters substituted in 3) Prints the force fields to the specified file.
+
+It does N\+OT store the mathematical parameters in the class state (since we can only hold one set of parameters).
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em printdir} & The directory that the force fields are printed to; as usual this is relative to the project root directory. \\
+\hline
+\mbox{\tt in}  & {\em vals} & Input parameters. I previously had an option where it uses stored values in the class state, but I don\textquotesingle{}t think that\textquotesingle{}s a good idea anymore. \\
+\hline
+\mbox{\tt in}  & {\em use\+\_\+pvals} & Switch for whether to bypass the coordinate transformation and use physical parameters directly. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 826 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1ffyapf_1_1FF_a18a97385107b6be7f56315516208bb68_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a6223213f69e13dc5af90501cf4e0a877}\label{classsrc_1_1ffyapf_1_1FF_a6223213f69e13dc5af90501cf4e0a877}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!make\+\_\+redirect@{make\+\_\+redirect}}
+\index{make\+\_\+redirect@{make\+\_\+redirect}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{make\+\_\+redirect()}{make\_redirect()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+make\+\_\+redirect (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals }\end{DoxyParamCaption})}
+
+
+
+Definition at line 987 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1ffyapf_1_1FF_a6223213f69e13dc5af90501cf4e0a877_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a36882a524f5c6a89284d3d6a97233c3f}\label{classsrc_1_1ffyapf_1_1FF_a36882a524f5c6a89284d3d6a97233c3f}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!make\+\_\+rescale@{make\+\_\+rescale}}
+\index{make\+\_\+rescale@{make\+\_\+rescale}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{make\+\_\+rescale()}{make\_rescale()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+make\+\_\+rescale (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{scales,  }\item[{}]{mvals = {\ttfamily None},  }\item[{}]{G = {\ttfamily None},  }\item[{}]{H = {\ttfamily None},  }\item[{}]{multiply = {\ttfamily True},  }\item[{}]{verbose = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Obtain rescaled versions of the inputs according to dictionary values in \char`\"{}scales\char`\"{} (i.\+e. 
+
+a replacement or multiplicative factor on self.\+rs\+\_\+ord). Note that self.\+rs and self.\+rs\+\_\+ord are not updated in this function. You need to do that outside.
+
+The purpose of this function is to simulate the effect of changing the parameter scale factors in the force field. If the scale factor is N, then a unit change in the mathematical parameters produces a change of N in the physical parameters. Thus, for a given point in the physical parameter space, the mathematical parameters are proportional to 1/N, the gradient is proportional to N, and the Hessian is proportional to N$^\wedge$2.
+
+\paragraph*{Parameters }
+
+mvals \+: numpy.\+ndarray Parameters to be transformed, if desired. Must be same length as number of parameters. G \+: numpy.\+ndarray Gradient to be transformed, if desired. Must be same length as number of parameters. H \+: numpy.\+ndarray Hessian to be transformed, if desired. Must be square matrix with side-\/length = number of parameters. scales \+: Ordered\+Dict A dictionary with the same keys as self.\+rs\+\_\+ord and floating point values. These represent the values with which to multiply the existing scale factors (if multiply == True) or replace them (if multiply == False). Pro Tip\+: Create this variable from a copy of self.\+rs\+\_\+ord multiply \+: bool When set to True, the new scale factors are the existing scale factors verbose \+: bool Loud and noisy
+
+\paragraph*{Returns }
+
+answer \+: Ordered\+Dict Output dictionary containing \+: \textquotesingle{}rs\textquotesingle{} \+: New parameter scale factors (multiplied by scales if multiply=True, or replaced if multiply=False) \textquotesingle{}rs\+\_\+ord\textquotesingle{} \+: New parameter scale factor dictionary \textquotesingle{}mvals\textquotesingle{} \+: New parameter values (if mvals is provided) \textquotesingle{}G\textquotesingle{} \+: New gradient (if G is provided) \textquotesingle{}H\textquotesingle{} \+: New Hessian (if H is provided) 
+
+Definition at line 1279 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_ab540e44d9ab8dccb60048694e460c4fc}\label{classsrc_1_1ffyapf_1_1FF_ab540e44d9ab8dccb60048694e460c4fc}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!mktransmat@{mktransmat}}
+\index{mktransmat@{mktransmat}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{mktransmat()}{mktransmat()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+mktransmat (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Create the transformation matrix to rescale and rotate the mathematical parameters. 
+
+For point charge parameters, project out perturbations that change the total charge.
+
+First build these\+:
+
+\textquotesingle{}qmap\textquotesingle{} \+: Just a list of parameter indices that point to charges.
+
+\textquotesingle{}qid\textquotesingle{} \+: For each parameter in the qmap, a list of the affected atoms \+:) A potential target for the molecule-\/specific thang.
+
+Then make this\+:
+
+\textquotesingle{}qtrans2\textquotesingle{} \+: A transformation matrix that rotates the charge parameters. The first row is all zeros (because it corresponds to increasing the charge on all atoms) The other rows correspond to changing one of the parameters and decreasing all of the others equally such that the overall charge is preserved.
+
+\textquotesingle{}qmat2\textquotesingle{} \+: An identity matrix with \textquotesingle{}qtrans2\textquotesingle{} pasted into the right place
+
+\textquotesingle{}transmat\textquotesingle{}\+: \textquotesingle{}qmat2\textquotesingle{} with rows and columns scaled using self.\+rs
+
+\textquotesingle{}excision\textquotesingle{}\+: Parameter indices that need to be \textquotesingle{}cut out\textquotesingle{} because they are irrelevant and mess with the matrix diagonalization
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000005}{Todo}]Only project out changes in total charge of a molecule, and perhaps generalize to fragments of molecules or other types of parameters. 
+
+The A\+M\+O\+E\+BA selection of charge depends not only on the atom type, but what that atom is bonded to. \end{DoxyRefDesc}
+Build the matrix that ensures the net charge does not change. 
+
+Definition at line 1357 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a1f2342882083a5b59d8d76d13d6f666d}\label{classsrc_1_1ffyapf_1_1FF_a1f2342882083a5b59d8d76d13d6f666d}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!print\+\_\+map@{print\+\_\+map}}
+\index{print\+\_\+map@{print\+\_\+map}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{print\+\_\+map()}{print\_map()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+print\+\_\+map (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{vals = {\ttfamily None},  }\item[{}]{precision = {\ttfamily 4} }\end{DoxyParamCaption})}
+
+
+
+Prints out the (physical or mathematical) parameter indices, I\+Ds and values in a visually appealing way. 
+
+
+
+Definition at line 1583 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1ffyapf_1_1FF_a1f2342882083a5b59d8d76d13d6f666d_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a392d73844890c87025d9a5ee2e24dc80}\label{classsrc_1_1ffyapf_1_1FF_a392d73844890c87025d9a5ee2e24dc80}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!rsmake@{rsmake}}
+\index{rsmake@{rsmake}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{rsmake()}{rsmake()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+rsmake (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{printfacs = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Create the rescaling factors for the coordinate transformation in parameter space. 
+
+The proper choice of rescaling factors (read\+: prior widths in maximum likelihood analysis) is still a black art. This is a topic of current research.
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000004}{Todo}]Pass in rsfactors through the input file\end{DoxyRefDesc}
+\begin{DoxyVerb}     @param[in] printfacs List for printing out the resecaling factors\end{DoxyVerb}
+ 
+
+Definition at line 1143 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1ffyapf_1_1FF_a392d73844890c87025d9a5ee2e24dc80_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_abca757d27cae3ee019e0b79f70ffd853}\label{classsrc_1_1ffyapf_1_1FF_abca757d27cae3ee019e0b79f70ffd853}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!sprint\+\_\+map@{sprint\+\_\+map}}
+\index{sprint\+\_\+map@{sprint\+\_\+map}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{sprint\+\_\+map()}{sprint\_map()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+F\+F.\+sprint\+\_\+map (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{vals = {\ttfamily None},  }\item[{}]{precision = {\ttfamily 4} }\end{DoxyParamCaption})}
+
+
+
+Prints out the (physical or mathematical) parameter indices, I\+Ds and values to a string. 
+
+
+
+Definition at line 1598 of file ffyapf.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1ffyapf_1_1FF_abca757d27cae3ee019e0b79f70ffd853_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_acba0e3b93ce2a36e03e56bcb63e9645b}\label{classsrc_1_1ffyapf_1_1FF_acba0e3b93ce2a36e03e56bcb63e9645b}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!amber\+\_\+frcmod@{amber\+\_\+frcmod}}
+\index{amber\+\_\+frcmod@{amber\+\_\+frcmod}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{amber\+\_\+frcmod}{amber\_frcmod}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+amber\+\_\+frcmod}
+
+
+
+Definition at line 493 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a4367fddb00f17b504ded233b3324a2f3}\label{classsrc_1_1ffyapf_1_1FF_a4367fddb00f17b504ded233b3324a2f3}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!amber\+\_\+mol2@{amber\+\_\+mol2}}
+\index{amber\+\_\+mol2@{amber\+\_\+mol2}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{amber\+\_\+mol2}{amber\_mol2}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+amber\+\_\+mol2}
+
+
+
+Definition at line 489 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_acf7da953fc17d47f0980400b8053712b}\label{classsrc_1_1ffyapf_1_1FF_acf7da953fc17d47f0980400b8053712b}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!atomnames@{atomnames}}
+\index{atomnames@{atomnames}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{atomnames}{atomnames}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+atomnames}
+
+
+
+A list of atom names (this is new, for E\+SP fitting) 
+
+
+
+Definition at line 299 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_acdf033be42f6827dbd150984f52f4076}\label{classsrc_1_1ffyapf_1_1FF_acdf033be42f6827dbd150984f52f4076}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!excision@{excision}}
+\index{excision@{excision}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{excision}{excision}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+excision}
+
+
+
+Indices to exclude from optimization / Hessian inversion. 
+
+Some customized constraints here.
+
+Quadrupoles must be traceless 
+
+Definition at line 291 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a978f71c36052e6e8d93da8baeef6c3d1}\label{classsrc_1_1ffyapf_1_1FF_a978f71c36052e6e8d93da8baeef6c3d1}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!F\+F\+Atom\+Types@{F\+F\+Atom\+Types}}
+\index{F\+F\+Atom\+Types@{F\+F\+Atom\+Types}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{F\+F\+Atom\+Types}{FFAtomTypes}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+F\+F\+Atom\+Types}
+
+
+
+W\+O\+RK IN P\+R\+O\+G\+R\+E\+SS \#\# This is a dictionary of \{\textquotesingle{}Atom\+Type\textquotesingle{}\+:\{\textquotesingle{}Mass\textquotesingle{} \+: float, \textquotesingle{}Charge\textquotesingle{} \+: float, \textquotesingle{}Particle\+Type\textquotesingle{} \+: string (\textquotesingle{}A\textquotesingle{}, \textquotesingle{}S\textquotesingle{}, or \textquotesingle{}D\textquotesingle{}), \textquotesingle{}Atomic\+Number\textquotesingle{} \+: int\}\}. 
+
+
+
+Definition at line 309 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a68a3599d8d9a86173693142888875a75}\label{classsrc_1_1ffyapf_1_1FF_a68a3599d8d9a86173693142888875a75}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!ffdata@{ffdata}}
+\index{ffdata@{ffdata}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{ffdata}{ffdata}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+ffdata}
+
+
+
+As these options proliferate, the force field class becomes less standalone. 
+
+I need to think of a good solution here... The root directory of the project File names of force fields Directory containing force fields, relative to project directory Priors given by the user \+:) Whether to constrain the charges. Whether to constrain the charges. Switch for A\+M\+O\+E\+BA direct or mutual. A\+M\+O\+E\+BA mutual dipole convergence tolerance. Switch for rigid water molecules Bypass the transformation and use physical parameters directly Allow duplicate parameter names (internally construct unique names) The content of all force field files are stored in memory 
+
+Definition at line 271 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_afdfcd362bdd2bee8c34193f0dda5aa3b}\label{classsrc_1_1ffyapf_1_1FF_afdfcd362bdd2bee8c34193f0dda5aa3b}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!ffdata\+\_\+isxml@{ffdata\+\_\+isxml}}
+\index{ffdata\+\_\+isxml@{ffdata\+\_\+isxml}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{ffdata\+\_\+isxml}{ffdata\_isxml}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+ffdata\+\_\+isxml}
+
+
+
+Definition at line 272 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_afee4ac5d39a026fc88efa63d3e82b105}\label{classsrc_1_1ffyapf_1_1FF_afee4ac5d39a026fc88efa63d3e82b105}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!F\+F\+Molecules@{F\+F\+Molecules}}
+\index{F\+F\+Molecules@{F\+F\+Molecules}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{F\+F\+Molecules}{FFMolecules}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+F\+F\+Molecules}
+
+
+
+Definition at line 324 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a7bf885d5ba1489b97bb4b90dc689f252}\label{classsrc_1_1ffyapf_1_1FF_a7bf885d5ba1489b97bb4b90dc689f252}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!linedestroy\+\_\+save@{linedestroy\+\_\+save}}
+\index{linedestroy\+\_\+save@{linedestroy\+\_\+save}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{linedestroy\+\_\+save}{linedestroy\_save}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+linedestroy\+\_\+save}
+
+
+
+Destruction dictionary (experimental). 
+
+
+
+Definition at line 354 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a045adc994f0b33cfe27ec9e07faef38f}\label{classsrc_1_1ffyapf_1_1FF_a045adc994f0b33cfe27ec9e07faef38f}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!linedestroy\+\_\+this@{linedestroy\+\_\+this}}
+\index{linedestroy\+\_\+this@{linedestroy\+\_\+this}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{linedestroy\+\_\+this}{linedestroy\_this}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+linedestroy\+\_\+this}
+
+
+
+Definition at line 356 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_ac0187f2700fff8b52387d1a9461bfacf}\label{classsrc_1_1ffyapf_1_1FF_ac0187f2700fff8b52387d1a9461bfacf}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!map@{map}}
+\index{map@{map}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{map}{map}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+map}
+
+
+
+The mapping of interaction type -\/$>$ parameter number. 
+
+
+
+Definition at line 274 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a29e74447e815d30b95c0fdb6beb56bbb}\label{classsrc_1_1ffyapf_1_1FF_a29e74447e815d30b95c0fdb6beb56bbb}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!np@{np}}
+\index{np@{np}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{np}{np}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+np}
+
+
+
+The total number of parameters. 
+
+
+
+Definition at line 293 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a65543d043d27378c63ac7d6ab4e4ba32}\label{classsrc_1_1ffyapf_1_1FF_a65543d043d27378c63ac7d6ab4e4ba32}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!offxml@{offxml}}
+\index{offxml@{offxml}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{offxml}{offxml}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+offxml}
+
+
+
+Definition at line 487 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a4d47f2447aecbbbc5b49f64eecd51cff}\label{classsrc_1_1ffyapf_1_1FF_a4d47f2447aecbbbc5b49f64eecd51cff}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!openmmxml@{openmmxml}}
+\index{openmmxml@{openmmxml}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{openmmxml}{openmmxml}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+openmmxml}
+
+
+
+Definition at line 480 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a2e0e0f75682e55de01b54713d854528f}\label{classsrc_1_1ffyapf_1_1FF_a2e0e0f75682e55de01b54713d854528f}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!patoms@{patoms}}
+\index{patoms@{patoms}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{patoms}{patoms}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+patoms}
+
+
+
+A listing of parameter number -\/$>$ atoms involved. 
+
+
+
+Definition at line 278 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a3a2bea7c7c3ecf63bb3cd98828c0fd58}\label{classsrc_1_1ffyapf_1_1FF_a3a2bea7c7c3ecf63bb3cd98828c0fd58}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!pfields@{pfields}}
+\index{pfields@{pfields}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{pfields}{pfields}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+pfields}
+
+
+
+A list where pfields\mbox{[}i\mbox{]} = \mbox{[}pid,\textquotesingle{}file\textquotesingle{},line,field,mult,cmd\mbox{]}, basically a new way to modify force field files; when we modify the force field file, we go to the specific line/field in a given file and change the number. 
+
+
+
+Definition at line 283 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a600c53e8b497f3cd6033ad04697fb40c}\label{classsrc_1_1ffyapf_1_1FF_a600c53e8b497f3cd6033ad04697fb40c}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!plist@{plist}}
+\index{plist@{plist}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{plist}{plist}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+plist}
+
+
+
+The listing of parameter number -\/$>$ interaction types. 
+
+
+
+Definition at line 276 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_abb8aab8aafc7bfe637d5fcf226debaad}\label{classsrc_1_1ffyapf_1_1FF_abb8aab8aafc7bfe637d5fcf226debaad}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!prmdestroy\+\_\+save@{prmdestroy\+\_\+save}}
+\index{prmdestroy\+\_\+save@{prmdestroy\+\_\+save}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{prmdestroy\+\_\+save}{prmdestroy\_save}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+prmdestroy\+\_\+save}
+
+
+
+Definition at line 355 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a75537037c3d897b85f7d54b45dbca014}\label{classsrc_1_1ffyapf_1_1FF_a75537037c3d897b85f7d54b45dbca014}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!prmdestroy\+\_\+this@{prmdestroy\+\_\+this}}
+\index{prmdestroy\+\_\+this@{prmdestroy\+\_\+this}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{prmdestroy\+\_\+this}{prmdestroy\_this}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+prmdestroy\+\_\+this}
+
+
+
+Definition at line 357 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_af59602ddb21a54c130b0b732e99eae67}\label{classsrc_1_1ffyapf_1_1FF_af59602ddb21a54c130b0b732e99eae67}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!pvals0@{pvals0}}
+\index{pvals0@{pvals0}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{pvals0}{pvals0}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+pvals0}
+
+
+
+Initial value of physical parameters. 
+
+
+
+Definition at line 295 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a59eed571d6673a73cabc156bc82dc73b}\label{classsrc_1_1ffyapf_1_1FF_a59eed571d6673a73cabc156bc82dc73b}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!qid@{qid}}
+\index{qid@{qid}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{qid}{qid}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+qid}
+
+
+
+Definition at line 1359 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a7a77e7aeb6678815e269096d33080842}\label{classsrc_1_1ffyapf_1_1FF_a7a77e7aeb6678815e269096d33080842}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!qid2@{qid2}}
+\index{qid2@{qid2}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{qid2}{qid2}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+qid2}
+
+
+
+Definition at line 1360 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a52a4a2d74424530171a1bf5cae4f8ad9}\label{classsrc_1_1ffyapf_1_1FF_a52a4a2d74424530171a1bf5cae4f8ad9}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!qmap@{qmap}}
+\index{qmap@{qmap}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{qmap}{qmap}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+qmap}
+
+
+
+Definition at line 1358 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a1ec5e078dd2f588a788164f7c8999e4d}\label{classsrc_1_1ffyapf_1_1FF_a1ec5e078dd2f588a788164f7c8999e4d}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!Readers@{Readers}}
+\index{Readers@{Readers}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{Readers}{Readers}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+Readers}
+
+
+
+A dictionary of force field reader classes. 
+
+
+
+Definition at line 297 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a605dfe868e2fb26f2e15b4478f7b6eeb}\label{classsrc_1_1ffyapf_1_1FF_a605dfe868e2fb26f2e15b4478f7b6eeb}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!redirect@{redirect}}
+\index{redirect@{redirect}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{redirect}{redirect}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+redirect}
+
+
+
+Creates plist from map. 
+
+Prints the plist to screen. Make the rescaling factors. Make the transformation matrix. Redirection dictionary (experimental). 
+
+Definition at line 352 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a3ae060d14ad1de53e459619dfc738d65}\label{classsrc_1_1ffyapf_1_1FF_a3ae060d14ad1de53e459619dfc738d65}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!rs@{rs}}
+\index{rs@{rs}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{rs}{rs}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+rs}
+
+
+
+List of rescaling factors. 
+
+The array of rescaling factors. 
+
+Definition at line 285 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a4a23c7867d6cc24c86f77fff3ce056e0}\label{classsrc_1_1ffyapf_1_1FF_a4a23c7867d6cc24c86f77fff3ce056e0}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!rs\+\_\+ord@{rs\+\_\+ord}}
+\index{rs\+\_\+ord@{rs\+\_\+ord}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{rs\+\_\+ord}{rs\_ord}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+rs\+\_\+ord}
+
+
+
+Takes the dictionary \textquotesingle{}B\+O\+N\+DS\textquotesingle{}\+:\{3\+:\textquotesingle{}B\textquotesingle{}, 4\+:\textquotesingle{}K\textquotesingle{}\}, \textquotesingle{}V\+DW\textquotesingle{}\+:\{4\+:\textquotesingle{}S\textquotesingle{}, 5\+:\textquotesingle{}T\textquotesingle{}\}, and turns it into a list of term types \mbox{[}\textquotesingle{}B\+O\+N\+D\+SB\textquotesingle{},\textquotesingle{}B\+O\+N\+D\+SK\textquotesingle{},\textquotesingle{}V\+D\+WS\textquotesingle{},\textquotesingle{}V\+D\+WT\textquotesingle{}\mbox{]}. 
+
+
+
+Definition at line 1204 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a7299d76bfff2489099eb88b4b5479245}\label{classsrc_1_1ffyapf_1_1FF_a7299d76bfff2489099eb88b4b5479245}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!rs\+\_\+type@{rs\+\_\+type}}
+\index{rs\+\_\+type@{rs\+\_\+type}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{rs\+\_\+type}{rs\_type}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+rs\+\_\+type}
+
+
+
+Definition at line 1207 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a8ed82b69537dcbc5f0b436e20689dc22}\label{classsrc_1_1ffyapf_1_1FF_a8ed82b69537dcbc5f0b436e20689dc22}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!tinkerprm@{tinkerprm}}
+\index{tinkerprm@{tinkerprm}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{tinkerprm}{tinkerprm}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+tinkerprm}
+
+
+
+Definition at line 472 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_ad1fce7db160144f58504671f0a7dd3d6}\label{classsrc_1_1ffyapf_1_1FF_ad1fce7db160144f58504671f0a7dd3d6}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!tm@{tm}}
+\index{tm@{tm}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{tm}{tm}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+tm}
+
+
+
+The transformation matrix for mathematical -\/$>$ physical parameters. 
+
+
+
+Definition at line 287 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1ffyapf_1_1FF_a1cb1c9305460432c3503ba9b7394acc5}\label{classsrc_1_1ffyapf_1_1FF_a1cb1c9305460432c3503ba9b7394acc5}} 
+\index{src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}!tmI@{tmI}}
+\index{tmI@{tmI}!src\+::ffyapf\+::\+FF@{src\+::ffyapf\+::\+FF}}
+\paragraph{\texorpdfstring{tmI}{tmI}}
+{\footnotesize\ttfamily src.\+ffyapf.\+F\+F.\+tmI}
+
+
+
+The transpose of the transformation matrix. 
+
+
+
+Definition at line 289 of file ffyapf.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{ffyapf_8py}{ffyapf.\+py}\end{DoxyCompactItemize}

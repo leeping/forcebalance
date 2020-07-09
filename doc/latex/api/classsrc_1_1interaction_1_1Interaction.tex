@@ -1,0 +1,364 @@
+\hypertarget{classsrc_1_1interaction_1_1Interaction}{}\subsection{src.\+interaction.\+Interaction Class Reference}
+\label{classsrc_1_1interaction_1_1Interaction}\index{src.\+interaction.\+Interaction@{src.\+interaction.\+Interaction}}
+
+
+Subclass of Target for fitting force fields to interaction energies.  
+
+
+
+
+Inheritance diagram for src.\+interaction.\+Interaction\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{classsrc_1_1interaction_1_1Interaction__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+interaction.\+Interaction\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=222pt]{classsrc_1_1interaction_1_1Interaction__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1interaction_1_1Interaction_a1d02c0274fb07297a75a21195abcfa1f}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1interaction_1_1Interaction_aa48acb8e4fb977757bf194d363996b4e}{read\+\_\+reference\+\_\+data} (self)
+\begin{DoxyCompactList}\small\item\em Read the reference ab initio data from a file such as qdata.\+txt. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1interaction_1_1Interaction_a701bc0f64d4ad094259c21a75d7addac}{indicate} (self)
+\item 
+def \hyperlink{classsrc_1_1interaction_1_1Interaction_a38b00f6a1a99561520b30f6995492de9}{get} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em Evaluate objective function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_a63eb069ad104da75714f27b0d7a7a3d0}{select1}
+\begin{DoxyCompactList}\small\item\em Number of snapshots. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_ae1076300eeaacf9a332d271ccc649c42}{select2}
+\begin{DoxyCompactList}\small\item\em Set fragment 2. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_a1410b7854f7d2d4758eefd757798873f}{loop\+\_\+over\+\_\+snapshots}
+\begin{DoxyCompactList}\small\item\em Set upper cutoff energy. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_a434998fff4f973ce1bd9d026e121a6f1}{eqm}
+\begin{DoxyCompactList}\small\item\em Reference (QM) interaction energies. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_acba080f3210608be3ce74ec1d747f502}{label}
+\begin{DoxyCompactList}\small\item\em Snapshot label, useful for graphing. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_a52e371922894f77fe7cff07fe89dc2fe}{qfnm}
+\begin{DoxyCompactList}\small\item\em The qdata.\+txt file that contains the QM energies and forces. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_a35ee5459733d0fb42f07db599a50aecd}{e\+\_\+err}
+\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_afa9f16852bba9e0fbb00287f6a6a0bbd}{e\+\_\+err\+\_\+pct}
+\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_a3607dc785b20dfb46c141137294cfd41}{mol}
+\begin{DoxyCompactList}\small\item\em Read in the trajectory file. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_a9614d9622c80c11805de5223e4f2696a}{ns}
+\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_acdf911ff3c6697b959bc5edcff67035b}{engine}
+\begin{DoxyCompactList}\small\item\em Build keyword dictionaries to pass to engine. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_a98cbd2bf41947df173b9e68cfb22f843}{divisor}
+\begin{DoxyCompactList}\small\item\em Read in the reference data. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_a1e607cf9aea355210083401b2dd0fc84}{prefactor}
+\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_abd8c04a4e99808c9d5eb728e9a56debe}{weight}
+\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_ab5614c9829933a5297efc2a895f8a7a7}{emm}
+\item 
+\hyperlink{classsrc_1_1interaction_1_1Interaction_affa79ef8ca4ec5a13bb925578356aacc}{objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for fitting force fields to interaction energies. 
+
+Currently T\+I\+N\+K\+ER is supported.
+
+We introduce the following concepts\+:
+\begin{DoxyItemize}
+\item The number of snapshots
+\item The reference interaction energies and the file they belong in (qdata.\+txt)
+\end{DoxyItemize}
+
+This subclass contains the \textquotesingle{}get\textquotesingle{} method for building the objective function from any simulation software (a driver to run the program and read output is still required). 
+
+Definition at line 38 of file interaction.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a1d02c0274fb07297a75a21195abcfa1f}\label{classsrc_1_1interaction_1_1Interaction_a1d02c0274fb07297a75a21195abcfa1f}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+interaction.\+Interaction.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 41 of file interaction.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1interaction_1_1Interaction_a1d02c0274fb07297a75a21195abcfa1f_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a38b00f6a1a99561520b30f6995492de9}\label{classsrc_1_1interaction_1_1Interaction_a38b00f6a1a99561520b30f6995492de9}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!get@{get}}
+\index{get@{get}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+interaction.\+Interaction.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Evaluate objective function. 
+
+
+
+Definition at line 185 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a701bc0f64d4ad094259c21a75d7addac}\label{classsrc_1_1interaction_1_1Interaction_a701bc0f64d4ad094259c21a75d7addac}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+interaction.\+Interaction.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 160 of file interaction.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1interaction_1_1Interaction_a701bc0f64d4ad094259c21a75d7addac_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_aa48acb8e4fb977757bf194d363996b4e}\label{classsrc_1_1interaction_1_1Interaction_aa48acb8e4fb977757bf194d363996b4e}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}}
+\index{read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{read\+\_\+reference\+\_\+data()}{read\_reference\_data()}}
+{\footnotesize\ttfamily def src.\+interaction.\+Interaction.\+read\+\_\+reference\+\_\+data (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Read the reference ab initio data from a file such as qdata.\+txt. 
+
+After reading in the information from qdata.\+txt, it is converted into kcal/mol. 
+
+Definition at line 143 of file interaction.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a98cbd2bf41947df173b9e68cfb22f843}\label{classsrc_1_1interaction_1_1Interaction_a98cbd2bf41947df173b9e68cfb22f843}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!divisor@{divisor}}
+\index{divisor@{divisor}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{divisor}{divisor}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+divisor}
+
+
+
+Read in the reference data. 
+
+
+
+Definition at line 110 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a35ee5459733d0fb42f07db599a50aecd}\label{classsrc_1_1interaction_1_1Interaction_a35ee5459733d0fb42f07db599a50aecd}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!e\+\_\+err@{e\+\_\+err}}
+\index{e\+\_\+err@{e\+\_\+err}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{e\+\_\+err}{e\_err}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+e\+\_\+err}
+
+
+
+Definition at line 89 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_afa9f16852bba9e0fbb00287f6a6a0bbd}\label{classsrc_1_1interaction_1_1Interaction_afa9f16852bba9e0fbb00287f6a6a0bbd}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!e\+\_\+err\+\_\+pct@{e\+\_\+err\+\_\+pct}}
+\index{e\+\_\+err\+\_\+pct@{e\+\_\+err\+\_\+pct}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{e\+\_\+err\+\_\+pct}{e\_err\_pct}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+e\+\_\+err\+\_\+pct}
+
+
+
+Definition at line 90 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_ab5614c9829933a5297efc2a895f8a7a7}\label{classsrc_1_1interaction_1_1Interaction_ab5614c9829933a5297efc2a895f8a7a7}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!emm@{emm}}
+\index{emm@{emm}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{emm}{emm}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+emm}
+
+
+
+Definition at line 232 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_acdf911ff3c6697b959bc5edcff67035b}\label{classsrc_1_1interaction_1_1Interaction_acdf911ff3c6697b959bc5edcff67035b}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!engine@{engine}}
+\index{engine@{engine}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{engine}{engine}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+engine}
+
+
+
+Build keyword dictionaries to pass to engine. 
+
+
+
+Definition at line 103 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a434998fff4f973ce1bd9d026e121a6f1}\label{classsrc_1_1interaction_1_1Interaction_a434998fff4f973ce1bd9d026e121a6f1}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!eqm@{eqm}}
+\index{eqm@{eqm}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{eqm}{eqm}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+eqm}
+
+
+
+Reference (QM) interaction energies. 
+
+
+
+Definition at line 84 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_acba080f3210608be3ce74ec1d747f502}\label{classsrc_1_1interaction_1_1Interaction_acba080f3210608be3ce74ec1d747f502}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!label@{label}}
+\index{label@{label}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{label}{label}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+label}
+
+
+
+Snapshot label, useful for graphing. 
+
+
+
+Definition at line 86 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a1410b7854f7d2d4758eefd757798873f}\label{classsrc_1_1interaction_1_1Interaction_a1410b7854f7d2d4758eefd757798873f}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}}
+\index{loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{loop\+\_\+over\+\_\+snapshots}{loop\_over\_snapshots}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+loop\+\_\+over\+\_\+snapshots}
+
+
+
+Set upper cutoff energy. 
+
+Option for how much data to write to disk. L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. 
+
+Definition at line 82 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a3607dc785b20dfb46c141137294cfd41}\label{classsrc_1_1interaction_1_1Interaction_a3607dc785b20dfb46c141137294cfd41}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!mol@{mol}}
+\index{mol@{mol}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{mol}{mol}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+mol}
+
+
+
+Read in the trajectory file. 
+
+
+
+Definition at line 92 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a9614d9622c80c11805de5223e4f2696a}\label{classsrc_1_1interaction_1_1Interaction_a9614d9622c80c11805de5223e4f2696a}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!ns@{ns}}
+\index{ns@{ns}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{ns}{ns}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+ns}
+
+
+
+Definition at line 96 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_affa79ef8ca4ec5a13bb925578356aacc}\label{classsrc_1_1interaction_1_1Interaction_affa79ef8ca4ec5a13bb925578356aacc}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!objective@{objective}}
+\index{objective@{objective}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{objective}{objective}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+objective}
+
+
+
+Definition at line 233 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a1e607cf9aea355210083401b2dd0fc84}\label{classsrc_1_1interaction_1_1Interaction_a1e607cf9aea355210083401b2dd0fc84}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!prefactor@{prefactor}}
+\index{prefactor@{prefactor}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{prefactor}{prefactor}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+prefactor}
+
+
+
+Definition at line 129 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a52e371922894f77fe7cff07fe89dc2fe}\label{classsrc_1_1interaction_1_1Interaction_a52e371922894f77fe7cff07fe89dc2fe}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!qfnm@{qfnm}}
+\index{qfnm@{qfnm}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{qfnm}{qfnm}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+qfnm}
+
+
+
+The qdata.\+txt file that contains the QM energies and forces. 
+
+
+
+Definition at line 88 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_a63eb069ad104da75714f27b0d7a7a3d0}\label{classsrc_1_1interaction_1_1Interaction_a63eb069ad104da75714f27b0d7a7a3d0}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!select1@{select1}}
+\index{select1@{select1}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{select1}{select1}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+select1}
+
+
+
+Number of snapshots. 
+
+Do we call Q-\/\+Chem for dielectric energies? (Currently needs to be fixed) Do we put the reference energy into the denominator? Do we put the reference energy into the denominator? Divide by the number of snapshots? What is the energy denominator? Set fragment 1 
+
+Definition at line 66 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_ae1076300eeaacf9a332d271ccc649c42}\label{classsrc_1_1interaction_1_1Interaction_ae1076300eeaacf9a332d271ccc649c42}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!select2@{select2}}
+\index{select2@{select2}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{select2}{select2}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+select2}
+
+
+
+Set fragment 2. 
+
+
+
+Definition at line 70 of file interaction.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1interaction_1_1Interaction_abd8c04a4e99808c9d5eb728e9a56debe}\label{classsrc_1_1interaction_1_1Interaction_abd8c04a4e99808c9d5eb728e9a56debe}} 
+\index{src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}!weight@{weight}}
+\index{weight@{weight}!src\+::interaction\+::\+Interaction@{src\+::interaction\+::\+Interaction}}
+\paragraph{\texorpdfstring{weight}{weight}}
+{\footnotesize\ttfamily src.\+interaction.\+Interaction.\+weight}
+
+
+
+Definition at line 189 of file interaction.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{interaction_8py}{interaction.\+py}\end{DoxyCompactItemize}

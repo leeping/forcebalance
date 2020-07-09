@@ -1,3 +1,9 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classforcebalance_1_1objective_1_1Penalty.html" title="Penalty functions for regularizing the force field optimizer. " alt="" coords="5,5,221,35"/>
+<area shape="rect" id="node2" href="$classsrc_1_1target_1_1Target.html" title="Base class for all fitting targets. " alt="" coords="201,17,329,44"/>
+<area shape="rect" id="node3" href="$classsrc_1_1target_1_1RemoteTarget.html" title="src.target.RemoteTarget" alt="" coords="400,17,579,44"/>
+<area shape="rect" id="node6" href="$classsrc_1_1engine_1_1Engine.html" title="Base class for all engines. " alt="" coords="196,68,333,95"/>
+<area shape="rect" id="node7" href="$classsrc_1_1ffyapf_1_1FF.html" title="Force field class. " alt="" coords="215,119,315,145"/>
+<area shape="rect" id="node8" href="$classsrc_1_1forcefield_1_1FF.html" title="Force field class. " alt="" coords="203,169,327,196"/>
+<area shape="rect" id="node9" href="$classsrc_1_1objective_1_1Objective.html" title="Objective function. " alt="" coords="179,220,350,247"/>
+<area shape="rect" id="node10" href="$classsrc_1_1optimizer_1_1Optimizer.html" title="Optimizer class. " alt="" coords="177,271,352,297"/>
 </map>

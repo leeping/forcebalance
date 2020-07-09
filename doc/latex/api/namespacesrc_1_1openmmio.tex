@@ -1,0 +1,440 @@
+\hypertarget{namespacesrc_1_1openmmio}{}\subsection{src.\+openmmio Namespace Reference}
+\label{namespacesrc_1_1openmmio}\index{src.\+openmmio@{src.\+openmmio}}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_ad7583e022fa36c353cef6481931550bb}{get\+\_\+mask} (grps)
+\begin{DoxyCompactList}\small\item\em Given a list of booleans \mbox{[}1, 0, 1\mbox{]} return the bitmask that sets these force groups appropriately in Context.\+get\+State(). \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1openmmio_a507e4cd5f30d91e2050f64294a63c988}{energy\+\_\+components} (Sim, verbose=False)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_ad38addc4a72dedef5717b71f4680c02f}{get\+\_\+multipoles} (simulation, q=None, mass=None, positions=None, rmcom=True)
+\begin{DoxyCompactList}\small\item\em Return the current multipole moments in Debye and Buckingham units. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1openmmio_a8b766c129297cc81c86b244f7bc56dac}{get\+\_\+dipole} (simulation, q=None, mass=None, positions=None)
+\begin{DoxyCompactList}\small\item\em Return the current dipole moment in Debye. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1openmmio_a14cbde182c75ab72b116ec6eb9bd92f2}{Prepare\+Virtual\+Sites} (system)
+\begin{DoxyCompactList}\small\item\em Prepare a list of function wrappers and vsite parameters from the system. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1openmmio_a26d4930d37579b96258528deeee33550}{Reset\+Virtual\+Sites\+\_\+fast} (positions, vsinfo)
+\begin{DoxyCompactList}\small\item\em Given a set of Open\+M\+M-\/compatible positions and a System object, compute the correct virtual site positions according to the System. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1openmmio_ac0f168dd1caad3c5fe49e598758095c1}{Reset\+Virtual\+Sites} (positions, system)
+\begin{DoxyCompactList}\small\item\em Given a set of Open\+M\+M-\/compatible positions and a System object, compute the correct virtual site positions according to the System. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1openmmio_a33ffd85523d8820df033185c58938001}{Get\+Virtual\+Site\+Parameters} (system)
+\begin{DoxyCompactList}\small\item\em Return an array of all virtual site parameters in the system. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1openmmio_ac0fe2d35bcfdc2c94cda354a5bc93a11}{Copy\+Amoeba\+Bond\+Parameters} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_a72f8a12fe66bfcf92c034363652249d7}{Copy\+Amoeba\+Out\+Of\+Plane\+Bend\+Parameters} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_a9dc2514058421b3874712cfa3a745467}{Copy\+Amoeba\+Angle\+Parameters} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_a5c95b3f06588585c9750b3a593c00d35}{Copy\+Amoeba\+In\+Plane\+Angle\+Parameters} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_a1c3b100c558ec5e2dfc6b9e576c3e116}{Copy\+Amoeba\+Vdw\+Parameters} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_ab727cc0fceb5ed4abacd52acc99ec43a}{Copy\+Amoeba\+Multipole\+Parameters} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_aac056cf25d1ae9d169117969690d3be2}{Copy\+Harmonic\+Bond\+Parameters} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_aa184460c9c3b9beaa95abaeb8a879bf9}{Copy\+Harmonic\+Angle\+Parameters} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_a69e8771291135627a9500f379be6746d}{Copy\+Periodic\+Torsion\+Parameters} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_a839c303fbea5ec7b5241d5bd22a32066}{Copy\+Nonbonded\+Parameters} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_a2b19364e1d03f9345add59a55f408a49}{Copy\+G\+B\+S\+A\+O\+B\+C\+Parameters} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_a0317b5a3aac0ab5a6da3d11d91d493f4}{Copy\+Custom\+Nonbonded\+Parameters} (src, dest)
+\begin{DoxyCompactList}\small\item\em copy whatever update\+Parameters\+In\+Context can update\+: per-\/particle parameters \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1openmmio_a4e11fdb61d3e9174f761f7ba87b0fb4c}{do\+\_\+nothing} (src, dest)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_aeab37a6fcba5be52553047efcdb14f58}{Copy\+System\+Parameters} (src, dest)
+\begin{DoxyCompactList}\small\item\em Copy parameters from one system (i.\+e. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1openmmio_adc5e020218883a8a87f7e1810d0a155e}{Update\+Simulation\+Parameters} (src\+\_\+system, dest\+\_\+simulation)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_a47edd2998916d71f064a34a8ab232e31}{Set\+Amoeba\+Virtual\+Exclusions} (system)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_a67650529d4176645bc663bced5ac3c64}{Add\+Virtual\+Site\+Bonds} (mod, ff)
+\item 
+def \hyperlink{namespacesrc_1_1openmmio_af1cd2d40bf806bf32b8bd4f90677bf12}{Set\+Amoeba\+Nonbonded\+Exclude\+All} (system, topology)
+\begin{DoxyCompactList}\small\item\em Manually set the Amoeba\+Vdw\+Force, Amoeba\+Multipole\+Force to exclude all atoms belonging to the same residue. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1openmmio_aa8e806e2d494fc1c36153e8523ba99ff}{M\+T\+S\+V\+V\+V\+R\+Integrator} (temperature, collision\+\_\+rate, timestep, system, ninnersteps=4)
+\begin{DoxyCompactList}\small\item\em Create a multiple timestep velocity verlet with velocity randomization (V\+V\+VR) integrator. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1openmmio_a6247d5e13d27a3110aac12d4d325347a}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a67650529d4176645bc663bced5ac3c64}\label{namespacesrc_1_1openmmio_a67650529d4176645bc663bced5ac3c64}} 
+\index{src\+::openmmio@{src\+::openmmio}!Add\+Virtual\+Site\+Bonds@{Add\+Virtual\+Site\+Bonds}}
+\index{Add\+Virtual\+Site\+Bonds@{Add\+Virtual\+Site\+Bonds}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Add\+Virtual\+Site\+Bonds()}{AddVirtualSiteBonds()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Add\+Virtual\+Site\+Bonds (\begin{DoxyParamCaption}\item[{}]{mod,  }\item[{}]{ff }\end{DoxyParamCaption})}
+
+
+
+Definition at line 368 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a9dc2514058421b3874712cfa3a745467}\label{namespacesrc_1_1openmmio_a9dc2514058421b3874712cfa3a745467}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+Amoeba\+Angle\+Parameters@{Copy\+Amoeba\+Angle\+Parameters}}
+\index{Copy\+Amoeba\+Angle\+Parameters@{Copy\+Amoeba\+Angle\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+Amoeba\+Angle\+Parameters()}{CopyAmoebaAngleParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+Amoeba\+Angle\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 247 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_ac0fe2d35bcfdc2c94cda354a5bc93a11}\label{namespacesrc_1_1openmmio_ac0fe2d35bcfdc2c94cda354a5bc93a11}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+Amoeba\+Bond\+Parameters@{Copy\+Amoeba\+Bond\+Parameters}}
+\index{Copy\+Amoeba\+Bond\+Parameters@{Copy\+Amoeba\+Bond\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+Amoeba\+Bond\+Parameters()}{CopyAmoebaBondParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+Amoeba\+Bond\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 233 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a5c95b3f06588585c9750b3a593c00d35}\label{namespacesrc_1_1openmmio_a5c95b3f06588585c9750b3a593c00d35}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+Amoeba\+In\+Plane\+Angle\+Parameters@{Copy\+Amoeba\+In\+Plane\+Angle\+Parameters}}
+\index{Copy\+Amoeba\+In\+Plane\+Angle\+Parameters@{Copy\+Amoeba\+In\+Plane\+Angle\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+Amoeba\+In\+Plane\+Angle\+Parameters()}{CopyAmoebaInPlaneAngleParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+Amoeba\+In\+Plane\+Angle\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 256 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_ab727cc0fceb5ed4abacd52acc99ec43a}\label{namespacesrc_1_1openmmio_ab727cc0fceb5ed4abacd52acc99ec43a}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+Amoeba\+Multipole\+Parameters@{Copy\+Amoeba\+Multipole\+Parameters}}
+\index{Copy\+Amoeba\+Multipole\+Parameters@{Copy\+Amoeba\+Multipole\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+Amoeba\+Multipole\+Parameters()}{CopyAmoebaMultipoleParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+Amoeba\+Multipole\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 269 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a72f8a12fe66bfcf92c034363652249d7}\label{namespacesrc_1_1openmmio_a72f8a12fe66bfcf92c034363652249d7}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+Amoeba\+Out\+Of\+Plane\+Bend\+Parameters@{Copy\+Amoeba\+Out\+Of\+Plane\+Bend\+Parameters}}
+\index{Copy\+Amoeba\+Out\+Of\+Plane\+Bend\+Parameters@{Copy\+Amoeba\+Out\+Of\+Plane\+Bend\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+Amoeba\+Out\+Of\+Plane\+Bend\+Parameters()}{CopyAmoebaOutOfPlaneBendParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+Amoeba\+Out\+Of\+Plane\+Bend\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 239 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a1c3b100c558ec5e2dfc6b9e576c3e116}\label{namespacesrc_1_1openmmio_a1c3b100c558ec5e2dfc6b9e576c3e116}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+Amoeba\+Vdw\+Parameters@{Copy\+Amoeba\+Vdw\+Parameters}}
+\index{Copy\+Amoeba\+Vdw\+Parameters@{Copy\+Amoeba\+Vdw\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+Amoeba\+Vdw\+Parameters()}{CopyAmoebaVdwParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+Amoeba\+Vdw\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 265 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a0317b5a3aac0ab5a6da3d11d91d493f4}\label{namespacesrc_1_1openmmio_a0317b5a3aac0ab5a6da3d11d91d493f4}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+Custom\+Nonbonded\+Parameters@{Copy\+Custom\+Nonbonded\+Parameters}}
+\index{Copy\+Custom\+Nonbonded\+Parameters@{Copy\+Custom\+Nonbonded\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+Custom\+Nonbonded\+Parameters()}{CopyCustomNonbondedParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+Custom\+Nonbonded\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+copy whatever update\+Parameters\+In\+Context can update\+: per-\/particle parameters 
+
+
+
+Definition at line 303 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a2b19364e1d03f9345add59a55f408a49}\label{namespacesrc_1_1openmmio_a2b19364e1d03f9345add59a55f408a49}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+G\+B\+S\+A\+O\+B\+C\+Parameters@{Copy\+G\+B\+S\+A\+O\+B\+C\+Parameters}}
+\index{Copy\+G\+B\+S\+A\+O\+B\+C\+Parameters@{Copy\+G\+B\+S\+A\+O\+B\+C\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+G\+B\+S\+A\+O\+B\+C\+Parameters()}{CopyGBSAOBCParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+G\+B\+S\+A\+O\+B\+C\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 292 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_aa184460c9c3b9beaa95abaeb8a879bf9}\label{namespacesrc_1_1openmmio_aa184460c9c3b9beaa95abaeb8a879bf9}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+Harmonic\+Angle\+Parameters@{Copy\+Harmonic\+Angle\+Parameters}}
+\index{Copy\+Harmonic\+Angle\+Parameters@{Copy\+Harmonic\+Angle\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+Harmonic\+Angle\+Parameters()}{CopyHarmonicAngleParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+Harmonic\+Angle\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 277 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_aac056cf25d1ae9d169117969690d3be2}\label{namespacesrc_1_1openmmio_aac056cf25d1ae9d169117969690d3be2}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+Harmonic\+Bond\+Parameters@{Copy\+Harmonic\+Bond\+Parameters}}
+\index{Copy\+Harmonic\+Bond\+Parameters@{Copy\+Harmonic\+Bond\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+Harmonic\+Bond\+Parameters()}{CopyHarmonicBondParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+Harmonic\+Bond\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 273 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a839c303fbea5ec7b5241d5bd22a32066}\label{namespacesrc_1_1openmmio_a839c303fbea5ec7b5241d5bd22a32066}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+Nonbonded\+Parameters@{Copy\+Nonbonded\+Parameters}}
+\index{Copy\+Nonbonded\+Parameters@{Copy\+Nonbonded\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+Nonbonded\+Parameters()}{CopyNonbondedParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+Nonbonded\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 285 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a69e8771291135627a9500f379be6746d}\label{namespacesrc_1_1openmmio_a69e8771291135627a9500f379be6746d}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+Periodic\+Torsion\+Parameters@{Copy\+Periodic\+Torsion\+Parameters}}
+\index{Copy\+Periodic\+Torsion\+Parameters@{Copy\+Periodic\+Torsion\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+Periodic\+Torsion\+Parameters()}{CopyPeriodicTorsionParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+Periodic\+Torsion\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 281 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_aeab37a6fcba5be52553047efcdb14f58}\label{namespacesrc_1_1openmmio_aeab37a6fcba5be52553047efcdb14f58}} 
+\index{src\+::openmmio@{src\+::openmmio}!Copy\+System\+Parameters@{Copy\+System\+Parameters}}
+\index{Copy\+System\+Parameters@{Copy\+System\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Copy\+System\+Parameters()}{CopySystemParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Copy\+System\+Parameters (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Copy parameters from one system (i.\+e. 
+
+that which is created by a new force field) sto another system (i.\+e. the one stored inside the Target object). D\+A\+N\+G\+ER\+: These need to be implemented manually!!! 
+
+Definition at line 314 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a4e11fdb61d3e9174f761f7ba87b0fb4c}\label{namespacesrc_1_1openmmio_a4e11fdb61d3e9174f761f7ba87b0fb4c}} 
+\index{src\+::openmmio@{src\+::openmmio}!do\+\_\+nothing@{do\+\_\+nothing}}
+\index{do\+\_\+nothing@{do\+\_\+nothing}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{do\+\_\+nothing()}{do\_nothing()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+do\+\_\+nothing (\begin{DoxyParamCaption}\item[{}]{src,  }\item[{}]{dest }\end{DoxyParamCaption})}
+
+
+
+Definition at line 307 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a507e4cd5f30d91e2050f64294a63c988}\label{namespacesrc_1_1openmmio_a507e4cd5f30d91e2050f64294a63c988}} 
+\index{src\+::openmmio@{src\+::openmmio}!energy\+\_\+components@{energy\+\_\+components}}
+\index{energy\+\_\+components@{energy\+\_\+components}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{energy\+\_\+components()}{energy\_components()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+energy\+\_\+components (\begin{DoxyParamCaption}\item[{}]{Sim,  }\item[{}]{verbose = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 58 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a8b766c129297cc81c86b244f7bc56dac}\label{namespacesrc_1_1openmmio_a8b766c129297cc81c86b244f7bc56dac}} 
+\index{src\+::openmmio@{src\+::openmmio}!get\+\_\+dipole@{get\+\_\+dipole}}
+\index{get\+\_\+dipole@{get\+\_\+dipole}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{get\+\_\+dipole()}{get\_dipole()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+get\+\_\+dipole (\begin{DoxyParamCaption}\item[{}]{simulation,  }\item[{}]{q = {\ttfamily None},  }\item[{}]{mass = {\ttfamily None},  }\item[{}]{positions = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Return the current dipole moment in Debye. 
+
+Note that this quantity is meaningless if the system carries a net charge. 
+
+Definition at line 127 of file openmmio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1openmmio_a8b766c129297cc81c86b244f7bc56dac_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_ad7583e022fa36c353cef6481931550bb}\label{namespacesrc_1_1openmmio_ad7583e022fa36c353cef6481931550bb}} 
+\index{src\+::openmmio@{src\+::openmmio}!get\+\_\+mask@{get\+\_\+mask}}
+\index{get\+\_\+mask@{get\+\_\+mask}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{get\+\_\+mask()}{get\_mask()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+get\+\_\+mask (\begin{DoxyParamCaption}\item[{}]{grps }\end{DoxyParamCaption})}
+
+
+
+Given a list of booleans \mbox{[}1, 0, 1\mbox{]} return the bitmask that sets these force groups appropriately in Context.\+get\+State(). 
+
+Any values not provided are defaulted to 1. 
+
+Definition at line 48 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_ad38addc4a72dedef5717b71f4680c02f}\label{namespacesrc_1_1openmmio_ad38addc4a72dedef5717b71f4680c02f}} 
+\index{src\+::openmmio@{src\+::openmmio}!get\+\_\+multipoles@{get\+\_\+multipoles}}
+\index{get\+\_\+multipoles@{get\+\_\+multipoles}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{get\+\_\+multipoles()}{get\_multipoles()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+get\+\_\+multipoles (\begin{DoxyParamCaption}\item[{}]{simulation,  }\item[{}]{q = {\ttfamily None},  }\item[{}]{mass = {\ttfamily None},  }\item[{}]{positions = {\ttfamily None},  }\item[{}]{rmcom = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Return the current multipole moments in Debye and Buckingham units. 
+
+
+
+Definition at line 68 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a33ffd85523d8820df033185c58938001}\label{namespacesrc_1_1openmmio_a33ffd85523d8820df033185c58938001}} 
+\index{src\+::openmmio@{src\+::openmmio}!Get\+Virtual\+Site\+Parameters@{Get\+Virtual\+Site\+Parameters}}
+\index{Get\+Virtual\+Site\+Parameters@{Get\+Virtual\+Site\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Get\+Virtual\+Site\+Parameters()}{GetVirtualSiteParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Get\+Virtual\+Site\+Parameters (\begin{DoxyParamCaption}\item[{}]{system }\end{DoxyParamCaption})}
+
+
+
+Return an array of all virtual site parameters in the system. 
+
+Used for comparison purposes. 
+
+Definition at line 214 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_aa8e806e2d494fc1c36153e8523ba99ff}\label{namespacesrc_1_1openmmio_aa8e806e2d494fc1c36153e8523ba99ff}} 
+\index{src\+::openmmio@{src\+::openmmio}!M\+T\+S\+V\+V\+V\+R\+Integrator@{M\+T\+S\+V\+V\+V\+R\+Integrator}}
+\index{M\+T\+S\+V\+V\+V\+R\+Integrator@{M\+T\+S\+V\+V\+V\+R\+Integrator}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{M\+T\+S\+V\+V\+V\+R\+Integrator()}{MTSVVVRIntegrator()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+M\+T\+S\+V\+V\+V\+R\+Integrator (\begin{DoxyParamCaption}\item[{}]{temperature,  }\item[{}]{collision\+\_\+rate,  }\item[{}]{timestep,  }\item[{}]{system,  }\item[{}]{ninnersteps = {\ttfamily 4} }\end{DoxyParamCaption})}
+
+
+
+Create a multiple timestep velocity verlet with velocity randomization (V\+V\+VR) integrator. 
+
+A\+R\+G\+U\+M\+E\+N\+TS
+
+temperature (Quantity compatible with kelvin) -\/ the temperature collision\+\_\+rate (Quantity compatible with 1/picoseconds) -\/ the collision rate timestep (Quantity compatible with femtoseconds) -\/ the integration timestep system (simtk.\+openmm.\+System) -\/ system whose forces will be partitioned ninnersteps (int) -\/ number of inner timesteps (default\+: 4)
+
+R\+E\+T\+U\+R\+NS
+
+integrator (openmm.\+Custom\+Integrator) -\/ a V\+V\+VR integrator
+
+N\+O\+T\+ES
+
+This integrator is equivalent to a Langevin integrator in the velocity Verlet discretization with a timestep correction to ensure that the field-\/free diffusion constant is timestep invariant. The inner velocity Verlet discretization is transformed into a multiple timestep algorithm.
+
+R\+E\+F\+E\+R\+E\+N\+C\+ES
+
+V\+V\+VR Langevin integrator\+:
+\begin{DoxyItemize}
+\item \href{http://arxiv.org/abs/1301.3800}{\tt http\+://arxiv.\+org/abs/1301.\+3800}
+\item \href{http://arxiv.org/abs/1107.2967}{\tt http\+://arxiv.\+org/abs/1107.\+2967} (to appear in P\+RX 2013)
+\end{DoxyItemize}
+
+T\+O\+DO
+
+Move initialization of \textquotesingle{}sigma\textquotesingle{} to setting the per-\/particle variables. 
+
+Definition at line 429 of file openmmio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1openmmio_aa8e806e2d494fc1c36153e8523ba99ff_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a14cbde182c75ab72b116ec6eb9bd92f2}\label{namespacesrc_1_1openmmio_a14cbde182c75ab72b116ec6eb9bd92f2}} 
+\index{src\+::openmmio@{src\+::openmmio}!Prepare\+Virtual\+Sites@{Prepare\+Virtual\+Sites}}
+\index{Prepare\+Virtual\+Sites@{Prepare\+Virtual\+Sites}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Prepare\+Virtual\+Sites()}{PrepareVirtualSites()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Prepare\+Virtual\+Sites (\begin{DoxyParamCaption}\item[{}]{system }\end{DoxyParamCaption})}
+
+
+
+Prepare a list of function wrappers and vsite parameters from the system. 
+
+
+
+Definition at line 132 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_ac0f168dd1caad3c5fe49e598758095c1}\label{namespacesrc_1_1openmmio_ac0f168dd1caad3c5fe49e598758095c1}} 
+\index{src\+::openmmio@{src\+::openmmio}!Reset\+Virtual\+Sites@{Reset\+Virtual\+Sites}}
+\index{Reset\+Virtual\+Sites@{Reset\+Virtual\+Sites}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Reset\+Virtual\+Sites()}{ResetVirtualSites()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Reset\+Virtual\+Sites (\begin{DoxyParamCaption}\item[{}]{positions,  }\item[{}]{system }\end{DoxyParamCaption})}
+
+
+
+Given a set of Open\+M\+M-\/compatible positions and a System object, compute the correct virtual site positions according to the System. 
+
+
+
+Definition at line 187 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a26d4930d37579b96258528deeee33550}\label{namespacesrc_1_1openmmio_a26d4930d37579b96258528deeee33550}} 
+\index{src\+::openmmio@{src\+::openmmio}!Reset\+Virtual\+Sites\+\_\+fast@{Reset\+Virtual\+Sites\+\_\+fast}}
+\index{Reset\+Virtual\+Sites\+\_\+fast@{Reset\+Virtual\+Sites\+\_\+fast}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Reset\+Virtual\+Sites\+\_\+fast()}{ResetVirtualSites\_fast()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Reset\+Virtual\+Sites\+\_\+fast (\begin{DoxyParamCaption}\item[{}]{positions,  }\item[{}]{vsinfo }\end{DoxyParamCaption})}
+
+
+
+Given a set of Open\+M\+M-\/compatible positions and a System object, compute the correct virtual site positions according to the System. 
+
+
+
+Definition at line 172 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_af1cd2d40bf806bf32b8bd4f90677bf12}\label{namespacesrc_1_1openmmio_af1cd2d40bf806bf32b8bd4f90677bf12}} 
+\index{src\+::openmmio@{src\+::openmmio}!Set\+Amoeba\+Nonbonded\+Exclude\+All@{Set\+Amoeba\+Nonbonded\+Exclude\+All}}
+\index{Set\+Amoeba\+Nonbonded\+Exclude\+All@{Set\+Amoeba\+Nonbonded\+Exclude\+All}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Set\+Amoeba\+Nonbonded\+Exclude\+All()}{SetAmoebaNonbondedExcludeAll()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Set\+Amoeba\+Nonbonded\+Exclude\+All (\begin{DoxyParamCaption}\item[{}]{system,  }\item[{}]{topology }\end{DoxyParamCaption})}
+
+
+
+Manually set the Amoeba\+Vdw\+Force, Amoeba\+Multipole\+Force to exclude all atoms belonging to the same residue. 
+
+
+
+Definition at line 382 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a47edd2998916d71f064a34a8ab232e31}\label{namespacesrc_1_1openmmio_a47edd2998916d71f064a34a8ab232e31}} 
+\index{src\+::openmmio@{src\+::openmmio}!Set\+Amoeba\+Virtual\+Exclusions@{Set\+Amoeba\+Virtual\+Exclusions}}
+\index{Set\+Amoeba\+Virtual\+Exclusions@{Set\+Amoeba\+Virtual\+Exclusions}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Set\+Amoeba\+Virtual\+Exclusions()}{SetAmoebaVirtualExclusions()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Set\+Amoeba\+Virtual\+Exclusions (\begin{DoxyParamCaption}\item[{}]{system }\end{DoxyParamCaption})}
+
+
+
+Definition at line 348 of file openmmio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_adc5e020218883a8a87f7e1810d0a155e}\label{namespacesrc_1_1openmmio_adc5e020218883a8a87f7e1810d0a155e}} 
+\index{src\+::openmmio@{src\+::openmmio}!Update\+Simulation\+Parameters@{Update\+Simulation\+Parameters}}
+\index{Update\+Simulation\+Parameters@{Update\+Simulation\+Parameters}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{Update\+Simulation\+Parameters()}{UpdateSimulationParameters()}}
+{\footnotesize\ttfamily def src.\+openmmio.\+Update\+Simulation\+Parameters (\begin{DoxyParamCaption}\item[{}]{src\+\_\+system,  }\item[{}]{dest\+\_\+simulation }\end{DoxyParamCaption})}
+
+
+
+Definition at line 335 of file openmmio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1openmmio_adc5e020218883a8a87f7e1810d0a155e_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1openmmio_a6247d5e13d27a3110aac12d4d325347a}\label{namespacesrc_1_1openmmio_a6247d5e13d27a3110aac12d4d325347a}} 
+\index{src\+::openmmio@{src\+::openmmio}!logger@{logger}}
+\index{logger@{logger}!src\+::openmmio@{src\+::openmmio}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+openmmio.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 35 of file openmmio.\+py.
+

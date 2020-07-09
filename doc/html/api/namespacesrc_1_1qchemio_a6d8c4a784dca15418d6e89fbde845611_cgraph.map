@@ -1,0 +1,8 @@
+<map id="src.qchemio.QChem_Dielectric_Energy" name="src.qchemio.QChem_Dielectric_Energy">
+<area shape="rect" id="node2" href="$namespacesrc_1_1nifty.html#ac5445375fcdc5825bb874014b04c45d7" title="src.nifty.GoInto" alt="" coords="286,5,406,32"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1nifty.html#a1e3f0a07d4cb01636522cbef8b1e8c72" title="Submit a job to the Work Queue. " alt="" coords="276,56,416,83"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1nifty.html#adef15c0f6efffef55b8c8212d5722d78" title="src.nifty.Leave" alt="" coords="288,107,404,133"/>
+<area shape="rect" id="node6" href="$namespacesrc_1_1nifty.html#a1f6829e41379fd0b24c3cc2f4d6a8036" title="This function waits until the work queue is completely empty. " alt="" coords="281,157,411,184"/>
+<area shape="rect" id="node5" href="$namespacesrc_1_1nifty.html#a18cbb1a44578e68dde486deac3089f77" title="src.nifty.allsplit" alt="" coords="473,107,594,133"/>
+<area shape="rect" id="node7" href="$namespacesrc_1_1nifty.html#a751edc0be54afcd841c93b4132cfb291" title="This function waits ten seconds to see if a task in the Work Queue has finished. " alt="" coords="464,157,603,184"/>
+</map>

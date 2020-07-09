@@ -1,11 +1,8 @@
 var searchData=
 [
-  ['leastsquares',['LeastSquares',['../classforcebalance_1_1leastsq_1_1LeastSquares.html',1,'forcebalance::leastsq']]],
-  ['linechunker',['LineChunker',['../classforcebalance_1_1nifty_1_1LineChunker.html',1,'forcebalance::nifty']]],
-  ['lipid',['Lipid',['../classforcebalance_1_1lipid_1_1Lipid.html',1,'forcebalance::lipid']]],
-  ['lipid_5fgmx',['Lipid_GMX',['../classforcebalance_1_1gmxio_1_1Lipid__GMX.html',1,'forcebalance::gmxio']]],
-  ['liquid',['Liquid',['../classforcebalance_1_1liquid_1_1Liquid.html',1,'forcebalance::liquid']]],
-  ['liquid_5fgmx',['Liquid_GMX',['../classforcebalance_1_1gmxio_1_1Liquid__GMX.html',1,'forcebalance::gmxio']]],
-  ['liquid_5fopenmm',['Liquid_OpenMM',['../classforcebalance_1_1openmmio_1_1Liquid__OpenMM.html',1,'forcebalance::openmmio']]],
-  ['liquid_5ftinker',['Liquid_TINKER',['../classforcebalance_1_1tinkerio_1_1Liquid__TINKER.html',1,'forcebalance::tinkerio']]]
+  ['interaction',['Interaction',['../classsrc_1_1interaction_1_1Interaction.html',1,'src::interaction']]],
+  ['interaction_5famber',['Interaction_AMBER',['../classsrc_1_1amberio_1_1Interaction__AMBER.html',1,'src::amberio']]],
+  ['interaction_5fgmx',['Interaction_GMX',['../classsrc_1_1gmxio_1_1Interaction__GMX.html',1,'src::gmxio']]],
+  ['interaction_5ftinker',['Interaction_TINKER',['../classsrc_1_1tinkerio_1_1Interaction__TINKER.html',1,'src::tinkerio']]],
+  ['itp_5freader',['ITP_Reader',['../classsrc_1_1gmxio_1_1ITP__Reader.html',1,'src::gmxio']]]
 ];

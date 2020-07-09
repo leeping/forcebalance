@@ -1,0 +1,326 @@
+\hypertarget{namespacesrc_1_1parser}{}\subsection{src.\+parser Namespace Reference}
+\label{namespacesrc_1_1parser}\index{src.\+parser@{src.\+parser}}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1parser_aced2c9dd0d97e164410aa12d7f69b829}{read\+\_\+mvals} (fobj)
+\item 
+def \hyperlink{namespacesrc_1_1parser_a93628f20ba0ae19f3efa460ea7f3e730}{read\+\_\+pvals} (fobj)
+\item 
+def \hyperlink{namespacesrc_1_1parser_a495dddc31f547cfe3d66134ffeb1bd90}{read\+\_\+priors} (fobj)
+\item 
+def \hyperlink{namespacesrc_1_1parser_abb7e103f77bb3de5a9019b2dd9680b5c}{read\+\_\+internals} (fobj)
+\item 
+def \hyperlink{namespacesrc_1_1parser_a070e27d6697698ee71f789283d019d52}{printsection} (heading, optdict, typedict)
+\begin{DoxyCompactList}\small\item\em Print out a section of the input file in a parser-\/compliant and readable format. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1parser_a0931939fda05a56904977f2b4e1394d2}{parse\+\_\+inputs} (input\+\_\+file=None)
+\begin{DoxyCompactList}\small\item\em Parse through the input file and read all user-\/supplied options. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1parser_a37a64ec016ef29a383149466e0531dc2}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\item 
+dictionary \hyperlink{namespacesrc_1_1parser_a87f26164b219a12ecb4b5e6408993d9f}{gen\+\_\+opts\+\_\+types}
+\begin{DoxyCompactList}\small\item\em Default general options. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespacesrc_1_1parser_a2bdfa0e60da43a8d38b4a460cde96c27}{tgt\+\_\+opts\+\_\+types}
+\begin{DoxyCompactList}\small\item\em Default fitting target options. \end{DoxyCompactList}\item 
+\hyperlink{namespacesrc_1_1parser_a26b1b3d3368acc2ec0ec971560d78275}{all\+\_\+opts\+\_\+names} = list(itertools.\+chain($\ast$\mbox{[}i.\+keys() for i in gen\+\_\+opts\+\_\+types.\+values()\mbox{]})) + list(itertools.\+chain($\ast$\mbox{[}i.\+keys() for i in tgt\+\_\+opts\+\_\+types.\+values()\mbox{]}))
+\item 
+list \hyperlink{namespacesrc_1_1parser_aa00075364aedd66048fd3e55084557e3}{iocc} = \mbox{[}$\,$\mbox{]}
+\begin{DoxyCompactList}\small\item\em Check for uniqueness of option names. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespacesrc_1_1parser_ad13e9dbc3f7c04ae17a7511611623c05}{gen\+\_\+opts\+\_\+defaults} = \{\}
+\begin{DoxyCompactList}\small\item\em Default general options -\/ basically a collapsed veresion of gen\+\_\+opts\+\_\+types. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespacesrc_1_1parser_acb02e552cbc9ba8a6aa198cfb3f611d1}{subdict} = \{\}
+\item 
+dictionary \hyperlink{namespacesrc_1_1parser_ae5983fa8e346d61dd63f2ecb04d1b2ab}{tgt\+\_\+opts\+\_\+defaults} = \{\}
+\begin{DoxyCompactList}\small\item\em Default target options -\/ basically a collapsed version of tgt\+\_\+opts\+\_\+types. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespacesrc_1_1parser_af3841a74b2abb7963296d90ba62f8cf4}{bkwd}
+\begin{DoxyCompactList}\small\item\em Option maps for maintaining backward compatibility. \end{DoxyCompactList}\item 
+list \hyperlink{namespacesrc_1_1parser_a4ef62c5cd7d4749296b0cfeb4b3bd0e2}{mainsections} = \mbox{[}\char`\"{}S\+I\+M\+U\+L\+A\+T\+I\+ON\char`\"{},\char`\"{}T\+A\+R\+G\+ET\char`\"{},\char`\"{}O\+P\+T\+I\+O\+NS\char`\"{},\char`\"{}E\+ND\char`\"{},\char`\"{}N\+O\+NE\char`\"{}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Listing of sections in the input file. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespacesrc_1_1parser_a956ec0b198397b9f4ccd520ecf589be2}{Pars\+Tab}
+\begin{DoxyCompactList}\small\item\em Pars\+Tab that refers to subsection parsers. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1parser_a0931939fda05a56904977f2b4e1394d2}\label{namespacesrc_1_1parser_a0931939fda05a56904977f2b4e1394d2}} 
+\index{src\+::parser@{src\+::parser}!parse\+\_\+inputs@{parse\+\_\+inputs}}
+\index{parse\+\_\+inputs@{parse\+\_\+inputs}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{parse\+\_\+inputs()}{parse\_inputs()}}
+{\footnotesize\ttfamily def src.\+parser.\+parse\+\_\+inputs (\begin{DoxyParamCaption}\item[{}]{input\+\_\+file = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Parse through the input file and read all user-\/supplied options. 
+
+This is usually the first thing that happens when an executable script is called. Our parser first loads the default options, and then updates these options as it encounters keywords.
+
+Each keyword corresponds to a variable type; each variable type (e.\+g. string, integer, float, boolean) is treated differently. For more elaborate inputs, there is a \textquotesingle{}section\textquotesingle{} variable type.
+
+There is only one set of general options, but multiple sets of target options. Each target has its own section delimited by the {\itshape \$target} keyword, and we build a list of target options.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em input\+\_\+file} & The name of the input file. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+options General options. 
+
+tgt\+\_\+opts List of fitting target options.
+\end{DoxyReturn}
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000014}{Todo}]Implement internal coordinates. 
+
+Implement sampling correction. 
+
+Implement charge groups. \end{DoxyRefDesc}
+
+
+Definition at line 471 of file parser.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1parser_a0931939fda05a56904977f2b4e1394d2_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1parser_a070e27d6697698ee71f789283d019d52}\label{namespacesrc_1_1parser_a070e27d6697698ee71f789283d019d52}} 
+\index{src\+::parser@{src\+::parser}!printsection@{printsection}}
+\index{printsection@{printsection}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{printsection()}{printsection()}}
+{\footnotesize\ttfamily def src.\+parser.\+printsection (\begin{DoxyParamCaption}\item[{}]{heading,  }\item[{}]{optdict,  }\item[{}]{typedict }\end{DoxyParamCaption})}
+
+
+
+Print out a section of the input file in a parser-\/compliant and readable format. 
+
+At the time of writing of this function, it\textquotesingle{}s mainly intended to be called by \hyperlink{MakeInputFile_8py}{Make\+Input\+File.\+py}. The heading is printed first (it is something like \$options or \$target). Then it loops through the variable types (strings, allcaps, etc...) and the keys in each variable type. The one-\/line description of each key is printed out as a comment, and then the key itself is printed out along with the value provided in optdict. If optdict is None, then the default value is printed out instead.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em heading} & Heading, either \$options or \$target \\
+\hline
+\mbox{\tt in}  & {\em optdict} & Options dictionary or None. \\
+\hline
+\mbox{\tt in}  & {\em typedict} & Option type dictionary, either gen\+\_\+opts\+\_\+types or tgt\+\_\+opts\+\_\+types specified in this file. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Answer List of strings for the section that we are printing out. 
+\end{DoxyReturn}
+
+
+Definition at line 374 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_abb7e103f77bb3de5a9019b2dd9680b5c}\label{namespacesrc_1_1parser_abb7e103f77bb3de5a9019b2dd9680b5c}} 
+\index{src\+::parser@{src\+::parser}!read\+\_\+internals@{read\+\_\+internals}}
+\index{read\+\_\+internals@{read\+\_\+internals}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{read\+\_\+internals()}{read\_internals()}}
+{\footnotesize\ttfamily def src.\+parser.\+read\+\_\+internals (\begin{DoxyParamCaption}\item[{}]{fobj }\end{DoxyParamCaption})}
+
+
+
+Definition at line 348 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_aced2c9dd0d97e164410aa12d7f69b829}\label{namespacesrc_1_1parser_aced2c9dd0d97e164410aa12d7f69b829}} 
+\index{src\+::parser@{src\+::parser}!read\+\_\+mvals@{read\+\_\+mvals}}
+\index{read\+\_\+mvals@{read\+\_\+mvals}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{read\+\_\+mvals()}{read\_mvals()}}
+{\footnotesize\ttfamily def src.\+parser.\+read\+\_\+mvals (\begin{DoxyParamCaption}\item[{}]{fobj }\end{DoxyParamCaption})}
+
+
+
+Definition at line 323 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_a495dddc31f547cfe3d66134ffeb1bd90}\label{namespacesrc_1_1parser_a495dddc31f547cfe3d66134ffeb1bd90}} 
+\index{src\+::parser@{src\+::parser}!read\+\_\+priors@{read\+\_\+priors}}
+\index{read\+\_\+priors@{read\+\_\+priors}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{read\+\_\+priors()}{read\_priors()}}
+{\footnotesize\ttfamily def src.\+parser.\+read\+\_\+priors (\begin{DoxyParamCaption}\item[{}]{fobj }\end{DoxyParamCaption})}
+
+
+
+Definition at line 339 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_a93628f20ba0ae19f3efa460ea7f3e730}\label{namespacesrc_1_1parser_a93628f20ba0ae19f3efa460ea7f3e730}} 
+\index{src\+::parser@{src\+::parser}!read\+\_\+pvals@{read\+\_\+pvals}}
+\index{read\+\_\+pvals@{read\+\_\+pvals}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{read\+\_\+pvals()}{read\_pvals()}}
+{\footnotesize\ttfamily def src.\+parser.\+read\+\_\+pvals (\begin{DoxyParamCaption}\item[{}]{fobj }\end{DoxyParamCaption})}
+
+
+
+Definition at line 331 of file parser.\+py.
+
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1parser_a26b1b3d3368acc2ec0ec971560d78275}\label{namespacesrc_1_1parser_a26b1b3d3368acc2ec0ec971560d78275}} 
+\index{src\+::parser@{src\+::parser}!all\+\_\+opts\+\_\+names@{all\+\_\+opts\+\_\+names}}
+\index{all\+\_\+opts\+\_\+names@{all\+\_\+opts\+\_\+names}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{all\+\_\+opts\+\_\+names}{all\_opts\_names}}
+{\footnotesize\ttfamily src.\+parser.\+all\+\_\+opts\+\_\+names = list(itertools.\+chain($\ast$\mbox{[}i.\+keys() for i in gen\+\_\+opts\+\_\+types.\+values()\mbox{]})) + list(itertools.\+chain($\ast$\mbox{[}i.\+keys() for i in tgt\+\_\+opts\+\_\+types.\+values()\mbox{]}))}
+
+
+
+Definition at line 275 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_af3841a74b2abb7963296d90ba62f8cf4}\label{namespacesrc_1_1parser_af3841a74b2abb7963296d90ba62f8cf4}} 
+\index{src\+::parser@{src\+::parser}!bkwd@{bkwd}}
+\index{bkwd@{bkwd}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{bkwd}{bkwd}}
+{\footnotesize\ttfamily dictionary src.\+parser.\+bkwd}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  \{\textcolor{stringliteral}{"simtype"} : \textcolor{stringliteral}{"type"},
+2         \textcolor{stringliteral}{"masterfile"} : \textcolor{stringliteral}{"inter\_txt"},
+3         \textcolor{stringliteral}{"openmm\_cuda\_precision"} : \textcolor{stringliteral}{"openmm\_precision"},
+4         \textcolor{stringliteral}{"mdrun\_threads"} : \textcolor{stringliteral}{"md\_threads"},
+5         \textcolor{stringliteral}{"mts\_vvvr"} : \textcolor{stringliteral}{"mts\_integrator"},
+6         \textcolor{stringliteral}{"amoeba\_polarization"} : \textcolor{stringliteral}{"amoeba\_pol"},
+7         \textcolor{stringliteral}{"liquid\_prod\_steps"} : \textcolor{stringliteral}{"liquid\_md\_steps"},
+8         \textcolor{stringliteral}{"gas\_prod\_steps"} : \textcolor{stringliteral}{"gas\_md\_steps"},
+9         \textcolor{stringliteral}{"liquid\_equ\_steps"} : \textcolor{stringliteral}{"liquid\_eq\_steps"},
+10         \textcolor{stringliteral}{"gas\_equ\_steps"} : \textcolor{stringliteral}{"gas\_eq\_steps"},
+11         \textcolor{stringliteral}{"lipid\_prod\_steps"} : \textcolor{stringliteral}{"lipid\_md\_steps"},
+12         \textcolor{stringliteral}{"lipid\_equ\_steps"} : \textcolor{stringliteral}{"lipid\_eq\_steps"},
+13         \}
+\end{DoxyCode}
+
+
+Option maps for maintaining backward compatibility. 
+
+
+
+Definition at line 306 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_ad13e9dbc3f7c04ae17a7511611623c05}\label{namespacesrc_1_1parser_ad13e9dbc3f7c04ae17a7511611623c05}} 
+\index{src\+::parser@{src\+::parser}!gen\+\_\+opts\+\_\+defaults@{gen\+\_\+opts\+\_\+defaults}}
+\index{gen\+\_\+opts\+\_\+defaults@{gen\+\_\+opts\+\_\+defaults}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{gen\+\_\+opts\+\_\+defaults}{gen\_opts\_defaults}}
+{\footnotesize\ttfamily dictionary src.\+parser.\+gen\+\_\+opts\+\_\+defaults = \{\}}
+
+
+
+Default general options -\/ basically a collapsed veresion of gen\+\_\+opts\+\_\+types. 
+
+
+
+Definition at line 290 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_a87f26164b219a12ecb4b5e6408993d9f}\label{namespacesrc_1_1parser_a87f26164b219a12ecb4b5e6408993d9f}} 
+\index{src\+::parser@{src\+::parser}!gen\+\_\+opts\+\_\+types@{gen\+\_\+opts\+\_\+types}}
+\index{gen\+\_\+opts\+\_\+types@{gen\+\_\+opts\+\_\+types}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{gen\+\_\+opts\+\_\+types}{gen\_opts\_types}}
+{\footnotesize\ttfamily dictionary src.\+parser.\+gen\+\_\+opts\+\_\+types}
+
+
+
+Default general options. 
+
+Note that the documentation is included in part of the key; this will aid in automatic doc-\/extraction. \+:) In the 5-\/tuple we have\+: Default value, priority (larger number means printed first), short docstring, description of scope, list of filter strings for pulling out pertinent targets (\hyperlink{MakeInputFile_8py}{Make\+Input\+File.\+py}) 
+
+Definition at line 67 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_aa00075364aedd66048fd3e55084557e3}\label{namespacesrc_1_1parser_aa00075364aedd66048fd3e55084557e3}} 
+\index{src\+::parser@{src\+::parser}!iocc@{iocc}}
+\index{iocc@{iocc}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{iocc}{iocc}}
+{\footnotesize\ttfamily list src.\+parser.\+iocc = \mbox{[}$\,$\mbox{]}}
+
+
+
+Check for uniqueness of option names. 
+
+
+
+Definition at line 278 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_a37a64ec016ef29a383149466e0531dc2}\label{namespacesrc_1_1parser_a37a64ec016ef29a383149466e0531dc2}} 
+\index{src\+::parser@{src\+::parser}!logger@{logger}}
+\index{logger@{logger}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+parser.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 62 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_a4ef62c5cd7d4749296b0cfeb4b3bd0e2}\label{namespacesrc_1_1parser_a4ef62c5cd7d4749296b0cfeb4b3bd0e2}} 
+\index{src\+::parser@{src\+::parser}!mainsections@{mainsections}}
+\index{mainsections@{mainsections}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{mainsections}{mainsections}}
+{\footnotesize\ttfamily list src.\+parser.\+mainsections = \mbox{[}\char`\"{}S\+I\+M\+U\+L\+A\+T\+I\+ON\char`\"{},\char`\"{}T\+A\+R\+G\+ET\char`\"{},\char`\"{}O\+P\+T\+I\+O\+NS\char`\"{},\char`\"{}E\+ND\char`\"{},\char`\"{}N\+O\+NE\char`\"{}\mbox{]}}
+
+
+
+Listing of sections in the input file. 
+
+
+
+Definition at line 321 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_a956ec0b198397b9f4ccd520ecf589be2}\label{namespacesrc_1_1parser_a956ec0b198397b9f4ccd520ecf589be2}} 
+\index{src\+::parser@{src\+::parser}!Pars\+Tab@{Pars\+Tab}}
+\index{Pars\+Tab@{Pars\+Tab}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{Pars\+Tab}{ParsTab}}
+{\footnotesize\ttfamily dictionary src.\+parser.\+Pars\+Tab}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  \{\textcolor{stringliteral}{"read\_mvals"} : read\_mvals,
+2             \textcolor{stringliteral}{"read\_pvals"} : read\_pvals,
+3             \textcolor{stringliteral}{"priors"}     : read\_priors,
+4             \textcolor{stringliteral}{"internal"}   : read\_internals
+5             \}
+\end{DoxyCode}
+
+
+Pars\+Tab that refers to subsection parsers. 
+
+
+
+Definition at line 352 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_acb02e552cbc9ba8a6aa198cfb3f611d1}\label{namespacesrc_1_1parser_acb02e552cbc9ba8a6aa198cfb3f611d1}} 
+\index{src\+::parser@{src\+::parser}!subdict@{subdict}}
+\index{subdict@{subdict}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{subdict}{subdict}}
+{\footnotesize\ttfamily dictionary src.\+parser.\+subdict = \{\}}
+
+
+
+Definition at line 292 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_ae5983fa8e346d61dd63f2ecb04d1b2ab}\label{namespacesrc_1_1parser_ae5983fa8e346d61dd63f2ecb04d1b2ab}} 
+\index{src\+::parser@{src\+::parser}!tgt\+\_\+opts\+\_\+defaults@{tgt\+\_\+opts\+\_\+defaults}}
+\index{tgt\+\_\+opts\+\_\+defaults@{tgt\+\_\+opts\+\_\+defaults}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{tgt\+\_\+opts\+\_\+defaults}{tgt\_opts\_defaults}}
+{\footnotesize\ttfamily dictionary src.\+parser.\+tgt\+\_\+opts\+\_\+defaults = \{\}}
+
+
+
+Default target options -\/ basically a collapsed version of tgt\+\_\+opts\+\_\+types. 
+
+
+
+Definition at line 298 of file parser.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1parser_a2bdfa0e60da43a8d38b4a460cde96c27}\label{namespacesrc_1_1parser_a2bdfa0e60da43a8d38b4a460cde96c27}} 
+\index{src\+::parser@{src\+::parser}!tgt\+\_\+opts\+\_\+types@{tgt\+\_\+opts\+\_\+types}}
+\index{tgt\+\_\+opts\+\_\+types@{tgt\+\_\+opts\+\_\+types}!src\+::parser@{src\+::parser}}
+\paragraph{\texorpdfstring{tgt\+\_\+opts\+\_\+types}{tgt\_opts\_types}}
+{\footnotesize\ttfamily dictionary src.\+parser.\+tgt\+\_\+opts\+\_\+types}
+
+
+
+Default fitting target options. 
+
+
+
+Definition at line 142 of file parser.\+py.
+

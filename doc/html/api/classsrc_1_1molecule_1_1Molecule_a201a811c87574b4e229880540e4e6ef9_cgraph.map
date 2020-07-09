@@ -1,0 +1,5 @@
+<map id="src.molecule.Molecule.find_clashes" name="src.molecule.Molecule.find_clashes">
+<area shape="rect" id="node2" href="$classsrc_1_1molecule_1_1Molecule.html#ac89b40e6c15282d3c685e80672a01cbf" title="Return a list of 3&#45;tuples corresponding to all of the angles in the system. " alt="" coords="248,5,443,47"/>
+<area shape="rect" id="node3" href="$classsrc_1_1molecule_1_1Molecule.html#ac07431c9d938d6f0e24e71beef9119c5" title="Return a list of 4&#45;tuples corresponding to all of the dihedral angles in the system. " alt="" coords="248,71,443,112"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1molecule.html#a8f70cfe4842e1f08578785ef9a95babc" title="Compute distances between pairs of atoms. " alt="" coords="248,137,443,163"/>
+</map>

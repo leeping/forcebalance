@@ -1,12 +1,9 @@
 var searchData=
 [
-  ['idnr',['idnr',['../classforcebalance_1_1thermo_1_1Point.html#a9bbe209a42bc715ad270ce760617f79a',1,'forcebalance::thermo::Point']]],
-  ['implemented_5ftargets',['Implemented_Targets',['../namespaceforcebalance_1_1objective.html#a8c93e21f995ed17addb493ec94368ab5',1,'forcebalance::objective']]],
-  ['inter_5fopts',['inter_opts',['../classforcebalance_1_1binding_1_1BindingEnergy.html#a9d1f28fc62222da17c0fd12593042f10',1,'forcebalance::binding::BindingEnergy']]],
-  ['invdists',['invdists',['../classforcebalance_1_1abinitio_1_1AbInitio.html#aa01ee600ba0f429ffc81135af9d8109b',1,'forcebalance::abinitio::AbInitio']]],
-  ['iocc',['iocc',['../namespaceforcebalance_1_1parser.html#a150e23172366de5938d0f32018d0b58b',1,'forcebalance::parser']]],
-  ['isdata',['isdata',['../classforcebalance_1_1psi4io_1_1GBS__Reader.html#a725975a6e197a132d3c4dba96412f9bb',1,'forcebalance.psi4io.GBS_Reader.isdata()'],['../classforcebalance_1_1psi4io_1_1Grid__Reader.html#a1134ad300de317ee30aa333d24978cc0',1,'forcebalance.psi4io.Grid_Reader.isdata()']]],
-  ['iteration',['ITERATION',['../namespaceforcebalance_1_1optimizer.html#aaf93ec60981b2c73b2f36a4cf5c5874f',1,'forcebalance::optimizer']]],
-  ['iterinit',['ITERINIT',['../namespaceforcebalance_1_1optimizer.html#a42aec8ce55b20c7ffdd69bf188ebbf44',1,'forcebalance::optimizer']]],
-  ['itype',['itype',['../classforcebalance_1_1BaseReader.html#a22ff3f4c684c728e019d801fface36f6',1,'forcebalance.BaseReader.itype()'],['../classforcebalance_1_1amberio_1_1Mol2__Reader.html#a243fd24ffd1c5a83a034468ac9265216',1,'forcebalance.amberio.Mol2_Reader.itype()'],['../classforcebalance_1_1amberio_1_1FrcMod__Reader.html#ab506962262c296d5f7c6abb66568d310',1,'forcebalance.amberio.FrcMod_Reader.itype()'],['../classforcebalance_1_1custom__io_1_1Gen__Reader.html#a4712ebcb615c785b66f48c78e5ee5739',1,'forcebalance.custom_io.Gen_Reader.itype()'],['../classforcebalance_1_1gmxio_1_1ITP__Reader.html#a1809bf22503b8647f48ea37c9f6f4cee',1,'forcebalance.gmxio.ITP_Reader.itype()'],['../classforcebalance_1_1mol2io_1_1Mol2__Reader.html#a86efd5020943bd5cb52a9299e88a4fac',1,'forcebalance.mol2io.Mol2_Reader.itype()'],['../classforcebalance_1_1qchemio_1_1QCIn__Reader.html#a7ad043dfeb891302b1b125eef9a235f3',1,'forcebalance.qchemio.QCIn_Reader.itype()'],['../classforcebalance_1_1tinkerio_1_1Tinker__Reader.html#a248491ef24b63a0c027d66d75e80e70e',1,'forcebalance.tinkerio.Tinker_Reader.itype()']]]
+  ['kb',['kb',['../namespacesrc_1_1nifty.html#a089f6f141e72825090e5f20f8ad49281',1,'src::nifty']]],
+  ['kb_5fkcal',['kb_kcal',['../namespacesrc_1_1amberio.html#acbb6d6c182cf67d8aac7feb23092d430',1,'src::amberio']]],
+  ['kb_5fsi',['kb_si',['../namespacesrc_1_1nifty.html#ad2e00824fb9acbea9ed5992470dd42d6',1,'src::nifty']]],
+  ['kcal2au',['kcal2au',['../namespacesrc_1_1nifty.html#a39edc5592ca319974e55d5e8891a1e7b',1,'src::nifty']]],
+  ['key',['key',['../classsrc_1_1tinkerio_1_1TINKER.html#aa1186969c31ca79849f82fe4fd6babc5',1,'src::tinkerio::TINKER']]],
+  ['kj2au',['kj2au',['../namespacesrc_1_1nifty.html#aec1c7f8eea5eec6ad29796827312d19d',1,'src::nifty']]]
 ];

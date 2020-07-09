@@ -1,0 +1,133 @@
+\hypertarget{namespacesrc_1_1ffyapf}{}\subsection{src.\+ffyapf Namespace Reference}
+\label{namespacesrc_1_1ffyapf}\index{src.\+ffyapf@{src.\+ffyapf}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1ffyapf_1_1BackedUpDict}{Backed\+Up\+Dict}
+\item 
+class \hyperlink{classsrc_1_1ffyapf_1_1FF}{FF}
+\begin{DoxyCompactList}\small\item\em Force field class. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1ffyapf_aac35f4253f397d2dc6cb5171acecb37e}{determine\+\_\+fftype} (ffname, verbose=False)
+\begin{DoxyCompactList}\small\item\em Determine the type of a force field file. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1ffyapf_a45f8578b3e3eab55235478c820ea6b1f}{rs\+\_\+override} (rsfactors, termtype, Temperature=298.\+15)
+\begin{DoxyCompactList}\small\item\em This function takes in a dictionary (rsfactors) and a string (termtype). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1ffyapf_a36a17b3ff1bf917d6e0100ea1217d5aa}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\item 
+dictionary \hyperlink{namespacesrc_1_1ffyapf_a6a87e161921b8562dd49ba909c2b23a5}{F\+F\+\_\+\+Extensions}
+\item 
+dictionary \hyperlink{namespacesrc_1_1ffyapf_a0131e28e9656a939158dde482700058b}{F\+F\+\_\+\+I\+O\+Modules}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1ffyapf_aac35f4253f397d2dc6cb5171acecb37e}\label{namespacesrc_1_1ffyapf_aac35f4253f397d2dc6cb5171acecb37e}} 
+\index{src\+::ffyapf@{src\+::ffyapf}!determine\+\_\+fftype@{determine\+\_\+fftype}}
+\index{determine\+\_\+fftype@{determine\+\_\+fftype}!src\+::ffyapf@{src\+::ffyapf}}
+\paragraph{\texorpdfstring{determine\+\_\+fftype()}{determine\_fftype()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+determine\+\_\+fftype (\begin{DoxyParamCaption}\item[{}]{ffname,  }\item[{}]{verbose = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Determine the type of a force field file. 
+
+It is possible to specify the file type explicitly in the input file using the syntax \textquotesingle{}force\+\_\+field.\+ext\+:type\textquotesingle{}. Otherwise this function will try to determine the force field type by extension. 
+
+Definition at line 156 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1ffyapf_a45f8578b3e3eab55235478c820ea6b1f}\label{namespacesrc_1_1ffyapf_a45f8578b3e3eab55235478c820ea6b1f}} 
+\index{src\+::ffyapf@{src\+::ffyapf}!rs\+\_\+override@{rs\+\_\+override}}
+\index{rs\+\_\+override@{rs\+\_\+override}!src\+::ffyapf@{src\+::ffyapf}}
+\paragraph{\texorpdfstring{rs\+\_\+override()}{rs\_override()}}
+{\footnotesize\ttfamily def src.\+ffyapf.\+rs\+\_\+override (\begin{DoxyParamCaption}\item[{}]{rsfactors,  }\item[{}]{termtype,  }\item[{}]{Temperature = {\ttfamily 298.15} }\end{DoxyParamCaption})}
+
+
+
+This function takes in a dictionary (rsfactors) and a string (termtype). 
+
+If termtype matches any of the strings below, rsfactors\mbox{[}termtype\mbox{]} is assigned to one of the numbers below.
+
+This is L\+PW\textquotesingle{}s attempt to simplify the rescaling factors.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em rsfactors} & The computed rescaling factor. \\
+\hline
+\mbox{\tt in}  & {\em termtype} & The interaction type (corresponding to a physical unit) \\
+\hline
+\mbox{\tt in}  & {\em Temperature} & The temperature for computing the kT energy scale \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1668 of file ffyapf.\+py.
+
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1ffyapf_a6a87e161921b8562dd49ba909c2b23a5}\label{namespacesrc_1_1ffyapf_a6a87e161921b8562dd49ba909c2b23a5}} 
+\index{src\+::ffyapf@{src\+::ffyapf}!F\+F\+\_\+\+Extensions@{F\+F\+\_\+\+Extensions}}
+\index{F\+F\+\_\+\+Extensions@{F\+F\+\_\+\+Extensions}!src\+::ffyapf@{src\+::ffyapf}}
+\paragraph{\texorpdfstring{F\+F\+\_\+\+Extensions}{FF\_Extensions}}
+{\footnotesize\ttfamily dictionary src.\+ffyapf.\+F\+F\+\_\+\+Extensions}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  \{
+2     \textcolor{stringliteral}{"itp"}: \textcolor{stringliteral}{"gmx"},
+3     \textcolor{stringliteral}{"top"}: \textcolor{stringliteral}{"gmx"},
+4     \textcolor{stringliteral}{"in"}: \textcolor{stringliteral}{"qchem"},
+5     \textcolor{stringliteral}{"prm"}: \textcolor{stringliteral}{"tinker"},
+6     \textcolor{stringliteral}{"gen"}: \textcolor{stringliteral}{"custom"},
+7     \textcolor{stringliteral}{"xml"}: \textcolor{stringliteral}{"openmm"},
+8     \textcolor{stringliteral}{"offxml"}: \textcolor{stringliteral}{"smirnoff"},
+9     \textcolor{stringliteral}{"frcmod"}: \textcolor{stringliteral}{"frcmod"},
+10     \textcolor{stringliteral}{"mol2"}: \textcolor{stringliteral}{"mol2"},
+11     \textcolor{stringliteral}{"gbs"}: \textcolor{stringliteral}{"gbs"},
+12     \textcolor{stringliteral}{"grid"}: \textcolor{stringliteral}{"grid"}
+13 \}
+\end{DoxyCode}
+
+
+Definition at line 123 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1ffyapf_a0131e28e9656a939158dde482700058b}\label{namespacesrc_1_1ffyapf_a0131e28e9656a939158dde482700058b}} 
+\index{src\+::ffyapf@{src\+::ffyapf}!F\+F\+\_\+\+I\+O\+Modules@{F\+F\+\_\+\+I\+O\+Modules}}
+\index{F\+F\+\_\+\+I\+O\+Modules@{F\+F\+\_\+\+I\+O\+Modules}!src\+::ffyapf@{src\+::ffyapf}}
+\paragraph{\texorpdfstring{F\+F\+\_\+\+I\+O\+Modules}{FF\_IOModules}}
+{\footnotesize\ttfamily dictionary src.\+ffyapf.\+F\+F\+\_\+\+I\+O\+Modules}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  \{
+2     \textcolor{stringliteral}{"gmx"}: gmxio.ITP\_Reader,
+3     \textcolor{stringliteral}{"qchem"}: qchemio.QCIn\_Reader,
+4     \textcolor{stringliteral}{"tinker"}: tinkerio.Tinker\_Reader,
+5     \textcolor{stringliteral}{"custom"}: custom\_io.Gen\_Reader,
+6     \textcolor{stringliteral}{"openmm"}: openmmio.OpenMM\_Reader,
+7     \textcolor{stringliteral}{"smirnoff"}: smirnoffio.SMIRNOFF\_Reader,
+8     \textcolor{stringliteral}{"frcmod"}: amberio.FrcMod\_Reader,
+9     \textcolor{stringliteral}{"mol2"}: amberio.Mol2\_Reader,
+10     \textcolor{stringliteral}{"gbs"}: psi4io.GBS\_Reader,
+11     \textcolor{stringliteral}{"grid"}: psi4io.Grid\_Reader
+12 \}
+\end{DoxyCode}
+
+
+Definition at line 137 of file ffyapf.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1ffyapf_a36a17b3ff1bf917d6e0100ea1217d5aa}\label{namespacesrc_1_1ffyapf_a36a17b3ff1bf917d6e0100ea1217d5aa}} 
+\index{src\+::ffyapf@{src\+::ffyapf}!logger@{logger}}
+\index{logger@{logger}!src\+::ffyapf@{src\+::ffyapf}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+ffyapf.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 116 of file ffyapf.\+py.
+

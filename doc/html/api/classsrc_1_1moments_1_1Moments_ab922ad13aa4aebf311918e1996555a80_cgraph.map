@@ -1,0 +1,6 @@
+<map id="src.moments.Moments.get" name="src.moments.Moments.get">
+<area shape="rect" id="node2" href="$classsrc_1_1moments_1_1Moments.html#afedc403680af7392e1b626f40efb4667" title="src.moments.Moments.unpack\l_moments" alt="" coords="249,5,472,47"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1finite__difference.html#a32a990bb791a59853130d9d71387822d" title="A three&#45;point finite difference stencil. " alt="" coords="261,71,460,98"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1finite__difference.html#af3a9d7a4fc96a7057679fa5f3af73fe0" title="A function wrapper for finite difference designed for differentiating &#39;get&#39;&#45;type functions. " alt="" coords="261,122,460,149"/>
+<area shape="rect" id="node5" href="$namespacesrc_1_1finite__difference.html#a6153660ad18674fc1d2ad6fd57541ef3" title="Invoking this function from anywhere will tell us whether we&#39;re being called by a finite&#45;difference f..." alt="" coords="267,173,454,199"/>
+</map>

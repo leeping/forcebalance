@@ -1,0 +1,5 @@
+<map id="src.molecule.Molecule.read_charmm" name="src.molecule.Molecule.read_charmm">
+<area shape="rect" id="node2" href="$namespacesrc_1_1molecule.html#a17d81a43f4f28d4db24d6548dc7018dd" title="Determines whether a line contains CHARMM data or not. " alt="" coords="253,23,435,65"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1molecule.html#a651f6c6d23932f5a2151784c992e94a8" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="489,5,626,32"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1molecule.html#ac2056d27322c6ee6dff0bef3755f2ed3" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="483,56,632,83"/>
+</map>

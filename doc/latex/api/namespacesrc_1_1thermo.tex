@@ -1,0 +1,85 @@
+\hypertarget{namespacesrc_1_1thermo}{}\subsection{src.\+thermo Namespace Reference}
+\label{namespacesrc_1_1thermo}\index{src.\+thermo@{src.\+thermo}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1thermo_1_1Point}{Point}
+\item 
+class \hyperlink{classsrc_1_1thermo_1_1Thermo}{Thermo}
+\begin{DoxyCompactList}\small\item\em A target for fitting general experimental data sets. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1thermo_a3aaa182f02560e7270d90bd0030ab8e6}{energy\+\_\+derivatives} (engine, FF, mvals, h, pgrad, dipole=False)
+\begin{DoxyCompactList}\small\item\em Compute the first and second derivatives of a set of snapshot energies with respect to the force field parameters. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1thermo_a3bb9aec3ed44b9a4a826e9c93a2a312c}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1thermo_a3aaa182f02560e7270d90bd0030ab8e6}\label{namespacesrc_1_1thermo_a3aaa182f02560e7270d90bd0030ab8e6}} 
+\index{src\+::thermo@{src\+::thermo}!energy\+\_\+derivatives@{energy\+\_\+derivatives}}
+\index{energy\+\_\+derivatives@{energy\+\_\+derivatives}!src\+::thermo@{src\+::thermo}}
+\paragraph{\texorpdfstring{energy\+\_\+derivatives()}{energy\_derivatives()}}
+{\footnotesize\ttfamily def src.\+thermo.\+energy\+\_\+derivatives (\begin{DoxyParamCaption}\item[{}]{engine,  }\item[{}]{FF,  }\item[{}]{mvals,  }\item[{}]{h,  }\item[{}]{pgrad,  }\item[{}]{dipole = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Compute the first and second derivatives of a set of snapshot energies with respect to the force field parameters. 
+
+This basically calls the finite difference subroutine on the energy\+\_\+driver subroutine also in this script.
+
+In the future we may need to be more sophisticated with controlling the quantities which are differentiated, but for now this is okay..
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em engine} & Engine object for calculating energies \\
+\hline
+\mbox{\tt in}  & {\em FF} & Force field object \\
+\hline
+\mbox{\tt in}  & {\em mvals} & Mathematical parameter values \\
+\hline
+\mbox{\tt in}  & {\em h} & Finite difference step size \\
+\hline
+\mbox{\tt in}  & {\em pgrad} & List of active parameters for differentiation \\
+\hline
+\mbox{\tt in}  & {\em dipole} & Switch for dipole derivatives. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+G First derivative of the energies in a N\+\_\+param x N\+\_\+coord array 
+
+G\+Dx First derivative of the box dipole moment x-\/component in a N\+\_\+param x N\+\_\+coord array 
+
+G\+Dy First derivative of the box dipole moment y-\/component in a N\+\_\+param x N\+\_\+coord array 
+
+G\+Dz First derivative of the box dipole moment z-\/component in a N\+\_\+param x N\+\_\+coord array 
+\end{DoxyReturn}
+
+
+Definition at line 46 of file thermo.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1thermo_a3aaa182f02560e7270d90bd0030ab8e6_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1thermo_a3bb9aec3ed44b9a4a826e9c93a2a312c}\label{namespacesrc_1_1thermo_a3bb9aec3ed44b9a4a826e9c93a2a312c}} 
+\index{src\+::thermo@{src\+::thermo}!logger@{logger}}
+\index{logger@{logger}!src\+::thermo@{src\+::thermo}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+thermo.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 20 of file thermo.\+py.
+

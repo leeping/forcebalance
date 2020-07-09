@@ -1,0 +1,1229 @@
+\hypertarget{classsrc_1_1abinitio_1_1AbInitio}{}\subsection{src.\+abinitio.\+Ab\+Initio Class Reference}
+\label{classsrc_1_1abinitio_1_1AbInitio}\index{src.\+abinitio.\+Ab\+Initio@{src.\+abinitio.\+Ab\+Initio}}
+
+
+Subclass of Target for fitting force fields to ab initio data.  
+
+
+
+
+Inheritance diagram for src.\+abinitio.\+Ab\+Initio\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{classsrc_1_1abinitio_1_1AbInitio__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+abinitio.\+Ab\+Initio\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=191pt]{classsrc_1_1abinitio_1_1AbInitio__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_a05142b8321814feceac1a39ab338615e}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\begin{DoxyCompactList}\small\item\em Initialization; define a few core concepts. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_a41dad975f9ae658f5ba75ee60f71c70b}{build\+\_\+invdist} (self, mvals)
+\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_a47d99a795699735638d55c5162ef1878}{compute\+\_\+netforce\+\_\+torque} (self, xyz, \hyperlink{classsrc_1_1abinitio_1_1AbInitio_ab026c75ec6db07cfe829718e944a871b}{force}, QM=False)
+\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_afacfa5d84fb6638dcfad3bff7f14d48f}{read\+\_\+reference\+\_\+data} (self)
+\begin{DoxyCompactList}\small\item\em Read the reference ab initio data from a file such as qdata.\+txt. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_ac1ecf4fd0ddfbd22d9baee6629ed1e27}{indicate} (self)
+\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_ad034ceabe8571ffd60c3c8f33cb86c85}{energy\+\_\+all} (self)
+\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_a123b55e22a49de1e3ea413d6c0de7837}{energy\+\_\+force\+\_\+all} (self)
+\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_a2a9c1db3829a4dd66229719fa8e3685a}{energy\+\_\+force\+\_\+transform} (self)
+\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_a49f95a1162a42d38a96c8484006d7052}{energy\+\_\+one} (self, i)
+\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_ace684b84061d90041fc1dac98cd2ce58}{energy\+\_\+force\+\_\+one} (self, i)
+\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_a21993fd11a62021d9aa0fe1f4eecd4ad}{energy\+\_\+force\+\_\+transform\+\_\+one} (self, i)
+\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_a3b2d4c6ce46dd5e393e2bd6d99f64a48}{get\+\_\+energy\+\_\+force} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em L\+PW 7-\/13-\/2016. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_ab5da2921f88ff384fb87f143d5f8f1c5}{get\+\_\+resp} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em Electrostatic potential fitting. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1abinitio_1_1AbInitio_a6a5f66c36e73c1ae24f60c042583c71f}{get} (self, mvals, A\+Grad=False, A\+Hess=False)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a57931eef3ca6d8ac0ade2ffc1f008ef4}{w\+\_\+force}
+\begin{DoxyCompactList}\small\item\em Initialize the base class. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a2a0e84edd38e6d52983769ac338d704e}{savg}
+\begin{DoxyCompactList}\small\item\em Option for how much data to write to disk. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a236b7a6a56af6a2ac2f0cc0bc8fab004}{energy\+\_\+asymmetry}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a472fb76548806e05b499d97c17776a33}{asym}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a4f584318b0b52d54f9d051e1f35b0d81}{loop\+\_\+over\+\_\+snapshots}
+\begin{DoxyCompactList}\small\item\em L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a38db8e6403bfb6f362c52e2441e7786d}{boltz\+\_\+wts}
+\begin{DoxyCompactList}\small\item\em Boltzmann weights. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a3c00c716389876408a957c24ec95b9b6}{eqm}
+\begin{DoxyCompactList}\small\item\em Reference (QM) energies. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a8ade8ee6cf57e840bc80a54380be4092}{fqm}
+\begin{DoxyCompactList}\small\item\em Reference (QM) forces. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a35c72bc60a4e4678c0d513f7a04535ee}{espxyz}
+\begin{DoxyCompactList}\small\item\em E\+SP grid points. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a907086906ad0726918a5888bb5f6a382}{espval}
+\begin{DoxyCompactList}\small\item\em E\+SP values. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a0ba71e502a5c605a6823000429189bcb}{qfnm}
+\begin{DoxyCompactList}\small\item\em The qdata.\+txt file that contains the QM energies and forces. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a184c5a163d4e359f3f2b8d1788d11c16}{e\+\_\+err}
+\begin{DoxyCompactList}\small\item\em Qualitative Indicator\+: average energy error (in k\+J/mol) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a39e033f3b54c689eed565afab4f0909b}{e\+\_\+err\+\_\+pct}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_ab0477deb7a9e68913b808d173d095931}{f\+\_\+err}
+\begin{DoxyCompactList}\small\item\em Qualitative Indicator\+: average force error (fractional) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a245a174a32cecbb1c28a71c2a7080880}{f\+\_\+err\+\_\+pct}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a083d6a86d0c4c3e81d7aa1f5e1985b94}{esp\+\_\+err}
+\begin{DoxyCompactList}\small\item\em Qualitative Indicator\+: \char`\"{}relative R\+M\+S\char`\"{} for electrostatic potential. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_af5bff4b475e1c30aa9ae65ba10d0bf23}{nf\+\_\+err}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a81b9a3e15cf6c8d7cbf35ebd5662e6bc}{nf\+\_\+err\+\_\+pct}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_ac780a1a084ef789ee064331988263242}{tq\+\_\+err\+\_\+pct}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a751af39fbd241badec09dd0214902d49}{use\+\_\+nft}
+\begin{DoxyCompactList}\small\item\em Whether to compute net forces and torques, or not. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_ae9dcad17db7b29f0aba942914cc25976}{mol}
+\begin{DoxyCompactList}\small\item\em Read in the trajectory file. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a5d953e461f019cf088728fe835213fb8}{ns}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_aec7479553c66ace03a185d838fd26a5e}{nparticles}
+\begin{DoxyCompactList}\small\item\em The number of (atoms + drude particles + virtual sites) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a5501a9f620a2dc65cf16f22d6f86c3aa}{engine}
+\begin{DoxyCompactList}\small\item\em Build keyword dictionaries to pass to engine. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_af600fbf9c649505ab9de7d4a132a9493}{Atom\+Lists}
+\begin{DoxyCompactList}\small\item\em Lists of atoms to do net force/torque fitting and excluding virtual sites. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_af60e2adac5dd3b79b1c368c4507ff623}{Atom\+Mask}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a01471cb04776812a1ac6fbdaef5c4152}{buildx}
+\begin{DoxyCompactList}\small\item\em Read in the reference data. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a91982f5bbc37e6dffc3484912d605672}{save\+\_\+vmvals}
+\begin{DoxyCompactList}\small\item\em Save the mvals from the last time we updated the vsites. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_acb45f30e4dc519406cc9a533b562778f}{M\+\_\+orig}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_ae01e6dceba23ad6a532d2fcc0cbee71c}{force\+\_\+map}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a2f016bb1122e78d773f0e5365ef72376}{nnf}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_aa8d4dfb98704f06de57a270ba7074d17}{ntq}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_aabd18cb0c7bd1a27ae43afeec60a50ed}{smin}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_ac6e917779f9240999f9deac94b9fc52b}{qmatoms}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_ab026c75ec6db07cfe829718e944a871b}{force}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a5696c164f89abc66027db99e17ebde41}{fitatoms}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_ae4adfd62453571f65b443b11e2de28ea}{nesp}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_aaccd8efb7ad8718729b040380a9e204f}{nftqm}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_aed404f4d80783d9680515bcc40415f43}{fref}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a186f7561777288cd391177ac1bdc2435}{w\+\_\+energy}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_ad62612a970e3d20e9ce975134cced90a}{w\+\_\+netforce}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a6a0e3f7148aa806e02f51078ff53076f}{w\+\_\+torque}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a16f13519c011bde03f371e211a8ff383}{maxfatom}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_ab88fec9eb79c388520da5f2bc13a20b0}{maxfshot}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_aca9f31e080c87f2f525ef4c35ae9c2f9}{maxdf}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a73d04716a91ecd0ba629104692379671}{e\+\_\+trm}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a6bd370861768a87aa5f6e486cb208a43}{e\+\_\+ctr}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a9fba43eef53de060d1f9bf1573b07649}{e\+\_\+ref}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a4b99282bb26c0bc8d32a3415425d54c8}{f\+\_\+trm}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_aab093b41beac84b678fb4bfdb9109c2d}{f\+\_\+ctr}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_ac7998d2a3464949f9f160a09de357eb3}{f\+\_\+ref}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_aca713951cc7f5ef415f5759e496ad050}{nf\+\_\+trm}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a24aa99bc1935ddcbcc929b32ef39bc67}{nf\+\_\+ctr}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a77d87d07cb414981cc99a2f9b90e6e18}{nf\+\_\+ref}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a2078c34ad682dd26eed7bfd2ce2eeac4}{tq\+\_\+trm}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a46a8768385f6e3e9db715b175a5285c6}{tq\+\_\+ctr}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a57be75dd1e20dfb18d0f4f28c5689d74}{tq\+\_\+ref}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a4b404cf1acc4b5e26f4ded9138698d5e}{tq\+\_\+err}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a88f678514f8b84c1ba3038d049818f66}{w\+\_\+resp}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a4f6729a22cad35df3a21db5e2ffddd75}{invdists}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a9427352d5d3e467c4af17ad2639f38d3}{esp\+\_\+ref}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a3f2f5b91f12c67a34d36e92800f89535}{esp\+\_\+err\+\_\+pct}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a784c7a7cc2997a0274bf8f9d929a2dc1}{respterm}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_aca3127dd6fe7f91371abf951dcc445c0}{esp\+\_\+trm}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_ac98424ef29a5f29fefc4c1ba7b9348fb}{esp\+\_\+ctr}
+\item 
+\hyperlink{classsrc_1_1abinitio_1_1AbInitio_a089d952a6da9705b7bea52ec282f761e}{objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for fitting force fields to ab initio data. 
+
+Currently Gromacs-\/\+X2, Gromacs, Tinker, Open\+MM and A\+M\+B\+ER are supported.
+
+We introduce the following concepts\+:
+\begin{DoxyItemize}
+\item The number of snapshots
+\item The reference energies and forces (eqm, fqm) and the file they belong in (qdata.\+txt)
+\item The sampling simulation energies (emd0)
+\item The W\+H\+AM Boltzmann weights (these are computed externally and passed in)
+\item The QM Boltzmann weights (computed internally using the difference between eqm and emd0)
+\end{DoxyItemize}
+
+There are also these little details\+:
+\begin{DoxyItemize}
+\item Switches for whether to turn on certain Boltzmann weights (they stack)
+\item Temperature for the QM Boltzmann weights
+\item Whether to fit a subset of atoms
+\end{DoxyItemize}
+
+This subclass contains the \textquotesingle{}get\textquotesingle{} method for building the objective function from any simulation software (a driver to run the program and read output is still required). The \textquotesingle{}get\textquotesingle{} method can be overridden by subclasses like Ab\+Initio\+\_\+\+G\+MX. 
+
+Definition at line 84 of file abinitio.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a05142b8321814feceac1a39ab338615e}\label{classsrc_1_1abinitio_1_1AbInitio_a05142b8321814feceac1a39ab338615e}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Initialization; define a few core concepts. 
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000001}{Todo}]Obtain the number of true atoms (or the particle -\/$>$ atom mapping) from the force field. \end{DoxyRefDesc}
+
+
+Definition at line 94 of file abinitio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1abinitio_1_1AbInitio_a05142b8321814feceac1a39ab338615e_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a41dad975f9ae658f5ba75ee60f71c70b}\label{classsrc_1_1abinitio_1_1AbInitio_a41dad975f9ae658f5ba75ee60f71c70b}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!build\+\_\+invdist@{build\+\_\+invdist}}
+\index{build\+\_\+invdist@{build\+\_\+invdist}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{build\+\_\+invdist()}{build\_invdist()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+build\+\_\+invdist (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals }\end{DoxyParamCaption})}
+
+
+
+Definition at line 216 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a47d99a795699735638d55c5162ef1878}\label{classsrc_1_1abinitio_1_1AbInitio_a47d99a795699735638d55c5162ef1878}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!compute\+\_\+netforce\+\_\+torque@{compute\+\_\+netforce\+\_\+torque}}
+\index{compute\+\_\+netforce\+\_\+torque@{compute\+\_\+netforce\+\_\+torque}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{compute\+\_\+netforce\+\_\+torque()}{compute\_netforce\_torque()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+compute\+\_\+netforce\+\_\+torque (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{xyz,  }\item[{}]{force,  }\item[{}]{QM = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 245 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ad034ceabe8571ffd60c3c8f33cb86c85}\label{classsrc_1_1abinitio_1_1AbInitio_ad034ceabe8571ffd60c3c8f33cb86c85}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!energy\+\_\+all@{energy\+\_\+all}}
+\index{energy\+\_\+all@{energy\+\_\+all}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{energy\+\_\+all()}{energy\_all()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+energy\+\_\+all (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 505 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a123b55e22a49de1e3ea413d6c0de7837}\label{classsrc_1_1abinitio_1_1AbInitio_a123b55e22a49de1e3ea413d6c0de7837}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!energy\+\_\+force\+\_\+all@{energy\+\_\+force\+\_\+all}}
+\index{energy\+\_\+force\+\_\+all@{energy\+\_\+force\+\_\+all}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{energy\+\_\+force\+\_\+all()}{energy\_force\_all()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+energy\+\_\+force\+\_\+all (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 512 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ace684b84061d90041fc1dac98cd2ce58}\label{classsrc_1_1abinitio_1_1AbInitio_ace684b84061d90041fc1dac98cd2ce58}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!energy\+\_\+force\+\_\+one@{energy\+\_\+force\+\_\+one}}
+\index{energy\+\_\+force\+\_\+one@{energy\+\_\+force\+\_\+one}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{energy\+\_\+force\+\_\+one()}{energy\_force\_one()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+energy\+\_\+force\+\_\+one (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i }\end{DoxyParamCaption})}
+
+
+
+Definition at line 544 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a2a9c1db3829a4dd66229719fa8e3685a}\label{classsrc_1_1abinitio_1_1AbInitio_a2a9c1db3829a4dd66229719fa8e3685a}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!energy\+\_\+force\+\_\+transform@{energy\+\_\+force\+\_\+transform}}
+\index{energy\+\_\+force\+\_\+transform@{energy\+\_\+force\+\_\+transform}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{energy\+\_\+force\+\_\+transform()}{energy\_force\_transform()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+energy\+\_\+force\+\_\+transform (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 519 of file abinitio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1abinitio_1_1AbInitio_a2a9c1db3829a4dd66229719fa8e3685a_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a21993fd11a62021d9aa0fe1f4eecd4ad}\label{classsrc_1_1abinitio_1_1AbInitio_a21993fd11a62021d9aa0fe1f4eecd4ad}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!energy\+\_\+force\+\_\+transform\+\_\+one@{energy\+\_\+force\+\_\+transform\+\_\+one}}
+\index{energy\+\_\+force\+\_\+transform\+\_\+one@{energy\+\_\+force\+\_\+transform\+\_\+one}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{energy\+\_\+force\+\_\+transform\+\_\+one()}{energy\_force\_transform\_one()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+energy\+\_\+force\+\_\+transform\+\_\+one (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i }\end{DoxyParamCaption})}
+
+
+
+Definition at line 551 of file abinitio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1abinitio_1_1AbInitio_a21993fd11a62021d9aa0fe1f4eecd4ad_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a49f95a1162a42d38a96c8484006d7052}\label{classsrc_1_1abinitio_1_1AbInitio_a49f95a1162a42d38a96c8484006d7052}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!energy\+\_\+one@{energy\+\_\+one}}
+\index{energy\+\_\+one@{energy\+\_\+one}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{energy\+\_\+one()}{energy\_one()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+energy\+\_\+one (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i }\end{DoxyParamCaption})}
+
+
+
+Definition at line 537 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a6a5f66c36e73c1ae24f60c042583c71f}\label{classsrc_1_1abinitio_1_1AbInitio_a6a5f66c36e73c1ae24f60c042583c71f}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!get@{get}}
+\index{get@{get}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1090 of file abinitio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1abinitio_1_1AbInitio_a6a5f66c36e73c1ae24f60c042583c71f_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a3b2d4c6ce46dd5e393e2bd6d99f64a48}\label{classsrc_1_1abinitio_1_1AbInitio_a3b2d4c6ce46dd5e393e2bd6d99f64a48}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!get\+\_\+energy\+\_\+force@{get\+\_\+energy\+\_\+force}}
+\index{get\+\_\+energy\+\_\+force@{get\+\_\+energy\+\_\+force}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{get\+\_\+energy\+\_\+force()}{get\_energy\_force()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+get\+\_\+energy\+\_\+force (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+L\+PW 7-\/13-\/2016. 
+
+This code computes the least squares objective function for the energy and force. The most recent revision simplified the code to make it easier to maintain, and to remove the covariance matrix and dual-\/weight features.
+
+The equations have also been simplified. Previously I normalizing each force component (or triples of components belonging to an atom) separately. I was also computing the objective function separately from the \char`\"{}indicators\char`\"{}, which led to confusion regarding why they resulted in different values. The code was structured around computing the objective function by multiplying an Applequist polytensor containing both energy and force with an inverse covariance matrix, but it became apparent over time and experience that the more complicated approach was not worth it, given the opacity that it introduced into how things were computed.
+
+In the new code, the objective function is computed in a simple way. For the energies we compute a weighted sum of squared differences between E\+\_\+\+MM and E\+\_\+\+QM, minus (optionally) the mean energy gap, for the numerator. The weighted variance of the QM energies $<$E\+\_\+\+Q\+M$^\wedge$2$>$-\/$<$\+E\+\_\+\+Q\+M$>$$^\wedge$2 is the denominator. The user-\/supplied w\+\_\+energy option is a prefactor that multiplies this term. If w\+\_\+normalize is set to True (no longer the default), the prefactor is further divided by the sum of all of the weights. The indicators are set to the square roots of the numerator and denominator above.
+
+For the forces we compute the same weighted sum, where each term in the sum is the norm-\/squared of F\+\_\+\+MM -\/ F\+\_\+\+QM, with no option to subtract the mean. The denominator is computed in an analogous way using the norm-\/squared F\+\_\+\+QM, and the prefactor is w\+\_\+force. The same approach is applied if the user asks for net forces and/or torques. The indicators are computed from the square roots of the numerator and denominator, divided by the number of atoms (molecules) for forces (net forces / torques).
+
+In equation form, the objective function is given by\+:
+
+\mbox{[} = \{W\+\_\+E\}\mbox{[} \{\{\{( \{\{i  \{N\+\_\+s\}\} \{\{w\+\_\+i\}\{\{( \{E\+\_\+i$^\wedge$\{MM\} -\/ E\+\_\+i$^\wedge$\{QM\}\} )\}$^\wedge$2\}\} \} ) -\/ \{\{( \{\{\{ E\}$^\wedge$\{MM\}\} -\/ \{\{ E\}$^\wedge$\{QM\}\}\} )\}$^\wedge$2\}\}\} \{\{\{i  \{N\+\_\+s\}\} \{\{w\+\_\+i\}\{\{( \{E\+\_\+i$^\wedge$\{QM\} -\/ \{\{ E\}$^\wedge$\{QM\}\}\} )\}$^\wedge$2\}\} \}\}\} \mbox{]} + \{W\+\_\+F\}\mbox{[} \{\{\{\{i  \{N\+\_\+s\}\} \{\{w\+\_\+i\}\{a  \{N\+\_\+a\}\} \{\{\{$\vert$ \{\{\{F\}\}\+\_\+\{i,a\}$^\wedge$\{MM\} -\/ \{\{F\}\}\+\_\+\{i,a\}$^\wedge$\{QM\}\} $\vert$\}$^\wedge$2\}\} \} \}\} \{\{\{i  \{N\+\_\+s\}\} \{\{w\+\_\+i\}\{a  \{N\+\_\+a\}\} \{\{\{$\vert$ \{\{\{F\}\}\+\_\+\{i,a\}$^\wedge$\{QM\}\} $\vert$\}$^\wedge$2\}\} \} \}\}\} \mbox{]}\mbox{]}
+
+In the previous code (For\+Tune, 2011 and previous) this subroutine used analytic first derivatives of the energy and force to build the derivatives of the objective function. Here I will take a simplified approach, because building the analytic derivatives require substantial modifications of the engine code, which is unsustainable. We use a finite different calculation of the first derivatives of the energies and forces to get the exact first derivative and approximate second derivative of the objective function..
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mvals} & Mathematical parameter values \\
+\hline
+\mbox{\tt in}  & {\em A\+Grad} & Switch to turn on analytic gradient \\
+\hline
+\mbox{\tt in}  & {\em A\+Hess} & Switch to turn on analytic Hessian \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Answer Contribution to the objective function 
+\end{DoxyReturn}
+
+
+Definition at line 626 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ab5da2921f88ff384fb87f143d5f8f1c5}\label{classsrc_1_1abinitio_1_1AbInitio_ab5da2921f88ff384fb87f143d5f8f1c5}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!get\+\_\+resp@{get\+\_\+resp}}
+\index{get\+\_\+resp@{get\+\_\+resp}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{get\+\_\+resp()}{get\_resp()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+get\+\_\+resp (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Electrostatic potential fitting. 
+
+Implements the R\+E\+SP objective function. (In Python so obviously not optimized.) Return the charges acting on the system. 
+
+Definition at line 975 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ac1ecf4fd0ddfbd22d9baee6629ed1e27}\label{classsrc_1_1abinitio_1_1AbInitio_ac1ecf4fd0ddfbd22d9baee6629ed1e27}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 464 of file abinitio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1abinitio_1_1AbInitio_ac1ecf4fd0ddfbd22d9baee6629ed1e27_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_afacfa5d84fb6638dcfad3bff7f14d48f}\label{classsrc_1_1abinitio_1_1AbInitio_afacfa5d84fb6638dcfad3bff7f14d48f}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}}
+\index{read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{read\+\_\+reference\+\_\+data()}{read\_reference\_data()}}
+{\footnotesize\ttfamily def src.\+abinitio.\+Ab\+Initio.\+read\+\_\+reference\+\_\+data (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Read the reference ab initio data from a file such as qdata.\+txt. 
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000002}{Todo}]Add an option for picking any slice out of qdata.\+txt, helpful for cross-\/validation\end{DoxyRefDesc}
+\begin{DoxyVerb}     After reading in the information from qdata.txt, it is converted
+     into the GROMACS energy units (kind of an arbitrary choice);
+     forces (kind of a misnomer in qdata.txt) are multipled by -1
+     to convert gradients to forces.
+
+     We typically subtract out the mean energies of all energy arrays
+     because energy/force matching does not account for zero-point
+     energy differences between MM and QM (i.e. energy of electrons
+     in core orbitals).
+
+     A 'hybrid' ensemble is possible where we use 50% MM and 50% QM
+     weights.  Please read more in LPW and Troy Van Voorhis, JCP
+     Vol. 133, Pg. 231101 (2010), doi:10.1063/1.3519043.  In the
+     updated version of the code (July 13 2016), this feature is
+     currently not implemented due to disuse, but it is easy to
+     re-implement if desired.
+
+     Finally, note that using non-Boltzmann weights degrades the
+     statistical information content of the snapshots.  This
+     problem will generally become worse if the ensemble to which
+     we're reweighting is dramatically different from the one we're
+     sampling from.  We end up with a set of Boltzmann weights like
+     [1e-9, 1e-9, 1.0, 1e-9, 1e-9 ... ] and this is essentially just
+     one snapshot.
+
+     Here, we have a measure for the information content of our snapshots,
+     which comes easily from the definition of information entropy:
+
+     S = -1*Sum_i(P_i*log(P_i))
+     InfoContent = exp(-S)
+
+     With uniform weights, InfoContent is equal to the number of snapshots;
+     with horrible weights, InfoContent is closer to one.\end{DoxyVerb}
+ 
+
+Definition at line 360 of file abinitio.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a472fb76548806e05b499d97c17776a33}\label{classsrc_1_1abinitio_1_1AbInitio_a472fb76548806e05b499d97c17776a33}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!asym@{asym}}
+\index{asym@{asym}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{asym}{asym}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+asym}
+
+
+
+Definition at line 148 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_af600fbf9c649505ab9de7d4a132a9493}\label{classsrc_1_1abinitio_1_1AbInitio_af600fbf9c649505ab9de7d4a132a9493}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!Atom\+Lists@{Atom\+Lists}}
+\index{Atom\+Lists@{Atom\+Lists}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{Atom\+Lists}{AtomLists}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+Atom\+Lists}
+
+
+
+Lists of atoms to do net force/torque fitting and excluding virtual sites. 
+
+
+
+Definition at line 204 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_af60e2adac5dd3b79b1c368c4507ff623}\label{classsrc_1_1abinitio_1_1AbInitio_af60e2adac5dd3b79b1c368c4507ff623}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!Atom\+Mask@{Atom\+Mask}}
+\index{Atom\+Mask@{Atom\+Mask}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{Atom\+Mask}{AtomMask}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+Atom\+Mask}
+
+
+
+Definition at line 205 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a38db8e6403bfb6f362c52e2441e7786d}\label{classsrc_1_1abinitio_1_1AbInitio_a38db8e6403bfb6f362c52e2441e7786d}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!boltz\+\_\+wts@{boltz\+\_\+wts}}
+\index{boltz\+\_\+wts@{boltz\+\_\+wts}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{boltz\+\_\+wts}{boltz\_wts}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+boltz\+\_\+wts}
+
+
+
+Boltzmann weights. 
+
+
+
+Definition at line 162 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a01471cb04776812a1ac6fbdaef5c4152}\label{classsrc_1_1abinitio_1_1AbInitio_a01471cb04776812a1ac6fbdaef5c4152}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!buildx@{buildx}}
+\index{buildx@{buildx}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{buildx}{buildx}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+buildx}
+
+
+
+Read in the reference data. 
+
+The below two options are related to whether we want to rebuild virtual site positions. Rebuild the distance matrix if virtual site positions have changed 
+
+Definition at line 210 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a6bd370861768a87aa5f6e486cb208a43}\label{classsrc_1_1abinitio_1_1AbInitio_a6bd370861768a87aa5f6e486cb208a43}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!e\+\_\+ctr@{e\+\_\+ctr}}
+\index{e\+\_\+ctr@{e\+\_\+ctr}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{e\+\_\+ctr}{e\_ctr}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+e\+\_\+ctr}
+
+
+
+Definition at line 942 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a184c5a163d4e359f3f2b8d1788d11c16}\label{classsrc_1_1abinitio_1_1AbInitio_a184c5a163d4e359f3f2b8d1788d11c16}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!e\+\_\+err@{e\+\_\+err}}
+\index{e\+\_\+err@{e\+\_\+err}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{e\+\_\+err}{e\_err}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+e\+\_\+err}
+
+
+
+Qualitative Indicator\+: average energy error (in k\+J/mol) 
+
+
+
+Definition at line 174 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a39e033f3b54c689eed565afab4f0909b}\label{classsrc_1_1abinitio_1_1AbInitio_a39e033f3b54c689eed565afab4f0909b}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!e\+\_\+err\+\_\+pct@{e\+\_\+err\+\_\+pct}}
+\index{e\+\_\+err\+\_\+pct@{e\+\_\+err\+\_\+pct}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{e\+\_\+err\+\_\+pct}{e\_err\_pct}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+e\+\_\+err\+\_\+pct}
+
+
+
+Definition at line 175 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a9fba43eef53de060d1f9bf1573b07649}\label{classsrc_1_1abinitio_1_1AbInitio_a9fba43eef53de060d1f9bf1573b07649}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!e\+\_\+ref@{e\+\_\+ref}}
+\index{e\+\_\+ref@{e\+\_\+ref}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{e\+\_\+ref}{e\_ref}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+e\+\_\+ref}
+
+
+
+Definition at line 944 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a73d04716a91ecd0ba629104692379671}\label{classsrc_1_1abinitio_1_1AbInitio_a73d04716a91ecd0ba629104692379671}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!e\+\_\+trm@{e\+\_\+trm}}
+\index{e\+\_\+trm@{e\+\_\+trm}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{e\+\_\+trm}{e\_trm}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+e\+\_\+trm}
+
+
+
+Definition at line 941 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a236b7a6a56af6a2ac2f0cc0bc8fab004}\label{classsrc_1_1abinitio_1_1AbInitio_a236b7a6a56af6a2ac2f0cc0bc8fab004}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!energy\+\_\+asymmetry@{energy\+\_\+asymmetry}}
+\index{energy\+\_\+asymmetry@{energy\+\_\+asymmetry}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{energy\+\_\+asymmetry}{energy\_asymmetry}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+energy\+\_\+asymmetry}
+
+
+
+Definition at line 147 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a5501a9f620a2dc65cf16f22d6f86c3aa}\label{classsrc_1_1abinitio_1_1AbInitio_a5501a9f620a2dc65cf16f22d6f86c3aa}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!engine@{engine}}
+\index{engine@{engine}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{engine}{engine}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+engine}
+
+
+
+Build keyword dictionaries to pass to engine. 
+
+Create engine object. 
+
+Definition at line 202 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a3c00c716389876408a957c24ec95b9b6}\label{classsrc_1_1abinitio_1_1AbInitio_a3c00c716389876408a957c24ec95b9b6}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!eqm@{eqm}}
+\index{eqm@{eqm}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{eqm}{eqm}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+eqm}
+
+
+
+Reference (QM) energies. 
+
+
+
+Definition at line 164 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ac98424ef29a5f29fefc4c1ba7b9348fb}\label{classsrc_1_1abinitio_1_1AbInitio_ac98424ef29a5f29fefc4c1ba7b9348fb}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!esp\+\_\+ctr@{esp\+\_\+ctr}}
+\index{esp\+\_\+ctr@{esp\+\_\+ctr}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{esp\+\_\+ctr}{esp\_ctr}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+esp\+\_\+ctr}
+
+
+
+Definition at line 1081 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a083d6a86d0c4c3e81d7aa1f5e1985b94}\label{classsrc_1_1abinitio_1_1AbInitio_a083d6a86d0c4c3e81d7aa1f5e1985b94}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!esp\+\_\+err@{esp\+\_\+err}}
+\index{esp\+\_\+err@{esp\+\_\+err}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{esp\+\_\+err}{esp\_err}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+esp\+\_\+err}
+
+
+
+Qualitative Indicator\+: \char`\"{}relative R\+M\+S\char`\"{} for electrostatic potential. 
+
+
+
+Definition at line 180 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a3f2f5b91f12c67a34d36e92800f89535}\label{classsrc_1_1abinitio_1_1AbInitio_a3f2f5b91f12c67a34d36e92800f89535}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!esp\+\_\+err\+\_\+pct@{esp\+\_\+err\+\_\+pct}}
+\index{esp\+\_\+err\+\_\+pct@{esp\+\_\+err\+\_\+pct}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{esp\+\_\+err\+\_\+pct}{esp\_err\_pct}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+esp\+\_\+err\+\_\+pct}
+
+
+
+Definition at line 1061 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a9427352d5d3e467c4af17ad2639f38d3}\label{classsrc_1_1abinitio_1_1AbInitio_a9427352d5d3e467c4af17ad2639f38d3}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!esp\+\_\+ref@{esp\+\_\+ref}}
+\index{esp\+\_\+ref@{esp\+\_\+ref}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{esp\+\_\+ref}{esp\_ref}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+esp\+\_\+ref}
+
+
+
+Definition at line 1060 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_aca3127dd6fe7f91371abf951dcc445c0}\label{classsrc_1_1abinitio_1_1AbInitio_aca3127dd6fe7f91371abf951dcc445c0}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!esp\+\_\+trm@{esp\+\_\+trm}}
+\index{esp\+\_\+trm@{esp\+\_\+trm}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{esp\+\_\+trm}{esp\_trm}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+esp\+\_\+trm}
+
+
+
+Definition at line 1080 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a907086906ad0726918a5888bb5f6a382}\label{classsrc_1_1abinitio_1_1AbInitio_a907086906ad0726918a5888bb5f6a382}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!espval@{espval}}
+\index{espval@{espval}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{espval}{espval}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+espval}
+
+
+
+E\+SP values. 
+
+
+
+Definition at line 170 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a35c72bc60a4e4678c0d513f7a04535ee}\label{classsrc_1_1abinitio_1_1AbInitio_a35c72bc60a4e4678c0d513f7a04535ee}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!espxyz@{espxyz}}
+\index{espxyz@{espxyz}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{espxyz}{espxyz}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+espxyz}
+
+
+
+E\+SP grid points. 
+
+
+
+Definition at line 168 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_aab093b41beac84b678fb4bfdb9109c2d}\label{classsrc_1_1abinitio_1_1AbInitio_aab093b41beac84b678fb4bfdb9109c2d}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!f\+\_\+ctr@{f\+\_\+ctr}}
+\index{f\+\_\+ctr@{f\+\_\+ctr}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{f\+\_\+ctr}{f\_ctr}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+f\+\_\+ctr}
+
+
+
+Definition at line 949 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ab0477deb7a9e68913b808d173d095931}\label{classsrc_1_1abinitio_1_1AbInitio_ab0477deb7a9e68913b808d173d095931}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!f\+\_\+err@{f\+\_\+err}}
+\index{f\+\_\+err@{f\+\_\+err}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{f\+\_\+err}{f\_err}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+f\+\_\+err}
+
+
+
+Qualitative Indicator\+: average force error (fractional) 
+
+
+
+Definition at line 177 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a245a174a32cecbb1c28a71c2a7080880}\label{classsrc_1_1abinitio_1_1AbInitio_a245a174a32cecbb1c28a71c2a7080880}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!f\+\_\+err\+\_\+pct@{f\+\_\+err\+\_\+pct}}
+\index{f\+\_\+err\+\_\+pct@{f\+\_\+err\+\_\+pct}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{f\+\_\+err\+\_\+pct}{f\_err\_pct}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+f\+\_\+err\+\_\+pct}
+
+
+
+Definition at line 178 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ac7998d2a3464949f9f160a09de357eb3}\label{classsrc_1_1abinitio_1_1AbInitio_ac7998d2a3464949f9f160a09de357eb3}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!f\+\_\+ref@{f\+\_\+ref}}
+\index{f\+\_\+ref@{f\+\_\+ref}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{f\+\_\+ref}{f\_ref}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+f\+\_\+ref}
+
+
+
+Definition at line 951 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a4b99282bb26c0bc8d32a3415425d54c8}\label{classsrc_1_1abinitio_1_1AbInitio_a4b99282bb26c0bc8d32a3415425d54c8}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!f\+\_\+trm@{f\+\_\+trm}}
+\index{f\+\_\+trm@{f\+\_\+trm}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{f\+\_\+trm}{f\_trm}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+f\+\_\+trm}
+
+
+
+Definition at line 948 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a5696c164f89abc66027db99e17ebde41}\label{classsrc_1_1abinitio_1_1AbInitio_a5696c164f89abc66027db99e17ebde41}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!fitatoms@{fitatoms}}
+\index{fitatoms@{fitatoms}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{fitatoms}{fitatoms}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+fitatoms}
+
+
+
+Definition at line 407 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ab026c75ec6db07cfe829718e944a871b}\label{classsrc_1_1abinitio_1_1AbInitio_ab026c75ec6db07cfe829718e944a871b}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!force@{force}}
+\index{force@{force}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{force}{force}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+force}
+
+
+
+Definition at line 399 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ae01e6dceba23ad6a532d2fcc0cbee71c}\label{classsrc_1_1abinitio_1_1AbInitio_ae01e6dceba23ad6a532d2fcc0cbee71c}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!force\+\_\+map@{force\+\_\+map}}
+\index{force\+\_\+map@{force\+\_\+map}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{force\+\_\+map}{force\_map}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+force\+\_\+map}
+
+
+
+Definition at line 254 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a8ade8ee6cf57e840bc80a54380be4092}\label{classsrc_1_1abinitio_1_1AbInitio_a8ade8ee6cf57e840bc80a54380be4092}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!fqm@{fqm}}
+\index{fqm@{fqm}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{fqm}{fqm}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+fqm}
+
+
+
+Reference (QM) forces. 
+
+
+
+Definition at line 166 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_aed404f4d80783d9680515bcc40415f43}\label{classsrc_1_1abinitio_1_1AbInitio_aed404f4d80783d9680515bcc40415f43}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!fref@{fref}}
+\index{fref@{fref}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{fref}{fref}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+fref}
+
+
+
+Definition at line 455 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a4f6729a22cad35df3a21db5e2ffddd75}\label{classsrc_1_1abinitio_1_1AbInitio_a4f6729a22cad35df3a21db5e2ffddd75}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!invdists@{invdists}}
+\index{invdists@{invdists}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{invdists}{invdists}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+invdists}
+
+
+
+Definition at line 983 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a4f584318b0b52d54f9d051e1f35b0d81}\label{classsrc_1_1abinitio_1_1AbInitio_a4f584318b0b52d54f9d051e1f35b0d81}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}}
+\index{loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{loop\+\_\+over\+\_\+snapshots}{loop\_over\_snapshots}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+loop\+\_\+over\+\_\+snapshots}
+
+
+
+L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. 
+
+
+
+Definition at line 160 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_acb45f30e4dc519406cc9a533b562778f}\label{classsrc_1_1abinitio_1_1AbInitio_acb45f30e4dc519406cc9a533b562778f}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!M\+\_\+orig@{M\+\_\+orig}}
+\index{M\+\_\+orig@{M\+\_\+orig}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{M\+\_\+orig}{M\_orig}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+M\+\_\+orig}
+
+
+
+Definition at line 214 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_aca9f31e080c87f2f525ef4c35ae9c2f9}\label{classsrc_1_1abinitio_1_1AbInitio_aca9f31e080c87f2f525ef4c35ae9c2f9}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!maxdf@{maxdf}}
+\index{maxdf@{maxdf}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{maxdf}{maxdf}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+maxdf}
+
+
+
+Definition at line 711 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a16f13519c011bde03f371e211a8ff383}\label{classsrc_1_1abinitio_1_1AbInitio_a16f13519c011bde03f371e211a8ff383}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!maxfatom@{maxfatom}}
+\index{maxfatom@{maxfatom}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{maxfatom}{maxfatom}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+maxfatom}
+
+
+
+Definition at line 709 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ab88fec9eb79c388520da5f2bc13a20b0}\label{classsrc_1_1abinitio_1_1AbInitio_ab88fec9eb79c388520da5f2bc13a20b0}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!maxfshot@{maxfshot}}
+\index{maxfshot@{maxfshot}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{maxfshot}{maxfshot}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+maxfshot}
+
+
+
+Definition at line 710 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ae9dcad17db7b29f0aba942914cc25976}\label{classsrc_1_1abinitio_1_1AbInitio_ae9dcad17db7b29f0aba942914cc25976}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!mol@{mol}}
+\index{mol@{mol}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{mol}{mol}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+mol}
+
+
+
+Read in the trajectory file. 
+
+Set the number of snapshots. 
+
+Definition at line 188 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ae4adfd62453571f65b443b11e2de28ea}\label{classsrc_1_1abinitio_1_1AbInitio_ae4adfd62453571f65b443b11e2de28ea}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!nesp@{nesp}}
+\index{nesp@{nesp}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{nesp}{nesp}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+nesp}
+
+
+
+Definition at line 429 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a24aa99bc1935ddcbcc929b32ef39bc67}\label{classsrc_1_1abinitio_1_1AbInitio_a24aa99bc1935ddcbcc929b32ef39bc67}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!nf\+\_\+ctr@{nf\+\_\+ctr}}
+\index{nf\+\_\+ctr@{nf\+\_\+ctr}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{nf\+\_\+ctr}{nf\_ctr}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+nf\+\_\+ctr}
+
+
+
+Definition at line 956 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_af5bff4b475e1c30aa9ae65ba10d0bf23}\label{classsrc_1_1abinitio_1_1AbInitio_af5bff4b475e1c30aa9ae65ba10d0bf23}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!nf\+\_\+err@{nf\+\_\+err}}
+\index{nf\+\_\+err@{nf\+\_\+err}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{nf\+\_\+err}{nf\_err}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+nf\+\_\+err}
+
+
+
+Definition at line 181 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a81b9a3e15cf6c8d7cbf35ebd5662e6bc}\label{classsrc_1_1abinitio_1_1AbInitio_a81b9a3e15cf6c8d7cbf35ebd5662e6bc}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!nf\+\_\+err\+\_\+pct@{nf\+\_\+err\+\_\+pct}}
+\index{nf\+\_\+err\+\_\+pct@{nf\+\_\+err\+\_\+pct}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{nf\+\_\+err\+\_\+pct}{nf\_err\_pct}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+nf\+\_\+err\+\_\+pct}
+
+
+
+Definition at line 182 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a77d87d07cb414981cc99a2f9b90e6e18}\label{classsrc_1_1abinitio_1_1AbInitio_a77d87d07cb414981cc99a2f9b90e6e18}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!nf\+\_\+ref@{nf\+\_\+ref}}
+\index{nf\+\_\+ref@{nf\+\_\+ref}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{nf\+\_\+ref}{nf\_ref}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+nf\+\_\+ref}
+
+
+
+Definition at line 957 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_aca713951cc7f5ef415f5759e496ad050}\label{classsrc_1_1abinitio_1_1AbInitio_aca713951cc7f5ef415f5759e496ad050}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!nf\+\_\+trm@{nf\+\_\+trm}}
+\index{nf\+\_\+trm@{nf\+\_\+trm}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{nf\+\_\+trm}{nf\_trm}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+nf\+\_\+trm}
+
+
+
+Definition at line 955 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_aaccd8efb7ad8718729b040380a9e204f}\label{classsrc_1_1abinitio_1_1AbInitio_aaccd8efb7ad8718729b040380a9e204f}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!nftqm@{nftqm}}
+\index{nftqm@{nftqm}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{nftqm}{nftqm}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+nftqm}
+
+
+
+Definition at line 451 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a2f016bb1122e78d773f0e5365ef72376}\label{classsrc_1_1abinitio_1_1AbInitio_a2f016bb1122e78d773f0e5365ef72376}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!nnf@{nnf}}
+\index{nnf@{nnf}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{nnf}{nnf}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+nnf}
+
+
+
+Definition at line 315 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_aec7479553c66ace03a185d838fd26a5e}\label{classsrc_1_1abinitio_1_1AbInitio_aec7479553c66ace03a185d838fd26a5e}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!nparticles@{nparticles}}
+\index{nparticles@{nparticles}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{nparticles}{nparticles}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+nparticles}
+
+
+
+The number of (atoms + drude particles + virtual sites) 
+
+
+
+Definition at line 197 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a5d953e461f019cf088728fe835213fb8}\label{classsrc_1_1abinitio_1_1AbInitio_a5d953e461f019cf088728fe835213fb8}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!ns@{ns}}
+\index{ns@{ns}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{ns}{ns}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+ns}
+
+
+
+Definition at line 195 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_aa8d4dfb98704f06de57a270ba7074d17}\label{classsrc_1_1abinitio_1_1AbInitio_aa8d4dfb98704f06de57a270ba7074d17}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!ntq@{ntq}}
+\index{ntq@{ntq}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{ntq}{ntq}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+ntq}
+
+
+
+Definition at line 316 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a089d952a6da9705b7bea52ec282f761e}\label{classsrc_1_1abinitio_1_1AbInitio_a089d952a6da9705b7bea52ec282f761e}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!objective@{objective}}
+\index{objective@{objective}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{objective}{objective}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+objective}
+
+
+
+Definition at line 1111 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a0ba71e502a5c605a6823000429189bcb}\label{classsrc_1_1abinitio_1_1AbInitio_a0ba71e502a5c605a6823000429189bcb}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!qfnm@{qfnm}}
+\index{qfnm@{qfnm}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{qfnm}{qfnm}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+qfnm}
+
+
+
+The qdata.\+txt file that contains the QM energies and forces. 
+
+
+
+Definition at line 172 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ac6e917779f9240999f9deac94b9fc52b}\label{classsrc_1_1abinitio_1_1AbInitio_ac6e917779f9240999f9deac94b9fc52b}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!qmatoms@{qmatoms}}
+\index{qmatoms@{qmatoms}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{qmatoms}{qmatoms}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+qmatoms}
+
+
+
+Definition at line 396 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a784c7a7cc2997a0274bf8f9d929a2dc1}\label{classsrc_1_1abinitio_1_1AbInitio_a784c7a7cc2997a0274bf8f9d929a2dc1}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!respterm@{respterm}}
+\index{respterm@{respterm}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{respterm}{respterm}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+respterm}
+
+
+
+Definition at line 1072 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a91982f5bbc37e6dffc3484912d605672}\label{classsrc_1_1abinitio_1_1AbInitio_a91982f5bbc37e6dffc3484912d605672}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!save\+\_\+vmvals@{save\+\_\+vmvals}}
+\index{save\+\_\+vmvals@{save\+\_\+vmvals}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{save\+\_\+vmvals}{save\_vmvals}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+save\+\_\+vmvals}
+
+
+
+Save the mvals from the last time we updated the vsites. 
+
+
+
+Definition at line 212 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a2a0e84edd38e6d52983769ac338d704e}\label{classsrc_1_1abinitio_1_1AbInitio_a2a0e84edd38e6d52983769ac338d704e}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!savg@{savg}}
+\index{savg@{savg}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{savg}{savg}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+savg}
+
+
+
+Option for how much data to write to disk. 
+
+Whether to do energy and force calculations for the whole trajectory, or to do one calculation per snapshot. Open\+M\+M-\/only option -\/ whether to run the energies and forces internally. Whether we have virtual sites (set at the global option level) Attenuate the weights as a function of energy What is the energy denominator? (Valid for \textquotesingle{}attenuate\textquotesingle{}) Set upper cutoff energy Assign a greater weight to MM snapshots that underestimate the QM energy (surfaces referenced to QM absolute minimum) 
+
+Definition at line 147 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_aabd18cb0c7bd1a27ae43afeec60a50ed}\label{classsrc_1_1abinitio_1_1AbInitio_aabd18cb0c7bd1a27ae43afeec60a50ed}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!smin@{smin}}
+\index{smin@{smin}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{smin}{smin}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+smin}
+
+
+
+Definition at line 386 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a46a8768385f6e3e9db715b175a5285c6}\label{classsrc_1_1abinitio_1_1AbInitio_a46a8768385f6e3e9db715b175a5285c6}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!tq\+\_\+ctr@{tq\+\_\+ctr}}
+\index{tq\+\_\+ctr@{tq\+\_\+ctr}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{tq\+\_\+ctr}{tq\_ctr}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+tq\+\_\+ctr}
+
+
+
+Definition at line 961 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a4b404cf1acc4b5e26f4ded9138698d5e}\label{classsrc_1_1abinitio_1_1AbInitio_a4b404cf1acc4b5e26f4ded9138698d5e}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!tq\+\_\+err@{tq\+\_\+err}}
+\index{tq\+\_\+err@{tq\+\_\+err}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{tq\+\_\+err}{tq\_err}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+tq\+\_\+err}
+
+
+
+Definition at line 963 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ac780a1a084ef789ee064331988263242}\label{classsrc_1_1abinitio_1_1AbInitio_ac780a1a084ef789ee064331988263242}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!tq\+\_\+err\+\_\+pct@{tq\+\_\+err\+\_\+pct}}
+\index{tq\+\_\+err\+\_\+pct@{tq\+\_\+err\+\_\+pct}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{tq\+\_\+err\+\_\+pct}{tq\_err\_pct}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+tq\+\_\+err\+\_\+pct}
+
+
+
+Definition at line 183 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a57be75dd1e20dfb18d0f4f28c5689d74}\label{classsrc_1_1abinitio_1_1AbInitio_a57be75dd1e20dfb18d0f4f28c5689d74}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!tq\+\_\+ref@{tq\+\_\+ref}}
+\index{tq\+\_\+ref@{tq\+\_\+ref}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{tq\+\_\+ref}{tq\_ref}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+tq\+\_\+ref}
+
+
+
+Definition at line 962 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a2078c34ad682dd26eed7bfd2ce2eeac4}\label{classsrc_1_1abinitio_1_1AbInitio_a2078c34ad682dd26eed7bfd2ce2eeac4}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!tq\+\_\+trm@{tq\+\_\+trm}}
+\index{tq\+\_\+trm@{tq\+\_\+trm}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{tq\+\_\+trm}{tq\_trm}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+tq\+\_\+trm}
+
+
+
+Definition at line 960 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a751af39fbd241badec09dd0214902d49}\label{classsrc_1_1abinitio_1_1AbInitio_a751af39fbd241badec09dd0214902d49}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!use\+\_\+nft@{use\+\_\+nft}}
+\index{use\+\_\+nft@{use\+\_\+nft}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{use\+\_\+nft}{use\_nft}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+use\+\_\+nft}
+
+
+
+Whether to compute net forces and torques, or not. 
+
+
+
+Definition at line 185 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a186f7561777288cd391177ac1bdc2435}\label{classsrc_1_1abinitio_1_1AbInitio_a186f7561777288cd391177ac1bdc2435}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!w\+\_\+energy@{w\+\_\+energy}}
+\index{w\+\_\+energy@{w\+\_\+energy}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{w\+\_\+energy}{w\_energy}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+w\+\_\+energy}
+
+
+
+Definition at line 651 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a57931eef3ca6d8ac0ade2ffc1f008ef4}\label{classsrc_1_1abinitio_1_1AbInitio_a57931eef3ca6d8ac0ade2ffc1f008ef4}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!w\+\_\+force@{w\+\_\+force}}
+\index{w\+\_\+force@{w\+\_\+force}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{w\+\_\+force}{w\_force}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+w\+\_\+force}
+
+
+
+Initialize the base class. 
+
+Number of snapshots Whether to match Absolute Energies (make sure you know what you\textquotesingle{}re doing) Number of atoms that we are fitting Whether to fit Energies. Whether to fit Forces. Whether to fit Electrostatic Potential. Weights for the three components. 
+
+Definition at line 121 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_ad62612a970e3d20e9ce975134cced90a}\label{classsrc_1_1abinitio_1_1AbInitio_ad62612a970e3d20e9ce975134cced90a}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!w\+\_\+netforce@{w\+\_\+netforce}}
+\index{w\+\_\+netforce@{w\+\_\+netforce}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{w\+\_\+netforce}{w\_netforce}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+w\+\_\+netforce}
+
+
+
+Definition at line 651 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a88f678514f8b84c1ba3038d049818f66}\label{classsrc_1_1abinitio_1_1AbInitio_a88f678514f8b84c1ba3038d049818f66}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!w\+\_\+resp@{w\+\_\+resp}}
+\index{w\+\_\+resp@{w\+\_\+resp}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{w\+\_\+resp}{w\_resp}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+w\+\_\+resp}
+
+
+
+Definition at line 976 of file abinitio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1abinitio_1_1AbInitio_a6a0e3f7148aa806e02f51078ff53076f}\label{classsrc_1_1abinitio_1_1AbInitio_a6a0e3f7148aa806e02f51078ff53076f}} 
+\index{src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}!w\+\_\+torque@{w\+\_\+torque}}
+\index{w\+\_\+torque@{w\+\_\+torque}!src\+::abinitio\+::\+Ab\+Initio@{src\+::abinitio\+::\+Ab\+Initio}}
+\paragraph{\texorpdfstring{w\+\_\+torque}{w\_torque}}
+{\footnotesize\ttfamily src.\+abinitio.\+Ab\+Initio.\+w\+\_\+torque}
+
+
+
+Definition at line 651 of file abinitio.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{abinitio_8py}{abinitio.\+py}\end{DoxyCompactItemize}

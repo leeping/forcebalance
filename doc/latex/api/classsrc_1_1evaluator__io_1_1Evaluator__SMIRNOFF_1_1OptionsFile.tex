@@ -1,0 +1,158 @@
+\hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile}{}\subsection{src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File Class Reference}
+\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile}\index{src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File@{src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File}}
+
+
+Represents the set of options that a {\ttfamily \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF}{Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}} target will be run with.  
+
+
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_a05b31ff779fa3ba3023378ee9db86b0c}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self)
+\item 
+def \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_abe5a6817f9456684926cba96c8b39040}{to\+\_\+json} (self)
+\begin{DoxyCompactList}\small\item\em Converts this class into a J\+S\+ON string. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ad6ce4f3e9aeb47878c7cc9ef363a6b87}{from\+\_\+json} (cls, json\+\_\+source)
+\begin{DoxyCompactList}\small\item\em Creates this class from a J\+S\+ON string. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ac13be6f72b2f4d3bc169e91841858ae0}{connection\+\_\+options}
+\item 
+\hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_a0af9d5c7fabbe9d87e0ea869b34c596f}{estimation\+\_\+options}
+\item 
+\hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_a744d421faa006be09aa04ce6afbe4276}{data\+\_\+set\+\_\+path}
+\item 
+\hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ad5315f81d0b3d27e9da56ecabb7685f5}{weights}
+\item 
+\hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_aecb937850bc692709733b0b70b65edd6}{denominators}
+\item 
+\hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ab59060929cea0b71aea7a1b578652ac2}{polling\+\_\+interval}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Represents the set of options that a {\ttfamily \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF}{Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}} target will be run with. 
+
+\paragraph*{Attributes }
+
+connection\+\_\+options\+: openff.\+evaluator.\+client.\+Connection\+Options The options for how the {\ttfamily evaluator} client should connect to a running server instance. estimation\+\_\+options\+: openff.\+evaluator.\+client.\+Request\+Options The options for how properties should be estimated by the {\ttfamily evaluator} (e.\+g. the uncertainties to which properties should be estimated). data\+\_\+set\+\_\+path\+: str The path to a J\+S\+ON serialized Physical\+Property\+Data\+Set which contains those physical properties which will be optimised against. weights\+: dict of float The weighting of each property which will be optimised against. denominators\+: dict of str and unit.\+Quantity The denominators will be used to remove units from the properties and scale their values. polling\+\_\+interval\+: float The time interval with which to check whether the evaluator has finished fulfilling the request (in seconds). 
+
+Definition at line 74 of file evaluator\+\_\+io.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_a05b31ff779fa3ba3023378ee9db86b0c}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_a05b31ff779fa3ba3023378ee9db86b0c}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 76 of file evaluator\+\_\+io.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ad6ce4f3e9aeb47878c7cc9ef363a6b87}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ad6ce4f3e9aeb47878c7cc9ef363a6b87}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}!from\+\_\+json@{from\+\_\+json}}
+\index{from\+\_\+json@{from\+\_\+json}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}}
+\paragraph{\texorpdfstring{from\+\_\+json()}{from\_json()}}
+{\footnotesize\ttfamily def src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File.\+from\+\_\+json (\begin{DoxyParamCaption}\item[{}]{cls,  }\item[{}]{json\+\_\+source }\end{DoxyParamCaption})}
+
+
+
+Creates this class from a J\+S\+ON string. 
+
+\paragraph*{Parameters }
+
+json\+\_\+source\+: str or file-\/like object The J\+S\+ON representation of this class. 
+
+Definition at line 129 of file evaluator\+\_\+io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_abe5a6817f9456684926cba96c8b39040}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_abe5a6817f9456684926cba96c8b39040}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}!to\+\_\+json@{to\+\_\+json}}
+\index{to\+\_\+json@{to\+\_\+json}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}}
+\paragraph{\texorpdfstring{to\+\_\+json()}{to\_json()}}
+{\footnotesize\ttfamily def src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File.\+to\+\_\+json (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Converts this class into a J\+S\+ON string. 
+
+\paragraph*{Returns }
+
+str The J\+S\+ON representation of this class. 
+
+Definition at line 95 of file evaluator\+\_\+io.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ac13be6f72b2f4d3bc169e91841858ae0}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ac13be6f72b2f4d3bc169e91841858ae0}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}!connection\+\_\+options@{connection\+\_\+options}}
+\index{connection\+\_\+options@{connection\+\_\+options}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}}
+\paragraph{\texorpdfstring{connection\+\_\+options}{connection\_options}}
+{\footnotesize\ttfamily src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File.\+connection\+\_\+options}
+
+
+
+Definition at line 78 of file evaluator\+\_\+io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_a744d421faa006be09aa04ce6afbe4276}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_a744d421faa006be09aa04ce6afbe4276}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}!data\+\_\+set\+\_\+path@{data\+\_\+set\+\_\+path}}
+\index{data\+\_\+set\+\_\+path@{data\+\_\+set\+\_\+path}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}}
+\paragraph{\texorpdfstring{data\+\_\+set\+\_\+path}{data\_set\_path}}
+{\footnotesize\ttfamily src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File.\+data\+\_\+set\+\_\+path}
+
+
+
+Definition at line 81 of file evaluator\+\_\+io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_aecb937850bc692709733b0b70b65edd6}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_aecb937850bc692709733b0b70b65edd6}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}!denominators@{denominators}}
+\index{denominators@{denominators}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}}
+\paragraph{\texorpdfstring{denominators}{denominators}}
+{\footnotesize\ttfamily src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File.\+denominators}
+
+
+
+Definition at line 83 of file evaluator\+\_\+io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_a0af9d5c7fabbe9d87e0ea869b34c596f}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_a0af9d5c7fabbe9d87e0ea869b34c596f}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}!estimation\+\_\+options@{estimation\+\_\+options}}
+\index{estimation\+\_\+options@{estimation\+\_\+options}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}}
+\paragraph{\texorpdfstring{estimation\+\_\+options}{estimation\_options}}
+{\footnotesize\ttfamily src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File.\+estimation\+\_\+options}
+
+
+
+Definition at line 79 of file evaluator\+\_\+io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ab59060929cea0b71aea7a1b578652ac2}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ab59060929cea0b71aea7a1b578652ac2}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}!polling\+\_\+interval@{polling\+\_\+interval}}
+\index{polling\+\_\+interval@{polling\+\_\+interval}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}}
+\paragraph{\texorpdfstring{polling\+\_\+interval}{polling\_interval}}
+{\footnotesize\ttfamily src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File.\+polling\+\_\+interval}
+
+
+
+Definition at line 85 of file evaluator\+\_\+io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ad5315f81d0b3d27e9da56ecabb7685f5}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile_ad5315f81d0b3d27e9da56ecabb7685f5}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}!weights@{weights}}
+\index{weights@{weights}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F\+::\+Options\+File}}
+\paragraph{\texorpdfstring{weights}{weights}}
+{\footnotesize\ttfamily src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+Options\+File.\+weights}
+
+
+
+Definition at line 82 of file evaluator\+\_\+io.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{evaluator__io_8py}{evaluator\+\_\+io.\+py}\end{DoxyCompactItemize}

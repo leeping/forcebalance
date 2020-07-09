@@ -1,0 +1,145 @@
+\hypertarget{classsrc_1_1custom__io_1_1Gen__Reader}{}\subsection{src.\+custom\+\_\+io.\+Gen\+\_\+\+Reader Class Reference}
+\label{classsrc_1_1custom__io_1_1Gen__Reader}\index{src.\+custom\+\_\+io.\+Gen\+\_\+\+Reader@{src.\+custom\+\_\+io.\+Gen\+\_\+\+Reader}}
+
+
+Finite state machine for parsing custom G\+R\+O\+M\+A\+CS force field files.  
+
+
+
+
+Inheritance diagram for src.\+custom\+\_\+io.\+Gen\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classsrc_1_1custom__io_1_1Gen__Reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+custom\+\_\+io.\+Gen\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=226pt]{classsrc_1_1custom__io_1_1Gen__Reader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1custom__io_1_1Gen__Reader_a51738eb886cd86e3ced2ab54cb39bcdf}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, fnm)
+\item 
+def \hyperlink{classsrc_1_1custom__io_1_1Gen__Reader_adee7b86d90da3818100d33975b8ec00e}{feed} (self, line)
+\begin{DoxyCompactList}\small\item\em Feed in a line. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1custom__io_1_1Gen__Reader_af73e83d59f466c89f2fc03052fc6c2d7}{sec}
+\begin{DoxyCompactList}\small\item\em The current section that we\textquotesingle{}re in. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1custom__io_1_1Gen__Reader_a9a7fe7d452d1cf79db07bfe1185c3fec}{pdict}
+\begin{DoxyCompactList}\small\item\em The parameter dictionary (defined in this file) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1custom__io_1_1Gen__Reader_a8a0c59194fe084356f69746cc1388278}{itype}
+\item 
+\hyperlink{classsrc_1_1custom__io_1_1Gen__Reader_ada076d5cafe10b9f4fcf7466381816e5}{suffix}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Finite state machine for parsing custom G\+R\+O\+M\+A\+CS force field files. 
+
+This class is instantiated when we begin to read in a file. The feed(line) method updates the state of the machine, giving it information like the residue we\textquotesingle{}re currently on, the nonbonded interaction type, and the section that we\textquotesingle{}re in. Using this information we can look up the interaction type and parameter type for building the parameter ID. 
+
+Definition at line 41 of file custom\+\_\+io.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1custom__io_1_1Gen__Reader_a51738eb886cd86e3ced2ab54cb39bcdf}\label{classsrc_1_1custom__io_1_1Gen__Reader_a51738eb886cd86e3ced2ab54cb39bcdf}} 
+\index{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+custom\+\_\+io.\+Gen\+\_\+\+Reader.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm }\end{DoxyParamCaption})}
+
+
+
+Definition at line 43 of file custom\+\_\+io.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1custom__io_1_1Gen__Reader_adee7b86d90da3818100d33975b8ec00e}\label{classsrc_1_1custom__io_1_1Gen__Reader_adee7b86d90da3818100d33975b8ec00e}} 
+\index{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}!feed@{feed}}
+\index{feed@{feed}!src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{feed()}{feed()}}
+{\footnotesize\ttfamily def src.\+custom\+\_\+io.\+Gen\+\_\+\+Reader.\+feed (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Feed in a line. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em line} & The line of data \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 57 of file custom\+\_\+io.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1custom__io_1_1Gen__Reader_a8a0c59194fe084356f69746cc1388278}\label{classsrc_1_1custom__io_1_1Gen__Reader_a8a0c59194fe084356f69746cc1388278}} 
+\index{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}!itype@{itype}}
+\index{itype@{itype}!src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{itype}{itype}}
+{\footnotesize\ttfamily src.\+custom\+\_\+io.\+Gen\+\_\+\+Reader.\+itype}
+
+
+
+Definition at line 60 of file custom\+\_\+io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1custom__io_1_1Gen__Reader_a9a7fe7d452d1cf79db07bfe1185c3fec}\label{classsrc_1_1custom__io_1_1Gen__Reader_a9a7fe7d452d1cf79db07bfe1185c3fec}} 
+\index{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{pdict}{pdict}}
+{\footnotesize\ttfamily src.\+custom\+\_\+io.\+Gen\+\_\+\+Reader.\+pdict}
+
+
+
+The parameter dictionary (defined in this file) 
+
+
+
+Definition at line 49 of file custom\+\_\+io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1custom__io_1_1Gen__Reader_af73e83d59f466c89f2fc03052fc6c2d7}\label{classsrc_1_1custom__io_1_1Gen__Reader_af73e83d59f466c89f2fc03052fc6c2d7}} 
+\index{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}!sec@{sec}}
+\index{sec@{sec}!src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{sec}{sec}}
+{\footnotesize\ttfamily src.\+custom\+\_\+io.\+Gen\+\_\+\+Reader.\+sec}
+
+
+
+The current section that we\textquotesingle{}re in. 
+
+
+
+Definition at line 47 of file custom\+\_\+io.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1custom__io_1_1Gen__Reader_ada076d5cafe10b9f4fcf7466381816e5}\label{classsrc_1_1custom__io_1_1Gen__Reader_ada076d5cafe10b9f4fcf7466381816e5}} 
+\index{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader@{src\+::custom\+\_\+io\+::\+Gen\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{suffix}{suffix}}
+{\footnotesize\ttfamily src.\+custom\+\_\+io.\+Gen\+\_\+\+Reader.\+suffix}
+
+
+
+Definition at line 79 of file custom\+\_\+io.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{custom__io_8py}{custom\+\_\+io.\+py}\end{DoxyCompactItemize}

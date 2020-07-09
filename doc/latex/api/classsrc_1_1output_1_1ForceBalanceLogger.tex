@@ -1,0 +1,132 @@
+\hypertarget{classsrc_1_1output_1_1ForceBalanceLogger}{}\subsection{src.\+output.\+Force\+Balance\+Logger Class Reference}
+\label{classsrc_1_1output_1_1ForceBalanceLogger}\index{src.\+output.\+Force\+Balance\+Logger@{src.\+output.\+Force\+Balance\+Logger}}
+
+
+This logger starts out with a default handler that writes to stdout add\+Handler removes this default the first time another handler is added.  
+
+
+
+
+Inheritance diagram for src.\+output.\+Force\+Balance\+Logger\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=247pt]{classsrc_1_1output_1_1ForceBalanceLogger__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+output.\+Force\+Balance\+Logger\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=247pt]{classsrc_1_1output_1_1ForceBalanceLogger__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1output_1_1ForceBalanceLogger_ad58768bef6288ef421d736dfcb34ddad}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, name)
+\item 
+def \hyperlink{classsrc_1_1output_1_1ForceBalanceLogger_a81672b6c5dfd96e11a73c6c345533d1f}{add\+Handler} (self, hdlr)
+\item 
+def \hyperlink{classsrc_1_1output_1_1ForceBalanceLogger_a8be21b79e392b07a93e1718be22b437c}{remove\+Handler} (self, hdlr)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1output_1_1ForceBalanceLogger_a02e7ca6f9f9a5daaa2d2f27457e9c1b2}{default\+Handler}
+\item 
+\hyperlink{classsrc_1_1output_1_1ForceBalanceLogger_a2da24df00a411d1603fcaf2ebef8161f}{propagate}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+This logger starts out with a default handler that writes to stdout add\+Handler removes this default the first time another handler is added. 
+
+This is used for forcebalance package level logging, where a logger should always be present unless otherwise specified. To silence, add a Null\+Handler We also by default set the log level to I\+N\+FO (logging.\+Logger starts at W\+A\+R\+N\+I\+NG) 
+
+Definition at line 10 of file output.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1output_1_1ForceBalanceLogger_ad58768bef6288ef421d736dfcb34ddad}\label{classsrc_1_1output_1_1ForceBalanceLogger_ad58768bef6288ef421d736dfcb34ddad}} 
+\index{src\+::output\+::\+Force\+Balance\+Logger@{src\+::output\+::\+Force\+Balance\+Logger}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::output\+::\+Force\+Balance\+Logger@{src\+::output\+::\+Force\+Balance\+Logger}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+output.\+Force\+Balance\+Logger.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{name }\end{DoxyParamCaption})}
+
+
+
+Definition at line 11 of file output.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1output_1_1ForceBalanceLogger_a81672b6c5dfd96e11a73c6c345533d1f}\label{classsrc_1_1output_1_1ForceBalanceLogger_a81672b6c5dfd96e11a73c6c345533d1f}} 
+\index{src\+::output\+::\+Force\+Balance\+Logger@{src\+::output\+::\+Force\+Balance\+Logger}!add\+Handler@{add\+Handler}}
+\index{add\+Handler@{add\+Handler}!src\+::output\+::\+Force\+Balance\+Logger@{src\+::output\+::\+Force\+Balance\+Logger}}
+\paragraph{\texorpdfstring{add\+Handler()}{addHandler()}}
+{\footnotesize\ttfamily def src.\+output.\+Force\+Balance\+Logger.\+add\+Handler (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{hdlr }\end{DoxyParamCaption})}
+
+
+
+Definition at line 18 of file output.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1output_1_1ForceBalanceLogger_a81672b6c5dfd96e11a73c6c345533d1f_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1output_1_1ForceBalanceLogger_a8be21b79e392b07a93e1718be22b437c}\label{classsrc_1_1output_1_1ForceBalanceLogger_a8be21b79e392b07a93e1718be22b437c}} 
+\index{src\+::output\+::\+Force\+Balance\+Logger@{src\+::output\+::\+Force\+Balance\+Logger}!remove\+Handler@{remove\+Handler}}
+\index{remove\+Handler@{remove\+Handler}!src\+::output\+::\+Force\+Balance\+Logger@{src\+::output\+::\+Force\+Balance\+Logger}}
+\paragraph{\texorpdfstring{remove\+Handler()}{removeHandler()}}
+{\footnotesize\ttfamily def src.\+output.\+Force\+Balance\+Logger.\+remove\+Handler (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{hdlr }\end{DoxyParamCaption})}
+
+
+
+Definition at line 24 of file output.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1output_1_1ForceBalanceLogger_a8be21b79e392b07a93e1718be22b437c_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1output_1_1ForceBalanceLogger_a02e7ca6f9f9a5daaa2d2f27457e9c1b2}\label{classsrc_1_1output_1_1ForceBalanceLogger_a02e7ca6f9f9a5daaa2d2f27457e9c1b2}} 
+\index{src\+::output\+::\+Force\+Balance\+Logger@{src\+::output\+::\+Force\+Balance\+Logger}!default\+Handler@{default\+Handler}}
+\index{default\+Handler@{default\+Handler}!src\+::output\+::\+Force\+Balance\+Logger@{src\+::output\+::\+Force\+Balance\+Logger}}
+\paragraph{\texorpdfstring{default\+Handler}{defaultHandler}}
+{\footnotesize\ttfamily src.\+output.\+Force\+Balance\+Logger.\+default\+Handler}
+
+
+
+Definition at line 13 of file output.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1output_1_1ForceBalanceLogger_a2da24df00a411d1603fcaf2ebef8161f}\label{classsrc_1_1output_1_1ForceBalanceLogger_a2da24df00a411d1603fcaf2ebef8161f}} 
+\index{src\+::output\+::\+Force\+Balance\+Logger@{src\+::output\+::\+Force\+Balance\+Logger}!propagate@{propagate}}
+\index{propagate@{propagate}!src\+::output\+::\+Force\+Balance\+Logger@{src\+::output\+::\+Force\+Balance\+Logger}}
+\paragraph{\texorpdfstring{propagate}{propagate}}
+{\footnotesize\ttfamily src.\+output.\+Force\+Balance\+Logger.\+propagate}
+
+
+
+Definition at line 16 of file output.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{output_8py}{output.\+py}\end{DoxyCompactItemize}

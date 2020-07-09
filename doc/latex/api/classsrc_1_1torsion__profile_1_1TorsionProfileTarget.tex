@@ -1,0 +1,292 @@
+\hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget}{}\subsection{src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target Class Reference}
+\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget}\index{src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target@{src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target}}
+
+
+Subclass of Target for fitting MM optimized geometries to QM optimized geometries.  
+
+
+
+
+Inheritance diagram for src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{classsrc_1_1torsion__profile_1_1TorsionProfileTarget__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=221pt]{classsrc_1_1torsion__profile_1_1TorsionProfileTarget__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a5b7676da29a7f8fb11b651155b1ba3bc}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a6c77e6f0409fe827e9b880bc26169062}{read\+\_\+reference\+\_\+data} (self)
+\begin{DoxyCompactList}\small\item\em Read the reference ab initio data from a file such as qdata.\+txt. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a6da94528ad2084b76e9de3886785923b}{indicate} (self)
+\item 
+def \hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a4a4d529b8da9b699f8d28e85f79e08a9}{get} (self, mvals, A\+Grad=False, A\+Hess=False)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a0908c012379dcc89a0da203e3c8d668a}{metadata}
+\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a19b32b5f1f872e29cc9d0c622ea2ca04}{ndim}
+\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_af6b03974a7241385d83e9d022fc32ce7}{freeze\+\_\+atoms}
+\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a97ae9d4a70c477227c573d780df479fa}{mol}
+\begin{DoxyCompactList}\small\item\em Read in the coordinate files and get topology information from P\+DB. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a2fb17f557cfc9406a728bd9a32fbb736}{ns}
+\begin{DoxyCompactList}\small\item\em Number of snapshots. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a9d0dc0a03ec67c2902215f7ca7f57264}{engine}
+\begin{DoxyCompactList}\small\item\em Option for how much data to write to disk. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a2ddb079e4264001b9e1a38c923694ae2}{eqm}
+\begin{DoxyCompactList}\small\item\em Reference (QM) energies. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a9b366b0c78ca940925b15e48f0934eb6}{qfnm}
+\begin{DoxyCompactList}\small\item\em The qdata.\+txt file that contains the QM energies and forces. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a68645067dfaf9262844abe68c4ecacb6}{smin}
+\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a712ce3fdf7f20114d54f59d79d97ede0}{wts}
+\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a6eebf646c6d67980aa8291fd931b4073}{Print\+Dict}
+\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_ac84137cb1ee745c8d8dfe2580ce807db}{emm\+\_\+orig}
+\item 
+\hyperlink{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_ac56fa0cfbe0cec0ca98322a5f7abff2a}{objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for fitting MM optimized geometries to QM optimized geometries. 
+
+
+
+Definition at line 24 of file torsion\+\_\+profile.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a5b7676da29a7f8fb11b651155b1ba3bc}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a5b7676da29a7f8fb11b651155b1ba3bc}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 25 of file torsion\+\_\+profile.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a4a4d529b8da9b699f8d28e85f79e08a9}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a4a4d529b8da9b699f8d28e85f79e08a9}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!get@{get}}
+\index{get@{get}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 118 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a6da94528ad2084b76e9de3886785923b}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a6da94528ad2084b76e9de3886785923b}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 112 of file torsion\+\_\+profile.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a6da94528ad2084b76e9de3886785923b_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a6c77e6f0409fe827e9b880bc26169062}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a6c77e6f0409fe827e9b880bc26169062}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}}
+\index{read\+\_\+reference\+\_\+data@{read\+\_\+reference\+\_\+data}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{read\+\_\+reference\+\_\+data()}{read\_reference\_data()}}
+{\footnotesize\ttfamily def src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+read\+\_\+reference\+\_\+data (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Read the reference ab initio data from a file such as qdata.\+txt. 
+
+After reading in the information from qdata.\+txt, it is converted into the G\+R\+O\+M\+A\+CS energy units (kind of an arbitrary choice). 
+
+Definition at line 68 of file torsion\+\_\+profile.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_ac84137cb1ee745c8d8dfe2580ce807db}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_ac84137cb1ee745c8d8dfe2580ce807db}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!emm\+\_\+orig@{emm\+\_\+orig}}
+\index{emm\+\_\+orig@{emm\+\_\+orig}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{emm\+\_\+orig}{emm\_orig}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+emm\+\_\+orig}
+
+
+
+Definition at line 162 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a9d0dc0a03ec67c2902215f7ca7f57264}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a9d0dc0a03ec67c2902215f7ca7f57264}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!engine@{engine}}
+\index{engine@{engine}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{engine}{engine}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+engine}
+
+
+
+Option for how much data to write to disk. 
+
+Harmonic restraint for non-\/torsion atoms in kcal/mol. Attenuate the weights as a function of energy Energy denominator for objective function Set upper cutoff energy Read in the reference data. Build keyword dictionaries to pass to engine. Create engine object. 
+
+Definition at line 60 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a2ddb079e4264001b9e1a38c923694ae2}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a2ddb079e4264001b9e1a38c923694ae2}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!eqm@{eqm}}
+\index{eqm@{eqm}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{eqm}{eqm}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+eqm}
+
+
+
+Reference (QM) energies. 
+
+
+
+Definition at line 71 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_af6b03974a7241385d83e9d022fc32ce7}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_af6b03974a7241385d83e9d022fc32ce7}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!freeze\+\_\+atoms@{freeze\+\_\+atoms}}
+\index{freeze\+\_\+atoms@{freeze\+\_\+atoms}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{freeze\+\_\+atoms}{freeze\_atoms}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+freeze\+\_\+atoms}
+
+
+
+Definition at line 33 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a0908c012379dcc89a0da203e3c8d668a}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a0908c012379dcc89a0da203e3c8d668a}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!metadata@{metadata}}
+\index{metadata@{metadata}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{metadata}{metadata}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+metadata}
+
+
+
+Definition at line 31 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a97ae9d4a70c477227c573d780df479fa}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a97ae9d4a70c477227c573d780df479fa}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!mol@{mol}}
+\index{mol@{mol}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{mol}{mol}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+mol}
+
+
+
+Read in the coordinate files and get topology information from P\+DB. 
+
+
+
+Definition at line 37 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a19b32b5f1f872e29cc9d0c622ea2ca04}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a19b32b5f1f872e29cc9d0c622ea2ca04}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!ndim@{ndim}}
+\index{ndim@{ndim}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{ndim}{ndim}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+ndim}
+
+
+
+Definition at line 32 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a2fb17f557cfc9406a728bd9a32fbb736}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a2fb17f557cfc9406a728bd9a32fbb736}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!ns@{ns}}
+\index{ns@{ns}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{ns}{ns}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+ns}
+
+
+
+Number of snapshots. 
+
+
+
+Definition at line 42 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_ac56fa0cfbe0cec0ca98322a5f7abff2a}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_ac56fa0cfbe0cec0ca98322a5f7abff2a}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!objective@{objective}}
+\index{objective@{objective}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{objective}{objective}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+objective}
+
+
+
+Definition at line 196 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a6eebf646c6d67980aa8291fd931b4073}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a6eebf646c6d67980aa8291fd931b4073}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!Print\+Dict@{Print\+Dict}}
+\index{Print\+Dict@{Print\+Dict}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{Print\+Dict}{PrintDict}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+Print\+Dict}
+
+
+
+Definition at line 120 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a9b366b0c78ca940925b15e48f0934eb6}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a9b366b0c78ca940925b15e48f0934eb6}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!qfnm@{qfnm}}
+\index{qfnm@{qfnm}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{qfnm}{qfnm}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+qfnm}
+
+
+
+The qdata.\+txt file that contains the QM energies and forces. 
+
+
+
+Definition at line 73 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a68645067dfaf9262844abe68c4ecacb6}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a68645067dfaf9262844abe68c4ecacb6}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!smin@{smin}}
+\index{smin@{smin}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{smin}{smin}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+smin}
+
+
+
+Definition at line 89 of file torsion\+\_\+profile.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a712ce3fdf7f20114d54f59d79d97ede0}\label{classsrc_1_1torsion__profile_1_1TorsionProfileTarget_a712ce3fdf7f20114d54f59d79d97ede0}} 
+\index{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}!wts@{wts}}
+\index{wts@{wts}!src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target@{src\+::torsion\+\_\+profile\+::\+Torsion\+Profile\+Target}}
+\paragraph{\texorpdfstring{wts}{wts}}
+{\footnotesize\ttfamily src.\+torsion\+\_\+profile.\+Torsion\+Profile\+Target.\+wts}
+
+
+
+Definition at line 98 of file torsion\+\_\+profile.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{torsion__profile_8py}{torsion\+\_\+profile.\+py}\end{DoxyCompactItemize}

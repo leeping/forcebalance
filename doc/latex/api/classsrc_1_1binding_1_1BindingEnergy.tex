@@ -1,0 +1,224 @@
+\hypertarget{classsrc_1_1binding_1_1BindingEnergy}{}\subsection{src.\+binding.\+Binding\+Energy Class Reference}
+\label{classsrc_1_1binding_1_1BindingEnergy}\index{src.\+binding.\+Binding\+Energy@{src.\+binding.\+Binding\+Energy}}
+
+
+Improved subclass of Target for fitting force fields to binding energies.  
+
+
+
+
+Inheritance diagram for src.\+binding.\+Binding\+Energy\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{classsrc_1_1binding_1_1BindingEnergy__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+binding.\+Binding\+Energy\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=223pt]{classsrc_1_1binding_1_1BindingEnergy__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1binding_1_1BindingEnergy_ab154e10c3317f8140634bee726d177d6}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1binding_1_1BindingEnergy_a9d1c99fadc807e4b04adc249d730483d}{system\+\_\+driver} (self, sysname)
+\item 
+def \hyperlink{classsrc_1_1binding_1_1BindingEnergy_a21124a9de77db1f3c04d6bdbefcb0b22}{indicate} (self)
+\item 
+def \hyperlink{classsrc_1_1binding_1_1BindingEnergy_a96467ec6f26522876e04e4782413602a}{get} (self, mvals, A\+Grad=False, A\+Hess=False)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1binding_1_1BindingEnergy_a85b7dcbdfbd0331864c07f78336300d0}{inter\+\_\+opts}
+\item 
+\hyperlink{classsrc_1_1binding_1_1BindingEnergy_a164303ff47ef0a15c7b63add7a56c432}{loop\+\_\+over\+\_\+snapshots}
+\begin{DoxyCompactList}\small\item\em L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1binding_1_1BindingEnergy_a1d9caef3e11b71a9ff15977cdb324de5}{engines}
+\begin{DoxyCompactList}\small\item\em Build keyword dictionaries to pass to engine. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1binding_1_1BindingEnergy_a8049a3666453a4bfb50c36788135d0ef}{Print\+Dict}
+\item 
+\hyperlink{classsrc_1_1binding_1_1BindingEnergy_a3ce83ed981346e4539b5f0450207b64d}{R\+M\+S\+D\+Dict}
+\item 
+\hyperlink{classsrc_1_1binding_1_1BindingEnergy_a8f13a1550287e4c8b6906dce55c9f364}{rmsd\+\_\+part}
+\item 
+\hyperlink{classsrc_1_1binding_1_1BindingEnergy_a91083ec8b983abfdc6ae863c69778f92}{energy\+\_\+part}
+\item 
+\hyperlink{classsrc_1_1binding_1_1BindingEnergy_a90fc3656bbc3b0e1183d8f0c78d84dd9}{objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Improved subclass of Target for fitting force fields to binding energies. 
+
+
+
+Definition at line 124 of file binding.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_ab154e10c3317f8140634bee726d177d6}\label{classsrc_1_1binding_1_1BindingEnergy_ab154e10c3317f8140634bee726d177d6}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+binding.\+Binding\+Energy.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 127 of file binding.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1binding_1_1BindingEnergy_ab154e10c3317f8140634bee726d177d6_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_a96467ec6f26522876e04e4782413602a}\label{classsrc_1_1binding_1_1BindingEnergy_a96467ec6f26522876e04e4782413602a}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!get@{get}}
+\index{get@{get}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+binding.\+Binding\+Energy.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 191 of file binding.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_a21124a9de77db1f3c04d6bdbefcb0b22}\label{classsrc_1_1binding_1_1BindingEnergy_a21124a9de77db1f3c04d6bdbefcb0b22}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+binding.\+Binding\+Energy.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 185 of file binding.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1binding_1_1BindingEnergy_a21124a9de77db1f3c04d6bdbefcb0b22_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_a9d1c99fadc807e4b04adc249d730483d}\label{classsrc_1_1binding_1_1BindingEnergy_a9d1c99fadc807e4b04adc249d730483d}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!system\+\_\+driver@{system\+\_\+driver}}
+\index{system\+\_\+driver@{system\+\_\+driver}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{system\+\_\+driver()}{system\_driver()}}
+{\footnotesize\ttfamily def src.\+binding.\+Binding\+Energy.\+system\+\_\+driver (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{sysname }\end{DoxyParamCaption})}
+
+
+
+Definition at line 181 of file binding.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_a91083ec8b983abfdc6ae863c69778f92}\label{classsrc_1_1binding_1_1BindingEnergy_a91083ec8b983abfdc6ae863c69778f92}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!energy\+\_\+part@{energy\+\_\+part}}
+\index{energy\+\_\+part@{energy\+\_\+part}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{energy\+\_\+part}{energy\_part}}
+{\footnotesize\ttfamily src.\+binding.\+Binding\+Energy.\+energy\+\_\+part}
+
+
+
+Definition at line 241 of file binding.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_a1d9caef3e11b71a9ff15977cdb324de5}\label{classsrc_1_1binding_1_1BindingEnergy_a1d9caef3e11b71a9ff15977cdb324de5}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!engines@{engines}}
+\index{engines@{engines}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{engines}{engines}}
+{\footnotesize\ttfamily src.\+binding.\+Binding\+Energy.\+engines}
+
+
+
+Build keyword dictionaries to pass to engine. 
+
+Create engine objects. 
+
+Definition at line 172 of file binding.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_a85b7dcbdfbd0331864c07f78336300d0}\label{classsrc_1_1binding_1_1BindingEnergy_a85b7dcbdfbd0331864c07f78336300d0}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!inter\+\_\+opts@{inter\+\_\+opts}}
+\index{inter\+\_\+opts@{inter\+\_\+opts}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{inter\+\_\+opts}{inter\_opts}}
+{\footnotesize\ttfamily src.\+binding.\+Binding\+Energy.\+inter\+\_\+opts}
+
+
+
+Definition at line 130 of file binding.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_a164303ff47ef0a15c7b63add7a56c432}\label{classsrc_1_1binding_1_1BindingEnergy_a164303ff47ef0a15c7b63add7a56c432}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}}
+\index{loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{loop\+\_\+over\+\_\+snapshots}{loop\_over\_snapshots}}
+{\footnotesize\ttfamily src.\+binding.\+Binding\+Energy.\+loop\+\_\+over\+\_\+snapshots}
+
+
+
+L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. 
+
+
+
+Definition at line 156 of file binding.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_a90fc3656bbc3b0e1183d8f0c78d84dd9}\label{classsrc_1_1binding_1_1BindingEnergy_a90fc3656bbc3b0e1183d8f0c78d84dd9}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!objective@{objective}}
+\index{objective@{objective}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{objective}{objective}}
+{\footnotesize\ttfamily src.\+binding.\+Binding\+Energy.\+objective}
+
+
+
+Definition at line 265 of file binding.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_a8049a3666453a4bfb50c36788135d0ef}\label{classsrc_1_1binding_1_1BindingEnergy_a8049a3666453a4bfb50c36788135d0ef}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!Print\+Dict@{Print\+Dict}}
+\index{Print\+Dict@{Print\+Dict}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{Print\+Dict}{PrintDict}}
+{\footnotesize\ttfamily src.\+binding.\+Binding\+Energy.\+Print\+Dict}
+
+
+
+Definition at line 193 of file binding.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_a8f13a1550287e4c8b6906dce55c9f364}\label{classsrc_1_1binding_1_1BindingEnergy_a8f13a1550287e4c8b6906dce55c9f364}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!rmsd\+\_\+part@{rmsd\+\_\+part}}
+\index{rmsd\+\_\+part@{rmsd\+\_\+part}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{rmsd\+\_\+part}{rmsd\_part}}
+{\footnotesize\ttfamily src.\+binding.\+Binding\+Energy.\+rmsd\+\_\+part}
+
+
+
+Definition at line 239 of file binding.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1binding_1_1BindingEnergy_a3ce83ed981346e4539b5f0450207b64d}\label{classsrc_1_1binding_1_1BindingEnergy_a3ce83ed981346e4539b5f0450207b64d}} 
+\index{src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}!R\+M\+S\+D\+Dict@{R\+M\+S\+D\+Dict}}
+\index{R\+M\+S\+D\+Dict@{R\+M\+S\+D\+Dict}!src\+::binding\+::\+Binding\+Energy@{src\+::binding\+::\+Binding\+Energy}}
+\paragraph{\texorpdfstring{R\+M\+S\+D\+Dict}{RMSDDict}}
+{\footnotesize\ttfamily src.\+binding.\+Binding\+Energy.\+R\+M\+S\+D\+Dict}
+
+
+
+Definition at line 194 of file binding.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{binding_8py}{binding.\+py}\end{DoxyCompactItemize}

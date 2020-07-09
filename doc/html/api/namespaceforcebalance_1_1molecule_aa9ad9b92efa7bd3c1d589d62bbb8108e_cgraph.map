@@ -1,5 +1,0 @@
-<map id="forcebalance.molecule.AlignToMoments" name="forcebalance.molecule.AlignToMoments">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a9a58eb1746e51420f50da3f3a6d51485" title="Computes a &quot;overlap density&quot; from two frames. " alt="" coords="257,35,457,82"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a8fcbb4a2b3470a85d25699b6f28a54fc" title="Computes an &#39;overlap&#39; between two molecules based on some fictitious density. " alt="" coords="507,5,736,51"/>
-<area shape="rect" id="node7" href="$namespaceforcebalance_1_1molecule.html#af02bf73765f34bbef81c4a5b000b86ce" title="Constructs an Euler matrix from three Euler angles. " alt="" coords="784,35,987,82"/>
-</map>

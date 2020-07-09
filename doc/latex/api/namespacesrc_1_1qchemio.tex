@@ -1,0 +1,89 @@
+\hypertarget{namespacesrc_1_1qchemio}{}\subsection{src.\+qchemio Namespace Reference}
+\label{namespacesrc_1_1qchemio}\index{src.\+qchemio@{src.\+qchemio}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1qchemio_1_1QCIn__Reader}{Q\+C\+In\+\_\+\+Reader}
+\begin{DoxyCompactList}\small\item\em Finite state machine for parsing Q-\/\+Chem input files. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1qchemio_a6d8c4a784dca15418d6e89fbde845611}{Q\+Chem\+\_\+\+Dielectric\+\_\+\+Energy} (fnm, wq)
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1qchemio_afb2d0a18f630955d2ad00ba5a97889bc}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\item 
+list \hyperlink{namespacesrc_1_1qchemio_a50bb8a1c1f0a033941377d8ff121529b}{ndtypes} = \mbox{[}None\mbox{]}
+\begin{DoxyCompactList}\small\item\em Types of counterpoise correction cptypes = \mbox{[}None, \textquotesingle{}B\+A\+SS\textquotesingle{}, \textquotesingle{}B\+A\+S\+SP\textquotesingle{}\mbox{]} Types of N\+D\+DO correction. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespacesrc_1_1qchemio_a360e0e02d18612db04a126c58afde31b}{pdict}
+\begin{DoxyCompactList}\small\item\em Section -\/$>$ Interaction type dictionary. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1qchemio_a6d8c4a784dca15418d6e89fbde845611}\label{namespacesrc_1_1qchemio_a6d8c4a784dca15418d6e89fbde845611}} 
+\index{src\+::qchemio@{src\+::qchemio}!Q\+Chem\+\_\+\+Dielectric\+\_\+\+Energy@{Q\+Chem\+\_\+\+Dielectric\+\_\+\+Energy}}
+\index{Q\+Chem\+\_\+\+Dielectric\+\_\+\+Energy@{Q\+Chem\+\_\+\+Dielectric\+\_\+\+Energy}!src\+::qchemio@{src\+::qchemio}}
+\paragraph{\texorpdfstring{Q\+Chem\+\_\+\+Dielectric\+\_\+\+Energy()}{QChem\_Dielectric\_Energy()}}
+{\footnotesize\ttfamily def src.\+qchemio.\+Q\+Chem\+\_\+\+Dielectric\+\_\+\+Energy (\begin{DoxyParamCaption}\item[{}]{fnm,  }\item[{}]{wq }\end{DoxyParamCaption})}
+
+
+
+Definition at line 76 of file qchemio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1qchemio_a6d8c4a784dca15418d6e89fbde845611_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1qchemio_afb2d0a18f630955d2ad00ba5a97889bc}\label{namespacesrc_1_1qchemio_afb2d0a18f630955d2ad00ba5a97889bc}} 
+\index{src\+::qchemio@{src\+::qchemio}!logger@{logger}}
+\index{logger@{logger}!src\+::qchemio@{src\+::qchemio}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+qchemio.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 13 of file qchemio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1qchemio_a50bb8a1c1f0a033941377d8ff121529b}\label{namespacesrc_1_1qchemio_a50bb8a1c1f0a033941377d8ff121529b}} 
+\index{src\+::qchemio@{src\+::qchemio}!ndtypes@{ndtypes}}
+\index{ndtypes@{ndtypes}!src\+::qchemio@{src\+::qchemio}}
+\paragraph{\texorpdfstring{ndtypes}{ndtypes}}
+{\footnotesize\ttfamily list src.\+qchemio.\+ndtypes = \mbox{[}None\mbox{]}}
+
+
+
+Types of counterpoise correction cptypes = \mbox{[}None, \textquotesingle{}B\+A\+SS\textquotesingle{}, \textquotesingle{}B\+A\+S\+SP\textquotesingle{}\mbox{]} Types of N\+D\+DO correction. 
+
+
+
+Definition at line 18 of file qchemio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1qchemio_a360e0e02d18612db04a126c58afde31b}\label{namespacesrc_1_1qchemio_a360e0e02d18612db04a126c58afde31b}} 
+\index{src\+::qchemio@{src\+::qchemio}!pdict@{pdict}}
+\index{pdict@{pdict}!src\+::qchemio@{src\+::qchemio}}
+\paragraph{\texorpdfstring{pdict}{pdict}}
+{\footnotesize\ttfamily dictionary src.\+qchemio.\+pdict}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  \{\textcolor{stringliteral}{'BASS'}:\{0:\textcolor{stringliteral}{'A'}, 1:\textcolor{stringliteral}{'C'}\},
+2          \textcolor{stringliteral}{'BASSP'} :\{0:\textcolor{stringliteral}{'A'}, 1:\textcolor{stringliteral}{'B'}, 2:\textcolor{stringliteral}{'C'}\}
+3          \}
+\end{DoxyCode}
+
+
+Section -\/$>$ Interaction type dictionary. 
+
+fdict = \{ \textquotesingle{}basis\textquotesingle{} \+: bastypes \} Interaction type -\/$>$ Parameter Dictionary. 
+
+Definition at line 25 of file qchemio.\+py.
+

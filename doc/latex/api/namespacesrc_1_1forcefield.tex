@@ -1,0 +1,131 @@
+\hypertarget{namespacesrc_1_1forcefield}{}\subsection{src.\+forcefield Namespace Reference}
+\label{namespacesrc_1_1forcefield}\index{src.\+forcefield@{src.\+forcefield}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1forcefield_1_1BackedUpDict}{Backed\+Up\+Dict}
+\item 
+class \hyperlink{classsrc_1_1forcefield_1_1FF}{FF}
+\begin{DoxyCompactList}\small\item\em Force field class. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1forcefield_a21066ef8f8395e0b0c7cc6700791d70b}{determine\+\_\+fftype} (ffname, verbose=False)
+\begin{DoxyCompactList}\small\item\em Determine the type of a force field file. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1forcefield_a2dd794c9844e1c875997ab1b21f4284a}{rs\+\_\+override} (rsfactors, termtype, Temperature=298.\+15)
+\begin{DoxyCompactList}\small\item\em This function takes in a dictionary (rsfactors) and a string (termtype). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1forcefield_a75e3cd97344b3c003c73bf0540e85fa0}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\item 
+dictionary \hyperlink{namespacesrc_1_1forcefield_a6d3bd556905ef9bd38f108995be63bb7}{F\+F\+\_\+\+Extensions}
+\item 
+dictionary \hyperlink{namespacesrc_1_1forcefield_a629afe3f91d5e48026b8bab018aefe30}{F\+F\+\_\+\+I\+O\+Modules}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1forcefield_a21066ef8f8395e0b0c7cc6700791d70b}\label{namespacesrc_1_1forcefield_a21066ef8f8395e0b0c7cc6700791d70b}} 
+\index{src\+::forcefield@{src\+::forcefield}!determine\+\_\+fftype@{determine\+\_\+fftype}}
+\index{determine\+\_\+fftype@{determine\+\_\+fftype}!src\+::forcefield@{src\+::forcefield}}
+\paragraph{\texorpdfstring{determine\+\_\+fftype()}{determine\_fftype()}}
+{\footnotesize\ttfamily def src.\+forcefield.\+determine\+\_\+fftype (\begin{DoxyParamCaption}\item[{}]{ffname,  }\item[{}]{verbose = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Determine the type of a force field file. 
+
+It is possible to specify the file type explicitly in the input file using the syntax \textquotesingle{}force\+\_\+field.\+ext\+:type\textquotesingle{}. Otherwise this function will try to determine the force field type by extension. 
+
+Definition at line 156 of file forcefield.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1forcefield_a2dd794c9844e1c875997ab1b21f4284a}\label{namespacesrc_1_1forcefield_a2dd794c9844e1c875997ab1b21f4284a}} 
+\index{src\+::forcefield@{src\+::forcefield}!rs\+\_\+override@{rs\+\_\+override}}
+\index{rs\+\_\+override@{rs\+\_\+override}!src\+::forcefield@{src\+::forcefield}}
+\paragraph{\texorpdfstring{rs\+\_\+override()}{rs\_override()}}
+{\footnotesize\ttfamily def src.\+forcefield.\+rs\+\_\+override (\begin{DoxyParamCaption}\item[{}]{rsfactors,  }\item[{}]{termtype,  }\item[{}]{Temperature = {\ttfamily 298.15} }\end{DoxyParamCaption})}
+
+
+
+This function takes in a dictionary (rsfactors) and a string (termtype). 
+
+If termtype matches any of the strings below, rsfactors\mbox{[}termtype\mbox{]} is assigned to one of the numbers below.
+
+This is L\+PW\textquotesingle{}s attempt to simplify the rescaling factors.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt out}  & {\em rsfactors} & The computed rescaling factor. \\
+\hline
+\mbox{\tt in}  & {\em termtype} & The interaction type (corresponding to a physical unit) \\
+\hline
+\mbox{\tt in}  & {\em Temperature} & The temperature for computing the kT energy scale \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 1584 of file forcefield.\+py.
+
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1forcefield_a6d3bd556905ef9bd38f108995be63bb7}\label{namespacesrc_1_1forcefield_a6d3bd556905ef9bd38f108995be63bb7}} 
+\index{src\+::forcefield@{src\+::forcefield}!F\+F\+\_\+\+Extensions@{F\+F\+\_\+\+Extensions}}
+\index{F\+F\+\_\+\+Extensions@{F\+F\+\_\+\+Extensions}!src\+::forcefield@{src\+::forcefield}}
+\paragraph{\texorpdfstring{F\+F\+\_\+\+Extensions}{FF\_Extensions}}
+{\footnotesize\ttfamily dictionary src.\+forcefield.\+F\+F\+\_\+\+Extensions}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  \{\textcolor{stringliteral}{"itp"} : \textcolor{stringliteral}{"gmx"},
+2                  \textcolor{stringliteral}{"top"} : \textcolor{stringliteral}{"gmx"},
+3                  \textcolor{stringliteral}{"in"}  : \textcolor{stringliteral}{"qchem"},
+4                  \textcolor{stringliteral}{"prm"} : \textcolor{stringliteral}{"tinker"},
+5                  \textcolor{stringliteral}{"gen"} : \textcolor{stringliteral}{"custom"},
+6                  \textcolor{stringliteral}{"xml"} : \textcolor{stringliteral}{"openmm"},
+7                  \textcolor{stringliteral}{"offxml"} : \textcolor{stringliteral}{"smirnoff"},
+8                  \textcolor{stringliteral}{"frcmod"} : \textcolor{stringliteral}{"frcmod"},
+9                  \textcolor{stringliteral}{"mol2"} : \textcolor{stringliteral}{"mol2"},
+10                  \textcolor{stringliteral}{"gbs"}  : \textcolor{stringliteral}{"gbs"},
+11                  \textcolor{stringliteral}{"grid"} : \textcolor{stringliteral}{"grid"}
+12                  \}
+\end{DoxyCode}
+
+
+Definition at line 125 of file forcefield.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1forcefield_a629afe3f91d5e48026b8bab018aefe30}\label{namespacesrc_1_1forcefield_a629afe3f91d5e48026b8bab018aefe30}} 
+\index{src\+::forcefield@{src\+::forcefield}!F\+F\+\_\+\+I\+O\+Modules@{F\+F\+\_\+\+I\+O\+Modules}}
+\index{F\+F\+\_\+\+I\+O\+Modules@{F\+F\+\_\+\+I\+O\+Modules}!src\+::forcefield@{src\+::forcefield}}
+\paragraph{\texorpdfstring{F\+F\+\_\+\+I\+O\+Modules}{FF\_IOModules}}
+{\footnotesize\ttfamily dictionary src.\+forcefield.\+F\+F\+\_\+\+I\+O\+Modules}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  \{\textcolor{stringliteral}{"gmx"}: gmxio.ITP\_Reader ,
+2                 \textcolor{stringliteral}{"qchem"}: qchemio.QCIn\_Reader ,
+3                 \textcolor{stringliteral}{"tinker"}: tinkerio.Tinker\_Reader ,
+4                 \textcolor{stringliteral}{"custom"}: custom\_io.Gen\_Reader ,
+5                 \textcolor{stringliteral}{"openmm"} : openmmio.OpenMM\_Reader,
+6                 \textcolor{stringliteral}{"smirnoff"} : smirnoffio.SMIRNOFF\_Reader,
+7                 \textcolor{stringliteral}{"frcmod"} : amberio.FrcMod\_Reader,
+8                 \textcolor{stringliteral}{"mol2"} : amberio.Mol2\_Reader,
+9                 \textcolor{stringliteral}{"gbs"} : psi4io.GBS\_Reader,
+10                 \textcolor{stringliteral}{"grid"} : psi4io.Grid\_Reader
+11                 \}
+\end{DoxyCode}
+
+
+Definition at line 139 of file forcefield.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1forcefield_a75e3cd97344b3c003c73bf0540e85fa0}\label{namespacesrc_1_1forcefield_a75e3cd97344b3c003c73bf0540e85fa0}} 
+\index{src\+::forcefield@{src\+::forcefield}!logger@{logger}}
+\index{logger@{logger}!src\+::forcefield@{src\+::forcefield}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+forcefield.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 118 of file forcefield.\+py.
+

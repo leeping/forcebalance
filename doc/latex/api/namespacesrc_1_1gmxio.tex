@@ -1,0 +1,310 @@
+\hypertarget{namespacesrc_1_1gmxio}{}\subsection{src.\+gmxio Namespace Reference}
+\label{namespacesrc_1_1gmxio}\index{src.\+gmxio@{src.\+gmxio}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1gmxio_1_1AbInitio__GMX}{Ab\+Initio\+\_\+\+G\+MX}
+\begin{DoxyCompactList}\small\item\em Subclass of Ab\+Initio for force and energy matching using G\+R\+O\+M\+A\+CS. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1gmxio_1_1BindingEnergy__GMX}{Binding\+Energy\+\_\+\+G\+MX}
+\begin{DoxyCompactList}\small\item\em Binding energy matching using Gromacs. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1gmxio_1_1GMX}{G\+MX}
+\begin{DoxyCompactList}\small\item\em Derived from Engine object for carrying out general purpose G\+R\+O\+M\+A\+CS calculations. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1gmxio_1_1Interaction__GMX}{Interaction\+\_\+\+G\+MX}
+\begin{DoxyCompactList}\small\item\em Interaction energy matching using G\+R\+O\+M\+A\+CS. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1gmxio_1_1ITP__Reader}{I\+T\+P\+\_\+\+Reader}
+\begin{DoxyCompactList}\small\item\em Finite state machine for parsing G\+R\+O\+M\+A\+CS force field files. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1gmxio_1_1Lipid__GMX}{Lipid\+\_\+\+G\+MX}
+\item 
+class \hyperlink{classsrc_1_1gmxio_1_1Liquid__GMX}{Liquid\+\_\+\+G\+MX}
+\item 
+class \hyperlink{classsrc_1_1gmxio_1_1Moments__GMX}{Moments\+\_\+\+G\+MX}
+\begin{DoxyCompactList}\small\item\em Multipole moment matching using G\+R\+O\+M\+A\+CS. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1gmxio_1_1Thermo__GMX}{Thermo\+\_\+\+G\+MX}
+\begin{DoxyCompactList}\small\item\em Thermodynamical property matching using G\+R\+O\+M\+A\+CS. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1gmxio_1_1Vibration__GMX}{Vibration\+\_\+\+G\+MX}
+\begin{DoxyCompactList}\small\item\em Vibrational frequency matching using G\+R\+O\+M\+A\+CS. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1gmxio_aea51f8e8c67deaad0fccdb8bf633a69c}{edit\+\_\+mdp} (fin=None, fout=None, options=\{\}, defaults=\{\}, verbose=False)
+\begin{DoxyCompactList}\small\item\em Read, create or edit a Gromacs M\+DP file. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1gmxio_a740586e61712601fc01ab404a40176df}{write\+\_\+ndx} (fout, grps, fin=None)
+\begin{DoxyCompactList}\small\item\em Create or edit a Gromacs ndx file. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1gmxio_ad77d69866b09dbe5830d9c5f7b48fe84}{parse\+\_\+atomtype\+\_\+line} (line)
+\begin{DoxyCompactList}\small\item\em Parses the \textquotesingle{}atomtype\textquotesingle{} line. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1gmxio_a7430b70092fa07b4cad7d894a6ade4f9}{rm\+\_\+gmx\+\_\+baks} (dir)
+\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1gmxio_af4ece92231f8ad70afc1a559065eec80}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\item 
+list \hyperlink{namespacesrc_1_1gmxio_aa7357cfd306beaec9404d74d21e5729e}{nftypes} = \mbox{[}None, \textquotesingle{}V\+DW\textquotesingle{}, \textquotesingle{}V\+D\+W\+\_\+\+B\+H\+AM\textquotesingle{}\mbox{]}
+\begin{DoxyCompactList}\small\item\em VdW interaction function types. \end{DoxyCompactList}\item 
+list \hyperlink{namespacesrc_1_1gmxio_aa2eb9673c40c470f5b83b9a6834bed91}{pftypes} = \mbox{[}None, \textquotesingle{}V\+P\+A\+IR\textquotesingle{}, \textquotesingle{}V\+P\+A\+I\+R\+\_\+\+B\+H\+AM\textquotesingle{}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Pairwise interaction function types. \end{DoxyCompactList}\item 
+list \hyperlink{namespacesrc_1_1gmxio_a1d9eaea45ad2ce4a5ad671480a896aa8}{bftypes} = \mbox{[}None, \textquotesingle{}B\+O\+N\+DS\textquotesingle{}, \textquotesingle{}G96\+B\+O\+N\+DS\textquotesingle{}, \textquotesingle{}M\+O\+R\+SE\textquotesingle{}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Bonded interaction function types. \end{DoxyCompactList}\item 
+list \hyperlink{namespacesrc_1_1gmxio_a88d279e65fc0870eb60d9a48b0e82da6}{aftypes}
+\begin{DoxyCompactList}\small\item\em Angle interaction function types. \end{DoxyCompactList}\item 
+list \hyperlink{namespacesrc_1_1gmxio_a35a8bc876463670e6c8c7342d9653f1f}{dftypes} = \mbox{[}None, \textquotesingle{}P\+D\+I\+HS\textquotesingle{}, \textquotesingle{}I\+D\+I\+HS\textquotesingle{}, \textquotesingle{}R\+B\+D\+I\+HS\textquotesingle{}, \textquotesingle{}P\+I\+M\+P\+D\+I\+HS\textquotesingle{}, \textquotesingle{}F\+O\+U\+R\+D\+I\+HS\textquotesingle{}, None, None, \textquotesingle{}T\+A\+B\+D\+I\+HS\textquotesingle{}, \textquotesingle{}P\+D\+I\+H\+M\+U\+LS\textquotesingle{}\mbox{]}
+\begin{DoxyCompactList}\small\item\em Dihedral interaction function types. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespacesrc_1_1gmxio_afe3f61930bba41119de318d11a29dd14}{fdict}
+\begin{DoxyCompactList}\small\item\em Section -\/$>$ Interaction type dictionary. \end{DoxyCompactList}\item 
+dictionary \hyperlink{namespacesrc_1_1gmxio_ad55e036d51846e3440a373c57439dffa}{pdict}
+\begin{DoxyCompactList}\small\item\em Interaction type -\/$>$ Parameter Dictionary. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_aea51f8e8c67deaad0fccdb8bf633a69c}\label{namespacesrc_1_1gmxio_aea51f8e8c67deaad0fccdb8bf633a69c}} 
+\index{src\+::gmxio@{src\+::gmxio}!edit\+\_\+mdp@{edit\+\_\+mdp}}
+\index{edit\+\_\+mdp@{edit\+\_\+mdp}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{edit\+\_\+mdp()}{edit\_mdp()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+edit\+\_\+mdp (\begin{DoxyParamCaption}\item[{}]{fin = {\ttfamily None},  }\item[{}]{fout = {\ttfamily None},  }\item[{}]{options = {\ttfamily \{\}},  }\item[{}]{defaults = {\ttfamily \{\}},  }\item[{}]{verbose = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Read, create or edit a Gromacs M\+DP file. 
+
+The M\+DP file contains G\+R\+O\+M\+A\+CS run parameters. If the input file exists, it is parsed and options are replaced where \char`\"{}options\char`\"{} overrides them. If the \char`\"{}options\char`\"{} dictionary contains more options, they are added at the end. If the \char`\"{}defaults\char`\"{} dictionary contains more options, they are added at the end. Keys are standardized to lower-\/case strings where all dashes are replaced by underscores. The output file contains the same comments and \char`\"{}dressing\char`\"{} as the input. Also returns a dictionary with the final key/value pairs.
+
+\paragraph*{Parameters }
+
+fin \+: str, optional Input .mdp file name containing options that are more important than \char`\"{}defaults\char`\"{}, but less important than \char`\"{}options\char`\"{} fout \+: str, optional Output .mdp file name. options \+: dict, optional Dictionary containing mdp options. Existing options are replaced, new options are added at the end, None values are deleted from output mdp. defaults \+: dict, optional defaults Dictionary containing \char`\"{}default\char`\"{} mdp options, added only if they don\textquotesingle{}t already exist. verbose \+: bool, optional Print out additional information
+
+\paragraph*{Returns }
+
+Ordered\+Dict Key-\/value pairs combined from the input .mdp and the supplied options/defaults and equivalent to what\textquotesingle{}s printed in the output mdp. 
+
+Definition at line 69 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1gmxio_aea51f8e8c67deaad0fccdb8bf633a69c_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_ad77d69866b09dbe5830d9c5f7b48fe84}\label{namespacesrc_1_1gmxio_ad77d69866b09dbe5830d9c5f7b48fe84}} 
+\index{src\+::gmxio@{src\+::gmxio}!parse\+\_\+atomtype\+\_\+line@{parse\+\_\+atomtype\+\_\+line}}
+\index{parse\+\_\+atomtype\+\_\+line@{parse\+\_\+atomtype\+\_\+line}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{parse\+\_\+atomtype\+\_\+line()}{parse\_atomtype\_line()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+parse\+\_\+atomtype\+\_\+line (\begin{DoxyParamCaption}\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Parses the \textquotesingle{}atomtype\textquotesingle{} line. 
+
+Parses lines like this\+:~\newline
+ {\ttfamily  opls\+\_\+135 CT 6 12.\+0107 0.\+0000 A 3.\+5000e-\/01 2.\+7614e-\/01~\newline
+ C 12.\+0107 0.\+0000 A 3.\+7500e-\/01 4.\+3932e-\/01~\newline
+ Na 11 22.\+9897 0.\+0000 A 6.\+068128070229e+03 2.\+662662556402e+01 0.\+0000e+00 ; P\+RM 5 6~\newline
+ } Look at all the variety!
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em line} & Input line. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+answer Dictionary containing\+:~\newline
+ atom type~\newline
+ bonded atom type (if any)~\newline
+ atomic number (if any)~\newline
+ atomic mass~\newline
+ charge~\newline
+ particle type~\newline
+ force field parameters~\newline
+ number of optional fields 
+\end{DoxyReturn}
+
+
+Definition at line 268 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1gmxio_ad77d69866b09dbe5830d9c5f7b48fe84_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_a7430b70092fa07b4cad7d894a6ade4f9}\label{namespacesrc_1_1gmxio_a7430b70092fa07b4cad7d894a6ade4f9}} 
+\index{src\+::gmxio@{src\+::gmxio}!rm\+\_\+gmx\+\_\+baks@{rm\+\_\+gmx\+\_\+baks}}
+\index{rm\+\_\+gmx\+\_\+baks@{rm\+\_\+gmx\+\_\+baks}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{rm\+\_\+gmx\+\_\+baks()}{rm\_gmx\_baks()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+rm\+\_\+gmx\+\_\+baks (\begin{DoxyParamCaption}\item[{}]{dir }\end{DoxyParamCaption})}
+
+
+
+Definition at line 524 of file gmxio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_a740586e61712601fc01ab404a40176df}\label{namespacesrc_1_1gmxio_a740586e61712601fc01ab404a40176df}} 
+\index{src\+::gmxio@{src\+::gmxio}!write\+\_\+ndx@{write\+\_\+ndx}}
+\index{write\+\_\+ndx@{write\+\_\+ndx}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{write\+\_\+ndx()}{write\_ndx()}}
+{\footnotesize\ttfamily def src.\+gmxio.\+write\+\_\+ndx (\begin{DoxyParamCaption}\item[{}]{fout,  }\item[{}]{grps,  }\item[{}]{fin = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Create or edit a Gromacs ndx file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fout} & Output file name, can be the same as input file name. \\
+\hline
+\mbox{\tt in}  & {\em grps} & Dictionary containing key \+: atom selections. \\
+\hline
+\mbox{\tt in}  & {\em fin} & Input file name. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 148 of file gmxio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1gmxio_a740586e61712601fc01ab404a40176df_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_a88d279e65fc0870eb60d9a48b0e82da6}\label{namespacesrc_1_1gmxio_a88d279e65fc0870eb60d9a48b0e82da6}} 
+\index{src\+::gmxio@{src\+::gmxio}!aftypes@{aftypes}}
+\index{aftypes@{aftypes}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{aftypes}{aftypes}}
+{\footnotesize\ttfamily list src.\+gmxio.\+aftypes}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  [\textcolor{keywordtype}{None}, \textcolor{stringliteral}{'ANGLES'}, \textcolor{stringliteral}{'G96ANGLES'}, \textcolor{stringliteral}{'CROSS\_BOND\_BOND'},
+2            \textcolor{stringliteral}{'CROSS\_BOND\_ANGLE'}, \textcolor{stringliteral}{'UREY\_BRADLEY'}, \textcolor{stringliteral}{'QANGLES'}]
+\end{DoxyCode}
+
+
+Angle interaction function types. 
+
+
+
+Definition at line 176 of file gmxio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_a1d9eaea45ad2ce4a5ad671480a896aa8}\label{namespacesrc_1_1gmxio_a1d9eaea45ad2ce4a5ad671480a896aa8}} 
+\index{src\+::gmxio@{src\+::gmxio}!bftypes@{bftypes}}
+\index{bftypes@{bftypes}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{bftypes}{bftypes}}
+{\footnotesize\ttfamily list src.\+gmxio.\+bftypes = \mbox{[}None, \textquotesingle{}B\+O\+N\+DS\textquotesingle{}, \textquotesingle{}G96\+B\+O\+N\+DS\textquotesingle{}, \textquotesingle{}M\+O\+R\+SE\textquotesingle{}\mbox{]}}
+
+
+
+Bonded interaction function types. 
+
+
+
+Definition at line 174 of file gmxio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_a35a8bc876463670e6c8c7342d9653f1f}\label{namespacesrc_1_1gmxio_a35a8bc876463670e6c8c7342d9653f1f}} 
+\index{src\+::gmxio@{src\+::gmxio}!dftypes@{dftypes}}
+\index{dftypes@{dftypes}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{dftypes}{dftypes}}
+{\footnotesize\ttfamily list src.\+gmxio.\+dftypes = \mbox{[}None, \textquotesingle{}P\+D\+I\+HS\textquotesingle{}, \textquotesingle{}I\+D\+I\+HS\textquotesingle{}, \textquotesingle{}R\+B\+D\+I\+HS\textquotesingle{}, \textquotesingle{}P\+I\+M\+P\+D\+I\+HS\textquotesingle{}, \textquotesingle{}F\+O\+U\+R\+D\+I\+HS\textquotesingle{}, None, None, \textquotesingle{}T\+A\+B\+D\+I\+HS\textquotesingle{}, \textquotesingle{}P\+D\+I\+H\+M\+U\+LS\textquotesingle{}\mbox{]}}
+
+
+
+Dihedral interaction function types. 
+
+
+
+Definition at line 179 of file gmxio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_afe3f61930bba41119de318d11a29dd14}\label{namespacesrc_1_1gmxio_afe3f61930bba41119de318d11a29dd14}} 
+\index{src\+::gmxio@{src\+::gmxio}!fdict@{fdict}}
+\index{fdict@{fdict}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{fdict}{fdict}}
+{\footnotesize\ttfamily dictionary src.\+gmxio.\+fdict}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  \{
+2     \textcolor{stringliteral}{'atomtypes'}     : nftypes,
+3     \textcolor{stringliteral}{'nonbond\_params'}: pftypes,
+4     \textcolor{stringliteral}{'pairtypes'}     : pftypes,
+5     \textcolor{stringliteral}{'bonds'}         : bftypes,
+6     \textcolor{stringliteral}{'bondtypes'}     : bftypes,
+7     \textcolor{stringliteral}{'angles'}        : aftypes,
+8     \textcolor{stringliteral}{'angletypes'}    : aftypes,
+9     \textcolor{stringliteral}{'dihedrals'}     : dftypes,
+10     \textcolor{stringliteral}{'dihedraltypes'} : dftypes,
+11     \textcolor{stringliteral}{'virtual\_sites2'}: [\textcolor{stringliteral}{'NONE'},\textcolor{stringliteral}{'VSITE2'}],
+12     \textcolor{stringliteral}{'virtual\_sites3'}: [\textcolor{stringliteral}{'NONE'},\textcolor{stringliteral}{'VSITE3'},\textcolor{stringliteral}{'VSITE3FD'},\textcolor{stringliteral}{'VSITE3FAD'},\textcolor{stringliteral}{'VSITE3OUT'}],
+13     \textcolor{stringliteral}{'virtual\_sites4'}: [\textcolor{stringliteral}{'NONE'},\textcolor{stringliteral}{'VSITE4FD'},\textcolor{stringliteral}{'VSITE4FDN'}]
+14     \}
+\end{DoxyCode}
+
+
+Section -\/$>$ Interaction type dictionary. 
+
+Based on the section you\textquotesingle{}re in and the integer given on the current line, this looks up the \textquotesingle{}interaction type\textquotesingle{} -\/ for example, within bonded interactions there are four interaction types\+: harmonic, G96, Morse, and quartic interactions. 
+
+Definition at line 187 of file gmxio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_af4ece92231f8ad70afc1a559065eec80}\label{namespacesrc_1_1gmxio_af4ece92231f8ad70afc1a559065eec80}} 
+\index{src\+::gmxio@{src\+::gmxio}!logger@{logger}}
+\index{logger@{logger}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+gmxio.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 39 of file gmxio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_aa7357cfd306beaec9404d74d21e5729e}\label{namespacesrc_1_1gmxio_aa7357cfd306beaec9404d74d21e5729e}} 
+\index{src\+::gmxio@{src\+::gmxio}!nftypes@{nftypes}}
+\index{nftypes@{nftypes}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{nftypes}{nftypes}}
+{\footnotesize\ttfamily list src.\+gmxio.\+nftypes = \mbox{[}None, \textquotesingle{}V\+DW\textquotesingle{}, \textquotesingle{}V\+D\+W\+\_\+\+B\+H\+AM\textquotesingle{}\mbox{]}}
+
+
+
+VdW interaction function types. 
+
+
+
+Definition at line 170 of file gmxio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_ad55e036d51846e3440a373c57439dffa}\label{namespacesrc_1_1gmxio_ad55e036d51846e3440a373c57439dffa}} 
+\index{src\+::gmxio@{src\+::gmxio}!pdict@{pdict}}
+\index{pdict@{pdict}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{pdict}{pdict}}
+{\footnotesize\ttfamily dictionary src.\+gmxio.\+pdict}
+
+
+
+Interaction type -\/$>$ Parameter Dictionary. 
+
+A list of supported G\+R\+O\+M\+A\+CS interaction types in force matching. The keys in this dictionary (e.\+g. \textquotesingle{}B\+O\+N\+DS\textquotesingle{},\textquotesingle{}A\+N\+G\+L\+ES\textquotesingle{}) are values in the interaction type dictionary. As the program loops through the force field file, it first looks up the interaction types in \textquotesingle{}fdict\textquotesingle{} and then goes here to do the parameter lookup by field. \begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000009}{Todo}]This needs to become more flexible because the parameter isn\textquotesingle{}t always in the same field. Still need to figure out how to do this. 
+
+How about making the P\+D\+I\+HS less ugly? \end{DoxyRefDesc}
+
+
+Definition at line 211 of file gmxio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1gmxio_aa2eb9673c40c470f5b83b9a6834bed91}\label{namespacesrc_1_1gmxio_aa2eb9673c40c470f5b83b9a6834bed91}} 
+\index{src\+::gmxio@{src\+::gmxio}!pftypes@{pftypes}}
+\index{pftypes@{pftypes}!src\+::gmxio@{src\+::gmxio}}
+\paragraph{\texorpdfstring{pftypes}{pftypes}}
+{\footnotesize\ttfamily list src.\+gmxio.\+pftypes = \mbox{[}None, \textquotesingle{}V\+P\+A\+IR\textquotesingle{}, \textquotesingle{}V\+P\+A\+I\+R\+\_\+\+B\+H\+AM\textquotesingle{}\mbox{]}}
+
+
+
+Pairwise interaction function types. 
+
+
+
+Definition at line 172 of file gmxio.\+py.
+

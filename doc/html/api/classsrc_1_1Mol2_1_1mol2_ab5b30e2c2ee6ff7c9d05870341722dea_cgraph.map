@@ -1,0 +1,4 @@
+<map id="src.Mol2.mol2.set_donnor_acceptor_atoms" name="src.Mol2.mol2.set_donnor_acceptor_atoms">
+<area shape="rect" id="node2" href="$classsrc_1_1Mol2_1_1mol2.html#a85de5060effdb6a854a5cad7f511bf30" title="return a dictionnary of atom instances bonded to the atom, and their types " alt="" coords="243,5,436,47"/>
+<area shape="rect" id="node3" href="$classsrc_1_1Mol2_1_1mol2.html#a1feb64ba646d7dc2c86b608f81940373" title="return the atom instance given its atom identifier " alt="" coords="484,13,663,39"/>
+</map>

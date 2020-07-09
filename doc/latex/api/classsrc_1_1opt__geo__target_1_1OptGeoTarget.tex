@@ -1,0 +1,215 @@
+\hypertarget{classsrc_1_1opt__geo__target_1_1OptGeoTarget}{}\subsection{src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target Class Reference}
+\label{classsrc_1_1opt__geo__target_1_1OptGeoTarget}\index{src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target@{src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target}}
+
+
+Subclass of Target for fitting MM optimized geometries to QM optimized geometries.  
+
+
+
+
+Inheritance diagram for src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{classsrc_1_1opt__geo__target_1_1OptGeoTarget__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=227pt]{classsrc_1_1opt__geo__target_1_1OptGeoTarget__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a6ced711f4eee45542af1fdb9df23dee6}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a3bd3235bb0ebf7d61e30e4f9d4c21e87}{create\+\_\+engines} (self, engine\+\_\+args)
+\item 
+def \hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a9ce6a2e6b4a9e7ee4e72de8287ddccba}{system\+\_\+driver} (self, sysname, save\+\_\+mol=None)
+\begin{DoxyCompactList}\small\item\em Run calculation for one system, return internal coordinate values after optimization. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget_ae16187c64e7ecd1e7adae8a3387a1c49}{indicate} (self)
+\item 
+def \hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a4aeb19ba173ff0067589a8edba18a6a2}{get} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em Compute total objective value for each system. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget_ad20376e926556e19798b72be33516ba9}{parse\+\_\+optgeo\+\_\+options} (filename)
+\begin{DoxyCompactList}\small\item\em Parse an optgeo\+\_\+options.\+txt file into specific \hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget}{Opt\+Geo\+Target} Target Options. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a301e9f7953425a4cf837077dd1cc6055}{sys\+\_\+opts}
+\item 
+\hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget_af7a4157a6ca9b60ecf801ed65754f1e6}{internal\+\_\+coordinates}
+\item 
+\hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget_aa80b789e03b7fd61cc04b79fa6be3086}{Print\+Dict}
+\item 
+\hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a5b86dae64ad13db75e1251856d06d301}{objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for fitting MM optimized geometries to QM optimized geometries. 
+
+
+
+Definition at line 74 of file opt\+\_\+geo\+\_\+target.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a6ced711f4eee45542af1fdb9df23dee6}\label{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a6ced711f4eee45542af1fdb9df23dee6}} 
+\index{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 75 of file opt\+\_\+geo\+\_\+target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a6ced711f4eee45542af1fdb9df23dee6_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a3bd3235bb0ebf7d61e30e4f9d4c21e87}\label{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a3bd3235bb0ebf7d61e30e4f9d4c21e87}} 
+\index{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}!create\+\_\+engines@{create\+\_\+engines}}
+\index{create\+\_\+engines@{create\+\_\+engines}!src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}}
+\paragraph{\texorpdfstring{create\+\_\+engines()}{create\_engines()}}
+{\footnotesize\ttfamily def src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target.\+create\+\_\+engines (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{engine\+\_\+args }\end{DoxyParamCaption})}
+
+
+
+Definition at line 89 of file opt\+\_\+geo\+\_\+target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a4aeb19ba173ff0067589a8edba18a6a2}\label{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a4aeb19ba173ff0067589a8edba18a6a2}} 
+\index{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}!get@{get}}
+\index{get@{get}!src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Compute total objective value for each system. 
+
+
+
+Definition at line 237 of file opt\+\_\+geo\+\_\+target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1opt__geo__target_1_1OptGeoTarget_ae16187c64e7ecd1e7adae8a3387a1c49}\label{classsrc_1_1opt__geo__target_1_1OptGeoTarget_ae16187c64e7ecd1e7adae8a3387a1c49}} 
+\index{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 230 of file opt\+\_\+geo\+\_\+target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1opt__geo__target_1_1OptGeoTarget_ae16187c64e7ecd1e7adae8a3387a1c49_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1opt__geo__target_1_1OptGeoTarget_ad20376e926556e19798b72be33516ba9}\label{classsrc_1_1opt__geo__target_1_1OptGeoTarget_ad20376e926556e19798b72be33516ba9}} 
+\index{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}!parse\+\_\+optgeo\+\_\+options@{parse\+\_\+optgeo\+\_\+options}}
+\index{parse\+\_\+optgeo\+\_\+options@{parse\+\_\+optgeo\+\_\+options}!src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}}
+\paragraph{\texorpdfstring{parse\+\_\+optgeo\+\_\+options()}{parse\_optgeo\_options()}}
+{\footnotesize\ttfamily def src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target.\+parse\+\_\+optgeo\+\_\+options (\begin{DoxyParamCaption}\item[{}]{filename }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Parse an optgeo\+\_\+options.\+txt file into specific \hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget}{Opt\+Geo\+Target} Target Options. 
+
+
+
+Definition at line 95 of file opt\+\_\+geo\+\_\+target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1opt__geo__target_1_1OptGeoTarget_ad20376e926556e19798b72be33516ba9_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a9ce6a2e6b4a9e7ee4e72de8287ddccba}\label{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a9ce6a2e6b4a9e7ee4e72de8287ddccba}} 
+\index{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}!system\+\_\+driver@{system\+\_\+driver}}
+\index{system\+\_\+driver@{system\+\_\+driver}!src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}}
+\paragraph{\texorpdfstring{system\+\_\+driver()}{system\_driver()}}
+{\footnotesize\ttfamily def src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target.\+system\+\_\+driver (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{sysname,  }\item[{}]{save\+\_\+mol = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Run calculation for one system, return internal coordinate values after optimization. 
+
+
+
+Definition at line 209 of file opt\+\_\+geo\+\_\+target.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1opt__geo__target_1_1OptGeoTarget_af7a4157a6ca9b60ecf801ed65754f1e6}\label{classsrc_1_1opt__geo__target_1_1OptGeoTarget_af7a4157a6ca9b60ecf801ed65754f1e6}} 
+\index{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}!internal\+\_\+coordinates@{internal\+\_\+coordinates}}
+\index{internal\+\_\+coordinates@{internal\+\_\+coordinates}!src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}}
+\paragraph{\texorpdfstring{internal\+\_\+coordinates}{internal\_coordinates}}
+{\footnotesize\ttfamily src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target.\+internal\+\_\+coordinates}
+
+
+
+Definition at line 171 of file opt\+\_\+geo\+\_\+target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a5b86dae64ad13db75e1251856d06d301}\label{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a5b86dae64ad13db75e1251856d06d301}} 
+\index{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}!objective@{objective}}
+\index{objective@{objective}!src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}}
+\paragraph{\texorpdfstring{objective}{objective}}
+{\footnotesize\ttfamily src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target.\+objective}
+
+
+
+Definition at line 335 of file opt\+\_\+geo\+\_\+target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1opt__geo__target_1_1OptGeoTarget_aa80b789e03b7fd61cc04b79fa6be3086}\label{classsrc_1_1opt__geo__target_1_1OptGeoTarget_aa80b789e03b7fd61cc04b79fa6be3086}} 
+\index{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}!Print\+Dict@{Print\+Dict}}
+\index{Print\+Dict@{Print\+Dict}!src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}}
+\paragraph{\texorpdfstring{Print\+Dict}{PrintDict}}
+{\footnotesize\ttfamily src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target.\+Print\+Dict}
+
+
+
+Definition at line 239 of file opt\+\_\+geo\+\_\+target.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a301e9f7953425a4cf837077dd1cc6055}\label{classsrc_1_1opt__geo__target_1_1OptGeoTarget_a301e9f7953425a4cf837077dd1cc6055}} 
+\index{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}!sys\+\_\+opts@{sys\+\_\+opts}}
+\index{sys\+\_\+opts@{sys\+\_\+opts}!src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target@{src\+::opt\+\_\+geo\+\_\+target\+::\+Opt\+Geo\+Target}}
+\paragraph{\texorpdfstring{sys\+\_\+opts}{sys\_opts}}
+{\footnotesize\ttfamily src.\+opt\+\_\+geo\+\_\+target.\+Opt\+Geo\+Target.\+sys\+\_\+opts}
+
+
+
+Definition at line 78 of file opt\+\_\+geo\+\_\+target.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{opt__geo__target_8py}{opt\+\_\+geo\+\_\+target.\+py}\end{DoxyCompactItemize}

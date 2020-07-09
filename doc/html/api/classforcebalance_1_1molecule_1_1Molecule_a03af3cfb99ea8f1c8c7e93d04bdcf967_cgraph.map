@@ -1,4 +1,0 @@
-<map id="forcebalance.molecule.Molecule.require_boxes" name="forcebalance.molecule.Molecule.require_boxes">
-<area shape="rect" id="node3" href="$namespaceforcebalance_1_1molecule.html#a0a6e3e79b04534bf2e83d09def189444" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="329,5,529,51"/>
-<area shape="rect" id="node5" href="$namespaceforcebalance_1_1molecule.html#a29fb1ac9324f4280f07c65baea339989" title="This function takes in three lattice vectors and tries to return a complete box specification. " alt="" coords="329,74,529,121"/>
-</map>

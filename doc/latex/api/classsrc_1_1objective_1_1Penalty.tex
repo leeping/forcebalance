@@ -1,0 +1,375 @@
+\hypertarget{classsrc_1_1objective_1_1Penalty}{}\subsection{src.\+objective.\+Penalty Class Reference}
+\label{classsrc_1_1objective_1_1Penalty}\index{src.\+objective.\+Penalty@{src.\+objective.\+Penalty}}
+
+
+\hyperlink{classsrc_1_1objective_1_1Penalty}{Penalty} functions for regularizing the force field optimizer.  
+
+
+
+
+Inheritance diagram for src.\+objective.\+Penalty\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=199pt]{classsrc_1_1objective_1_1Penalty__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+objective.\+Penalty\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=199pt]{classsrc_1_1objective_1_1Penalty__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1objective_1_1Penalty_acea9117e2aa54b3b6fed9a86d53fbe96}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, User\+\_\+\+Option, Force\+Field, Factor\+\_\+\+Add=0.\+0, Factor\+\_\+\+Mult=0.\+0, Factor\+\_\+B=0.\+1, Alpha=1.\+0, Power=2.\+0)
+\item 
+def \hyperlink{classsrc_1_1objective_1_1Penalty_a234f3d0c04908c8fe275df0b4b09afd0}{compute} (self, mvals, \hyperlink{classsrc_1_1objective_1_1Objective}{Objective})
+\item 
+def \hyperlink{classsrc_1_1objective_1_1Penalty_ac462ae51ca2ed44c587b155a8b8f4a9a}{L2\+\_\+norm} (self, mvals)
+\begin{DoxyCompactList}\small\item\em Harmonic L2-\/norm constraints. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1objective_1_1Penalty_a673bdca43bc69b1275fe96e235d3dc0b}{B\+OX} (self, mvals)
+\begin{DoxyCompactList}\small\item\em Box-\/style constraints. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1objective_1_1Penalty_a20792a8b530d72cb0cddfde36b3be78d}{H\+YP} (self, mvals)
+\begin{DoxyCompactList}\small\item\em Hyperbolic constraints. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1objective_1_1Penalty_a190dc5c3843732098b76a6bee4e6d1ec}{F\+U\+SE} (self, mvals)
+\item 
+def \hyperlink{classsrc_1_1objective_1_1Penalty_abb8686b72c5850e731ec5a96003a9237}{F\+U\+S\+E\+\_\+\+B\+A\+R\+R\+I\+ER} (self, mvals)
+\item 
+def \hyperlink{classsrc_1_1objective_1_1Penalty_a02a8b3d6848053c479808332cee91777}{F\+U\+S\+E\+\_\+\+L0} (self, mvals)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1objective_1_1Penalty_ac3c1f33c407b580bbb1d5c91a82c8801}{fadd}
+\item 
+\hyperlink{classsrc_1_1objective_1_1Penalty_aec8ff392d779b29af0c58b4b021e2252}{fmul}
+\item 
+\hyperlink{classsrc_1_1objective_1_1Penalty_ae4a8c21e4d3f5c7e5d1861dec88a35cd}{a}
+\item 
+\hyperlink{classsrc_1_1objective_1_1Penalty_a24f907fe33df0c1da1cbf50795d64ec9}{b}
+\item 
+\hyperlink{classsrc_1_1objective_1_1Penalty_ae623d28435d898a1eb331350e0c11882}{p}
+\item 
+\hyperlink{classsrc_1_1objective_1_1Penalty_a3c2af904607eca375ee4e9826e57b716}{FF}
+\item 
+\hyperlink{classsrc_1_1objective_1_1Penalty_acc858beb8126e12b33df0b58ba51b74d}{ptyp}
+\item 
+\hyperlink{classsrc_1_1objective_1_1Penalty_ae0d1f6e2d30d3452a47825d332f41cc3}{Pen\+\_\+\+Tab}
+\item 
+\hyperlink{classsrc_1_1objective_1_1Penalty_a54f8696cb98aabcd6da11025b1f954a5}{spacings}
+\begin{DoxyCompactList}\small\item\em Find exponential spacings. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+dictionary \hyperlink{classsrc_1_1objective_1_1Penalty_aa4376227d51b15dd02140dc80117eacc}{Pen\+\_\+\+Names}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+\hyperlink{classsrc_1_1objective_1_1Penalty}{Penalty} functions for regularizing the force field optimizer. 
+
+The purpose for this module is to improve the behavior of our optimizer; essentially, our problem is fraught with \textquotesingle{}linear dependencies\textquotesingle{}, a.\+k.\+a. directions in the parameter space that the objective function does not respond to. This would happen if a parameter is just plain useless, or if there are two or more parameters that describe the same thing.
+
+To accomplish these objectives, a penalty function is added to the objective function. Generally, the more the parameters change (i.\+e. the greater the norm of the parameter vector), the greater the penalty. Note that this is added on after all of the other contributions have been computed. This only matters if the penalty \textquotesingle{}multiplies\textquotesingle{} the objective function\+: Obj + Obj$\ast$\+Penalty, but we also have the option of an additive penalty\+: Obj + \hyperlink{classsrc_1_1objective_1_1Penalty}{Penalty}.
+
+Statistically, this is called regularization. If the penalty function is the norm squared of the parameter vector, it is called ridge regression. There is also the option of using simply the norm, and this is called lasso, but I think it presents problems for the optimizer that I need to work out.
+
+Note that the penalty functions can be considered as part of a \textquotesingle{}maximum likelihood\textquotesingle{} framework in which we assume a P\+R\+I\+OR P\+R\+O\+B\+A\+B\+I\+L\+I\+TY of the force field parameters around their initial values. The penalty function is related to the prior by an exponential. Ridge regression corresponds to a Gaussian prior and lasso corresponds to an exponential prior. There is also \textquotesingle{}elastic net regression\textquotesingle{} which interpolates between Gaussian and exponential using a tuning parameter.
+
+Our priors are adjustable too -\/ there is one parameter, which is the width of the distribution. We can even use a noninformative prior for the distribution widths (hyperprior!). These are all important things to consider later.
+
+Importantly, note that here there is no code that treats the distribution width. That is because the distribution width is wrapped up in the rescaling factors, which is essentially a coordinate transformation on the parameter space. More documentation on this will follow, perhaps in the \textquotesingle{}rsmake\textquotesingle{} method. 
+
+Definition at line 368 of file objective.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_acea9117e2aa54b3b6fed9a86d53fbe96}\label{classsrc_1_1objective_1_1Penalty_acea9117e2aa54b3b6fed9a86d53fbe96}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+objective.\+Penalty.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{User\+\_\+\+Option,  }\item[{}]{Force\+Field,  }\item[{}]{Factor\+\_\+\+Add = {\ttfamily 0.0},  }\item[{}]{Factor\+\_\+\+Mult = {\ttfamily 0.0},  }\item[{}]{Factor\+\_\+B = {\ttfamily 0.1},  }\item[{}]{Alpha = {\ttfamily 1.0},  }\item[{}]{Power = {\ttfamily 2.0} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 373 of file objective.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_a673bdca43bc69b1275fe96e235d3dc0b}\label{classsrc_1_1objective_1_1Penalty_a673bdca43bc69b1275fe96e235d3dc0b}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!B\+OX@{B\+OX}}
+\index{B\+OX@{B\+OX}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{B\+O\+X()}{BOX()}}
+{\footnotesize\ttfamily def src.\+objective.\+Penalty.\+B\+OX (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals }\end{DoxyParamCaption})}
+
+
+
+Box-\/style constraints. 
+
+A penalty term of mvals\mbox{[}i\mbox{]}$^\wedge$\+Power is added for each parameter. \begin{DoxyVerb}   If Power = 2.0 (default value of penalty_power) then this is the same as L2 regularization.
+   If set to a larger number such as 12.0, then this corresponds to adding a flat-bottomed
+   restraint to each parameter separately.
+
+   @param[in] mvals The parameter vector
+   @return DC0 The norm squared of the vector
+   @return DC1 The gradient of DC0
+   @return DC2 The Hessian (just a constant)\end{DoxyVerb}
+ 
+
+Definition at line 479 of file objective.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1objective_1_1Penalty_a673bdca43bc69b1275fe96e235d3dc0b_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_a234f3d0c04908c8fe275df0b4b09afd0}\label{classsrc_1_1objective_1_1Penalty_a234f3d0c04908c8fe275df0b4b09afd0}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!compute@{compute}}
+\index{compute@{compute}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{compute()}{compute()}}
+{\footnotesize\ttfamily def src.\+objective.\+Penalty.\+compute (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{Objective }\end{DoxyParamCaption})}
+
+
+
+Definition at line 417 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_a190dc5c3843732098b76a6bee4e6d1ec}\label{classsrc_1_1objective_1_1Penalty_a190dc5c3843732098b76a6bee4e6d1ec}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!F\+U\+SE@{F\+U\+SE}}
+\index{F\+U\+SE@{F\+U\+SE}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{F\+U\+S\+E()}{FUSE()}}
+{\footnotesize\ttfamily def src.\+objective.\+Penalty.\+F\+U\+SE (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals }\end{DoxyParamCaption})}
+
+
+
+Definition at line 514 of file objective.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1objective_1_1Penalty_a190dc5c3843732098b76a6bee4e6d1ec_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_abb8686b72c5850e731ec5a96003a9237}\label{classsrc_1_1objective_1_1Penalty_abb8686b72c5850e731ec5a96003a9237}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!F\+U\+S\+E\+\_\+\+B\+A\+R\+R\+I\+ER@{F\+U\+S\+E\+\_\+\+B\+A\+R\+R\+I\+ER}}
+\index{F\+U\+S\+E\+\_\+\+B\+A\+R\+R\+I\+ER@{F\+U\+S\+E\+\_\+\+B\+A\+R\+R\+I\+ER}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{F\+U\+S\+E\+\_\+\+B\+A\+R\+R\+I\+E\+R()}{FUSE\_BARRIER()}}
+{\footnotesize\ttfamily def src.\+objective.\+Penalty.\+F\+U\+S\+E\+\_\+\+B\+A\+R\+R\+I\+ER (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals }\end{DoxyParamCaption})}
+
+
+
+Definition at line 555 of file objective.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1objective_1_1Penalty_abb8686b72c5850e731ec5a96003a9237_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_a02a8b3d6848053c479808332cee91777}\label{classsrc_1_1objective_1_1Penalty_a02a8b3d6848053c479808332cee91777}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!F\+U\+S\+E\+\_\+\+L0@{F\+U\+S\+E\+\_\+\+L0}}
+\index{F\+U\+S\+E\+\_\+\+L0@{F\+U\+S\+E\+\_\+\+L0}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{F\+U\+S\+E\+\_\+\+L0()}{FUSE\_L0()}}
+{\footnotesize\ttfamily def src.\+objective.\+Penalty.\+F\+U\+S\+E\+\_\+\+L0 (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals }\end{DoxyParamCaption})}
+
+
+
+Definition at line 597 of file objective.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1objective_1_1Penalty_a02a8b3d6848053c479808332cee91777_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_a20792a8b530d72cb0cddfde36b3be78d}\label{classsrc_1_1objective_1_1Penalty_a20792a8b530d72cb0cddfde36b3be78d}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!H\+YP@{H\+YP}}
+\index{H\+YP@{H\+YP}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{H\+Y\+P()}{HYP()}}
+{\footnotesize\ttfamily def src.\+objective.\+Penalty.\+H\+YP (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals }\end{DoxyParamCaption})}
+
+
+
+Hyperbolic constraints. 
+
+Depending on the \textquotesingle{}b\textquotesingle{} parameter, the smaller it is, the closer we are to an L1-\/norm constraint. If we use these, we expect a properly-\/behaving optimizer to make several of the parameters very nearly zero (which would be cool).
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mvals} & The parameter vector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+D\+C0 The hyperbolic penalty 
+
+D\+C1 The gradient 
+
+D\+C2 The Hessian 
+\end{DoxyReturn}
+
+
+Definition at line 504 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_ac462ae51ca2ed44c587b155a8b8f4a9a}\label{classsrc_1_1objective_1_1Penalty_ac462ae51ca2ed44c587b155a8b8f4a9a}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!L2\+\_\+norm@{L2\+\_\+norm}}
+\index{L2\+\_\+norm@{L2\+\_\+norm}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{L2\+\_\+norm()}{L2\_norm()}}
+{\footnotesize\ttfamily def src.\+objective.\+Penalty.\+L2\+\_\+norm (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals }\end{DoxyParamCaption})}
+
+
+
+Harmonic L2-\/norm constraints. 
+
+These are the ones that I use the most often to regularize my optimization.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mvals} & The parameter vector \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+D\+C0 The norm squared of the vector 
+
+D\+C1 The gradient of D\+C0 
+
+D\+C2 The Hessian (just a constant) 
+\end{DoxyReturn}
+
+
+Definition at line 450 of file objective.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_ae4a8c21e4d3f5c7e5d1861dec88a35cd}\label{classsrc_1_1objective_1_1Penalty_ae4a8c21e4d3f5c7e5d1861dec88a35cd}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!a@{a}}
+\index{a@{a}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{a}{a}}
+{\footnotesize\ttfamily src.\+objective.\+Penalty.\+a}
+
+
+
+Definition at line 376 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_a24f907fe33df0c1da1cbf50795d64ec9}\label{classsrc_1_1objective_1_1Penalty_a24f907fe33df0c1da1cbf50795d64ec9}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!b@{b}}
+\index{b@{b}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{b}{b}}
+{\footnotesize\ttfamily src.\+objective.\+Penalty.\+b}
+
+
+
+Definition at line 377 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_ac3c1f33c407b580bbb1d5c91a82c8801}\label{classsrc_1_1objective_1_1Penalty_ac3c1f33c407b580bbb1d5c91a82c8801}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!fadd@{fadd}}
+\index{fadd@{fadd}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{fadd}{fadd}}
+{\footnotesize\ttfamily src.\+objective.\+Penalty.\+fadd}
+
+
+
+Definition at line 374 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_a3c2af904607eca375ee4e9826e57b716}\label{classsrc_1_1objective_1_1Penalty_a3c2af904607eca375ee4e9826e57b716}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!FF@{FF}}
+\index{FF@{FF}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{FF}{FF}}
+{\footnotesize\ttfamily src.\+objective.\+Penalty.\+FF}
+
+
+
+Definition at line 379 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_aec8ff392d779b29af0c58b4b021e2252}\label{classsrc_1_1objective_1_1Penalty_aec8ff392d779b29af0c58b4b021e2252}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!fmul@{fmul}}
+\index{fmul@{fmul}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{fmul}{fmul}}
+{\footnotesize\ttfamily src.\+objective.\+Penalty.\+fmul}
+
+
+
+Definition at line 375 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_ae623d28435d898a1eb331350e0c11882}\label{classsrc_1_1objective_1_1Penalty_ae623d28435d898a1eb331350e0c11882}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!p@{p}}
+\index{p@{p}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{p}{p}}
+{\footnotesize\ttfamily src.\+objective.\+Penalty.\+p}
+
+
+
+Definition at line 378 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_aa4376227d51b15dd02140dc80117eacc}\label{classsrc_1_1objective_1_1Penalty_aa4376227d51b15dd02140dc80117eacc}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!Pen\+\_\+\+Names@{Pen\+\_\+\+Names}}
+\index{Pen\+\_\+\+Names@{Pen\+\_\+\+Names}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{Pen\+\_\+\+Names}{Pen\_Names}}
+{\footnotesize\ttfamily dictionary src.\+objective.\+Penalty.\+Pen\+\_\+\+Names\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+=  \{\textcolor{stringliteral}{'HYP'} : 1, \textcolor{stringliteral}{'HYPER'} : 1, \textcolor{stringliteral}{'HYPERBOLIC'} : 1, \textcolor{stringliteral}{'L1'} : 1, \textcolor{stringliteral}{'HYPERBOLA'} : 1,
+                 \textcolor{stringliteral}{'PARA'} : 2, \textcolor{stringliteral}{'PARABOLA'} : 2, \textcolor{stringliteral}{'PARABOLIC'} : 2, \textcolor{stringliteral}{'L2'}: 2, \textcolor{stringliteral}{'QUADRATIC'} : 2,
+                 \textcolor{stringliteral}{'BOX'} : 3, \textcolor{stringliteral}{'FUSE'} : 4, \textcolor{stringliteral}{'FUSE-L0'} : 5, \textcolor{stringliteral}{'FUSE-BARRIER'} : 6\}
+\end{DoxyCode}
+
+
+Definition at line 369 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_ae0d1f6e2d30d3452a47825d332f41cc3}\label{classsrc_1_1objective_1_1Penalty_ae0d1f6e2d30d3452a47825d332f41cc3}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!Pen\+\_\+\+Tab@{Pen\+\_\+\+Tab}}
+\index{Pen\+\_\+\+Tab@{Pen\+\_\+\+Tab}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{Pen\+\_\+\+Tab}{Pen\_Tab}}
+{\footnotesize\ttfamily src.\+objective.\+Penalty.\+Pen\+\_\+\+Tab}
+
+
+
+Definition at line 381 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_acc858beb8126e12b33df0b58ba51b74d}\label{classsrc_1_1objective_1_1Penalty_acc858beb8126e12b33df0b58ba51b74d}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!ptyp@{ptyp}}
+\index{ptyp@{ptyp}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{ptyp}{ptyp}}
+{\footnotesize\ttfamily src.\+objective.\+Penalty.\+ptyp}
+
+
+
+Definition at line 380 of file objective.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1objective_1_1Penalty_a54f8696cb98aabcd6da11025b1f954a5}\label{classsrc_1_1objective_1_1Penalty_a54f8696cb98aabcd6da11025b1f954a5}} 
+\index{src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}!spacings@{spacings}}
+\index{spacings@{spacings}!src\+::objective\+::\+Penalty@{src\+::objective\+::\+Penalty}}
+\paragraph{\texorpdfstring{spacings}{spacings}}
+{\footnotesize\ttfamily src.\+objective.\+Penalty.\+spacings}
+
+
+
+Find exponential spacings. 
+
+
+
+Definition at line 414 of file objective.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{objective_8py}{objective.\+py}\end{DoxyCompactItemize}

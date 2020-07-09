@@ -1,0 +1,4 @@
+<map id="src.nifty.isdecimal" name="src.nifty.isdecimal">
+<area shape="rect" id="node2" href="$namespacesrc_1_1nifty.html#a1527eb932518ec1ac5b6e879c279bf24" title="Matches ANY number; it can be a decimal, scientific notation, what have you CAUTION &#45; this will also ..." alt="" coords="193,5,311,32"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1nifty.html#a594046f5f131f78ae33a5930144f002b" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="199,56,305,83"/>
+</map>

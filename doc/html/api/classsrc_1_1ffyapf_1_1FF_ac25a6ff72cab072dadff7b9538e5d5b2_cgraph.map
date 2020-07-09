@@ -1,0 +1,6 @@
+<map id="src.ffyapf.FF.addff_txt" name="src.ffyapf.FF.addff_txt">
+<area shape="rect" id="node2" href="$namespacesrc_1_1nifty.html#a6ae2951ba2a22420a11abda6be7e5454" title="src.nifty.warn_press_key" alt="" coords="213,5,396,32"/>
+<area shape="rect" id="node3" href="$classsrc_1_1ffyapf_1_1FF.html#ab59231fa39e29bfdc70466871c4ec8be" title="Check to see whether a given parameter ID already exists, and provide an alternate if needed..." alt="" coords="235,57,375,98"/>
+<area shape="rect" id="node4" href="$classsrc_1_1ffyapf_1_1FF.html#a45405387da443c3cccedf420539f0f34" title="Assign physical parameter values to the &#39;pvals0&#39; array. " alt="" coords="221,123,388,149"/>
+<area shape="rect" id="node5" href="$classsrc_1_1ffyapf_1_1FF.html#a30c65ab08a53066ebd3be85de9f2dfba" title="Record the locations of a parameter in a txt file; [[file name, line number, field number..." alt="" coords="233,174,377,215"/>
+</map>

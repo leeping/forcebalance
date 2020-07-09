@@ -1,0 +1,4 @@
+<map id="src.molecule.Molecule.rotate_bond" name="src.molecule.Molecule.rotate_bond">
+<area shape="rect" id="node2" href="$namespacesrc_1_1molecule.html#a18b08895867e37ef3cb86a3d4456c775" title="Given a rotation axis and angle, return the corresponding 3x3 rotation matrix, which will rotate a (N..." alt="" coords="303,5,481,32"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1molecule.html#a593b80c51a439f35789c16ad5fbcbfec" title="Given a quaternion p, form a rotation matrix from it. " alt="" coords="529,5,695,32"/>
+</map>

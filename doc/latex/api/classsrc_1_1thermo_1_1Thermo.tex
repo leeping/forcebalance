@@ -1,0 +1,348 @@
+\hypertarget{classsrc_1_1thermo_1_1Thermo}{}\subsection{src.\+thermo.\+Thermo Class Reference}
+\label{classsrc_1_1thermo_1_1Thermo}\index{src.\+thermo.\+Thermo@{src.\+thermo.\+Thermo}}
+
+
+A target for fitting general experimental data sets.  
+
+
+
+
+Inheritance diagram for src.\+thermo.\+Thermo\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{classsrc_1_1thermo_1_1Thermo__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+thermo.\+Thermo\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=190pt]{classsrc_1_1thermo_1_1Thermo__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1thermo_1_1Thermo_a3278db2b6681f25efdd8185c9d2ac4fe}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1thermo_1_1Thermo_a9d63adfe6c3808c186a47d194de9d851}{retrieve} (self, dp)
+\begin{DoxyCompactList}\small\item\em Retrieve the molecular dynamics (MD) results and store the calculated quantities in the \hyperlink{classsrc_1_1thermo_1_1Point}{Point} object dp. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1thermo_1_1Thermo_a9f614671342b1e8cdd55ce4c8b153242}{submit\+\_\+jobs} (self, mvals, A\+Grad=True, A\+Hess=True)
+\begin{DoxyCompactList}\small\item\em This routine is called by Objective.\+stage() and will run before \char`\"{}get\char`\"{}. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1thermo_1_1Thermo_a608afc83596d03d41f3860ce4bcedfea}{indicate} (self)
+\begin{DoxyCompactList}\small\item\em Shows optimization state. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1thermo_1_1Thermo_abb7c8739b6b88d7dd08a80f5561ba6f1}{objective\+\_\+term} (self, quantity)
+\begin{DoxyCompactList}\small\item\em Calculates the contribution to the objective function (the term) for a given quantity. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1thermo_1_1Thermo_ac47eddac7bd3b77ef6f575941946f4bf}{get} (self, mvals, A\+Grad=True, A\+Hess=True)
+\begin{DoxyCompactList}\small\item\em Return the contribution to the total objective function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1thermo_1_1Thermo_ae0461d1a1ad33e619a2e8e6a9f73d0ff}{loop\+\_\+over\+\_\+snapshots}
+\begin{DoxyCompactList}\small\item\em Initialize base class. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1thermo_1_1Thermo_ab263fe1ce27b50dfb10922320be6b1f5}{simpfx}
+\item 
+\hyperlink{classsrc_1_1thermo_1_1Thermo_aaeeea9d4ee23f01a929279f33988bb9b}{points}
+\item 
+\hyperlink{classsrc_1_1thermo_1_1Thermo_a52da57ea1927e6d0b9d32d8a65f619a3}{denoms}
+\item 
+\hyperlink{classsrc_1_1thermo_1_1Thermo_a3570c94b3f8e6e1fb5305039371fcbfa}{weights}
+\item 
+\hyperlink{classsrc_1_1thermo_1_1Thermo_af0cdfb1c8688ee0d65b87abac5e0dfef}{Xp}
+\item 
+\hyperlink{classsrc_1_1thermo_1_1Thermo_a366d44a8261e5331ff81bdf16753e58f}{Wp}
+\item 
+\hyperlink{classsrc_1_1thermo_1_1Thermo_a7d023681679021dd5c7718c10c0f8066}{Pp}
+\item 
+\hyperlink{classsrc_1_1thermo_1_1Thermo_a84596cc2780296226be18d9df3d28c65}{Gp}
+\item 
+\hyperlink{classsrc_1_1thermo_1_1Thermo_a001e7b98ef31162bd4708c8cc5a4d9b7}{Objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+A target for fitting general experimental data sets. 
+
+The experimental data is described in a .txt file and is handled with a {\ttfamily Quantity} subclass. 
+
+Definition at line 78 of file thermo.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_a3278db2b6681f25efdd8185c9d2ac4fe}\label{classsrc_1_1thermo_1_1Thermo_a3278db2b6681f25efdd8185c9d2ac4fe}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+thermo.\+Thermo.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 79 of file thermo.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1thermo_1_1Thermo_a3278db2b6681f25efdd8185c9d2ac4fe_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_ac47eddac7bd3b77ef6f575941946f4bf}\label{classsrc_1_1thermo_1_1Thermo_ac47eddac7bd3b77ef6f575941946f4bf}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!get@{get}}
+\index{get@{get}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+thermo.\+Thermo.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Return the contribution to the total objective function. 
+
+This is a weighted average of the calculated quantities.
+
+\paragraph*{Parameters }
+
+mvals \+: list Mathematical parameter values. A\+Grad \+: Boolean Switch to turn on analytic gradient. A\+Hess \+: Boolean Switch to turn on analytic Hessian.
+
+\paragraph*{Returns }
+
+Answer \+: dict Contribution to the objective function. {\ttfamily Answer} is a dict with keys {\ttfamily X} for the objective function, {\ttfamily G} for its gradient and {\ttfamily H} for its Hessian. 
+
+Definition at line 417 of file thermo.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1thermo_1_1Thermo_ac47eddac7bd3b77ef6f575941946f4bf_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_a608afc83596d03d41f3860ce4bcedfea}\label{classsrc_1_1thermo_1_1Thermo_a608afc83596d03d41f3860ce4bcedfea}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+thermo.\+Thermo.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Shows optimization state. 
+
+
+
+Definition at line 276 of file thermo.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1thermo_1_1Thermo_a608afc83596d03d41f3860ce4bcedfea_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_abb7c8739b6b88d7dd08a80f5561ba6f1}\label{classsrc_1_1thermo_1_1Thermo_abb7c8739b6b88d7dd08a80f5561ba6f1}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!objective\+\_\+term@{objective\+\_\+term}}
+\index{objective\+\_\+term@{objective\+\_\+term}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{objective\+\_\+term()}{objective\_term()}}
+{\footnotesize\ttfamily def src.\+thermo.\+Thermo.\+objective\+\_\+term (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{quantity }\end{DoxyParamCaption})}
+
+
+
+Calculates the contribution to the objective function (the term) for a given quantity. 
+
+\paragraph*{Parameters }
+
+quantity \+: string Calculate the objective term for this quantity.
+
+\paragraph*{Returns }
+
+term \+: dict {\ttfamily term} is a dict with keys {\ttfamily X}, {\ttfamily G}, {\ttfamily H} and {\ttfamily info}. The values of these keys are the objective term itself ({\ttfamily X}), its gradient ({\ttfamily G}), its Hessian ({\ttfamily H}), and an Ordered\+Dict with print information on individiual data points ({\ttfamily info}). 
+
+Definition at line 329 of file thermo.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1thermo_1_1Thermo_abb7c8739b6b88d7dd08a80f5561ba6f1_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_a9d63adfe6c3808c186a47d194de9d851}\label{classsrc_1_1thermo_1_1Thermo_a9d63adfe6c3808c186a47d194de9d851}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!retrieve@{retrieve}}
+\index{retrieve@{retrieve}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{retrieve()}{retrieve()}}
+{\footnotesize\ttfamily def src.\+thermo.\+Thermo.\+retrieve (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{dp }\end{DoxyParamCaption})}
+
+
+
+Retrieve the molecular dynamics (MD) results and store the calculated quantities in the \hyperlink{classsrc_1_1thermo_1_1Point}{Point} object dp. 
+
+\paragraph*{Parameters }
+
+dp \+: \hyperlink{classsrc_1_1thermo_1_1Point}{Point} Store the calculated quantities in this point.
+
+\paragraph*{Returns }
+
+Nothing 
+
+Definition at line 197 of file thermo.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1thermo_1_1Thermo_a9d63adfe6c3808c186a47d194de9d851_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_a9f614671342b1e8cdd55ce4c8b153242}\label{classsrc_1_1thermo_1_1Thermo_a9f614671342b1e8cdd55ce4c8b153242}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!submit\+\_\+jobs@{submit\+\_\+jobs}}
+\index{submit\+\_\+jobs@{submit\+\_\+jobs}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{submit\+\_\+jobs()}{submit\_jobs()}}
+{\footnotesize\ttfamily def src.\+thermo.\+Thermo.\+submit\+\_\+jobs (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+This routine is called by Objective.\+stage() and will run before \char`\"{}get\char`\"{}. 
+
+It submits the jobs and the stage() function will wait for jobs to complete.
+
+\paragraph*{Parameters }
+
+mvals \+: list Mathematical parameter values. A\+Grad \+: Boolean Switch to turn on analytic gradient. A\+Hess \+: Boolean Switch to turn on analytic Hessian.
+
+\paragraph*{Returns }
+
+Nothing. 
+
+Definition at line 236 of file thermo.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1thermo_1_1Thermo_a9f614671342b1e8cdd55ce4c8b153242_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_a52da57ea1927e6d0b9d32d8a65f619a3}\label{classsrc_1_1thermo_1_1Thermo_a52da57ea1927e6d0b9d32d8a65f619a3}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!denoms@{denoms}}
+\index{denoms@{denoms}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{denoms}{denoms}}
+{\footnotesize\ttfamily src.\+thermo.\+Thermo.\+denoms}
+
+
+
+Definition at line 104 of file thermo.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_a84596cc2780296226be18d9df3d28c65}\label{classsrc_1_1thermo_1_1Thermo_a84596cc2780296226be18d9df3d28c65}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!Gp@{Gp}}
+\index{Gp@{Gp}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{Gp}{Gp}}
+{\footnotesize\ttfamily src.\+thermo.\+Thermo.\+Gp}
+
+
+
+Definition at line 474 of file thermo.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_ae0461d1a1ad33e619a2e8e6a9f73d0ff}\label{classsrc_1_1thermo_1_1Thermo_ae0461d1a1ad33e619a2e8e6a9f73d0ff}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}}
+\index{loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{loop\+\_\+over\+\_\+snapshots}{loop\_over\_snapshots}}
+{\footnotesize\ttfamily src.\+thermo.\+Thermo.\+loop\+\_\+over\+\_\+snapshots}
+
+
+
+Initialize base class. 
+
+Parameters Reference experimental data Variables L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. 
+
+Definition at line 98 of file thermo.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_a001e7b98ef31162bd4708c8cc5a4d9b7}\label{classsrc_1_1thermo_1_1Thermo_a001e7b98ef31162bd4708c8cc5a4d9b7}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!Objective@{Objective}}
+\index{Objective@{Objective}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{Objective}{Objective}}
+{\footnotesize\ttfamily src.\+thermo.\+Thermo.\+Objective}
+
+
+
+Definition at line 476 of file thermo.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_aaeeea9d4ee23f01a929279f33988bb9b}\label{classsrc_1_1thermo_1_1Thermo_aaeeea9d4ee23f01a929279f33988bb9b}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!points@{points}}
+\index{points@{points}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{points}{points}}
+{\footnotesize\ttfamily src.\+thermo.\+Thermo.\+points}
+
+
+
+Definition at line 102 of file thermo.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_a7d023681679021dd5c7718c10c0f8066}\label{classsrc_1_1thermo_1_1Thermo_a7d023681679021dd5c7718c10c0f8066}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!Pp@{Pp}}
+\index{Pp@{Pp}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{Pp}{Pp}}
+{\footnotesize\ttfamily src.\+thermo.\+Thermo.\+Pp}
+
+
+
+Definition at line 471 of file thermo.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_ab263fe1ce27b50dfb10922320be6b1f5}\label{classsrc_1_1thermo_1_1Thermo_ab263fe1ce27b50dfb10922320be6b1f5}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!simpfx@{simpfx}}
+\index{simpfx@{simpfx}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{simpfx}{simpfx}}
+{\footnotesize\ttfamily src.\+thermo.\+Thermo.\+simpfx}
+
+
+
+Definition at line 100 of file thermo.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_a3570c94b3f8e6e1fb5305039371fcbfa}\label{classsrc_1_1thermo_1_1Thermo_a3570c94b3f8e6e1fb5305039371fcbfa}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!weights@{weights}}
+\index{weights@{weights}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{weights}{weights}}
+{\footnotesize\ttfamily src.\+thermo.\+Thermo.\+weights}
+
+
+
+Definition at line 106 of file thermo.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_a366d44a8261e5331ff81bdf16753e58f}\label{classsrc_1_1thermo_1_1Thermo_a366d44a8261e5331ff81bdf16753e58f}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!Wp@{Wp}}
+\index{Wp@{Wp}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{Wp}{Wp}}
+{\footnotesize\ttfamily src.\+thermo.\+Thermo.\+Wp}
+
+
+
+Definition at line 469 of file thermo.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1thermo_1_1Thermo_af0cdfb1c8688ee0d65b87abac5e0dfef}\label{classsrc_1_1thermo_1_1Thermo_af0cdfb1c8688ee0d65b87abac5e0dfef}} 
+\index{src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}!Xp@{Xp}}
+\index{Xp@{Xp}!src\+::thermo\+::\+Thermo@{src\+::thermo\+::\+Thermo}}
+\paragraph{\texorpdfstring{Xp}{Xp}}
+{\footnotesize\ttfamily src.\+thermo.\+Thermo.\+Xp}
+
+
+
+Definition at line 468 of file thermo.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{thermo_8py}{thermo.\+py}\end{DoxyCompactItemize}

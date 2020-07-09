@@ -1,0 +1,189 @@
+\hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF}{}\subsection{src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF Class Reference}
+\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF}\index{src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF@{src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}}
+
+
+A custom optimisation target which employs the {\ttfamily openff-\/evaluator} package to rapidly estimate a collection of condensed phase physical properties at each optimisation epoch.  
+
+
+
+
+Inheritance diagram for src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_1_1OptionsFile}{Options\+File}
+\begin{DoxyCompactList}\small\item\em Represents the set of options that a {\ttfamily \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF}{Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}} target will be run with. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a97531ba6b45131f7940470ed0143e45a}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a27d6f29563811786b154b4c37d2ee845}{submit\+\_\+jobs} (self, mvals, A\+Grad=True, A\+Hess=True)
+\begin{DoxyCompactList}\small\item\em Submit jobs for evaluating the objective function. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a111e3b1112012349ffbb658f68a970bd}{wq\+\_\+complete} (self)
+\begin{DoxyCompactList}\small\item\em Check if all jobs are finished This function should have a sleep in it if not finished. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a609eeee4162c7b26fa40ff0df3eff104}{get} (self, mvals, A\+Grad=True, A\+Hess=True)
+\begin{DoxyCompactList}\small\item\em Get the objective function value, gradient, and hessian. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_ac09d0d592c217a77684c8a20e8ae8cef}{indicate} (self)
+\begin{DoxyCompactList}\small\item\em print information into the output file about the last objective function evaluated This function should be called after \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a609eeee4162c7b26fa40ff0df3eff104}{get()} \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+A custom optimisation target which employs the {\ttfamily openff-\/evaluator} package to rapidly estimate a collection of condensed phase physical properties at each optimisation epoch. 
+
+
+
+Definition at line 46 of file evaluator\+\_\+io.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a97531ba6b45131f7940470ed0143e45a}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a97531ba6b45131f7940470ed0143e45a}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 172 of file evaluator\+\_\+io.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a97531ba6b45131f7940470ed0143e45a_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a609eeee4162c7b26fa40ff0df3eff104}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a609eeee4162c7b26fa40ff0df3eff104}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}!get@{get}}
+\index{get@{get}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Get the objective function value, gradient, and hessian. 
+
+\paragraph*{Parameters }
+
+mvals\+: np.\+ndarray mvals array containing the math values of the parameters A\+Grad\+: bool Flag for computing gradients of not A\+Hess\+: bool Flag for computing hessian or not
+
+\paragraph*{Returns }
+
+Answer\+: dict Answer = \{\textquotesingle{}X\textquotesingle{}\+:obj\+\_\+value, \textquotesingle{}G\textquotesingle{}\+:obj\+\_\+grad, \textquotesingle{}H\textquotesingle{}\+:obj\+\_\+hess\} obj\+\_\+value\+: float obj\+\_\+grad\+: np.\+ndarray of shape (n\+\_\+param, ) obj\+\_\+hess\+: np.\+ndarray of shape (n\+\_\+param, n\+\_\+param)
+
+\paragraph*{Notes }
+
+
+\begin{DoxyEnumerate}
+\item obj\+\_\+grad is all zero when A\+Grad == False
+\item obj\+\_\+hess is all zero when A\+Hess == False or A\+Grad == False, because the hessian estimate depends on gradients 
+\end{DoxyEnumerate}
+
+Definition at line 721 of file evaluator\+\_\+io.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a609eeee4162c7b26fa40ff0df3eff104_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_ac09d0d592c217a77684c8a20e8ae8cef}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_ac09d0d592c217a77684c8a20e8ae8cef}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+print information into the output file about the last objective function evaluated This function should be called after \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a609eeee4162c7b26fa40ff0df3eff104}{get()} 
+
+
+
+Definition at line 821 of file evaluator\+\_\+io.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_ac09d0d592c217a77684c8a20e8ae8cef_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a27d6f29563811786b154b4c37d2ee845}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a27d6f29563811786b154b4c37d2ee845}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}!submit\+\_\+jobs@{submit\+\_\+jobs}}
+\index{submit\+\_\+jobs@{submit\+\_\+jobs}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{submit\+\_\+jobs()}{submit\_jobs()}}
+{\footnotesize\ttfamily def src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+submit\+\_\+jobs (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Submit jobs for evaluating the objective function. 
+
+\paragraph*{Parameters }
+
+mvals\+: np.\+ndarray mvals array containing the math values of the parameters A\+Grad\+: bool Flag for computing gradients of not A\+Hess\+: bool Flag for computing hessian or not
+
+\paragraph*{Notes }
+
+
+\begin{DoxyEnumerate}
+\item This function is called before \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a111e3b1112012349ffbb658f68a970bd}{wq\+\_\+complete()} and \hyperlink{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a609eeee4162c7b26fa40ff0df3eff104}{get()}.
+\item This function should not block. 
+\end{DoxyEnumerate}
+
+Definition at line 437 of file evaluator\+\_\+io.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a27d6f29563811786b154b4c37d2ee845_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a111e3b1112012349ffbb658f68a970bd}\label{classsrc_1_1evaluator__io_1_1Evaluator__SMIRNOFF_a111e3b1112012349ffbb658f68a970bd}} 
+\index{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}!wq\+\_\+complete@{wq\+\_\+complete}}
+\index{wq\+\_\+complete@{wq\+\_\+complete}!src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF@{src\+::evaluator\+\_\+io\+::\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+FF}}
+\paragraph{\texorpdfstring{wq\+\_\+complete()}{wq\_complete()}}
+{\footnotesize\ttfamily def src.\+evaluator\+\_\+io.\+Evaluator\+\_\+\+S\+M\+I\+R\+N\+O\+F\+F.\+wq\+\_\+complete (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Check if all jobs are finished This function should have a sleep in it if not finished. 
+
+\paragraph*{Returns }
+
+finished\+: bool True if all jobs are finished, False if not 
+
+Definition at line 685 of file evaluator\+\_\+io.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{evaluator__io_8py}{evaluator\+\_\+io.\+py}\end{DoxyCompactItemize}

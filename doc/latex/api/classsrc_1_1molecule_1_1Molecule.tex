@@ -1,0 +1,2214 @@
+\hypertarget{classsrc_1_1molecule_1_1Molecule}{}\subsection{src.\+molecule.\+Molecule Class Reference}
+\label{classsrc_1_1molecule_1_1Molecule}\index{src.\+molecule.\+Molecule@{src.\+molecule.\+Molecule}}
+
+
+Lee-\/\+Ping\textquotesingle{}s general file format conversion class.  
+
+
+
+
+Inheritance diagram for src.\+molecule.\+Molecule\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsrc_1_1molecule_1_1Molecule__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+molecule.\+Molecule\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=205pt]{classsrc_1_1molecule_1_1Molecule__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a8c3f5b48ac288e3b251b42d90c8f8016}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, fnm=None, ftype=None, top=None, ttype=None, kwargs)
+\begin{DoxyCompactList}\small\item\em Create a \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a23a3a5c340084abc00fb577d2b3c85c2}{\+\_\+\+\_\+len\+\_\+\+\_\+} (self)
+\begin{DoxyCompactList}\small\item\em Return the number of frames in the trajectory. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_afbb728fb44c4465e4f53b26a64439165}{\+\_\+\+\_\+getattr\+\_\+\+\_\+} (self, key)
+\begin{DoxyCompactList}\small\item\em Whenever we try to get a class attribute, it first tries to get the attribute from the Data dictionary. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a73f8860755f337e3fafb91d074a7d459}{\+\_\+\+\_\+setattr\+\_\+\+\_\+} (self, key, value)
+\begin{DoxyCompactList}\small\item\em Whenever we try to get a class attribute, it first tries to get the attribute from the Data dictionary. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ac40e3fd2c1f79e316be59016e7dfd253}{\+\_\+\+\_\+deepcopy\+\_\+\+\_\+} (self, memo)
+\begin{DoxyCompactList}\small\item\em Custom deepcopy method because Python 3.\+6 appears to have changed its behavior. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a30e057898525695364528d3b02c5762b}{\+\_\+\+\_\+getitem\+\_\+\+\_\+} (self, key)
+\begin{DoxyCompactList}\small\item\em The \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} class has list-\/like behavior, so we can get slices of it. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a31014aa4ca1b8259557bedd6d13a51aa}{\+\_\+\+\_\+delitem\+\_\+\+\_\+} (self, key)
+\begin{DoxyCompactList}\small\item\em Similarly, in order to delete a frame, we simply perform item deletion on framewise variables. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a05079753fc6897507fa02eb4ef57fc77}{\+\_\+\+\_\+iter\+\_\+\+\_\+} (self)
+\begin{DoxyCompactList}\small\item\em List-\/like behavior for looping over trajectories. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a087212040303a4f62a3462106428cc38}{\+\_\+\+\_\+add\+\_\+\+\_\+} (self, other)
+\begin{DoxyCompactList}\small\item\em Add method for \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} objects. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a4a1e6648a99afd550e7b24db3a2b249b}{\+\_\+\+\_\+iadd\+\_\+\+\_\+} (self, other)
+\begin{DoxyCompactList}\small\item\em Add method for \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} objects. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_aaf70e66c397fd1e77644339ec81dfa9e}{repair} (self, key, klast)
+\begin{DoxyCompactList}\small\item\em Attempt to repair trivial issues that would otherwise break the object. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a16dcb06bf37392ef659cc156e0b61688}{reorder\+\_\+according\+\_\+to} (self, other)
+\begin{DoxyCompactList}\small\item\em Reorder atoms according to some other \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a9f764980b8a0df810aa7264036617975}{reorder\+\_\+indices} (self, other)
+\begin{DoxyCompactList}\small\item\em Return the indices that would reorder atoms according to some other \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a1969b621b7e6e65722ec245b74518cfe}{append} (self, other)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a5e74901959a8b939fc5a6c851e64d4ae}{require} (self, args)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a557af72409188133ef446ee8dbed2338}{write} (self, fnm=None, ftype=None, \hyperlink{classsrc_1_1molecule_1_1Molecule_a1969b621b7e6e65722ec245b74518cfe}{append}=False, selection=None, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_abd4e9ae70858f3f3d522ae6149236697}{center\+\_\+of\+\_\+mass} (self)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a972ec8931555662db70e0f6acaa009ca}{radius\+\_\+of\+\_\+gyration} (self)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a6b6551ae13458225d8fc8d117112e23f}{rigid\+\_\+water} (self)
+\begin{DoxyCompactList}\small\item\em If one atom is oxygen and the next two are hydrogen, make the water molecule rigid. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a93e42cc0135d2a68354e384d6bc9185b}{load\+\_\+frames} (self, fnm, ftype=None, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ad47b76d0fe660f2cfafceb67f358a5c2}{edit\+\_\+qcrems} (self, in\+\_\+dict, subcalc=None)
+\begin{DoxyCompactList}\small\item\em Edit Q-\/\+Chem rem variables with a dictionary. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ab863d592cf9369137d6298eb005556c9}{add\+\_\+quantum} (self, other)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_afa69c71616ba48c2641d3e2b5914b6d9}{add\+\_\+virtual\+\_\+site} (self, idx, kwargs)
+\begin{DoxyCompactList}\small\item\em Add a virtual site to the system. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a10b21e9ed15d4d1d3242a2696a939e61}{replace\+\_\+peratom} (self, key, orig, want)
+\begin{DoxyCompactList}\small\item\em Replace all of the data for a certain attribute in the system from orig to want. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a958636d732433ffc356a1f7a1e70d7d7}{replace\+\_\+peratom\+\_\+conditional} (self, key1, cond, key2, orig, want)
+\begin{DoxyCompactList}\small\item\em Replace all of the data for a attribute key2 from orig to want, contingent on key1 being equal to cond. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_af7b405613971e5d76720b1a655e05981}{atom\+\_\+select} (self, atomslice, \hyperlink{classsrc_1_1molecule_1_1Molecule_afae2c34b572e137801c8077f4267b247}{build\+\_\+topology}=True)
+\begin{DoxyCompactList}\small\item\em Return a copy of the object with certain atoms selected. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a06d6ebbb45f759c58b30f6c7c084c3e5}{atom\+\_\+stack} (self, other)
+\begin{DoxyCompactList}\small\item\em Return a copy of the object with another molecule object appended. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a73446a192061fe52b26899005e3bbc31}{align\+\_\+by\+\_\+moments} (self)
+\begin{DoxyCompactList}\small\item\em Align molecules using the moment of inertia. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a692df3c446a2c9517ab4a3d2a9e7b373}{get\+\_\+populations} (self)
+\begin{DoxyCompactList}\small\item\em Return a cloned molecule object but with X-\/coordinates set to Mulliken charges and Y-\/coordinates set to Mulliken spins. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_af2cf7dad143a2cca4cfa651c82185c3d}{load\+\_\+popxyz} (self, fnm)
+\begin{DoxyCompactList}\small\item\em Given a charge-\/spin xyz file, load the charges (x-\/coordinate) and spins (y-\/coordinate) into internal arrays. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ad74d00f84b4b0b66b18de8a3f6b41c88}{align} (self, smooth=False, \hyperlink{classsrc_1_1molecule_1_1Molecule_a3a4d580584a25a74ec835bf6b09ded81}{center}=True, center\+\_\+mass=False, \hyperlink{classsrc_1_1molecule_1_1Molecule_af7b405613971e5d76720b1a655e05981}{atom\+\_\+select}=None)
+\begin{DoxyCompactList}\small\item\em Align molecules. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a3a4d580584a25a74ec835bf6b09ded81}{center} (self, center\+\_\+mass=False)
+\begin{DoxyCompactList}\small\item\em Move geometric center to the origin. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a55418dce14e7b54da5ccfa96b0c564d4}{build\+\_\+bonds} (self)
+\begin{DoxyCompactList}\small\item\em Build the bond connectivity graph. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_afae2c34b572e137801c8077f4267b247}{build\+\_\+topology} (self, force\+\_\+bonds=True, kwargs)
+\begin{DoxyCompactList}\small\item\em Create self.\+topology and self.\+molecules; these are graph representations of the individual molecules (fragments) contained in the \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ac9ca356c6a6ea6d5b470d819ab473f84}{distance\+\_\+matrix} (self, pbc=True)
+\begin{DoxyCompactList}\small\item\em Obtain distance matrix between all pairs of atoms. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a29b2035c5e476fb22707d6c17eaf5e3e}{distance\+\_\+displacement} (self)
+\begin{DoxyCompactList}\small\item\em Obtain distance matrix and displacement vectors between all pairs of atoms. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ae8aa53ace87ec66daf8264b2add069c3}{rotate\+\_\+bond} (self, frame, aj, ak, increment=15)
+\begin{DoxyCompactList}\small\item\em Return a new \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object containing the selected frame plus a number of frames where the selected dihedral angle is rotated in steps of \textquotesingle{}increment\textquotesingle{} given in degrees. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a201a811c87574b4e229880540e4e6ef9}{find\+\_\+clashes} (self, thre=0.\+0, pbc=True, groups=None)
+\begin{DoxyCompactList}\small\item\em Obtain a list of atoms that \textquotesingle{}clash\textquotesingle{} (i.\+e. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a011f4f4e9170d8f3c86adf61453142ce}{rotate\+\_\+check\+\_\+clash} (self, frame, rotate\+\_\+index, thresh\+\_\+hyd=1.\+4, thresh\+\_\+hvy=1.\+8, print\+Level=1)
+\begin{DoxyCompactList}\small\item\em Return a new \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object containing the selected frame plus a number of frames where the selected dihedral angle is rotated in steps of \textquotesingle{}increment\textquotesingle{} given in degrees. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ac89b40e6c15282d3c685e80672a01cbf}{find\+\_\+angles} (self)
+\begin{DoxyCompactList}\small\item\em Return a list of 3-\/tuples corresponding to all of the angles in the system. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ac07431c9d938d6f0e24e71beef9119c5}{find\+\_\+dihedrals} (self)
+\begin{DoxyCompactList}\small\item\em Return a list of 4-\/tuples corresponding to all of the dihedral angles in the system. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a2a818455c2439cd42f7489d3f811eb72}{measure\+\_\+distances} (self, i, j)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ad9a055066973a760e4898581224736b0}{measure\+\_\+angles} (self, i, j, k)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a4c1539dbe8854e261e7dbdb4a6fa0a98}{measure\+\_\+dihedrals} (self, i, j, k, l)
+\begin{DoxyCompactList}\small\item\em Return a series of dihedral angles, given four atom indices numbered from zero. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_abb42e2d8a17fac1eb2a8912e1ea3a9a7}{find\+\_\+rings} (self, max\+\_\+size=6)
+\begin{DoxyCompactList}\small\item\em Return a list of rings in the molecule. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a5aac5225e3c6c540659410f7a783cd99}{order\+\_\+by\+\_\+connectivity} (self, m, i, curr\+List, max\+\_\+min\+\_\+path)
+\begin{DoxyCompactList}\small\item\em Recursive function that orders atoms based on connectivity. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ab2a58903fe3c7522158165619b92fab2}{aliphatic\+\_\+hydrogens} (self)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ac2da956804fed7a98341c94582838f26}{all\+\_\+pairwise\+\_\+rmsd} (self)
+\begin{DoxyCompactList}\small\item\em Find pairwise R\+M\+SD (super slow, not like the one in M\+S\+M\+Builder.) \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_af1fbd83fc5bba35b5df496413410f84d}{pathwise\+\_\+rmsd} (self, \hyperlink{classsrc_1_1molecule_1_1Molecule_ad74d00f84b4b0b66b18de8a3f6b41c88}{align}=True)
+\begin{DoxyCompactList}\small\item\em Find R\+M\+SD between frames along path. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a029c994fba2c8388259bd062def28fde}{ref\+\_\+rmsd} (self, i, \hyperlink{classsrc_1_1molecule_1_1Molecule_ad74d00f84b4b0b66b18de8a3f6b41c88}{align}=True)
+\begin{DoxyCompactList}\small\item\em Find R\+M\+SD to a reference frame. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a42c302c3f922e6f89862f2e5d39514a6}{align\+\_\+center} (self)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a466ab9dea14be9117488c6198b0f77cd}{openmm\+\_\+positions} (self)
+\begin{DoxyCompactList}\small\item\em Returns the Cartesian coordinates in the \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object in a list of Open\+M\+M-\/compatible positions, so it is possible to type simulation.\+context.\+set\+Positions(Mol.\+openmm\+\_\+positions()\mbox{[}0\mbox{]}) or something like that. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a4afda180689c9bfde319a025f96d4c0b}{openmm\+\_\+boxes} (self)
+\begin{DoxyCompactList}\small\item\em Returns the periodic box vectors in the \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object in a list of Open\+M\+M-\/compatible boxes, so it is possible to type simulation.\+context.\+set\+Periodic\+Box\+Vectors(Mol.\+openmm\+\_\+boxes()\mbox{[}0\mbox{]}) or something like that. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a004a64d4b979002026c23d15a79e8dfc}{split} (self, fnm=None, ftype=None, method=\char`\"{}chunks\char`\"{}, num=None)
+\begin{DoxyCompactList}\small\item\em Split the molecule object into a number of separate files (chunks), either by specifying the number of frames per chunk or the number of chunks. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_aeab236a12cffd66ce282c1a7d03af7f9}{without} (self, args)
+\begin{DoxyCompactList}\small\item\em Return a copy of the \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object but with certain fields deleted if they exist. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a7aeff86c1d2b8f73bea9191b33f665c3}{read\+\_\+comm\+\_\+charge\+\_\+mult} (self, verbose=False)
+\begin{DoxyCompactList}\small\item\em Set charge and multiplicity from reading the comment line, formatted in a specific way. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a1b0681641dfbba1c2d182151b5e60f5d}{read\+\_\+qcschema} (self, schema, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a36a4504f013d86188435e01231235386}{read\+\_\+xyz} (self, fnm, kwargs)
+\begin{DoxyCompactList}\small\item\em .xyz files can be T\+I\+N\+K\+ER formatted which is why we have the try/except here. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a4b84ec657b8c89c34674bb205f7eb1b2}{read\+\_\+xyz0} (self, fnm, kwargs)
+\begin{DoxyCompactList}\small\item\em Parse a .xyz file which contains several xyz coordinates, and return their elements. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_aa7a40df32ff22ef52b902ac6a24dcb50}{read\+\_\+mdcrd} (self, fnm, kwargs)
+\begin{DoxyCompactList}\small\item\em Parse an A\+M\+B\+ER .mdcrd file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a25e54248bd35147e2c2aa210d06a58a5}{read\+\_\+inpcrd} (self, fnm, kwargs)
+\begin{DoxyCompactList}\small\item\em Parse an A\+M\+B\+ER .inpcrd or .rst file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a6c78338a640dbf1fd95c38f980203643}{read\+\_\+qdata} (self, fnm, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a1d771e111c1cc4c8a0783b58081e282d}{read\+\_\+mol2} (self, fnm, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a258bc7b495910f9ff3bb552413207ecd}{read\+\_\+dcd} (self, fnm, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a742c96f62c86d00ac97bb5004f8ebd92}{read\+\_\+com} (self, fnm, kwargs)
+\begin{DoxyCompactList}\small\item\em Parse a Gaussian .com file and return a S\+I\+N\+G\+L\+E-\/\+E\+L\+E\+M\+E\+NT list of xyz coordinates (no multiple file support) \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a7e4057a5d9f4bb4a62cef21680f91327}{read\+\_\+arc} (self, fnm, kwargs)
+\begin{DoxyCompactList}\small\item\em Read a T\+I\+N\+K\+ER .arc file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a4ce0cfbb42e84ec2fe5d8097d0ff5fda}{read\+\_\+gro} (self, fnm, kwargs)
+\begin{DoxyCompactList}\small\item\em Read a G\+R\+O\+M\+A\+CS .gro file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a3710f2055a57158a9b5fbab2c5943683}{read\+\_\+charmm} (self, fnm, kwargs)
+\begin{DoxyCompactList}\small\item\em Read a C\+H\+A\+R\+MM .cor (or .crd) file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_aa9caaf6d7ccff3a9077da98b4c8096a9}{read\+\_\+qcin} (self, fnm, kwargs)
+\begin{DoxyCompactList}\small\item\em Read a Q-\/\+Chem input file. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_af52f2ee9f9376925eab6e3309536e011}{read\+\_\+pdb} (self, fnm, kwargs)
+\begin{DoxyCompactList}\small\item\em Loads a P\+DB and returns a dictionary containing its data. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a12369eb306cb29148e610e9ee08d7e2c}{read\+\_\+qcesp} (self, fnm, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a243cce870c970db8cac7f102325e872b}{read\+\_\+qcout} (self, fnm, errok=None, kwargs)
+\begin{DoxyCompactList}\small\item\em Q-\/\+Chem output file reader, adapted for our parser. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a21d78053aab2fda1fd5e2577a02ec696}{write\+\_\+qcin} (self, selection, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_af42c16177cc7cbfce3c0b2be7b132480}{write\+\_\+xyz} (self, selection, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a36b472b4d2504123fab8083068f8315a}{get\+\_\+reaxff\+\_\+atom\+\_\+types} (self)
+\begin{DoxyCompactList}\small\item\em Return a list of element names which maps the L\+A\+M\+M\+PS atom types to the Reax\+FF elements. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a7b85106cd6cc8e1d3e7e1ccb4edff551}{write\+\_\+lammps\+\_\+data} (self, selection, kwargs)
+\begin{DoxyCompactList}\small\item\em Write the first frame of the selection to a L\+A\+M\+M\+PS data file for the purpose of automatically initializing a L\+A\+M\+M\+PS simulation. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ab74230360451f0feefcfceae3b292223}{write\+\_\+molproq} (self, selection, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a94a0b29f772bb5e6e03383fd854ad70a}{write\+\_\+mdcrd} (self, selection, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_af975f93f5c43f518b84d0bd067c75604}{write\+\_\+inpcrd} (self, selection, sn=None, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a5c04a001643a8165de635697f2d418f3}{write\+\_\+arc} (self, selection, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_accdd08d1cdef8a51da59e1fc2268c7d8}{write\+\_\+gro} (self, selection, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a722ba2597f067fc042169926c0b37274}{write\+\_\+dcd} (self, selection, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_adea929913736e69b7af631dc0014a1e7}{write\+\_\+pdb} (self, selection, kwargs)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ac33547444f6fc81cae37ce37db9743ef}{write\+\_\+qdata} (self, selection, kwargs)
+\begin{DoxyCompactList}\small\item\em Text quantum data format. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_af74bcae2931e36e08ff33037b1b0fa37}{require\+\_\+resid} (self)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_a68eee3cd2b86790c0cb2954c8310bd29}{require\+\_\+resname} (self)
+\item 
+def \hyperlink{classsrc_1_1molecule_1_1Molecule_ab72729cb3e6b2ed086669142c1409ed4}{require\+\_\+boxes} (self)
+\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a809f63082b7a39e0f787fc455dd18516}{Read\+\_\+\+Tab}
+\begin{DoxyCompactList}\small\item\em The table of file readers. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a0c2c1e8f6951f338e8ce2220a5d12045}{Write\+\_\+\+Tab}
+\begin{DoxyCompactList}\small\item\em The table of file writers. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a56e223f4d0b5bf391e7d038b36d335d8}{Funnel}
+\begin{DoxyCompactList}\small\item\em A funnel dictionary that takes redundant file types and maps them down to a few. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a16ef842ad2eb3048d82d2303639e56e0}{positive\+\_\+resid}
+\begin{DoxyCompactList}\small\item\em Creates entries like \textquotesingle{}gromacs\textquotesingle{} \+: \textquotesingle{}gromacs\textquotesingle{} and \textquotesingle{}xyz\textquotesingle{} \+: \textquotesingle{}xyz\textquotesingle{} in the Funnel. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_ae084bae0a4a0204c4d92fff5cbdbeee5}{built\+\_\+bonds}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_afd7595ccf68f4fc41c728a5071d0a0b9}{top\+\_\+settings}
+\begin{DoxyCompactList}\small\item\em Topology settings. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a0270df3966f56e55abb73ab7de5a3e77}{Data}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a36609ce51ce26648178b39f22343f085}{comms}
+\begin{DoxyCompactList}\small\item\em Read in stuff if we passed in a file name, otherwise return an empty instance. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a96266112f8af20de9810e2fee0d5861c}{fout}
+\begin{DoxyCompactList}\small\item\em I needed to add in this line because the D\+CD writer requires the file name, but the other methods don\textquotesingle{}t. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_ab59ba8cf9a0b9e525428723c813d15c8}{qm\+\_\+mulliken\+\_\+charges}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_abdc7b61bb516d9f57aff156ec09b19bf}{qm\+\_\+mulliken\+\_\+spins}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_aa66fa5839f821805bdd08ed17a206987}{topology}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a91b5115334f638c29d7a1cc46aedca5d}{molecules}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a146f60bbab00e12c5754fd666233e86f}{charge}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_aa6fbbf278cf844c7bbdac896c71f5c64}{mult}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a9701dad854112650bd6b7601cab8b40b}{xyzs}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_afd4c36987dbdc45da729fe1668485628}{atomname}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a840f24f26e96c001cd36b254c402e481}{resid}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a346c5b384082c9779f83ea7853a460c8}{resname}
+\item 
+\hyperlink{classsrc_1_1molecule_1_1Molecule_a996cd83807d88f3fb81aef6278e10051}{boxes}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Lee-\/\+Ping\textquotesingle{}s general file format conversion class. 
+
+The purpose of this class is to read and write chemical file formats in a way that is convenient for research. There are highly general file format converters out there (e.\+g. catdcd, openbabel) but I find that writing my own class can be very helpful for specific purposes. Here are some things this class can do\+:
+
+
+\begin{DoxyItemize}
+\item Convert a .gro file to a .xyz file, or a .pdb file to a .dcd file. Data is stored internally, so any readable file can be converted into any writable file as long as there is sufficient information to write that file.
+\item Accumulate information from different files. For example, we may read A.\+gro to get a list of coordinates, add quantum settings from a B.\+in file, and write A.\+in (this gives us a file that we can use to run QM calculations)
+\item Concatenate two trajectories together as long as they\textquotesingle{}re compatible. This is done by creating two \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} objects and then simply adding them. Addition means two things\+: (1) Information fields missing from each class, but present in the other, are added to the sum, and (2) Appendable or per-\/frame fields (i.\+e. coordinates) are concatenated together.
+\item Slice trajectories using reasonable Python language. That is to say, My\+Molecule\mbox{[}1\+:10\mbox{]} returns a new \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object that contains frames 1 through 9 (inclusive and numbered starting from zero.)
+\end{DoxyItemize}
+
+Special variables\+: These variables cannot be set manually because there is a special method associated with getting them.
+
+na = The number of atoms. You\textquotesingle{}ll get this if you use My\+Mol.\+na or My\+Mol\mbox{[}\textquotesingle{}na\textquotesingle{}\mbox{]}. ns = The number of snapshots. You\textquotesingle{}ll get this if you use My\+Mol.\+ns or My\+Mol\mbox{[}\textquotesingle{}ns\textquotesingle{}\mbox{]}.
+
+Unit system\+: Angstroms. 
+
+Definition at line 1182 of file molecule.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a8c3f5b48ac288e3b251b42d90c8f8016}\label{classsrc_1_1molecule_1_1Molecule_a8c3f5b48ac288e3b251b42d90c8f8016}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm = {\ttfamily None},  }\item[{}]{ftype = {\ttfamily None},  }\item[{}]{top = {\ttfamily None},  }\item[{}]{ttype = {\ttfamily None},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Create a \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object. 
+
+\paragraph*{Parameters }
+
+fnm \+: str, optional File name to create the \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object from. If provided, the file will be parsed and used to fill in the fields such as elem (elements), xyzs (coordinates) and so on. If ftype is not provided, will automatically try to determine file type from file extension. If not provided, will create an empty object. ftype \+: str, optional File type, corresponding to an entry in the internal table of known file types. Provide this if you have a nonstandard file extension or if you wish to force to invoke a particular parser. top \+: str, optional \char`\"{}\+Topology\char`\"{} file name. If provided, will build the \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} using this file name, then \char`\"{}fnm\char`\"{} will load frames instead. ttype \+: str, optional \char`\"{}\+Typology\char`\"{} file type. build\+\_\+topology \+: bool, optional Build the molecular topology consisting of\+: topology (overall connectivity graph), molecules (list of connected subgraphs), bonds (if not explicitly read in), default True toppbc \+: bool, optional Use periodic boundary conditions when building the molecular topology, default False The build\+\_\+topology code will attempt to determine this intelligently. topframe \+: int, optional Provide a frame number for building the molecular topology, default first frame Fac \+: float, optional Multiplicative factor to covalent radii criterion for deciding whether two atoms are bonded Default value of 1.\+2 is reasonable, 1.\+4 will produce lots of bonds positive\+\_\+resid \+: bool, optional If provided, enforce all positive res\+I\+Ds. 
+
+Definition at line 1219 of file molecule.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a087212040303a4f62a3462106428cc38}\label{classsrc_1_1molecule_1_1Molecule_a087212040303a4f62a3462106428cc38}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!\+\_\+\+\_\+add\+\_\+\+\_\+@{\+\_\+\+\_\+add\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+add\+\_\+\+\_\+@{\+\_\+\+\_\+add\+\_\+\+\_\+}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+add\+\_\+\+\_\+()}{\_\_add\_\_()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+\_\+\+\_\+add\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+
+
+Add method for \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} objects. 
+
+
+
+Definition at line 1496 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a087212040303a4f62a3462106428cc38_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ac40e3fd2c1f79e316be59016e7dfd253}\label{classsrc_1_1molecule_1_1Molecule_ac40e3fd2c1f79e316be59016e7dfd253}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!\+\_\+\+\_\+deepcopy\+\_\+\+\_\+@{\+\_\+\+\_\+deepcopy\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+deepcopy\+\_\+\+\_\+@{\+\_\+\+\_\+deepcopy\+\_\+\+\_\+}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+deepcopy\+\_\+\+\_\+()}{\_\_deepcopy\_\_()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+\_\+\+\_\+deepcopy\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{memo }\end{DoxyParamCaption})}
+
+
+
+Custom deepcopy method because Python 3.\+6 appears to have changed its behavior. 
+
+
+
+Definition at line 1398 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_ac40e3fd2c1f79e316be59016e7dfd253_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a31014aa4ca1b8259557bedd6d13a51aa}\label{classsrc_1_1molecule_1_1Molecule_a31014aa4ca1b8259557bedd6d13a51aa}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!\+\_\+\+\_\+delitem\+\_\+\+\_\+@{\+\_\+\+\_\+delitem\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+delitem\+\_\+\+\_\+@{\+\_\+\+\_\+delitem\+\_\+\+\_\+}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+delitem\+\_\+\+\_\+()}{\_\_delitem\_\_()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+\_\+\+\_\+delitem\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{key }\end{DoxyParamCaption})}
+
+
+
+Similarly, in order to delete a frame, we simply perform item deletion on framewise variables. 
+
+
+
+Definition at line 1476 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_afbb728fb44c4465e4f53b26a64439165}\label{classsrc_1_1molecule_1_1Molecule_afbb728fb44c4465e4f53b26a64439165}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!\+\_\+\+\_\+getattr\+\_\+\+\_\+@{\+\_\+\+\_\+getattr\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+getattr\+\_\+\+\_\+@{\+\_\+\+\_\+getattr\+\_\+\+\_\+}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+getattr\+\_\+\+\_\+()}{\_\_getattr\_\_()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+\_\+\+\_\+getattr\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{key }\end{DoxyParamCaption})}
+
+
+
+Whenever we try to get a class attribute, it first tries to get the attribute from the Data dictionary. 
+
+
+
+Definition at line 1347 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_afbb728fb44c4465e4f53b26a64439165_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a30e057898525695364528d3b02c5762b}\label{classsrc_1_1molecule_1_1Molecule_a30e057898525695364528d3b02c5762b}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!\+\_\+\+\_\+getitem\+\_\+\+\_\+@{\+\_\+\+\_\+getitem\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+getitem\+\_\+\+\_\+@{\+\_\+\+\_\+getitem\+\_\+\+\_\+}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+getitem\+\_\+\+\_\+()}{\_\_getitem\_\_()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+\_\+\+\_\+getitem\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{key }\end{DoxyParamCaption})}
+
+
+
+The \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} class has list-\/like behavior, so we can get slices of it. 
+
+If we say My\+Molecule\mbox{[}0\+:10\mbox{]}, then we\textquotesingle{}ll return a copy of My\+Molecule with frames 0 through 9. 
+
+Definition at line 1453 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a4a1e6648a99afd550e7b24db3a2b249b}\label{classsrc_1_1molecule_1_1Molecule_a4a1e6648a99afd550e7b24db3a2b249b}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!\+\_\+\+\_\+iadd\+\_\+\+\_\+@{\+\_\+\+\_\+iadd\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+iadd\+\_\+\+\_\+@{\+\_\+\+\_\+iadd\+\_\+\+\_\+}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+iadd\+\_\+\+\_\+()}{\_\_iadd\_\_()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+\_\+\+\_\+iadd\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+
+
+Add method for \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} objects. 
+
+
+
+Definition at line 1543 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a4a1e6648a99afd550e7b24db3a2b249b_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a05079753fc6897507fa02eb4ef57fc77}\label{classsrc_1_1molecule_1_1Molecule_a05079753fc6897507fa02eb4ef57fc77}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!\+\_\+\+\_\+iter\+\_\+\+\_\+@{\+\_\+\+\_\+iter\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+iter\+\_\+\+\_\+@{\+\_\+\+\_\+iter\+\_\+\+\_\+}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+iter\+\_\+\+\_\+()}{\_\_iter\_\_()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+\_\+\+\_\+iter\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+List-\/like behavior for looping over trajectories. 
+
+Note that these values are returned by reference. Note that this is intended to be more efficient than {\bfseries getitem}, so when we loop over a trajectory, it\textquotesingle{}s best to go \char`\"{}for m in M\char`\"{} instead of \char`\"{}for i in range(len(\+M))\+: m = M\mbox{[}i\mbox{]}\char`\"{} 
+
+Definition at line 1485 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a23a3a5c340084abc00fb577d2b3c85c2}\label{classsrc_1_1molecule_1_1Molecule_a23a3a5c340084abc00fb577d2b3c85c2}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!\+\_\+\+\_\+len\+\_\+\+\_\+@{\+\_\+\+\_\+len\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+len\+\_\+\+\_\+@{\+\_\+\+\_\+len\+\_\+\+\_\+}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+len\+\_\+\+\_\+()}{\_\_len\_\_()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+\_\+\+\_\+len\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return the number of frames in the trajectory. 
+
+
+
+Definition at line 1331 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a23a3a5c340084abc00fb577d2b3c85c2_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a73f8860755f337e3fafb91d074a7d459}\label{classsrc_1_1molecule_1_1Molecule_a73f8860755f337e3fafb91d074a7d459}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!\+\_\+\+\_\+setattr\+\_\+\+\_\+@{\+\_\+\+\_\+setattr\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+setattr\+\_\+\+\_\+@{\+\_\+\+\_\+setattr\+\_\+\+\_\+}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+setattr\+\_\+\+\_\+()}{\_\_setattr\_\_()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+\_\+\+\_\+setattr\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{key,  }\item[{}]{value }\end{DoxyParamCaption})}
+
+
+
+Whenever we try to get a class attribute, it first tries to get the attribute from the Data dictionary. 
+
+
+
+Definition at line 1386 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ab863d592cf9369137d6298eb005556c9}\label{classsrc_1_1molecule_1_1Molecule_ab863d592cf9369137d6298eb005556c9}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!add\+\_\+quantum@{add\+\_\+quantum}}
+\index{add\+\_\+quantum@{add\+\_\+quantum}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{add\+\_\+quantum()}{add\_quantum()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+add\+\_\+quantum (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1813 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_afa69c71616ba48c2641d3e2b5914b6d9}\label{classsrc_1_1molecule_1_1Molecule_afa69c71616ba48c2641d3e2b5914b6d9}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!add\+\_\+virtual\+\_\+site@{add\+\_\+virtual\+\_\+site}}
+\index{add\+\_\+virtual\+\_\+site@{add\+\_\+virtual\+\_\+site}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{add\+\_\+virtual\+\_\+site()}{add\_virtual\_site()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+add\+\_\+virtual\+\_\+site (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{idx,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Add a virtual site to the system. 
+
+This does N\+OT set the position of the virtual site; it sits at the origin. 
+
+Definition at line 1826 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ad74d00f84b4b0b66b18de8a3f6b41c88}\label{classsrc_1_1molecule_1_1Molecule_ad74d00f84b4b0b66b18de8a3f6b41c88}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!align@{align}}
+\index{align@{align}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{align()}{align()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+align (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{smooth = {\ttfamily False},  }\item[{}]{center = {\ttfamily True},  }\item[{}]{center\+\_\+mass = {\ttfamily False},  }\item[{}]{atom\+\_\+select = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Align molecules. 
+
+Has the option to create smooth trajectories (align each frame to the previous one) or to align each frame to the first one.
+
+Also has the option to remove the center of mass.
+
+Provide a list of atom indices to align along selected atoms. 
+
+Definition at line 1994 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_ad74d00f84b4b0b66b18de8a3f6b41c88_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a73446a192061fe52b26899005e3bbc31}\label{classsrc_1_1molecule_1_1Molecule_a73446a192061fe52b26899005e3bbc31}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!align\+\_\+by\+\_\+moments@{align\+\_\+by\+\_\+moments}}
+\index{align\+\_\+by\+\_\+moments@{align\+\_\+by\+\_\+moments}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{align\+\_\+by\+\_\+moments()}{align\_by\_moments()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+align\+\_\+by\+\_\+moments (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Align molecules using the moment of inertia. 
+
+Departs from M\+S\+M\+Builder convention of using arithmetic mean for mass. 
+
+Definition at line 1952 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a73446a192061fe52b26899005e3bbc31_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a42c302c3f922e6f89862f2e5d39514a6}\label{classsrc_1_1molecule_1_1Molecule_a42c302c3f922e6f89862f2e5d39514a6}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!align\+\_\+center@{align\+\_\+center}}
+\index{align\+\_\+center@{align\+\_\+center}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{align\+\_\+center()}{align\_center()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+align\+\_\+center (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 2854 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a42c302c3f922e6f89862f2e5d39514a6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ab2a58903fe3c7522158165619b92fab2}\label{classsrc_1_1molecule_1_1Molecule_ab2a58903fe3c7522158165619b92fab2}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!aliphatic\+\_\+hydrogens@{aliphatic\+\_\+hydrogens}}
+\index{aliphatic\+\_\+hydrogens@{aliphatic\+\_\+hydrogens}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{aliphatic\+\_\+hydrogens()}{aliphatic\_hydrogens()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+aliphatic\+\_\+hydrogens (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 2791 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ac2da956804fed7a98341c94582838f26}\label{classsrc_1_1molecule_1_1Molecule_ac2da956804fed7a98341c94582838f26}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!all\+\_\+pairwise\+\_\+rmsd@{all\+\_\+pairwise\+\_\+rmsd}}
+\index{all\+\_\+pairwise\+\_\+rmsd@{all\+\_\+pairwise\+\_\+rmsd}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{all\+\_\+pairwise\+\_\+rmsd()}{all\_pairwise\_rmsd()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+all\+\_\+pairwise\+\_\+rmsd (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Find pairwise R\+M\+SD (super slow, not like the one in M\+S\+M\+Builder.) 
+
+
+
+Definition at line 2803 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_ac2da956804fed7a98341c94582838f26_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a1969b621b7e6e65722ec245b74518cfe}\label{classsrc_1_1molecule_1_1Molecule_a1969b621b7e6e65722ec245b74518cfe}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!append@{append}}
+\index{append@{append}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{append()}{append()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+append (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1652 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_af7b405613971e5d76720b1a655e05981}\label{classsrc_1_1molecule_1_1Molecule_af7b405613971e5d76720b1a655e05981}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!atom\+\_\+select@{atom\+\_\+select}}
+\index{atom\+\_\+select@{atom\+\_\+select}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{atom\+\_\+select()}{atom\_select()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+atom\+\_\+select (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{atomslice,  }\item[{}]{build\+\_\+topology = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Return a copy of the object with certain atoms selected. 
+
+Takes an integer, list or array as argument. 
+
+Definition at line 1868 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a06d6ebbb45f759c58b30f6c7c084c3e5}\label{classsrc_1_1molecule_1_1Molecule_a06d6ebbb45f759c58b30f6c7c084c3e5}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!atom\+\_\+stack@{atom\+\_\+stack}}
+\index{atom\+\_\+stack@{atom\+\_\+stack}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{atom\+\_\+stack()}{atom\_stack()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+atom\+\_\+stack (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+
+
+Return a copy of the object with another molecule object appended. 
+
+W\+A\+R\+N\+I\+NG\+: This function may invalidate stuff like QM energies. 
+
+Definition at line 1905 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a55418dce14e7b54da5ccfa96b0c564d4}\label{classsrc_1_1molecule_1_1Molecule_a55418dce14e7b54da5ccfa96b0c564d4}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!build\+\_\+bonds@{build\+\_\+bonds}}
+\index{build\+\_\+bonds@{build\+\_\+bonds}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{build\+\_\+bonds()}{build\_bonds()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+build\+\_\+bonds (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Build the bond connectivity graph. 
+
+
+
+Definition at line 2034 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a55418dce14e7b54da5ccfa96b0c564d4_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_afae2c34b572e137801c8077f4267b247}\label{classsrc_1_1molecule_1_1Molecule_afae2c34b572e137801c8077f4267b247}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!build\+\_\+topology@{build\+\_\+topology}}
+\index{build\+\_\+topology@{build\+\_\+topology}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{build\+\_\+topology()}{build\_topology()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+build\+\_\+topology (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{force\+\_\+bonds = {\ttfamily True},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Create self.\+topology and self.\+molecules; these are graph representations of the individual molecules (fragments) contained in the \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object. 
+
+\paragraph*{Parameters }
+
+force\+\_\+bonds \+: bool Build the bonds from interatomic distances. If the user calls build\+\_\+topology from outside, assume this is the default behavior. If creating a \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object using {\bfseries init}, do not force the building of bonds by default (only build bonds if not read from file.) topframe \+: int, optional Provide the frame number used for reading the bonds. If not provided, this will be taken from the top\+\_\+settings field. If provided, this will take priority and write the value into top\+\_\+settings. 
+
+Definition at line 2208 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_afae2c34b572e137801c8077f4267b247_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a3a4d580584a25a74ec835bf6b09ded81}\label{classsrc_1_1molecule_1_1Molecule_a3a4d580584a25a74ec835bf6b09ded81}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!center@{center}}
+\index{center@{center}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{center()}{center()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+center (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{center\+\_\+mass = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Move geometric center to the origin. 
+
+
+
+Definition at line 2023 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a3a4d580584a25a74ec835bf6b09ded81_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_abd4e9ae70858f3f3d522ae6149236697}\label{classsrc_1_1molecule_1_1Molecule_abd4e9ae70858f3f3d522ae6149236697}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!center\+\_\+of\+\_\+mass@{center\+\_\+of\+\_\+mass}}
+\index{center\+\_\+of\+\_\+mass@{center\+\_\+of\+\_\+mass}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{center\+\_\+of\+\_\+mass()}{center\_of\_mass()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+center\+\_\+of\+\_\+mass (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1723 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a29b2035c5e476fb22707d6c17eaf5e3e}\label{classsrc_1_1molecule_1_1Molecule_a29b2035c5e476fb22707d6c17eaf5e3e}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!distance\+\_\+displacement@{distance\+\_\+displacement}}
+\index{distance\+\_\+displacement@{distance\+\_\+displacement}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{distance\+\_\+displacement()}{distance\_displacement()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+distance\+\_\+displacement (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Obtain distance matrix and displacement vectors between all pairs of atoms. 
+
+
+
+Definition at line 2254 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a29b2035c5e476fb22707d6c17eaf5e3e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ac9ca356c6a6ea6d5b470d819ab473f84}\label{classsrc_1_1molecule_1_1Molecule_ac9ca356c6a6ea6d5b470d819ab473f84}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!distance\+\_\+matrix@{distance\+\_\+matrix}}
+\index{distance\+\_\+matrix@{distance\+\_\+matrix}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{distance\+\_\+matrix()}{distance\_matrix()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+distance\+\_\+matrix (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{pbc = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Obtain distance matrix between all pairs of atoms. 
+
+
+
+Definition at line 2242 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_ac9ca356c6a6ea6d5b470d819ab473f84_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ad47b76d0fe660f2cfafceb67f358a5c2}\label{classsrc_1_1molecule_1_1Molecule_ad47b76d0fe660f2cfafceb67f358a5c2}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!edit\+\_\+qcrems@{edit\+\_\+qcrems}}
+\index{edit\+\_\+qcrems@{edit\+\_\+qcrems}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{edit\+\_\+qcrems()}{edit\_qcrems()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+edit\+\_\+qcrems (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{in\+\_\+dict,  }\item[{}]{subcalc = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Edit Q-\/\+Chem rem variables with a dictionary. 
+
+Pass a value of None to delete a rem variable. 
+
+Definition at line 1798 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ac89b40e6c15282d3c685e80672a01cbf}\label{classsrc_1_1molecule_1_1Molecule_ac89b40e6c15282d3c685e80672a01cbf}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!find\+\_\+angles@{find\+\_\+angles}}
+\index{find\+\_\+angles@{find\+\_\+angles}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{find\+\_\+angles()}{find\_angles()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+find\+\_\+angles (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return a list of 3-\/tuples corresponding to all of the angles in the system. 
+
+Verified for lysine and tryptophan dipeptide when comparing to T\+I\+N\+K\+ER\textquotesingle{}s analyze program. 
+
+Definition at line 2502 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a201a811c87574b4e229880540e4e6ef9}\label{classsrc_1_1molecule_1_1Molecule_a201a811c87574b4e229880540e4e6ef9}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!find\+\_\+clashes@{find\+\_\+clashes}}
+\index{find\+\_\+clashes@{find\+\_\+clashes}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{find\+\_\+clashes()}{find\_clashes()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+find\+\_\+clashes (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{thre = {\ttfamily 0.0},  }\item[{}]{pbc = {\ttfamily True},  }\item[{}]{groups = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Obtain a list of atoms that \textquotesingle{}clash\textquotesingle{} (i.\+e. 
+
+are more than 3 bonds apart and are closer than the provided threshold.)
+
+\paragraph*{Parameters }
+
+thre \+: float Create a sorted-\/list of all non-\/bonded atom pairs with distance below this threshold pbc \+: bool Whether to use P\+BC when computing interatomic distances filt \+: tuple (group1, group2) If not None, only compute distances between atoms in \textquotesingle{}group1\textquotesingle{} and atoms in \textquotesingle{}group2\textquotesingle{}. For example this could be \mbox{[}g\+Atoms, o\+Atoms\mbox{]} from rotate\+\_\+bond
+
+\paragraph*{Returns }
+
+min\+Pair\+\_\+frames \+: list of tuples The closest pair of non-\/bonded atoms in each frame min\+Dist\+\_\+frames \+: list of tuples The distance between the closest pair of non-\/bonded atoms in each frame clash\+Pairs\+\_\+frames \+: list of lists Pairs of non-\/bonded atoms with distance below the threshold in each frame clash\+Dists\+\_\+frames \+: list of lists Distances between pairs of non-\/bonded atoms below the threshold in each frame 
+
+Definition at line 2379 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a201a811c87574b4e229880540e4e6ef9_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ac07431c9d938d6f0e24e71beef9119c5}\label{classsrc_1_1molecule_1_1Molecule_ac07431c9d938d6f0e24e71beef9119c5}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!find\+\_\+dihedrals@{find\+\_\+dihedrals}}
+\index{find\+\_\+dihedrals@{find\+\_\+dihedrals}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{find\+\_\+dihedrals()}{find\_dihedrals()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+find\+\_\+dihedrals (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return a list of 4-\/tuples corresponding to all of the dihedral angles in the system. 
+
+Verified for alanine and tryptophan dipeptide when comparing to T\+I\+N\+K\+ER\textquotesingle{}s analyze program. 
+
+Definition at line 2529 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_abb42e2d8a17fac1eb2a8912e1ea3a9a7}\label{classsrc_1_1molecule_1_1Molecule_abb42e2d8a17fac1eb2a8912e1ea3a9a7}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!find\+\_\+rings@{find\+\_\+rings}}
+\index{find\+\_\+rings@{find\+\_\+rings}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{find\+\_\+rings()}{find\_rings()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+find\+\_\+rings (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{max\+\_\+size = {\ttfamily 6} }\end{DoxyParamCaption})}
+
+
+
+Return a list of rings in the molecule. 
+
+Tested on a D\+NA base pair and C60. Warning\+: Using large max\+\_\+size for rings (e.\+g. for finding the macrocycle in porphyrin) could lead to some undefined behavior.
+
+\paragraph*{Parameters }
+
+max\+\_\+size \+: int The maximum ring size. If a large ring contains smaller sub-\/rings, they are all mapped into one.
+
+\paragraph*{Returns }
+
+list A list of rings sorted in ascending order of the smallest atom number. The atoms in each ring are ordered starting from the lowest number and going along the ring, with the second atom being the lower of the two possible choices. 
+
+Definition at line 2621 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_abb42e2d8a17fac1eb2a8912e1ea3a9a7_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a692df3c446a2c9517ab4a3d2a9e7b373}\label{classsrc_1_1molecule_1_1Molecule_a692df3c446a2c9517ab4a3d2a9e7b373}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!get\+\_\+populations@{get\+\_\+populations}}
+\index{get\+\_\+populations@{get\+\_\+populations}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{get\+\_\+populations()}{get\_populations()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+get\+\_\+populations (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return a cloned molecule object but with X-\/coordinates set to Mulliken charges and Y-\/coordinates set to Mulliken spins. 
+
+
+
+Definition at line 1966 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a36b472b4d2504123fab8083068f8315a}\label{classsrc_1_1molecule_1_1Molecule_a36b472b4d2504123fab8083068f8315a}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!get\+\_\+reaxff\+\_\+atom\+\_\+types@{get\+\_\+reaxff\+\_\+atom\+\_\+types}}
+\index{get\+\_\+reaxff\+\_\+atom\+\_\+types@{get\+\_\+reaxff\+\_\+atom\+\_\+types}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{get\+\_\+reaxff\+\_\+atom\+\_\+types()}{get\_reaxff\_atom\_types()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+get\+\_\+reaxff\+\_\+atom\+\_\+types (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Return a list of element names which maps the L\+A\+M\+M\+PS atom types to the Reax\+FF elements. 
+
+
+
+Definition at line 4229 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a93e42cc0135d2a68354e384d6bc9185b}\label{classsrc_1_1molecule_1_1Molecule_a93e42cc0135d2a68354e384d6bc9185b}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!load\+\_\+frames@{load\+\_\+frames}}
+\index{load\+\_\+frames@{load\+\_\+frames}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{load\+\_\+frames()}{load\_frames()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+load\+\_\+frames (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{ftype = {\ttfamily None},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1769 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_af2cf7dad143a2cca4cfa651c82185c3d}\label{classsrc_1_1molecule_1_1Molecule_af2cf7dad143a2cca4cfa651c82185c3d}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!load\+\_\+popxyz@{load\+\_\+popxyz}}
+\index{load\+\_\+popxyz@{load\+\_\+popxyz}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{load\+\_\+popxyz()}{load\_popxyz()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+load\+\_\+popxyz (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm }\end{DoxyParamCaption})}
+
+
+
+Given a charge-\/spin xyz file, load the charges (x-\/coordinate) and spins (y-\/coordinate) into internal arrays. 
+
+
+
+Definition at line 1977 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ad9a055066973a760e4898581224736b0}\label{classsrc_1_1molecule_1_1Molecule_ad9a055066973a760e4898581224736b0}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!measure\+\_\+angles@{measure\+\_\+angles}}
+\index{measure\+\_\+angles@{measure\+\_\+angles}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{measure\+\_\+angles()}{measure\_angles()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+measure\+\_\+angles (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i,  }\item[{}]{j,  }\item[{}]{k }\end{DoxyParamCaption})}
+
+
+
+Definition at line 2560 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a4c1539dbe8854e261e7dbdb4a6fa0a98}\label{classsrc_1_1molecule_1_1Molecule_a4c1539dbe8854e261e7dbdb4a6fa0a98}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!measure\+\_\+dihedrals@{measure\+\_\+dihedrals}}
+\index{measure\+\_\+dihedrals@{measure\+\_\+dihedrals}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{measure\+\_\+dihedrals()}{measure\_dihedrals()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+measure\+\_\+dihedrals (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i,  }\item[{}]{j,  }\item[{}]{k,  }\item[{}]{l }\end{DoxyParamCaption})}
+
+
+
+Return a series of dihedral angles, given four atom indices numbered from zero. 
+
+
+
+Definition at line 2575 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a2a818455c2439cd42f7489d3f811eb72}\label{classsrc_1_1molecule_1_1Molecule_a2a818455c2439cd42f7489d3f811eb72}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!measure\+\_\+distances@{measure\+\_\+distances}}
+\index{measure\+\_\+distances@{measure\+\_\+distances}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{measure\+\_\+distances()}{measure\_distances()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+measure\+\_\+distances (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i,  }\item[{}]{j }\end{DoxyParamCaption})}
+
+
+
+Definition at line 2551 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a4afda180689c9bfde319a025f96d4c0b}\label{classsrc_1_1molecule_1_1Molecule_a4afda180689c9bfde319a025f96d4c0b}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!openmm\+\_\+boxes@{openmm\+\_\+boxes}}
+\index{openmm\+\_\+boxes@{openmm\+\_\+boxes}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{openmm\+\_\+boxes()}{openmm\_boxes()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+openmm\+\_\+boxes (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Returns the periodic box vectors in the \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object in a list of Open\+M\+M-\/compatible boxes, so it is possible to type simulation.\+context.\+set\+Periodic\+Box\+Vectors(Mol.\+openmm\+\_\+boxes()\mbox{[}0\mbox{]}) or something like that. 
+
+
+
+Definition at line 2880 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a4afda180689c9bfde319a025f96d4c0b_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a466ab9dea14be9117488c6198b0f77cd}\label{classsrc_1_1molecule_1_1Molecule_a466ab9dea14be9117488c6198b0f77cd}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!openmm\+\_\+positions@{openmm\+\_\+positions}}
+\index{openmm\+\_\+positions@{openmm\+\_\+positions}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{openmm\+\_\+positions()}{openmm\_positions()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+openmm\+\_\+positions (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Returns the Cartesian coordinates in the \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object in a list of Open\+M\+M-\/compatible positions, so it is possible to type simulation.\+context.\+set\+Positions(Mol.\+openmm\+\_\+positions()\mbox{[}0\mbox{]}) or something like that. 
+
+
+
+Definition at line 2863 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a466ab9dea14be9117488c6198b0f77cd_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a5aac5225e3c6c540659410f7a783cd99}\label{classsrc_1_1molecule_1_1Molecule_a5aac5225e3c6c540659410f7a783cd99}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!order\+\_\+by\+\_\+connectivity@{order\+\_\+by\+\_\+connectivity}}
+\index{order\+\_\+by\+\_\+connectivity@{order\+\_\+by\+\_\+connectivity}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{order\+\_\+by\+\_\+connectivity()}{order\_by\_connectivity()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+order\+\_\+by\+\_\+connectivity (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{m,  }\item[{}]{i,  }\item[{}]{curr\+List,  }\item[{}]{max\+\_\+min\+\_\+path }\end{DoxyParamCaption})}
+
+
+
+Recursive function that orders atoms based on connectivity. 
+
+To call the function, pass in the topology object (e.\+g. M.\+molecules\mbox{[}0\mbox{]}) and the index of the atom assigned to be \char`\"{}first\char`\"{}.
+
+The neighbors of \char`\"{}i\char`\"{} are placed in decreasing order of the maximum length of the shortest path to all other atoms -\/ i.\+e. an atom closer to the \char`\"{}edge\char`\"{} of the molecule has a longer shortest-\/path to atoms on the other \char`\"{}edge\char`\"{}, and they should be added first.
+
+Snippet\+:
+
+from forcebalance.\+molecule import $\ast$ import numpy as np M = \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule}(\textquotesingle{}mov\+Prot.\+xyz\textquotesingle{}, Fac=1.\+25) \subsubsection*{Arbitrarily select heaviest atom as the first atom in each molecule}
+
+first\+Atom = \mbox{[}\hyperlink{namespacesrc_1_1chemistry_ab523d2adfa843021628d784c390fb46f}{m.\+L()}\mbox{[}np.\+argmax(\mbox{[}Periodic\+Table\mbox{[}M.\+elem\mbox{[}i\mbox{]}\mbox{]} for i in \hyperlink{namespacesrc_1_1chemistry_ab523d2adfa843021628d784c390fb46f}{m.\+L()}\mbox{]})\mbox{]} for m in M.\+molecules\mbox{]} \subsubsection*{Explicitly set the first atom in the first molecule}
+
+first\+Atom\mbox{[}0\mbox{]} = 40 \subsubsection*{Build a list of new atom orderings}
+
+new\+Order = \mbox{[}\mbox{]} for i in range(len(M.\+molecules))\+: new\+Order += M.\+order\+\_\+by\+\_\+connectivity(M.\+molecules\mbox{[}i\mbox{]}, first\+Atom\mbox{[}i\mbox{]}, \mbox{[}\mbox{]}, None) \subsubsection*{Write the new \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object}
+
+newM = M.\+atom\+\_\+select(new\+Order) new\+M.\+write(\textquotesingle{}reordered1.\+xyz\textquotesingle{})
+
+\paragraph*{Parameters }
+
+m \+: topology object (contained in \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule}) i \+: integer Index of the atom to be added first (if called recursively, the index of subsequent atoms to be added) curr\+List \+: list Current list of new atom orderings max\+\_\+min\+\_\+path \+: dict Dictionary mapping 
+
+Definition at line 2758 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=234pt]{classsrc_1_1molecule_1_1Molecule_a5aac5225e3c6c540659410f7a783cd99_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_af1fbd83fc5bba35b5df496413410f84d}\label{classsrc_1_1molecule_1_1Molecule_af1fbd83fc5bba35b5df496413410f84d}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!pathwise\+\_\+rmsd@{pathwise\+\_\+rmsd}}
+\index{pathwise\+\_\+rmsd@{pathwise\+\_\+rmsd}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{pathwise\+\_\+rmsd()}{pathwise\_rmsd()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+pathwise\+\_\+rmsd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{align = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Find R\+M\+SD between frames along path. 
+
+
+
+Definition at line 2821 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_af1fbd83fc5bba35b5df496413410f84d_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a972ec8931555662db70e0f6acaa009ca}\label{classsrc_1_1molecule_1_1Molecule_a972ec8931555662db70e0f6acaa009ca}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!radius\+\_\+of\+\_\+gyration@{radius\+\_\+of\+\_\+gyration}}
+\index{radius\+\_\+of\+\_\+gyration@{radius\+\_\+of\+\_\+gyration}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{radius\+\_\+of\+\_\+gyration()}{radius\_of\_gyration()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+radius\+\_\+of\+\_\+gyration (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1727 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a972ec8931555662db70e0f6acaa009ca_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a7e4057a5d9f4bb4a62cef21680f91327}\label{classsrc_1_1molecule_1_1Molecule_a7e4057a5d9f4bb4a62cef21680f91327}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+arc@{read\+\_\+arc}}
+\index{read\+\_\+arc@{read\+\_\+arc}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+arc()}{read\_arc()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+arc (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Read a T\+I\+N\+K\+ER .arc file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fnm} & The input file name \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+xyzs A list for the X\+YZ coordinates. 
+
+boxes A list of periodic boxes (newer .arc files have these) 
+
+resid The residue ID numbers. These are not easy to get! 
+
+elem A list of chemical elements in the X\+YZ file 
+
+comms A single-\/element list for the comment. 
+
+tinkersuf The suffix that comes after lines in the X\+YZ coordinates; this is usually topology info 
+\end{DoxyReturn}
+
+
+Definition at line 3300 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a7e4057a5d9f4bb4a62cef21680f91327_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a3710f2055a57158a9b5fbab2c5943683}\label{classsrc_1_1molecule_1_1Molecule_a3710f2055a57158a9b5fbab2c5943683}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+charmm@{read\+\_\+charmm}}
+\index{read\+\_\+charmm@{read\+\_\+charmm}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+charmm()}{read\_charmm()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+charmm (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Read a C\+H\+A\+R\+MM .cor (or .crd) file. 
+
+
+
+Definition at line 3455 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a3710f2055a57158a9b5fbab2c5943683_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a742c96f62c86d00ac97bb5004f8ebd92}\label{classsrc_1_1molecule_1_1Molecule_a742c96f62c86d00ac97bb5004f8ebd92}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+com@{read\+\_\+com}}
+\index{read\+\_\+com@{read\+\_\+com}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+com()}{read\_com()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+com (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Parse a Gaussian .com file and return a S\+I\+N\+G\+L\+E-\/\+E\+L\+E\+M\+E\+NT list of xyz coordinates (no multiple file support) 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fnm} & The input file name \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+elem A list of chemical elements in the X\+YZ file 
+
+comms A single-\/element list for the comment. 
+
+xyzs A single-\/element list for the X\+YZ coordinates. 
+
+charge The total charge of the system. 
+
+mult The spin multiplicity of the system. 
+\end{DoxyReturn}
+
+
+Definition at line 3255 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a742c96f62c86d00ac97bb5004f8ebd92_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a7aeff86c1d2b8f73bea9191b33f665c3}\label{classsrc_1_1molecule_1_1Molecule_a7aeff86c1d2b8f73bea9191b33f665c3}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+comm\+\_\+charge\+\_\+mult@{read\+\_\+comm\+\_\+charge\+\_\+mult}}
+\index{read\+\_\+comm\+\_\+charge\+\_\+mult@{read\+\_\+comm\+\_\+charge\+\_\+mult}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+comm\+\_\+charge\+\_\+mult()}{read\_comm\_charge\_mult()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+comm\+\_\+charge\+\_\+mult (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{verbose = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Set charge and multiplicity from reading the comment line, formatted in a specific way. 
+
+
+
+Definition at line 2925 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a7aeff86c1d2b8f73bea9191b33f665c3_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a258bc7b495910f9ff3bb552413207ecd}\label{classsrc_1_1molecule_1_1Molecule_a258bc7b495910f9ff3bb552413207ecd}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+dcd@{read\+\_\+dcd}}
+\index{read\+\_\+dcd@{read\+\_\+dcd}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+dcd()}{read\_dcd()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+dcd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 3215 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a258bc7b495910f9ff3bb552413207ecd_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a4ce0cfbb42e84ec2fe5d8097d0ff5fda}\label{classsrc_1_1molecule_1_1Molecule_a4ce0cfbb42e84ec2fe5d8097d0ff5fda}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+gro@{read\+\_\+gro}}
+\index{read\+\_\+gro@{read\+\_\+gro}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+gro()}{read\_gro()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+gro (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Read a G\+R\+O\+M\+A\+CS .gro file. 
+
+
+
+Definition at line 3373 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a4ce0cfbb42e84ec2fe5d8097d0ff5fda_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a25e54248bd35147e2c2aa210d06a58a5}\label{classsrc_1_1molecule_1_1Molecule_a25e54248bd35147e2c2aa210d06a58a5}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+inpcrd@{read\+\_\+inpcrd}}
+\index{read\+\_\+inpcrd@{read\+\_\+inpcrd}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+inpcrd()}{read\_inpcrd()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+inpcrd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Parse an A\+M\+B\+ER .inpcrd or .rst file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fnm} & The input file name \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+xyzs A list of X\+YZ coordinates (number of snapshots times number of atoms) 
+
+boxes Boxes (if present.) 
+\end{DoxyReturn}
+
+
+Definition at line 3064 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a25e54248bd35147e2c2aa210d06a58a5_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_aa7a40df32ff22ef52b902ac6a24dcb50}\label{classsrc_1_1molecule_1_1Molecule_aa7a40df32ff22ef52b902ac6a24dcb50}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+mdcrd@{read\+\_\+mdcrd}}
+\index{read\+\_\+mdcrd@{read\+\_\+mdcrd}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+mdcrd()}{read\_mdcrd()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+mdcrd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Parse an A\+M\+B\+ER .mdcrd file. 
+
+This requires at least the number of atoms. This will F\+A\+IL for monatomic trajectories (but who the heck makes those?)
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fnm} & The input file name \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+xyzs A list of X\+YZ coordinates (number of snapshots times number of atoms) 
+
+boxes Boxes (if present.) 
+\end{DoxyReturn}
+
+
+Definition at line 3031 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_aa7a40df32ff22ef52b902ac6a24dcb50_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a1d771e111c1cc4c8a0783b58081e282d}\label{classsrc_1_1molecule_1_1Molecule_a1d771e111c1cc4c8a0783b58081e282d}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+mol2@{read\+\_\+mol2}}
+\index{read\+\_\+mol2@{read\+\_\+mol2}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+mol2()}{read\_mol2()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+mol2 (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 3161 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_af52f2ee9f9376925eab6e3309536e011}\label{classsrc_1_1molecule_1_1Molecule_af52f2ee9f9376925eab6e3309536e011}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+pdb@{read\+\_\+pdb}}
+\index{read\+\_\+pdb@{read\+\_\+pdb}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+pdb()}{read\_pdb()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+pdb (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Loads a P\+DB and returns a dictionary containing its data. 
+
+
+
+Definition at line 3649 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_af52f2ee9f9376925eab6e3309536e011_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a12369eb306cb29148e610e9ee08d7e2c}\label{classsrc_1_1molecule_1_1Molecule_a12369eb306cb29148e610e9ee08d7e2c}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+qcesp@{read\+\_\+qcesp}}
+\index{read\+\_\+qcesp@{read\+\_\+qcesp}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+qcesp()}{read\_qcesp()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+qcesp (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 3746 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a12369eb306cb29148e610e9ee08d7e2c_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_aa9caaf6d7ccff3a9077da98b4c8096a9}\label{classsrc_1_1molecule_1_1Molecule_aa9caaf6d7ccff3a9077da98b4c8096a9}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+qcin@{read\+\_\+qcin}}
+\index{read\+\_\+qcin@{read\+\_\+qcin}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+qcin()}{read\_qcin()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+qcin (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Read a Q-\/\+Chem input file. 
+
+These files can be very complicated, and I can\textquotesingle{}t write a completely general parser for them. It is important to keep our goal in mind\+:
+
+1) The main goal is to convert a trajectory to Q-\/\+Chem input files with identical calculation settings.
+
+2) When we print the Q-\/\+Chem file, we should preserve the line ordering of the \textquotesingle{}rem\textquotesingle{} section, but also be able to add \textquotesingle{}rem\textquotesingle{} options at the end.
+
+3) We should accommodate the use case that the Q-\/\+Chem file may have follow-\/up calculations delimited by \textquotesingle{}@@\textquotesingle{}.
+
+4) We can read in all of the xyz\textquotesingle{}s as a trajectory, but only the Q-\/\+Chem settings belonging to the first xyz will be saved. 
+
+Definition at line 3524 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_aa9caaf6d7ccff3a9077da98b4c8096a9_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a243cce870c970db8cac7f102325e872b}\label{classsrc_1_1molecule_1_1Molecule_a243cce870c970db8cac7f102325e872b}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+qcout@{read\+\_\+qcout}}
+\index{read\+\_\+qcout@{read\+\_\+qcout}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+qcout()}{read\_qcout()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+qcout (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{errok = {\ttfamily None},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Q-\/\+Chem output file reader, adapted for our parser. 
+
+Q-\/\+Chem output files are very flexible and there\textquotesingle{}s no way I can account for all of them. Here\textquotesingle{}s what I am able to account for\+:
+
+A list of\+:
+\begin{DoxyItemize}
+\item Coordinates
+\item Energies
+\item Forces
+\end{DoxyItemize}
+
+Calling with errok will proceed with reading file even if the specified error messages are encountered.
+
+Note that each step in a geometry optimization counts as a frame.
+
+As with all Q-\/\+Chem output files, note that successive calculations can have different numbers of atoms. 
+
+Definition at line 3778 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a243cce870c970db8cac7f102325e872b_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a1b0681641dfbba1c2d182151b5e60f5d}\label{classsrc_1_1molecule_1_1Molecule_a1b0681641dfbba1c2d182151b5e60f5d}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+qcschema@{read\+\_\+qcschema}}
+\index{read\+\_\+qcschema@{read\+\_\+qcschema}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+qcschema()}{read\_qcschema()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+qcschema (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{schema,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 2933 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a6c78338a640dbf1fd95c38f980203643}\label{classsrc_1_1molecule_1_1Molecule_a6c78338a640dbf1fd95c38f980203643}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+qdata@{read\+\_\+qdata}}
+\index{read\+\_\+qdata@{read\+\_\+qdata}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+qdata()}{read\_qdata()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+qdata (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 3125 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a36a4504f013d86188435e01231235386}\label{classsrc_1_1molecule_1_1Molecule_a36a4504f013d86188435e01231235386}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+xyz@{read\+\_\+xyz}}
+\index{read\+\_\+xyz@{read\+\_\+xyz}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+xyz()}{read\_xyz()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+xyz (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+.xyz files can be T\+I\+N\+K\+ER formatted which is why we have the try/except here. 
+
+
+
+Definition at line 2952 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a36a4504f013d86188435e01231235386_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a4b84ec657b8c89c34674bb205f7eb1b2}\label{classsrc_1_1molecule_1_1Molecule_a4b84ec657b8c89c34674bb205f7eb1b2}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!read\+\_\+xyz0@{read\+\_\+xyz0}}
+\index{read\+\_\+xyz0@{read\+\_\+xyz0}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{read\+\_\+xyz0()}{read\_xyz0()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+read\+\_\+xyz0 (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Parse a .xyz file which contains several xyz coordinates, and return their elements. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fnm} & The input file name \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+elem A list of chemical elements in the X\+YZ file 
+
+comms A list of comments. 
+
+xyzs A list of X\+YZ coordinates (number of snapshots times number of atoms) 
+\end{DoxyReturn}
+
+
+Definition at line 2967 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a4b84ec657b8c89c34674bb205f7eb1b2_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a029c994fba2c8388259bd062def28fde}\label{classsrc_1_1molecule_1_1Molecule_a029c994fba2c8388259bd062def28fde}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!ref\+\_\+rmsd@{ref\+\_\+rmsd}}
+\index{ref\+\_\+rmsd@{ref\+\_\+rmsd}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{ref\+\_\+rmsd()}{ref\_rmsd()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+ref\+\_\+rmsd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i,  }\item[{}]{align = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Find R\+M\+SD to a reference frame. 
+
+
+
+Definition at line 2839 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a029c994fba2c8388259bd062def28fde_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a16dcb06bf37392ef659cc156e0b61688}\label{classsrc_1_1molecule_1_1Molecule_a16dcb06bf37392ef659cc156e0b61688}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!reorder\+\_\+according\+\_\+to@{reorder\+\_\+according\+\_\+to}}
+\index{reorder\+\_\+according\+\_\+to@{reorder\+\_\+according\+\_\+to}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{reorder\+\_\+according\+\_\+to()}{reorder\_according\_to()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+reorder\+\_\+according\+\_\+to (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+
+
+Reorder atoms according to some other \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object. 
+
+This happens when we run a program like pdb2gmx or pdbxyz and it scrambles our atom ordering, forcing us to reorder the atoms for all frames in the current \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object.
+
+Directions\+: (1) Load up the scrambled file as a new \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object. (2) Call this function\+: Original\+\_\+\+Molecule.\+reorder\+\_\+according\+\_\+to(scrambled) (3) Save Original\+\_\+\+Molecule to a new file name. 
+
+Definition at line 1621 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a16dcb06bf37392ef659cc156e0b61688_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a9f764980b8a0df810aa7264036617975}\label{classsrc_1_1molecule_1_1Molecule_a9f764980b8a0df810aa7264036617975}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!reorder\+\_\+indices@{reorder\+\_\+indices}}
+\index{reorder\+\_\+indices@{reorder\+\_\+indices}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{reorder\+\_\+indices()}{reorder\_indices()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+reorder\+\_\+indices (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{other }\end{DoxyParamCaption})}
+
+
+
+Return the indices that would reorder atoms according to some other \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object. 
+
+This happens when we run a program like pdb2gmx or pdbxyz and it scrambles our atom ordering.
+
+Directions\+: (1) Load up the scrambled file as a new \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object. (2) Call this function\+: Original\+\_\+\+Molecule.\+reorder\+\_\+indices(scrambled) 
+
+Definition at line 1648 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a9f764980b8a0df810aa7264036617975_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_aaf70e66c397fd1e77644339ec81dfa9e}\label{classsrc_1_1molecule_1_1Molecule_aaf70e66c397fd1e77644339ec81dfa9e}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!repair@{repair}}
+\index{repair@{repair}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{repair()}{repair()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+repair (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{key,  }\item[{}]{klast }\end{DoxyParamCaption})}
+
+
+
+Attempt to repair trivial issues that would otherwise break the object. 
+
+
+
+Definition at line 1586 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_aaf70e66c397fd1e77644339ec81dfa9e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a10b21e9ed15d4d1d3242a2696a939e61}\label{classsrc_1_1molecule_1_1Molecule_a10b21e9ed15d4d1d3242a2696a939e61}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!replace\+\_\+peratom@{replace\+\_\+peratom}}
+\index{replace\+\_\+peratom@{replace\+\_\+peratom}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{replace\+\_\+peratom()}{replace\_peratom()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+replace\+\_\+peratom (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{key,  }\item[{}]{orig,  }\item[{}]{want }\end{DoxyParamCaption})}
+
+
+
+Replace all of the data for a certain attribute in the system from orig to want. 
+
+
+
+Definition at line 1845 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a958636d732433ffc356a1f7a1e70d7d7}\label{classsrc_1_1molecule_1_1Molecule_a958636d732433ffc356a1f7a1e70d7d7}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!replace\+\_\+peratom\+\_\+conditional@{replace\+\_\+peratom\+\_\+conditional}}
+\index{replace\+\_\+peratom\+\_\+conditional@{replace\+\_\+peratom\+\_\+conditional}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{replace\+\_\+peratom\+\_\+conditional()}{replace\_peratom\_conditional()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+replace\+\_\+peratom\+\_\+conditional (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{key1,  }\item[{}]{cond,  }\item[{}]{key2,  }\item[{}]{orig,  }\item[{}]{want }\end{DoxyParamCaption})}
+
+
+
+Replace all of the data for a attribute key2 from orig to want, contingent on key1 being equal to cond. 
+
+For instance\+: replace H1 with H2 if resname is S\+OL. 
+
+Definition at line 1857 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a5e74901959a8b939fc5a6c851e64d4ae}\label{classsrc_1_1molecule_1_1Molecule_a5e74901959a8b939fc5a6c851e64d4ae}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!require@{require}}
+\index{require@{require}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{require()}{require()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+require (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{args }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1656 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ab72729cb3e6b2ed086669142c1409ed4}\label{classsrc_1_1molecule_1_1Molecule_ab72729cb3e6b2ed086669142c1409ed4}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!require\+\_\+boxes@{require\+\_\+boxes}}
+\index{require\+\_\+boxes@{require\+\_\+boxes}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{require\+\_\+boxes()}{require\_boxes()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+require\+\_\+boxes (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4608 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_ab72729cb3e6b2ed086669142c1409ed4_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_af74bcae2931e36e08ff33037b1b0fa37}\label{classsrc_1_1molecule_1_1Molecule_af74bcae2931e36e08ff33037b1b0fa37}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!require\+\_\+resid@{require\+\_\+resid}}
+\index{require\+\_\+resid@{require\+\_\+resid}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{require\+\_\+resid()}{require\_resid()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+require\+\_\+resid (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4595 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a68eee3cd2b86790c0cb2954c8310bd29}\label{classsrc_1_1molecule_1_1Molecule_a68eee3cd2b86790c0cb2954c8310bd29}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!require\+\_\+resname@{require\+\_\+resname}}
+\index{require\+\_\+resname@{require\+\_\+resname}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{require\+\_\+resname()}{require\_resname()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+require\+\_\+resname (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4603 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a6b6551ae13458225d8fc8d117112e23f}\label{classsrc_1_1molecule_1_1Molecule_a6b6551ae13458225d8fc8d117112e23f}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!rigid\+\_\+water@{rigid\+\_\+water}}
+\index{rigid\+\_\+water@{rigid\+\_\+water}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{rigid\+\_\+water()}{rigid\_water()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+rigid\+\_\+water (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+If one atom is oxygen and the next two are hydrogen, make the water molecule rigid. 
+
+
+
+Definition at line 1739 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a6b6551ae13458225d8fc8d117112e23f_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ae8aa53ace87ec66daf8264b2add069c3}\label{classsrc_1_1molecule_1_1Molecule_ae8aa53ace87ec66daf8264b2add069c3}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!rotate\+\_\+bond@{rotate\+\_\+bond}}
+\index{rotate\+\_\+bond@{rotate\+\_\+bond}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{rotate\+\_\+bond()}{rotate\_bond()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+rotate\+\_\+bond (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{frame,  }\item[{}]{aj,  }\item[{}]{ak,  }\item[{}]{increment = {\ttfamily 15} }\end{DoxyParamCaption})}
+
+
+
+Return a new \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object containing the selected frame plus a number of frames where the selected dihedral angle is rotated in steps of \textquotesingle{}increment\textquotesingle{} given in degrees. 
+
+This function is designed to be called by \hyperlink{classsrc_1_1molecule_1_1Molecule_a011f4f4e9170d8f3c86adf61453142ce}{Molecule.\+rotate\+\_\+check\+\_\+clash()}.
+
+\paragraph*{Parameters }
+
+frame \+: int Structure number of the current \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} to be rotated aj, ak \+: int Atom numbers of the bond to be rotated increment \+: float Degrees of the rotation increment
+
+\paragraph*{Returns }
+
+\hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} New \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object containing the rotated structures 
+
+Definition at line 2286 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_ae8aa53ace87ec66daf8264b2add069c3_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a011f4f4e9170d8f3c86adf61453142ce}\label{classsrc_1_1molecule_1_1Molecule_a011f4f4e9170d8f3c86adf61453142ce}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!rotate\+\_\+check\+\_\+clash@{rotate\+\_\+check\+\_\+clash}}
+\index{rotate\+\_\+check\+\_\+clash@{rotate\+\_\+check\+\_\+clash}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{rotate\+\_\+check\+\_\+clash()}{rotate\_check\_clash()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+rotate\+\_\+check\+\_\+clash (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{frame,  }\item[{}]{rotate\+\_\+index,  }\item[{}]{thresh\+\_\+hyd = {\ttfamily 1.4},  }\item[{}]{thresh\+\_\+hvy = {\ttfamily 1.8},  }\item[{}]{print\+Level = {\ttfamily 1} }\end{DoxyParamCaption})}
+
+
+
+Return a new \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object containing the selected frame plus a number of frames where the selected dihedral angle is rotated in steps of \textquotesingle{}increment\textquotesingle{} given in degrees. 
+
+Additionally, check for if pairs of non-\/bonded atoms \char`\"{}clash\char`\"{} i.\+e. approach below the specified thresholds.
+
+\paragraph*{Parameters }
+
+frame \+: int Structure number of the current \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} to be rotated (if only a single frame, this number should be 0) rotate\+\_\+index \+: tuple 4 atom indices (ai, aj, ak, al) representing the dihedral angle to be rotated. The first and last indices are used to measure the dihedral angle. thresh\+\_\+hyd \+: float Clash threshold for hydrogen atoms. Reasonable values are in between 1.\+3 and 2.\+0. thresh\+\_\+hvy \+: float Clash threshold for heavy atoms. Reasonable values are in between 1.\+7 and 2.\+5. print\+Level\+: int Sets the amount of printout (larger = more printout)
+
+\paragraph*{Returns }
+
+\hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} New \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object containing the rotated structures Success \+: bool True if no clashes 
+
+Definition at line 2445 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a011f4f4e9170d8f3c86adf61453142ce_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a004a64d4b979002026c23d15a79e8dfc}\label{classsrc_1_1molecule_1_1Molecule_a004a64d4b979002026c23d15a79e8dfc}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!split@{split}}
+\index{split@{split}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{split()}{split()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+split (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm = {\ttfamily None},  }\item[{}]{ftype = {\ttfamily None},  }\item[{}]{method = {\ttfamily \char`\"{}chunks\char`\"{}},  }\item[{}]{num = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Split the molecule object into a number of separate files (chunks), either by specifying the number of frames per chunk or the number of chunks. 
+
+Only relevant for \char`\"{}trajectories\char`\"{}. The type of file may be specified; if they aren\textquotesingle{}t specified then the original file type is used.
+
+The output file names are \mbox{[}name\mbox{]}.\mbox{[}numbers\mbox{]}.\mbox{[}extension\mbox{]} where \mbox{[}name\mbox{]} can be specified by passing \textquotesingle{}fnm\textquotesingle{} or taken from the object\textquotesingle{}s \textquotesingle{}fnm\textquotesingle{} attribute by default. \mbox{[}numbers\mbox{]} are integers ranging from the lowest to the highest chunk number, prepended by zeros.
+
+If the number of chunks / frames is not specified, then one file is written for each frame.
+
+\begin{DoxyReturn}{Returns}
+fnms A list of the file names that were written. 
+\end{DoxyReturn}
+
+
+Definition at line 2903 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_aeab236a12cffd66ce282c1a7d03af7f9}\label{classsrc_1_1molecule_1_1Molecule_aeab236a12cffd66ce282c1a7d03af7f9}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!without@{without}}
+\index{without@{without}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{without()}{without()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+without (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{args }\end{DoxyParamCaption})}
+
+
+
+Return a copy of the \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} object but with certain fields deleted if they exist. 
+
+This is useful for when we\textquotesingle{}d like to add \hyperlink{classsrc_1_1molecule_1_1Molecule}{Molecule} objects that don\textquotesingle{}t share some fields that we know about. 
+
+Definition at line 2915 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a557af72409188133ef446ee8dbed2338}\label{classsrc_1_1molecule_1_1Molecule_a557af72409188133ef446ee8dbed2338}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write@{write}}
+\index{write@{write}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write()}{write()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm = {\ttfamily None},  }\item[{}]{ftype = {\ttfamily None},  }\item[{}]{append = {\ttfamily False},  }\item[{}]{selection = {\ttfamily None},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1678 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a557af72409188133ef446ee8dbed2338_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a5c04a001643a8165de635697f2d418f3}\label{classsrc_1_1molecule_1_1Molecule_a5c04a001643a8165de635697f2d418f3}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write\+\_\+arc@{write\+\_\+arc}}
+\index{write\+\_\+arc@{write\+\_\+arc}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write\+\_\+arc()}{write\_arc()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write\+\_\+arc (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selection,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4355 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a5c04a001643a8165de635697f2d418f3_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a722ba2597f067fc042169926c0b37274}\label{classsrc_1_1molecule_1_1Molecule_a722ba2597f067fc042169926c0b37274}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write\+\_\+dcd@{write\+\_\+dcd}}
+\index{write\+\_\+dcd@{write\+\_\+dcd}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write\+\_\+dcd()}{write\_dcd()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write\+\_\+dcd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selection,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4404 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a722ba2597f067fc042169926c0b37274_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_accdd08d1cdef8a51da59e1fc2268c7d8}\label{classsrc_1_1molecule_1_1Molecule_accdd08d1cdef8a51da59e1fc2268c7d8}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write\+\_\+gro@{write\+\_\+gro}}
+\index{write\+\_\+gro@{write\+\_\+gro}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write\+\_\+gro()}{write\_gro()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write\+\_\+gro (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selection,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4370 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_accdd08d1cdef8a51da59e1fc2268c7d8_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_af975f93f5c43f518b84d0bd067c75604}\label{classsrc_1_1molecule_1_1Molecule_af975f93f5c43f518b84d0bd067c75604}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write\+\_\+inpcrd@{write\+\_\+inpcrd}}
+\index{write\+\_\+inpcrd@{write\+\_\+inpcrd}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write\+\_\+inpcrd()}{write\_inpcrd()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write\+\_\+inpcrd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selection,  }\item[{}]{sn = {\ttfamily None},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4332 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_af975f93f5c43f518b84d0bd067c75604_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a7b85106cd6cc8e1d3e7e1ccb4edff551}\label{classsrc_1_1molecule_1_1Molecule_a7b85106cd6cc8e1d3e7e1ccb4edff551}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write\+\_\+lammps\+\_\+data@{write\+\_\+lammps\+\_\+data}}
+\index{write\+\_\+lammps\+\_\+data@{write\+\_\+lammps\+\_\+data}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write\+\_\+lammps\+\_\+data()}{write\_lammps\_data()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write\+\_\+lammps\+\_\+data (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selection,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Write the first frame of the selection to a L\+A\+M\+M\+PS data file for the purpose of automatically initializing a L\+A\+M\+M\+PS simulation. 
+
+This function makes several assumptions until further notice\+:
+
+(1) We are interested in a Reax\+FF simulation (2) Atom types will be generated from elements 
+
+Definition at line 4245 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a94a0b29f772bb5e6e03383fd854ad70a}\label{classsrc_1_1molecule_1_1Molecule_a94a0b29f772bb5e6e03383fd854ad70a}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write\+\_\+mdcrd@{write\+\_\+mdcrd}}
+\index{write\+\_\+mdcrd@{write\+\_\+mdcrd}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write\+\_\+mdcrd()}{write\_mdcrd()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write\+\_\+mdcrd (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selection,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4321 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a94a0b29f772bb5e6e03383fd854ad70a_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ab74230360451f0feefcfceae3b292223}\label{classsrc_1_1molecule_1_1Molecule_ab74230360451f0feefcfceae3b292223}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write\+\_\+molproq@{write\+\_\+molproq}}
+\index{write\+\_\+molproq@{write\+\_\+molproq}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write\+\_\+molproq()}{write\_molproq()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write\+\_\+molproq (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selection,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4309 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_ab74230360451f0feefcfceae3b292223_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_adea929913736e69b7af631dc0014a1e7}\label{classsrc_1_1molecule_1_1Molecule_adea929913736e69b7af631dc0014a1e7}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write\+\_\+pdb@{write\+\_\+pdb}}
+\index{write\+\_\+pdb@{write\+\_\+pdb}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write\+\_\+pdb()}{write\_pdb()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write\+\_\+pdb (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selection,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4430 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_adea929913736e69b7af631dc0014a1e7_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a21d78053aab2fda1fd5e2577a02ec696}\label{classsrc_1_1molecule_1_1Molecule_a21d78053aab2fda1fd5e2577a02ec696}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write\+\_\+qcin@{write\+\_\+qcin}}
+\index{write\+\_\+qcin@{write\+\_\+qcin}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write\+\_\+qcin()}{write\_qcin()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write\+\_\+qcin (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selection,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4147 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_a21d78053aab2fda1fd5e2577a02ec696_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ac33547444f6fc81cae37ce37db9743ef}\label{classsrc_1_1molecule_1_1Molecule_ac33547444f6fc81cae37ce37db9743ef}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write\+\_\+qdata@{write\+\_\+qdata}}
+\index{write\+\_\+qdata@{write\+\_\+qdata}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write\+\_\+qdata()}{write\_qdata()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write\+\_\+qdata (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selection,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Text quantum data format. 
+
+
+
+Definition at line 4574 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_ac33547444f6fc81cae37ce37db9743ef_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_af42c16177cc7cbfce3c0b2be7b132480}\label{classsrc_1_1molecule_1_1Molecule_af42c16177cc7cbfce3c0b2be7b132480}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!write\+\_\+xyz@{write\+\_\+xyz}}
+\index{write\+\_\+xyz@{write\+\_\+xyz}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{write\+\_\+xyz()}{write\_xyz()}}
+{\footnotesize\ttfamily def src.\+molecule.\+Molecule.\+write\+\_\+xyz (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{selection,  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 4213 of file molecule.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1molecule_1_1Molecule_af42c16177cc7cbfce3c0b2be7b132480_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_afd4c36987dbdc45da729fe1668485628}\label{classsrc_1_1molecule_1_1Molecule_afd4c36987dbdc45da729fe1668485628}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!atomname@{atomname}}
+\index{atomname@{atomname}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{atomname}{atomname}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+atomname}
+
+
+
+Definition at line 4458 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a996cd83807d88f3fb81aef6278e10051}\label{classsrc_1_1molecule_1_1Molecule_a996cd83807d88f3fb81aef6278e10051}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!boxes@{boxes}}
+\index{boxes@{boxes}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{boxes}{boxes}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+boxes}
+
+
+
+Definition at line 4658 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ae084bae0a4a0204c4d92fff5cbdbeee5}\label{classsrc_1_1molecule_1_1Molecule_ae084bae0a4a0204c4d92fff5cbdbeee5}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!built\+\_\+bonds@{built\+\_\+bonds}}
+\index{built\+\_\+bonds@{built\+\_\+bonds}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{built\+\_\+bonds}{built\_bonds}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+built\+\_\+bonds}
+
+
+
+Definition at line 1281 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a146f60bbab00e12c5754fd666233e86f}\label{classsrc_1_1molecule_1_1Molecule_a146f60bbab00e12c5754fd666233e86f}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!charge@{charge}}
+\index{charge@{charge}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{charge}{charge}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+charge}
+
+
+
+Definition at line 2927 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a36609ce51ce26648178b39f22343f085}\label{classsrc_1_1molecule_1_1Molecule_a36609ce51ce26648178b39f22343f085}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!comms@{comms}}
+\index{comms@{comms}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{comms}{comms}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+comms}
+
+
+
+Read in stuff if we passed in a file name, otherwise return an empty instance. 
+
+Fill in comments.
+
+Try to determine from the file name using the extension. Actually read the file. Set member variables. Create a list of comment lines if we don\textquotesingle{}t already have them from reading the file.
+
+Definition at line 1311 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a0270df3966f56e55abb73ab7de5a3e77}\label{classsrc_1_1molecule_1_1Molecule_a0270df3966f56e55abb73ab7de5a3e77}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!Data@{Data}}
+\index{Data@{Data}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{Data}{Data}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+Data}
+
+
+
+Definition at line 1293 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a96266112f8af20de9810e2fee0d5861c}\label{classsrc_1_1molecule_1_1Molecule_a96266112f8af20de9810e2fee0d5861c}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!fout@{fout}}
+\index{fout@{fout}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{fout}{fout}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+fout}
+
+
+
+I needed to add in this line because the D\+CD writer requires the file name, but the other methods don\textquotesingle{}t. 
+
+
+
+Definition at line 1692 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a56e223f4d0b5bf391e7d038b36d335d8}\label{classsrc_1_1molecule_1_1Molecule_a56e223f4d0b5bf391e7d038b36d335d8}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!Funnel@{Funnel}}
+\index{Funnel@{Funnel}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{Funnel}{Funnel}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+Funnel}
+
+
+
+A funnel dictionary that takes redundant file types and maps them down to a few. 
+
+
+
+Definition at line 1264 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a91b5115334f638c29d7a1cc46aedca5d}\label{classsrc_1_1molecule_1_1Molecule_a91b5115334f638c29d7a1cc46aedca5d}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!molecules@{molecules}}
+\index{molecules@{molecules}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{molecules}{molecules}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+molecules}
+
+
+
+Definition at line 2235 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_aa6fbbf278cf844c7bbdac896c71f5c64}\label{classsrc_1_1molecule_1_1Molecule_aa6fbbf278cf844c7bbdac896c71f5c64}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!mult@{mult}}
+\index{mult@{mult}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{mult}{mult}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+mult}
+
+
+
+Definition at line 2928 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a16ef842ad2eb3048d82d2303639e56e0}\label{classsrc_1_1molecule_1_1Molecule_a16ef842ad2eb3048d82d2303639e56e0}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!positive\+\_\+resid@{positive\+\_\+resid}}
+\index{positive\+\_\+resid@{positive\+\_\+resid}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{positive\+\_\+resid}{positive\_resid}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+positive\+\_\+resid}
+
+
+
+Creates entries like \textquotesingle{}gromacs\textquotesingle{} \+: \textquotesingle{}gromacs\textquotesingle{} and \textquotesingle{}xyz\textquotesingle{} \+: \textquotesingle{}xyz\textquotesingle{} in the Funnel. 
+
+
+
+Definition at line 1280 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_ab59ba8cf9a0b9e525428723c813d15c8}\label{classsrc_1_1molecule_1_1Molecule_ab59ba8cf9a0b9e525428723c813d15c8}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!qm\+\_\+mulliken\+\_\+charges@{qm\+\_\+mulliken\+\_\+charges}}
+\index{qm\+\_\+mulliken\+\_\+charges@{qm\+\_\+mulliken\+\_\+charges}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{qm\+\_\+mulliken\+\_\+charges}{qm\_mulliken\_charges}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+qm\+\_\+mulliken\+\_\+charges}
+
+
+
+Definition at line 1979 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_abdc7b61bb516d9f57aff156ec09b19bf}\label{classsrc_1_1molecule_1_1Molecule_abdc7b61bb516d9f57aff156ec09b19bf}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!qm\+\_\+mulliken\+\_\+spins@{qm\+\_\+mulliken\+\_\+spins}}
+\index{qm\+\_\+mulliken\+\_\+spins@{qm\+\_\+mulliken\+\_\+spins}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{qm\+\_\+mulliken\+\_\+spins}{qm\_mulliken\_spins}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+qm\+\_\+mulliken\+\_\+spins}
+
+
+
+Definition at line 1980 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a809f63082b7a39e0f787fc455dd18516}\label{classsrc_1_1molecule_1_1Molecule_a809f63082b7a39e0f787fc455dd18516}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!Read\+\_\+\+Tab@{Read\+\_\+\+Tab}}
+\index{Read\+\_\+\+Tab@{Read\+\_\+\+Tab}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{Read\+\_\+\+Tab}{Read\_Tab}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+Read\+\_\+\+Tab}
+
+
+
+The table of file readers. 
+
+
+
+Definition at line 1235 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a840f24f26e96c001cd36b254c402e481}\label{classsrc_1_1molecule_1_1Molecule_a840f24f26e96c001cd36b254c402e481}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!resid@{resid}}
+\index{resid@{resid}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{resid}{resid}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+resid}
+
+
+
+Definition at line 4599 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a346c5b384082c9779f83ea7853a460c8}\label{classsrc_1_1molecule_1_1Molecule_a346c5b384082c9779f83ea7853a460c8}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!resname@{resname}}
+\index{resname@{resname}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{resname}{resname}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+resname}
+
+
+
+Definition at line 4606 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_afd7595ccf68f4fc41c728a5071d0a0b9}\label{classsrc_1_1molecule_1_1Molecule_afd7595ccf68f4fc41c728a5071d0a0b9}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!top\+\_\+settings@{top\+\_\+settings}}
+\index{top\+\_\+settings@{top\+\_\+settings}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{top\+\_\+settings}{top\_settings}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+top\+\_\+settings}
+
+
+
+Topology settings. 
+
+
+
+Definition at line 1283 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_aa66fa5839f821805bdd08ed17a206987}\label{classsrc_1_1molecule_1_1Molecule_aa66fa5839f821805bdd08ed17a206987}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!topology@{topology}}
+\index{topology@{topology}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{topology}{topology}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+topology}
+
+
+
+Definition at line 2233 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a0c2c1e8f6951f338e8ce2220a5d12045}\label{classsrc_1_1molecule_1_1Molecule_a0c2c1e8f6951f338e8ce2220a5d12045}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!Write\+\_\+\+Tab@{Write\+\_\+\+Tab}}
+\index{Write\+\_\+\+Tab@{Write\+\_\+\+Tab}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{Write\+\_\+\+Tab}{Write\_Tab}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+Write\+\_\+\+Tab}
+
+
+
+The table of file writers. 
+
+
+
+Definition at line 1251 of file molecule.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1molecule_1_1Molecule_a9701dad854112650bd6b7601cab8b40b}\label{classsrc_1_1molecule_1_1Molecule_a9701dad854112650bd6b7601cab8b40b}} 
+\index{src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}!xyzs@{xyzs}}
+\index{xyzs@{xyzs}!src\+::molecule\+::\+Molecule@{src\+::molecule\+::\+Molecule}}
+\paragraph{\texorpdfstring{xyzs}{xyzs}}
+{\footnotesize\ttfamily src.\+molecule.\+Molecule.\+xyzs}
+
+
+
+Definition at line 4338 of file molecule.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{molecule_8py}{molecule.\+py}\end{DoxyCompactItemize}

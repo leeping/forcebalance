@@ -1,0 +1,4 @@
+<map id="src.amberio.write_mdin" name="src.amberio.write_mdin">
+<area shape="rect" id="node2" href="$namespacesrc_1_1amberio.html#a526ac77cde3d083631db82b2d229d2db" title="Parse a file containing an AMBER namelist (only significantly tested for sander input). " alt="" coords="229,5,417,47"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1amberio.html#ab145e7dc869bc06009b5f5cf0208bb77" title="Remove the comment from a line in an AMBER namelist. " alt="" coords="465,13,660,39"/>
+</map>

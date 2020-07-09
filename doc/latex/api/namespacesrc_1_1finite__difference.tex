@@ -1,0 +1,242 @@
+\hypertarget{namespacesrc_1_1finite__difference}{}\subsection{src.\+finite\+\_\+difference Namespace Reference}
+\label{namespacesrc_1_1finite__difference}\index{src.\+finite\+\_\+difference@{src.\+finite\+\_\+difference}}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1finite__difference_a0be718f014c3197c50ee4f5fbec9528d}{f1d2p} (f, h, f0=None)
+\begin{DoxyCompactList}\small\item\em A two-\/point finite difference stencil. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1finite__difference_af922da6a4776261be0b4d59b238fb20c}{f1d5p} (f, h)
+\begin{DoxyCompactList}\small\item\em A highly accurate five-\/point finite difference stencil for computing derivatives of a function. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1finite__difference_a49f3f0fa01ca9196dc99d73fd3dadf5a}{f1d7p} (f, h)
+\begin{DoxyCompactList}\small\item\em A highly accurate seven-\/point finite difference stencil for computing derivatives of a function. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1finite__difference_a50a4e1556e52c97b3237d9216360f2cf}{f12d7p} (f, h)
+\item 
+def \hyperlink{namespacesrc_1_1finite__difference_a32a990bb791a59853130d9d71387822d}{f12d3p} (f, h, f0=None)
+\begin{DoxyCompactList}\small\item\em A three-\/point finite difference stencil. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1finite__difference_a524e09fa66783f7df59eaa707e28fd4c}{f2var} (f, h)
+\begin{DoxyCompactList}\small\item\em A finite difference stencil for a function of two variables. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1finite__difference_a6153660ad18674fc1d2ad6fd57541ef3}{in\+\_\+fd} ()
+\begin{DoxyCompactList}\small\item\em Invoking this function from anywhere will tell us whether we\textquotesingle{}re being called by a finite-\/difference function. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1finite__difference_af62619af114a030e945e0963a8d25090}{in\+\_\+fd\+\_\+srch} ()
+\begin{DoxyCompactList}\small\item\em Invoking this function from anywhere will tell us whether we\textquotesingle{}re being called by a finite-\/difference function. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1finite__difference_af3a9d7a4fc96a7057679fa5f3af73fe0}{fdwrap} (func, mvals0, pidx, key=None, kwargs)
+\begin{DoxyCompactList}\small\item\em A function wrapper for finite difference designed for differentiating \textquotesingle{}get\textquotesingle{}-\/type functions. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1finite__difference_ad60720d6270fcf96cb4bd2a9957620ed}{fdwrap\+\_\+G} (tgt, mvals0, pidx)
+\begin{DoxyCompactList}\small\item\em A driver to fdwrap for gradients (see documentation for fdwrap) Inputs\+: tgt = The Target containing the objective function that we want to differentiate mvals0 = The \textquotesingle{}central\textquotesingle{} values of the mathematical parameters -\/ i.\+e. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1finite__difference_a29e89e33f7fd5acd4569125c0c5f4732}{fdwrap\+\_\+H} (tgt, mvals0, pidx)
+\begin{DoxyCompactList}\small\item\em A driver to fdwrap for Hessians (see documentation for fdwrap) Inputs\+: tgt = The Target containing the objective function that we want to differentiate mvals0 = The \textquotesingle{}central\textquotesingle{} values of the mathematical parameters -\/ i.\+e. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1finite__difference_a75d4771fe24a9e75631674733a10cfa9}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_a32a990bb791a59853130d9d71387822d}\label{namespacesrc_1_1finite__difference_a32a990bb791a59853130d9d71387822d}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!f12d3p@{f12d3p}}
+\index{f12d3p@{f12d3p}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{f12d3p()}{f12d3p()}}
+{\footnotesize\ttfamily def src.\+finite\+\_\+difference.\+f12d3p (\begin{DoxyParamCaption}\item[{}]{f,  }\item[{}]{h,  }\item[{}]{f0 = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+A three-\/point finite difference stencil. 
+
+This function does either two computations or three, depending on whether the \textquotesingle{}center\textquotesingle{} value is supplied. This is done in order to avoid recomputing the center value many times.
+
+The first derivative is evaluated using central difference. One advantage of using central difference (as opposed to forward difference) is that we get zero at the bottom of a parabola.
+
+Using this formula we also get an approximate second derivative, which can then be inserted into the diagonal of the Hessian. This is very useful for optimizations like B\+F\+GS where the diagonal determines how far we step in the parameter space.
+
+How to use\+: use fdwrap or something similar to generate a one-\/variable function from the (usually) much more complicated function that we wish to differentate. Then pass it to this function.
+
+Inputs\+: f = The one-\/variable function f(x) that we\textquotesingle{}re differentiating h = The finite difference step size, usually a small number
+
+Outputs\+: fp = The finite difference derivative of the function f(x) around x=0. 
+
+Definition at line 110 of file finite\+\_\+difference.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_a50a4e1556e52c97b3237d9216360f2cf}\label{namespacesrc_1_1finite__difference_a50a4e1556e52c97b3237d9216360f2cf}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!f12d7p@{f12d7p}}
+\index{f12d7p@{f12d7p}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{f12d7p()}{f12d7p()}}
+{\footnotesize\ttfamily def src.\+finite\+\_\+difference.\+f12d7p (\begin{DoxyParamCaption}\item[{}]{f,  }\item[{}]{h }\end{DoxyParamCaption})}
+
+
+
+Definition at line 76 of file finite\+\_\+difference.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_a0be718f014c3197c50ee4f5fbec9528d}\label{namespacesrc_1_1finite__difference_a0be718f014c3197c50ee4f5fbec9528d}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!f1d2p@{f1d2p}}
+\index{f1d2p@{f1d2p}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{f1d2p()}{f1d2p()}}
+{\footnotesize\ttfamily def src.\+finite\+\_\+difference.\+f1d2p (\begin{DoxyParamCaption}\item[{}]{f,  }\item[{}]{h,  }\item[{}]{f0 = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+A two-\/point finite difference stencil. 
+
+This function does either two computations or one, depending on whether the \textquotesingle{}center\textquotesingle{} value is supplied. This is done in order to avoid recomputing the center value many times when we repeat this function for each index of the gradient.
+
+How to use\+: use fdwrap or something similar to generate a one-\/variable function from the (usually) much more complicated function that we wish to differentate. Then pass it to this function.
+
+Inputs\+: f = The one-\/variable function f(x) that we\textquotesingle{}re differentiating h = The finite difference step size, usually a small number
+
+Outputs\+: fp = The finite difference derivative of the function f(x) around x=0. 
+
+Definition at line 30 of file finite\+\_\+difference.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_af922da6a4776261be0b4d59b238fb20c}\label{namespacesrc_1_1finite__difference_af922da6a4776261be0b4d59b238fb20c}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!f1d5p@{f1d5p}}
+\index{f1d5p@{f1d5p}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{f1d5p()}{f1d5p()}}
+{\footnotesize\ttfamily def src.\+finite\+\_\+difference.\+f1d5p (\begin{DoxyParamCaption}\item[{}]{f,  }\item[{}]{h }\end{DoxyParamCaption})}
+
+
+
+A highly accurate five-\/point finite difference stencil for computing derivatives of a function. 
+
+It works on both scalar and vector functions (i.\+e. functions that return arrays). Since the function does four computations, it\textquotesingle{}s costly but recommended if we really need an accurate reference value.
+
+The function is evaluated at points -\/2h, -\/h, +h and +2h and these values are combined to make the derivative according to\+: \href{http://www.holoborodko.com/pavel/numerical-methods/numerical-derivative/central-differences/}{\tt http\+://www.\+holoborodko.\+com/pavel/numerical-\/methods/numerical-\/derivative/central-\/differences/}
+
+How to use\+: use fdwrap or something similar to generate a one-\/variable function from the (usually) much more complicated function that we wish to differentate. Then pass it to this function.
+
+Inputs\+: f = The one-\/variable function f(x) that we\textquotesingle{}re differentiating h = The finite difference step size, usually a small number
+
+Outputs\+: fp = The finite difference derivative of the function f(x) around x=0. 
+
+Definition at line 61 of file finite\+\_\+difference.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_a49f3f0fa01ca9196dc99d73fd3dadf5a}\label{namespacesrc_1_1finite__difference_a49f3f0fa01ca9196dc99d73fd3dadf5a}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!f1d7p@{f1d7p}}
+\index{f1d7p@{f1d7p}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{f1d7p()}{f1d7p()}}
+{\footnotesize\ttfamily def src.\+finite\+\_\+difference.\+f1d7p (\begin{DoxyParamCaption}\item[{}]{f,  }\item[{}]{h }\end{DoxyParamCaption})}
+
+
+
+A highly accurate seven-\/point finite difference stencil for computing derivatives of a function. 
+
+
+
+Definition at line 71 of file finite\+\_\+difference.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_a524e09fa66783f7df59eaa707e28fd4c}\label{namespacesrc_1_1finite__difference_a524e09fa66783f7df59eaa707e28fd4c}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!f2var@{f2var}}
+\index{f2var@{f2var}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{f2var()}{f2var()}}
+{\footnotesize\ttfamily def src.\+finite\+\_\+difference.\+f2var (\begin{DoxyParamCaption}\item[{}]{f,  }\item[{}]{h }\end{DoxyParamCaption})}
+
+
+
+A finite difference stencil for a function of two variables. 
+
+
+
+Definition at line 121 of file finite\+\_\+difference.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_af3a9d7a4fc96a7057679fa5f3af73fe0}\label{namespacesrc_1_1finite__difference_af3a9d7a4fc96a7057679fa5f3af73fe0}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!fdwrap@{fdwrap}}
+\index{fdwrap@{fdwrap}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{fdwrap()}{fdwrap()}}
+{\footnotesize\ttfamily def src.\+finite\+\_\+difference.\+fdwrap (\begin{DoxyParamCaption}\item[{}]{func,  }\item[{}]{mvals0,  }\item[{}]{pidx,  }\item[{}]{key = {\ttfamily None},  }\item[{}]{kwargs }\end{DoxyParamCaption})}
+
+
+
+A function wrapper for finite difference designed for differentiating \textquotesingle{}get\textquotesingle{}-\/type functions. 
+
+Since our finite difference stencils take single-\/variable functions and differentiate them around zero, and our objective function is quite a complicated function, we need a wrapper to serve as a middleman. The alternative would be to copy the finite difference formula to wherever we\textquotesingle{}re taking the derivative, and that is prone to mistakes.
+
+Inputs\+: func = Either get\+\_\+X or get\+\_\+G; these functions return dictionaries. \mbox{[}\textquotesingle{}X\textquotesingle{}\mbox{]} = 1.\+23, \mbox{[}\textquotesingle{}G\textquotesingle{}\mbox{]} = \mbox{[}0.\+12, 3,45, ...\mbox{]} mvals0 = The \textquotesingle{}central\textquotesingle{} values of the mathematical parameters -\/ i.\+e. the wrapped function\textquotesingle{}s origin is here. pidx = The index of the parameter that we\textquotesingle{}re differentiating key = either \textquotesingle{}G\textquotesingle{} or \textquotesingle{}X\textquotesingle{}, the value we wish to take out of the dictionary kwargs = Anything else we want to pass to the objective function (for instance, Project.\+Objective takes Order as an argument)
+
+Outputs\+: func1 = Wrapped version of func, which takes a single float argument. 
+
+Definition at line 161 of file finite\+\_\+difference.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_ad60720d6270fcf96cb4bd2a9957620ed}\label{namespacesrc_1_1finite__difference_ad60720d6270fcf96cb4bd2a9957620ed}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!fdwrap\+\_\+G@{fdwrap\+\_\+G}}
+\index{fdwrap\+\_\+G@{fdwrap\+\_\+G}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{fdwrap\+\_\+\+G()}{fdwrap\_G()}}
+{\footnotesize\ttfamily def src.\+finite\+\_\+difference.\+fdwrap\+\_\+G (\begin{DoxyParamCaption}\item[{}]{tgt,  }\item[{}]{mvals0,  }\item[{}]{pidx }\end{DoxyParamCaption})}
+
+
+
+A driver to fdwrap for gradients (see documentation for fdwrap) Inputs\+: tgt = The Target containing the objective function that we want to differentiate mvals0 = The \textquotesingle{}central\textquotesingle{} values of the mathematical parameters -\/ i.\+e. 
+
+the wrapped function\textquotesingle{}s origin is here. pidx = The index of the parameter that we\textquotesingle{}re differentiating 
+
+Definition at line 180 of file finite\+\_\+difference.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1finite__difference_ad60720d6270fcf96cb4bd2a9957620ed_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_a29e89e33f7fd5acd4569125c0c5f4732}\label{namespacesrc_1_1finite__difference_a29e89e33f7fd5acd4569125c0c5f4732}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!fdwrap\+\_\+H@{fdwrap\+\_\+H}}
+\index{fdwrap\+\_\+H@{fdwrap\+\_\+H}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{fdwrap\+\_\+\+H()}{fdwrap\_H()}}
+{\footnotesize\ttfamily def src.\+finite\+\_\+difference.\+fdwrap\+\_\+H (\begin{DoxyParamCaption}\item[{}]{tgt,  }\item[{}]{mvals0,  }\item[{}]{pidx }\end{DoxyParamCaption})}
+
+
+
+A driver to fdwrap for Hessians (see documentation for fdwrap) Inputs\+: tgt = The Target containing the objective function that we want to differentiate mvals0 = The \textquotesingle{}central\textquotesingle{} values of the mathematical parameters -\/ i.\+e. 
+
+the wrapped function\textquotesingle{}s origin is here. pidx = The index of the parameter that we\textquotesingle{}re differentiating 
+
+Definition at line 191 of file finite\+\_\+difference.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1finite__difference_a29e89e33f7fd5acd4569125c0c5f4732_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_a6153660ad18674fc1d2ad6fd57541ef3}\label{namespacesrc_1_1finite__difference_a6153660ad18674fc1d2ad6fd57541ef3}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!in\+\_\+fd@{in\+\_\+fd}}
+\index{in\+\_\+fd@{in\+\_\+fd}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{in\+\_\+fd()}{in\_fd()}}
+{\footnotesize\ttfamily def src.\+finite\+\_\+difference.\+in\+\_\+fd (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Invoking this function from anywhere will tell us whether we\textquotesingle{}re being called by a finite-\/difference function. 
+
+This is mainly useful for deciding when to update the \textquotesingle{}qualitative indicators\textquotesingle{} and when not to. 
+
+Definition at line 128 of file finite\+\_\+difference.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_af62619af114a030e945e0963a8d25090}\label{namespacesrc_1_1finite__difference_af62619af114a030e945e0963a8d25090}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!in\+\_\+fd\+\_\+srch@{in\+\_\+fd\+\_\+srch}}
+\index{in\+\_\+fd\+\_\+srch@{in\+\_\+fd\+\_\+srch}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{in\+\_\+fd\+\_\+srch()}{in\_fd\_srch()}}
+{\footnotesize\ttfamily def src.\+finite\+\_\+difference.\+in\+\_\+fd\+\_\+srch (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Invoking this function from anywhere will tell us whether we\textquotesingle{}re being called by a finite-\/difference function. 
+
+This is mainly useful for deciding when to update the \textquotesingle{}qualitative indicators\textquotesingle{} and when not to. 
+
+Definition at line 135 of file finite\+\_\+difference.\+py.
+
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1finite__difference_a75d4771fe24a9e75631674733a10cfa9}\label{namespacesrc_1_1finite__difference_a75d4771fe24a9e75631674733a10cfa9}} 
+\index{src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}!logger@{logger}}
+\index{logger@{logger}!src\+::finite\+\_\+difference@{src\+::finite\+\_\+difference}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+finite\+\_\+difference.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 8 of file finite\+\_\+difference.\+py.
+

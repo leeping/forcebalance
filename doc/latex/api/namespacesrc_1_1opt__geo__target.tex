@@ -1,0 +1,93 @@
+\hypertarget{namespacesrc_1_1opt__geo__target}{}\subsection{src.\+opt\+\_\+geo\+\_\+target Namespace Reference}
+\label{namespacesrc_1_1opt__geo__target}\index{src.\+opt\+\_\+geo\+\_\+target@{src.\+opt\+\_\+geo\+\_\+target}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1opt__geo__target_1_1OptGeoTarget}{Opt\+Geo\+Target}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for fitting MM optimized geometries to QM optimized geometries. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1opt__geo__target_afbe357b3c6d344e4549b0cff5400e027}{periodic\+\_\+diff} (a, b, v\+\_\+periodic)
+\begin{DoxyCompactList}\small\item\em convenient function for computing the minimum difference in periodic coordinates \paragraph*{Parameters }
+
+a\+: np.\+ndarray or float Reference values in a numpy array b\+: np.\+ndarray or float Target values in a numpy arrary v\+\_\+periodic\+: float $>$ 0 Value of the periodic boundary \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1opt__geo__target_a646aaa5ddda0042e6c9ea15077fe0504}{compute\+\_\+rmsd} (ref, tar, v\+\_\+periodic=None)
+\begin{DoxyCompactList}\small\item\em Compute the R\+M\+SD between two arrays, supporting periodic difference. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1opt__geo__target_a02a9cc0378ce93c64c05f75bfc9f8ef9}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\item 
+int \hyperlink{namespacesrc_1_1opt__geo__target_a36da143de24751427dbce910c8af825e}{R\+A\+D\+I\+A\+N\+\_\+2\+\_\+\+D\+E\+G\+R\+EE} = 180 / np.\+pi
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1opt__geo__target_a646aaa5ddda0042e6c9ea15077fe0504}\label{namespacesrc_1_1opt__geo__target_a646aaa5ddda0042e6c9ea15077fe0504}} 
+\index{src\+::opt\+\_\+geo\+\_\+target@{src\+::opt\+\_\+geo\+\_\+target}!compute\+\_\+rmsd@{compute\+\_\+rmsd}}
+\index{compute\+\_\+rmsd@{compute\+\_\+rmsd}!src\+::opt\+\_\+geo\+\_\+target@{src\+::opt\+\_\+geo\+\_\+target}}
+\paragraph{\texorpdfstring{compute\+\_\+rmsd()}{compute\_rmsd()}}
+{\footnotesize\ttfamily def src.\+opt\+\_\+geo\+\_\+target.\+compute\+\_\+rmsd (\begin{DoxyParamCaption}\item[{}]{ref,  }\item[{}]{tar,  }\item[{}]{v\+\_\+periodic = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Compute the R\+M\+SD between two arrays, supporting periodic difference. 
+
+
+
+Definition at line 61 of file opt\+\_\+geo\+\_\+target.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1opt__geo__target_a646aaa5ddda0042e6c9ea15077fe0504_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1opt__geo__target_afbe357b3c6d344e4549b0cff5400e027}\label{namespacesrc_1_1opt__geo__target_afbe357b3c6d344e4549b0cff5400e027}} 
+\index{src\+::opt\+\_\+geo\+\_\+target@{src\+::opt\+\_\+geo\+\_\+target}!periodic\+\_\+diff@{periodic\+\_\+diff}}
+\index{periodic\+\_\+diff@{periodic\+\_\+diff}!src\+::opt\+\_\+geo\+\_\+target@{src\+::opt\+\_\+geo\+\_\+target}}
+\paragraph{\texorpdfstring{periodic\+\_\+diff()}{periodic\_diff()}}
+{\footnotesize\ttfamily def src.\+opt\+\_\+geo\+\_\+target.\+periodic\+\_\+diff (\begin{DoxyParamCaption}\item[{}]{a,  }\item[{}]{b,  }\item[{}]{v\+\_\+periodic }\end{DoxyParamCaption})}
+
+
+
+convenient function for computing the minimum difference in periodic coordinates \paragraph*{Parameters }
+
+a\+: np.\+ndarray or float Reference values in a numpy array b\+: np.\+ndarray or float Target values in a numpy arrary v\+\_\+periodic\+: float $>$ 0 Value of the periodic boundary 
+
+\paragraph*{Returns }
+
+diff\+: np.\+ndarray The array of same shape containing the difference between a and b All return values are in range \mbox{[}-\/v\+\_\+periodic/2, v\+\_\+periodic/2), \char`\"{}( )\char`\"{} means exclusive, \char`\"{}\mbox{[} \mbox{]}\char`\"{} means inclusive
+
+\paragraph*{Examples }
+
+periodic\+\_\+diff(0.\+0, 2.\+1, 2.\+0) =$>$ -\/0.\+1 periodic\+\_\+diff(0.\+0, 1.\+9, 2.\+0) =$>$ 0.\+1 periodic\+\_\+diff(0.\+0, 1.\+0, 2.\+0) =$>$ -\/1.\+0 periodic\+\_\+diff(1.\+0, 0.\+0, 2.\+0) =$>$ -\/1.\+0 periodic\+\_\+diff(1.\+0, 0.\+1, 2.\+0) =$>$ -\/0.\+9 periodic\+\_\+diff(1.\+0, 10.\+1, 2.\+0) =$>$ 0.\+9 periodic\+\_\+diff(1.\+0, 9.\+9, 2.\+0) =$>$ -\/0.\+9 
+
+Definition at line 52 of file opt\+\_\+geo\+\_\+target.\+py.
+
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1opt__geo__target_a02a9cc0378ce93c64c05f75bfc9f8ef9}\label{namespacesrc_1_1opt__geo__target_a02a9cc0378ce93c64c05f75bfc9f8ef9}} 
+\index{src\+::opt\+\_\+geo\+\_\+target@{src\+::opt\+\_\+geo\+\_\+target}!logger@{logger}}
+\index{logger@{logger}!src\+::opt\+\_\+geo\+\_\+target@{src\+::opt\+\_\+geo\+\_\+target}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+opt\+\_\+geo\+\_\+target.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 20 of file opt\+\_\+geo\+\_\+target.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1opt__geo__target_a36da143de24751427dbce910c8af825e}\label{namespacesrc_1_1opt__geo__target_a36da143de24751427dbce910c8af825e}} 
+\index{src\+::opt\+\_\+geo\+\_\+target@{src\+::opt\+\_\+geo\+\_\+target}!R\+A\+D\+I\+A\+N\+\_\+2\+\_\+\+D\+E\+G\+R\+EE@{R\+A\+D\+I\+A\+N\+\_\+2\+\_\+\+D\+E\+G\+R\+EE}}
+\index{R\+A\+D\+I\+A\+N\+\_\+2\+\_\+\+D\+E\+G\+R\+EE@{R\+A\+D\+I\+A\+N\+\_\+2\+\_\+\+D\+E\+G\+R\+EE}!src\+::opt\+\_\+geo\+\_\+target@{src\+::opt\+\_\+geo\+\_\+target}}
+\paragraph{\texorpdfstring{R\+A\+D\+I\+A\+N\+\_\+2\+\_\+\+D\+E\+G\+R\+EE}{RADIAN\_2\_DEGREE}}
+{\footnotesize\ttfamily int src.\+opt\+\_\+geo\+\_\+target.\+R\+A\+D\+I\+A\+N\+\_\+2\+\_\+\+D\+E\+G\+R\+EE = 180 / np.\+pi}
+
+
+
+Definition at line 22 of file opt\+\_\+geo\+\_\+target.\+py.
+

@@ -1,0 +1,91 @@
+\hypertarget{namespacesrc_1_1quantity}{}\subsection{src.\+quantity Namespace Reference}
+\label{namespacesrc_1_1quantity}\index{src.\+quantity@{src.\+quantity}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1quantity_1_1Quantity}{Quantity}
+\begin{DoxyCompactList}\small\item\em Base class for thermodynamical quantity used for fitting. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1quantity_1_1Quantity__Density}{Quantity\+\_\+\+Density}
+\item 
+class \hyperlink{classsrc_1_1quantity_1_1Quantity__H__vap}{Quantity\+\_\+\+H\+\_\+vap}
+\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1quantity_abf34041e04e73124655bf67566e8346b}{mean\+\_\+stderr} (ts)
+\begin{DoxyCompactList}\small\item\em Return mean and standard deviation of a time series ts. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1quantity_ad54b891da90cd132afe1a57dfde0f03f}{energy\+\_\+derivatives} (engine, FF, mvals, h, pgrad, length, A\+Grad=True)
+\begin{DoxyCompactList}\small\item\em Compute the first derivatives of a set of snapshot energies with respect to the force field parameters. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{namespacesrc_1_1quantity_acff8db4e0f2c2b0748a9286ac7a8ee52}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1quantity_ad54b891da90cd132afe1a57dfde0f03f}\label{namespacesrc_1_1quantity_ad54b891da90cd132afe1a57dfde0f03f}} 
+\index{src\+::quantity@{src\+::quantity}!energy\+\_\+derivatives@{energy\+\_\+derivatives}}
+\index{energy\+\_\+derivatives@{energy\+\_\+derivatives}!src\+::quantity@{src\+::quantity}}
+\paragraph{\texorpdfstring{energy\+\_\+derivatives()}{energy\_derivatives()}}
+{\footnotesize\ttfamily def src.\+quantity.\+energy\+\_\+derivatives (\begin{DoxyParamCaption}\item[{}]{engine,  }\item[{}]{FF,  }\item[{}]{mvals,  }\item[{}]{h,  }\item[{}]{pgrad,  }\item[{}]{length,  }\item[{}]{A\+Grad = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Compute the first derivatives of a set of snapshot energies with respect to the force field parameters. 
+
+The function calls the finite difference subroutine on the energy\+\_\+driver subroutine also in this script.
+
+\paragraph*{Parameters }
+
+engine \+: Engine Use this Engine ({\ttfamily G\+MX},{\ttfamily T\+I\+N\+K\+ER},{\ttfamily O\+P\+E\+N\+MM} etc.) object to get the energy snapshots. FF \+: FF Force field object. mvals \+: list Mathematical parameter values. h \+: float Finite difference step size. length \+: int Number of snapshots (length of energy trajectory). A\+Grad \+: Boolean Switch that turns derivatives on or off; if off, return all zeros.
+
+\paragraph*{Returns }
+
+G \+: np.\+array Derivative of the energy in a F\+F.\+np x length array. 
+
+Definition at line 52 of file quantity.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1quantity_ad54b891da90cd132afe1a57dfde0f03f_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1quantity_abf34041e04e73124655bf67566e8346b}\label{namespacesrc_1_1quantity_abf34041e04e73124655bf67566e8346b}} 
+\index{src\+::quantity@{src\+::quantity}!mean\+\_\+stderr@{mean\+\_\+stderr}}
+\index{mean\+\_\+stderr@{mean\+\_\+stderr}!src\+::quantity@{src\+::quantity}}
+\paragraph{\texorpdfstring{mean\+\_\+stderr()}{mean\_stderr()}}
+{\footnotesize\ttfamily def src.\+quantity.\+mean\+\_\+stderr (\begin{DoxyParamCaption}\item[{}]{ts }\end{DoxyParamCaption})}
+
+
+
+Return mean and standard deviation of a time series ts. 
+
+
+
+Definition at line 19 of file quantity.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1quantity_abf34041e04e73124655bf67566e8346b_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1quantity_acff8db4e0f2c2b0748a9286ac7a8ee52}\label{namespacesrc_1_1quantity_acff8db4e0f2c2b0748a9286ac7a8ee52}} 
+\index{src\+::quantity@{src\+::quantity}!logger@{logger}}
+\index{logger@{logger}!src\+::quantity@{src\+::quantity}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+quantity.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 14 of file quantity.\+py.
+

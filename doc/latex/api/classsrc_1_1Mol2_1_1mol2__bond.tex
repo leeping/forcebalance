@@ -1,0 +1,246 @@
+\hypertarget{classsrc_1_1Mol2_1_1mol2__bond}{}\subsection{src.\+Mol2.\+mol2\+\_\+bond Class Reference}
+\label{classsrc_1_1Mol2_1_1mol2__bond}\index{src.\+Mol2.\+mol2\+\_\+bond@{src.\+Mol2.\+mol2\+\_\+bond}}
+
+
+This is to manage \hyperlink{classsrc_1_1Mol2_1_1mol2}{mol2} bond lines on the form\+: 1 1 2 ar.  
+
+
+
+
+Inheritance diagram for src.\+Mol2.\+mol2\+\_\+bond\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{classsrc_1_1Mol2_1_1mol2__bond__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+Mol2.\+mol2\+\_\+bond\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=194pt]{classsrc_1_1Mol2_1_1mol2__bond__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_a14c3e0c4ad994f336ef56700aabda4a8}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, \hyperlink{namespacesrc_1_1Mol2_a12bf18db47042b1704de5e1fb05b2ade}{data}=None)
+\begin{DoxyCompactList}\small\item\em if data is passed, it will be installed \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_a00120739b7a37cb20068552ad53f6159}{\+\_\+\+\_\+repr\+\_\+\+\_\+} (self)
+\item 
+def \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_aed0e7a537ae4bf0b4be69a1b03c297e0}{parse} (self, \hyperlink{namespacesrc_1_1Mol2_a12bf18db47042b1704de5e1fb05b2ade}{data})
+\begin{DoxyCompactList}\small\item\em split the text line into a series of properties \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_af07dc3dfa15804f72e45933c3f0d6a83}{set\+\_\+bond\+\_\+id} (self, \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_afe6abbb34e33f4ba7fe25d8e1d62683a}{bond\+\_\+id}=None)
+\begin{DoxyCompactList}\small\item\em bond identifier (integer, starting from 1) \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_af68218cad88736c51ce5efde940e9ad8}{set\+\_\+origin\+\_\+atom\+\_\+id} (self, \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_a5398fa9b38fd91b27365db7371ec6690}{origin\+\_\+atom\+\_\+id}=None)
+\begin{DoxyCompactList}\small\item\em the origin atom identifier (integer) \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_a0534fd1edfa863de26314114bc007ff5}{set\+\_\+target\+\_\+atom\+\_\+id} (self, \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_ae2417295a726650e16cc71984487d37d}{target\+\_\+atom\+\_\+id}=None)
+\begin{DoxyCompactList}\small\item\em the target atom identifier (integer) \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_aee8fcdcc674648c140ef84f5562cbe9c}{set\+\_\+bond\+\_\+type} (self, \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_a7219155d68989a8dc784453b761b7c3b}{bond\+\_\+type}=None)
+\begin{DoxyCompactList}\small\item\em bond type (string) one of\+: 1 = single 2 = double 3 = triple am = amide ar = aromatic du = dummy un = unknown nc = not connected \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_a626117c036a1736d76176e5af3c2e69a}{set\+\_\+status\+\_\+bit} (self, \hyperlink{classsrc_1_1Mol2_1_1mol2__bond_a6ecf583fc88ad0976bd05ead4c8d409c}{status\+\_\+bit}=None)
+\begin{DoxyCompactList}\small\item\em Never to use (in theory) \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1Mol2_1_1mol2__bond_afe6abbb34e33f4ba7fe25d8e1d62683a}{bond\+\_\+id}
+\item 
+\hyperlink{classsrc_1_1Mol2_1_1mol2__bond_a5398fa9b38fd91b27365db7371ec6690}{origin\+\_\+atom\+\_\+id}
+\item 
+\hyperlink{classsrc_1_1Mol2_1_1mol2__bond_ae2417295a726650e16cc71984487d37d}{target\+\_\+atom\+\_\+id}
+\item 
+\hyperlink{classsrc_1_1Mol2_1_1mol2__bond_a7219155d68989a8dc784453b761b7c3b}{bond\+\_\+type}
+\item 
+\hyperlink{classsrc_1_1Mol2_1_1mol2__bond_a6ecf583fc88ad0976bd05ead4c8d409c}{status\+\_\+bit}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+This is to manage \hyperlink{classsrc_1_1Mol2_1_1mol2}{mol2} bond lines on the form\+: 1 1 2 ar. 
+
+Definition at line 175 of file Mol2.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_a14c3e0c4ad994f336ef56700aabda4a8}\label{classsrc_1_1Mol2_1_1mol2__bond_a14c3e0c4ad994f336ef56700aabda4a8}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+Mol2.\+mol2\+\_\+bond.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{data = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+if data is passed, it will be installed 
+
+
+
+Definition at line 180 of file Mol2.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_a00120739b7a37cb20068552ad53f6159}\label{classsrc_1_1Mol2_1_1mol2__bond_a00120739b7a37cb20068552ad53f6159}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!\+\_\+\+\_\+repr\+\_\+\+\_\+@{\+\_\+\+\_\+repr\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+repr\+\_\+\+\_\+@{\+\_\+\+\_\+repr\+\_\+\+\_\+}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+repr\+\_\+\+\_\+()}{\_\_repr\_\_()}}
+{\footnotesize\ttfamily def src.\+Mol2.\+mol2\+\_\+bond.\+\_\+\+\_\+repr\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 189 of file Mol2.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_aed0e7a537ae4bf0b4be69a1b03c297e0}\label{classsrc_1_1Mol2_1_1mol2__bond_aed0e7a537ae4bf0b4be69a1b03c297e0}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!parse@{parse}}
+\index{parse@{parse}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{parse()}{parse()}}
+{\footnotesize\ttfamily def src.\+Mol2.\+mol2\+\_\+bond.\+parse (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{data }\end{DoxyParamCaption})}
+
+
+
+split the text line into a series of properties 
+
+
+
+Definition at line 200 of file Mol2.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1Mol2_1_1mol2__bond_aed0e7a537ae4bf0b4be69a1b03c297e0_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_af07dc3dfa15804f72e45933c3f0d6a83}\label{classsrc_1_1Mol2_1_1mol2__bond_af07dc3dfa15804f72e45933c3f0d6a83}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!set\+\_\+bond\+\_\+id@{set\+\_\+bond\+\_\+id}}
+\index{set\+\_\+bond\+\_\+id@{set\+\_\+bond\+\_\+id}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{set\+\_\+bond\+\_\+id()}{set\_bond\_id()}}
+{\footnotesize\ttfamily def src.\+Mol2.\+mol2\+\_\+bond.\+set\+\_\+bond\+\_\+id (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{bond\+\_\+id = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+bond identifier (integer, starting from 1) 
+
+
+
+Definition at line 217 of file Mol2.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_aee8fcdcc674648c140ef84f5562cbe9c}\label{classsrc_1_1Mol2_1_1mol2__bond_aee8fcdcc674648c140ef84f5562cbe9c}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!set\+\_\+bond\+\_\+type@{set\+\_\+bond\+\_\+type}}
+\index{set\+\_\+bond\+\_\+type@{set\+\_\+bond\+\_\+type}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{set\+\_\+bond\+\_\+type()}{set\_bond\_type()}}
+{\footnotesize\ttfamily def src.\+Mol2.\+mol2\+\_\+bond.\+set\+\_\+bond\+\_\+type (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{bond\+\_\+type = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+bond type (string) one of\+: 1 = single 2 = double 3 = triple am = amide ar = aromatic du = dummy un = unknown nc = not connected 
+
+
+
+Definition at line 253 of file Mol2.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_af68218cad88736c51ce5efde940e9ad8}\label{classsrc_1_1Mol2_1_1mol2__bond_af68218cad88736c51ce5efde940e9ad8}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!set\+\_\+origin\+\_\+atom\+\_\+id@{set\+\_\+origin\+\_\+atom\+\_\+id}}
+\index{set\+\_\+origin\+\_\+atom\+\_\+id@{set\+\_\+origin\+\_\+atom\+\_\+id}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{set\+\_\+origin\+\_\+atom\+\_\+id()}{set\_origin\_atom\_id()}}
+{\footnotesize\ttfamily def src.\+Mol2.\+mol2\+\_\+bond.\+set\+\_\+origin\+\_\+atom\+\_\+id (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{origin\+\_\+atom\+\_\+id = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+the origin atom identifier (integer) 
+
+
+
+Definition at line 226 of file Mol2.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_a626117c036a1736d76176e5af3c2e69a}\label{classsrc_1_1Mol2_1_1mol2__bond_a626117c036a1736d76176e5af3c2e69a}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!set\+\_\+status\+\_\+bit@{set\+\_\+status\+\_\+bit}}
+\index{set\+\_\+status\+\_\+bit@{set\+\_\+status\+\_\+bit}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{set\+\_\+status\+\_\+bit()}{set\_status\_bit()}}
+{\footnotesize\ttfamily def src.\+Mol2.\+mol2\+\_\+bond.\+set\+\_\+status\+\_\+bit (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{status\+\_\+bit = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Never to use (in theory) 
+
+
+
+Definition at line 262 of file Mol2.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_a0534fd1edfa863de26314114bc007ff5}\label{classsrc_1_1Mol2_1_1mol2__bond_a0534fd1edfa863de26314114bc007ff5}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!set\+\_\+target\+\_\+atom\+\_\+id@{set\+\_\+target\+\_\+atom\+\_\+id}}
+\index{set\+\_\+target\+\_\+atom\+\_\+id@{set\+\_\+target\+\_\+atom\+\_\+id}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{set\+\_\+target\+\_\+atom\+\_\+id()}{set\_target\_atom\_id()}}
+{\footnotesize\ttfamily def src.\+Mol2.\+mol2\+\_\+bond.\+set\+\_\+target\+\_\+atom\+\_\+id (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{target\+\_\+atom\+\_\+id = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+the target atom identifier (integer) 
+
+
+
+Definition at line 235 of file Mol2.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_afe6abbb34e33f4ba7fe25d8e1d62683a}\label{classsrc_1_1Mol2_1_1mol2__bond_afe6abbb34e33f4ba7fe25d8e1d62683a}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!bond\+\_\+id@{bond\+\_\+id}}
+\index{bond\+\_\+id@{bond\+\_\+id}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{bond\+\_\+id}{bond\_id}}
+{\footnotesize\ttfamily src.\+Mol2.\+mol2\+\_\+bond.\+bond\+\_\+id}
+
+
+
+Definition at line 181 of file Mol2.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_a7219155d68989a8dc784453b761b7c3b}\label{classsrc_1_1Mol2_1_1mol2__bond_a7219155d68989a8dc784453b761b7c3b}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!bond\+\_\+type@{bond\+\_\+type}}
+\index{bond\+\_\+type@{bond\+\_\+type}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{bond\+\_\+type}{bond\_type}}
+{\footnotesize\ttfamily src.\+Mol2.\+mol2\+\_\+bond.\+bond\+\_\+type}
+
+
+
+Definition at line 184 of file Mol2.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_a5398fa9b38fd91b27365db7371ec6690}\label{classsrc_1_1Mol2_1_1mol2__bond_a5398fa9b38fd91b27365db7371ec6690}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!origin\+\_\+atom\+\_\+id@{origin\+\_\+atom\+\_\+id}}
+\index{origin\+\_\+atom\+\_\+id@{origin\+\_\+atom\+\_\+id}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{origin\+\_\+atom\+\_\+id}{origin\_atom\_id}}
+{\footnotesize\ttfamily src.\+Mol2.\+mol2\+\_\+bond.\+origin\+\_\+atom\+\_\+id}
+
+
+
+Definition at line 182 of file Mol2.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_a6ecf583fc88ad0976bd05ead4c8d409c}\label{classsrc_1_1Mol2_1_1mol2__bond_a6ecf583fc88ad0976bd05ead4c8d409c}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!status\+\_\+bit@{status\+\_\+bit}}
+\index{status\+\_\+bit@{status\+\_\+bit}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{status\+\_\+bit}{status\_bit}}
+{\footnotesize\ttfamily src.\+Mol2.\+mol2\+\_\+bond.\+status\+\_\+bit}
+
+
+
+Definition at line 209 of file Mol2.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1Mol2_1_1mol2__bond_ae2417295a726650e16cc71984487d37d}\label{classsrc_1_1Mol2_1_1mol2__bond_ae2417295a726650e16cc71984487d37d}} 
+\index{src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}!target\+\_\+atom\+\_\+id@{target\+\_\+atom\+\_\+id}}
+\index{target\+\_\+atom\+\_\+id@{target\+\_\+atom\+\_\+id}!src\+::\+Mol2\+::mol2\+\_\+bond@{src\+::\+Mol2\+::mol2\+\_\+bond}}
+\paragraph{\texorpdfstring{target\+\_\+atom\+\_\+id}{target\_atom\_id}}
+{\footnotesize\ttfamily src.\+Mol2.\+mol2\+\_\+bond.\+target\+\_\+atom\+\_\+id}
+
+
+
+Definition at line 183 of file Mol2.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{Mol2_8py}{Mol2.\+py}\end{DoxyCompactItemize}

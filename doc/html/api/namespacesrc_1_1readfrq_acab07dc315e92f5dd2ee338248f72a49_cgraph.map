@@ -1,0 +1,11 @@
+<map id="src.readfrq.main" name="src.readfrq.main">
+<area shape="rect" id="node2" href="$namespacesrc_1_1readfrq.html#aa60d506cc40377d6ca6736729b25a8bd" title="src.readfrq.read_frq_gen" alt="" coords="183,107,364,133"/>
+<area shape="rect" id="node10" href="$namespacesrc_1_1readfrq.html#aa63f27ca510452256ef35b8d7052966c" title="src.readfrq.print_mode" alt="" coords="188,157,359,184"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1readfrq.html#af9e59f81d04fd3dfbb651e36175fa1b1" title="src.readfrq.read_frq_tc" alt="" coords="418,5,587,32"/>
+<area shape="rect" id="node5" href="$namespacesrc_1_1readfrq.html#a3658ba083ec7f18a0bfbada9e6272301" title="src.readfrq.read_frq_qc" alt="" coords="417,56,589,83"/>
+<area shape="rect" id="node6" href="$namespacesrc_1_1readfrq.html#ab76215acf9b8b25d9fcdfa39e6af2633" title="src.readfrq.read_frq_psi" alt="" coords="415,107,591,133"/>
+<area shape="rect" id="node8" href="$namespacesrc_1_1readfrq.html#acea99aa6d0048a5ef5afedb360fb27e3" title="src.readfrq.read_frq_gau" alt="" coords="412,157,593,184"/>
+<area shape="rect" id="node9" href="$namespacesrc_1_1readfrq.html#a48a1a99942b010b7408fd2de6561701f" title="Read ForceBalance&#45;formatted vibrational data from a vdata.txt file. " alt="" coords="417,208,588,235"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1molecule.html#a651f6c6d23932f5a2151784c992e94a8" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="647,5,785,32"/>
+<area shape="rect" id="node7" href="$namespacesrc_1_1molecule.html#ac2056d27322c6ee6dff0bef3755f2ed3" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="641,107,791,133"/>
+</map>

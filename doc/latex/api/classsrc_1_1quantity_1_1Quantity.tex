@@ -1,0 +1,156 @@
+\hypertarget{classsrc_1_1quantity_1_1Quantity}{}\subsection{src.\+quantity.\+Quantity Class Reference}
+\label{classsrc_1_1quantity_1_1Quantity}\index{src.\+quantity.\+Quantity@{src.\+quantity.\+Quantity}}
+
+
+Base class for thermodynamical quantity used for fitting.  
+
+
+
+
+Inheritance diagram for src.\+quantity.\+Quantity\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=334pt]{classsrc_1_1quantity_1_1Quantity__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+quantity.\+Quantity\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=198pt]{classsrc_1_1quantity_1_1Quantity__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1quantity_1_1Quantity_a47b1d34c21e799aeeebc184ccb40f0c9}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, \hyperlink{classsrc_1_1quantity_1_1Quantity_a75c5d4731a158b9f1daade94193e4105}{engname}, \hyperlink{classsrc_1_1quantity_1_1Quantity_a1f54d5969bb33f67e72bc9ff8c7d6b68}{temperature}, \hyperlink{classsrc_1_1quantity_1_1Quantity_adf325119dc5139a5d664707336bc2e65}{pressure}, \hyperlink{classsrc_1_1quantity_1_1Quantity_a88012f3c2a7b2adf06632d6910f21e83}{name}=None)
+\item 
+def \hyperlink{classsrc_1_1quantity_1_1Quantity_a75f05aea06603e7830b17c4fb4f5264f}{\+\_\+\+\_\+str\+\_\+\+\_\+} (self)
+\item 
+def \hyperlink{classsrc_1_1quantity_1_1Quantity_a31f14fa77a8312030e07f3be4b797dec}{extract} (self, engines, FF, mvals, h, A\+Grad=True)
+\begin{DoxyCompactList}\small\item\em Calculate and extract the quantity from MD results. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1quantity_1_1Quantity_a88012f3c2a7b2adf06632d6910f21e83}{name}
+\item 
+\hyperlink{classsrc_1_1quantity_1_1Quantity_a75c5d4731a158b9f1daade94193e4105}{engname}
+\item 
+\hyperlink{classsrc_1_1quantity_1_1Quantity_a1f54d5969bb33f67e72bc9ff8c7d6b68}{temperature}
+\item 
+\hyperlink{classsrc_1_1quantity_1_1Quantity_adf325119dc5139a5d664707336bc2e65}{pressure}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Base class for thermodynamical quantity used for fitting. 
+
+This can be any experimental data that can be calculated as an ensemble average from a simulation.
+
+\paragraph*{Data attributes }
+
+name \+: string Identifier for the quantity that is specified in {\ttfamily quantities} in Target options. engname \+: string Use this engine to extract the quantity from the simulation results. At present, only {\ttfamily gromacs} is supported. temperature \+: float Calculate the quantity at this temperature (in K). pressure \+: float Calculate the quantity at this pressure (in bar). 
+
+Definition at line 90 of file quantity.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1quantity_1_1Quantity_a47b1d34c21e799aeeebc184ccb40f0c9}\label{classsrc_1_1quantity_1_1Quantity_a47b1d34c21e799aeeebc184ccb40f0c9}} 
+\index{src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+quantity.\+Quantity.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{engname,  }\item[{}]{temperature,  }\item[{}]{pressure,  }\item[{}]{name = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 91 of file quantity.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1quantity_1_1Quantity_a75f05aea06603e7830b17c4fb4f5264f}\label{classsrc_1_1quantity_1_1Quantity_a75f05aea06603e7830b17c4fb4f5264f}} 
+\index{src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}!\+\_\+\+\_\+str\+\_\+\+\_\+@{\+\_\+\+\_\+str\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+str\+\_\+\+\_\+@{\+\_\+\+\_\+str\+\_\+\+\_\+}!src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+str\+\_\+\+\_\+()}{\_\_str\_\_()}}
+{\footnotesize\ttfamily def src.\+quantity.\+Quantity.\+\_\+\+\_\+str\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 97 of file quantity.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1quantity_1_1Quantity_a31f14fa77a8312030e07f3be4b797dec}\label{classsrc_1_1quantity_1_1Quantity_a31f14fa77a8312030e07f3be4b797dec}} 
+\index{src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}!extract@{extract}}
+\index{extract@{extract}!src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}}
+\paragraph{\texorpdfstring{extract()}{extract()}}
+{\footnotesize\ttfamily def src.\+quantity.\+Quantity.\+extract (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{engines,  }\item[{}]{FF,  }\item[{}]{mvals,  }\item[{}]{h,  }\item[{}]{A\+Grad = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Calculate and extract the quantity from MD results. 
+
+How this is done depends on the quantity and the engine so this must be implemented in the subclass.
+
+\paragraph*{Parameters }
+
+engines \+: list A list of Engine objects that are requred to calculate the quantity. FF \+: FF Force field object. mvals \+: list Mathematical parameter values. h \+: float Finite difference step size. A\+Grad \+: Boolean Switch that turns derivatives on or off; if off, return all zeros.
+
+\paragraph*{Returns }
+
+result \+: (float, float, np.\+array) The returned tuple is (Q, Qerr, Qgrad), where Q is the calculated quantity, Qerr is the calculated standard deviation of the quantity, and Qgrad is a M-\/array with the calculated gradients for the quantity, with M being the number of force field parameters that are being fitted. 
+
+Definition at line 128 of file quantity.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1quantity_1_1Quantity_a75c5d4731a158b9f1daade94193e4105}\label{classsrc_1_1quantity_1_1Quantity_a75c5d4731a158b9f1daade94193e4105}} 
+\index{src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}!engname@{engname}}
+\index{engname@{engname}!src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}}
+\paragraph{\texorpdfstring{engname}{engname}}
+{\footnotesize\ttfamily src.\+quantity.\+Quantity.\+engname}
+
+
+
+Definition at line 93 of file quantity.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1quantity_1_1Quantity_a88012f3c2a7b2adf06632d6910f21e83}\label{classsrc_1_1quantity_1_1Quantity_a88012f3c2a7b2adf06632d6910f21e83}} 
+\index{src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}!name@{name}}
+\index{name@{name}!src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}}
+\paragraph{\texorpdfstring{name}{name}}
+{\footnotesize\ttfamily src.\+quantity.\+Quantity.\+name}
+
+
+
+Definition at line 92 of file quantity.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1quantity_1_1Quantity_adf325119dc5139a5d664707336bc2e65}\label{classsrc_1_1quantity_1_1Quantity_adf325119dc5139a5d664707336bc2e65}} 
+\index{src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}!pressure@{pressure}}
+\index{pressure@{pressure}!src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}}
+\paragraph{\texorpdfstring{pressure}{pressure}}
+{\footnotesize\ttfamily src.\+quantity.\+Quantity.\+pressure}
+
+
+
+Definition at line 95 of file quantity.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1quantity_1_1Quantity_a1f54d5969bb33f67e72bc9ff8c7d6b68}\label{classsrc_1_1quantity_1_1Quantity_a1f54d5969bb33f67e72bc9ff8c7d6b68}} 
+\index{src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}!temperature@{temperature}}
+\index{temperature@{temperature}!src\+::quantity\+::\+Quantity@{src\+::quantity\+::\+Quantity}}
+\paragraph{\texorpdfstring{temperature}{temperature}}
+{\footnotesize\ttfamily src.\+quantity.\+Quantity.\+temperature}
+
+
+
+Definition at line 94 of file quantity.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{quantity_8py}{quantity.\+py}\end{DoxyCompactItemize}

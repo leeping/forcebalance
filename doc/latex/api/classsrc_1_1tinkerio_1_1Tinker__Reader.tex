@@ -1,0 +1,165 @@
+\hypertarget{classsrc_1_1tinkerio_1_1Tinker__Reader}{}\subsection{src.\+tinkerio.\+Tinker\+\_\+\+Reader Class Reference}
+\label{classsrc_1_1tinkerio_1_1Tinker__Reader}\index{src.\+tinkerio.\+Tinker\+\_\+\+Reader@{src.\+tinkerio.\+Tinker\+\_\+\+Reader}}
+
+
+Finite state machine for parsing \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} force field files.  
+
+
+
+
+Inheritance diagram for src.\+tinkerio.\+Tinker\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=185pt]{classsrc_1_1tinkerio_1_1Tinker__Reader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+tinkerio.\+Tinker\+\_\+\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=185pt]{classsrc_1_1tinkerio_1_1Tinker__Reader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1Tinker__Reader_a0b8cd6b8396f92db9e389f61a692e984}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, fnm)
+\item 
+def \hyperlink{classsrc_1_1tinkerio_1_1Tinker__Reader_a456a3fad03449282241abbea4a866a42}{feed} (self, line)
+\begin{DoxyCompactList}\small\item\em Given a line, determine the interaction type and the atoms involved (the suffix). \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1Tinker__Reader_a4c305cce11cc0a46afafaeffcd5aff08}{pdict}
+\begin{DoxyCompactList}\small\item\em The parameter dictionary (defined in this file) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1tinkerio_1_1Tinker__Reader_a35bc6d08ba78332cb55415646373893a}{atom}
+\begin{DoxyCompactList}\small\item\em The atom numbers in the interaction (stored in the \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} parser) \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1tinkerio_1_1Tinker__Reader_a6d94f65ac2cb4240a9bacac8c01467c8}{itype}
+\item 
+\hyperlink{classsrc_1_1tinkerio_1_1Tinker__Reader_ad98ef38ba4d380e5e94abd71773a611c}{suffix}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Finite state machine for parsing \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} force field files. 
+
+This class is instantiated when we begin to read in a file. The feed(line) method updates the state of the machine, informing it of the current interaction type. Using this information we can look up the interaction type and parameter type for building the parameter ID. 
+
+Definition at line 97 of file tinkerio.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1Tinker__Reader_a0b8cd6b8396f92db9e389f61a692e984}\label{classsrc_1_1tinkerio_1_1Tinker__Reader_a0b8cd6b8396f92db9e389f61a692e984}} 
+\index{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+Tinker\+\_\+\+Reader.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm }\end{DoxyParamCaption})}
+
+
+
+Definition at line 99 of file tinkerio.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1Tinker__Reader_a456a3fad03449282241abbea4a866a42}\label{classsrc_1_1tinkerio_1_1Tinker__Reader_a456a3fad03449282241abbea4a866a42}} 
+\index{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}!feed@{feed}}
+\index{feed@{feed}!src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{feed()}{feed()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+Tinker\+\_\+\+Reader.\+feed (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Given a line, determine the interaction type and the atoms involved (the suffix). 
+
+\hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} generally has stuff like this\+:
+
+\begin{DoxyVerb}         bond-cubic              -2.55
+         bond-quartic            3.793125
+ 
+         vdw           1               3.4050     0.1100
+         vdw           2               2.6550     0.0135      0.910 # PRM 4
+ 
+         multipole     2    1    2               0.25983
+                                                -0.03859    0.00000   -0.05818
+                                                -0.03673
+                                                 0.00000   -0.10739
+                                                -0.00203    0.00000    0.14412\end{DoxyVerb}
+
+
+The \textquotesingle{}\#\+P\+RM 4\textquotesingle{} has no effect on \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} but it indicates that we are tuning the fourth field on the line (the 0.\+910 value).
+
+\begin{DoxyRefDesc}{Todo}
+\item[\hyperlink{todo__todo000016}{Todo}]Put the rescaling factors for \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} parameters in here. Currently we\textquotesingle{}re using the initial value to determine the rescaling factor which is not very good.\end{DoxyRefDesc}
+\begin{DoxyVerb}     Every parameter line is prefaced by the interaction type
+     except for 'multipole' which is on multiple lines.  Because
+     the lines that come after 'multipole' are predictable, we just
+     determine the current line using the previous line.
+
+     Random note: Unit of force is kcal / mole / angstrom squared.\end{DoxyVerb}
+ 
+
+Definition at line 140 of file tinkerio.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1Tinker__Reader_a35bc6d08ba78332cb55415646373893a}\label{classsrc_1_1tinkerio_1_1Tinker__Reader_a35bc6d08ba78332cb55415646373893a}} 
+\index{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}!atom@{atom}}
+\index{atom@{atom}!src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{atom}{atom}}
+{\footnotesize\ttfamily src.\+tinkerio.\+Tinker\+\_\+\+Reader.\+atom}
+
+
+
+The atom numbers in the interaction (stored in the \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} parser) 
+
+
+
+Definition at line 104 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1Tinker__Reader_a6d94f65ac2cb4240a9bacac8c01467c8}\label{classsrc_1_1tinkerio_1_1Tinker__Reader_a6d94f65ac2cb4240a9bacac8c01467c8}} 
+\index{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}!itype@{itype}}
+\index{itype@{itype}!src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{itype}{itype}}
+{\footnotesize\ttfamily src.\+tinkerio.\+Tinker\+\_\+\+Reader.\+itype}
+
+
+
+Definition at line 148 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1Tinker__Reader_a4c305cce11cc0a46afafaeffcd5aff08}\label{classsrc_1_1tinkerio_1_1Tinker__Reader_a4c305cce11cc0a46afafaeffcd5aff08}} 
+\index{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{pdict}{pdict}}
+{\footnotesize\ttfamily src.\+tinkerio.\+Tinker\+\_\+\+Reader.\+pdict}
+
+
+
+The parameter dictionary (defined in this file) 
+
+
+
+Definition at line 102 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1tinkerio_1_1Tinker__Reader_ad98ef38ba4d380e5e94abd71773a611c}\label{classsrc_1_1tinkerio_1_1Tinker__Reader_ad98ef38ba4d380e5e94abd71773a611c}} 
+\index{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!src\+::tinkerio\+::\+Tinker\+\_\+\+Reader@{src\+::tinkerio\+::\+Tinker\+\_\+\+Reader}}
+\paragraph{\texorpdfstring{suffix}{suffix}}
+{\footnotesize\ttfamily src.\+tinkerio.\+Tinker\+\_\+\+Reader.\+suffix}
+
+
+
+Definition at line 170 of file tinkerio.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{tinkerio_8py}{tinkerio.\+py}\end{DoxyCompactItemize}

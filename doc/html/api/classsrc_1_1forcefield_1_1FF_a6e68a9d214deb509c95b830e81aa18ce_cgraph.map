@@ -1,0 +1,11 @@
+<map id="src.forcefield.FF.addff_xml" name="src.forcefield.FF.addff_xml">
+<area shape="rect" id="node2" href="$classsrc_1_1ffyapf_1_1FF.html#afffd561460e3fbf6216709f63efa103f" title="Parse a force field file and add it to the class. " alt="" coords="272,21,407,47"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1nifty.html#a6ae2951ba2a22420a11abda6be7e5454" title="src.nifty.warn_press_key" alt="" coords="483,71,665,98"/>
+<area shape="rect" id="node5" href="$classsrc_1_1forcefield_1_1FF.html#ae1092a94c188af5bb65da2bb3ac89c5f" title="Parse a force field file and add it to the class. " alt="" coords="260,122,419,149"/>
+<area shape="rect" id="node7" href="$classsrc_1_1ffyapf_1_1FF.html#a45405387da443c3cccedf420539f0f34" title="Assign physical parameter values to the &#39;pvals0&#39; array. " alt="" coords="256,173,423,199"/>
+<area shape="rect" id="node8" href="$classsrc_1_1forcefield_1_1FF.html#adb4e62d2c1343f4dceb5a26ac9fca168" title="Assign physical parameter values to the &#39;pvals0&#39; array. " alt="" coords="244,223,435,250"/>
+<area shape="rect" id="node9" href="$classsrc_1_1ffyapf_1_1FF.html#a30c65ab08a53066ebd3be85de9f2dfba" title="Record the locations of a parameter in a txt file; [[file name, line number, field number..." alt="" coords="267,275,411,316"/>
+<area shape="rect" id="node10" href="$classsrc_1_1forcefield_1_1FF.html#ac8299d9ef9a75fcfc2ddfd3621924241" title="Record the locations of a parameter in a txt file; [[file name, line number, field number..." alt="" coords="255,340,423,381"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1ffyapf.html#aac35f4253f397d2dc6cb5171acecb37e" title="Determine the type of a force field file. " alt="" coords="497,5,651,47"/>
+<area shape="rect" id="node6" href="$namespacesrc_1_1forcefield.html#a21066ef8f8395e0b0c7cc6700791d70b" title="Determine the type of a force field file. " alt="" coords="485,123,663,164"/>
+</map>

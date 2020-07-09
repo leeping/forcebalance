@@ -1,0 +1,5 @@
+<map id="src.target.Target.wq_complete" name="src.target.Target.wq_complete">
+<area shape="rect" id="node2" href="$namespacesrc_1_1nifty.html#aa26be058ed4503aa168d81f9076aefc3" title="src.nifty.getWorkQueue" alt="" coords="204,5,377,32"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1nifty.html#aeafa6a382b79659b374ba813160e4589" title="src.nifty.getWQIds" alt="" coords="221,56,361,83"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1nifty.html#a751edc0be54afcd841c93b4132cfb291" title="This function waits ten seconds to see if a task in the Work Queue has finished. " alt="" coords="221,107,360,133"/>
+</map>

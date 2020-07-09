@@ -1,0 +1,15 @@
+<map id="src.gmxio.GMX.evaluate_" name="src.gmxio.GMX.evaluate_">
+<area shape="rect" id="node2" href="$namespacesrc_1_1gmxio.html#aea51f8e8c67deaad0fccdb8bf633a69c" title="Read, create or edit a Gromacs MDP file. " alt="" coords="259,53,409,80"/>
+<area shape="rect" id="node7" href="$classsrc_1_1gmxio_1_1GMX.html#a24343e631722ec863df94641493128a9" title="Call gromacs and allow for certain expected warnings. " alt="" coords="241,104,427,131"/>
+<area shape="rect" id="node8" href="$classsrc_1_1gmxio_1_1GMX.html#a9cd8a8dde96ee479107dd2933922235d" title="Call GROMACS; prepend the gmxpath to the call to the GROMACS program. " alt="" coords="475,133,651,160"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1nifty.html#a82f89e3045bdeed09a928bb9ce8b0dc1" title="If trying to write to a symbolic link, remove it first. " alt="" coords="503,5,623,32"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1nifty.html#a78476d8a6da41a734762a4e44c339975" title="See documentation for printcool; this is a nice way to print out keys/values in a dictionary..." alt="" coords="495,57,630,98"/>
+<area shape="rect" id="node5" href="$namespacesrc_1_1nifty.html#a9bda70a78d0f5d31e10dfffaf85803c9" title="Cool&#45;looking printout for slick formatting of output. " alt="" coords="723,64,857,91"/>
+<area shape="rect" id="node6" href="$namespacesrc_1_1nifty.html#a6ae2951ba2a22420a11abda6be7e5454" title="src.nifty.warn_press_key" alt="" coords="929,64,1112,91"/>
+<area shape="rect" id="node9" href="$namespacesrc_1_1gmxio.html#a7430b70092fa07b4cad7d894a6ade4f9" title="src.gmxio.rm_gmx_baks" alt="" coords="699,119,881,145"/>
+<area shape="rect" id="node10" href="$classsrc_1_1gmxio_1_1GMX.html#a3f0267ba817464cc778e6fe4a50e8440" title="src.gmxio.GMX.links" alt="" coords="713,169,867,196"/>
+<area shape="rect" id="node11" href="$namespacesrc_1_1nifty.html#aa751e61b12e5549898f8e1b03c3cb74b" title="src.nifty.onefile" alt="" coords="960,140,1081,167"/>
+<area shape="rect" id="node13" href="$namespacesrc_1_1nifty.html#a7fd3a0edb0212c320360d7685227b0f5" title="src.nifty.LinkFile" alt="" coords="957,191,1084,217"/>
+<area shape="rect" id="node12" href="$namespacesrc_1_1nifty.html#ab233937d3663f03a912737572c08da9d" title="Prints a warning but will only do so once in a given run. " alt="" coords="1194,140,1341,167"/>
+<area shape="rect" id="node14" href="$namespacesrc_1_1nifty.html#a39a23ca3b83aadd4bfdf3eee9abb3257" title="src.nifty.MissingFileInspection" alt="" coords="1160,191,1375,217"/>
+</map>

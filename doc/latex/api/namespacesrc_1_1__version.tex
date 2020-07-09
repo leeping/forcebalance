@@ -1,0 +1,399 @@
+\hypertarget{namespacesrc_1_1__version}{}\subsection{src.\+\_\+version Namespace Reference}
+\label{namespacesrc_1_1__version}\index{src.\+\_\+version@{src.\+\_\+version}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1__version_1_1NotThisMethod}{Not\+This\+Method}
+\begin{DoxyCompactList}\small\item\em Exception raised if a method is not valid for the current scenario. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1__version_1_1VersioneerConfig}{Versioneer\+Config}
+\begin{DoxyCompactList}\small\item\em Container for Versioneer configuration parameters. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1__version_afdd5bbfefc2bef0d88e1406709fe7541}{get\+\_\+keywords} ()
+\begin{DoxyCompactList}\small\item\em Get the keywords needed to look up the version information. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_af28ed90f44f99213d839ab63b92be972}{get\+\_\+config} ()
+\begin{DoxyCompactList}\small\item\em Create, populate and return the Versioneer\+Config() object. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_a0477040e1e7a9284f041925048d8757d}{register\+\_\+vcs\+\_\+handler} (vcs, method)
+\begin{DoxyCompactList}\small\item\em Decorator to mark a method as the handler for a particular V\+CS. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_a07869f13dacbb2c9659c38961e969824}{run\+\_\+command} (commands, args, cwd=None, verbose=False, hide\+\_\+stderr=False, env=None)
+\begin{DoxyCompactList}\small\item\em Call the given command(s). \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_a8ab6a4b8a5612bba9d90c884f50fce13}{versions\+\_\+from\+\_\+parentdir} (parentdir\+\_\+prefix, root, verbose)
+\begin{DoxyCompactList}\small\item\em Try to determine the version from the parent directory name. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_a55b4959421edb5200447f5199d19f4c1}{git\+\_\+get\+\_\+keywords} (versionfile\+\_\+abs)
+\begin{DoxyCompactList}\small\item\em Extract version information from the given file. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_af7c030b0c688642e46d34ee86979d5b1}{git\+\_\+versions\+\_\+from\+\_\+keywords} (keywords, tag\+\_\+prefix, verbose)
+\begin{DoxyCompactList}\small\item\em Get version information from git keywords. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_a7f961ca0bf593256fdbc850f707dadca}{git\+\_\+pieces\+\_\+from\+\_\+vcs} (tag\+\_\+prefix, root, verbose, \hyperlink{namespacesrc_1_1__version_a07869f13dacbb2c9659c38961e969824}{run\+\_\+command}=\hyperlink{namespacesrc_1_1__version_a07869f13dacbb2c9659c38961e969824}{run\+\_\+command})
+\begin{DoxyCompactList}\small\item\em Get version from \textquotesingle{}git describe\textquotesingle{} in the root of the source tree. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_a21c3be02b22ff9893ddf1de4b4609066}{plus\+\_\+or\+\_\+dot} (pieces)
+\begin{DoxyCompactList}\small\item\em Return a + if we don\textquotesingle{}t already have one, else return a . \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_a08b184a852fca45124c31efad07ae91d}{render\+\_\+pep440} (pieces)
+\begin{DoxyCompactList}\small\item\em Build up version string, with post-\/release \char`\"{}local version identifier\char`\"{}. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_a966d7d904289700bc6bbc20d64bd5c6e}{render\+\_\+pep440\+\_\+pre} (pieces)
+\begin{DoxyCompactList}\small\item\em T\+AG\mbox{[}.post.\+dev\+D\+I\+S\+T\+A\+N\+CE\mbox{]} -- No -\/dirty. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_a2553edd494b07cc780e662bbb2467b66}{render\+\_\+pep440\+\_\+post} (pieces)
+\begin{DoxyCompactList}\small\item\em T\+AG\mbox{[}.post\+D\+I\+S\+T\+A\+N\+CE\mbox{[}.dev0\mbox{]}+g\+H\+EX\mbox{]} . \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_a04e18593f1d130a8f2609ebb4520faf3}{render\+\_\+pep440\+\_\+old} (pieces)
+\begin{DoxyCompactList}\small\item\em T\+AG\mbox{[}.post\+D\+I\+S\+T\+A\+N\+CE\mbox{[}.dev0\mbox{]}\mbox{]} . \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_afab0479c00019cd66c0000ffb3fcba2f}{render\+\_\+git\+\_\+describe} (pieces)
+\begin{DoxyCompactList}\small\item\em T\+AG\mbox{[}-\/\+D\+I\+S\+T\+A\+N\+C\+E-\/g\+H\+EX\mbox{]}\mbox{[}-\/dirty\mbox{]}. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_aefa841fcd557dd2ff3594846803f1e58}{render\+\_\+git\+\_\+describe\+\_\+long} (pieces)
+\begin{DoxyCompactList}\small\item\em T\+A\+G-\/\+D\+I\+S\+T\+A\+N\+C\+E-\/g\+H\+EX\mbox{[}-\/dirty\mbox{]}. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_a993e064384f8f9986d0ef6f48f7e967c}{render} (pieces, style)
+\begin{DoxyCompactList}\small\item\em Render the given version pieces into the requested style. \end{DoxyCompactList}\item 
+def \hyperlink{namespacesrc_1_1__version_ab09491ecacc235eeaa4a2e433ce17977}{get\+\_\+versions} ()
+\begin{DoxyCompactList}\small\item\em Get version information or return default if unable to do so. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+dictionary \hyperlink{namespacesrc_1_1__version_afa1acce20123f2e96e51dce215e94f39}{L\+O\+N\+G\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+PY} = \{\}
+\item 
+dictionary \hyperlink{namespacesrc_1_1__version_afc5a37c61f1815d00f27cf37fa2a08c6}{H\+A\+N\+D\+L\+E\+RS} = \{\}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1__version_af28ed90f44f99213d839ab63b92be972}\label{namespacesrc_1_1__version_af28ed90f44f99213d839ab63b92be972}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!get\+\_\+config@{get\+\_\+config}}
+\index{get\+\_\+config@{get\+\_\+config}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{get\+\_\+config()}{get\_config()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+get\+\_\+config (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Create, populate and return the Versioneer\+Config() object. 
+
+
+
+Definition at line 42 of file \+\_\+version.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1__version_afdd5bbfefc2bef0d88e1406709fe7541}\label{namespacesrc_1_1__version_afdd5bbfefc2bef0d88e1406709fe7541}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!get\+\_\+keywords@{get\+\_\+keywords}}
+\index{get\+\_\+keywords@{get\+\_\+keywords}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{get\+\_\+keywords()}{get\_keywords()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+get\+\_\+keywords (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get the keywords needed to look up the version information. 
+
+
+
+Definition at line 23 of file \+\_\+version.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1__version_ab09491ecacc235eeaa4a2e433ce17977}\label{namespacesrc_1_1__version_ab09491ecacc235eeaa4a2e433ce17977}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!get\+\_\+versions@{get\+\_\+versions}}
+\index{get\+\_\+versions@{get\+\_\+versions}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{get\+\_\+versions()}{get\_versions()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+get\+\_\+versions (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Get version information or return default if unable to do so. 
+
+
+
+Definition at line 499 of file \+\_\+version.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1__version_ab09491ecacc235eeaa4a2e433ce17977_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1__version_a55b4959421edb5200447f5199d19f4c1}\label{namespacesrc_1_1__version_a55b4959421edb5200447f5199d19f4c1}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!git\+\_\+get\+\_\+keywords@{git\+\_\+get\+\_\+keywords}}
+\index{git\+\_\+get\+\_\+keywords@{git\+\_\+get\+\_\+keywords}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{git\+\_\+get\+\_\+keywords()}{git\_get\_keywords()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+git\+\_\+get\+\_\+keywords (\begin{DoxyParamCaption}\item[{}]{versionfile\+\_\+abs }\end{DoxyParamCaption})}
+
+
+
+Extract version information from the given file. 
+
+
+
+Definition at line 144 of file \+\_\+version.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1__version_a55b4959421edb5200447f5199d19f4c1_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1__version_a7f961ca0bf593256fdbc850f707dadca}\label{namespacesrc_1_1__version_a7f961ca0bf593256fdbc850f707dadca}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!git\+\_\+pieces\+\_\+from\+\_\+vcs@{git\+\_\+pieces\+\_\+from\+\_\+vcs}}
+\index{git\+\_\+pieces\+\_\+from\+\_\+vcs@{git\+\_\+pieces\+\_\+from\+\_\+vcs}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{git\+\_\+pieces\+\_\+from\+\_\+vcs()}{git\_pieces\_from\_vcs()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+git\+\_\+pieces\+\_\+from\+\_\+vcs (\begin{DoxyParamCaption}\item[{}]{tag\+\_\+prefix,  }\item[{}]{root,  }\item[{}]{verbose,  }\item[{}]{run\+\_\+command = {\ttfamily \hyperlink{namespacesrc_1_1__version_a07869f13dacbb2c9659c38961e969824}{run\+\_\+command}} }\end{DoxyParamCaption})}
+
+
+
+Get version from \textquotesingle{}git describe\textquotesingle{} in the root of the source tree. 
+
+This only gets called if the git-\/archive \textquotesingle{}subst\textquotesingle{} keywords were {\itshape not} expanded, and \hyperlink{__version_8py}{\+\_\+version.\+py} hasn\textquotesingle{}t already been rewritten with a short version string, meaning we\textquotesingle{}re inside a checked out source tree. 
+
+Definition at line 235 of file \+\_\+version.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1__version_a7f961ca0bf593256fdbc850f707dadca_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1__version_af7c030b0c688642e46d34ee86979d5b1}\label{namespacesrc_1_1__version_af7c030b0c688642e46d34ee86979d5b1}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!git\+\_\+versions\+\_\+from\+\_\+keywords@{git\+\_\+versions\+\_\+from\+\_\+keywords}}
+\index{git\+\_\+versions\+\_\+from\+\_\+keywords@{git\+\_\+versions\+\_\+from\+\_\+keywords}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{git\+\_\+versions\+\_\+from\+\_\+keywords()}{git\_versions\_from\_keywords()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+git\+\_\+versions\+\_\+from\+\_\+keywords (\begin{DoxyParamCaption}\item[{}]{keywords,  }\item[{}]{tag\+\_\+prefix,  }\item[{}]{verbose }\end{DoxyParamCaption})}
+
+
+
+Get version information from git keywords. 
+
+
+
+Definition at line 174 of file \+\_\+version.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1__version_af7c030b0c688642e46d34ee86979d5b1_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1__version_a21c3be02b22ff9893ddf1de4b4609066}\label{namespacesrc_1_1__version_a21c3be02b22ff9893ddf1de4b4609066}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!plus\+\_\+or\+\_\+dot@{plus\+\_\+or\+\_\+dot}}
+\index{plus\+\_\+or\+\_\+dot@{plus\+\_\+or\+\_\+dot}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{plus\+\_\+or\+\_\+dot()}{plus\_or\_dot()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+plus\+\_\+or\+\_\+dot (\begin{DoxyParamCaption}\item[{}]{pieces }\end{DoxyParamCaption})}
+
+
+
+Return a + if we don\textquotesingle{}t already have one, else return a . 
+
+
+
+Definition at line 322 of file \+\_\+version.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1__version_a0477040e1e7a9284f041925048d8757d}\label{namespacesrc_1_1__version_a0477040e1e7a9284f041925048d8757d}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!register\+\_\+vcs\+\_\+handler@{register\+\_\+vcs\+\_\+handler}}
+\index{register\+\_\+vcs\+\_\+handler@{register\+\_\+vcs\+\_\+handler}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{register\+\_\+vcs\+\_\+handler()}{register\_vcs\_handler()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+register\+\_\+vcs\+\_\+handler (\begin{DoxyParamCaption}\item[{}]{vcs,  }\item[{}]{method }\end{DoxyParamCaption})}
+
+
+
+Decorator to mark a method as the handler for a particular V\+CS. 
+
+Store f in H\+A\+N\+D\+L\+E\+RS\mbox{[}vcs\mbox{]}\mbox{[}method\mbox{]}. 
+
+Definition at line 66 of file \+\_\+version.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1__version_a0477040e1e7a9284f041925048d8757d_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1__version_a993e064384f8f9986d0ef6f48f7e967c}\label{namespacesrc_1_1__version_a993e064384f8f9986d0ef6f48f7e967c}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!render@{render}}
+\index{render@{render}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{render()}{render()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+render (\begin{DoxyParamCaption}\item[{}]{pieces,  }\item[{}]{style }\end{DoxyParamCaption})}
+
+
+
+Render the given version pieces into the requested style. 
+
+
+
+Definition at line 466 of file \+\_\+version.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1__version_a993e064384f8f9986d0ef6f48f7e967c_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1__version_afab0479c00019cd66c0000ffb3fcba2f}\label{namespacesrc_1_1__version_afab0479c00019cd66c0000ffb3fcba2f}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!render\+\_\+git\+\_\+describe@{render\+\_\+git\+\_\+describe}}
+\index{render\+\_\+git\+\_\+describe@{render\+\_\+git\+\_\+describe}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{render\+\_\+git\+\_\+describe()}{render\_git\_describe()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+render\+\_\+git\+\_\+describe (\begin{DoxyParamCaption}\item[{}]{pieces }\end{DoxyParamCaption})}
+
+
+
+T\+AG\mbox{[}-\/\+D\+I\+S\+T\+A\+N\+C\+E-\/g\+H\+EX\mbox{]}\mbox{[}-\/dirty\mbox{]}. 
+
+Like \textquotesingle{}git describe --tags --dirty --always\textquotesingle{}.
+
+Exceptions\+: 1\+: no tags. H\+EX\mbox{[}-\/dirty\mbox{]} (note\+: no \textquotesingle{}g\textquotesingle{} prefix) 
+
+Definition at line 430 of file \+\_\+version.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1__version_aefa841fcd557dd2ff3594846803f1e58}\label{namespacesrc_1_1__version_aefa841fcd557dd2ff3594846803f1e58}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!render\+\_\+git\+\_\+describe\+\_\+long@{render\+\_\+git\+\_\+describe\+\_\+long}}
+\index{render\+\_\+git\+\_\+describe\+\_\+long@{render\+\_\+git\+\_\+describe\+\_\+long}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{render\+\_\+git\+\_\+describe\+\_\+long()}{render\_git\_describe\_long()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+render\+\_\+git\+\_\+describe\+\_\+long (\begin{DoxyParamCaption}\item[{}]{pieces }\end{DoxyParamCaption})}
+
+
+
+T\+A\+G-\/\+D\+I\+S\+T\+A\+N\+C\+E-\/g\+H\+EX\mbox{[}-\/dirty\mbox{]}. 
+
+Like \textquotesingle{}git describe --tags --dirty --always -\/long\textquotesingle{}. The distance/hash is unconditional.
+
+Exceptions\+: 1\+: no tags. H\+EX\mbox{[}-\/dirty\mbox{]} (note\+: no \textquotesingle{}g\textquotesingle{} prefix) 
+
+Definition at line 452 of file \+\_\+version.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1__version_a08b184a852fca45124c31efad07ae91d}\label{namespacesrc_1_1__version_a08b184a852fca45124c31efad07ae91d}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!render\+\_\+pep440@{render\+\_\+pep440}}
+\index{render\+\_\+pep440@{render\+\_\+pep440}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{render\+\_\+pep440()}{render\_pep440()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+render\+\_\+pep440 (\begin{DoxyParamCaption}\item[{}]{pieces }\end{DoxyParamCaption})}
+
+
+
+Build up version string, with post-\/release \char`\"{}local version identifier\char`\"{}. 
+
+Our goal\+: T\+AG\mbox{[}+\+D\+I\+S\+T\+A\+N\+CE.g\+H\+EX\mbox{[}.dirty\mbox{]}\mbox{]} . Note that if you get a tagged build and then dirty it, you\textquotesingle{}ll get T\+A\+G+0.g\+H\+E\+X.\+dirty
+
+Exceptions\+: 1\+: no tags. git\+\_\+describe was just H\+EX. 0+untagged.D\+I\+S\+T\+A\+N\+C\+E.\+g\+H\+EX\mbox{[}.dirty\mbox{]} 
+
+Definition at line 337 of file \+\_\+version.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1__version_a08b184a852fca45124c31efad07ae91d_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1__version_a04e18593f1d130a8f2609ebb4520faf3}\label{namespacesrc_1_1__version_a04e18593f1d130a8f2609ebb4520faf3}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!render\+\_\+pep440\+\_\+old@{render\+\_\+pep440\+\_\+old}}
+\index{render\+\_\+pep440\+\_\+old@{render\+\_\+pep440\+\_\+old}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{render\+\_\+pep440\+\_\+old()}{render\_pep440\_old()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+render\+\_\+pep440\+\_\+old (\begin{DoxyParamCaption}\item[{}]{pieces }\end{DoxyParamCaption})}
+
+
+
+T\+AG\mbox{[}.post\+D\+I\+S\+T\+A\+N\+CE\mbox{[}.dev0\mbox{]}\mbox{]} . 
+
+The \char`\"{}.\+dev0\char`\"{} means dirty.
+
+Eexceptions\+: 1\+: no tags. 0.\+post\+D\+I\+S\+T\+A\+N\+CE\mbox{[}.dev0\mbox{]} 
+
+Definition at line 407 of file \+\_\+version.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1__version_a2553edd494b07cc780e662bbb2467b66}\label{namespacesrc_1_1__version_a2553edd494b07cc780e662bbb2467b66}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!render\+\_\+pep440\+\_\+post@{render\+\_\+pep440\+\_\+post}}
+\index{render\+\_\+pep440\+\_\+post@{render\+\_\+pep440\+\_\+post}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{render\+\_\+pep440\+\_\+post()}{render\_pep440\_post()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+render\+\_\+pep440\+\_\+post (\begin{DoxyParamCaption}\item[{}]{pieces }\end{DoxyParamCaption})}
+
+
+
+T\+AG\mbox{[}.post\+D\+I\+S\+T\+A\+N\+CE\mbox{[}.dev0\mbox{]}+g\+H\+EX\mbox{]} . 
+
+The \char`\"{}.\+dev0\char`\"{} means dirty. Note that .dev0 sorts backwards (a dirty tree will appear \char`\"{}older\char`\"{} than the corresponding clean one), but you shouldn\textquotesingle{}t be releasing software with -\/dirty anyways.
+
+Exceptions\+: 1\+: no tags. 0.\+post\+D\+I\+S\+T\+A\+N\+CE\mbox{[}.dev0\mbox{]} 
+
+Definition at line 381 of file \+\_\+version.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1__version_a2553edd494b07cc780e662bbb2467b66_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{namespacesrc_1_1__version_a966d7d904289700bc6bbc20d64bd5c6e}\label{namespacesrc_1_1__version_a966d7d904289700bc6bbc20d64bd5c6e}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!render\+\_\+pep440\+\_\+pre@{render\+\_\+pep440\+\_\+pre}}
+\index{render\+\_\+pep440\+\_\+pre@{render\+\_\+pep440\+\_\+pre}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{render\+\_\+pep440\+\_\+pre()}{render\_pep440\_pre()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+render\+\_\+pep440\+\_\+pre (\begin{DoxyParamCaption}\item[{}]{pieces }\end{DoxyParamCaption})}
+
+
+
+T\+AG\mbox{[}.post.\+dev\+D\+I\+S\+T\+A\+N\+CE\mbox{]} -- No -\/dirty. 
+
+Exceptions\+: 1\+: no tags. 0.\+post.\+dev\+D\+I\+S\+T\+A\+N\+CE 
+
+Definition at line 360 of file \+\_\+version.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1__version_a07869f13dacbb2c9659c38961e969824}\label{namespacesrc_1_1__version_a07869f13dacbb2c9659c38961e969824}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!run\+\_\+command@{run\+\_\+command}}
+\index{run\+\_\+command@{run\+\_\+command}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{run\+\_\+command()}{run\_command()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+run\+\_\+command (\begin{DoxyParamCaption}\item[{}]{commands,  }\item[{}]{args,  }\item[{}]{cwd = {\ttfamily None},  }\item[{}]{verbose = {\ttfamily False},  }\item[{}]{hide\+\_\+stderr = {\ttfamily False},  }\item[{}]{env = {\ttfamily None} }\end{DoxyParamCaption})}
+
+
+
+Call the given command(s). 
+
+
+
+Definition at line 80 of file \+\_\+version.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1__version_a8ab6a4b8a5612bba9d90c884f50fce13}\label{namespacesrc_1_1__version_a8ab6a4b8a5612bba9d90c884f50fce13}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!versions\+\_\+from\+\_\+parentdir@{versions\+\_\+from\+\_\+parentdir}}
+\index{versions\+\_\+from\+\_\+parentdir@{versions\+\_\+from\+\_\+parentdir}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{versions\+\_\+from\+\_\+parentdir()}{versions\_from\_parentdir()}}
+{\footnotesize\ttfamily def src.\+\_\+version.\+versions\+\_\+from\+\_\+parentdir (\begin{DoxyParamCaption}\item[{}]{parentdir\+\_\+prefix,  }\item[{}]{root,  }\item[{}]{verbose }\end{DoxyParamCaption})}
+
+
+
+Try to determine the version from the parent directory name. 
+
+Source tarballs conventionally unpack into a directory that includes both the project name and a version string. We will also support searching up two directory levels for an appropriately named parent directory 
+
+Definition at line 122 of file \+\_\+version.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1__version_a8ab6a4b8a5612bba9d90c884f50fce13_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1__version_afc5a37c61f1815d00f27cf37fa2a08c6}\label{namespacesrc_1_1__version_afc5a37c61f1815d00f27cf37fa2a08c6}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!H\+A\+N\+D\+L\+E\+RS@{H\+A\+N\+D\+L\+E\+RS}}
+\index{H\+A\+N\+D\+L\+E\+RS@{H\+A\+N\+D\+L\+E\+RS}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{H\+A\+N\+D\+L\+E\+RS}{HANDLERS}}
+{\footnotesize\ttfamily dictionary src.\+\_\+version.\+H\+A\+N\+D\+L\+E\+RS = \{\}}
+
+
+
+Definition at line 61 of file \+\_\+version.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1__version_afa1acce20123f2e96e51dce215e94f39}\label{namespacesrc_1_1__version_afa1acce20123f2e96e51dce215e94f39}} 
+\index{src\+::\+\_\+version@{src\+::\+\_\+version}!L\+O\+N\+G\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+PY@{L\+O\+N\+G\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+PY}}
+\index{L\+O\+N\+G\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+PY@{L\+O\+N\+G\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+PY}!src\+::\+\_\+version@{src\+::\+\_\+version}}
+\paragraph{\texorpdfstring{L\+O\+N\+G\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+PY}{LONG\_VERSION\_PY}}
+{\footnotesize\ttfamily dictionary src.\+\_\+version.\+L\+O\+N\+G\+\_\+\+V\+E\+R\+S\+I\+O\+N\+\_\+\+PY = \{\}}
+
+
+
+Definition at line 60 of file \+\_\+version.\+py.
+

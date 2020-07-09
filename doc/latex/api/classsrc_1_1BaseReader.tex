@@ -1,0 +1,234 @@
+\hypertarget{classsrc_1_1BaseReader}{}\subsection{src.\+Base\+Reader Class Reference}
+\label{classsrc_1_1BaseReader}\index{src.\+Base\+Reader@{src.\+Base\+Reader}}
+
+
+The \textquotesingle{}reader\textquotesingle{} class.  
+
+
+
+
+Inheritance diagram for src.\+Base\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=172pt]{classsrc_1_1BaseReader__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+Base\+Reader\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=172pt]{classsrc_1_1BaseReader__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1BaseReader_a71de80aae79e75dea79b6038cb781915}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, fnm)
+\item 
+def \hyperlink{classsrc_1_1BaseReader_abe502aafac460a23f8594724a181c7d5}{Split} (self, line)
+\item 
+def \hyperlink{classsrc_1_1BaseReader_a749b5836039a78456d72f184d977568e}{Whites} (self, line)
+\item 
+def \hyperlink{classsrc_1_1BaseReader_a35f2a12d14c3b94e11fe85aa8013d959}{feed} (self, line)
+\item 
+def \hyperlink{classsrc_1_1BaseReader_a71385d420c4010876c06bc840d0f73db}{build\+\_\+pid} (self, pfld)
+\begin{DoxyCompactList}\small\item\em Returns the parameter type (e.\+g. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1BaseReader_a7e0a1d1c74526b1e8f043590c0642eaa}{ln}
+\item 
+\hyperlink{classsrc_1_1BaseReader_a37bf0bb6679d767317e4fe3030987320}{itype}
+\item 
+\hyperlink{classsrc_1_1BaseReader_a424d95bfd19d90f0fb8e1ba228d3583b}{suffix}
+\item 
+\hyperlink{classsrc_1_1BaseReader_ac9cfd59b917771c7234cb36dd4c34048}{pdict}
+\item 
+\hyperlink{classsrc_1_1BaseReader_ad345ca9b16960d07f927d84f823aa75a}{adict}
+\begin{DoxyCompactList}\small\item\em The mapping of (this residue, atom number) to (atom name) for building atom-\/specific interactions in \mbox{[} bonds \mbox{]}, \mbox{[} angles \mbox{]} etc. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1BaseReader_af4802f985bc997673945070d37b15bb0}{molatom}
+\begin{DoxyCompactList}\small\item\em The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1BaseReader_a86945517a0969c7a099c9aec850b9762}{Molecules}
+\item 
+\hyperlink{classsrc_1_1BaseReader_a4bb84fc28fa648fb0167bc7d90719095}{Atom\+Types}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+The \textquotesingle{}reader\textquotesingle{} class. 
+
+It serves two main functions\+:
+
+1) When parsing a text force field file, the \textquotesingle{}feed\textquotesingle{} method is called once for every line. Calling the \textquotesingle{}feed\textquotesingle{} method stores the internal variables that are needed for making the unique parameter identifier.
+
+2) The \textquotesingle{}reader\textquotesingle{} also stores the \textquotesingle{}pdict\textquotesingle{} dictionary, which is needed for building the matrix of rescaling factors. This is not needed for the X\+ML force fields, so in X\+ML force fields pdict is replaced with a string called \char`\"{}\+X\+M\+L\+\_\+\+Override\char`\"{}. 
+
+Definition at line 85 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1BaseReader_a71de80aae79e75dea79b6038cb781915}\label{classsrc_1_1BaseReader_a71de80aae79e75dea79b6038cb781915}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+Base\+Reader.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{fnm }\end{DoxyParamCaption})}
+
+
+
+Definition at line 87 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1BaseReader_a71385d420c4010876c06bc840d0f73db}\label{classsrc_1_1BaseReader_a71385d420c4010876c06bc840d0f73db}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!build\+\_\+pid@{build\+\_\+pid}}
+\index{build\+\_\+pid@{build\+\_\+pid}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{build\+\_\+pid()}{build\_pid()}}
+{\footnotesize\ttfamily def src.\+Base\+Reader.\+build\+\_\+pid (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{pfld }\end{DoxyParamCaption})}
+
+
+
+Returns the parameter type (e.\+g. 
+
+K in B\+O\+N\+D\+SK) based on the current interaction type.
+
+Both the \textquotesingle{}pdict\textquotesingle{} dictionary (see \hyperlink{namespacesrc_1_1gmxio_ad55e036d51846e3440a373c57439dffa}{gmxio.\+pdict}) and the interaction type \textquotesingle{}state\textquotesingle{} (here, B\+O\+N\+DS) are needed to get the parameter type.
+
+If, however, \textquotesingle{}pdict\textquotesingle{} does not contain the ptype value, a suitable substitute is simply the field number.
+
+Note that if the interaction type state is not set, then it defaults to the file name, so a generic parameter ID is \textquotesingle{}filename.\+line\+\_\+num.\+field\+\_\+num\textquotesingle{} 
+
+Definition at line 128 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1BaseReader_a35f2a12d14c3b94e11fe85aa8013d959}\label{classsrc_1_1BaseReader_a35f2a12d14c3b94e11fe85aa8013d959}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!feed@{feed}}
+\index{feed@{feed}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{feed()}{feed()}}
+{\footnotesize\ttfamily def src.\+Base\+Reader.\+feed (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Definition at line 109 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1BaseReader_abe502aafac460a23f8594724a181c7d5}\label{classsrc_1_1BaseReader_abe502aafac460a23f8594724a181c7d5}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!Split@{Split}}
+\index{Split@{Split}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{Split()}{Split()}}
+{\footnotesize\ttfamily def src.\+Base\+Reader.\+Split (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Definition at line 103 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1BaseReader_a749b5836039a78456d72f184d977568e}\label{classsrc_1_1BaseReader_a749b5836039a78456d72f184d977568e}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!Whites@{Whites}}
+\index{Whites@{Whites}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{Whites()}{Whites()}}
+{\footnotesize\ttfamily def src.\+Base\+Reader.\+Whites (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{line }\end{DoxyParamCaption})}
+
+
+
+Definition at line 106 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1BaseReader_ad345ca9b16960d07f927d84f823aa75a}\label{classsrc_1_1BaseReader_ad345ca9b16960d07f927d84f823aa75a}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!adict@{adict}}
+\index{adict@{adict}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{adict}{adict}}
+{\footnotesize\ttfamily src.\+Base\+Reader.\+adict}
+
+
+
+The mapping of (this residue, atom number) to (atom name) for building atom-\/specific interactions in \mbox{[} bonds \mbox{]}, \mbox{[} angles \mbox{]} etc. 
+
+
+
+Definition at line 93 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1BaseReader_a4bb84fc28fa648fb0167bc7d90719095}\label{classsrc_1_1BaseReader_a4bb84fc28fa648fb0167bc7d90719095}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!Atom\+Types@{Atom\+Types}}
+\index{Atom\+Types@{Atom\+Types}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{Atom\+Types}{AtomTypes}}
+{\footnotesize\ttfamily src.\+Base\+Reader.\+Atom\+Types}
+
+
+
+Definition at line 101 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1BaseReader_a37bf0bb6679d767317e4fe3030987320}\label{classsrc_1_1BaseReader_a37bf0bb6679d767317e4fe3030987320}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!itype@{itype}}
+\index{itype@{itype}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{itype}{itype}}
+{\footnotesize\ttfamily src.\+Base\+Reader.\+itype}
+
+
+
+Definition at line 89 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1BaseReader_a7e0a1d1c74526b1e8f043590c0642eaa}\label{classsrc_1_1BaseReader_a7e0a1d1c74526b1e8f043590c0642eaa}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!ln@{ln}}
+\index{ln@{ln}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{ln}{ln}}
+{\footnotesize\ttfamily src.\+Base\+Reader.\+ln}
+
+
+
+Definition at line 88 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1BaseReader_af4802f985bc997673945070d37b15bb0}\label{classsrc_1_1BaseReader_af4802f985bc997673945070d37b15bb0}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!molatom@{molatom}}
+\index{molatom@{molatom}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{molatom}{molatom}}
+{\footnotesize\ttfamily src.\+Base\+Reader.\+molatom}
+
+
+
+The mapping of (molecule name) to a dictionary of of atom types for the atoms in that residue. 
+
+self.\+moleculedict = Ordered\+Dict() The listing of \textquotesingle{}R\+ES\+:A\+T\+O\+M\+N\+A\+M\+ES\textquotesingle{} for atom names in the line This is obviously a placeholder. 
+
+Definition at line 98 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1BaseReader_a86945517a0969c7a099c9aec850b9762}\label{classsrc_1_1BaseReader_a86945517a0969c7a099c9aec850b9762}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!Molecules@{Molecules}}
+\index{Molecules@{Molecules}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{Molecules}{Molecules}}
+{\footnotesize\ttfamily src.\+Base\+Reader.\+Molecules}
+
+
+
+Definition at line 100 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1BaseReader_ac9cfd59b917771c7234cb36dd4c34048}\label{classsrc_1_1BaseReader_ac9cfd59b917771c7234cb36dd4c34048}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!pdict@{pdict}}
+\index{pdict@{pdict}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{pdict}{pdict}}
+{\footnotesize\ttfamily src.\+Base\+Reader.\+pdict}
+
+
+
+Definition at line 91 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1BaseReader_a424d95bfd19d90f0fb8e1ba228d3583b}\label{classsrc_1_1BaseReader_a424d95bfd19d90f0fb8e1ba228d3583b}} 
+\index{src\+::\+Base\+Reader@{src\+::\+Base\+Reader}!suffix@{suffix}}
+\index{suffix@{suffix}!src\+::\+Base\+Reader@{src\+::\+Base\+Reader}}
+\paragraph{\texorpdfstring{suffix}{suffix}}
+{\footnotesize\ttfamily src.\+Base\+Reader.\+suffix}
+
+
+
+Definition at line 90 of file \+\_\+\+\_\+init\+\_\+\+\_\+.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{____init_____8py}{\+\_\+\+\_\+init\+\_\+\+\_\+.\+py}\end{DoxyCompactItemize}

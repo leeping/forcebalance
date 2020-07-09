@@ -1,0 +1,160 @@
+\hypertarget{classsrc_1_1leastsq_1_1LeastSquares}{}\subsection{src.\+leastsq.\+Least\+Squares Class Reference}
+\label{classsrc_1_1leastsq_1_1LeastSquares}\index{src.\+leastsq.\+Least\+Squares@{src.\+leastsq.\+Least\+Squares}}
+
+
+Subclass of Target for general least squares fitting.  
+
+
+
+
+Inheritance diagram for src.\+leastsq.\+Least\+Squares\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=217pt]{classsrc_1_1leastsq_1_1LeastSquares__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+leastsq.\+Least\+Squares\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=217pt]{classsrc_1_1leastsq_1_1LeastSquares__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1leastsq_1_1LeastSquares_a92540b3f42bc00f5a712507c58d65abd}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1leastsq_1_1LeastSquares_a069649328a4279cf2548636a09611630}{indicate} (self)
+\item 
+def \hyperlink{classsrc_1_1leastsq_1_1LeastSquares_a4e586dda3fc35ba842ca972bc296f1f3}{get} (self, mvals, A\+Grad=False, A\+Hess=False)
+\begin{DoxyCompactList}\small\item\em L\+PW 05-\/30-\/2012. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1leastsq_1_1LeastSquares_a32ee7af48e079e88362d1a3f9cef293d}{M\+AQ}
+\begin{DoxyCompactList}\small\item\em Dictionary for derivative terms. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1leastsq_1_1LeastSquares_a4b7d42bb706dc5a4c32a0db0a9eb489a}{D}
+\item 
+\hyperlink{classsrc_1_1leastsq_1_1LeastSquares_add53989a9dd606903f90c11e4e07f206}{objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for general least squares fitting. 
+
+
+
+Definition at line 36 of file leastsq.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1leastsq_1_1LeastSquares_a92540b3f42bc00f5a712507c58d65abd}\label{classsrc_1_1leastsq_1_1LeastSquares_a92540b3f42bc00f5a712507c58d65abd}} 
+\index{src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+leastsq.\+Least\+Squares.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 39 of file leastsq.\+py.
+
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1leastsq_1_1LeastSquares_a4e586dda3fc35ba842ca972bc296f1f3}\label{classsrc_1_1leastsq_1_1LeastSquares_a4e586dda3fc35ba842ca972bc296f1f3}} 
+\index{src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}!get@{get}}
+\index{get@{get}!src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+leastsq.\+Least\+Squares.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily False},  }\item[{}]{A\+Hess = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+L\+PW 05-\/30-\/2012. 
+
+This subroutine builds the objective function (and optionally its derivatives) from a general software.
+
+This subroutine interfaces with simulation software \textquotesingle{}drivers\textquotesingle{}. The driver is expected to give exact values, fitting values, and weights.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mvals} & Mathematical parameter values \\
+\hline
+\mbox{\tt in}  & {\em A\+Grad} & Switch to turn on analytic gradient \\
+\hline
+\mbox{\tt in}  & {\em A\+Hess} & Switch to turn on analytic Hessian \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+Answer Contribution to the objective function 
+\end{DoxyReturn}
+
+
+Definition at line 63 of file leastsq.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1leastsq_1_1LeastSquares_a4e586dda3fc35ba842ca972bc296f1f3_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1leastsq_1_1LeastSquares_a069649328a4279cf2548636a09611630}\label{classsrc_1_1leastsq_1_1LeastSquares_a069649328a4279cf2548636a09611630}} 
+\index{src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+leastsq.\+Least\+Squares.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 42 of file leastsq.\+py.
+
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1leastsq_1_1LeastSquares_a4b7d42bb706dc5a4c32a0db0a9eb489a}\label{classsrc_1_1leastsq_1_1LeastSquares_a4b7d42bb706dc5a4c32a0db0a9eb489a}} 
+\index{src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}!D@{D}}
+\index{D@{D}!src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}}
+\paragraph{\texorpdfstring{D}{D}}
+{\footnotesize\ttfamily src.\+leastsq.\+Least\+Squares.\+D}
+
+
+
+Definition at line 127 of file leastsq.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1leastsq_1_1LeastSquares_a32ee7af48e079e88362d1a3f9cef293d}\label{classsrc_1_1leastsq_1_1LeastSquares_a32ee7af48e079e88362d1a3f9cef293d}} 
+\index{src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}!M\+AQ@{M\+AQ}}
+\index{M\+AQ@{M\+AQ}!src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}}
+\paragraph{\texorpdfstring{M\+AQ}{MAQ}}
+{\footnotesize\ttfamily src.\+leastsq.\+Least\+Squares.\+M\+AQ}
+
+
+
+Dictionary for derivative terms. 
+
+
+
+Definition at line 89 of file leastsq.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1leastsq_1_1LeastSquares_add53989a9dd606903f90c11e4e07f206}\label{classsrc_1_1leastsq_1_1LeastSquares_add53989a9dd606903f90c11e4e07f206}} 
+\index{src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}!objective@{objective}}
+\index{objective@{objective}!src\+::leastsq\+::\+Least\+Squares@{src\+::leastsq\+::\+Least\+Squares}}
+\paragraph{\texorpdfstring{objective}{objective}}
+{\footnotesize\ttfamily src.\+leastsq.\+Least\+Squares.\+objective}
+
+
+
+Definition at line 128 of file leastsq.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{leastsq_8py}{leastsq.\+py}\end{DoxyCompactItemize}

@@ -1,0 +1,819 @@
+\hypertarget{classsrc_1_1liquid_1_1Liquid}{}\subsection{src.\+liquid.\+Liquid Class Reference}
+\label{classsrc_1_1liquid_1_1Liquid}\index{src.\+liquid.\+Liquid@{src.\+liquid.\+Liquid}}
+
+
+Subclass of Target for liquid property matching.  
+
+
+
+
+Inheritance diagram for src.\+liquid.\+Liquid\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{classsrc_1_1liquid_1_1Liquid__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for src.\+liquid.\+Liquid\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=173pt]{classsrc_1_1liquid_1_1Liquid__coll__graph}
+\end{center}
+\end{figure}
+\subsubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_a218eb2c83f267c28251e4c85e9841182}{\+\_\+\+\_\+init\+\_\+\+\_\+} (self, options, tgt\+\_\+opts, forcefield)
+\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_a8ded8861b18852faa19ce5193691f1f6}{post\+\_\+init} (self, options)
+\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_a8655401dad963220060fd4dbd4b2c39a}{prepare\+\_\+temp\+\_\+directory} (self)
+\begin{DoxyCompactList}\small\item\em Prepare the temporary directory by copying in important files. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_adb6661611a77152b1442392bf4e0c303}{read\+\_\+data} (self)
+\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_afdbdeb57ce8f506a90711367e9926586}{check\+\_\+files} (self, there)
+\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_a7ce7650a951da8f4c44c13a55b831719}{npt\+\_\+simulation} (self, temperature, pressure, simnum)
+\begin{DoxyCompactList}\small\item\em Submit a N\+PT simulation to the Work Queue. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_aadcc3367e376135de20c3e1dc60d6e1e}{nvt\+\_\+simulation} (self, temperature)
+\begin{DoxyCompactList}\small\item\em Submit a N\+VT simulation to the Work Queue. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_a4d42de04975d1fac3a958bb943cc1250}{polarization\+\_\+correction} (self, mvals)
+\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_a2d50c22b2cf9632ab7bebb415ef5028b}{indicate} (self)
+\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_ac5a5a9186569e177bf69563dd2b08e80}{objective\+\_\+term} (self, points, expname, calc, err, grad, name=\char`\"{}Quantity\char`\"{}, Sub\+Average=False)
+\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_adb3676bf501d6683c2a8f36b10270a82}{submit\+\_\+jobs} (self, mvals, A\+Grad=True, A\+Hess=True)
+\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_ac70bf9d77fc3969a27a5ddba3ba4eb3a}{read} (self, mvals, A\+Grad=True, A\+Hess=True)
+\begin{DoxyCompactList}\small\item\em Read in time series for all previous iterations. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_ad55246e641f979a22458c645c362abbe}{get} (self, mvals, A\+Grad=True, A\+Hess=True)
+\begin{DoxyCompactList}\small\item\em Wrapper of self.\+get\+\_\+normal() and self.\+get\+\_\+pure\+\_\+num\+\_\+grad() \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_ae6a946b860b70f1b002acdff15fdb023}{get\+\_\+normal} (self, mvals, A\+Grad=True, A\+Hess=True)
+\begin{DoxyCompactList}\small\item\em Fitting of liquid bulk properties. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_adec909709edf0a79148d87d97ae2fde1}{get\+\_\+pure\+\_\+num\+\_\+grad} (self, mvals, A\+Grad=True, A\+Hess=True)
+\begin{DoxyCompactList}\small\item\em This function calls self.\+get\+\_\+normal(A\+Grad=False) to get the property values and std\+\_\+err, but compute the property gradients using finite difference of the FF parameters. \end{DoxyCompactList}\item 
+def \hyperlink{classsrc_1_1liquid_1_1Liquid_a6c7d6b8ce3f748fba7db1d390ff6fed9}{form\+\_\+get\+\_\+result} (self, property\+\_\+results, A\+Grad=True, A\+Hess=True)
+\begin{DoxyCompactList}\small\item\em This function takes the property\+\_\+results from \hyperlink{classsrc_1_1liquid_1_1Liquid_ae6a946b860b70f1b002acdff15fdb023}{get\+\_\+normal()} or \hyperlink{classsrc_1_1liquid_1_1Liquid_adec909709edf0a79148d87d97ae2fde1}{get\+\_\+pure\+\_\+num\+\_\+grad()} and form the answer for the return of the self.\+get() function. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_aa71069dd2ca72eb8f34ec2cd9628cc78}{do\+\_\+self\+\_\+pol}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a984364c62fcda179ec1352b6849a89bc}{loop\+\_\+over\+\_\+snapshots}
+\begin{DoxyCompactList}\small\item\em L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a188bf7be2f84cb659f6e9f47fa7d6dff}{liquid\+\_\+mol}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a0e3e31fe5612fc358781b86f0a2a2241}{n\+\_\+molecules}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a42909fcba8430ba70f38a5421b29ab9f}{gas\+\_\+mol}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a9f6eba84a2ed8a3ce69a1e9c27b98cb0}{last\+\_\+traj}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_aefe3b8e42753ca98c1c2ad1fe567a84e}{extra\+\_\+output}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a5b6454446d809402102964d8be24a1a5}{surf\+\_\+ten\+\_\+mol}
+\begin{DoxyCompactList}\small\item\em Read the reference data. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a258ee224b0bc2345f5a721b01eb329e8}{Saved\+Traj}
+\begin{DoxyCompactList}\small\item\em Saved trajectories for all iterations and all temperatures. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_aef2366a4e32f76e5c9c2657ee81b8d0c}{M\+Bar\+Energy}
+\begin{DoxyCompactList}\small\item\em Evaluated energies for all trajectories (i.\+e. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_aff804d628027f3d20892fbe5ef0452f2}{All\+Results}
+\begin{DoxyCompactList}\small\item\em Saved results for all iterations self.\+Saved\+M\+Vals = \mbox{[}\mbox{]}. \end{DoxyCompactList}\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a067dcffe71bddcc374dc8619d529062f}{gas\+\_\+engine}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_afc6a5b1380c9fe67d0483a54c02487c5}{read\+\_\+indicate}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a74646db7c89f4f7f07578e0840f182b0}{write\+\_\+indicate}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_ade287efb41717feefeb244c4113163f8}{Ref\+Data}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_acd631b2d731a2c0fadaf82c1a134df79}{Phase\+Points}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a303043e31dfe693950a2e028bbcd727e}{Labels}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_ac2028906051f1ba08ec748acffa8aa7b}{engname}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_af87eed064ec6048a40baeef234c46639}{rundir}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a1c430d62e8736ae276b7bcb3c5e48af5}{w\+\_\+rho}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_ad0c30b119ee7502f3288131a0ff79219}{w\+\_\+hvap}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_acc59dd087898dc187bf5067e735e9297}{w\+\_\+alpha}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a8681a1168945b752c37877249a99cb01}{w\+\_\+kappa}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a6f95bb37f323d05d597f4341cd15f221}{w\+\_\+cp}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a3bdeef04fb48f2a34b7f7a8844d8d3a8}{w\+\_\+eps0}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_aab7d8dd8039e6d4898dbfbbdaf5ac034}{w\+\_\+surf\+\_\+ten}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_ae2b753e0fc7b02a275cc45bccce2419a}{Xp}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a71c4080be710cf3f450ce618340f54f2}{Wp}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_aa1587611e32e765ed6552c044d23b8ca}{Pp}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_a593cab1d5e4ebe99d3e4f0dc8004258a}{Gp}
+\item 
+\hyperlink{classsrc_1_1liquid_1_1Liquid_afa4318bb1f833e5891262e3814408c0b}{Objective}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Detailed Description}
+Subclass of Target for liquid property matching. 
+
+
+
+Definition at line 91 of file liquid.\+py.
+
+
+
+\subsubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a218eb2c83f267c28251e4c85e9841182}\label{classsrc_1_1liquid_1_1Liquid_a218eb2c83f267c28251e4c85e9841182}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}}
+\index{\+\_\+\+\_\+init\+\_\+\+\_\+@{\+\_\+\+\_\+init\+\_\+\+\_\+}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{\+\_\+\+\_\+init\+\_\+\+\_\+()}{\_\_init\_\_()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options,  }\item[{}]{tgt\+\_\+opts,  }\item[{}]{forcefield }\end{DoxyParamCaption})}
+
+
+
+Definition at line 94 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_a218eb2c83f267c28251e4c85e9841182_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Function Documentation}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_afdbdeb57ce8f506a90711367e9926586}\label{classsrc_1_1liquid_1_1Liquid_afdbdeb57ce8f506a90711367e9926586}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!check\+\_\+files@{check\+\_\+files}}
+\index{check\+\_\+files@{check\+\_\+files}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{check\+\_\+files()}{check\_files()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+check\+\_\+files (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{there }\end{DoxyParamCaption})}
+
+
+
+Definition at line 359 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a6c7d6b8ce3f748fba7db1d390ff6fed9}\label{classsrc_1_1liquid_1_1Liquid_a6c7d6b8ce3f748fba7db1d390ff6fed9}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!form\+\_\+get\+\_\+result@{form\+\_\+get\+\_\+result}}
+\index{form\+\_\+get\+\_\+result@{form\+\_\+get\+\_\+result}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{form\+\_\+get\+\_\+result()}{form\_get\_result()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+form\+\_\+get\+\_\+result (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{property\+\_\+results,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+This function takes the property\+\_\+results from \hyperlink{classsrc_1_1liquid_1_1Liquid_ae6a946b860b70f1b002acdff15fdb023}{get\+\_\+normal()} or \hyperlink{classsrc_1_1liquid_1_1Liquid_adec909709edf0a79148d87d97ae2fde1}{get\+\_\+pure\+\_\+num\+\_\+grad()} and form the answer for the return of the self.\+get() function. 
+
+property\+\_\+results \begin{DoxyReturn}{Returns}
+Answer Contribution to the objective function 
+\end{DoxyReturn}
+
+
+Definition at line 1138 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_a6c7d6b8ce3f748fba7db1d390ff6fed9_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_ad55246e641f979a22458c645c362abbe}\label{classsrc_1_1liquid_1_1Liquid_ad55246e641f979a22458c645c362abbe}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!get@{get}}
+\index{get@{get}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{get()}{get()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+get (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Wrapper of self.\+get\+\_\+normal() and self.\+get\+\_\+pure\+\_\+num\+\_\+grad() 
+
+
+
+Definition at line 697 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_ad55246e641f979a22458c645c362abbe_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_ae6a946b860b70f1b002acdff15fdb023}\label{classsrc_1_1liquid_1_1Liquid_ae6a946b860b70f1b002acdff15fdb023}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!get\+\_\+normal@{get\+\_\+normal}}
+\index{get\+\_\+normal@{get\+\_\+normal}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{get\+\_\+normal()}{get\_normal()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+get\+\_\+normal (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Fitting of liquid bulk properties. 
+
+This is the current major direction of development for \hyperlink{namespaceForceBalance}{Force\+Balance}. Basically, fitting the QM energies / forces alone does not always give us the best simulation behavior. In many cases it makes more sense to try and reproduce some experimentally known data as well.
+
+In order to reproduce experimentally known data, we need to run a simulation and compare the simulation result to experiment. The main challenge here is that the simulations are computationally intensive (i.\+e. they require energy and force evaluations), and furthermore the results are noisy. We need to run the simulations automatically and remotely (i.\+e. on clusters) and a good way to calculate the derivatives of the simulation results with respect to the parameter values.
+
+This function contains some experimentally known values of the density and enthalpy of vaporization (Hvap) of liquid water. It launches the density and Hvap calculations on the cluster, and gathers the results / derivatives. The actual calculation of results / derivatives is done in a separate file.
+
+After the results come back, they are gathered together to form an objective function.
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mvals} & Mathematical parameter values \\
+\hline
+\mbox{\tt in}  & {\em A\+Grad} & Switch to turn on analytic gradient \\
+\hline
+\mbox{\tt in}  & {\em A\+Hess} & Switch to turn on analytic Hessian \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+property\+\_\+results Fill in the weight matrix with M\+B\+AR weights where M\+B\+AR was run, and equal weights otherwise. 
+\end{DoxyReturn}
+
+
+Definition at line 736 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_ae6a946b860b70f1b002acdff15fdb023_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_adec909709edf0a79148d87d97ae2fde1}\label{classsrc_1_1liquid_1_1Liquid_adec909709edf0a79148d87d97ae2fde1}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!get\+\_\+pure\+\_\+num\+\_\+grad@{get\+\_\+pure\+\_\+num\+\_\+grad}}
+\index{get\+\_\+pure\+\_\+num\+\_\+grad@{get\+\_\+pure\+\_\+num\+\_\+grad}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{get\+\_\+pure\+\_\+num\+\_\+grad()}{get\_pure\_num\_grad()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+get\+\_\+pure\+\_\+num\+\_\+grad (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+This function calls self.\+get\+\_\+normal(A\+Grad=False) to get the property values and std\+\_\+err, but compute the property gradients using finite difference of the FF parameters. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em mvals} & Mathematical parameter values \\
+\hline
+\mbox{\tt in}  & {\em A\+Grad} & Switch to turn on analytic gradient \\
+\hline
+\mbox{\tt in}  & {\em A\+Hess} & Switch to turn on analytic Hessian \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+property\+\_\+results 
+\end{DoxyReturn}
+
+
+Definition at line 1098 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_adec909709edf0a79148d87d97ae2fde1_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a2d50c22b2cf9632ab7bebb415ef5028b}\label{classsrc_1_1liquid_1_1Liquid_a2d50c22b2cf9632ab7bebb415ef5028b}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!indicate@{indicate}}
+\index{indicate@{indicate}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{indicate()}{indicate()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+indicate (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 439 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_a2d50c22b2cf9632ab7bebb415ef5028b_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a7ce7650a951da8f4c44c13a55b831719}\label{classsrc_1_1liquid_1_1Liquid_a7ce7650a951da8f4c44c13a55b831719}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!npt\+\_\+simulation@{npt\+\_\+simulation}}
+\index{npt\+\_\+simulation@{npt\+\_\+simulation}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{npt\+\_\+simulation()}{npt\_simulation()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+npt\+\_\+simulation (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{temperature,  }\item[{}]{pressure,  }\item[{}]{simnum }\end{DoxyParamCaption})}
+
+
+
+Submit a N\+PT simulation to the Work Queue. 
+
+
+
+Definition at line 374 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_a7ce7650a951da8f4c44c13a55b831719_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_aadcc3367e376135de20c3e1dc60d6e1e}\label{classsrc_1_1liquid_1_1Liquid_aadcc3367e376135de20c3e1dc60d6e1e}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!nvt\+\_\+simulation@{nvt\+\_\+simulation}}
+\index{nvt\+\_\+simulation@{nvt\+\_\+simulation}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{nvt\+\_\+simulation()}{nvt\_simulation()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+nvt\+\_\+simulation (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{temperature }\end{DoxyParamCaption})}
+
+
+
+Submit a N\+VT simulation to the Work Queue. 
+
+
+
+Definition at line 399 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_aadcc3367e376135de20c3e1dc60d6e1e_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_ac5a5a9186569e177bf69563dd2b08e80}\label{classsrc_1_1liquid_1_1Liquid_ac5a5a9186569e177bf69563dd2b08e80}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!objective\+\_\+term@{objective\+\_\+term}}
+\index{objective\+\_\+term@{objective\+\_\+term}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{objective\+\_\+term()}{objective\_term()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+objective\+\_\+term (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{points,  }\item[{}]{expname,  }\item[{}]{calc,  }\item[{}]{err,  }\item[{}]{grad,  }\item[{}]{name = {\ttfamily \char`\"{}Quantity\char`\"{}},  }\item[{}]{Sub\+Average = {\ttfamily False} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 466 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_ac5a5a9186569e177bf69563dd2b08e80_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a4d42de04975d1fac3a958bb943cc1250}\label{classsrc_1_1liquid_1_1Liquid_a4d42de04975d1fac3a958bb943cc1250}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!polarization\+\_\+correction@{polarization\+\_\+correction}}
+\index{polarization\+\_\+correction@{polarization\+\_\+correction}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{polarization\+\_\+correction()}{polarization\_correction()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+polarization\+\_\+correction (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals }\end{DoxyParamCaption})}
+
+
+
+Definition at line 420 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_a4d42de04975d1fac3a958bb943cc1250_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a8ded8861b18852faa19ce5193691f1f6}\label{classsrc_1_1liquid_1_1Liquid_a8ded8861b18852faa19ce5193691f1f6}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!post\+\_\+init@{post\+\_\+init}}
+\index{post\+\_\+init@{post\+\_\+init}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{post\+\_\+init()}{post\_init()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+post\+\_\+init (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{options }\end{DoxyParamCaption})}
+
+
+
+Definition at line 234 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_a8ded8861b18852faa19ce5193691f1f6_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a8655401dad963220060fd4dbd4b2c39a}\label{classsrc_1_1liquid_1_1Liquid_a8655401dad963220060fd4dbd4b2c39a}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!prepare\+\_\+temp\+\_\+directory@{prepare\+\_\+temp\+\_\+directory}}
+\index{prepare\+\_\+temp\+\_\+directory@{prepare\+\_\+temp\+\_\+directory}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{prepare\+\_\+temp\+\_\+directory()}{prepare\_temp\_directory()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+prepare\+\_\+temp\+\_\+directory (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Prepare the temporary directory by copying in important files. 
+
+
+
+Definition at line 250 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_a8655401dad963220060fd4dbd4b2c39a_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_ac70bf9d77fc3969a27a5ddba3ba4eb3a}\label{classsrc_1_1liquid_1_1Liquid_ac70bf9d77fc3969a27a5ddba3ba4eb3a}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!read@{read}}
+\index{read@{read}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{read()}{read()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+read (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Read in time series for all previous iterations. 
+
+
+
+Definition at line 621 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_ac70bf9d77fc3969a27a5ddba3ba4eb3a_cgraph}
+\end{center}
+\end{figure}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_adb6661611a77152b1442392bf4e0c303}\label{classsrc_1_1liquid_1_1Liquid_adb6661611a77152b1442392bf4e0c303}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!read\+\_\+data@{read\+\_\+data}}
+\index{read\+\_\+data@{read\+\_\+data}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{read\+\_\+data()}{read\_data()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+read\+\_\+data (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
+
+
+
+Definition at line 257 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_adb3676bf501d6683c2a8f36b10270a82}\label{classsrc_1_1liquid_1_1Liquid_adb3676bf501d6683c2a8f36b10270a82}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!submit\+\_\+jobs@{submit\+\_\+jobs}}
+\index{submit\+\_\+jobs@{submit\+\_\+jobs}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{submit\+\_\+jobs()}{submit\_jobs()}}
+{\footnotesize\ttfamily def src.\+liquid.\+Liquid.\+submit\+\_\+jobs (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{mvals,  }\item[{}]{A\+Grad = {\ttfamily True},  }\item[{}]{A\+Hess = {\ttfamily True} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 546 of file liquid.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{classsrc_1_1liquid_1_1Liquid_adb3676bf501d6683c2a8f36b10270a82_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Member Data Documentation}
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_aff804d628027f3d20892fbe5ef0452f2}\label{classsrc_1_1liquid_1_1Liquid_aff804d628027f3d20892fbe5ef0452f2}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!All\+Results@{All\+Results}}
+\index{All\+Results@{All\+Results}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{All\+Results}{AllResults}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+All\+Results}
+
+
+
+Saved results for all iterations self.\+Saved\+M\+Vals = \mbox{[}\mbox{]}. 
+
+
+
+Definition at line 232 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_aa71069dd2ca72eb8f34ec2cd9628cc78}\label{classsrc_1_1liquid_1_1Liquid_aa71069dd2ca72eb8f34ec2cd9628cc78}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!do\+\_\+self\+\_\+pol@{do\+\_\+self\+\_\+pol}}
+\index{do\+\_\+self\+\_\+pol@{do\+\_\+self\+\_\+pol}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{do\+\_\+self\+\_\+pol}{do\_self\_pol}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+do\+\_\+self\+\_\+pol}
+
+
+
+Definition at line 146 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_ac2028906051f1ba08ec748acffa8aa7b}\label{classsrc_1_1liquid_1_1Liquid_ac2028906051f1ba08ec748acffa8aa7b}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!engname@{engname}}
+\index{engname@{engname}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{engname}{engname}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+engname}
+
+
+
+Definition at line 379 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_aefe3b8e42753ca98c1c2ad1fe567a84e}\label{classsrc_1_1liquid_1_1Liquid_aefe3b8e42753ca98c1c2ad1fe567a84e}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!extra\+\_\+output@{extra\+\_\+output}}
+\index{extra\+\_\+output@{extra\+\_\+output}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{extra\+\_\+output}{extra\_output}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+extra\+\_\+output}
+
+
+
+Definition at line 200 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a067dcffe71bddcc374dc8619d529062f}\label{classsrc_1_1liquid_1_1Liquid_a067dcffe71bddcc374dc8619d529062f}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!gas\+\_\+engine@{gas\+\_\+engine}}
+\index{gas\+\_\+engine@{gas\+\_\+engine}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{gas\+\_\+engine}{gas\_engine}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+gas\+\_\+engine}
+
+
+
+Definition at line 243 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a42909fcba8430ba70f38a5421b29ab9f}\label{classsrc_1_1liquid_1_1Liquid_a42909fcba8430ba70f38a5421b29ab9f}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!gas\+\_\+mol@{gas\+\_\+mol}}
+\index{gas\+\_\+mol@{gas\+\_\+mol}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{gas\+\_\+mol}{gas\_mol}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+gas\+\_\+mol}
+
+
+
+Definition at line 196 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a593cab1d5e4ebe99d3e4f0dc8004258a}\label{classsrc_1_1liquid_1_1Liquid_a593cab1d5e4ebe99d3e4f0dc8004258a}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!Gp@{Gp}}
+\index{Gp@{Gp}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{Gp}{Gp}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+Gp}
+
+
+
+Definition at line 1196 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a303043e31dfe693950a2e028bbcd727e}\label{classsrc_1_1liquid_1_1Liquid_a303043e31dfe693950a2e028bbcd727e}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!Labels@{Labels}}
+\index{Labels@{Labels}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{Labels}{Labels}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+Labels}
+
+
+
+Definition at line 349 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a9f6eba84a2ed8a3ce69a1e9c27b98cb0}\label{classsrc_1_1liquid_1_1Liquid_a9f6eba84a2ed8a3ce69a1e9c27b98cb0}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!last\+\_\+traj@{last\+\_\+traj}}
+\index{last\+\_\+traj@{last\+\_\+traj}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{last\+\_\+traj}{last\_traj}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+last\+\_\+traj}
+
+
+
+Definition at line 198 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a188bf7be2f84cb659f6e9f47fa7d6dff}\label{classsrc_1_1liquid_1_1Liquid_a188bf7be2f84cb659f6e9f47fa7d6dff}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!liquid\+\_\+mol@{liquid\+\_\+mol}}
+\index{liquid\+\_\+mol@{liquid\+\_\+mol}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{liquid\+\_\+mol}{liquid\_mol}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+liquid\+\_\+mol}
+
+
+
+Definition at line 177 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a984364c62fcda179ec1352b6849a89bc}\label{classsrc_1_1liquid_1_1Liquid_a984364c62fcda179ec1352b6849a89bc}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}}
+\index{loop\+\_\+over\+\_\+snapshots@{loop\+\_\+over\+\_\+snapshots}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{loop\+\_\+over\+\_\+snapshots}{loop\_over\_snapshots}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+loop\+\_\+over\+\_\+snapshots}
+
+
+
+L\+PW 2018-\/02-\/11\+: This is set to True if the target calculates a single-\/point property over several existing snapshots. 
+
+
+
+Definition at line 172 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_aef2366a4e32f76e5c9c2657ee81b8d0c}\label{classsrc_1_1liquid_1_1Liquid_aef2366a4e32f76e5c9c2657ee81b8d0c}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!M\+Bar\+Energy@{M\+Bar\+Energy}}
+\index{M\+Bar\+Energy@{M\+Bar\+Energy}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{M\+Bar\+Energy}{MBarEnergy}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+M\+Bar\+Energy}
+
+
+
+Evaluated energies for all trajectories (i.\+e. 
+
+all iterations and all temperatures), using all mvals 
+
+Definition at line 229 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a0e3e31fe5612fc358781b86f0a2a2241}\label{classsrc_1_1liquid_1_1Liquid_a0e3e31fe5612fc358781b86f0a2a2241}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!n\+\_\+molecules@{n\+\_\+molecules}}
+\index{n\+\_\+molecules@{n\+\_\+molecules}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{n\+\_\+molecules}{n\_molecules}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+n\+\_\+molecules}
+
+
+
+Definition at line 181 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_afa4318bb1f833e5891262e3814408c0b}\label{classsrc_1_1liquid_1_1Liquid_afa4318bb1f833e5891262e3814408c0b}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!Objective@{Objective}}
+\index{Objective@{Objective}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{Objective}{Objective}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+Objective}
+
+
+
+Definition at line 1198 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_acd631b2d731a2c0fadaf82c1a134df79}\label{classsrc_1_1liquid_1_1Liquid_acd631b2d731a2c0fadaf82c1a134df79}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!Phase\+Points@{Phase\+Points}}
+\index{Phase\+Points@{Phase\+Points}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{Phase\+Points}{PhasePoints}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+Phase\+Points}
+
+
+
+Definition at line 347 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_aa1587611e32e765ed6552c044d23b8ca}\label{classsrc_1_1liquid_1_1Liquid_aa1587611e32e765ed6552c044d23b8ca}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!Pp@{Pp}}
+\index{Pp@{Pp}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{Pp}{Pp}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+Pp}
+
+
+
+Definition at line 1193 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_afc6a5b1380c9fe67d0483a54c02487c5}\label{classsrc_1_1liquid_1_1Liquid_afc6a5b1380c9fe67d0483a54c02487c5}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!read\+\_\+indicate@{read\+\_\+indicate}}
+\index{read\+\_\+indicate@{read\+\_\+indicate}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{read\+\_\+indicate}{read\_indicate}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+read\+\_\+indicate}
+
+
+
+Definition at line 245 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_ade287efb41717feefeb244c4113163f8}\label{classsrc_1_1liquid_1_1Liquid_ade287efb41717feefeb244c4113163f8}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!Ref\+Data@{Ref\+Data}}
+\index{Ref\+Data@{Ref\+Data}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{Ref\+Data}{RefData}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+Ref\+Data}
+
+
+
+Definition at line 268 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_af87eed064ec6048a40baeef234c46639}\label{classsrc_1_1liquid_1_1Liquid_af87eed064ec6048a40baeef234c46639}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!rundir@{rundir}}
+\index{rundir@{rundir}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{rundir}{rundir}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+rundir}
+
+
+
+Definition at line 609 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a258ee224b0bc2345f5a721b01eb329e8}\label{classsrc_1_1liquid_1_1Liquid_a258ee224b0bc2345f5a721b01eb329e8}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!Saved\+Traj@{Saved\+Traj}}
+\index{Saved\+Traj@{Saved\+Traj}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{Saved\+Traj}{SavedTraj}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+Saved\+Traj}
+
+
+
+Saved trajectories for all iterations and all temperatures. 
+
+
+
+Definition at line 227 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a5b6454446d809402102964d8be24a1a5}\label{classsrc_1_1liquid_1_1Liquid_a5b6454446d809402102964d8be24a1a5}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!surf\+\_\+ten\+\_\+mol@{surf\+\_\+ten\+\_\+mol}}
+\index{surf\+\_\+ten\+\_\+mol@{surf\+\_\+ten\+\_\+mol}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{surf\+\_\+ten\+\_\+mol}{surf\_ten\_mol}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+surf\+\_\+ten\+\_\+mol}
+
+
+
+Read the reference data. 
+
+
+
+Definition at line 213 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_acc59dd087898dc187bf5067e735e9297}\label{classsrc_1_1liquid_1_1Liquid_acc59dd087898dc187bf5067e735e9297}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!w\+\_\+alpha@{w\+\_\+alpha}}
+\index{w\+\_\+alpha@{w\+\_\+alpha}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{w\+\_\+alpha}{w\_alpha}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+w\+\_\+alpha}
+
+
+
+Definition at line 1164 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a6f95bb37f323d05d597f4341cd15f221}\label{classsrc_1_1liquid_1_1Liquid_a6f95bb37f323d05d597f4341cd15f221}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!w\+\_\+cp@{w\+\_\+cp}}
+\index{w\+\_\+cp@{w\+\_\+cp}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{w\+\_\+cp}{w\_cp}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+w\+\_\+cp}
+
+
+
+Definition at line 1166 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a3bdeef04fb48f2a34b7f7a8844d8d3a8}\label{classsrc_1_1liquid_1_1Liquid_a3bdeef04fb48f2a34b7f7a8844d8d3a8}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!w\+\_\+eps0@{w\+\_\+eps0}}
+\index{w\+\_\+eps0@{w\+\_\+eps0}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{w\+\_\+eps0}{w\_eps0}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+w\+\_\+eps0}
+
+
+
+Definition at line 1167 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_ad0c30b119ee7502f3288131a0ff79219}\label{classsrc_1_1liquid_1_1Liquid_ad0c30b119ee7502f3288131a0ff79219}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!w\+\_\+hvap@{w\+\_\+hvap}}
+\index{w\+\_\+hvap@{w\+\_\+hvap}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{w\+\_\+hvap}{w\_hvap}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+w\+\_\+hvap}
+
+
+
+Definition at line 1163 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a8681a1168945b752c37877249a99cb01}\label{classsrc_1_1liquid_1_1Liquid_a8681a1168945b752c37877249a99cb01}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!w\+\_\+kappa@{w\+\_\+kappa}}
+\index{w\+\_\+kappa@{w\+\_\+kappa}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{w\+\_\+kappa}{w\_kappa}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+w\+\_\+kappa}
+
+
+
+Definition at line 1165 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a1c430d62e8736ae276b7bcb3c5e48af5}\label{classsrc_1_1liquid_1_1Liquid_a1c430d62e8736ae276b7bcb3c5e48af5}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!w\+\_\+rho@{w\+\_\+rho}}
+\index{w\+\_\+rho@{w\+\_\+rho}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{w\+\_\+rho}{w\_rho}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+w\+\_\+rho}
+
+
+
+Definition at line 1162 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_aab7d8dd8039e6d4898dbfbbdaf5ac034}\label{classsrc_1_1liquid_1_1Liquid_aab7d8dd8039e6d4898dbfbbdaf5ac034}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!w\+\_\+surf\+\_\+ten@{w\+\_\+surf\+\_\+ten}}
+\index{w\+\_\+surf\+\_\+ten@{w\+\_\+surf\+\_\+ten}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{w\+\_\+surf\+\_\+ten}{w\_surf\_ten}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+w\+\_\+surf\+\_\+ten}
+
+
+
+Definition at line 1168 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a71c4080be710cf3f450ce618340f54f2}\label{classsrc_1_1liquid_1_1Liquid_a71c4080be710cf3f450ce618340f54f2}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!Wp@{Wp}}
+\index{Wp@{Wp}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{Wp}{Wp}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+Wp}
+
+
+
+Definition at line 1191 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_a74646db7c89f4f7f07578e0840f182b0}\label{classsrc_1_1liquid_1_1Liquid_a74646db7c89f4f7f07578e0840f182b0}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!write\+\_\+indicate@{write\+\_\+indicate}}
+\index{write\+\_\+indicate@{write\+\_\+indicate}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{write\+\_\+indicate}{write\_indicate}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+write\+\_\+indicate}
+
+
+
+Definition at line 246 of file liquid.\+py.
+
+\mbox{\Hypertarget{classsrc_1_1liquid_1_1Liquid_ae2b753e0fc7b02a275cc45bccce2419a}\label{classsrc_1_1liquid_1_1Liquid_ae2b753e0fc7b02a275cc45bccce2419a}} 
+\index{src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}!Xp@{Xp}}
+\index{Xp@{Xp}!src\+::liquid\+::\+Liquid@{src\+::liquid\+::\+Liquid}}
+\paragraph{\texorpdfstring{Xp}{Xp}}
+{\footnotesize\ttfamily src.\+liquid.\+Liquid.\+Xp}
+
+
+
+Definition at line 1189 of file liquid.\+py.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+\hyperlink{liquid_8py}{liquid.\+py}\end{DoxyCompactItemize}

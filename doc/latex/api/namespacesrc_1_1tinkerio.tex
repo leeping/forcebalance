@@ -1,0 +1,180 @@
+\hypertarget{namespacesrc_1_1tinkerio}{}\subsection{src.\+tinkerio Namespace Reference}
+\label{namespacesrc_1_1tinkerio}\index{src.\+tinkerio@{src.\+tinkerio}}
+\subsubsection*{Classes}
+\begin{DoxyCompactItemize}
+\item 
+class \hyperlink{classsrc_1_1tinkerio_1_1AbInitio__TINKER}{Ab\+Initio\+\_\+\+T\+I\+N\+K\+ER}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for force and energy matching using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER}. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1tinkerio_1_1BindingEnergy__TINKER}{Binding\+Energy\+\_\+\+T\+I\+N\+K\+ER}
+\begin{DoxyCompactList}\small\item\em Binding energy matching using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER}. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1tinkerio_1_1Interaction__TINKER}{Interaction\+\_\+\+T\+I\+N\+K\+ER}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for interaction matching using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER}. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1tinkerio_1_1Liquid__TINKER}{Liquid\+\_\+\+T\+I\+N\+K\+ER}
+\begin{DoxyCompactList}\small\item\em Condensed phase property matching using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER}. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1tinkerio_1_1Moments__TINKER}{Moments\+\_\+\+T\+I\+N\+K\+ER}
+\begin{DoxyCompactList}\small\item\em Subclass of Target for multipole moment matching using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER}. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER}
+\begin{DoxyCompactList}\small\item\em Engine for carrying out general purpose \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} calculations. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1tinkerio_1_1Tinker__Reader}{Tinker\+\_\+\+Reader}
+\begin{DoxyCompactList}\small\item\em Finite state machine for parsing \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} force field files. \end{DoxyCompactList}\item 
+class \hyperlink{classsrc_1_1tinkerio_1_1Vibration__TINKER}{Vibration\+\_\+\+T\+I\+N\+K\+ER}
+\begin{DoxyCompactList}\small\item\em Vibrational frequency matching using \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER}. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+def \hyperlink{namespacesrc_1_1tinkerio_a31804fdc4114aacf17a92c48595cbab0}{write\+\_\+key} (fout, options, fin=None, defaults=\{\}, verbose=False, prmfnm=None, chk=\mbox{[}$\,$\mbox{]})
+\begin{DoxyCompactList}\small\item\em Create or edit a \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} .key file. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+list \hyperlink{namespacesrc_1_1tinkerio_a6ba025f75f7361d1ac7d242797561ff7}{allp}
+\item 
+list \hyperlink{namespacesrc_1_1tinkerio_a0a06196607dcb099012894f7997ea81a}{eckeys}
+\item 
+\hyperlink{namespacesrc_1_1tinkerio_ae4bc471e9f9ecfced2b990ffa2b781aa}{logger} = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)
+\item 
+dictionary \hyperlink{namespacesrc_1_1tinkerio_aba760bdf570ad66c513d1ab4b2888cc1}{pdict}
+\end{DoxyCompactItemize}
+
+
+\subsubsection{Function Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1tinkerio_a31804fdc4114aacf17a92c48595cbab0}\label{namespacesrc_1_1tinkerio_a31804fdc4114aacf17a92c48595cbab0}} 
+\index{src\+::tinkerio@{src\+::tinkerio}!write\+\_\+key@{write\+\_\+key}}
+\index{write\+\_\+key@{write\+\_\+key}!src\+::tinkerio@{src\+::tinkerio}}
+\paragraph{\texorpdfstring{write\+\_\+key()}{write\_key()}}
+{\footnotesize\ttfamily def src.\+tinkerio.\+write\+\_\+key (\begin{DoxyParamCaption}\item[{}]{fout,  }\item[{}]{options,  }\item[{}]{fin = {\ttfamily None},  }\item[{}]{defaults = {\ttfamily \{\}},  }\item[{}]{verbose = {\ttfamily False},  }\item[{}]{prmfnm = {\ttfamily None},  }\item[{}]{chk = {\ttfamily \mbox{[}\mbox{]}} }\end{DoxyParamCaption})}
+
+
+
+Create or edit a \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} .key file. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em fout} & Output file name, can be the same as input file name. \\
+\hline
+\mbox{\tt in}  & {\em options} & Dictionary containing .key options. Existing options are replaced, new options are added at the end. Passing None causes options to be deleted. To pass an option without an argument, use \textquotesingle{}\textquotesingle{}. \\
+\hline
+\mbox{\tt in}  & {\em fin} & Input file name. \\
+\hline
+\mbox{\tt in}  & {\em defaults} & Default options to add to the mdp only if they don\textquotesingle{}t already exist. \\
+\hline
+\mbox{\tt in}  & {\em verbose} & Print out all modifications to the file. \\
+\hline
+\mbox{\tt in}  & {\em prmfnm} & \hyperlink{classsrc_1_1tinkerio_1_1TINKER}{T\+I\+N\+K\+ER} parameter file name. \\
+\hline
+\mbox{\tt in}  & {\em chk} & Crash if the key file does N\+OT have these options by the end. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 184 of file tinkerio.\+py.
+
+Here is the call graph for this function\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=350pt]{namespacesrc_1_1tinkerio_a31804fdc4114aacf17a92c48595cbab0_cgraph}
+\end{center}
+\end{figure}
+
+
+\subsubsection{Variable Documentation}
+\mbox{\Hypertarget{namespacesrc_1_1tinkerio_a6ba025f75f7361d1ac7d242797561ff7}\label{namespacesrc_1_1tinkerio_a6ba025f75f7361d1ac7d242797561ff7}} 
+\index{src\+::tinkerio@{src\+::tinkerio}!allp@{allp}}
+\index{allp@{allp}!src\+::tinkerio@{src\+::tinkerio}}
+\paragraph{\texorpdfstring{allp}{allp}}
+{\footnotesize\ttfamily list src.\+tinkerio.\+allp}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  [\textcolor{stringliteral}{'atom'}, \textcolor{stringliteral}{'vdw'}, \textcolor{stringliteral}{'vdw14'}, \textcolor{stringliteral}{'vdwpr'}, \textcolor{stringliteral}{'hbond'}, \textcolor{stringliteral}{'bond'}, \textcolor{stringliteral}{'bond5'}, \textcolor{stringliteral}{'bond4'},
+2         \textcolor{stringliteral}{'bond3'}, \textcolor{stringliteral}{'electneg'}, \textcolor{stringliteral}{'angle'}, \textcolor{stringliteral}{'angle5'}, \textcolor{stringliteral}{'angle4'}, \textcolor{stringliteral}{'angle3'}, \textcolor{stringliteral}{'anglef'},
+3         \textcolor{stringliteral}{'strbnd'}, \textcolor{stringliteral}{'ureybrad'}, \textcolor{stringliteral}{'angang'}, \textcolor{stringliteral}{'opbend'}, \textcolor{stringliteral}{'opdist'}, \textcolor{stringliteral}{'improper'}, \textcolor{stringliteral}{'imptors'},
+4         \textcolor{stringliteral}{'torsion'}, \textcolor{stringliteral}{'torsion5'}, \textcolor{stringliteral}{'torsion4'}, \textcolor{stringliteral}{'pitors'}, \textcolor{stringliteral}{'strtors'}, \textcolor{stringliteral}{'tortors'}, \textcolor{stringliteral}{'charge'},
+5         \textcolor{stringliteral}{'dipole'}, \textcolor{stringliteral}{'dipole5'}, \textcolor{stringliteral}{'dipole4'}, \textcolor{stringliteral}{'dipole3'}, \textcolor{stringliteral}{'multipole'}, \textcolor{stringliteral}{'polarize'}, \textcolor{stringliteral}{'piatom'},
+6         \textcolor{stringliteral}{'pibond'}, \textcolor{stringliteral}{'pibond5'}, \textcolor{stringliteral}{'pibond4'}, \textcolor{stringliteral}{'metal'}, \textcolor{stringliteral}{'biotype'}, \textcolor{stringliteral}{'mmffvdw'}, \textcolor{stringliteral}{'mmffbond'},
+7         \textcolor{stringliteral}{'mmffbonder'}, \textcolor{stringliteral}{'mmffangle'}, \textcolor{stringliteral}{'mmffstrbnd'}, \textcolor{stringliteral}{'mmffopbend'}, \textcolor{stringliteral}{'mmfftorsion'}, \textcolor{stringliteral}{'mmffbci'},
+8         \textcolor{stringliteral}{'mmffpbci'}, \textcolor{stringliteral}{'mmffequiv'}, \textcolor{stringliteral}{'mmffdefstbn'}, \textcolor{stringliteral}{'mmffcovrad'}, \textcolor{stringliteral}{'mmffprop'}, \textcolor{stringliteral}{'mmffarom'}]
+\end{DoxyCode}
+
+
+Definition at line 39 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1tinkerio_a0a06196607dcb099012894f7997ea81a}\label{namespacesrc_1_1tinkerio_a0a06196607dcb099012894f7997ea81a}} 
+\index{src\+::tinkerio@{src\+::tinkerio}!eckeys@{eckeys}}
+\index{eckeys@{eckeys}!src\+::tinkerio@{src\+::tinkerio}}
+\paragraph{\texorpdfstring{eckeys}{eckeys}}
+{\footnotesize\ttfamily list src.\+tinkerio.\+eckeys}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  [\textcolor{stringliteral}{'Angle-Angle'}, \textcolor{stringliteral}{'Angle Bending'}, \textcolor{stringliteral}{'Atomic Multipoles'}, \textcolor{stringliteral}{'Bond Stretching'}, \textcolor{stringliteral}{'Charge-Charge'}, 
+2           \textcolor{stringliteral}{'Charge-Dipole'}, \textcolor{stringliteral}{'Dipole-Dipole'}, \textcolor{stringliteral}{'Extra Energy Terms'}, \textcolor{stringliteral}{'Geometric Restraints'}, \textcolor{stringliteral}{'Implicit
+       Solvation'}, 
+3           \textcolor{stringliteral}{'Improper Dihedral'}, \textcolor{stringliteral}{'Improper Torsion'}, \textcolor{stringliteral}{'Metal Ligand Field'}, \textcolor{stringliteral}{'Out-of-Plane Bend'}, \textcolor{stringliteral}{'Out-of-Plane
+       Distance'}, 
+4           \textcolor{stringliteral}{'Pi-Orbital Torsion'}, \textcolor{stringliteral}{'Polarization'}, \textcolor{stringliteral}{'Reaction Field'}, \textcolor{stringliteral}{'Stretch-Bend'}, \textcolor{stringliteral}{'Stretch-Torsion'}, 
+5           \textcolor{stringliteral}{'Torsional Angle'}, \textcolor{stringliteral}{'Torsion-Torsion'}, \textcolor{stringliteral}{'Urey-Bradley'}, \textcolor{stringliteral}{'Van der Waals'}]
+\end{DoxyCode}
+
+
+Definition at line 49 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1tinkerio_ae4bc471e9f9ecfced2b990ffa2b781aa}\label{namespacesrc_1_1tinkerio_ae4bc471e9f9ecfced2b990ffa2b781aa}} 
+\index{src\+::tinkerio@{src\+::tinkerio}!logger@{logger}}
+\index{logger@{logger}!src\+::tinkerio@{src\+::tinkerio}}
+\paragraph{\texorpdfstring{logger}{logger}}
+{\footnotesize\ttfamily src.\+tinkerio.\+logger = get\+Logger(\+\_\+\+\_\+name\+\_\+\+\_\+)}
+
+
+
+Definition at line 56 of file tinkerio.\+py.
+
+\mbox{\Hypertarget{namespacesrc_1_1tinkerio_aba760bdf570ad66c513d1ab4b2888cc1}\label{namespacesrc_1_1tinkerio_aba760bdf570ad66c513d1ab4b2888cc1}} 
+\index{src\+::tinkerio@{src\+::tinkerio}!pdict@{pdict}}
+\index{pdict@{pdict}!src\+::tinkerio@{src\+::tinkerio}}
+\paragraph{\texorpdfstring{pdict}{pdict}}
+{\footnotesize\ttfamily dictionary src.\+tinkerio.\+pdict}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}
+1 =  \{\textcolor{stringliteral}{'VDW'}          : \{\textcolor{stringliteral}{'Atom'}:[1], 2:\textcolor{stringliteral}{'S'},3:\textcolor{stringliteral}{'T'},4:\textcolor{stringliteral}{'D'}\}, \textcolor{comment}{# Van der Waals distance, well depth, distance from
+       bonded neighbor?}
+2          \textcolor{stringliteral}{'BOND'}         : \{\textcolor{stringliteral}{'Atom'}:[1,2], 3:\textcolor{stringliteral}{'K'},4:\textcolor{stringliteral}{'B'}\},     \textcolor{comment}{# Bond force constant and equilibrium distance
+       (Angstrom)}
+3          \textcolor{stringliteral}{'ANGLE'}        : \{\textcolor{stringliteral}{'Atom'}:[1,2,3], 4:\textcolor{stringliteral}{'K'},5:\textcolor{stringliteral}{'B'}\},   \textcolor{comment}{# Angle force constant and equilibrium angle}
+4          \textcolor{stringliteral}{'STRBND'}       : \{\textcolor{stringliteral}{'Atom'}:[1,2,3], 4:\textcolor{stringliteral}{'K1'},5:\textcolor{stringliteral}{'K2'}\}, \textcolor{comment}{# Two stretch-bend force constants (usually
+       same)}
+5          \textcolor{stringliteral}{'OPBEND'}       : \{\textcolor{stringliteral}{'Atom'}:[1,2,3,4], 5:\textcolor{stringliteral}{'K'}\},       \textcolor{comment}{# Out-of-plane bending force constant}
+6          \textcolor{stringliteral}{'UREYBRAD'}     : \{\textcolor{stringliteral}{'Atom'}:[1,2,3], 4:\textcolor{stringliteral}{'K'},5:\textcolor{stringliteral}{'B'}\},   \textcolor{comment}{# Urey-Bradley force constant and equilibrium
+       distance (Angstrom)}
+7          \textcolor{stringliteral}{'TORSION'}      : (\{\textcolor{stringliteral}{'Atom'}:[1,2,3,4], 5:\textcolor{stringliteral}{'1K'}, 6:\textcolor{stringliteral}{'1B'}, 
+8                             8:\textcolor{stringliteral}{'2K'}, 9:\textcolor{stringliteral}{'2B'}, 11:\textcolor{stringliteral}{'3K'}, 12:\textcolor{stringliteral}{'3B'}\}), \textcolor{comment}{# Torsional force constants and equilibrium
+       phi-angles}
+9          \textcolor{stringliteral}{'PITORS'}       : \{\textcolor{stringliteral}{'Atom'}:[1,2], 3:\textcolor{stringliteral}{'K'}\},           \textcolor{comment}{# Pi-torsion force constants (usually 6.85 ..)}
+10          \textcolor{stringliteral}{'CHARGE'}       : \{\textcolor{stringliteral}{'Atom'}:[1], 2:\textcolor{stringliteral}{''}\},              \textcolor{comment}{# Atomic partial charge (OPLS style)}
+11          \textcolor{comment}{# Note torsion-torsion (CMAP) not implemented at this time.}
+12          \textcolor{stringliteral}{'MCHARGE'}      : \{\textcolor{stringliteral}{'Atom'}:[1,2,3], 4:\textcolor{stringliteral}{''}\},          \textcolor{comment}{# Atomic charge}
+13          \textcolor{stringliteral}{'DIPOLE'}       : \{0:\textcolor{stringliteral}{'X'},1:\textcolor{stringliteral}{'Y'},2:\textcolor{stringliteral}{'Z'}\},             \textcolor{comment}{# Dipole moment in local frame}
+14          \textcolor{stringliteral}{'QUADX'}        : \{0:\textcolor{stringliteral}{'X'}\},                         \textcolor{comment}{# Quadrupole moment, X component}
+15          \textcolor{stringliteral}{'QUADY'}        : \{0:\textcolor{stringliteral}{'X'},1:\textcolor{stringliteral}{'Y'}\},                   \textcolor{comment}{# Quadrupole moment, Y component}
+16          \textcolor{stringliteral}{'QUADZ'}        : \{0:\textcolor{stringliteral}{'X'},1:\textcolor{stringliteral}{'Y'},2:\textcolor{stringliteral}{'Z'}\},             \textcolor{comment}{# Quadrupole moment, Y component}
+17          \textcolor{stringliteral}{'POLARIZE'}     : \{\textcolor{stringliteral}{'Atom'}:[1], 2:\textcolor{stringliteral}{'A'},3:\textcolor{stringliteral}{'T'}\},       \textcolor{comment}{# Atomic dipole polarizability}
+18          \textcolor{stringliteral}{'BOND-CUBIC'}   : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},    \textcolor{comment}{# Below are global parameters.}
+19          \textcolor{stringliteral}{'BOND-QUARTIC'} : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+20          \textcolor{stringliteral}{'ANGLE-CUBIC'}  : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+21          \textcolor{stringliteral}{'ANGLE-QUARTIC'}: \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+22          \textcolor{stringliteral}{'ANGLE-PENTIC'} : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+23          \textcolor{stringliteral}{'ANGLE-SEXTIC'} : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+24          \textcolor{stringliteral}{'DIELECTRIC'}   : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\},
+25          \textcolor{stringliteral}{'POLAR-SOR'}    : \{\textcolor{stringliteral}{'Atom'}:[], 0:\textcolor{stringliteral}{''}\}
+26                                                 \textcolor{comment}{# Ignored for now: stretch/bend coupling, out-of-plane
+       bending,}
+27                                                 \textcolor{comment}{# torsional parameters, pi-torsion, torsion-torsion}
+28          \}
+\end{DoxyCode}
+
+
+Definition at line 58 of file tinkerio.\+py.
+

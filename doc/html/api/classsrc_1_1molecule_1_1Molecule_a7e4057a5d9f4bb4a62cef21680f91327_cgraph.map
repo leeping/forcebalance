@@ -1,0 +1,6 @@
+<map id="src.molecule.Molecule.read_arc" name="src.molecule.Molecule.read_arc">
+<area shape="rect" id="node2" href="$namespacesrc_1_1molecule.html#ac2056d27322c6ee6dff0bef3755f2ed3" title="Matches ANY number; it can be a decimal, scientific notation, integer, or what have you..." alt="" coords="299,5,448,32"/>
+<area shape="rect" id="node3" href="$namespacesrc_1_1molecule.html#a037d06bd9038517f2784bce4e0ad6d86" title="This function takes in three lattice lengths and three lattice angles, and tries to return a complete..." alt="" coords="280,57,467,98"/>
+<area shape="rect" id="node4" href="$namespacesrc_1_1molecule.html#a651f6c6d23932f5a2151784c992e94a8" title="ONLY matches integers! If you have a decimal point? None shall pass! " alt="" coords="305,123,442,149"/>
+<area shape="rect" id="node5" href="$namespacesrc_1_1molecule.html#a4638e3bec89d2fa20ba340988456a1ac" title="Given an atom name, attempt to get the element in most cases. " alt="" coords="283,174,463,215"/>
+</map>
