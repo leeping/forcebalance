@@ -52,7 +52,11 @@ try:
     # QYD: name of class are modified to avoid colliding with ForceBalance Molecule
     from openforcefield.topology import Molecule as OffMolecule
     from openforcefield.topology import Topology as OffTopology
-except:
+    import openforcefield
+    from pkg_resources import parse_version
+    if parse_version(openforcefield.__version__) < parse_version('0.7'):
+        raise RuntimeError('This version of FB is incompatible with OpenFF toolkit version <0.7.0')
+except ImportError:
     pass
 
 ## pdict is a useless variable if the force field is XML.

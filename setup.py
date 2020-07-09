@@ -12,16 +12,6 @@ import glob
 import argparse
 import subprocess
 
-try:
-    import numpy
-    import scipy
-except ImportError as e:
-    msg = ("\n"
-        "Error importing numpy and scipy but these are required to install ForceBalance.\n"
-        "Please make sure the numpy and scipy modules are installed and try again.\n"
-    )
-    raise ImportError(msg)
-
 #===================================#
 #|   ForceBalance version number   |#
 #| Make sure to update the version |#
