@@ -1,0 +1,388 @@
+This is a tutorial page, but if you haven\textquotesingle{}t installed Force\+Balance yet please go to the Installation page first.
+
+It is very much in process, and there are many more examples to come.\hypertarget{tutorial_tip4p}{}\subsection{Fitting a T\+I\+P4\+P potential to Q\+M cluster calculations}\label{tutorial_tip4p}
+After everything is installed, go to the {\ttfamily studies/001\+\_\+water\+\_\+tutorial} directory in the distribution. Extract the {\ttfamily targets.\+tar.\+bz2} archive file. Now execute\+:
+
+\begin{DoxyVerb} ForceBalance.py very_simple.in\end{DoxyVerb}
+
+
+If the installation was successful, you will get an output file similar to {\ttfamily very\+\_\+simple.\+out} . What follows is a description of the output file and what Force\+Balance is actually doing.
+
+Force\+Balance begins by reading the force field files from the {\ttfamily forcefield} directory. The parameters to be optimized are specified in the parameter file by adding a special comment inside the file. For example, in the {\ttfamily water.\+itp} file, we specify that the two van der Waals parameters on oxygen are to be optimized, using the following syntax\+:
+
+\begin{DoxyVerb} OW     8     15.99940     0.000       A    3.15365e-01  6.48520e-01 ; PRM 5 6\end{DoxyVerb}
+
+
+The comment {\ttfamily P\+RM 5 6} signals that \char`\"{}the parameters in fields 5
+ and 6 are to be optimized.\char`\"{} The force field parser stores the physical value of the parameter and gives the parameter a name. These are printed out in the output file\+:
+
+\begin{DoxyVerb} Reading force field from file: water.itp
+ #=========================================================#
+ #|  Starting parameter indices, physical values and IDs  |#
+ #=========================================================#
+    0 [  3.1537e-01 ] : VDWS:OW
+    1 [  6.4852e-01 ] : VDWT:OW
+    2 [  9.5720e-02 ] : BONDSB:HWOW
+    3 [  5.0242e+05 ] : BONDSK:HWOW
+    4 [  1.0452e+02 ] : ANGLESB:HWOWHW
+    5 [  6.2802e+02 ] : ANGLESK:HWOWHW
+    6 [  5.2000e-01 ] : COUL:SOL-2 COUL:SOL-3
+    7 [ -1.0400e+00 ] : COUL:SOL-4
+    8 [  1.2800e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+ -----------------------------------------------------------\end{DoxyVerb}
+
+
+The next section it prints out are a set of rescaling factors which are important for various aspects of the optimization. They are discussed further in this \href{https://simtk.org/forums/viewtopic.php?f=710&t=3827}{\tt forum post}. For now it suffices to say that these values represent the natural size of the parameter, or more specifically how much the parameter is expected to vary.
+
+\begin{DoxyVerb} #========================================================#
+ #|     Rescaling Factors (Lower Takes Precedence):      |#
+ #========================================================#
+    BONDSB                               : 5.29177e-02
+    BONDSK                               : 9.37583e+05
+    VSITE3A                              : 5.29177e-02
+    VSITE3B                              : 5.29177e-02
+    ANGLESB                              : 5.72958e+01
+    VDWS                                 : 5.29177e-02
+    ANGLESK                              : 6.05928e+02
+    COUL                                 : 1.00000e+00
+    VDWT                                 : 2.47894e+00
+ ----------------------------------------------------------\end{DoxyVerb}
+
+
+Next, it prints out user-\/specified options that pertain to the force field the targets, the objective function and the optimizer. Options that are left at their default values (in this case, most) are not printed out. Use {\ttfamily verbose\+\_\+options True} in the input file to print out all of the options.
+
+Now for the good stuff -\/ the optimizer begins. Force\+Balance computes each target and prints out an indicator for each one, then provides a breakdown of the overall objective function\+:
+
+\begin{DoxyVerb} #========================================================#
+ #|                    Main Optimizer                    |#
+ #|        Newton-Raphson Mode (Adaptive Radius)         |#
+ #========================================================#
+ 
+ #=======================================================================#
+ #|  Target: cluster-06 Type: AbInitio_GMX Objective = 1.12035e-01      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                 9.4124       27.3135     34.4605% 
+     Gradient (kJ/mol/A)            39.1963      119.0841     32.9148% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-12 Type: AbInitio_GMX Objective = 1.04039e-01      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                15.2291       47.3455     32.1658% 
+     Gradient (kJ/mol/A)            38.5401      118.0240     32.6545% 
+ -------------------------------------------------------------------------
+ #====================================================================#
+ #|                   Objective Function Breakdown                   |#
+ #|   Target Name              Residual  x  Weight  =  Contribution  |#
+ #====================================================================#
+ cluster-06                     0.11203      0.500      5.60173e-02 
+ cluster-12                     0.10404      0.500      5.20195e-02 
+ Regularization                 0.00000      1.000      0.00000e+00 
+ Total                                                  1.08037e-01 
+ ----------------------------------------------------------------------
+   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+      0   0.000e+00   0.000e+00   3.206e+00   1.08037e-01   0.000e+00      0.000\end{DoxyVerb}
+
+
+In this example job, the targets were QM energies and forces for clusters of 6 and 12 water molecules. In the initial step (using the default T\+I\+P4P parameters) and for the first target (6-\/mers), the R\+MS error for energies is 9.\+4124 k\+J/mol (34\% of the variance in the QM energies themselves), and the R\+MS error for atomistic forces is 32\% (again, scaled to the variance of the QM forces). Similar information is printed out for the 12-\/mers. Each target contributes to the overall objective function, whose value is 1.\+080e-\/01. The parameters are at their initial values, which means that any penalty function will have a value of zero (the Regularization term).
+
+Next, Force\+Balance takes a step in the parameter space. The default algorithm (a variation of Newton-\/\+Raphson) uses first and second derivative information; the gradient is printed to the screen, as is the parameter step.
+
+\begin{DoxyVerb} #========================================================#
+ #|                    Total Gradient                    |#
+ #========================================================#
+    0 [ -1.36605285e-01 ] : VDWS:OW
+    1 [ -2.24335748e-01 ] : VDWT:OW
+    2 [ -3.14688760e+00 ] : BONDSB:HWOW
+    3 [  3.54975985e-01 ] : BONDSK:HWOW
+    4 [ -3.24607484e-01 ] : ANGLESB:HWOWHW
+    5 [  8.92900123e-02 ] : ANGLESK:HWOWHW
+    6 [ -7.50893285e-02 ] : COUL:SOL-2 COUL:SOL-3
+    7 [ -2.44318391e-01 ] : COUL:SOL-4
+    8 [ -2.23561237e-02 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+ ----------------------------------------------------------
+ 
+ Levenberg-Marquardt: Newton-Raphson step found (length 1.000e-01),  0.92958359 added to Hessian diagonal
+ #========================================================#
+ #|   Mathematical Parameters (Current + Step = Next)    |#
+ #========================================================#
+    0 [  0.0000e+00 + 2.3057e-02 =  2.3057e-02 ] : VDWS:OW
+    1 [  0.0000e+00 + 3.7320e-02 =  3.7320e-02 ] : VDWT:OW
+    2 [  0.0000e+00 + 5.7207e-03 =  5.7207e-03 ] : BONDSB:HWOW
+    3 [  0.0000e+00 - 3.8228e-02 = -3.8228e-02 ] : BONDSK:HWOW
+    4 [  0.0000e+00 + 8.6160e-03 =  8.6160e-03 ] : ANGLESB:HWOWHW
+    5 [  0.0000e+00 - 7.4597e-02 = -7.4597e-02 ] : ANGLESK:HWOWHW
+    6 [  0.0000e+00 - 7.4155e-03 = -7.4155e-03 ] : COUL:SOL-2 COUL:SOL-3
+    7 [  0.0000e+00 + 2.9107e-02 =  2.9107e-02 ] : COUL:SOL-4
+    8 [  0.0000e+00 + 6.3479e-03 =  6.3479e-03 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+ ----------------------------------------------------------
+ #========================================================#
+ #|     Physical Parameters (Current + Step = Next)      |#
+ #========================================================#
+    0 [  3.1537e-01 + 1.2201e-03 =  3.1659e-01 ] : VDWS:OW
+    1 [  6.4852e-01 + 9.2513e-02 =  7.4103e-01 ] : VDWT:OW
+    2 [  9.5720e-02 + 3.0273e-04 =  9.6023e-02 ] : BONDSB:HWOW
+    3 [  5.0242e+05 - 3.5842e+04 =  4.6657e+05 ] : BONDSK:HWOW
+    4 [  1.0452e+02 + 4.9366e-01 =  1.0501e+02 ] : ANGLESB:HWOWHW
+    5 [  6.2802e+02 - 4.5200e+01 =  5.8282e+02 ] : ANGLESK:HWOWHW
+    6 [  5.2000e-01 - 7.4155e-03 =  5.1258e-01 ] : COUL:SOL-2 COUL:SOL-3
+    7 [ -1.0400e+00 + 2.9107e-02 = -1.0109e+00 ] : COUL:SOL-4
+    8 [  1.2800e-01 + 3.3591e-04 =  1.2834e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+ ----------------------------------------------------------\end{DoxyVerb}
+
+
+Note that the step length is limited to a \char`\"{}trust radius\char`\"{} of 0.\+1 -\/ this option is tunable. The step in parameter space is given in terms of the \char`\"{}mathematical parameters\char`\"{} -\/ the internal optimization variables -\/ and the \char`\"{}physical parameters\char`\"{} which are the actual values in the force field files. The mathematical parameters are mainly useful because they can be used to restart an optimization by creating a {\ttfamily read\+\_\+mvals} section to the input file and pasting the lines from the output.
+
+Force\+Balance now computes the objective function again, using the new parameter values.
+
+\begin{DoxyVerb} #=======================================================================#
+ #|  Target: cluster-06 Type: AbInitio_GMX Objective = 7.55909e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                 8.0920       27.3135     29.6263% 
+     Gradient (kJ/mol/A)            30.1378      119.0841     25.3080% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-12 Type: AbInitio_GMX Objective = 7.17029e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                13.2306       47.3455     27.9447% 
+     Gradient (kJ/mol/A)            30.1330      118.0240     25.5312% 
+ -------------------------------------------------------------------------
+ #===================================================================================#
+ #|                          Objective Function Breakdown                           |#
+ #|   Target Name              Residual  x  Weight  =  Contribution (Current-Prev)  |#
+ #===================================================================================#
+ cluster-06                     0.07559      0.500      3.77955e-02 ( -1.822e-02 ) 
+ cluster-12                     0.07170      0.500      3.58514e-02 ( -1.617e-02 ) 
+ Regularization                 0.00010      1.000      9.99999e-05 ( +1.000e-04 ) 
+ Total                                                  7.37469e-02 ( -3.429e-02 ) 
+ -------------------------------------------------------------------------------------
+   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+      1   1.000e-01   1.000e-01   1.941e-01   7.37469e-02   3.429e-02      1.001\end{DoxyVerb}
+
+
+Using the new parameter values, the values for each target have gone down -\/ that is to say, the force field now produces better agreement with the reference data. In the objective function breakdown, improvements (i.\+e. decreasing values) from the previous step are printed in green while increasing values are printed in red. The \char`\"{}\+Regularization\char`\"{} term is printed in red because the parameters have moved from their initial values, so the penalty function is now finite.
+
+The last line reports\+:
+
+\begin{DoxyItemize}
+\item The step number ({\ttfamily Step}) \item The length of the parameter vector in the mathematical parameter space ({\ttfamily $\vert$k$\vert$}) \item The length of the most recent step ({\ttfamily $\vert$dk$\vert$}) \item The magnitude of the objective function gradient vector ({\ttfamily $\vert$grad$\vert$}) \item The objective function value ({\ttfamily -\/=X2=-\/}) \item The standard deviation of the objective function over a user-\/specified number of optimization steps \item The ratio of actual-\/to-\/predicted change in the objective function value. A {\ttfamily Step\+Qual} value of 1.\+0 signifies that the trust radius can be increased.\end{DoxyItemize}
+Eventually, the optimization will converge. For this job (and when this documentation was written) it took five steps\+:
+
+\begin{DoxyVerb} #=======================================================================#
+ #|  Target: cluster-06 Type: AbInitio_GMX Objective = 6.30676e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                 7.9083       27.3135     28.9539% 
+     Gradient (kJ/mol/A)            24.1991      119.0841     20.3210% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-12 Type: AbInitio_GMX Objective = 5.89806e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                12.9053       47.3455     27.2578% 
+     Gradient (kJ/mol/A)            24.3021      118.0240     20.5908% 
+ -------------------------------------------------------------------------
+ #===================================================================================#
+ #|                          Objective Function Breakdown                           |#
+ #|   Target Name              Residual  x  Weight  =  Contribution (Current-Prev)  |#
+ #===================================================================================#
+ cluster-06                     0.06307      0.500      3.15338e-02 ( -4.544e-07 ) 
+ cluster-12                     0.05898      0.500      2.94903e-02 ( -7.454e-06 ) 
+ Regularization                 0.00170      1.000      1.70115e-03 ( +7.704e-06 ) 
+ Total                                                  6.27252e-02 ( -2.045e-07 ) 
+ -------------------------------------------------------------------------------------
+   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+      5   4.124e-01   2.498e-03   2.130e-05   6.27252e-02   2.045e-07      1.029
+ 
+ Convergence criterion reached for gradient norm (1.00e-04)
+ @========================================================@
+ @|            Final objective function value            |@
+ @|   Full:  6.272524e-02  Un-penalized:  6.102410e-02   |@
+ @========================================================@
+ #========================================================#
+ #|            Final optimization parameters:            |#
+ #|            Paste to input file to restart            |#
+ #========================================================#
+ read_mvals
+    0 [  3.3161e-02 ] : VDWS:OW
+    1 [  4.3311e-02 ] : VDWT:OW
+    2 [  5.5070e-03 ] : BONDSB:HWOW
+    3 [ -4.5933e-02 ] : BONDSK:HWOW
+    4 [  1.5497e-02 ] : ANGLESB:HWOWHW
+    5 [ -3.7655e-01 ] : ANGLESK:HWOWHW
+    6 [  2.4929e-03 ] : COUL:SOL-2 COUL:SOL-3
+    7 [  1.1874e-02 ] : COUL:SOL-4
+    8 [  1.5108e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+ /read_mvals
+ #========================================================#
+ #|              Final physical parameters:              |#
+ #========================================================#
+    0 [  3.1712e-01 ] : VDWS:OW
+    1 [  7.5589e-01 ] : VDWT:OW
+    2 [  9.6011e-02 ] : BONDSB:HWOW
+    3 [  4.5935e+05 ] : BONDSK:HWOW
+    4 [  1.0541e+02 ] : ANGLESB:HWOWHW
+    5 [  3.9986e+02 ] : ANGLESK:HWOWHW
+    6 [  5.2249e-01 ] : COUL:SOL-2 COUL:SOL-3
+    7 [ -1.0281e+00 ] : COUL:SOL-4
+    8 [  1.3599e-01 ] : VSITE3B:SOL-4 VSITE3A:SOL-4
+ ----------------------------------------------------------
+ 
+ The final force field has been printed to the 'result' directory.
+ #========================================================#
+ #|      Congratulations, ForceBalance has finished      |#
+ #|           Give yourself a pat on the back!           |#
+ #========================================================#\end{DoxyVerb}
+
+
+As you can see, the objective function has decreased considerably since the previous step, and most of the improvement was due to reducing the error in the atomistic forces. In the {\ttfamily result} directory, you will find an updated {\ttfamily water.\+itp} file with the optimized parameter values.
+
+This newly generated force field is a better fit to the reference data, but is it actually a better force field or did we just overfit the data? To answer this question, look at {\ttfamily validate.\+in} where the job type is set to {\ttfamily single}, and there are many more targets. In particular, we are now including QM energies and forces for many cluster sizes ranging from 2 to 12.
+
+Take the {\ttfamily read\+\_\+mvals} section from the output file of your previous run, paste it intointo the {\ttfamily \$options} section of {\ttfamily validate.\+in}, and run {\ttfamily Force\+Balance.\+py validate.\+in} . Force\+Balance will now evaluate the objective function using the force field parameters from the previous optimization.
+
+You should see the following output\+:
+
+\begin{DoxyVerb} #=======================================================================#
+ #|  Target: cluster-02 Type: AbInitio_GMX Objective = 6.59279e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                 2.6852        8.9926     29.8605% 
+     Gradient (kJ/mol/A)            24.4491      120.0100     20.3725% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-03 Type: AbInitio_GMX Objective = 6.86838e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                 4.1222       13.3676     30.8370% 
+     Gradient (kJ/mol/A)            24.1603      119.6514     20.1922% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-04 Type: AbInitio_GMX Objective = 6.99336e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                 5.3337       17.0641     31.2567% 
+     Gradient (kJ/mol/A)            24.4117      121.2622     20.1313% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-05 Type: AbInitio_GMX Objective = 6.83413e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                 6.4445       20.9275     30.7946% 
+     Gradient (kJ/mol/A)            24.2035      120.2407     20.1292% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-06 Type: AbInitio_GMX Objective = 6.30676e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                 7.9083       27.3135     28.9539% 
+     Gradient (kJ/mol/A)            24.1990      119.0841     20.3209% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-07 Type: AbInitio_GMX Objective = 7.23291e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                 9.0541       28.5018     31.7666% 
+     Gradient (kJ/mol/A)            24.5603      119.6730     20.5228% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-08 Type: AbInitio_GMX Objective = 6.47534e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                 9.9105       33.9780     29.1676% 
+     Gradient (kJ/mol/A)            24.5318      118.7419     20.6598% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-09 Type: AbInitio_GMX Objective = 6.31661e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                10.6633       37.0249     28.8003% 
+     Gradient (kJ/mol/A)            24.5632      119.9943     20.4703% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-10 Type: AbInitio_GMX Objective = 6.16248e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                11.3800       40.4430     28.1383% 
+     Gradient (kJ/mol/A)            24.6246      119.4050     20.6227% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-11 Type: AbInitio_GMX Objective = 5.88603e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                12.7370       47.0656     27.0623% 
+     Gradient (kJ/mol/A)            24.6241      118.6740     20.7493% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-12 Type: AbInitio_GMX Objective = 5.89805e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                12.9053       47.3455     27.2578% 
+     Gradient (kJ/mol/A)            24.3021      118.0240     20.5908% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-13 Type: AbInitio_GMX Objective = 5.94277e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                13.7931       50.5451     27.2887% 
+     Gradient (kJ/mol/A)            24.7275      119.3178     20.7241% 
+ -------------------------------------------------------------------------
+ #=======================================================================#
+ #|  Target: cluster-14 Type: AbInitio_GMX Objective = 5.53305e-02      |#
+ #|                              Difference   Denominator     Percent   |#
+ #|  Physical Variable           (Calc-Ref)     RMS (Ref)   Difference  |#
+ #=======================================================================#
+     Energy (kJ/mol)                14.1450       54.7952     25.8143% 
+     Gradient (kJ/mol/A)            24.6526      119.0962     20.6997% 
+ -------------------------------------------------------------------------
+ #====================================================================#
+ #|                   Objective Function Breakdown                   |#
+ #|   Target Name              Residual  x  Weight  =  Contribution  |#
+ #====================================================================#
+ cluster-02                     0.06593      0.077      5.07138e-03 
+ cluster-03                     0.06868      0.077      5.28337e-03 
+ cluster-04                     0.06993      0.077      5.37951e-03 
+ cluster-05                     0.06834      0.077      5.25702e-03 
+ cluster-06                     0.06307      0.077      4.85135e-03 
+ cluster-07                     0.07233      0.077      5.56378e-03 
+ cluster-08                     0.06475      0.077      4.98103e-03 
+ cluster-09                     0.06317      0.077      4.85893e-03 
+ cluster-10                     0.06162      0.077      4.74037e-03 
+ cluster-11                     0.05886      0.077      4.52772e-03 
+ cluster-12                     0.05898      0.077      4.53697e-03 
+ cluster-13                     0.05943      0.077      4.57136e-03 
+ cluster-14                     0.05533      0.077      4.25619e-03 
+ Regularization                 0.00170      1.000      1.70118e-03 
+ Total                                                  6.55802e-02 
+ ----------------------------------------------------------------------\end{DoxyVerb}
+
+
+As you can see, the agreement is comparable for all of the cluster sizes, and this effectively means that we were able to achieve an accurate fit to QM energies and forces for a wide range of cluster sizes using only the 6-\/mers and 12-\/mers.
+
+A truly good force field needs to accurately reproduce experimental measurements, but these are more difficult to compute and optimize. Force\+Balance provides methods for optimizing using experimental targets, but it is beyond the scope of this tutorial. However, hopefully this simple example helps to explain how force field optimization works within the framework of Force\+Balance.
+
+Feel free to explore using the other provided input files\+:
+
+\begin{DoxyItemize}
+\item {\ttfamily 0.\+energy\+\_\+force.\+in} uses all of the targets -\/ cluster sizes 2 through 14 -\/ in the optimization. \item {\ttfamily 1.\+netforce\+\_\+torque.\+in} includes net forces on water molecules and torques in the optimization. \item {\ttfamily 2.\+L1\+\_\+penalty.\+in} uses a L1 penalty function, effectively causing only some parameters to change and not others. \item {\ttfamily 3.\+no\+\_\+penalty.\+in} illustrates what happens when no penalty function is used at all. \item {\ttfamily 4.\+change\+\_\+factor.\+in} shows the effect of changing the rescaling factors. \item {\ttfamily 5.\+gradient.\+in} performs a finite-\/difference check on the objective function gradient. \end{DoxyItemize}

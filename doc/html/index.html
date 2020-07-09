@@ -65,10 +65,78 @@ $(function() {
 <div class="title">ForceBalance Documentation</div>  </div>
 </div><!--header-->
 <div class="contents">
-</div><!-- contents -->
+<div class="textblock"><h1><a class="anchor" id="preface_sec"></a>
+Preface: How to use this document</h1>
+<p>The documentation for ForceBalance exists in two forms: a web page and a PDF manual. They contain equivalent content. The newest versions of the software and documentation, along with relevant literature, can be found on the <a href="https://simtk.org/home/forcebalance/">SimTK website</a>.</p>
+<p><b>Users</b> of the program should read the <em>Introduction, Installation</em>, <em>Usage</em>, and <em>Tutorial</em> sections on the main page.</p>
+<p><b>Developers and contributors</b> should read the Introduction chapter, including the <em>Program Layout</em> and <em>Creating Documentation</em> sections. The <em><a href="http://leeping.github.io/forcebalance/doc/html/api/roadmap.html">API documentation</a></em>, which describes all of the modules, classes and functions in the program, is intended as a reference for contributors who are writing code.</p>
+<p>ForceBalance is a work in progress; using the program is nontrivial and many features are still being actively developed. Thus, users and developers are highly encouraged to contact me through the <a href="https://simtk.org/home/forcebalance/">SimTK website</a>, either by sending me email or posting to the public forum, in order to get things up and running.</p>
+<p>Thanks!</p>
+<p>Lee-Ping Wang</p>
+<h1><a class="anchor" id="intro_sec"></a>
+Introduction</h1>
+<p>Welcome to ForceBalance! :)</p>
+<p>This is a <em> theoretical and computational chemistry </em> program primarily developed by Lee-Ping Wang and the Wang research group at UC Davis. The full list of people who made this project possible are given in the <a class="el" href="index.html#credits">Credits</a>.</p>
+<p>The function of ForceBalance is <em>automatic force field optimization</em>. Here I will provide some background, which for the sake of brevity and readability will lack precision and details. In the future, this documentation will include literature citations which will guide further reading.</p>
+<h2><a class="anchor" id="background"></a>
+Background: Empirical Potentials</h2>
+<p>In theoretical and computational chemistry, there are many methods for computing the potential energy of a collection of atoms and molecules given their positions in space. For a system of <em>N</em> particles, the potential energy surface (or <em>potential</em> for short) is a function of the <em>3N</em> variables that specify the atomic coordinates. The potential is the foundation for many types of atomistic simulations, including molecular dynamics and Monte Carlo, which are used to simulate all sorts of chemical and biochemical processes ranging from protein folding and enzyme catalysis to reactions between small molecules in interstellar clouds.</p>
+<p>The true potential is given by the energy eigenvalue of the time-independent Schrodinger's equation, but since the exact solution is intractable for virtually all systems of interest, approximate methods are used. Some are <em>ab initio</em> methods ('from first principles') since they are derived directly from approximating Schrodinger's equation; examples include the independent electron approximation (Hartree-Fock) and perturbation theory (MP2). However, most methods contain some tunable constants or <em>empirical parameters</em> which are carefully chosen to make the method as accurate as possible. Three examples: the widely used B3LYP approximation in density functional theory (DFT) contains three parameters, the semiempirical PM3 method has 10-20 parameters per chemical element, and classical force fields have hundreds to thousands of parameters. All such formulations require an accurate parameterization to properly describe reality.</p>
+<div class="image">
+<img src="ladder_sm.png" alt="ladder_sm.png"/>
+<div class="caption">
+An arrangement of simulation methods by accuracy vs. computational cost.</div></div>
+ <p>The main audience of ForceBalance is the scientific community that uses and develops classical force fields. These force fields do not use the Schrodinger's equation as a starting point; instead, the potential is entirely specified using elementary mathematical functions. Thus, the rigorous physical foundation is sacrificed but the computational cost is reduced by a factor of millions, enabling atomic-resolution simulations of large biomolecules on long timescales and allowing the study of problems like protein folding.</p>
+<p>In classical force fields, relatively few parameters may be determined directly from experiment - for instance, a chemical bond may be described using a harmonic spring with the experimental bond length and vibrational frequency. More often there is no experimentally measurable counterpart to a parameter - for example, electrostatic interactions are often described as Coulomb interactions between pairs of atomic point "partial charges", but the fractional charge assigned to each atom has no rigorous experimental of theoretical definition. To complicate matters further, most molecular motions arise from a combination of interactions and are sensitive to many parameters at once - for example, the dihedral interaction term is intended to govern torsional motion about a bond, but these motions are modulated by the flexibility of the nearby bond and angle interactions as well as the nonbonded interactions on either side.</p>
+<div class="image">
+<img src="interactions_sm.png" alt="interactions_sm.png"/>
+<div class="caption">
+An illustration of some interactions typically found in classical force fields.</div></div>
+ <p>For all of these reasons, force field parameterization is difficult. In the current practice, parameters are often determined by fitting to results from other calculations (for example, restrained electrostatic potential fitting (RESP) for determining the partial charges) or chosen so that the simulation results match experimental measurements (for example, adjusting the partial charges on a solvent molecule to reproduce the bulk dielectric constant.) Published force fields have been modified by hand over decades to maximize their agreement with experimental observations (for example, adjusting some parameters in order to reproduce particular protein NMR structure) at the expense of reproducibility.</p>
+<h2><a class="anchor" id="mission_statement"></a>
+Purpose and brief description of this program</h2>
+<p>Given this background, I can make the following statement. <b>The purpose of ForceBalance is to create force fields by applying a highly general and systematic process with explicitly specified input data and optimization methods, paving the way to higher accuracy and improved reproducibility. </b></p>
+<p>At a high level, ForceBalance takes an empirical potential and a set of reference data as inputs, and tunes the parameters such that the simulations are able to reproduce the data as accurately as possible. Examples of reference data include energy and forces from high-level QM calculations, experimentally known molecular properties (e.g. polarizabilities and multipole moments), and experimentally measured bulk properties (e.g. density and dielectric constant).</p>
+<p>ForceBalance presents the problem of potential optimization in a unified and easily extensible framework. Since there are many empirical potentials in theoretical chemistry and similarly many types of reference data, significant effort is taken to provide an infrastructure which allows a researcher to fit any type of potential to any type of reference data.</p>
+<p>Conceptually, a set of reference data (usually a physical quantity of some kind), in combination with a method for computing the corresponding quantity with the force field, is called a <b>target</b>. For example:</p>
+<ul>
+<li>A force field can predict the density of a liquid by running NPT molecular dynamics, and this computed value can be compared against the experimental density.</li>
+<li>A force field can be used to evaluate the energies and forces at several molecular geometries, and these can be compared against energies and forces from higher-level quantum chemistry calculations using these same geometries. This is known as <b>force and energy matching</b>.</li>
+<li>A force field can predict the multipole moments and polarizabilities of a molecule isolated in vacuum, and these can be compared against experimental measurements.</li>
+</ul>
+<p>Within a target, the accuracy of the force field can be optimized by tuning the parameters to minimize the difference between the computed and reference quantities. One or more targets can be combined to produce an aggregate <b>objective function</b> whose domain is the <b>parameter space</b>. This objective function, which typically depends on the parameters in a complex way, is minimized using nonlinear optimization algorithms. The result is a force field which minimizes the errors for all of the targets.</p>
+<div class="image">
+<img src="cycle_sm.png" alt="cycle_sm.png"/>
+<div class="caption">
+The division of the potential optimization problem into three parts; the force field, targets and optimization algorithm.</div></div>
+ <p>The problem is now split into three main components; the force field, the targets, and the optimization algorithm. ForceBalance uses this conceptual division to define three classes with minimal interdependence. Thus, if a researcher wishes to explore a new functional form, incorporate a new type of reference data or try a new optimization algorithm, he or she would only need to contribute to one branch of the program without having to restructure the entire code base.</p>
+<p>The scientific problems and concepts that this program is based upon are further described in my Powerpoint presentations and publications, which can be found on the <a href="https://simtk.org/home/forcebalance/">SimTK website</a>.</p>
+<h1><a class="anchor" id="credits"></a>
+Credits</h1>
+<ul>
+<li>Lee-Ping Wang is the principal developer and author. (2006-2019)</li>
+<li>Yudong Qiu contributed the surface tension target, pure finite-difference for thermodynamic property gradients, the optimized geometry target, the OpenMM implementation of the vibrational frequency target, the interface to PropertyEstimator, and other improvements when ForceBalance is used with the SMIRNOFF force field. (2016-2019)</li>
+<li>Jeffrey Wagner contributed modernized testing infrastructure and continuous integration, and assisted with developing the interface to the Open Force Field toolkit. (2019)</li>
+<li>Hyesu Jang contributed modernized testing infrastructure with Jeff Wagner. (2019)</li>
+<li>Simon Boothroyd contributed the interface to PropertyEstimator with Yudong Qiu. (2019)</li>
+<li>Arthur Vigil contributed the unit testing framework and many unit tests, significant improvements to the automatic documentation generation, logging of output, graphical user interface, and various code improvements. (2012-2013)</li>
+<li>Keri McKiernan contributed the lipid bilayer target, starting from multiple initial conditions at each thermodynamic phase point, and several other features. (2012-2015)</li>
+<li>Erik Brandt contributed the general thermodynamic property "Thermo" target. (2014)</li>
+<li>Johnny Israeli contributed the XmlScript functionality that allows adjustable parameters to be read from embedded scripts in OpenMM XML files. (2012)</li>
+<li>Matt Welborn contributed the parallelization-over-snapshots functionality in the general force matching module (2011, only in the older ForTune code).</li>
+<li>Jiahao Chen contributed the call graph generator, the QTPIE fluctuating-charge force field (which Lee-Ping implemented into GROMACS), the interface to the MOPAC semiempirical code, and many helpful discussions in 2009-2011. (Many of these are only in the older ForTune code)</li>
+<li>Troy Van Voorhis provided scientific guidance and many of the central ideas as well as financial support during the time Lee-Ping was a graduate student (2006-2011).</li>
+<li>Vijay Pande provided scientific guidance and financial support, and through the SimBios program gave this software a home on the Web at the <a href="https://simtk.org/home/forcebalance/">SimTK website</a>.</li>
+<li>Todd Martinez provided scientific guidance and financial support.</li>
+</ul>
+<h1><a class="anchor" id="funding"></a>
+Funding</h1>
+<p>The development of this code has been supported in part by the following grants and awards:</p>
+<p>NIH Grant R01 AI130684-02 ACS-PRF 58158-DNI6 NIH Grant U54 GM072970 Open Force Field Consortium </p>
+</div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Thu Jul 9 2020 11:34:02 for ForceBalance by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Thu Jul 9 2020 11:40:26 for ForceBalance by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.13
 </small></address>

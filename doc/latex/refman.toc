@@ -1,0 +1,28 @@
+\contentsline {section}{\numberline {1}Main Page}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}Preface\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}: How to use this document}{1}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Introduction}{2}{subsection.1.2}
+\contentsline {subsubsection}{\numberline {1.2.1}Background\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}: Empirical Potentials}{2}{subsubsection.1.2.1}
+\contentsline {subsubsection}{\numberline {1.2.2}Purpose and brief description of this program}{3}{subsubsection.1.2.2}
+\contentsline {subsection}{\numberline {1.3}Credits}{5}{subsection.1.3}
+\contentsline {subsection}{\numberline {1.4}Funding}{5}{subsection.1.4}
+\contentsline {section}{\numberline {2}Installation}{6}{section.2}
+\contentsline {subsection}{\numberline {2.1}Installing Force\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}Balance using conda package manager}{6}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Installing Force\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}Balance using conda package manager}{6}{subsection.2.2}
+\contentsline {subsubsection}{\numberline {2.2.1}Prerequisites}{6}{subsubsection.2.2.1}
+\contentsline {subsubsection}{\numberline {2.2.2}Installing}{7}{subsubsection.2.2.2}
+\contentsline {subsection}{\numberline {2.3}Create documentation}{8}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Installing G\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}R\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}O\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}M\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}A\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}C\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}S-\/\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}X2}{8}{subsection.2.4}
+\contentsline {subsubsection}{\numberline {2.4.1}Prerequisites for G\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}R\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}O\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}M\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}A\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}C\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}S-\/\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}X2}{9}{subsubsection.2.4.1}
+\contentsline {section}{\numberline {3}Usage}{9}{section.3}
+\contentsline {subsection}{\numberline {3.1}Input file}{10}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Directory structure}{10}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Setting up the targets}{11}{subsection.3.3}
+\contentsline {subsubsection}{\numberline {3.3.1}Energy and force matching}{11}{subsubsection.3.3.1}
+\contentsline {subsubsection}{\numberline {3.3.2}potentials}{12}{subsubsection.3.3.2}
+\contentsline {subsection}{\numberline {3.4}Running the optimization}{12}{subsection.3.4}
+\contentsline {section}{\numberline {4}Tutorial}{12}{section.4}
+\contentsline {subsection}{\numberline {4.1}Fitting a T\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}I\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}P4\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}P potential to Q\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}M cluster calculations}{12}{subsection.4.1}
+\contentsline {section}{\numberline {5}Glossary}{19}{section.5}
+\contentsline {subsection}{\numberline {5.1}Scientific concepts}{19}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Option index\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}: General options}{19}{subsection.5.2}
+\contentsline {subsection}{\numberline {5.3}Option index\discretionary {\unhbox \voidb@x \hbox {\relax \fontsize {7}{8}\selectfont $\leftarrow \joinrel \rhook $}}{}{}: Target options}{27}{subsection.5.3}
