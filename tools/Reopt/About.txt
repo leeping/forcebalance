@@ -21,7 +21,7 @@ and cluster centroids are identified using similarity measures
 (http://mdtraj.org/1.4.2/examples/centroids.html).
 
 The output of the code is a "centroids.gro" file for each residue
-(located in "fb_dir/reopt.tmp/Clusters/PTR" in the example 
+(located in "fb_dir/reopt.tmp/Cluster/PTR" in the example 
 ForceBalance directory in this case). The centroids.gro file for 
 each residue can then be used to run new QM energy/gradient calculations 
 and form new "mmopt" targets that can be included in the objective function
