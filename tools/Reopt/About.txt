@@ -1,6 +1,8 @@
 #========================#
 #|   Code Description   |#
 #========================#
+Author: John Stoppelman
+
 Reopt.py is a tool used in conjunction with ForceBalance in
 order to identify spurious minima in the potential energy surface 
 of force fields. After a ForceBalance optimization, spurious

@@ -1,4 +1,0 @@
-Note: This is just a test-study meant to show that ForceBalance is able to use
-the AbInitio_OpenMM target to parameterize Drude particle parameters.
-It is not recommended to actually use this, as fitting to conformational energies isn't
-likely to reproduce an accurate polarizability for the Drude particles. 
