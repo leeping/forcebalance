@@ -340,7 +340,7 @@ def main():
     # Set up MD options
     MDOpts = OrderedDict()
     MDOpts["lipid"] = OrderedDict([("nsteps", lipid_nsteps), ("timestep", lipid_timestep),
-                                    ("temperature", "%s %s" % (temperature, temperature)), ("pressure", "%s %s" % (pressure, pressure)),
+                                    ("temperature", temperature), ("pressure", pressure),
                                     ("nequil", lipid_nequil), ("minimize", minimize),
                                     ("nsave", int(1000 * lipid_intvl / lipid_timestep)),
                                     ("verbose", False), ('save_traj', TgtOptions['save_traj']), 

@@ -7243,6 +7243,8 @@
   <Angle class1="HS" class2="SH" class3="LP" angle="1.57079632679" k="1255.2"/>
  </HarmonicAngleForce>
  <PeriodicTorsionForce>
+  <Proper class1="H1" class2="CT" class3="N" class4="C" periodicity1="3" phase1="0.0" k1="4.184"/>
+  <Proper class1="O2" class2="C" class3="CT" class4="CT" periodicity1="2" phase1="0.0" k1="-8.368"/>
   <Proper class1="CT" class2="CT" class3="C" class4="N" periodicity1="4" phase1="0.0" k1="0.0" periodicity2="3" phase2="0.0" k2="1.6736" periodicity3="2" phase3="0.0" k3="0.8368" periodicity4="1" phase4="0.0" k4="0.8368"/>
   <Proper class1="CT" class2="CT" class3="N" class4="C" periodicity1="4" phase1="0.0" k1="0.0" periodicity2="3" phase2="0.0" k2="1.6736" periodicity3="2" phase3="0.0" k3="8.368" periodicity4="1" phase4="0.0" k4="8.368"/>
   <Proper class1="N" class2="CT" class3="C" class4="N" periodicity1="4" phase1="0.0" k1="0.0" periodicity2="3" phase2="3.14159265359" k2="2.3012" periodicity3="2" phase3="3.14159265359" k3="6.61072" periodicity4="1" phase4="3.14159265359" k4="1.8828"/>

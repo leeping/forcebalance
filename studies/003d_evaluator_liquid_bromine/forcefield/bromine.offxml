@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SMIRNOFF version="0.3" aromaticity_model="OEAroModel_MDL">
+	<Author/>
+	<Date>2019-11-21</Date>
+	<Constraints version="0.3">
+	    <!-- constrain all bonds on bromine to equilibrium length -->
+        <Constraint smirks="[#35:1]-[#35:2]" id="c1"/>
+    </Constraints>
+	<Bonds version="0.3" potential="harmonic" fractional_bondorder_method="None" fractional_bondorder_interpolation="linear">
+		<!-- This value was taken from the 003c_amber_liquid_bromine/forcefield files. -->
+		<Bond smirks="[#35:1]-[#35:2]" length="2.28 * angstrom" k="660.0 * kilocalorie * mole**-1 * angstrom**-2" id="b01"></Bond>
+	</Bonds>
+	<vdW version="0.3" potential="Lennard-Jones-12-6" combining_rules="Lorentz-Berthelot" scale12="0.0" scale13="0.0" scale14="0.5" scale15="1.0" cutoff="6.0 * angstrom" switch_width="1.0 * angstrom" method="cutoff">
+	    <!-- This value was taken from the 003c_amber_liquid_bromine/forcefield files. -->
+		<Atom smirks="[#35:1]" id="v01" sigma="0.367 * nanometer" epsilon="2.46648 * kilojoule * mole**-1" parameterize="sigma, epsilon"></Atom>
+	</vdW>
+	<Electrostatics version="0.3" scale12="0.0" scale13="0.0" scale14="0.833333" scale15="1.0" cutoff="6.0 * angstrom" switch_width="0.0 * angstrom" method="PME"></Electrostatics>
+	<LibraryCharges version="0.3">
+	   <LibraryCharge smirks="[#35:1]-[#35:2]" charge1="0.0*elementary_charge" charge2="0.0*elementary_charge"/>
+	</LibraryCharges>
+</SMIRNOFF>

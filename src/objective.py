@@ -43,6 +43,12 @@ except:
     logger.warning("SMIRNOFF module import failed; check SMIRNOFF package\n")
 
 try:
+    from forcebalance.evaluator_io import Evaluator_SMIRNOFF
+except:
+    logger.warning(traceback.format_exc())
+    logger.warning("openff.evaluator module import failed\n")
+
+try:
     from forcebalance.abinitio_internal import AbInitio_Internal
 except:
     logger.warning(traceback.format_exc())
@@ -112,8 +118,10 @@ Implemented_Targets = {
     'OPTGEOTARGET_SMIRNOFF': OptGeoTarget_SMIRNOFF,     # Keeping these two for compatibility with released FB calculation files.
     'TORSIONPROFILE_OPENMM': TorsionProfileTarget_OpenMM,
     'TORSIONPROFILE_SMIRNOFF': TorsionProfileTarget_SMIRNOFF,
+    'EVALUATOR_SMIRNOFF': Evaluator_SMIRNOFF,
     'REMOTE_TARGET':RemoteTarget,
     }
+
 
 ## This is the canonical lettering that corresponds to : objective function, gradient, Hessian.
 Letters = ['X','G','H']
@@ -170,7 +178,7 @@ class Objective(forcebalance.BaseClass):
             logger.error("The list of target names is not unique!\n")
             raise RuntimeError
         if enable_smirnoff_prints:
-            smirnoff_analyze_parameter_coverage(forcefield, self.Targets)
+            smirnoff_analyze_parameter_coverage(forcefield, tgt_opts)
         ## The force field (it seems to be everywhere)
         self.FF = forcefield
         ## Initialize the penalty function.

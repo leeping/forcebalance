@@ -1148,6 +1148,7 @@ class OpenMM(Engine):
         """
         Optimize the geometry and align the optimized
         geometry to the starting geometry.
+        
         Parameters
         ----------
         shot : int

@@ -9,6 +9,7 @@ import shutil
 import numpy as np
 import re
 import subprocess
+from copy import deepcopy
 from collections import OrderedDict, defaultdict
 from forcebalance.nifty import col, eqcgmx, flat, floatornan, fqcgmx, invert_svd, kb, printcool, printcool_dictionary, bohr2ang, warn_press_key
 from forcebalance.target import Target
@@ -198,14 +199,18 @@ class OptGeoTarget(Target):
                 'vref_impropers': vref_impropers,
             }
 
-    def system_driver(self, sysname):
+    def system_driver(self, sysname, save_mol=None):
         """ Run calculation for one system, return internal coordinate values after optimization """
         engine = self.engines[sysname]
         ic_dict = self.internal_coordinates[sysname]
         if engine.__class__.__name__ in ('OpenMM', 'SMIRNOFF'):
             # OpenMM.optimize() by default resets geometry to initial geometry before optimization
-            engine.optimize()
+            engine.optimize(0)
             pos = engine.getContextPosition()
+            if save_mol is not None:
+                MM_minimized_mol = deepcopy(engine.mol[0])
+                MM_minimized_mol.xyzs[0] = pos
+                MM_minimized_mol.write(save_mol)
         else:
             raise NotImplementedError("system_driver() not implemented for %s" % engine.__name__)
         v_ic = {
@@ -300,8 +305,8 @@ class OptGeoTarget(Target):
                     # reference data
                     sys_data = self.internal_coordinates[sysname]
                     sys_data['ic_bonds']
-                    # compute all internal coordinate values again
-                    v_ic = self.system_driver(sysname)
+                    # compute all internal coordinate values again and save mm optimized geometry in xyz file
+                    v_ic = self.system_driver(sysname, save_mol='%s_mmopt.xyz' % sysname)
                     for p in ['bonds', 'angles', 'dihedrals', 'impropers']:
                         fout.write('--- ' + p + ' ---\n')
                         ic_list = sys_data['ic_' + p]
@@ -311,7 +316,6 @@ class OptGeoTarget(Target):
                         for ic, v1, v2 in zip(ic_list, ref_v, tar_v):
                             diff = periodic_diff(v1, v2, v_periodic=360) if p != 'bonds' else v1-v2
                             fout.write('%-25s %15.5f %15.5f %+15.3e\n' % (ic, v1, v2, diff))
-
         # compute gradients and hessian
         dV = np.zeros((self.FF.np,len(V)))
         if AGrad or AHess:

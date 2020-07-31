@@ -367,7 +367,7 @@ class Optimizer(forcebalance.BaseClass):
         ## Print out final message
         logger.info("Wall time since calculation start: %.1f seconds\n" % (time.time() - t0))
         if self.failmsg:
-            bar = printcool("I have not failed.\nI've just found 10,000 ways that won't work.",ansi="40;97")
+            bar = printcool("It is possible to commit no errors and still lose.\nThat is not a weakness. That is life.",ansi="40;93")
         else:
             bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
 
@@ -466,6 +466,7 @@ class Optimizer(forcebalance.BaseClass):
                       bold=0, color=0, center=[True, False, False, False, False])
         # Optimization steps before this one are ineligible for consideration for "best step".
         Best_Start = 0
+        criteria_satisfied = {'step' : False, 'grad' : False, 'obj' : False}
 
         def print_progress(itn, nx, nd, ng, clr, x, std, qual):
             # Step number, norm of parameter vector / step / gradient, objective function value, change from previous steps, step quality.
@@ -631,18 +632,24 @@ class Optimizer(forcebalance.BaseClass):
             #================================#
             #|  Check convergence criteria. |#
             #================================#
-            ncrit = 0
-            if self.uncert or self.converge_lowq or Quality > ThreLQ:
+            # Three conditions for checking convergence criteria:
+            # 1) If any of the targets contain statistical uncertainty
+            # 2) If the step quality is above the "low quality" threshold, -or- if we allow convergence on low quality steps
+            # 3) If we continued from a previous run and this is the first objective function evaluation
+            if self.uncert or (self.converge_lowq or Quality > ThreLQ) or (ITERATION == self.iterinit and self.iterinit > 0):
                 if ngd < self.convergence_gradient:
                     logger.info("Convergence criterion reached for gradient norm (%.2e)\n" % self.convergence_gradient)
-                    ncrit += 1
-                if ndx < self.convergence_step and ITERATION > self.iterinit:
+                    criteria_satisfied['grad'] = True
+                else: criteria_satisfied['grad'] = False
+                if ndx < self.convergence_step and ndx >= 0.0 and ITERATION > self.iterinit:
                     logger.info("Convergence criterion reached in step size (%.2e)\n" % self.convergence_step)
-                    ncrit += 1
+                    criteria_satisfied['step'] = True
+                else: criteria_satisfied['step'] = False
                 if stdfront < self.convergence_objective and len(X_hist) >= self.hist:
                     logger.info("Convergence criterion reached for objective function (%.2e)\n" % self.convergence_objective)
-                    ncrit += 1
-            if ncrit >= self.criteria: break
+                    criteria_satisfied['obj'] = True
+                else: criteria_satisfied['obj'] = False
+            if sum(criteria_satisfied.values()) >= self.criteria: break
             #================================#
             #| Save optimization variables  |#
             #| before taking the next step. |#
@@ -667,6 +674,27 @@ class Optimizer(forcebalance.BaseClass):
             # Increment the parameters.
             xk += dx
             ndx = np.linalg.norm(dx)
+            #===============================#
+            #|  Second convergence check.  |#
+            #===============================#
+            # At this point in the optimization cycle, we have G(i) --> dx(i) but not dx(i) --> G(i+1).
+            # Here we check if the step size is below threshold and decide to converge before
+            # evaluating the next gradient.
+            if self.uncert or (self.converge_lowq or Quality > ThreLQ) or (ITERATION == self.iterinit and self.iterinit > 0):
+                if ndx < self.convergence_step and ndx >= 0.0 and ITERATION > self.iterinit:
+                    logger.info("Convergence criterion reached in step size (%.2e)\n" % self.convergence_step)
+                    criteria_satisfied['step'] = True
+                else: criteria_satisfied['step'] = False
+            if sum(criteria_satisfied.values()) >= self.criteria: break
+            # Either of these conditions could cause a convergence failure:
+            # The maximum number of optimization cycles is reached.
+            if ITERATION == self.maxstep:
+                logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION)
+                break
+            # The step size is too small to continue. Sometimes happens for very rough objective functions.
+            if ITERATION > self.iterinit and ndx < self.step_lowerbound:
+                logger.info("Step size is too small to continue (%.3e < %.3e)\n" % (ndx, self.step_lowerbound))
+                break
             #================================#
             #|  Increase iteration number.  |#
             #================================#
@@ -691,16 +719,8 @@ class Optimizer(forcebalance.BaseClass):
                 self.writechk()           
             outfnm = self.save_mvals_to_input(xk)
             logger.info("Input file with saved parameters: %s\n" % outfnm)
-            # Check for whether the maximum number of optimization cycles is reached.
-            if ITERATION == self.maxstep:
-                logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION)
-                break
-            # Check for whether the step size is too small to continue.
-            if ndx < self.step_lowerbound:
-                logger.info("Step size is too small to continue (%.3e < %.3e)\n" % (ndx, self.step_lowerbound))
-                break
 
-        cnvgd = ncrit >= self.criteria
+        cnvgd = sum(criteria_satisfied.values()) >= self.criteria
         bar = printcool("\x1b[0m%s\x1b[0m\nFinal objective function value\nFull: % .6e  Un-penalized: % .6e" % 
                         ("\x1b[1mOptimization Converged" if cnvgd else "\x1b[1;91mConvergence Failure",
                          data['X'],data['X0']), color=2)

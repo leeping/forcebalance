@@ -52,13 +52,17 @@ try:
     # QYD: name of class are modified to avoid colliding with ForceBalance Molecule
     from openforcefield.topology import Molecule as OffMolecule
     from openforcefield.topology import Topology as OffTopology
-except:
+    import openforcefield
+    from pkg_resources import parse_version
+    if parse_version(openforcefield.__version__) < parse_version('0.7'):
+        raise RuntimeError('This version of FB is incompatible with OpenFF toolkit version <0.7.0')
+except ImportError:
     pass
 
 ## pdict is a useless variable if the force field is XML.
 pdict = "XML_Override"
 
-def smirnoff_analyze_parameter_coverage(forcefield, targets):
+def smirnoff_analyze_parameter_coverage(forcefield, tgt_opts):
     printcool("SMIRNOFF Parameter Coverage Analysis")
     assert hasattr(forcefield, 'offxml'), "Only SMIRNOFF Force Field is supported"
     parameter_assignment_data = defaultdict(list)
@@ -66,41 +70,30 @@ def smirnoff_analyze_parameter_coverage(forcefield, targets):
     # The openforcefield.typing.engines.smirnoff.ForceField object should now be contained in forcebalance.forcefield.FF
     ff = forcefield.openff_forcefield
     # analyze each target
-    for target in targets:
-        off_topology = None
-        ## remote targets are not initialized yet, we do a manual setup here
-        if isinstance(target, forcebalance.target.RemoteTarget):
-            if target.r_tgt_opts['type'].endswith('SMIRNOFF'):
-                target_path = os.path.join(target.root, target.tgtdir)
-                if target.r_tgt_opts['type'] == 'OPTGEOTARGET_SMIRNOFF':
-                    # parse optgeo_options_txt and get the names of the mol2 files
-                    optgeo_options_txt = os.path.join(target_path, target.r_tgt_opts['optgeo_options_txt'])
-                    sys_opts = forcebalance.opt_geo_target.OptGeoTarget.parse_optgeo_options(optgeo_options_txt)
-                    openff_mols = [OffMolecule.from_file(os.path.join(target_path,fnm), allow_undefined_stereo=True) \
-                                   for sysopt in sys_opts.values() for fnm in sysopt['mol2']]
-                else:
-                    openff_mols = [OffMolecule.from_file(os.path.join(target_path,fnm), allow_undefined_stereo=True) \
-                                   for fnm in target.r_tgt_opts.get('mol2', [])]
-                off_topology = OffTopology.from_molecules(openff_mols)
-        elif isinstance(target, forcebalance.opt_geo_target.OptGeoTarget):
-            if target.engine_.__name__ == 'SMIRNOFF':
-                target_path = os.path.join(target.root, target.tgtdir)
-                openff_mols = [OffMolecule.from_file(os.path.join(target_path,fnm), allow_undefined_stereo=True) \
-                    for sysopt in target.sys_opts.values() for fnm in sysopt['mol2']]
-                off_topology = OffTopology.from_molecules(openff_mols)
-        elif hasattr(target, 'engine') and isinstance(target.engine, SMIRNOFF) and hasattr(target.engine,'off_topology'):
-            off_topology = target.engine.off_topology
-        if off_topology is not None:
+    for tgt_option in tgt_opts:
+        target_path = os.path.join('targets', tgt_option['name'])
+        # aggregate mol2 file paths from all targets
+        mol2_paths = []
+        if tgt_option['type'] == 'OPTGEOTARGET_SMIRNOFF':
+            # parse optgeo_options_txt and get the names of the mol2 files
+            optgeo_options_txt = os.path.join(target_path, tgt_option['optgeo_options_txt'])
+            sys_opts = forcebalance.opt_geo_target.OptGeoTarget.parse_optgeo_options(optgeo_options_txt)
+            mol2_paths = [os.path.join(target_path,fnm) for sysopt in sys_opts.values() for fnm in sysopt['mol2']]
+        elif tgt_option['type'].endswith('_SMIRNOFF'):
+            mol2_paths = [os.path.join(target_path,fnm) for fnm in tgt_option['mol2']]
+        # analyze SMIRKs terms
+        for mol_fnm in mol2_paths:
+            # we work with one file at a time to avoid the topology sliently combine "same" molecules
+            openff_mol = OffMolecule.from_file(mol_fnm)
+            off_topology = OffTopology.from_molecules([openff_mol])
             molecule_force_list = ff.label_molecules(off_topology)
             for mol_idx, mol_forces in enumerate(molecule_force_list):
                 for force_tag, force_dict in mol_forces.items():
                     # e.g. force_tag = 'Bonds'
                     for atom_indices, parameter in force_dict.items():
                         param_dict = {'id': parameter.id, 'smirks': parameter.smirks, 'type':force_tag, 'atoms': list(atom_indices),}
-                        parameter_assignment_data[target.name].append(param_dict)
+                        parameter_assignment_data[mol_fnm].append(param_dict)
                         parameter_counter[parameter.smirks] += 1
-        else:
-            logger.warning("No smirnoff topology or molecule found for target %s\n" % target.name)
     # write out parameter assignment data
     out_json_path = os.path.join(forcefield.root, 'smirnoff_parameter_assignments.json')
     with open(out_json_path, 'w') as jsonfile:
@@ -257,7 +250,7 @@ class SMIRNOFF(OpenMM):
 
         # Store a separate copy of the molecule for reference restraint positions.
         self.ref_mol = deepcopy(self.mol)
-        
+
     def prepare(self, pbc=False, mmopts={}, **kwargs):
 
         """
@@ -283,7 +276,7 @@ class SMIRNOFF(OpenMM):
         openff_mols = []
         for fnm in self.mol2:
             try:
-                mol = OffMolecule.from_file(fnm, allow_undefined_stereo=True)
+                mol = OffMolecule.from_file(fnm)
             except Exception as e:
                 logger.error("Error when loading %s" % fnm)
                 raise e
@@ -393,11 +386,11 @@ class SMIRNOFF(OpenMM):
 
     def optimize(self, shot=0, align=True, crit=1e-4):
         return super(SMIRNOFF,self).optimize(shot=shot, align=align, crit=crit, disable_vsite=True)
-        
+
     def interaction_energy(self, fraga, fragb):
 
-        """ 
-        Calculate the interaction energy for two fragments. 
+        """
+        Calculate the interaction energy for two fragments.
         Because this creates two new objects and requires passing in the mol2 argument,
         the codes are copied and modified from the OpenMM class.
         """
@@ -701,7 +694,7 @@ class TorsionProfileTarget_SMIRNOFF(TorsionProfileTarget):
         # this ensure we do not add any new items into self.pgrad
         pgrads_set.intersection_update(orig_pgrad_set)
         self.pgrad = sorted(list(pgrads_set))
-        
+
 # class BindingEnergy_SMIRNOFF(BindingEnergy):
 #     """ Binding energy matching using OpenMM. """
 

@@ -29,7 +29,7 @@ class TorsionProfileTarget(Target):
             self.metadata = json.load(f)
             self.ndim = len(self.metadata['dihedrals'])
             self.freeze_atoms = sorted(set(itertools.chain(*self.metadata['dihedrals'])))
-        
+
         ## Read in the coordinate files and get topology information from PDB
         if hasattr(self, 'pdb') and self.pdb is not None:
             self.mol = Molecule(os.path.join(self.root,self.tgtdir,self.coords),
@@ -135,25 +135,35 @@ class TorsionProfileTarget(Target):
             compute.rmsd = np.array(compute.rmsd)
             if indicate:
                 if self.writelevel > 0:
+                    energy_comparison = np.array([
+                        self.eqm,
+                        compute.emm,
+                        compute.emm - self.eqm,
+                        np.sqrt(self.wts)/self.energy_denom
+                    ]).T
+                    np.savetxt("EnergyCompare.txt", energy_comparison, header="%11s  %12s  %12s  %12s" % ("QMEnergy", "MMEnergy", "Delta(MM-QM)", "Weight"), fmt="% 12.6e")
                     M_opts.write('mm_minimized.xyz')
                     if self.ndim == 1:
-                        import matplotlib.pyplot as plt
-                        plt.switch_backend('agg')
-                        fig, ax = plt.subplots()
-                        dihedrals = np.array([i[0] for i in self.metadata['torsion_grid_ids']])
-                        dsort = np.argsort(dihedrals)
-                        ax.plot(dihedrals[dsort], self.eqm[dsort], label='QM')
-                        if hasattr(self, 'emm_orig'):
-                            ax.plot(dihedrals[dsort], compute.emm[dsort], label='MM Current')
-                            ax.plot(dihedrals[dsort], self.emm_orig[dsort], label='MM Initial')
-                        else:
-                            ax.plot(dihedrals[dsort], compute.emm[dsort], label='MM Initial')
-                            self.emm_orig = compute.emm.copy()
-                        ax.legend()
-                        ax.set_xlabel('Dihedral (degree)')
-                        ax.set_ylabel('Energy (kcal/mol)')
-                        fig.suptitle('Torsion profile: iteration %i\nSystem: %s' % (Counter(), self.name))
-                        fig.savefig('plot_torsion.pdf')
+                        try:
+                            import matplotlib.pyplot as plt
+                            plt.switch_backend('agg')
+                            fig, ax = plt.subplots()
+                            dihedrals = np.array([i[0] for i in self.metadata['torsion_grid_ids']])
+                            dsort = np.argsort(dihedrals)
+                            ax.plot(dihedrals[dsort], self.eqm[dsort], label='QM')
+                            if hasattr(self, 'emm_orig'):
+                                ax.plot(dihedrals[dsort], compute.emm[dsort], label='MM Current')
+                                ax.plot(dihedrals[dsort], self.emm_orig[dsort], label='MM Initial')
+                            else:
+                                ax.plot(dihedrals[dsort], compute.emm[dsort], label='MM Initial')
+                                self.emm_orig = compute.emm.copy()
+                            ax.legend()
+                            ax.set_xlabel('Dihedral (degree)')
+                            ax.set_ylabel('Energy (kcal/mol)')
+                            fig.suptitle('Torsion profile: iteration %i\nSystem: %s' % (Counter(), self.name))
+                            fig.savefig('plot_torsion.pdf')
+                        except ImportError:
+                            logger.warning("matplotlib package is needed to make torsion profile plots\n")
             return (np.sqrt(self.wts)/self.energy_denom) * (compute.emm - self.eqm)
         compute.emm = None
         compute.rmsd = None

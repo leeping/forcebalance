@@ -698,7 +698,7 @@ class FF(forcebalance.BaseClass):
             os.unlink(absScript)
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameterize/..'):
-            parameters_to_optimize = sorted([i.strip() for i in e.get('parameterize').split(',')])
+            parameters_to_optimize = [i.strip() for i in e.get('parameterize').split(',')]
             for p in parameters_to_optimize:
                 if p not in e.attrib:
                     logger.error("Parameter \'%s\' is not found for \'%s\', please check %s" % (p, e.get('type'), ffname) )

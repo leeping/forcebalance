@@ -247,6 +247,49 @@ def read_frq_psi(psiout):
     unnorm = [np.array(i) for i in modes]
     return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm], np.zeros_like(frqs), elem, np.array(xyzs[-1])
 
+def read_frq_fb(vfnm):
+    """ Read ForceBalance-formatted vibrational data from a vdata.txt file. """
+    ## Number of atoms
+    na = -1
+    ref_eigvals = []
+    ref_eigvecs = []
+    an = 0
+    ln = 0
+    cn = -1
+    elem = []
+    for line in open(vfnm):
+        line = line.split('#')[0] # Strip off comments
+        s = line.split()
+        if len(s) == 1 and na == -1:
+            na = int(s[0])
+            xyz = np.zeros((na, 3))
+            cn = ln + 1
+        elif ln == cn:
+            pass
+        elif an < na and len(s) == 4:
+            elem.append(s[0])
+            xyz[an, :] = np.array([float(i) for i in s[1:]])
+            an += 1
+        elif len(s) == 1:
+            ref_eigvals.append(float(s[0]))
+            ref_eigvecs.append(np.zeros((na, 3)))
+            an = 0
+        elif len(s) == 3:
+            ref_eigvecs[-1][an, :] = np.array([float(i) for i in s])
+            an += 1
+        elif len(s) == 0:
+            pass
+        else:
+            logger.info(line + '\n')
+            logger.error("This line doesn't comply with our vibration file format!\n")
+            raise RuntimeError
+        ln += 1
+    ref_eigvals = np.array(ref_eigvals)
+    ref_eigvecs = np.array(ref_eigvecs)
+    for v2 in ref_eigvecs:
+        v2 /= np.linalg.norm(v2)
+    return ref_eigvals, ref_eigvecs, np.zeros_like(ref_eigvals), elem, xyz
+
 def scale_freqs(arr):
     """ Apply harmonic vibrational scaling factors. """
     # Scaling factors are taken from:
@@ -310,6 +353,8 @@ def read_frq_gen(fout):
             return read_frq_psi(fout)
         elif 'Gaussian' in line:
             return read_frq_gau(fout)
+        elif 'ForceBalance' in line:
+            return read_frq_fb(fout)
         ln += 1
     raise RuntimeError('Cannot determine format')
 

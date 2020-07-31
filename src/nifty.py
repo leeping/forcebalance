@@ -19,6 +19,7 @@ from __future__ import print_function
 
 import filecmp
 import itertools
+import distutils.dir_util
 import os
 import re
 import shutil
@@ -112,24 +113,49 @@ except ImportError:
     logger.warning("gzip module import failed (used in compressing or decompressing pickle files)\n")
     HaveGZ = False
 
-## Boltzmann constant
-kb = 0.0083144100163
-## Q-Chem to GMX unit conversion for energy
-eqcgmx = 2625.5002
-## Q-Chem to GMX unit conversion for force
-fqcgmx = -49621.9
+# The directory that this file lives in
+rootdir = os.path.dirname(os.path.abspath(__file__))
+
+# On 2020-05-07, these values were revised to CODATA 2018 values
+# hartree-joule relationship   4.359 744 722 2071(85) e-18
+# Hartree energy in eV         27.211 386 245 988(53)
+# Avogadro constant            6.022 140 76 e23         (exact)
+# molar gas constant           8.314 462 618            (exact)
+# Boltzmann constant           1.380649e-23             (exact)
+# Bohr radius                  5.291 772 109 03(80) e-11
+# speed of light in vacuum     299 792 458 (exact)
+# reduced Planck's constant    1.054571817e-34 (exact)
+# calorie-joule relationship   4.184 J (exact; from NIST)
+
+## Boltzmann constant in kJ mol^-1 k^-1
+kb          = 0.008314462618       # Previous value: 0.0083144100163
+kb_si       = 1.380649e-23
+
 # Conversion factors
-bohr2ang = 0.529177210
-ang2bohr = 1.0 / bohr2ang
-au2kcal = 627.5096080306
-kcal2au = 1.0 / au2kcal
-au2kj = 2625.5002
-kj2au = 1.0 / au2kj
-grad_au2gmx = 49614.75960959161
-grad_gmx2au = 1.0 / grad_au2gmx
-# Gradient units
-au2evang = 51.42209166566339
-evang2au = 1.0 / au2evang
+bohr2ang     = 0.529177210903      # Previous value: 0.529177210
+ang2bohr     = 1.0 / bohr2ang
+au2kcal      = 627.5094740630558   # Previous value: 627.5096080306
+kcal2au      = 1.0 / au2kcal
+au2kj        = 2625.4996394798254  # Previous value: 2625.5002
+kj2au        = 1.0 / au2kj
+grad_au2gmx  = 49614.75258920567   # Previous value: 49614.75960959161
+grad_gmx2au  = 1.0 / grad_au2gmx
+au2evang     = 51.422067476325886  # Previous value: 51.42209166566339
+evang2au     = 1.0 / au2evang
+c_lightspeed = 299792458.
+hbar         = 1.054571817e-34
+avogadro     = 6.02214076e23
+au_mass      = 9.1093837015e-31    # Atomic unit of mass in kg
+amu_mass     = 1.66053906660e-27   # Atomic mass unit in kg
+amu2au       = amu_mass / au_mass
+cm2au        = 100 * c_lightspeed * (2*np.pi*hbar) * avogadro / 1000 / au2kj # Multiply to convert cm^-1 to Hartree
+ambervel2au  = 9.349961132249932e-04 # Multiply to go from AMBER velocity unit Ang/(1/20.455 ps) to bohr/atu.
+
+
+## Q-Chem to GMX unit conversion for energy
+eqcgmx = au2kj                     # Previous value: 2625.5002
+## Q-Chem to GMX unit conversion for force
+fqcgmx = -grad_au2gmx              # Previous value: -49621.9
 
 
 #=========================#
@@ -1010,10 +1036,30 @@ def click():
     return ans
 click.t0 = time.time()
 
+def splitall(path):
+    allparts = []
+    while 1:
+        parts = os.path.split(path)
+        if parts[0] == path:  # sentinel for absolute paths
+            allparts.insert(0, parts[0])
+            break
+        elif parts[1] == path: # sentinel for relative paths
+            allparts.insert(0, parts[1])
+            break
+        else:
+            path = parts[0]
+            allparts.insert(0, parts[1])
+    return allparts
+
 # Back up a file.
-def bak(path, dest=None):
+def bak(path, dest=None, cwd=None, start=1):
     oldf = path
     newf = None
+    if cwd != None:
+        if not os.path.exists(cwd):
+            raise RuntimeError("%s is not an existing folder" % cwd)
+        old_d = os.getcwd()
+        os.chdir(cwd)
     if os.path.exists(path):
         dnm, fnm = os.path.split(path)
         if dnm == '' : dnm = '.'
@@ -1021,7 +1067,7 @@ def bak(path, dest=None):
         if dest is None:
             dest = dnm
         if not os.path.isdir(dest): os.makedirs(dest)
-        i = 1
+        i = start
         while True:
             fnm = "%s_%i%s" % (base,i,ext)
             newf = os.path.join(dest, fnm)
@@ -1029,6 +1075,8 @@ def bak(path, dest=None):
             i += 1
         logger.info("Backing up %s -> %s\n" % (oldf, newf))
         shutil.move(oldf,newf)
+    if cwd != None:
+        os.chdir(old_d)
     return newf
 
 # Purpose: Given a file name and/or an extension, do one of the following:
@@ -1283,6 +1331,19 @@ def which(fnm):
     except:
         return ''
 
+def copy_tree_over(src, dest):
+    """
+    Copy a source directory tree to a destination directory tree,
+    overwriting files as necessary.  This does not require removing
+    the destination folder, which can reduce the number of times
+    shutil.rmtree needs to be called.
+    """
+    # From https://stackoverflow.com/questions/9160227/dir-util-copy-tree-fails-after-shutil-rmtree/28055993 : 
+    # If you copy folder, then remove it, then copy again it will fail, because it caches all the created dirs. 
+    # To workaround you can clear _path_created before copy:
+    distutils.dir_util._path_created = {}
+    distutils.dir_util.copy_tree(src, dest)
+
 # Thanks to cesarkawakami on #python (IRC freenode) for this code.
 class LineChunker(object):
     def __init__(self, callback):
@@ -1379,16 +1440,27 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     #===============================================================#
     # stdout and stderr streams of the process.
     streams = [p.stdout, p.stderr]
+    # Are we using Python 2?
+    p2 = sys.version_info.major == 2
     # These are functions that take chunks of lines (read) as inputs.
     def process_out(read):
-        if print_to_screen: sys.stdout.write(str(read.encode('utf-8')))
+        if print_to_screen:
+            # LPW 2019-11-25: We should be writing a string, not a representation of bytes
+            if p2:
+                sys.stdout.write(str(read.encode('utf-8')))
+            else:
+                sys.stdout.write(read)
         if copy_stdout:
             process_out.stdout.append(read)
             wtf(read)
     process_out.stdout = []
 
     def process_err(read):
-        if print_to_screen: sys.stderr.write(str(read.encode('utf-8')))
+        if print_to_screen:
+            if p2:
+                sys.stderr.write(str(read.encode('utf-8')))
+            else:
+                sys.stderr.write(read)
         process_err.stderr.append(read)
         if copy_stderr:
             process_out.stdout.append(read)
@@ -1401,15 +1473,24 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
         while True:
             to_read, _, _ = select(streams, [], [])
             for fh in to_read:
+                # We want to call fh.read below, but this can lead to a system hang when executing Tinker on mac.
+                # This hang can be avoided by running fh.read1 (with a "1" at the end), however python2.7
+                # doesn't implement ByteStream.read1. So, to enable python3 builds on mac to work, we pick the "best"
+                # fh.read function we can get
+                if hasattr(fh, 'read1'):
+                    fhread = fh.read1
+                else:
+                    fhread = fh.read
+
                 if fh is p.stdout:
                     read_nbytes = 0
                     read = ''.encode('utf-8')
                     while True:
                         if read_nbytes == 0:
-                            read += fh.read(rbytes)
+                            read += fhread(rbytes)
                             read_nbytes += rbytes
                         else:
-                            read += fh.read(1)
+                            read += fhread(1)
                             read_nbytes += 1
                         if read_nbytes > 10+rbytes:
                             raise RuntimeError("Failed to decode stdout from external process.")
@@ -1428,10 +1509,10 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
                     read = ''.encode('utf-8')
                     while True:
                         if read_nbytes == 0:
-                            read += fh.read(rbytes)
+                            read += fhread(rbytes)
                             read_nbytes += rbytes
                         else:
-                            read += fh.read(1)
+                            read += fhread(1)
                             read_nbytes += 1
                         if read_nbytes > 10+rbytes:
                             raise RuntimeError("Failed to decode stderr from external process.")
