@@ -1,5 +1,4 @@
 """ @package forcebalance.openmmio OpenMM input/output.
-
 @author Lee-Ping Wang
 @date 04/2012
 """
@@ -222,29 +221,6 @@ def GetVirtualSiteParameters(system):
                 vsprm.append(_openmm.OutOfPlaneSite_getWeightCross(vs))
     return np.array(vsprm)
 
-def GetDrudeParameters(system):
-    """This is a similar function as GetVirtualSiteParameters, designed
-    to return all of the parameters associated with the Drude class in 
-    order to test whether any changes have been made by ForceBalance.
-    The drude_particle array contains the charge of the Drude particle,
-    the isotropic polarizability, and the two potential anisotropic polarizabilities.
-    The drude_screen array contains the Thole screening parameter.
-    See OpenMM's DrudeForce class reference for more information.
-    """
-
-    drude_particle = []
-    drude_screen = []
-    for f in system.getForces():
-        if f.__class__.__name__ == "DrudeForce":
-            for i in range(f.getNumParticles()):
-                drude_particle.append(f.getParticleParameters(i)[5]._value)
-                drude_particle.append(f.getParticleParameters(i)[6]._value)
-                drude_particle.append(f.getParticleParameters(i)[7])
-                drude_particle.append(f.getParticleParameters(i)[8])
-            for i in range(f.getNumScreenedPairs()):
-                drude_screen.append(f.getScreenedPairParameters(i)[2])
-    return np.array(drude_particle), np.array(drude_screen)
-
 def CopyAmoebaBondParameters(src,dest):
     dest.setAmoebaGlobalBondCubic(src.getAmoebaGlobalBondCubic())
     dest.setAmoebaGlobalBondQuartic(src.getAmoebaGlobalBondQuartic())
@@ -284,12 +260,6 @@ def CopyAmoebaVdwParameters(src, dest):
 def CopyAmoebaMultipoleParameters(src, dest):
     for i in range(src.getNumMultipoles()):
         dest.setMultipoleParameters(i,*src.getMultipoleParameters(i))
-
-def CopyDrudeForceParameters(src, dest):
-    for i in range(src.getNumScreenedPairs()):
-        dest.setScreenedPairParameters(i,*src.getScreenedPairParameters(i))
-    for i in range(src.getNumParticles()):
-        dest.setParticleParameters(i,*src.getParticleParameters(i))
 
 def CopyHarmonicBondParameters(src, dest):
     for i in range(src.getNumBonds()):
@@ -337,7 +307,6 @@ def CopySystemParameters(src,dest):
                'AmoebaInPlaneAngleForce':CopyAmoebaInPlaneAngleParameters,
                'AmoebaVdwForce':CopyAmoebaVdwParameters,
                'AmoebaMultipoleForce':CopyAmoebaMultipoleParameters,
-               'DrudeForce':CopyDrudeForceParameters,
                'HarmonicBondForce':CopyHarmonicBondParameters,
                'HarmonicAngleForce':CopyHarmonicAngleParameters,
                'PeriodicTorsionForce':CopyPeriodicTorsionParameters,
@@ -363,6 +332,7 @@ def UpdateSimulationParameters(src_system, dest_simulation):
                 pName = force.getGlobalParameterName(j)
                 pValue = force.getGlobalParameterDefaultValue(j)
                 dest_simulation.context.setParameter(pName, pValue)
+
 
 def SetAmoebaVirtualExclusions(system):
     if any([f.__class__.__name__ == "AmoebaMultipoleForce" for f in system.getForces()]):
@@ -414,39 +384,28 @@ def SetAmoebaNonbondedExcludeAll(system, topology):
 def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps=4):
     """
     Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.
-
     ARGUMENTS
-
     temperature (Quantity compatible with kelvin) - the temperature
     collision_rate (Quantity compatible with 1/picoseconds) - the collision rate
     timestep (Quantity compatible with femtoseconds) - the integration timestep
     system (simtk.openmm.System) - system whose forces will be partitioned
     ninnersteps (int) - number of inner timesteps (default: 4)
-
     RETURNS
-
     integrator (openmm.CustomIntegrator) - a VVVR integrator
-
     NOTES
-
     This integrator is equivalent to a Langevin integrator in the velocity Verlet discretization with a
     timestep correction to ensure that the field-free diffusion constant is timestep invariant.  The inner
     velocity Verlet discretization is transformed into a multiple timestep algorithm.
-
     REFERENCES
-
     VVVR Langevin integrator:
     * http://arxiv.org/abs/1301.3800
     * http://arxiv.org/abs/1107.2967 (to appear in PRX 2013)
-
     TODO
-
     Move initialization of 'sigma' to setting the per-particle variables.
-
     """
     # Multiple timestep Langevin integrator.
     for i in system.getForces():
-        if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce", "DrudeForce"]:
+        if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce"]:
             # Slow force.
             logger.info(i.__class__.__name__ + " is a Slow Force\n")
             i.setForceGroup(1)
@@ -520,7 +479,6 @@ suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "AmoebaVdwForce" : {"Vdw" : ["class"]},
                 "AmoebaMultipoleForce" : {"Multipole" : ["type","kz","kx"], "Polarize" : ["type"]},
                 "AmoebaUreyBradleyForce" : {"UreyBradley" : ["class1","class2","class3"]},
-                "DrudeForce" : {"Particle" : ["type1","type2"]},
                 "Residues.Residue" : {"VirtualSite" : ["index"]},
                 ## LPW's custom parameter definitions
                 "ForceBalance" : {"GB": ["type"]},
@@ -649,7 +607,7 @@ class OpenMM(Engine):
 
         # Store a separate copy of the molecule for reference restraint positions.
         self.ref_mol = deepcopy(self.mol)
-        
+
     def prepare(self, pbc=False, mmopts={}, **kwargs):
 
         """
@@ -763,7 +721,6 @@ class OpenMM(Engine):
 
         ## Generate list of OpenMM-compatible positions
         mod = self.generate_xyz_omm(self.mol)
-            
         ## Build a topology and atom lists.
         Top = mod.getTopology()
         Atoms = list(Top.atoms())
@@ -826,10 +783,8 @@ class OpenMM(Engine):
                     logger.info("Creating RPMD integrator with %i beads.\n" % rpmd_beads)
                     self.tdiv = rpmd_beads
                     integrator = RPMDIntegrator(rpmd_beads, temperature*kelvin, collision/picosecond, timestep*femtosecond)
-                elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeLangevinIntegrator(temperature*kelvin, collision/picosecond, 1*kelvin, collision/picosecond, 0.1*femtoseconds)
                 else:
                     integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
-        elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeSCFIntegrator(0.1*femtoseconds)
         else:
             ## If no temperature control, default to the Verlet integrator.
             if rpmd_beads > 0:
@@ -863,13 +818,13 @@ class OpenMM(Engine):
 
         # Freeze atoms if we have any.
         if hasattr(self, 'freeze_atoms'):
-            for i, j in enumerate(self.realAtomIdxs):
-                if i in self.freeze_atoms:
-                    self.system.setParticleMass(j, 0.0)
-                        
+            for i in self.freeze_atoms:
+                j = self.realAtomIdxs[i]
+                self.system.setParticleMass(j, 0.0)
+
         ## Set up for energy component analysis.
         GrpTogether = ['AmoebaGeneralizedKirkwoodForce', 'AmoebaMultipoleForce','AmoebaWcaDispersionForce',
-                        'DrudeForce', 'CustomNonbondedForce',  'NonbondedForce']
+                        'CustomNonbondedForce',  'NonbondedForce']
         GrpNums = {}
         if not mts:
             for j in self.system.getForces():
@@ -937,7 +892,7 @@ class OpenMM(Engine):
             if isinstance(i, AmoebaMultipoleForce):
                 if self.SetPME:
                     i.setNonbondedMethod(i.PME)
-                    
+
         #----
         # If the virtual site parameters have changed,
         # the simulation object must be remade.
@@ -947,26 +902,6 @@ class OpenMM(Engine):
             if hasattr(self, 'simulation'):
                 delattr(self, 'simulation')
         self.vsprm = vsprm.copy()
-
-        #----
-        #Same with the Drude Particles, if the parameters
-        #have changed then the positions must be recomputed and 
-        #the simulation object must be remade.
-        #----
-        if any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]):
-            drude_particle, drude_screen = GetDrudeParameters(self.system)
-            if hasattr(self, 'simulation'):
-                if hasattr(self, 'drude_particle') and len(self.drude_particle)>0 and np.max(np.abs(self.drude_particle - drude_particle)) != 0:
-                    self.xyz_omms = self.drude_initial_positions
-                    self.adjust_drude_positions()
-                elif hasattr(self, 'drude_screen') and len(self.drude_screen)>0 and np.max(np.abs(self.drude_screen - drude_screen)) != 0:
-                    self.xyz_omms = self.drude_initial_positions
-                    self.adjust_drude_positions()
-            else:
-                self.drude_initial_positions = self.xyz_omms
-                self.adjust_drude_positions()
-            self.drude_particle = drude_particle.copy()
-            self.drude_screen = drude_screen.copy() 
 
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)
@@ -993,7 +928,6 @@ class OpenMM(Engine):
         """
         Set the positions and periodic box vectors to one of the
         stored coordinates.
-
         *** NOTE: If you run a MD simulation, then the coordinates are
         overwritten by the MD trajectory. ***
         """
@@ -1051,13 +985,11 @@ class OpenMM(Engine):
 
         """
         Utility function for computing energy, and (optionally) forces and dipoles using OpenMM.
-
         Inputs:
         force: Switch for calculating the force.
         dipole: Switch for calculating the dipole.
         traj: Trajectory (listing of coordinate and box 2-tuples).  If provide, will loop over these snapshots.
         Otherwise will do a single point evaluation at the current geometry.
-
         Outputs:
         Result: Dictionary containing energies, forces and/or dipoles.
         """
@@ -1065,7 +997,7 @@ class OpenMM(Engine):
         self.update_simulation()
 
         # If trajectory flag set to False, perform a single-point calculation.
-        if not traj: return self.evaluate_one_(force, dipole)
+        if not traj: return evaluate_one_(force, dipole)
         Energies = []
         Forces = []
         Dipoles = []
@@ -1110,12 +1042,10 @@ class OpenMM(Engine):
     def build_mass_weighted_hessian(self, shot=0, optimize=True):
         """OpenMM single frame hessian evaluation
         Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
-
         Parameters
         ----------
         shot: int
             The frame number in the trajectory of this target
-
         Returns
         -------
         hessian: np.array with shape 3N x 3N, N = number of "real" atoms
@@ -1126,7 +1056,7 @@ class OpenMM(Engine):
         """
         self.update_simulation()
         if optimize is True:
-            self.optimize(shot, crit=1e-10)
+            self.optimize(shot, crit=1e-8)
         else:
             warn_once("Computing mass-weighted hessian without geometry optimization")
             self.set_positions(shot)
@@ -1168,14 +1098,12 @@ class OpenMM(Engine):
     def normal_modes(self, shot=0, optimize=True):
         """OpenMM Normal Mode Analysis
         Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
-
         Parameters
         ----------
         shot: int
             The frame number in the trajectory of this target
         optimize: bool, default True
             Optimize the geometry before evaluating the normal modes
-
         Returns
         -------
         freqs: np.array with shape (3N - 6) x 1, N = number of "real" atoms
@@ -1202,6 +1130,12 @@ class OpenMM(Engine):
         # step 4: convert eigenvectors to normal modes
         # re-arange to row index and shape
         normal_modes = eigvecs.T.reshape(noa*3, noa, 3)
+        # step 5: Remove mass weighting from eigenvectors
+        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
+        for i in range(normal_modes.shape[0]):
+            mode = normal_modes[i]
+            mode /= np.sqrt(massList[:,np.newaxis])
+            mode /= np.linalg.norm(mode)
         # step 5: remove the 6 freqs with smallest abs value and corresponding normal modes
         n_remove = 5 if len(self.realAtomIdxs) == 2 else 6
         larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])
@@ -1211,10 +1145,9 @@ class OpenMM(Engine):
 
     def optimize(self, shot, crit=1e-4, disable_vsite=False, align=True, include_restraint_energy=False):
 
-        """ 
-        Optimize the geometry and align the optimized 
+        """
+        Optimize the geometry and align the optimized
         geometry to the starting geometry.
-        
         Parameters
         ----------
         shot : int
@@ -1225,7 +1158,6 @@ class OpenMM(Engine):
             Disable virtual sites (needed for SMIRNOFF)
         include_restraint_energy : bool
             Include energy component from CustomExternalForce
-
         Returns
         -------
         E : float
@@ -1244,7 +1176,18 @@ class OpenMM(Engine):
         # printcool_dictionary(energy_components(self.simulation), title='Energy component analysis before minimization, shot %i' % shot)
         # Minimize the energy.  Optimizer works best in "steps".
         for logc in np.linspace(0, np.log10(crit), steps):
-            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=10000)
+            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=100000)
+        # check if energy minimization is successful
+        # try 1000 times with 10 steps each as openmm minimizer is not very stable at the tolerance
+        for _ in range(1000):
+            e_minimized = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
+            self.simulation.minimizeEnergy(tolerance=crit*kilojoule_per_mole, maxIterations=10)
+            e_new = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
+            if abs(e_new - e_minimized) < crit * 10:
+                break
+        else:
+            logger.error("Energy minimization did not converge")
+            raise RuntimeError("Energy minimization did not converge")
         # Remove the restraint energy from the total energy if desired.
         groups = set(range(32))
         if self.restraint_frc_index is not None and not include_restraint_energy:
@@ -1257,6 +1200,7 @@ class OpenMM(Engine):
         E = S.getPotentialEnergy().value_in_unit(kilocalorie_per_mole)
         # Align to original geometry.
         M = deepcopy(self.mol[0])
+        M += deepcopy(M)
         M.xyzs = [X0, X1]
         if not self.pbc and align:
             M.align(center=False)
@@ -1273,17 +1217,14 @@ class OpenMM(Engine):
     def getContextPosition(self, removeVirtual=False):
         """
         Get current position from simulation context.
-
         Parameters
         ----------
         removeVirtual: bool
             Remove positions of virtual atoms, result will only have positions of real atoms.
-
         Returns
         -------
         pos: np.ndarray of shape (N x 3)
             Position array in unit of Angstrom. If removeVirtual=True, N = No. real atoms, else N = No. all atoms.
-
         """
         pos = self.simulation.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(angstrom)
         if removeVirtual:
@@ -1372,7 +1313,6 @@ class OpenMM(Engine):
 
         """
         Method for running a molecular dynamics simulation.
-
         Required arguments:
         nsteps      = (int)   Number of total time steps
         timestep    = (float) Time step in FEMTOSECONDS
@@ -1381,7 +1321,6 @@ class OpenMM(Engine):
         nequil      = (int)   Number of additional time steps at the beginning for equilibration
         nsave       = (int)   Step interval for saving and printing data
         minimize    = (bool)  Perform an energy minimization prior to dynamics
-
         Returns simulation data:
         Rhos        = (array)     Density in kilogram m^-3
         Potentials  = (array)     Potential energies
@@ -1570,34 +1509,6 @@ class OpenMM(Engine):
             # update this frame
             self.xyz_omms[i] = [new_pos.astype(np.float32)*nanometer, new_box*nanometer]
 
-    def adjust_drude_positions(self):
-        """First zero the mass of the system. This is needed because the Drude positions
-        are on top of the parent atom, giving incorrect polarization energy. Taking a small
-        time step with a zero mass system will "optimize" the Drude particle positions
-        without moving the initial particle positions. The system is then remassed after
-        the positions have been changed."""
-
-        mass = []
-        for k in range(self.system.getNumParticles()):
-            mass.append(self.system.getParticleMass(k))
-            self.system.setParticleMass(k, 0)
-        self.create_simulation(**self.simkwargs)
-        if self.pbc:
-            box_omm = [Vec3(mol.boxes[I].a, 0, 0)*nanometer,
-                        Vec3(0, mol.boxes[I].b, 0)*nanometer,
-                        Vec3(0, 0, mol.boxes[I].c)*nanometer]
-        else:
-            box_omm = None
-        for I in range(len(self.xyz_omms)):
-            self.set_positions(I)
-            self.simulation.step(1)
-            pos = self.simulation.context.getState(getPositions=True).getPositions()._value
-            pos = [Vec3(i[0],i[1],i[2]) for i in pos]*nanometer
-            self.xyz_omms[I] = (pos, box_omm)
-        for k in range(self.system.getNumParticles()):
-            self.system.setParticleMass(k,mass[k])
-        delattr(self, 'simulation')
-
 class Liquid_OpenMM(Liquid):
     """ Condensed phase property matching using OpenMM. """
     def __init__(self,options,tgt_opts,forcefield):
@@ -1744,7 +1655,7 @@ class OptGeoTarget_OpenMM(OptGeoTarget):
             # here mol=M is given for the purpose of using the topology from the input pdb file
             # if we don't do this, pdb=top.pdb option will only copy some basic information but not the topology into OpenMM.mol (openmmio.py line 615)
             self.engines[sysname] = self.engine_(target=self, mol=M, name=sysname, pdb=pdbpath, **engine_args)
- 
+
 class TorsionProfileTarget_OpenMM(TorsionProfileTarget):
     """ Optimized geometry matching using OpenMM. """
     def __init__(self,options,tgt_opts,forcefield):
@@ -1756,4 +1667,3 @@ class TorsionProfileTarget_OpenMM(TorsionProfileTarget):
         self.engine_ = OpenMM
         ## Initialize base class.
         super(TorsionProfileTarget_OpenMM,self).__init__(options,tgt_opts,forcefield)
-
