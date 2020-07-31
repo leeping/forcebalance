@@ -2688,15 +2688,15 @@ class Molecule(object):
                 hyds.append(i)
         return hyds
 
-    def all_pairwise_rmsd(self):
+    def all_pairwise_rmsd(self, atom_inds=slice(None)):
         """ Find pairwise RMSD (super slow, not like the one in MSMBuilder.) """
         N = len(self)
         Mat = np.zeros((N,N),dtype=float)
         for i in range(N):
-            xyzi = self.xyzs[i].copy()
+            xyzi = self.xyzs[i][atom_inds].copy()
             xyzi -= xyzi.mean(0)
             for j in range(i):
-                xyzj = self.xyzs[j].copy()
+                xyzj = self.xyzs[j][atom_inds].copy()
                 xyzj -= xyzj.mean(0)
                 tr, rt = get_rotate_translate(xyzj, xyzi)
                 xyzj = np.dot(xyzj, rt) + tr
@@ -2722,14 +2722,14 @@ class Molecule(object):
             Vec[i] = rmsd
         return Vec
 
-    def ref_rmsd(self, i, align=True):
+    def ref_rmsd(self, i, atom_inds=slice(None), align=True):
         """ Find RMSD to a reference frame. """
         N = len(self)
         Vec = np.zeros(N)
-        xyzi = self.xyzs[i].copy()
+        xyzi = self.xyzs[i][atom_inds].copy()
         if align: xyzi -= xyzi.mean(0)
         for j in range(N):
-            xyzj = self.xyzs[j].copy()
+            xyzj = self.xyzs[j][atom_inds].copy()
             if align:
                 xyzj -= xyzj.mean(0)
                 tr, rt = get_rotate_translate(xyzj, xyzi)
