@@ -168,6 +168,7 @@ tgt_opts_types = {
                  "subset"                : (None, 0, 'Specify a subset of molecules to fit.  The rest are used for cross-validation.', 'Hydration free energy target', 'Hydration'),
                  "gmx_eq_barostat"       : ('berendsen', 0, 'Name of the barostat to use for equilibration.', 'Condensed phase property targets, Gromacs only', 'liquid, lipid'),
                  "evaluator_input"        : ('evaluator_input.json', 0, 'JSON file containing options for the OpenFF Evaluator target. If not provided, will search for a default.', 'OpenFF Evaluator target', 'Evaluator_SMIRNOFF'),
+                 "recharge_esp_store"        : ('esp-store.sqlite', 0, 'A SQLite database containing the electrostatic potential data (computed using the `openff-recharge` framework) to train against. If not provided, will search for a default.', 'OpenFF Recharge target', 'Recharge_SMIRNOFF'),
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
