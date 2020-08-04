@@ -97,6 +97,7 @@ from __future__ import division
 from builtins import zip
 from builtins import str
 from builtins import range
+import csv
 import os
 import sys
 import numpy as np
@@ -735,7 +736,7 @@ class FF(forcebalance.BaseClass):
                 self.offxml_unit_strs[dest] = unit_str
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
-            for field in e.get('parameter_eval').split(','):
+            for field in next(csv.reader([e.get('parameter_eval')])):
                 parameter_name = field.strip().split('=', 1)[0]
                 if parameter_name not in e.attrib:
                     logger.error("Parameter \'%s\' is not found for \'%s\', please check %s" % (parameter_name, e.get('type'), ffname) )
