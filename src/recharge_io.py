@@ -255,7 +255,7 @@ class Recharge_SMIRNOFF(Target):
         bcc_values = parameter_values[self._parameter_to_bcc_map].reshape(-1, 1)
 
         # Compute the objective function
-        delta = self._target_residuals - self._design_matrix @ bcc_values
+        delta = self._target_residuals - np.matmul(self._design_matrix, bcc_values)
         loss = (delta * delta).sum()
 
         loss_gradient = np.zeros(len(parameter_values))
@@ -271,13 +271,13 @@ class Recharge_SMIRNOFF(Target):
         # Compute the objective gradient and hessian.
         if AGrad is True:
 
-            bcc_gradient = -2.0 * self._design_matrix.T @ delta
+            bcc_gradient = -2.0 * np.matmul(self._design_matrix.T, delta)
 
             for bcc_index, parameter_index in enumerate(self._parameter_to_bcc_map):
                 loss_gradient[parameter_index] = bcc_gradient[bcc_index]
 
             gradient_jacobian = self._compute_gradient_jacobian(mvals)
-            loss_gradient = gradient_jacobian @ loss_gradient
+            loss_gradient = np.matmul(gradient_jacobian, loss_gradient)
 
         if AHess is True:
             loss_hessian = 2.0 * np.outer(loss_gradient * 0.5, loss_gradient * 0.5)
