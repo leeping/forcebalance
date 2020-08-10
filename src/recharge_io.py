@@ -68,7 +68,7 @@ class Recharge_SMIRNOFF(Target):
         esp_store = MoleculeESPStore(os.path.join(self.tgtdir, self.recharge_esp_store))
 
         # Define the molecules to include in the training set.
-        smiles = [*esp_store.list()]
+        smiles = [smiles_pattern for smiles_pattern in esp_store.list()]
 
         # Determine which BCC parameters are being optimized.
         force_field = smirnoff.ForceField(
