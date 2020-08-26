@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SMIRNOFF version="0.3" aromaticity_model="OEAroModel_MDL">
+    <ChargeIncrementModel version="0.3" number_of_conformers="500" partial_charge_method="am1elf10">
+        <ChargeIncrement smirks="[#6X4:1]-[#1:2]" charge_increment1="0.0393 * elementary_charge"
+                         charge_increment2="-0.0393 * elementary_charge"
+                         parameterize="charge_increment1"
+                         parameter_eval="charge_increment2=-PRM['ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]']"/>
+    </ChargeIncrementModel>
+</SMIRNOFF>
