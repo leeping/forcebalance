@@ -211,8 +211,7 @@ tgt_opts_types = {
                  "optimize_geometry": (1, 0, 'Perform a geometry optimization before computing properties', 'Monomer properties', 'moments'),
                  # Replaced 2020-08-20 with energy_mode
                  # "absolute"         : (0, -150, 'When matching energies in AbInitio, do not subtract the mean energy gap.', 'Energy matching (advanced usage)', 'abinitio'),
-                 "cauchy"           : (0, 0, 'Normalize interaction energies each using 1/sqrt(denom**2 + reference**2) which resembles a Cauchy distribution', 'Interaction energy targets', 'interaction'),
-                 "attenuate"        : (0, 0, 'Normalize interaction energies using 1/sqrt(denom**2 + (reference-denom)**2) only for repulsive interactions greater than denom.', 'Interaction energy targets', 'interaction'),
+                 "attenuate"        : (0, 110, 'Normalize interaction energies using 1/sqrt(denom**2 + (E(qm)-denom)**2) for energies more positive than denom.', 'Multiple targets that involve realtive energies', 'abinitio, binding, interaction, torsionprofile'),
                  "normalize"        : (0, -150, 'Divide objective function by the number of snapshots / vibrations', 'Interaction energy / vibrational mode targets', 'interaction, vibration'),
                  "w_normalize"      : (0, 0, 'Normalize the condensed phase property contributions to the liquid / lipid property target', 'Condensed phase property targets', 'liquid, lipid'),
                  "manual"           : (0, -150, 'Give the user a chance to fill in condensed phase stuff on the zeroth step', 'Condensed phase property targets (advanced usage)', 'liquid'),

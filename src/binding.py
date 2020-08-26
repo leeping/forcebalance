@@ -146,7 +146,6 @@ class BindingEnergy(Target):
 
         self.set_option(None, None, 'rmsd_denom', val=tgt_opts['rmsd_denom'])
 
-        self.set_option(tgt_opts,'cauchy')
         self.set_option(tgt_opts,'attenuate')
         ## LPW 2018-02-11: This is set to True if the target calculates
         ## a single-point property over several existing snapshots.
@@ -155,13 +154,9 @@ class BindingEnergy(Target):
         logger.info("The energy denominator is: %s\n" % str(self.energy_denom)) 
         logger.info("The RMSD denominator is: %s\n" % str(self.rmsd_denom))
 
-        if self.cauchy:
-            logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( denom**2 + reference**2 )\n")
-            if self.attenuate:
-                logger.error('attenuate and cauchy are mutually exclusive\n')
-                raise RuntimeError
-        elif self.attenuate:
-            logger.info("Repulsive interactions beyond energy_denom will be scaled by 1.0 / ( denom**2 + (reference-denom)**2 )\n")
+        if self.attenuate:
+            denom = self.energy_denom
+            logger.info("Interaction energies more positive than %.1f will have reduced weight going as: 1.0 / (%.1f^2 + (energy-%.1f)^2)\n" % (denom, denom, denom))
         ## Build keyword dictionaries to pass to engine.
         engine_args = OrderedDict(list(self.OptionDict.items()) + list(options.items()))
         engine_args.pop('name', None)
@@ -216,9 +211,7 @@ class BindingEnergy(Target):
                 Reference_ = self.inter_opts[inter_]['reference_physical']
                 Delta_ = Calculated_ - Reference_
                 Denom_ = self.energy_denom
-                if self.cauchy:
-                    Divisor_ = np.sqrt(Denom_**2 + Reference_**2)
-                elif self.attenuate:
+                if self.attenuate:
                     if Reference_ < Denom_:
                         Divisor_ = Denom_
                     else:
