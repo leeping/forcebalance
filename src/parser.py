@@ -169,6 +169,8 @@ tgt_opts_types = {
                  "gmx_eq_barostat"       : ('berendsen', 0, 'Name of the barostat to use for equilibration.', 'Condensed phase property targets, Gromacs only', 'liquid, lipid'),
                  "evaluator_input"        : ('evaluator_input.json', 0, 'JSON file containing options for the OpenFF Evaluator target. If not provided, will search for a default.', 'OpenFF Evaluator target', 'Evaluator_SMIRNOFF'),
                  "recharge_esp_store"        : ('esp-store.sqlite', 0, 'A SQLite database containing the electrostatic potential data (computed using the `openff-recharge` framework) to train against. If not provided, will search for a default.', 'OpenFF Recharge target', 'Recharge_SMIRNOFF'),
+                 "energy_mode"           : ('average', 50, 'How to treat relative (MM-QM) energies. "average": Subtract out the mean gap (default). "qm_minimum": Reference all MM and QM energies to the structure with minimum QM energy.'
+                                            '"absolute": Use absolute energies in fitting, do not subtract out any energy gap.', 'Energy + Force Matching', 'AbInitio')
                  },
     'allcaps' : {"type"   : (None, 200, 'The type of fitting target, for instance AbInitio_GMX ; this must correspond to the name of a Target subclass.', 'All targets (important)' ,''),
                  "engine" : (None, 180, 'The external code used to execute the simulations (GMX, TINKER, AMBER, OpenMM)', 'All targets (important)', '')
@@ -207,9 +209,9 @@ tgt_opts_types = {
                  "resp"             : (0, -150, 'Enable the RESP objective function', 'Ab initio targets with RESP; experimental (remember to set espweight)'),
                  "do_cosmo"         : (0, -150, 'Call Q-Chem to do MM COSMO on MM snapshots.', 'Currently unused, but possible in AbInitio target'),
                  "optimize_geometry": (1, 0, 'Perform a geometry optimization before computing properties', 'Monomer properties', 'moments'),
-                 "absolute"         : (0, -150, 'When matching energies in AbInitio, do not subtract the mean energy gap.', 'Energy matching (advanced usage)', 'abinitio'),
-                 "cauchy"           : (0, 0, 'Normalize interaction energies each using 1/(denom**2 + reference**2) which resembles a Cauchy distribution', 'Interaction energy targets', 'interaction'),
-                 "attenuate"        : (0, 0, 'Normalize interaction energies using 1/(denom**2 + reference**2) only for repulsive interactions greater than denom.', 'Interaction energy targets', 'interaction'),
+                 # Replaced 2020-08-20 with energy_mode
+                 # "absolute"         : (0, -150, 'When matching energies in AbInitio, do not subtract the mean energy gap.', 'Energy matching (advanced usage)', 'abinitio'),
+                 "attenuate"        : (0, 110, 'Normalize interaction energies using 1/sqrt(denom**2 + (E(qm)-denom)**2) for energies more positive than denom.', 'Multiple targets that involve realtive energies', 'abinitio, binding, interaction, torsionprofile'),
                  "normalize"        : (0, -150, 'Divide objective function by the number of snapshots / vibrations', 'Interaction energy / vibrational mode targets', 'interaction, vibration'),
                  "w_normalize"      : (0, 0, 'Normalize the condensed phase property contributions to the liquid / lipid property target', 'Condensed phase property targets', 'liquid, lipid'),
                  "manual"           : (0, -150, 'Give the user a chance to fill in condensed phase stuff on the zeroth step', 'Condensed phase property targets (advanced usage)', 'liquid'),
@@ -225,6 +227,8 @@ tgt_opts_types = {
                  "pure_num_grad"    : (0, -50, 'Pure numerical gradients -- launch two additional simulations for each perturbed forcefield parameter, and compute derivatives using 3-point formula. (This is very expensive and should only serve as a sanity check)')
                  },
     'floats'  : {"weight"       : (1.0, 150, 'Weight of the target (determines its importance vs. other targets)', 'All targets (important)'),
+                 "energy_denom" : (1.0, 100, 'Energy denominator in kcal/mol for objective function and lower energy limit for attenuating weights where applicable', 'Multiple targets that involve realtive energies', 'abinitio, binding, hydration, interaction, torsionprofile'),
+                 "energy_upper" : (30.0, 50, 'Upper energy cutoff in kcal/mol for setting weights to zero, used to exclude super-repulsive interactions', 'Multiple targets that involve relative energies', 'abinitio, interaction, torsionprofile'),
                  "w_rho"        : (1.0, 0, 'Weight of experimental density', 'Condensed phase property targets', 'liquid, lipid'),
                  "w_hvap"       : (1.0, 0, 'Weight of enthalpy of vaporization', 'Condensed phase property targets', 'liquid, lipid'),
                  "w_alpha"      : (1.0, 0, 'Weight of thermal expansion coefficient', 'Condensed phase property targets', 'liquid, lipid'),
@@ -241,10 +245,8 @@ tgt_opts_types = {
                  "w_resp"       : (0.0, -150, 'Weight of RESP', 'Ab initio targets with RESP (advanced usage)', 'abinitio'),
                  "resp_a"       : (0.001, -150, 'RESP "a" parameter for strength of penalty; 0.001 is strong, 0.0005 is weak', 'Ab initio targets with RESP (advanced usage)', 'abinitio'),
                  "resp_b"       : (0.1, -150, 'RESP "b" parameter for hyperbolic behavior; 0.1 is recommended', 'Ab initio targets with RESP (advanced usage)', 'abinitio'),
-                 "energy_upper" : (30.0, 0, 'Upper energy cutoff (in kcal/mol); super-repulsive interactions are given zero weight', 'Interaction energy targets', 'interaction'),
                  "hfe_temperature"  : (298.15, -100, 'Simulation temperature for hydration free energies (Kelvin)', 'Hydration free energy using molecular dynamics', 'hydration'),
                  "hfe_pressure"   : (1.0, -100, 'Simulation temperature for hydration free energies (atm)', 'Hydration free energy using molecular dynamics', 'hydration'),
-                 "energy_denom"   : (1.0, 0, 'Energy normalization for binding energies in kcal/mol (default is to use stdev)', 'Binding energy targets', 'binding'),
                  "energy_rms_override"   : (0.0, 0, 'If nonzero, override the Energy RMS used to normalize the energy part of the objective function term', 'Energy matching', 'abinitio'),
                  "force_rms_override"   : (0.0, 0, 'If nonzero, override the Force RMS used to normalize the energy part of the objective function term', 'Force matching', 'abinitio'),
                  "rmsd_denom"     : (0.1, 0, 'RMSD normalization for optimized geometries in Angstrom', 'Binding energy targets', 'binding'),
@@ -263,7 +265,7 @@ tgt_opts_types = {
                  "self_pol_mu0"  : (0.0, -150, 'Gas-phase dipole parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "self_pol_alpha"  : (0.0, -150, 'Polarizability parameter for self-polarization correction (in debye).', 'Condensed phase property targets', 'liquid'),
                  "epsgrad"         : (0.0, -150, 'Gradient below this threshold will be set to zero.', 'All targets'),
-                 "energy_asymmetry": (1.0, -150, 'Snapshots with (E_MM - E_QM) < 0.0 will have their weights increased by this factor.', 'Ab initio targets'),
+                 "energy_asymmetry": (1.0, -150, 'Snapshots with (E_MM - E_QM) < 0.0 will have their weights increased by this factor. Only valid if energy_mode is set to "qm_minimum".', 'Ab initio targets'),
                  "nonbonded_cutoff"  : (None, -1, 'Cutoff for nonbonded interactions (passed to engines).', 'Condensed phase property targets', 'liquid'),
                  "vdw_cutoff"        : (None, -2, 'Cutoff for vdW interactions if different from other nonbonded interactions', 'Condensed phase property targets', 'liquid'),
                  "liquid_fdiff_h" : (1e-2, 0, 'Step size for finite difference derivatives for liquid targets in pure_num_grad', 'Condensed phase property targets', 'liquid'),
