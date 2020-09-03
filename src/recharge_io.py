@@ -7,6 +7,7 @@ author Simon Boothroyd
 """
 from __future__ import division, print_function
 
+import json
 import os
 
 import numpy as np
@@ -250,6 +251,12 @@ class Recharge_SMIRNOFF(Target):
             smiles: delta[self._molecule_residual_ranges[smiles]].sum()
             for smiles in self._molecule_residual_ranges
         }
+
+        # Save a copy of the per molecule residuals to the temporary directory
+        residuals_path = os.path.join(self.root, self.rundir, "residuals.json")
+
+        with open(residuals_path, "w") as file:
+            json.dump(self._per_molecule_residuals, file)
 
         # Compute the objective gradient and hessian.
         if AGrad is True:
