@@ -248,7 +248,10 @@ class Recharge_SMIRNOFF(Target):
         # Track the per molecule loss as the sum over all conformer
         # contributions
         self._per_molecule_residuals = {
-            smiles: delta[self._molecule_residual_ranges[smiles]].sum()
+            smiles: (
+                delta[self._molecule_residual_ranges[smiles]]
+                * delta[self._molecule_residual_ranges[smiles]]
+            ).sum()
             for smiles in self._molecule_residual_ranges
         }
 
