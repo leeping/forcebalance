@@ -18,7 +18,7 @@ from forcebalance.target import Target
 try:
     from openff.recharge.charges.charges import ChargeSettings
     from openff.recharge.esp.storage import MoleculeESPStore
-    from openff.recharge.optimize import ESPOptimization
+    from openff.recharge.optimize import ElectricFieldOptimization, ESPOptimization
     from openff.recharge.smirnoff import from_smirnoff
 except ImportError:
     warn_once("Note: Failed to import the optional openff.recharge package.")
@@ -56,6 +56,9 @@ class Recharge_SMIRNOFF(Target):
         # Get the filename for the database which contains the ESP data
         # to train against.
         self.set_option(tgt_opts, "recharge_esp_store", forceprint=True)
+        self.set_option(tgt_opts, "recharge_property", forceprint=True)
+
+        assert self.recharge_property in ["esp", "electric-field"]
 
         # Initialize the target.
         self._initialize()
@@ -117,13 +120,22 @@ class Recharge_SMIRNOFF(Target):
             ]
         )
 
+        # TODO: Currently only AM1 is supported by the SMIRNOFF handler.
         charge_settings = ChargeSettings(theory="am1", symmetrize=True, optimize=True)
 
         # Pre-calculate the expensive operations which are needed to evaluate the
         # objective function, but do not depend on the current parameters.
-        objective_terms = ESPOptimization.compute_objective_terms(
-            smiles, esp_store, bcc_collection, fixed_parameters, charge_settings
-        )
+        optimization_class = {
+            "esp": ESPOptimization,
+            "electric-field": ElectricFieldOptimization,
+        }[self.recharge_property]
+
+        objective_terms = [
+            objective_term
+            for objective_term in optimization_class.compute_objective_terms(
+                smiles, esp_store, bcc_collection, fixed_parameters, charge_settings
+            )
+        ]
 
         self._design_matrix = np.vstack(
             [objective_term.design_matrix for objective_term in objective_terms]
@@ -182,39 +194,6 @@ class Recharge_SMIRNOFF(Target):
         jacobian = np.array(jacobian_list)
         return jacobian
 
-    def _compute_hessian_jacobian(self, mvals, perturbation_amount=1.0e-4):
-        """Build the matrix which maps the hessian w.r.t. physical parameters to
-        a hessian w.r.t mathematical parameters.
-
-        Parameters
-        ----------
-        mvals: np.ndarray
-            The current force balance mathematical parameters.
-        perturbation_amount: float
-            The amount to perturb the mathematical parameters by
-            when calculating the finite difference gradients.
-        """
-
-        jacobian_list = []
-
-        for index in range(len(mvals)):
-
-            reverse_mvals = mvals.copy()
-            reverse_mvals[index] -= perturbation_amount
-            reverse_dmvals_d_pvals = self._compute_gradient_jacobian(reverse_mvals)
-
-            forward_mvals = mvals.copy()
-            forward_mvals[index] += perturbation_amount
-            forward_dmvals_d_pvals = self._compute_gradient_jacobian(forward_mvals)
-
-            gradients = (forward_dmvals_d_pvals - reverse_dmvals_d_pvals) / (
-                2.0 * perturbation_amount
-            )
-            jacobian_list.append(gradients)
-
-        jacobian = np.array(jacobian_list)
-        return jacobian
-
     def wq_complete(self):
         return True
 
@@ -254,6 +233,10 @@ class Recharge_SMIRNOFF(Target):
         parameter_values = np.array(self.FF.make(mvals))
         bcc_values = parameter_values[self._parameter_to_bcc_map].reshape(-1, 1)
 
+        if self.recharge_property == "electric-field":
+            # Flatten the charges to ensure correct shapes after tensor multiplication.
+            bcc_values = bcc_values.flatten()
+
         # Compute the objective function
         delta = self._target_residuals - np.matmul(self._design_matrix, bcc_values)
         loss = (delta * delta).sum()
@@ -271,7 +254,17 @@ class Recharge_SMIRNOFF(Target):
         # Compute the objective gradient and hessian.
         if AGrad is True:
 
-            bcc_gradient = -2.0 * np.matmul(self._design_matrix.T, delta)
+            if self.recharge_property == "esp":
+                bcc_gradient = -2.0 * np.matmul(self._design_matrix.T, delta)
+
+            elif self.recharge_property == "electric-field":
+
+                bcc_gradient = -2.0 * np.einsum(
+                    "ij,ijk->ijk", delta, self._design_matrix
+                ).sum(0).sum(0)
+
+            else:
+                raise NotImplementedError()
 
             for bcc_index, parameter_index in enumerate(self._parameter_to_bcc_map):
                 loss_gradient[parameter_index] = bcc_gradient[bcc_index]
