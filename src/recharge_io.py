@@ -65,8 +65,7 @@ class Recharge_SMIRNOFF(Target):
         self._initialize()
 
     def _initialize(self):
-        """Initializes the target.
-        """
+        """Initializes the target."""
 
         # Load in the ESP data store.
         esp_store = MoleculeESPStore(os.path.join(self.tgtdir, self.recharge_esp_store))
