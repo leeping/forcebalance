@@ -38,10 +38,12 @@ EXPECTED_LIPID_RESULTS = array([-6.7553e-03, -2.4070e-02])
 EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([-9.4238e-02, 7.3350e-03, -7.9467e-05, 1.7172e-02, -1.3309e-01, 6.0076e-02, 1.7895e-02, 6.5866e-02, -1.4084e-01, -2.2906e-02])
 
 # expected objective function from 025 recharge methane study. (updated 08/04/20)
-EXPECTED_RECHARGE_METHANE_OBJECTIVE = array([5.68107e-04])
+EXPECTED_RECHARGE_METHANE_ESP_OBJECTIVE = array([5.68107e-04])
+EXPECTED_RECHARGE_METHANE_FIELD_OBJECTIVE = array([7.43711e-04])
 
 # expected gradient elements from 025 recharge methane. (updated 08/04/20)
-EXPECTED_RECHARGE_METHANE_GRADIENT = array([9.76931016e-03])
+EXPECTED_RECHARGE_METHANE_ESP_GRADIENT = array([9.76931016e-03])
+EXPECTED_RECHARGE_METHANE_FIELD_GRADIENT = array([1.12071584e-02])
 
 
 class ForceBalanceSystemTest(ForceBalanceTestCase):
@@ -288,7 +290,33 @@ class TestRechargeMethaneStudy(ForceBalanceSystemTest):
         data      = objective.Full(np.zeros(objective.FF.np),1,verbose=True)
         X, G, H   = data['X'], data['G'], data['H']
 
-        msgX="\nCalculated objective function is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_OBJECTIVE in test_system.py with these values"
-        np.testing.assert_allclose(EXPECTED_RECHARGE_METHANE_OBJECTIVE, X, rtol=5.0e-7, err_msg=msgX)
-        msgG="\nCalculated gradient is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_GRADIENT in test_system.py with these values"
-        np.testing.assert_allclose(EXPECTED_RECHARGE_METHANE_GRADIENT, G, rtol=5.0e-7, err_msg=msgG)
+        msgX=(
+            "\nCalculated objective function is outside expected range.\n "
+            "If this seems reasonable, update EXPECTED_RECHARGE_METHANE_ESP_OBJECTIVE "
+            "and EXPECTED_RECHARGE_METHANE_FIELD_OBJECTIVE in test_system.py with "
+            "these values"
+        )
+        np.testing.assert_allclose(
+            (
+                EXPECTED_RECHARGE_METHANE_ESP_OBJECTIVE
+                + EXPECTED_RECHARGE_METHANE_FIELD_OBJECTIVE
+            ),
+            X,
+            rtol=5.0e-7,
+            err_msg=msgX
+        )
+        msgG = (
+            "\nCalculated gradient is outside expected range.\n "
+            "If this seems reasonable, update EXPECTED_RECHARGE_METHANE_ESP_GRADIENT "
+            "and EXPECTED_RECHARGE_METHANE_FIELD_GRADIENT in test_system.py with "
+            "these values"
+        )
+        np.testing.assert_allclose(
+            (
+                EXPECTED_RECHARGE_METHANE_ESP_GRADIENT
+                + EXPECTED_RECHARGE_METHANE_FIELD_GRADIENT
+            ),
+            G,
+            rtol=5.0e-7,
+            err_msg=msgG
+        )

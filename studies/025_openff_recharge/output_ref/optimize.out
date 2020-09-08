@@ -1,4 +1,3 @@
-Note: Failed to import the optional openff.evaluator package. 
 #======================================================================#
 #| [1m            Welcome to ForceBalance version 1.7.4! =D             [0m |#
 #| [1m                 Force Field Optimization System                  [0m |#
@@ -10,18 +9,18 @@ Note: Failed to import the optional openff.evaluator package.
 #| [1m           Arthur Vigil, Erik G. Brandt, Johnny Israeli           [0m |#
 #======================================================================#
 
-                          [44m     [0m                                        
-                       [44m        [0m      [43m     [0m                              
-                    [44m        [0m   [44m  [0m    [43m         [0m                          
-                 [44m       [0m    [44m      [0m      [43m         [0m                       
-             [44m        [0m    [44m        [0m          [43m         [0m                    
-          [44m        [0m    [44m        [0m                 [43m        [0m                 
-       [44m        [0m    [44m       [0m                        [43m        [0m              
-    [44m        [0m   [44m        [0m                              [43m         [0m          
-   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
-    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
-      [44m        [0m         +################':`                    [43m [0m        
-      [44m     [0m              `.,,...####+.                                  
+                          [44m     [0m
+                       [44m        [0m      [43m     [0m
+                    [44m        [0m   [44m  [0m    [43m         [0m
+                 [44m       [0m    [44m      [0m      [43m         [0m
+             [44m        [0m    [44m        [0m          [43m         [0m
+          [44m        [0m    [44m        [0m                 [43m        [0m
+       [44m        [0m    [44m       [0m                        [43m        [0m
+    [44m        [0m   [44m        [0m                              [43m         [0m
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m
+      [44m        [0m         +################':`                    [43m [0m
+      [44m     [0m              `.,,...####+.
                                 ,#####      +##.               [44m   [0m   [44m   [0m
  [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
  [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
@@ -40,19 +39,19 @@ Note: Failed to import the optional openff.evaluator package.
  [43m    [0m                            ####                          [44m   [0m   [44m   [0m
  [43m    [0m                            ####                          [44m   [0m   [44m   [0m
  [43m    [0m                            ####                          [44m   [0m   [44m   [0m
-      [44m    [0m                       ####                                   
-     [44m        [0m                    ####                                   
-    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
-   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
-   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
-      [44m        [0m    [44m        [0m        +`               [43m        [0m             
-          [44m        [0m   [44m        [0m                   [43m        [0m                
-             [44m        [0m   [44m         [0m           [43m         [0m                   
-                [44m        [0m    [44m       [0m      [43m         [0m                      
-                   [44m        [0m    [44m   [0m    [43m        [0m                          
-                      [44m        [0m       [43m      [0m                             
-                          [44m      [0m      [43m  [0m                                
-                             [44m  [0m                                         
+      [44m    [0m                       ####
+     [44m        [0m                    ####
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m
+      [44m        [0m    [44m        [0m        +`               [43m        [0m
+          [44m        [0m   [44m        [0m                   [43m        [0m
+             [44m        [0m   [44m         [0m           [43m         [0m
+                [44m        [0m    [44m       [0m      [43m         [0m
+                   [44m        [0m    [44m   [0m    [43m        [0m
+                      [44m        [0m       [43m      [0m
+                          [44m      [0m      [43m  [0m
+                             [44m  [0m
 
 Reading options from file: optimize.in
 #========================================================#
@@ -78,16 +77,26 @@ Reading force field from file: forcefield.offxml
 #========================================================#
 #| [92m               Setup for force field                [0m |#
 #========================================================#
-fnms                      ['forcefield.offxml'] 
-priors                    OrderedDict([('ChargeIncrementModel/ChargeIncrement/charge_increment1', 1.0)]) 
+fnms                      ['forcefield.offxml']
+priors                    OrderedDict([('ChargeIncrementModel/ChargeIncrement/charge_increment1', 1.0)])
 ----------------------------------------------------------
 #========================================================#
-#| [92m             Setup for target methane :             [0m |#
+#| [92m           Setup for target methane-esp :           [0m |#
 #========================================================#
-name                      methane 
-type                      RECHARGE_SMIRNOFF 
-tgtdir                    targets/methane 
-recharge_esp_store        esp-store.sqlite 
+name                      methane-esp
+type                      RECHARGE_SMIRNOFF
+tgtdir                    targets/methane-esp
+recharge_esp_store        esp-store.sqlite
+recharge_property         esp
+----------------------------------------------------------
+#========================================================#
+#| [92m          Setup for target methane-field :          [0m |#
+#========================================================#
+name                      methane-field
+type                      RECHARGE_SMIRNOFF
+tgtdir                    targets/methane-field
+recharge_esp_store        esp-store.sqlite
+recharge_property         electric-field
 ----------------------------------------------------------
 #========================================================#
 #| [92m        SMIRNOFF Parameter Coverage Analysis        [0m |#
@@ -102,24 +111,24 @@ Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+
 #========================================================#
 #| [92m           Setup for objective function :           [0m |#
 #========================================================#
-penalty_additive          1.0 
-normalize_weights         False 
+penalty_additive          1.0
+normalize_weights         False
 ----------------------------------------------------------
 #========================================================#
 #| [92m                Setup for optimizer                 [0m |#
 #========================================================#
-jobtype                   OPTIMIZE 
-trust0                    0.25 
-mintrust                  5e-05 
-eps                       0.01 
-convergence_gradient      0.0001 
-adapt_fac                 0.2 
-adapt_damp                1.0 
-print_hess                True 
-err_tol                   1.0 
-input_file                optimize.in 
+jobtype                   OPTIMIZE
+trust0                    0.25
+mintrust                  5e-05
+eps                       0.01
+convergence_gradient      0.0001
+adapt_fac                 0.2
+adapt_damp                1.0
+print_hess                True
+err_tol                   1.0
+input_file                optimize.in
 ----------------------------------------------------------
-Calculation started at 2020-08-04 02:37 PM
+Calculation started at 2020-09-03 05:53 PM
 #========================================================#
 #| [1m                  Main Optimizer                    [0m |#
 #| [1m   Newton-Raphson Method (Adaptive Trust Radius)    [0m |#
@@ -145,41 +154,49 @@ Calculation started at 2020-08-04 02:37 PM
 #| [1;94m                       SMILES                       [0m |#
 #| [1;94m                         X                          [0m |#
 #========================================================#
-C               -6.287e-02 
+C               -6.287e-02
+----------------------------------------------------------
+
+#========================================================#
+#| [1;94m                       SMILES                       [0m |#
+#| [1;94m                         X                          [0m |#
+#========================================================#
+C               -1.318e-02
 ----------------------------------------------------------
 #====================================================================#
 #| [94m                  Objective Function Breakdown                  [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
 #====================================================================#
-methane                        0.00057      1.000 [94m     5.68107e-04[0m 
-Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
-Total                                             [94m     5.68107e-04[0m 
+methane-esp                    0.00057      1.000 [94m     5.68107e-04[0m
+methane-field                  0.00074      1.000 [94m     7.43711e-04[0m
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m
+Total                                             [94m     1.31182e-03[0m
 ----------------------------------------------------------------------
 
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     0   0.000e+00   0.000e+00   9.769e-03[1m   5.68107e-04[0m   0.000e+00      0.000
+     0   0.000e+00   0.000e+00   2.098e-02[1m   1.31182e-03[0m   0.000e+00      0.000
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
 #========================================================#
-   0 [  9.76931016e-03 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
+   0 [  2.09764685e-02 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
 ----------------------------------------------------------
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 2.00004772e+00 
+ 2.00011052e+00
 ----------------------------------------------------------
 Calculating nonlinear optimization step
-Newton-Raphson step found (length 4.8845e-03)
+Newton-Raphson step found (length 1.0488e-02)
 #========================================================#
 #| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
 #========================================================#
-   0 [  0.0000e+00 - 4.8845e-03 = -4.8845e-03 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
+   0 [  0.0000e+00 - 1.0488e-02 = -1.0488e-02 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
 ----------------------------------------------------------
 #========================================================#
 #| [95m    Physical Parameters (Current + Step = Next)     [0m |#
 #========================================================#
-   0 [  3.9300e-02 - 4.8845e-03 =  3.4415e-02 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
+   0 [  3.9300e-02 - 1.0488e-02 =  2.8812e-02 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
 ----------------------------------------------------------
 Input file with saved parameters: optimize.sav
 #========================================================#
@@ -191,15 +208,23 @@ Input file with saved parameters: optimize.sav
 #| [1;94m                       SMILES                       [0m |#
 #| [1;94m                         X                          [0m |#
 #========================================================#
-C               -5.913e-02 
+C               -5.484e-02
+----------------------------------------------------------
+
+#========================================================#
+#| [1;94m                       SMILES                       [0m |#
+#| [1;94m                         X                          [0m |#
+#========================================================#
+C               -1.253e-02
 ----------------------------------------------------------
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-methane                        0.00052      1.000 [92m     5.21437e-04[0m ( -4.667e-05 ) 
-Regularization                 0.00002      1.000 [91m     2.38587e-05[0m ( +2.386e-05 ) 
-Total                                             [92m     5.45296e-04[0m ( -2.281e-05 ) 
+methane-esp                    0.00047      1.000 [92m     4.70486e-04[0m ( -9.762e-05 )
+methane-field                  0.00063      1.000 [92m     6.31464e-04[0m ( -1.122e-04 )
+Regularization                 0.00011      1.000 [91m     1.09991e-04[0m ( +1.100e-04 )
+Total                                             [92m     1.21194e-03[0m ( -9.988e-05 )
 -------------------------------------------------------------------------------------
 Creating the directory /Users/boothros/PyCharmProjects/forcebalance/studies/025_openff_recharge/result/optimize to print the force field
 #========================================================================#
@@ -208,32 +233,32 @@ Creating the directory /Users/boothros/PyCharmProjects/forcebalance/studies/025_
 #========================================================================#
 
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
-     1   4.885e-03   4.885e-03   4.293e-04[92m   5.45296e-04[0m  -2.281e-05      0.956
+     1   1.049e-02   1.049e-02   1.930e-03[92m   1.21194e-03[0m  -9.988e-05      0.908
 
 #========================================================#
 #| [94m                   Total Gradient                   [0m |#
 #========================================================#
-   0 [ -4.29312637e-04 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
+   0 [ -1.92995659e-03 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
 ----------------------------------------------------------
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 2.00004362e+00 
+ 2.00009114e+00
 ----------------------------------------------------------
 Convergence criterion reached for objective function (1.00e-04)
 #========================================================#
 #| [92m               [0m[1mOptimization Converged[0m               [0m |#
 #| [92m           Final objective function value           [0m |#
-#| [92m  Full:  5.452961e-04  Un-penalized:  5.214374e-04  [0m |#
+#| [92m  Full:  1.211941e-03  Un-penalized:  1.101950e-03  [0m |#
 #========================================================#
 #========================================================#
 #| [94m           Final optimization parameters:           [0m |#
 #========================================================#
-   0 [ -4.8845e-03 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
+   0 [ -1.0488e-02 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
 #========================================================#
 #| [94m             Final physical parameters:             [0m |#
 #========================================================#
-   0 [  3.4415e-02 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
+   0 [  2.8812e-02 ] : ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]
 ----------------------------------------------------------
 Backing up result/optimize/forcefield.offxml -> result/optimize/forcefield_1.offxml
 #========================================================================#

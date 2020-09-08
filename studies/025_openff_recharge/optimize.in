@@ -56,8 +56,17 @@ priors
 $end
 
 $target
-name methane
+name methane-esp
 type Recharge_SMIRNOFF
 weight 1.0
 recharge_esp_store esp-store.sqlite
+recharge_property esp
+$end
+
+$target
+name methane-field
+type Recharge_SMIRNOFF
+weight 1.0
+recharge_esp_store esp-store.sqlite
+recharge_property electric-field
 $end
