@@ -1,5 +1,4 @@
 """ @package forcebalance.openmmio OpenMM input/output.
-
 @author Lee-Ping Wang
 @date 04/2012
 """
@@ -385,35 +384,24 @@ def SetAmoebaNonbondedExcludeAll(system, topology):
 def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps=4):
     """
     Create a multiple timestep velocity verlet with velocity randomization (VVVR) integrator.
-
     ARGUMENTS
-
     temperature (Quantity compatible with kelvin) - the temperature
     collision_rate (Quantity compatible with 1/picoseconds) - the collision rate
     timestep (Quantity compatible with femtoseconds) - the integration timestep
     system (simtk.openmm.System) - system whose forces will be partitioned
     ninnersteps (int) - number of inner timesteps (default: 4)
-
     RETURNS
-
     integrator (openmm.CustomIntegrator) - a VVVR integrator
-
     NOTES
-
     This integrator is equivalent to a Langevin integrator in the velocity Verlet discretization with a
     timestep correction to ensure that the field-free diffusion constant is timestep invariant.  The inner
     velocity Verlet discretization is transformed into a multiple timestep algorithm.
-
     REFERENCES
-
     VVVR Langevin integrator:
     * http://arxiv.org/abs/1301.3800
     * http://arxiv.org/abs/1107.2967 (to appear in PRX 2013)
-
     TODO
-
     Move initialization of 'sigma' to setting the per-particle variables.
-
     """
     # Multiple timestep Langevin integrator.
     for i in system.getForces():
@@ -940,7 +928,6 @@ class OpenMM(Engine):
         """
         Set the positions and periodic box vectors to one of the
         stored coordinates.
-
         *** NOTE: If you run a MD simulation, then the coordinates are
         overwritten by the MD trajectory. ***
         """
@@ -998,13 +985,11 @@ class OpenMM(Engine):
 
         """
         Utility function for computing energy, and (optionally) forces and dipoles using OpenMM.
-
         Inputs:
         force: Switch for calculating the force.
         dipole: Switch for calculating the dipole.
         traj: Trajectory (listing of coordinate and box 2-tuples).  If provide, will loop over these snapshots.
         Otherwise will do a single point evaluation at the current geometry.
-
         Outputs:
         Result: Dictionary containing energies, forces and/or dipoles.
         """
@@ -1057,12 +1042,10 @@ class OpenMM(Engine):
     def build_mass_weighted_hessian(self, shot=0, optimize=True):
         """OpenMM single frame hessian evaluation
         Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
-
         Parameters
         ----------
         shot: int
             The frame number in the trajectory of this target
-
         Returns
         -------
         hessian: np.array with shape 3N x 3N, N = number of "real" atoms
@@ -1115,14 +1098,12 @@ class OpenMM(Engine):
     def normal_modes(self, shot=0, optimize=True):
         """OpenMM Normal Mode Analysis
         Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
-
         Parameters
         ----------
         shot: int
             The frame number in the trajectory of this target
         optimize: bool, default True
             Optimize the geometry before evaluating the normal modes
-
         Returns
         -------
         freqs: np.array with shape (3N - 6) x 1, N = number of "real" atoms
@@ -1167,7 +1148,7 @@ class OpenMM(Engine):
         """
         Optimize the geometry and align the optimized
         geometry to the starting geometry.
-
+        
         Parameters
         ----------
         shot : int
@@ -1178,7 +1159,6 @@ class OpenMM(Engine):
             Disable virtual sites (needed for SMIRNOFF)
         include_restraint_energy : bool
             Include energy component from CustomExternalForce
-
         Returns
         -------
         E : float
@@ -1238,17 +1218,14 @@ class OpenMM(Engine):
     def getContextPosition(self, removeVirtual=False):
         """
         Get current position from simulation context.
-
         Parameters
         ----------
         removeVirtual: bool
             Remove positions of virtual atoms, result will only have positions of real atoms.
-
         Returns
         -------
         pos: np.ndarray of shape (N x 3)
             Position array in unit of Angstrom. If removeVirtual=True, N = No. real atoms, else N = No. all atoms.
-
         """
         pos = self.simulation.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(angstrom)
         if removeVirtual:
@@ -1337,7 +1314,6 @@ class OpenMM(Engine):
 
         """
         Method for running a molecular dynamics simulation.
-
         Required arguments:
         nsteps      = (int)   Number of total time steps
         timestep    = (float) Time step in FEMTOSECONDS
@@ -1346,7 +1322,6 @@ class OpenMM(Engine):
         nequil      = (int)   Number of additional time steps at the beginning for equilibration
         nsave       = (int)   Step interval for saving and printing data
         minimize    = (bool)  Perform an energy minimization prior to dynamics
-
         Returns simulation data:
         Rhos        = (array)     Density in kilogram m^-3
         Potentials  = (array)     Potential energies

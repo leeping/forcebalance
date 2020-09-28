@@ -1,0 +1,47 @@
+memory 4 gb
+
+molecule dimer {
+   C  24.081  20.550   2.967  
+   C  25.023  21.562   2.352  
+   O  24.861  21.548   0.942  
+   H  25.478  22.205   0.581  
+   H  24.180  20.535   4.056  
+   H  23.042  20.785   2.711  
+   H  24.284  19.546   2.580  
+   H  26.062  21.311   2.589  
+   H  24.803  22.567   2.723  
+
+units angstrom
+symmetry c1
+}
+
+set globals{
+basis       aug-cc-pVTZ
+print       1
+}
+
+gradient('pbe')
+
+molecule dimer {
+ 0 1
+   C  19.898  23.202  17.886  
+   C  19.314  24.409  18.589  
+   O  19.298  25.506  17.688  
+   H  18.920  26.260  18.169  
+   H  19.925  22.336  18.554  
+   H  19.307  22.947  17.001  
+   H  20.915  23.412  17.540  
+   H  19.920  24.676  19.459  
+   H  18.289  24.205  18.914  
+
+units angstrom
+symmetry c1
+}
+
+set globals{
+basis       aug-cc-pVTZ
+print       1
+}
+
+gradient('pbe')
+

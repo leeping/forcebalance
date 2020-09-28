@@ -32,10 +32,6 @@ try:
 except NameError:
     pass
 
-# Special error which is thrown when TINKER .arc data is detected in a .xyz file
-class ActuallyArcError(IOError):
-    pass
-
 # ======================================================================#
 # |                                                                    |#
 # |              Chemical file format conversion module                |#
@@ -173,9 +169,9 @@ AtomVariableNames = {'elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersu
 # charge     = The net charge of the molecule
 # mult       = The spin multiplicity of the molecule
 MetaVariableNames = {'fnm', 'ftype', 'qcrems', 'qctemplate', 'qcerr', 'charge', 'mult', 'bonds', 'topology',
-                     'molecules'}
+                     'molecules', 'psi4template', 'psi4fragn', 'psi4args'}
 # Variable names relevant to quantum calculations explicitly
-QuantumVariableNames = {'qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost', 'qm_bondorder'}
+QuantumVariableNames = {'qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost', 'qm_bondorder', 'psi4template', 'psi4fragn',                         'psi4args'}
 # Superset of all variable names.
 AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames | FrameVariableNames
 
@@ -246,48 +242,20 @@ Elements = ["None",'H','He',
             'Fr','Ra','Ac','Th','Pa','U','Np','Pu','Am','Cm','Bk','Cf','Es','Fm','Md','No','Lr','Rf','Db','Sg','Bh','Hs','Mt']
 
 # Dictionary of atomic masses ; also serves as the list of elements (periodic table)
-#
-# Atomic mass data was updated on 2020-05-07 from NIST:
-# "Atomic Weights and Isotopic Compositions with Relative Atomic Masses"
-# https://www.nist.gov/pml/atomic-weights-and-isotopic-compositions-relative-atomic-masses
-# using All Elements -> preformatted ASCII table.
-#
-# The standard atomic weight was provided in several different formats:
-# Two numbers in brackets as in [1.00784,1.00811] : The average value of the two limits is used.
-# With parentheses(uncert) as in 4.002602(2) : The parentheses was split off and all significant digits are used.
-# A single number in brackets as in [98] : The single number was used
-# Not provided (for Am, Z=95 and up): The mass number of the lightest isotope was used
-PeriodicTable = OrderedDict([("H", 1.007975), ("He", 4.002602), # First row
-                             ("Li", 6.9675), ("Be", 9.0121831), ("B", 10.8135), ("C", 12.0106), ("N", 14.006855), ("O", 15.99940), ("F", 18.99840316), ("Ne", 20.1797), # Second row Li-Ne
-                             ("Na", 22.98976928), ("Mg", 24.3055), ("Al", 26.9815385), ("Si", 28.085), ("P", 30.973762), ("S", 32.0675), ("Cl", 35.4515), ("Ar", 39.948), # Third row Na-Ar
-                             ("K", 39.0983), ("Ca", 40.078), ("Sc", 44.955908), ("Ti", 47.867), ("V", 50.9415), ("Cr", 51.9961), ("Mn", 54.938044), ("Fe", 55.845), ("Co", 58.933194), # Fourth row K-Kr
-                             ("Ni", 58.6934), ("Cu", 63.546), ("Zn", 65.38), ("Ga", 69.723), ("Ge", 72.63), ("As", 74.921595), ("Se", 78.971), ("Br", 79.904), ("Kr", 83.798),
-                             ("Rb", 85.4678), ("Sr", 87.62), ("Y", 88.90584), ("Zr", 91.224), ("Nb", 92.90637), ("Mo", 95.95), ("Tc", 98.), ("Ru", 101.07), ("Rh", 102.9055), # Fifth row Rb-Xe
-                             ("Pd", 106.42), ("Ag", 107.8682), ("Cd", 112.414), ("In", 114.818), ("Sn", 118.71), ("Sb", 121.76), ("Te", 127.6), ("I", 126.90447), ("Xe", 131.293),
-                             ("Cs", 132.905452), ("Ba", 137.327), ("La", 138.90547), ("Ce", 140.116), ("Pr", 140.90766), ("Nd", 144.242), ("Pm", 145.), ("Sm", 150.36), # Sixth row Cs-Rn
-                             ("Eu", 151.964), ("Gd", 157.25), ("Tb", 158.92535), ("Dy", 162.5), ("Ho", 164.93033), ("Er", 167.259), ("Tm", 168.93422), ("Yb", 173.054),
-                             ("Lu", 174.9668), ("Hf", 178.49), ("Ta", 180.94788), ("W", 183.84), ("Re", 186.207), ("Os", 190.23), ("Ir", 192.217), ("Pt", 195.084),
-                             ("Au", 196.966569), ("Hg", 200.592), ("Tl", 204.3835), ("Pb", 207.2), ("Bi", 208.9804), ("Po", 209.), ("At", 210.), ("Rn", 222.),
-                             ("Fr", 223.), ("Ra", 226.), ("Ac", 227.), ("Th", 232.0377), ("Pa", 231.03588), ("U", 238.02891), ("Np", 237.), ("Pu", 244.), # Seventh row Fr-Og
-                             ("Am", 241.), ("Cm", 243.), ("Bk", 247.), ("Cf", 249.), ("Es", 252.), ("Fm", 257.), ("Md", 258.), ("No", 259.),
-                             ("Lr", 262.), ("Rf", 267.), ("Db", 268.), ("Sg", 271.), ("Bh", 272.), ("Hs", 270.), ("Mt", 276.), ("Ds", 281.),
-                             ("Rg", 280.), ("Cn", 285.), ("Nh", 284.), ("Fl", 289.), ("Mc", 288.), ("Lv", 293.), ("Ts", 292.), ("Og", 294.)])
-
-# Old masses used pre-2020, retained in case it is useful:
-# PeriodicTable = OrderedDict([('H' , 1.0079), ('He' , 4.0026),
-#                              ('Li' , 6.941), ('Be' , 9.0122), ('B' , 10.811), ('C' , 12.0107), ('N' , 14.0067), ('O' , 15.9994), ('F' , 18.9984), ('Ne' , 20.1797),
-#                              ('Na' , 22.9897), ('Mg' , 24.305), ('Al' , 26.9815), ('Si' , 28.0855), ('P' , 30.9738), ('S' , 32.065), ('Cl' , 35.453), ('Ar' , 39.948),
-#                              ('K' , 39.0983), ('Ca' , 40.078), ('Sc' , 44.9559), ('Ti' , 47.867), ('V' , 50.9415), ('Cr' , 51.9961), ('Mn' , 54.938), ('Fe' , 55.845), ('Co' , 58.9332),
-#                              ('Ni' , 58.6934), ('Cu' , 63.546), ('Zn' , 65.39), ('Ga' , 69.723), ('Ge' , 72.64), ('As' , 74.9216), ('Se' , 78.96), ('Br' , 79.904), ('Kr' , 83.8),
-#                              ('Rb' , 85.4678), ('Sr' , 87.62), ('Y' , 88.9059), ('Zr' , 91.224), ('Nb' , 92.9064), ('Mo' , 95.94), ('Tc' , 98), ('Ru' , 101.07), ('Rh' , 102.9055),
-#                              ('Pd' , 106.42), ('Ag' , 107.8682), ('Cd' , 112.411), ('In' , 114.818), ('Sn' , 118.71), ('Sb' , 121.76), ('Te' , 127.6), ('I' , 126.9045), ('Xe' , 131.293),
-#                              ('Cs' , 132.9055), ('Ba' , 137.327), ('La' , 138.9055), ('Ce' , 140.116), ('Pr' , 140.9077), ('Nd' , 144.24), ('Pm' , 145), ('Sm' , 150.36),
-#                              ('Eu' , 151.964), ('Gd' , 157.25), ('Tb' , 158.9253), ('Dy' , 162.5), ('Ho' , 164.9303), ('Er' , 167.259), ('Tm' , 168.9342), ('Yb' , 173.04),
-#                              ('Lu' , 174.967), ('Hf' , 178.49), ('Ta' , 180.9479), ('W' , 183.84), ('Re' , 186.207), ('Os' , 190.23), ('Ir' , 192.217), ('Pt' , 195.078),
-#                              ('Au' , 196.9665), ('Hg' , 200.59), ('Tl' , 204.3833), ('Pb' , 207.2), ('Bi' , 208.9804), ('Po' , 209), ('At' , 210), ('Rn' , 222),
-#                              ('Fr' , 223), ('Ra' , 226), ('Ac' , 227), ('Th' , 232.0381), ('Pa' , 231.0359), ('U' , 238.0289), ('Np' , 237), ('Pu' , 244),
-#                              ('Am' , 243), ('Cm' , 247), ('Bk' , 247), ('Cf' , 251), ('Es' , 252), ('Fm' , 257), ('Md' , 258), ('No' , 259),
-#                              ('Lr' , 262), ('Rf' , 261), ('Db' , 262), ('Sg' , 266), ('Bh' , 264), ('Hs' , 277), ('Mt' , 268)])
+PeriodicTable = OrderedDict([('H' , 1.0079), ('He' , 4.0026),
+                             ('Li' , 6.941), ('Be' , 9.0122), ('B' , 10.811), ('C' , 12.0107), ('N' , 14.0067), ('O' , 15.9994), ('F' , 18.9984), ('Ne' , 20.1797),
+                             ('Na' , 22.9897), ('Mg' , 24.305), ('Al' , 26.9815), ('Si' , 28.0855), ('P' , 30.9738), ('S' , 32.065), ('Cl' , 35.453), ('Ar' , 39.948),
+                             ('K' , 39.0983), ('Ca' , 40.078), ('Sc' , 44.9559), ('Ti' , 47.867), ('V' , 50.9415), ('Cr' , 51.9961), ('Mn' , 54.938), ('Fe' , 55.845), ('Co' , 58.9332),
+                             ('Ni' , 58.6934), ('Cu' , 63.546), ('Zn' , 65.39), ('Ga' , 69.723), ('Ge' , 72.64), ('As' , 74.9216), ('Se' , 78.96), ('Br' , 79.904), ('Kr' , 83.8),
+                             ('Rb' , 85.4678), ('Sr' , 87.62), ('Y' , 88.9059), ('Zr' , 91.224), ('Nb' , 92.9064), ('Mo' , 95.94), ('Tc' , 98), ('Ru' , 101.07), ('Rh' , 102.9055),
+                             ('Pd' , 106.42), ('Ag' , 107.8682), ('Cd' , 112.411), ('In' , 114.818), ('Sn' , 118.71), ('Sb' , 121.76), ('Te' , 127.6), ('I' , 126.9045), ('Xe' , 131.293),
+                             ('Cs' , 132.9055), ('Ba' , 137.327), ('La' , 138.9055), ('Ce' , 140.116), ('Pr' , 140.9077), ('Nd' , 144.24), ('Pm' , 145), ('Sm' , 150.36),
+                             ('Eu' , 151.964), ('Gd' , 157.25), ('Tb' , 158.9253), ('Dy' , 162.5), ('Ho' , 164.9303), ('Er' , 167.259), ('Tm' , 168.9342), ('Yb' , 173.04),
+                             ('Lu' , 174.967), ('Hf' , 178.49), ('Ta' , 180.9479), ('W' , 183.84), ('Re' , 186.207), ('Os' , 190.23), ('Ir' , 192.217), ('Pt' , 195.078),
+                             ('Au' , 196.9665), ('Hg' , 200.59), ('Tl' , 204.3833), ('Pb' , 207.2), ('Bi' , 208.9804), ('Po' , 209), ('At' , 210), ('Rn' , 222),
+                             ('Fr' , 223), ('Ra' , 226), ('Ac' , 227), ('Th' , 232.0381), ('Pa' , 231.0359), ('U' , 238.0289), ('Np' , 237), ('Pu' , 244),
+                             ('Am' , 243), ('Cm' , 247), ('Bk' , 247), ('Cf' , 251), ('Es' , 252), ('Fm' , 257), ('Md' , 258), ('No' , 259),
+                             ('Lr' , 262), ('Rf' , 261), ('Db' , 262), ('Sg' , 266), ('Bh' , 264), ('Hs' , 277), ('Mt' , 268)])
 
 def getElement(mass):
     return PeriodicTable.keys()[np.argmin([np.abs(m-mass) for m in PeriodicTable.values()])]
@@ -313,7 +281,7 @@ if "forcebalance" in __name__:
             have_dcdlib = True
             break
     if not have_dcdlib:
-        logger.debug('Note: Cannot import optional dcdlib module to read/write DCD files.\n')
+        logger.info('The dcdlib module cannot be imported (Cannot read/write DCD files)')
 
     #============================#
     #| PDB read/write functions |#
@@ -321,7 +289,7 @@ if "forcebalance" in __name__:
     try:
         from .PDB import *
     except ImportError:
-        logger.debug('Note: Cannot import optional pdb module to read/write PDB files.\n')
+        logger.info('The pdb module cannot be imported (Cannot read/write PDB files)')
 
     #=============================#
     #| Mol2 read/write functions |#
@@ -329,7 +297,7 @@ if "forcebalance" in __name__:
     try:
         from . import Mol2
     except ImportError:
-        logger.debug('Note: Cannot import optional Mol2 module to read .mol2 files.\n')
+        logger.info('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
 
     #==============================#
     #| OpenMM interface functions |#
@@ -339,8 +307,7 @@ if "forcebalance" in __name__:
         from simtk.openmm import *
         from simtk.openmm.app import *
     except ImportError:
-        logger.debug('Note: Cannot import optional OpenMM module.\n')
-
+        logger.info('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
 elif "geometric" in __name__:
     #============================#
     #| PDB read/write functions |#
@@ -348,7 +315,7 @@ elif "geometric" in __name__:
     try:
         from .PDB import *
     except ImportError:
-        logger.debug('Note: Failed to import optional pdb module to read/write PDB files.\n')
+        logger.info('The pdb module cannot be imported (Cannot read/write PDB files)')
     #==============================#
     #| OpenMM interface functions |#
     #==============================#
@@ -357,7 +324,7 @@ elif "geometric" in __name__:
         from simtk.openmm import *
         from simtk.openmm.app import *
     except ImportError:
-        logger.debug('Note: Failed to import optional OpenMM module.\n')
+        logger.info('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
 
 #===========================#
 #| Convenience subroutines |#
@@ -489,8 +456,8 @@ try:
             return ','.join(['%i' % i for i in self.L()])
         def e(self):
             """ Return an array of the elements.  For instance ['H' 'C' 'C' 'H']. """
-            elems = nx.get_node_attributes(self,'e')
-            return [elems[i] for i in self.L()]
+            elem = nx.get_node_attributes(self,'e')
+            return [elem[i] for i in self.L()]
         def ef(self):
             """ Create an Empirical Formula """
             Formula = list(self.e())
@@ -500,7 +467,7 @@ try:
             coors = nx.get_node_attributes(self,'x')
             return np.array([coors[i] for i in self.L()])
 except ImportError:
-    logger.warning("Cannot import optional NetworkX module, topology tools won't work\n.")
+    logger.warning("NetworkX cannot be imported (topology tools won't work).  Most functionality should still work though.")
 
 def TopEqual(mol1, mol2):
     """ For the nanoreactor project: Determine whether two Molecule objects have the same topologies. """
@@ -1205,7 +1172,9 @@ class Molecule(object):
                          'qcout'    : self.read_qcout,
                          'qcesp'    : self.read_qcesp,
                          'qdata'    : self.read_qdata,
-                         'tinker'   : self.read_arc}
+                         'tinker'   : self.read_arc,
+                         'psi4in'   : self.read_psi4in, 
+                         'psi4out'  : self.read_psi4out}
         ## The table of file writers
         self.Write_Tab = {'gromacs' : self.write_gro,
                           'xyz'     : self.write_xyz,
@@ -1217,7 +1186,8 @@ class Molecule(object):
                           'pdb'     : self.write_pdb,
                           'qcin'    : self.write_qcin,
                           'qdata'   : self.write_qdata,
-                          'tinker'  : self.write_arc}
+                          'tinker'  : self.write_arc, 
+                          'psi4in'  : self.write_psi4in}
         ## A funnel dictionary that takes redundant file types
         ## and maps them down to a few.
         self.Funnel    = {'gromos'  : 'gromacs',
@@ -1233,7 +1203,9 @@ class Molecule(object):
                           'txt'     : 'qdata',
                           'crd'     : 'charmm',
                           'cor'     : 'charmm',
-                          'arc'     : 'tinker'}
+                          'arc'     : 'tinker',
+                          'psi4in'  : 'psi4in', 
+                          'psi4out' : 'psi4out'}
         ## Creates entries like 'gromacs' : 'gromacs' and 'xyz' : 'xyz'
         ## in the Funnel
         self.positive_resid = kwargs.get('positive_resid', 0)
@@ -1376,7 +1348,7 @@ class Molecule(object):
                     New.Data[key].append(copy.deepcopy(self.Data[key][i]))
             elif key in ['comms', 'qm_energies', 'qm_interaction', 'qm_zpe', 'qm_entropy', 'qm_enthalpy', 'elem', 'partial_charge',
                          'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost', 'chain', 'altloc', 'icode',
-                         'terminal']:
+                         'terminal', 'psi4template', 'psi4fragn']:
                 if not isinstance(self.Data[key], list):
                     raise RuntimeError('Expected data attribute %s to be a list, but it is %s' % (key, str(type(self.Data[key]))))
                 # Lists of strings or floats.
@@ -1396,6 +1368,11 @@ class Molecule(object):
                 New.Data[key] = []
                 for SectName, SectData in self.Data[key]:
                     New.Data[key].append((SectName, SectData[:]))
+            elif key in ['psi4args']:
+                #Dictionary with items of a list and another dictionary
+                New.Data[key] = {}
+                for k, v in self.Data[key].items():
+                    New.Data[key][k] = v
             else:
                 raise RuntimeError("Failed to copy key %s" % key)
         return New
@@ -1668,17 +1645,17 @@ class Molecule(object):
     #=====================================#
 
     def center_of_mass(self):
-        totMass = sum([PeriodicTable.get(self.elem[i], 0.0) for i in range(self.na)])
-        return np.array([np.sum([xyz[i,:] * PeriodicTable.get(self.elem[i], 0.0) / totMass for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs])
+        M = sum([PeriodicTable.get(self.elem[i], 0.0) for i in range(self.na)])
+        return np.array([np.sum([xyz[i,:] * PeriodicTable.get(self.elem[i], 0.0) / M for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs])
 
     def radius_of_gyration(self):
-        totMass = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
+        M = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
         coms = self.center_of_mass()
         rgs = []
         for i, xyz in enumerate(self.xyzs):
             xyz1 = xyz.copy()
             xyz1 -= coms[i]
-            rgs.append(np.sqrt(np.sum([PeriodicTable[self.elem[i]]*np.dot(x,x) for i, x in enumerate(xyz1)])/totMass))
+            rgs.append(np.sum([PeriodicTable[self.elem[i]]*np.dot(x,x) for i, x in enumerate(xyz1)])/M)
         return np.array(rgs)
 
     def rigid_water(self):
@@ -2721,15 +2698,15 @@ class Molecule(object):
                 hyds.append(i)
         return hyds
 
-    def all_pairwise_rmsd(self):
+    def all_pairwise_rmsd(self, atom_inds=slice(None)):
         """ Find pairwise RMSD (super slow, not like the one in MSMBuilder.) """
         N = len(self)
         Mat = np.zeros((N,N),dtype=float)
         for i in range(N):
-            xyzi = self.xyzs[i].copy()
+            xyzi = self.xyzs[i][atom_inds].copy()
             xyzi -= xyzi.mean(0)
             for j in range(i):
-                xyzj = self.xyzs[j].copy()
+                xyzj = self.xyzs[j][atom_inds].copy()
                 xyzj -= xyzj.mean(0)
                 tr, rt = get_rotate_translate(xyzj, xyzi)
                 xyzj = np.dot(xyzj, rt) + tr
@@ -2755,14 +2732,14 @@ class Molecule(object):
             Vec[i] = rmsd
         return Vec
 
-    def ref_rmsd(self, i, align=True):
+    def ref_rmsd(self, i, atom_inds=slice(None), align=True):
         """ Find RMSD to a reference frame. """
         N = len(self)
         Vec = np.zeros(N)
-        xyzi = self.xyzs[i].copy()
+        xyzi = self.xyzs[i][atom_inds].copy()
         if align: xyzi -= xyzi.mean(0)
         for j in range(N):
-            xyzj = self.xyzs[j].copy()
+            xyzj = self.xyzs[j][atom_inds].copy()
             if align:
                 xyzj -= xyzj.mean(0)
                 tr, rt = get_rotate_translate(xyzj, xyzi)
@@ -2866,7 +2843,7 @@ class Molecule(object):
         """ .xyz files can be TINKER formatted which is why we have the try/except here. """
         try:
             return self.read_xyz0(fnm, **kwargs)
-        except ActuallyArcError:
+        except:
             return self.read_arc(fnm, **kwargs)
 
     def read_xyz0(self, fnm, **kwargs):
@@ -2891,28 +2868,11 @@ class Molecule(object):
             if ln == 0:
                 # Skip blank lines.
                 if len(line.strip()) > 0:
-                    try:
-                        na = int(line.strip())
-                    except:
-                        # If the first line contains a comment, it's a TINKER .arc file
-                        logger.warning("Non-integer detected in first line; will parse as TINKER .arc file.")
-                        raise ActuallyArcError
+                    na = int(line.strip())
             elif ln == 1:
-                sline = line.split()
-                if len(sline) == 6 and all([isfloat(word) for word in sline]):
-                    # If the second line contains box data, it's a TINKER .arc file
-                    logger.warning("Tinker box data detected in second line; will parse as TINKER .arc file.")
-                    raise ActuallyArcError
-                elif len(sline) >= 5 and isint(sline[0]) and isfloat(sline[2]) and isfloat(sline[3]) and isfloat(sline[4]):
-                    # If the second line contains coordinate data, it's a TINKER .arc file
-                    logger.warning("Tinker coordinate data detected in second line; will parse as TINKER .arc file.")
-                    raise ActuallyArcError
                 comms.append(line.strip())
             else:
                 line = re.sub(r"([0-9])(-[0-9])", r"\1 \2", line)
-                # Error checking. Slows performance by ~20% when tested on a 200 MB .xyz file
-                if not re.match(r"[A-Z][A-Za-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
-                    raise IOError("Expected coordinates at line %i but got this instead:\n%s" % (absln, line))
                 sline = line.split()
                 xyz.append([float(i) for i in sline[1:]])
                 if len(elem) < na:
@@ -2987,11 +2947,7 @@ class Molecule(object):
             if ln == 0:
                 comms = [line]
             elif ln == 1:
-                # Although is isn't exactly up to spec, 
-                # it seems that some .rst7 files have spaces that precede the "integer"
-                # and others have >99999 atoms
-                # na = int(line[:5])
-                na = int(line.split()[0])
+                na = int(line[:5])
             elif mode == 'x':
                 xyz.append([float(line[:12]), float(line[12:24]), float(line[24:36])])
                 an += 1
@@ -3332,7 +3288,6 @@ class Molecule(object):
                         thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
                     elem.append(thiselem)
 
-                # Different frames may have different decimal precision
                 if ln == 2:
                     pdeci = [i for i, x in enumerate(line) if x == '.']
                     ndeci = pdeci[1] - pdeci[0] - 5
@@ -3527,7 +3482,7 @@ class Molecule(object):
                 template.append(('@@@', []))
             elif re.match('Welcome to Q-Chem', line) and reading_template and fff:
                 template.append(('@@@', []))
-
+        
         if template_cut != 0:
             template = template[:template_cut]
 
@@ -3538,7 +3493,6 @@ class Molecule(object):
                   }
         if suffix:
             Answer['qcsuf'] = suffix
-
         if len(xyzs) > 0:
             Answer['xyzs'] = xyzs
         else:
@@ -4041,7 +3995,227 @@ class Molecule(object):
             unnorm = [np.array(i) for i in modes]
             Answer['freqs'] = np.array(frqs)
             Answer['modes'] = [i/np.linalg.norm(i) for i in unnorm]
+        
+        return Answer
 
+    def read_psi4in(self, fnm, **kwargs):
+        """ Written by John Stoppelman read in Psi4 input file.
+
+        Reads a Psi4 input file and forms a template (psi4template)
+
+        Mainly follows similar procedure as in geomeTRIC.engine.Psi4.load_psi4_input
+        and only works with xyz-style cartesian coordinates for now. There are a wide variety 
+        of calculation types. The script can theoretically read in any type of Psi4 calculation
+        type, but read_psi4out is only designed to read the outputs of energy, gradient and
+        optimization calculation types.
+
+        A 'geomeTRIC' boolean can be passed in through kwargs in order to enforce geomeTRIC
+        checs to the input format.
+        """
+        elem, fragn, xyz, xyzs, charge, mult, psi4_template = [], [], [], [], [], [], []
+        geomeTRIC = kwargs.get('geomeTRIC', False)
+        units_conv = 1.0
+        found_molecule, found_geo, found_calc, found_set, found_symmetry, found_no_reorient, found_no_com, read_temp = False, False, False, False, False, False, False, True
+        psi4_args = {'calc': [], 'set': {}}
+        num_calcs = 0
+        for line in open(fnm):
+            if 'molecule' in line:
+                found_molecule = True
+                if any('molecule' in i for i in psi4_template): read_temp = False
+                if read_temp: psi4_template.append(line.rstrip())
+            elif found_molecule is True:
+                ls = line.split()
+                if len(ls) == 4:
+                    if found_geo == False:
+                        found_geo = True
+                        if read_temp: psi4_template.append("$!geometry@here")
+                    if read_temp: elem.append(ls[0])
+                    xyz.append([float(i) for i in ls[1:4]])
+                elif len(ls) == 2 and isint(ls[0]):
+                    if read_temp:
+                        charge.append(int(ls[0]))
+                        mult.append(int(ls[1]))
+                elif '--' in line:
+                    if read_temp: fragn.append(len(elem))
+                elif 'symmetry' in line:
+                    found_symmetry = True
+                    if read_temp: psi4_template.append(line.rstrip())
+                    if line.split()[1].lower() != 'c1' and geomeTRIC:
+                        logger.error("Input will used for geomeTRIC and symmetry must be set to c1")
+                        raise RuntimeError 
+                elif 'no_reorient' in line or 'noreorient' in line:
+                    found_no_reorient = True
+                    if read_temp: psi4_template.append(line.rstrip())
+                elif 'no_com' in line or 'nocom' in line:
+                    found_no_com = True
+                    if read_temp: psi4_template.append(line.rstrip())
+                elif 'units' in line:
+                    if line.split()[1].lower()[:3] != 'ang': units_conv = bohr2ang
+                    if read_temp: psi4_template.append(line.rstrip())
+                else:
+                    if '}' in line:
+                        found_molecule = False
+                        found_geo = False
+                        xyzs.append(np.array(xyz))
+                        xyz = []
+                        if read_temp:
+                            if geomeTRIC:
+                                if not found_no_com: psi4_template.append("no_com")
+                                if not found_no_reorient: psi4_template.append("no_reorient")
+                                if not found_symmetry: psi4_template.append("symmetry c1")
+                    if read_temp: psi4_template.append(line.rstrip())
+            elif "set" in line and "_" not in line and "optking" not in line:
+                found_set = True
+                if not len(psi4_args["set"]):
+                    if read_temp:
+                        psi4_template.append("\nset globals{")
+                        psi4_template.append("$!set@here")
+                        psi4_template.append("}")
+                if "{" not in line:
+                    ls = line.split()
+                    if read_temp:
+                        psi4_args["set"][ls[1]] = ls[2:]
+                    found_set = False
+            elif found_set:
+                ls = line.split()
+                if read_temp:
+                    if len(ls) >= 2: psi4_args["set"][ls[0]] = ls[1:]
+                    if "}" in line: found_set = False
+            elif "energy(" in line or "gradient(" in line or "optimize(" in line:
+                found_calc = True
+                if read_temp:
+                    if num_calcs == 0: psi4_template.append("$!calc@here")
+                    num_calcs += 1
+                    psi4_args['calc'].append(line.rstrip())
+                    if geomeTRIC:
+                        if "gradient(" not in line:
+                            logger.error("Calculation type should be gradient if running geomeTRIC calculation")
+                            raise RuntimeError
+            #If this is an output file, don't read past the input file writeout
+            elif "--------------------------------------------------------------------------" in line:
+                if any('molecule' in i for i in psi4_template): read_temp = False
+                else: psi4_template.append(line.rstrip())
+            else:
+                if read_temp: psi4_template.append(line.rstrip())
+        if found_calc == False:
+            logger.error("Psi4 input file should have a calculation type")
+            raise RuntimeError
+        if geomeTRIC and num_calcs > 1:
+            logger.error("geomeTRIC input should only have 1 input gradient calculation.")
+            raise RuntimeError
+        for i in range(len(xyzs)): xyzs[i] *= units_conv
+        Answer = {'psi4template' : psi4_template,
+                  'psi4fragn'    : fragn,
+                  'psi4args'     : psi4_args}
+        if len(xyzs) > 0: Answer['xyzs'] = xyzs
+        else: Answer['xyzs'] = [np.array([])]
+        if len(elem) > 0: Answer['elem'] = elem
+        if not len(charge): 
+            for i in range(len(fragn)+1): charge.append(0)
+        Answer['charge'] = charge
+        if not len(mult):
+            for i in range(len(fragn)+1): mult.append(1)
+        Answer['mult'] = mult
+        return Answer
+
+    def read_psi4out(self, fnm, **kwargs):
+        """
+        Written by John Stoppelman Read result from Psi4 output file. Can return outputs from energy, gradient 
+        or optimization calculations. The script returns 
+        - Coordinates
+        - Energies
+        - Gradients
+        Also makes a psi4template from the output file
+
+        Partly follows the procedure from geomeTRIC engine.Psi4.read_result
+        """
+        Answer = {}
+        xyz, xyzs, energy, grad, gradient, cbs_energy, cbs_xyzs, cbs_gradient, psi4_temp = [], [], [], [], [], [], [], [], []
+        found_scf, found_xyz, found_energy, found_grad, found_num_grad, found_cbs = False, False, False, False, False, False
+        found_inp = False
+        Tmp_Answ = self.read_psi4in(fnm)
+        #Remove sections before input file
+        psi4_temp = Tmp_Answ['psi4template']
+        psi4_temp = psi4_temp[psi4_temp.index("--------------------------------------------------------------------------")+1:]
+        Tmp_Answ['psi4template'] = psi4_temp
+        for key, val in Tmp_Answ.items():
+            if key in ['psi4template', 'psi4args', 'elem', 'charge', 'mult', 'psi4fragn']: Answer[key] = val
+        with open(fnm) as outfile:
+            for line in outfile:
+                line_strip = line.strip()
+                ls = line_strip.split()
+                if line_strip == "SCF" and not found_scf: found_scf, found_xyz = True, True
+                if found_xyz and len(ls)==5:
+                    if isfloat(ls[1]) and isfloat(ls[2]) and isfloat(ls[3]):
+                        xyz.append([float(s) for s in ls[1:4]])
+                #Determines when out of SCF geometry section
+                if "Running in" in line: 
+                        found_xyz = False
+                        xyzs.append(np.array(xyz))
+                        xyz = []
+                if line_strip.startswith('*'):
+                    # this works for CCSD and CCSD(T) total energy
+                    if len(ls) > 4 and ls[2] == 'total' and ls[3] == 'energy':
+                        #Remove HF energy that was appended to energy list
+                        energy.pop(-1)
+                        energy.append(float(ls[-1]))
+                        found_scf = False
+                elif line_strip.startswith('Total Energy'):
+                    # this works for DF-MP2 total energy
+                    if ls[-1] == '[Eh]':
+                        energy.pop(-1)
+                        energy.append(float(ls[-2]))
+                    else:
+                        # this works for HF and DFT total energy
+                        try:
+                            energy.append(float(ls[-1]))
+                        except:
+                            pass
+                    found_scf = False
+                elif line_strip.startswith('total'):
+                    if ls[1] == 'CBS':
+                        found_cbs = True
+                        cbs_energy.append(float(ls[-1]))
+                        cbs_xyzs.append(xyzs[-1])
+                elif line_strip == '-Total Gradient:' or line_strip == '-Total gradient:' or 'CURRENT GRADIENT' in line:
+                    # this works for most of the analytic gradients
+                    found_grad = True
+                elif found_grad is True:
+                    if len(ls) == 4:
+                        if ls[0].isdigit():
+                            grad.append([float(g) for g in ls[1:4]])
+                    else:
+                        found_grad = False
+                        found_num_grad = False
+                        gradient.append(np.array(grad))
+                        if found_cbs: cbs_gradient.append(gradient[-1])
+                        grad = []
+                elif line_strip == 'Gradient written.':
+                    # this works for CCSD(T) gradients computed by numerical displacements
+                    found_num_grad = True
+                    logger.info("found num grad\n")
+                elif found_num_grad is True and line_strip.startswith('------------------------------'):
+                    for _ in range(4):
+                        line = next(outfile)
+                    found_grad = True
+        if found_cbs:
+            xyzs = cbs_xyzs
+            energy = cbs_energy
+            gradient = cbs_gradient
+        if len(xyzs) > 0:
+            Answer['xyzs'] = xyzs
+        else:
+            Answer['xyzs'] = [np.array([])]
+        if not energy:
+            logger.error("Psi4 output does not have energy result")
+            raise RuntimeError
+        Answer['qm_energies'] = energy
+        if gradient: Answer['qm_grads'] = gradient
+        #Repeated from read_qcout
+        if 'qm_grads' in Answer:
+            if len(energy) != len(gradient):
+                logger.warning("Number of energies and gradients is inconsistent (composite jobs?)  Deleting gradients.")
+                del Answer['qm_grads']
         return Answer
 
     #=====================================#
@@ -4114,6 +4288,33 @@ class Molecule(object):
                 out.append('')
         return out
 
+    def write_psi4in(self, selection, **kwargs):
+        self.require('psi4template', 'psi4fragn', 'psi4args', 'charge', 'mult')
+        out = []
+        opts = self.psi4args['set']
+        calcs = self.psi4args['calc']
+        for SI, I in enumerate(selection):
+            chg = 0
+            for i in self.psi4template:
+                if "$!geometry@here" in i:
+                    out.append(" {}  {}".format(self.charge[chg], self.mult[chg]))
+                    for i, (e, c) in enumerate(zip(self.elem, self.xyzs[I])):
+                        if i in self.psi4fragn:
+                            out.append('--')
+                            chg+=1
+                            out.append(" {}  {}".format(self.charge[chg], self.mult[chg]))
+                        out.append("{:7s} {:13.7f} {:13.7f} {:13.7f}".format(e, c[0], c[1], c[2]))
+                elif "$!set@here" in i:
+                    for key, vals in opts.items(): 
+                        opt = " {}".format(key)
+                        for j in vals: opt += " {}".format(j)
+                        out.append(opt)
+                elif "$!calc@here" in i:
+                    for c in range(len(calcs)): out.append(calcs[c])
+                else:
+                    out.append(i)
+        return out
+ 
     def write_xyz(self, selection, **kwargs):
         self.require('elem','xyzs')
         out = []
