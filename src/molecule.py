@@ -32,6 +32,10 @@ try:
 except NameError:
     pass
 
+# Special error which is thrown when TINKER .arc data is detected in a .xyz file
+class ActuallyArcError(IOError):
+    pass
+
 # ======================================================================#
 # |                                                                    |#
 # |              Chemical file format conversion module                |#
@@ -171,7 +175,8 @@ AtomVariableNames = {'elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersu
 MetaVariableNames = {'fnm', 'ftype', 'qcrems', 'qctemplate', 'qcerr', 'charge', 'mult', 'bonds', 'topology',
                      'molecules', 'psi4template', 'psi4fragn', 'psi4args'}
 # Variable names relevant to quantum calculations explicitly
-QuantumVariableNames = {'qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost', 'qm_bondorder', 'psi4template', 'psi4fragn',                         'psi4args'}
+QuantumVariableNames = {'qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost', 'qm_bondorder', 
+                        'psi4template', 'psi4fragn', 'psi4args'}
 # Superset of all variable names.
 AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames | FrameVariableNames
 
@@ -242,20 +247,48 @@ Elements = ["None",'H','He',
             'Fr','Ra','Ac','Th','Pa','U','Np','Pu','Am','Cm','Bk','Cf','Es','Fm','Md','No','Lr','Rf','Db','Sg','Bh','Hs','Mt']
 
 # Dictionary of atomic masses ; also serves as the list of elements (periodic table)
-PeriodicTable = OrderedDict([('H' , 1.0079), ('He' , 4.0026),
-                             ('Li' , 6.941), ('Be' , 9.0122), ('B' , 10.811), ('C' , 12.0107), ('N' , 14.0067), ('O' , 15.9994), ('F' , 18.9984), ('Ne' , 20.1797),
-                             ('Na' , 22.9897), ('Mg' , 24.305), ('Al' , 26.9815), ('Si' , 28.0855), ('P' , 30.9738), ('S' , 32.065), ('Cl' , 35.453), ('Ar' , 39.948),
-                             ('K' , 39.0983), ('Ca' , 40.078), ('Sc' , 44.9559), ('Ti' , 47.867), ('V' , 50.9415), ('Cr' , 51.9961), ('Mn' , 54.938), ('Fe' , 55.845), ('Co' , 58.9332),
-                             ('Ni' , 58.6934), ('Cu' , 63.546), ('Zn' , 65.39), ('Ga' , 69.723), ('Ge' , 72.64), ('As' , 74.9216), ('Se' , 78.96), ('Br' , 79.904), ('Kr' , 83.8),
-                             ('Rb' , 85.4678), ('Sr' , 87.62), ('Y' , 88.9059), ('Zr' , 91.224), ('Nb' , 92.9064), ('Mo' , 95.94), ('Tc' , 98), ('Ru' , 101.07), ('Rh' , 102.9055),
-                             ('Pd' , 106.42), ('Ag' , 107.8682), ('Cd' , 112.411), ('In' , 114.818), ('Sn' , 118.71), ('Sb' , 121.76), ('Te' , 127.6), ('I' , 126.9045), ('Xe' , 131.293),
-                             ('Cs' , 132.9055), ('Ba' , 137.327), ('La' , 138.9055), ('Ce' , 140.116), ('Pr' , 140.9077), ('Nd' , 144.24), ('Pm' , 145), ('Sm' , 150.36),
-                             ('Eu' , 151.964), ('Gd' , 157.25), ('Tb' , 158.9253), ('Dy' , 162.5), ('Ho' , 164.9303), ('Er' , 167.259), ('Tm' , 168.9342), ('Yb' , 173.04),
-                             ('Lu' , 174.967), ('Hf' , 178.49), ('Ta' , 180.9479), ('W' , 183.84), ('Re' , 186.207), ('Os' , 190.23), ('Ir' , 192.217), ('Pt' , 195.078),
-                             ('Au' , 196.9665), ('Hg' , 200.59), ('Tl' , 204.3833), ('Pb' , 207.2), ('Bi' , 208.9804), ('Po' , 209), ('At' , 210), ('Rn' , 222),
-                             ('Fr' , 223), ('Ra' , 226), ('Ac' , 227), ('Th' , 232.0381), ('Pa' , 231.0359), ('U' , 238.0289), ('Np' , 237), ('Pu' , 244),
-                             ('Am' , 243), ('Cm' , 247), ('Bk' , 247), ('Cf' , 251), ('Es' , 252), ('Fm' , 257), ('Md' , 258), ('No' , 259),
-                             ('Lr' , 262), ('Rf' , 261), ('Db' , 262), ('Sg' , 266), ('Bh' , 264), ('Hs' , 277), ('Mt' , 268)])
+#
+# Atomic mass data was updated on 2020-05-07 from NIST:
+# "Atomic Weights and Isotopic Compositions with Relative Atomic Masses"
+# https://www.nist.gov/pml/atomic-weights-and-isotopic-compositions-relative-atomic-masses
+# using All Elements -> preformatted ASCII table.
+#
+# The standard atomic weight was provided in several different formats:
+# Two numbers in brackets as in [1.00784,1.00811] : The average value of the two limits is used.
+# With parentheses(uncert) as in 4.002602(2) : The parentheses was split off and all significant digits are used.
+# A single number in brackets as in [98] : The single number was used
+# Not provided (for Am, Z=95 and up): The mass number of the lightest isotope was used
+PeriodicTable = OrderedDict([("H", 1.007975), ("He", 4.002602), # First row
+                             ("Li", 6.9675), ("Be", 9.0121831), ("B", 10.8135), ("C", 12.0106), ("N", 14.006855), ("O", 15.99940), ("F", 18.99840316), ("Ne", 20.1797), # Second row Li-Ne
+                             ("Na", 22.98976928), ("Mg", 24.3055), ("Al", 26.9815385), ("Si", 28.085), ("P", 30.973762), ("S", 32.0675), ("Cl", 35.4515), ("Ar", 39.948), # Third row Na-Ar
+                             ("K", 39.0983), ("Ca", 40.078), ("Sc", 44.955908), ("Ti", 47.867), ("V", 50.9415), ("Cr", 51.9961), ("Mn", 54.938044), ("Fe", 55.845), ("Co", 58.933194), # Fourth row K-Kr
+                             ("Ni", 58.6934), ("Cu", 63.546), ("Zn", 65.38), ("Ga", 69.723), ("Ge", 72.63), ("As", 74.921595), ("Se", 78.971), ("Br", 79.904), ("Kr", 83.798),
+                             ("Rb", 85.4678), ("Sr", 87.62), ("Y", 88.90584), ("Zr", 91.224), ("Nb", 92.90637), ("Mo", 95.95), ("Tc", 98.), ("Ru", 101.07), ("Rh", 102.9055), # Fifth row Rb-Xe
+                             ("Pd", 106.42), ("Ag", 107.8682), ("Cd", 112.414), ("In", 114.818), ("Sn", 118.71), ("Sb", 121.76), ("Te", 127.6), ("I", 126.90447), ("Xe", 131.293),
+                             ("Cs", 132.905452), ("Ba", 137.327), ("La", 138.90547), ("Ce", 140.116), ("Pr", 140.90766), ("Nd", 144.242), ("Pm", 145.), ("Sm", 150.36), # Sixth row Cs-Rn
+                             ("Eu", 151.964), ("Gd", 157.25), ("Tb", 158.92535), ("Dy", 162.5), ("Ho", 164.93033), ("Er", 167.259), ("Tm", 168.93422), ("Yb", 173.054),
+                             ("Lu", 174.9668), ("Hf", 178.49), ("Ta", 180.94788), ("W", 183.84), ("Re", 186.207), ("Os", 190.23), ("Ir", 192.217), ("Pt", 195.084),
+                             ("Au", 196.966569), ("Hg", 200.592), ("Tl", 204.3835), ("Pb", 207.2), ("Bi", 208.9804), ("Po", 209.), ("At", 210.), ("Rn", 222.),
+                             ("Fr", 223.), ("Ra", 226.), ("Ac", 227.), ("Th", 232.0377), ("Pa", 231.03588), ("U", 238.02891), ("Np", 237.), ("Pu", 244.), # Seventh row Fr-Og
+                             ("Am", 241.), ("Cm", 243.), ("Bk", 247.), ("Cf", 249.), ("Es", 252.), ("Fm", 257.), ("Md", 258.), ("No", 259.),
+                             ("Lr", 262.), ("Rf", 267.), ("Db", 268.), ("Sg", 271.), ("Bh", 272.), ("Hs", 270.), ("Mt", 276.), ("Ds", 281.),
+                             ("Rg", 280.), ("Cn", 285.), ("Nh", 284.), ("Fl", 289.), ("Mc", 288.), ("Lv", 293.), ("Ts", 292.), ("Og", 294.)])
+
+# Old masses used pre-2020, retained in case it is useful:
+# PeriodicTable = OrderedDict([('H' , 1.0079), ('He' , 4.0026),
+#                              ('Li' , 6.941), ('Be' , 9.0122), ('B' , 10.811), ('C' , 12.0107), ('N' , 14.0067), ('O' , 15.9994), ('F' , 18.9984), ('Ne' , 20.1797),
+#                              ('Na' , 22.9897), ('Mg' , 24.305), ('Al' , 26.9815), ('Si' , 28.0855), ('P' , 30.9738), ('S' , 32.065), ('Cl' , 35.453), ('Ar' , 39.948),
+#                              ('K' , 39.0983), ('Ca' , 40.078), ('Sc' , 44.9559), ('Ti' , 47.867), ('V' , 50.9415), ('Cr' , 51.9961), ('Mn' , 54.938), ('Fe' , 55.845), ('Co' , 58.9332),
+#                              ('Ni' , 58.6934), ('Cu' , 63.546), ('Zn' , 65.39), ('Ga' , 69.723), ('Ge' , 72.64), ('As' , 74.9216), ('Se' , 78.96), ('Br' , 79.904), ('Kr' , 83.8),
+#                              ('Rb' , 85.4678), ('Sr' , 87.62), ('Y' , 88.9059), ('Zr' , 91.224), ('Nb' , 92.9064), ('Mo' , 95.94), ('Tc' , 98), ('Ru' , 101.07), ('Rh' , 102.9055),
+#                              ('Pd' , 106.42), ('Ag' , 107.8682), ('Cd' , 112.411), ('In' , 114.818), ('Sn' , 118.71), ('Sb' , 121.76), ('Te' , 127.6), ('I' , 126.9045), ('Xe' , 131.293),
+#                              ('Cs' , 132.9055), ('Ba' , 137.327), ('La' , 138.9055), ('Ce' , 140.116), ('Pr' , 140.9077), ('Nd' , 144.24), ('Pm' , 145), ('Sm' , 150.36),
+#                              ('Eu' , 151.964), ('Gd' , 157.25), ('Tb' , 158.9253), ('Dy' , 162.5), ('Ho' , 164.9303), ('Er' , 167.259), ('Tm' , 168.9342), ('Yb' , 173.04),
+#                              ('Lu' , 174.967), ('Hf' , 178.49), ('Ta' , 180.9479), ('W' , 183.84), ('Re' , 186.207), ('Os' , 190.23), ('Ir' , 192.217), ('Pt' , 195.078),
+#                              ('Au' , 196.9665), ('Hg' , 200.59), ('Tl' , 204.3833), ('Pb' , 207.2), ('Bi' , 208.9804), ('Po' , 209), ('At' , 210), ('Rn' , 222),
+#                              ('Fr' , 223), ('Ra' , 226), ('Ac' , 227), ('Th' , 232.0381), ('Pa' , 231.0359), ('U' , 238.0289), ('Np' , 237), ('Pu' , 244),
+#                              ('Am' , 243), ('Cm' , 247), ('Bk' , 247), ('Cf' , 251), ('Es' , 252), ('Fm' , 257), ('Md' , 258), ('No' , 259),
+#                              ('Lr' , 262), ('Rf' , 261), ('Db' , 262), ('Sg' , 266), ('Bh' , 264), ('Hs' , 277), ('Mt' , 268)])
 
 def getElement(mass):
     return PeriodicTable.keys()[np.argmin([np.abs(m-mass) for m in PeriodicTable.values()])]
@@ -281,7 +314,7 @@ if "forcebalance" in __name__:
             have_dcdlib = True
             break
     if not have_dcdlib:
-        logger.info('The dcdlib module cannot be imported (Cannot read/write DCD files)')
+        logger.debug('Note: Cannot import optional dcdlib module to read/write DCD files.\n')
 
     #============================#
     #| PDB read/write functions |#
@@ -289,7 +322,7 @@ if "forcebalance" in __name__:
     try:
         from .PDB import *
     except ImportError:
-        logger.info('The pdb module cannot be imported (Cannot read/write PDB files)')
+        logger.debug('Note: Cannot import optional pdb module to read/write PDB files.\n')
 
     #=============================#
     #| Mol2 read/write functions |#
@@ -297,7 +330,7 @@ if "forcebalance" in __name__:
     try:
         from . import Mol2
     except ImportError:
-        logger.info('The Mol2 module cannot be imported (Cannot read/write Mol2 files)')
+        logger.debug('Note: Cannot import optional Mol2 module to read .mol2 files.\n')
 
     #==============================#
     #| OpenMM interface functions |#
@@ -307,7 +340,8 @@ if "forcebalance" in __name__:
         from simtk.openmm import *
         from simtk.openmm.app import *
     except ImportError:
-        logger.info('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
+        logger.debug('Note: Cannot import optional OpenMM module.\n')
+
 elif "geometric" in __name__:
     #============================#
     #| PDB read/write functions |#
@@ -315,7 +349,7 @@ elif "geometric" in __name__:
     try:
         from .PDB import *
     except ImportError:
-        logger.info('The pdb module cannot be imported (Cannot read/write PDB files)')
+        logger.debug('Note: Failed to import optional pdb module to read/write PDB files.\n')
     #==============================#
     #| OpenMM interface functions |#
     #==============================#
@@ -324,7 +358,7 @@ elif "geometric" in __name__:
         from simtk.openmm import *
         from simtk.openmm.app import *
     except ImportError:
-        logger.info('The OpenMM modules cannot be imported (Cannot interface with OpenMM)')
+        logger.debug('Note: Failed to import optional OpenMM module.\n')
 
 #===========================#
 #| Convenience subroutines |#
@@ -456,8 +490,8 @@ try:
             return ','.join(['%i' % i for i in self.L()])
         def e(self):
             """ Return an array of the elements.  For instance ['H' 'C' 'C' 'H']. """
-            elem = nx.get_node_attributes(self,'e')
-            return [elem[i] for i in self.L()]
+            elems = nx.get_node_attributes(self,'e')
+            return [elems[i] for i in self.L()]
         def ef(self):
             """ Create an Empirical Formula """
             Formula = list(self.e())
@@ -467,7 +501,7 @@ try:
             coors = nx.get_node_attributes(self,'x')
             return np.array([coors[i] for i in self.L()])
 except ImportError:
-    logger.warning("NetworkX cannot be imported (topology tools won't work).  Most functionality should still work though.")
+    logger.warning("Cannot import optional NetworkX module, topology tools won't work\n.")
 
 def TopEqual(mol1, mol2):
     """ For the nanoreactor project: Determine whether two Molecule objects have the same topologies. """
@@ -1645,17 +1679,17 @@ class Molecule(object):
     #=====================================#
 
     def center_of_mass(self):
-        M = sum([PeriodicTable.get(self.elem[i], 0.0) for i in range(self.na)])
-        return np.array([np.sum([xyz[i,:] * PeriodicTable.get(self.elem[i], 0.0) / M for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs])
+        totMass = sum([PeriodicTable.get(self.elem[i], 0.0) for i in range(self.na)])
+        return np.array([np.sum([xyz[i,:] * PeriodicTable.get(self.elem[i], 0.0) / totMass for i in range(xyz.shape[0])],axis=0) for xyz in self.xyzs])
 
     def radius_of_gyration(self):
-        M = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
+        totMass = sum([PeriodicTable[self.elem[i]] for i in range(self.na)])
         coms = self.center_of_mass()
         rgs = []
         for i, xyz in enumerate(self.xyzs):
             xyz1 = xyz.copy()
             xyz1 -= coms[i]
-            rgs.append(np.sum([PeriodicTable[self.elem[i]]*np.dot(x,x) for i, x in enumerate(xyz1)])/M)
+            rgs.append(np.sqrt(np.sum([PeriodicTable[self.elem[i]]*np.dot(x,x) for i, x in enumerate(xyz1)])/totMass))
         return np.array(rgs)
 
     def rigid_water(self):
@@ -2843,7 +2877,7 @@ class Molecule(object):
         """ .xyz files can be TINKER formatted which is why we have the try/except here. """
         try:
             return self.read_xyz0(fnm, **kwargs)
-        except:
+        except ActuallyArcError:
             return self.read_arc(fnm, **kwargs)
 
     def read_xyz0(self, fnm, **kwargs):
@@ -2868,11 +2902,28 @@ class Molecule(object):
             if ln == 0:
                 # Skip blank lines.
                 if len(line.strip()) > 0:
-                    na = int(line.strip())
+                    try:
+                        na = int(line.strip())
+                    except:
+                        # If the first line contains a comment, it's a TINKER .arc file
+                        logger.warning("Non-integer detected in first line; will parse as TINKER .arc file.")
+                        raise ActuallyArcError
             elif ln == 1:
+                sline = line.split()
+                if len(sline) == 6 and all([isfloat(word) for word in sline]):
+                    # If the second line contains box data, it's a TINKER .arc file
+                    logger.warning("Tinker box data detected in second line; will parse as TINKER .arc file.")
+                    raise ActuallyArcError
+                elif len(sline) >= 5 and isint(sline[0]) and isfloat(sline[2]) and isfloat(sline[3]) and isfloat(sline[4]):
+                    # If the second line contains coordinate data, it's a TINKER .arc file
+                    logger.warning("Tinker coordinate data detected in second line; will parse as TINKER .arc file.")
+                    raise ActuallyArcError
                 comms.append(line.strip())
             else:
                 line = re.sub(r"([0-9])(-[0-9])", r"\1 \2", line)
+                # Error checking. Slows performance by ~20% when tested on a 200 MB .xyz file
+                if not re.match(r"[A-Z][A-Za-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
+                    raise IOError("Expected coordinates at line %i but got this instead:\n%s" % (absln, line))
                 sline = line.split()
                 xyz.append([float(i) for i in sline[1:]])
                 if len(elem) < na:
@@ -2947,7 +2998,11 @@ class Molecule(object):
             if ln == 0:
                 comms = [line]
             elif ln == 1:
-                na = int(line[:5])
+                # Although is isn't exactly up to spec, 
+                # it seems that some .rst7 files have spaces that precede the "integer"
+                # and others have >99999 atoms
+                # na = int(line[:5])
+                na = int(line.split()[0])
             elif mode == 'x':
                 xyz.append([float(line[:12]), float(line[12:24]), float(line[24:36])])
                 an += 1
@@ -3288,6 +3343,7 @@ class Molecule(object):
                         thiselem = thiselem[0] + re.sub('[A-Z0-9]','',thiselem[1:])
                     elem.append(thiselem)
 
+                # Different frames may have different decimal precision
                 if ln == 2:
                     pdeci = [i for i, x in enumerate(line) if x == '.']
                     ndeci = pdeci[1] - pdeci[0] - 5
@@ -3482,7 +3538,7 @@ class Molecule(object):
                 template.append(('@@@', []))
             elif re.match('Welcome to Q-Chem', line) and reading_template and fff:
                 template.append(('@@@', []))
-        
+
         if template_cut != 0:
             template = template[:template_cut]
 
@@ -3493,6 +3549,7 @@ class Molecule(object):
                   }
         if suffix:
             Answer['qcsuf'] = suffix
+
         if len(xyzs) > 0:
             Answer['xyzs'] = xyzs
         else:
