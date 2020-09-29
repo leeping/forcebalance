@@ -1,0 +1,35 @@
+#========================#
+#|   Code Description   |#
+#========================#
+Author: John Stoppelman
+
+Reopt.py is a tool used in conjunction with ForceBalance in
+order to identify spurious minima in the potential energy surface 
+of force fields. After a ForceBalance optimization, spurious
+minima are still likely to exist in the force field. 
+This code produces additional targets for another ForceBalance cycle 
+with QM energies for these false minima. This helps the objective 
+function eliminate these structures from the potential energy surface. 
+
+The code works within the ForceBalance optimization directory (included in the
+fb_dir.tar.gz tar file). The script "Reopt.py" is run with the FB input file 
+(named "optimize.in" in this case): "python Reopt.py optimize.in"
+The script proceeds to MM optimize the AbInitio type-targets that were used
+to parameterize the force field. The MM-optimized structures for each
+unique residue are clustered using hierarchical clustering 
+(https://docs.scipy.org/doc/scipy/reference/cluster.hierarchy.html)
+and cluster centroids are identified using similarity measures
+(http://mdtraj.org/1.4.2/examples/centroids.html).
+
+The output of the code is a "centroids.gro" file for each residue
+(located in "fb_dir/reopt.tmp/Cluster/PTR" in the example 
+ForceBalance directory in this case). The centroids.gro file for 
+each residue can then be used to run new QM energy/gradient calculations 
+and form new "mmopt" targets that can be included in the objective function
+similarly to the existing AbInitio targets. The script "mk_inps.py" included 
+in the fb_dir/reopt.tmp/Cluster/PTR directory makes Psi4 input calculations 
+from the centroids.gro file along with two calculation templates (in this case,
+the calculation templates are for MP2/CBS energies and MP2/aug-cc-pVTZ gradients). 
+The "write_qdata.py" file in this trajectory shows how to combine this data
+using ForceBalance's Molecule class in order to write a qdata.txt file, which
+works as input for ForceBalance.
