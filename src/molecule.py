@@ -173,9 +173,10 @@ AtomVariableNames = {'elem', 'partial_charge', 'atomname', 'atomtype', 'tinkersu
 # charge     = The net charge of the molecule
 # mult       = The spin multiplicity of the molecule
 MetaVariableNames = {'fnm', 'ftype', 'qcrems', 'qctemplate', 'qcerr', 'charge', 'mult', 'bonds', 'topology',
-                     'molecules'}
+                     'molecules', 'psi4template', 'psi4fragn', 'psi4args'}
 # Variable names relevant to quantum calculations explicitly
-QuantumVariableNames = {'qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost', 'qm_bondorder'}
+QuantumVariableNames = {'qcrems', 'qctemplate', 'charge', 'mult', 'qcsuf', 'qm_ghost', 'qm_bondorder', 
+                        'psi4template', 'psi4fragn', 'psi4args'}
 # Superset of all variable names.
 AllVariableNames = QuantumVariableNames | AtomVariableNames | MetaVariableNames | FrameVariableNames
 
@@ -1205,7 +1206,9 @@ class Molecule(object):
                          'qcout'    : self.read_qcout,
                          'qcesp'    : self.read_qcesp,
                          'qdata'    : self.read_qdata,
-                         'tinker'   : self.read_arc}
+                         'tinker'   : self.read_arc,
+                         'psi4in'   : self.read_psi4in, 
+                         'psi4out'  : self.read_psi4out}
         ## The table of file writers
         self.Write_Tab = {'gromacs' : self.write_gro,
                           'xyz'     : self.write_xyz,
@@ -1217,7 +1220,8 @@ class Molecule(object):
                           'pdb'     : self.write_pdb,
                           'qcin'    : self.write_qcin,
                           'qdata'   : self.write_qdata,
-                          'tinker'  : self.write_arc}
+                          'tinker'  : self.write_arc, 
+                          'psi4in'  : self.write_psi4in}
         ## A funnel dictionary that takes redundant file types
         ## and maps them down to a few.
         self.Funnel    = {'gromos'  : 'gromacs',
@@ -1233,7 +1237,9 @@ class Molecule(object):
                           'txt'     : 'qdata',
                           'crd'     : 'charmm',
                           'cor'     : 'charmm',
-                          'arc'     : 'tinker'}
+                          'arc'     : 'tinker',
+                          'psi4in'  : 'psi4in', 
+                          'psi4out' : 'psi4out'}
         ## Creates entries like 'gromacs' : 'gromacs' and 'xyz' : 'xyz'
         ## in the Funnel
         self.positive_resid = kwargs.get('positive_resid', 0)
@@ -1376,7 +1382,7 @@ class Molecule(object):
                     New.Data[key].append(copy.deepcopy(self.Data[key][i]))
             elif key in ['comms', 'qm_energies', 'qm_interaction', 'qm_zpe', 'qm_entropy', 'qm_enthalpy', 'elem', 'partial_charge',
                          'atomname', 'atomtype', 'tinkersuf', 'resid', 'resname', 'qcsuf', 'qm_ghost', 'chain', 'altloc', 'icode',
-                         'terminal']:
+                         'terminal', 'psi4template', 'psi4fragn']:
                 if not isinstance(self.Data[key], list):
                     raise RuntimeError('Expected data attribute %s to be a list, but it is %s' % (key, str(type(self.Data[key]))))
                 # Lists of strings or floats.
@@ -1396,6 +1402,11 @@ class Molecule(object):
                 New.Data[key] = []
                 for SectName, SectData in self.Data[key]:
                     New.Data[key].append((SectName, SectData[:]))
+            elif key in ['psi4args']:
+                #Dictionary with items of a list and another dictionary
+                New.Data[key] = {}
+                for k, v in self.Data[key].items():
+                    New.Data[key][k] = v
             else:
                 raise RuntimeError("Failed to copy key %s" % key)
         return New
@@ -2721,15 +2732,15 @@ class Molecule(object):
                 hyds.append(i)
         return hyds
 
-    def all_pairwise_rmsd(self):
+    def all_pairwise_rmsd(self, atom_inds=slice(None)):
         """ Find pairwise RMSD (super slow, not like the one in MSMBuilder.) """
         N = len(self)
         Mat = np.zeros((N,N),dtype=float)
         for i in range(N):
-            xyzi = self.xyzs[i].copy()
+            xyzi = self.xyzs[i][atom_inds].copy()
             xyzi -= xyzi.mean(0)
             for j in range(i):
-                xyzj = self.xyzs[j].copy()
+                xyzj = self.xyzs[j][atom_inds].copy()
                 xyzj -= xyzj.mean(0)
                 tr, rt = get_rotate_translate(xyzj, xyzi)
                 xyzj = np.dot(xyzj, rt) + tr
@@ -2755,14 +2766,14 @@ class Molecule(object):
             Vec[i] = rmsd
         return Vec
 
-    def ref_rmsd(self, i, align=True):
+    def ref_rmsd(self, i, atom_inds=slice(None), align=True):
         """ Find RMSD to a reference frame. """
         N = len(self)
         Vec = np.zeros(N)
-        xyzi = self.xyzs[i].copy()
+        xyzi = self.xyzs[i][atom_inds].copy()
         if align: xyzi -= xyzi.mean(0)
         for j in range(N):
-            xyzj = self.xyzs[j].copy()
+            xyzj = self.xyzs[j][atom_inds].copy()
             if align:
                 xyzj -= xyzj.mean(0)
                 tr, rt = get_rotate_translate(xyzj, xyzi)
@@ -4041,7 +4052,227 @@ class Molecule(object):
             unnorm = [np.array(i) for i in modes]
             Answer['freqs'] = np.array(frqs)
             Answer['modes'] = [i/np.linalg.norm(i) for i in unnorm]
+        
+        return Answer
 
+    def read_psi4in(self, fnm, **kwargs):
+        """ Written by John Stoppelman read in Psi4 input file.
+
+        Reads a Psi4 input file and forms a template (psi4template)
+
+        Mainly follows similar procedure as in geomeTRIC.engine.Psi4.load_psi4_input
+        and only works with xyz-style cartesian coordinates for now. There are a wide variety 
+        of calculation types. The script can theoretically read in any type of Psi4 calculation
+        type, but read_psi4out is only designed to read the outputs of energy, gradient and
+        optimization calculation types.
+
+        A 'geomeTRIC' boolean can be passed in through kwargs in order to enforce geomeTRIC
+        checs to the input format.
+        """
+        elem, fragn, xyz, xyzs, charge, mult, psi4_template = [], [], [], [], [], [], []
+        geomeTRIC = kwargs.get('geomeTRIC', False)
+        units_conv = 1.0
+        found_molecule, found_geo, found_calc, found_set, found_symmetry, found_no_reorient, found_no_com, read_temp = False, False, False, False, False, False, False, True
+        psi4_args = {'calc': [], 'set': {}}
+        num_calcs = 0
+        for line in open(fnm):
+            if 'molecule' in line:
+                found_molecule = True
+                if any('molecule' in i for i in psi4_template): read_temp = False
+                if read_temp: psi4_template.append(line.rstrip())
+            elif found_molecule is True:
+                ls = line.split()
+                if len(ls) == 4:
+                    if found_geo == False:
+                        found_geo = True
+                        if read_temp: psi4_template.append("$!geometry@here")
+                    if read_temp: elem.append(ls[0])
+                    xyz.append([float(i) for i in ls[1:4]])
+                elif len(ls) == 2 and isint(ls[0]):
+                    if read_temp:
+                        charge.append(int(ls[0]))
+                        mult.append(int(ls[1]))
+                elif '--' in line:
+                    if read_temp: fragn.append(len(elem))
+                elif 'symmetry' in line:
+                    found_symmetry = True
+                    if read_temp: psi4_template.append(line.rstrip())
+                    if line.split()[1].lower() != 'c1' and geomeTRIC:
+                        logger.error("Input will used for geomeTRIC and symmetry must be set to c1")
+                        raise RuntimeError 
+                elif 'no_reorient' in line or 'noreorient' in line:
+                    found_no_reorient = True
+                    if read_temp: psi4_template.append(line.rstrip())
+                elif 'no_com' in line or 'nocom' in line:
+                    found_no_com = True
+                    if read_temp: psi4_template.append(line.rstrip())
+                elif 'units' in line:
+                    if line.split()[1].lower()[:3] != 'ang': units_conv = bohr2ang
+                    if read_temp: psi4_template.append(line.rstrip())
+                else:
+                    if '}' in line:
+                        found_molecule = False
+                        found_geo = False
+                        xyzs.append(np.array(xyz))
+                        xyz = []
+                        if read_temp:
+                            if geomeTRIC:
+                                if not found_no_com: psi4_template.append("no_com")
+                                if not found_no_reorient: psi4_template.append("no_reorient")
+                                if not found_symmetry: psi4_template.append("symmetry c1")
+                    if read_temp: psi4_template.append(line.rstrip())
+            elif "set" in line and "_" not in line and "optking" not in line:
+                found_set = True
+                if not len(psi4_args["set"]):
+                    if read_temp:
+                        psi4_template.append("\nset globals{")
+                        psi4_template.append("$!set@here")
+                        psi4_template.append("}")
+                if "{" not in line:
+                    ls = line.split()
+                    if read_temp:
+                        psi4_args["set"][ls[1]] = ls[2:]
+                    found_set = False
+            elif found_set:
+                ls = line.split()
+                if read_temp:
+                    if len(ls) >= 2: psi4_args["set"][ls[0]] = ls[1:]
+                    if "}" in line: found_set = False
+            elif "energy(" in line or "gradient(" in line or "optimize(" in line:
+                found_calc = True
+                if read_temp:
+                    if num_calcs == 0: psi4_template.append("$!calc@here")
+                    num_calcs += 1
+                    psi4_args['calc'].append(line.rstrip())
+                    if geomeTRIC:
+                        if "gradient(" not in line:
+                            logger.error("Calculation type should be gradient if running geomeTRIC calculation")
+                            raise RuntimeError
+            #If this is an output file, don't read past the input file writeout
+            elif "--------------------------------------------------------------------------" in line:
+                if any('molecule' in i for i in psi4_template): read_temp = False
+                else: psi4_template.append(line.rstrip())
+            else:
+                if read_temp: psi4_template.append(line.rstrip())
+        if found_calc == False:
+            logger.error("Psi4 input file should have a calculation type")
+            raise RuntimeError
+        if geomeTRIC and num_calcs > 1:
+            logger.error("geomeTRIC input should only have 1 input gradient calculation.")
+            raise RuntimeError
+        for i in range(len(xyzs)): xyzs[i] *= units_conv
+        Answer = {'psi4template' : psi4_template,
+                  'psi4fragn'    : fragn,
+                  'psi4args'     : psi4_args}
+        if len(xyzs) > 0: Answer['xyzs'] = xyzs
+        else: Answer['xyzs'] = [np.array([])]
+        if len(elem) > 0: Answer['elem'] = elem
+        if not len(charge): 
+            for i in range(len(fragn)+1): charge.append(0)
+        Answer['charge'] = charge
+        if not len(mult):
+            for i in range(len(fragn)+1): mult.append(1)
+        Answer['mult'] = mult
+        return Answer
+
+    def read_psi4out(self, fnm, **kwargs):
+        """
+        Written by John Stoppelman Read result from Psi4 output file. Can return outputs from energy, gradient 
+        or optimization calculations. The script returns 
+        - Coordinates
+        - Energies
+        - Gradients
+        Also makes a psi4template from the output file
+
+        Partly follows the procedure from geomeTRIC engine.Psi4.read_result
+        """
+        Answer = {}
+        xyz, xyzs, energy, grad, gradient, cbs_energy, cbs_xyzs, cbs_gradient, psi4_temp = [], [], [], [], [], [], [], [], []
+        found_scf, found_xyz, found_energy, found_grad, found_num_grad, found_cbs = False, False, False, False, False, False
+        found_inp = False
+        Tmp_Answ = self.read_psi4in(fnm)
+        #Remove sections before input file
+        psi4_temp = Tmp_Answ['psi4template']
+        psi4_temp = psi4_temp[psi4_temp.index("--------------------------------------------------------------------------")+1:]
+        Tmp_Answ['psi4template'] = psi4_temp
+        for key, val in Tmp_Answ.items():
+            if key in ['psi4template', 'psi4args', 'elem', 'charge', 'mult', 'psi4fragn']: Answer[key] = val
+        with open(fnm) as outfile:
+            for line in outfile:
+                line_strip = line.strip()
+                ls = line_strip.split()
+                if line_strip == "SCF" and not found_scf: found_scf, found_xyz = True, True
+                if found_xyz and len(ls)==5:
+                    if isfloat(ls[1]) and isfloat(ls[2]) and isfloat(ls[3]):
+                        xyz.append([float(s) for s in ls[1:4]])
+                #Determines when out of SCF geometry section
+                if "Running in" in line: 
+                        found_xyz = False
+                        xyzs.append(np.array(xyz))
+                        xyz = []
+                if line_strip.startswith('*'):
+                    # this works for CCSD and CCSD(T) total energy
+                    if len(ls) > 4 and ls[2] == 'total' and ls[3] == 'energy':
+                        #Remove HF energy that was appended to energy list
+                        energy.pop(-1)
+                        energy.append(float(ls[-1]))
+                        found_scf = False
+                elif line_strip.startswith('Total Energy'):
+                    # this works for DF-MP2 total energy
+                    if ls[-1] == '[Eh]':
+                        energy.pop(-1)
+                        energy.append(float(ls[-2]))
+                    else:
+                        # this works for HF and DFT total energy
+                        try:
+                            energy.append(float(ls[-1]))
+                        except:
+                            pass
+                    found_scf = False
+                elif line_strip.startswith('total'):
+                    if ls[1] == 'CBS':
+                        found_cbs = True
+                        cbs_energy.append(float(ls[-1]))
+                        cbs_xyzs.append(xyzs[-1])
+                elif line_strip == '-Total Gradient:' or line_strip == '-Total gradient:' or 'CURRENT GRADIENT' in line:
+                    # this works for most of the analytic gradients
+                    found_grad = True
+                elif found_grad is True:
+                    if len(ls) == 4:
+                        if ls[0].isdigit():
+                            grad.append([float(g) for g in ls[1:4]])
+                    else:
+                        found_grad = False
+                        found_num_grad = False
+                        gradient.append(np.array(grad))
+                        if found_cbs: cbs_gradient.append(gradient[-1])
+                        grad = []
+                elif line_strip == 'Gradient written.':
+                    # this works for CCSD(T) gradients computed by numerical displacements
+                    found_num_grad = True
+                    logger.info("found num grad\n")
+                elif found_num_grad is True and line_strip.startswith('------------------------------'):
+                    for _ in range(4):
+                        line = next(outfile)
+                    found_grad = True
+        if found_cbs:
+            xyzs = cbs_xyzs
+            energy = cbs_energy
+            gradient = cbs_gradient
+        if len(xyzs) > 0:
+            Answer['xyzs'] = xyzs
+        else:
+            Answer['xyzs'] = [np.array([])]
+        if not energy:
+            logger.error("Psi4 output does not have energy result")
+            raise RuntimeError
+        Answer['qm_energies'] = energy
+        if gradient: Answer['qm_grads'] = gradient
+        #Repeated from read_qcout
+        if 'qm_grads' in Answer:
+            if len(energy) != len(gradient):
+                logger.warning("Number of energies and gradients is inconsistent (composite jobs?)  Deleting gradients.")
+                del Answer['qm_grads']
         return Answer
 
     #=====================================#
@@ -4114,6 +4345,33 @@ class Molecule(object):
                 out.append('')
         return out
 
+    def write_psi4in(self, selection, **kwargs):
+        self.require('psi4template', 'psi4fragn', 'psi4args', 'charge', 'mult')
+        out = []
+        opts = self.psi4args['set']
+        calcs = self.psi4args['calc']
+        for SI, I in enumerate(selection):
+            chg = 0
+            for i in self.psi4template:
+                if "$!geometry@here" in i:
+                    out.append(" {}  {}".format(self.charge[chg], self.mult[chg]))
+                    for i, (e, c) in enumerate(zip(self.elem, self.xyzs[I])):
+                        if i in self.psi4fragn:
+                            out.append('--')
+                            chg+=1
+                            out.append(" {}  {}".format(self.charge[chg], self.mult[chg]))
+                        out.append("{:7s} {:13.7f} {:13.7f} {:13.7f}".format(e, c[0], c[1], c[2]))
+                elif "$!set@here" in i:
+                    for key, vals in opts.items(): 
+                        opt = " {}".format(key)
+                        for j in vals: opt += " {}".format(j)
+                        out.append(opt)
+                elif "$!calc@here" in i:
+                    for c in range(len(calcs)): out.append(calcs[c])
+                else:
+                    out.append(i)
+        return out
+ 
     def write_xyz(self, selection, **kwargs):
         self.require('elem','xyzs')
         out = []
