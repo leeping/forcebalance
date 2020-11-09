@@ -367,7 +367,7 @@ class Optimizer(forcebalance.BaseClass):
         ## Print out final message
         logger.info("Wall time since calculation start: %.1f seconds\n" % (time.time() - t0))
         if self.failmsg:
-            bar = printcool("It is possible to commit no errors and still lose.\nThat is not a weakness. That is life.",ansi="40;93")
+            bar = printcool("It is possible to commit no mistakes and still lose.\nThat is not a weakness. That is life.",ansi="40;93")
         else:
             bar = printcool("Calculation Finished.\n---==(  May the Force be with you!  )==---",ansi="1;44;93")
 
