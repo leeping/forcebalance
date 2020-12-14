@@ -125,15 +125,15 @@ install:
   - which mdrun_d
   
     # Tinker binaries
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.2.1.tar.gz -O tinker.tar.gz; fi
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.2.1.tar.gz -O tinker.tar.gz; fi
-  #- wget https://dasher.wustl.edu/tinker/downloads/bin-${OS}-8.2.1.tar.gz -O tinker.tar.gz
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz; fi
+  #- wget https://dasher.wustl.edu/tinker/downloads/bin-${OS}-8.8.3.tar.gz -O tinker.tar.gz
   - tar xvzf tinker.tar.gz &> untar.log
     # The macos files are also gzipped inside the tarball.
-  - mkdir -p $HOME/opt/tinker/8.2.1
-  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then gunzip bin-macos/*gz; mv bin-macos $HOME/opt/tinker/8.2.1/bin; fi ;
-  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mv bin-linux64 $HOME/opt/tinker/8.2.1/bin; fi ;
-  - export PATH="$HOME/opt/tinker/8.2.1/bin:$PATH"
+  - mkdir -p $HOME/opt/tinker/8.8.3
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then gunzip bin-macos/*gz; mv bin-macos $HOME/opt/tinker/8.8.3/bin; fi ;
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mv bin-linux64 $HOME/opt/tinker/8.8.3/bin; fi ;
+  - export PATH="$HOME/opt/tinker/8.8.3/bin:$PATH"
 
 #    # Amber (now in test_env.yaml)
 #  - conda install -c ambermd ambertools
