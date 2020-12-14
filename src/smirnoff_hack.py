@@ -1,5 +1,6 @@
 ## HACK: Improve the performance of the openff forcefield.create_openmm_system()
 from openforcefield.utils.toolkits import OpenEyeToolkitWrapper, RDKitToolkitWrapper, AmberToolsToolkitWrapper
+from openforcefield.topology.molecule import Molecule
 
 # time based on total 540s evaluation
 # cache for OE find_smarts_matches (save 300+ s)
@@ -52,7 +53,7 @@ ChemicalEnvironment.validate = cached_validate
 # Cache for OETK assign_partial_charges
 oe_original_assign_partial_charges = OpenEyeToolkitWrapper.assign_partial_charges
 OE_TOOLKIT_CACHE_assign_partial_charges = {}
-def oe_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, strict_n_conformers=False):
+def oe_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, strict_n_conformers=False, _cls=Molecule):
     cache_key = hash((molecule, partial_charge_method, str(use_conformers), strict_n_conformers))
     if cache_key not in OE_TOOLKIT_CACHE_assign_partial_charges:
         oe_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers)
@@ -66,7 +67,7 @@ OpenEyeToolkitWrapper.assign_partial_charges = oe_cached_assign_partial_charges
 # Cache for AmberTools assign_partial_charges
 at_original_assign_partial_charges = AmberToolsToolkitWrapper.assign_partial_charges
 AT_TOOLKIT_CACHE_assign_partial_charges = {}
-def at_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, strict_n_conformers=False):
+def at_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, strict_n_conformers=False, _cls=Molecule):
     cache_key = hash((molecule, partial_charge_method, str(use_conformers), strict_n_conformers))
     if cache_key not in AT_TOOLKIT_CACHE_assign_partial_charges:
         at_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers)
