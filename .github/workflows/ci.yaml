@@ -1,17 +1,6 @@
 name: ci
 
-on:
-  push:
-    branches:
-      - "master"
-      - "maintenance/.+"
-  pull_request:
-    branches:
-      - "master"
-      - "maintenance/.+"
-  schedule:
-    # Run a cron job once daily
-    - cron: "0 0 * * *"
+on: push
 
 jobs:
   test:
