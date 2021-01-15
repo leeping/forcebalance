@@ -13,6 +13,7 @@ jobs:
         os: [macOS-latest, ubuntu-latest]
         python-version: [3.7]  # Needs 2.7 on Linux
     env:
+      CI_OS: ${{ matrix.cfg.os }}
       PYVER: ${{ matrix.python-version }}
       PACKAGE: forcebalance
 
@@ -61,9 +62,26 @@ jobs:
       shell: bash -l {0}
       run: |
         # This will not install double precision, needs to be replaced with a fresh build
-        conda install gromacs -c bioconda
+        conda install gromacs -c bioconda -c conda-forge -y
 
-    # TODO: Install tinker
+    - name: Install Tinker
+      run: |
+        if [ "$CI_OS" == "ubuntu-lates" ]; then
+          wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
+        fi
+        if [ "$CI_OS" == "macos-latest" ]; then
+          wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
+        fi
+        tar xvzf tinker.tar.gz &> untar.log
+
+        mkdir -p $HOME/opt/tinker/8.2.1
+        if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+          gunzip bin-macos/*gz; mv bin-macos $HOME/opt/tinker/8.2.1/bin
+        fi
+        if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+          mv bin-linux64 $HOME/opt/tinker/8.2.1/bin
+        fi
+        export PATH="$HOME/opt/tinker/8.2.1/bin:$PATH"
 
     - name: Extract data archives
       run: |
