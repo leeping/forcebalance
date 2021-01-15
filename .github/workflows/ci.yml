@@ -69,19 +69,27 @@ jobs:
       run: |
         cd studies/001_water_tutorial
         tar xvjf targets.tar.bz2
-        # cd -
+        cd -
 
     - name: Install package
       shell: bash -l {0}
       run: |
-        # python setup.py install
-        python -m pip install --no-deps .
+        python setup.py install
+        - python -m pip install --no-deps .
         python -c "import forcebalance"
+        ForceBalance -h
+
+    - name: Run water study
+      shell: bash -l {0}
+      run: |
+        cd studies/001_water_tutorial
+        tar xvjf targets.tar.bz2
+        ForceBalance very_simple.in
+        cd -
 
     - name: Run tests
       shell: bash -l {0}
       run: |
-        ForceBalance very_simple.in
         pytest --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
 
     - name: Codecov
@@ -89,4 +97,3 @@ jobs:
       with:
         file: ./coverage.xml
         fail_ci_if_error: true
-
