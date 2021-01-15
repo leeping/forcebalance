@@ -66,20 +66,20 @@ jobs:
 
     - name: Install Tinker
       run: |
-        if [ "$CI_OS" == "ubuntu-lates" ]; then
+        if [[ "$CI_OS" == "ubuntu-latest" ]]; then
           wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
         fi
-        if [ "$CI_OS" == "macos-latest" ]; then
+        if [[ "$CI_OS" == "macOS-latest" ]]; then
           wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
         fi
         tar xvzf tinker.tar.gz &> untar.log
 
         mkdir -p $HOME/opt/tinker/8.2.1
-        if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-          gunzip bin-macos/*gz; mv bin-macos $HOME/opt/tinker/8.2.1/bin
-        fi
-        if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+        if [[ "$CI_OS" == "ubuntu-latest" ]]; then
           mv bin-linux64 $HOME/opt/tinker/8.2.1/bin
+        fi
+        if [[ "$CI_OS" == "macOS-latest" ]]; then
+          gunzip bin-macos/*gz; mv bin-macos $HOME/opt/tinker/8.2.1/bin
         fi
         export PATH="$HOME/opt/tinker/8.2.1/bin:$PATH"
 
