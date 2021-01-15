@@ -74,8 +74,8 @@ jobs:
     - name: Install package
       shell: bash -l {0}
       run: |
-        python setup.py install
-        - python -m pip install --no-deps .
+        # python setup.py install
+        python -m pip install --no-deps .
         python -c "import forcebalance; print(forcebalance.__version__)"
 
     - name: Run water study
