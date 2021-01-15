@@ -76,6 +76,8 @@ jobs:
       run: |
         # python setup.py install
         python -m pip install --no-deps .
+        python -c "import forcefield"
+
     - name: Run tests
       shell: bash -l {0}
       run: |
