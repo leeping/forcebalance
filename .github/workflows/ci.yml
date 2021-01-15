@@ -76,7 +76,7 @@ jobs:
       run: |
         # python setup.py install
         python -m pip install --no-deps .
-        python -c "import forcefield"
+        python -c "import forcebalance"
 
     - name: Run tests
       shell: bash -l {0}
