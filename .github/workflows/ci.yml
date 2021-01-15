@@ -76,8 +76,7 @@ jobs:
       run: |
         python setup.py install
         - python -m pip install --no-deps .
-        python -c "import forcebalance"
-        ForceBalance -h
+        python -c "import forcebalance; print(forcebalance.__version__)"
 
     - name: Run water study
       shell: bash -l {0}
