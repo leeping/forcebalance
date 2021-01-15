@@ -56,7 +56,7 @@ jobs:
         python -c "import work_queue"
         export PATH="$HOME/opt/cctools/current/bin:$PATH"
 
-    - name: Install GROMACS:
+    - name: Install GROMACS
       shell: bash -l {0}
       run: |
         # This will not install double precision, may be better to directly build
