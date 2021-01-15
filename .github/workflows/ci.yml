@@ -47,19 +47,20 @@ jobs:
 #        conda install openforcefield -c conda-forge -c omnia -y
 #        conda install openeye-toolkits -c openeye -y
 
-    - name: Install Work Queue
-      shell: bash -l {0}
-      run: |
-        wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
-        bash install-cctools.sh
-        echo "Checking for Work Queue import; if successful, no message will be printed"
-        python -c "import work_queue"
-        export PATH="$HOME/opt/cctools/current/bin:$PATH"
+#       Need to replace ndcctools with this block
+#    - name: Install Work Queue
+#      shell: bash -l {0}
+#      run: |
+#        wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
+#        bash install-cctools.sh
+#        echo "Checking for Work Queue import; if successful, no message will be printed"
+#        python -c "import work_queue"
+#        export PATH="$HOME/opt/cctools/current/bin:$PATH"
 
     - name: Install GROMACS
       shell: bash -l {0}
       run: |
-        # This will not install double precision, may be better to directly build
+        # This will not install double precision, needs to be replaced with a fresh build
         conda install gromacs -c bioconda
 
     # TODO: Install tinker
