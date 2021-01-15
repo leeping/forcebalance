@@ -1,6 +1,8 @@
 name: ci
 
-on: push
+on:
+  push:
+  pull_request:
 
 jobs:
   test:
@@ -9,10 +11,10 @@ jobs:
       fail-fast: false
       matrix:
         os: [macOS-latest, ubuntu-latest]
-        python-version: [3.5, 3.6, 3.7, 3.8, 3.9]
+        python-version: [3.6, 3.7]
     env:
       PYVER: ${{ matrix.python-version }}
-      PACKAGE: PACKAGE_NAME_HERE  # Replace with the name of your package
+      PACKAGE: forcebalance
 
     steps:
     - uses: actions/checkout@v2
