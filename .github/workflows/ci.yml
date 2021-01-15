@@ -69,7 +69,7 @@ jobs:
       run: |
         cd studies/001_water_tutorial
         tar xvjf targets.tar.bz2
-        cd -
+        cd ../../
 
     - name: Install package
       shell: bash -l {0}
@@ -85,7 +85,7 @@ jobs:
         cd studies/001_water_tutorial
         tar xvjf targets.tar.bz2
         ForceBalance very_simple.in
-        cd -
+        cd ../../
 
     - name: Run tests
       shell: bash -l {0}
