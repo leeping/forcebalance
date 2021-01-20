@@ -56,7 +56,6 @@ jobs:
       shell: bash -l {0}
       run: |
         conda install openforcefield -c conda-forge -c omnia -y
-        conda install openeye-toolkits -c openeye -y
 
 #       Need to replace ndcctools with this block
 #    - name: Install Work Queue
