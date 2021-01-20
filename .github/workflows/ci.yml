@@ -65,7 +65,7 @@ jobs:
 #        bash install-cctools.sh
 #        echo "Checking for Work Queue import; if successful, no message will be printed"
 #        python -c "import work_queue"
-#        export PATH="$HOME/opt/cctools/current/bin:$PATH"
+#        export PATH="$GITHUB_WORKSPACE/opt/cctools/current/bin:$PATH"
 
     - name: Install GROMACS
       shell: bash -l {0}
@@ -83,15 +83,18 @@ jobs:
         fi
         tar xvzf tinker.tar.gz &> untar.log
 
-        mkdir -p $HOME/opt/tinker/8.8.3
+        mkdir -p $GITHUB_WORKSPACE/opt/tinker/8.8.3
         if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
-          mv bin-linux $HOME/opt/tinker/8.8.3/bin
+          mv bin-linux $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
         fi
         if [[ "$CI_OS" == 'macOS-latest' ]]; then
-          mv bin-macos $HOME/opt/tinker/8.8.3/bin
+          mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
         fi
 
-        echo "$HOME/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
+        echo "appending to GITHUB_PATH ... "
+        echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
+        echo "successfully appended to GITHUB_PATH"
+        echo "GITHUB_PATH is $GITHUB_PATH"
 
         path_to_executable=$(which testgrad)
         if [ -x "$path_to_executable" ] ; then
