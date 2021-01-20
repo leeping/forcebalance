@@ -51,12 +51,12 @@ jobs:
         conda info --all
         conda list
 
-#    - name: Install OpenFF stack and OpenEye on Python 3.6+
-#      if: ${{ matrix.python-version != 3.5 && matrix.python-version != 2.7}}
-#      shell: bash -l {0}
-#      run: |
-#        conda install openforcefield -c conda-forge -c omnia -y
-#        conda install openeye-toolkits -c openeye -y
+    - name: Install OpenFF stack and OpenEye on Python 3.6+
+      if: ${{ matrix.python-version != 2.7}}
+      shell: bash -l {0}
+      run: |
+        conda install openforcefield -c conda-forge -c omnia -y
+        conda install openeye-toolkits -c openeye -y
 
 #       Need to replace ndcctools with this block
 #    - name: Install Work Queue
