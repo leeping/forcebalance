@@ -10,10 +10,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [macOS-latest, ubuntu-latest]
+        os:
+          - macOS-latest
+          - ubuntu-latest
         python-version: [3.7]  # Needs 2.7 on Linux
     env:
-      CI_OS: ${{ matrix.cfg.os }}
+      CI_OS: ${{ matrix.os }}
       PYVER: ${{ matrix.python-version }}
       PACKAGE: forcebalance
 
@@ -74,14 +76,14 @@ jobs:
         fi
         tar xvzf tinker.tar.gz &> untar.log
 
-        mkdir -p $HOME/opt/tinker/8.2.1
+        mkdir -p $HOME/opt/tinker/8.8.3
         if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
-          mv bin-linux64 $HOME/opt/tinker/8.2.1/bin
+          mv bin-linux $HOME/opt/tinker/8.8.3/bin
         fi
         if [[ "$CI_OS" == 'macOS-latest' ]]; then
-          gunzip bin-macos/*gz; mv bin-macos $HOME/opt/tinker/8.2.1/bin
+          mv bin-macos $HOME/opt/tinker/8.8.3/bin
         fi
-        export PATH="$HOME/opt/tinker/8.2.1/bin:$PATH"
+        export PATH="$HOME/opt/tinker/8.8.3/bin:$PATH"
 
     - name: Extract data archives
       run: |
