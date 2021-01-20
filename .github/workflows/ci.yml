@@ -121,7 +121,7 @@ jobs:
     - name: Run tests
       shell: bash -l {0}
       run: |
-        pytest --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
+        pytest --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml --ignore=src/tests/test_tinkerio.py
 
     - name: Codecov
       uses: codecov/codecov-action@v1
