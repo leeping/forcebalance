@@ -90,7 +90,8 @@ jobs:
         if [[ "$CI_OS" == 'macOS-latest' ]]; then
           mv bin-macos $HOME/opt/tinker/8.8.3/bin
         fi
-        export PATH="$HOME/opt/tinker/8.8.3/bin:$PATH"
+
+        echo "$HOME/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
 
         path_to_executable=$(which testgrad)
         if [ -x "$path_to_executable" ] ; then
