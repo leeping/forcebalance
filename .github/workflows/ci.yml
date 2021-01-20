@@ -2,7 +2,11 @@ name: ci
 
 on:
   push:
+    branches:
+      - "master"
   pull_request:
+    branches:
+      - "master"
 
 jobs:
   test:
@@ -13,14 +17,18 @@ jobs:
         os:
           - macOS-latest
           - ubuntu-latest
-        python-version: [3.7]  # Needs 2.7 on Linux
+        python-version:
+          - 3.6
+          - 3.7
+          - 3.8
     env:
       CI_OS: ${{ matrix.os }}
       PYVER: ${{ matrix.python-version }}
       PACKAGE: forcebalance
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout
+      uses: actions/checkout@v2
 
     - uses: conda-incubator/setup-miniconda@v2
       with:
