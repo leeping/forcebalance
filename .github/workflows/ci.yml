@@ -92,6 +92,11 @@ jobs:
         fi
         export PATH="$HOME/opt/tinker/8.8.3/bin:$PATH"
 
+        path_to_executable=$(which testgrad)
+        if [ -x "$path_to_executable" ] ; then
+          echo "Found tinker executable testgrad at: $path_to_executable"
+        fi
+
     - name: Extract data archives
       run: |
         cd studies/001_water_tutorial
