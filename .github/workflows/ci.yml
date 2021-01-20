@@ -94,12 +94,6 @@ jobs:
         echo "appending to GITHUB_PATH ... "
         echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
         echo "successfully appended to GITHUB_PATH"
-        echo "GITHUB_PATH is $GITHUB_PATH"
-
-        path_to_executable=$(which testgrad)
-        if [ -x "$path_to_executable" ] ; then
-          echo "Found tinker executable testgrad at: $path_to_executable"
-        fi
 
     - name: Extract data archives
       run: |
