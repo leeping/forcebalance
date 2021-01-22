@@ -26,3 +26,4 @@ dependencies:
   #- openforcefield
   #- openeye-toolkits
 
+  - ndcctools

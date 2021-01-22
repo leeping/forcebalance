@@ -158,7 +158,7 @@ class TestBromineStudy(ForceBalanceSystemTest):
         self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
         self.expected_results_name = "EXPECTED_BROMINE_RESULTS"
         self.expected_results = EXPECTED_BROMINE_RESULTS
-        self.absolute_tolerance = 0.05
+        self.absolute_tolerance = 0.10
 
     def test_bromine_study(self):
         """Check liquid bromine study converges to expected results"""
