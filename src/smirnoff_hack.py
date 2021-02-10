@@ -1,5 +1,6 @@
 ## HACK: Improve the performance of the openff forcefield.create_openmm_system()
-from openforcefield.utils.toolkits import OpenEyeToolkitWrapper, RDKitToolkitWrapper, AmberToolsToolkitWrapper
+from openff.toolkit.utils.toolkits import OpenEyeToolkitWrapper, RDKitToolkitWrapper, AmberToolsToolkitWrapper
+from openff.toolkit.topology.molecule import Molecule
 
 # time based on total 540s evaluation
 # cache for OE find_smarts_matches (save 300+ s)
@@ -26,7 +27,7 @@ RDKitToolkitWrapper.find_smarts_matches = rdk_cached_find_smarts_matches
 
 
 # cache for the validate function (save 94s)
-from openforcefield.typing.chemistry.environment import ChemicalEnvironment
+from openff.toolkit.typing.chemistry.environment import ChemicalEnvironment
 original_validate = ChemicalEnvironment.validate
 TOOLKIT_CACHE_ChemicalEnvironment_validate = {}
 def cached_validate(smirks, validate_valence_type=True, toolkit_registry=OpenEyeToolkitWrapper):
@@ -52,10 +53,10 @@ ChemicalEnvironment.validate = cached_validate
 # Cache for OETK assign_partial_charges
 oe_original_assign_partial_charges = OpenEyeToolkitWrapper.assign_partial_charges
 OE_TOOLKIT_CACHE_assign_partial_charges = {}
-def oe_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, strict_n_conformers=False):
+def oe_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, strict_n_conformers=False, _cls=Molecule):
     cache_key = hash((molecule, partial_charge_method, str(use_conformers), strict_n_conformers))
     if cache_key not in OE_TOOLKIT_CACHE_assign_partial_charges:
-        oe_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers)
+        oe_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers, _cls=_cls)
         OE_TOOLKIT_CACHE_assign_partial_charges[cache_key] = molecule.partial_charges
     else:
         molecule.partial_charges = OE_TOOLKIT_CACHE_assign_partial_charges[cache_key]
@@ -66,10 +67,10 @@ OpenEyeToolkitWrapper.assign_partial_charges = oe_cached_assign_partial_charges
 # Cache for AmberTools assign_partial_charges
 at_original_assign_partial_charges = AmberToolsToolkitWrapper.assign_partial_charges
 AT_TOOLKIT_CACHE_assign_partial_charges = {}
-def at_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, strict_n_conformers=False):
+def at_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, strict_n_conformers=False, _cls=Molecule):
     cache_key = hash((molecule, partial_charge_method, str(use_conformers), strict_n_conformers))
     if cache_key not in AT_TOOLKIT_CACHE_assign_partial_charges:
-        at_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers)
+        at_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers, _cls=_cls)
         AT_TOOLKIT_CACHE_assign_partial_charges[cache_key] = molecule.partial_charges
     else:
         molecule.partial_charges = AT_TOOLKIT_CACHE_assign_partial_charges[cache_key]
@@ -106,7 +107,7 @@ RDKitToolkitWrapper.generate_conformers = rdk_cached_generate_conformers
 # cache the ForceField creation (no longer needed since using OpenFF API for parameter modifications)
 
 # import hashlib
-# from openforcefield.typing.engines.smirnoff import ForceField
+# from openff.toolkit.typing.engines.smirnoff import ForceField
 # SMIRNOFF_FORCE_FIELD_CACHE = {}
 # def getForceField(*ffpaths):
 #     hasher = hashlib.md5()

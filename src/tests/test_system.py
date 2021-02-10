@@ -247,7 +247,7 @@ class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
 
 class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
-        pytest.importorskip("openforcefield", minversion="0.4")
+        pytest.importorskip("openff.toolkit", minversion="0.4")
         pytest.importorskip("openeye.oechem")
         super(TestOpenFFTorsionProfileStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))

@@ -45,17 +45,13 @@ except:
     pass
 
 try:
-    # import the hack for openforcefield to improve performance by 10x
+    # import the hack for openff.toolkit to improve performance by 10x
     from forcebalance import smirnoff_hack
     # Import the SMIRNOFF forcefield engine and some useful tools
-    from openforcefield.typing.engines.smirnoff import ForceField as OpenFF_ForceField
+    from openff.toolkit.typing.engines.smirnoff import ForceField as OpenFF_ForceField
     # QYD: name of class are modified to avoid colliding with ForceBalance Molecule
-    from openforcefield.topology import Molecule as OffMolecule
-    from openforcefield.topology import Topology as OffTopology
-    import openforcefield
-    from pkg_resources import parse_version
-    if parse_version(openforcefield.__version__) < parse_version('0.7'):
-        raise RuntimeError('This version of FB is incompatible with OpenFF toolkit version <0.7.0')
+    from openff.toolkit.topology import Molecule as OffMolecule
+    from openff.toolkit.topology import Topology as OffTopology
 except ImportError:
     pass
 
@@ -67,7 +63,7 @@ def smirnoff_analyze_parameter_coverage(forcefield, tgt_opts):
     assert hasattr(forcefield, 'offxml'), "Only SMIRNOFF Force Field is supported"
     parameter_assignment_data = defaultdict(list)
     parameter_counter = Counter()
-    # The openforcefield.typing.engines.smirnoff.ForceField object should now be contained in forcebalance.forcefield.FF
+    # The openff.toolkit.typing.engines.smirnoff.ForceField object should now be contained in forcebalance.forcefield.FF
     ff = forcefield.openff_forcefield
     # analyze each target
     for tgt_option in tgt_opts:
@@ -133,7 +129,7 @@ class SMIRNOFF_Reader(BaseReader):
 
 def assign_openff_parameter(ff, new_value, pid):
     """
-    Assign a SMIRNOFF parameter given the openforcefield.ForceField object, the desired parameter value,
+    Assign a SMIRNOFF parameter given the OpenFF ForceField object, the desired parameter value,
     and the parameter's unique ID.
     """
     # Split the parameter's unique ID into four fields using a slash:

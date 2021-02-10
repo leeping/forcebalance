@@ -55,7 +55,7 @@ jobs:
       if: ${{ matrix.python-version != 2.7}}
       shell: bash -l {0}
       run: |
-        conda install openforcefield -c conda-forge -c omnia -y
+        conda install openff-toolkit -c conda-forge -y
 
 #       Need to replace ndcctools with this block
 #    - name: Install Work Queue
