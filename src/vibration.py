@@ -164,7 +164,7 @@ class Vibration(Target):
             eigvals, eigvecs = self.vibration_driver()
             # The overlap metric may take into account some frequency differences.
             # Here, an element of dev is equal to 2/3 if (for example) the frequencies differ by 1000.
-            dev = np.array([[(np.abs(i-j)/1000)/(1.0+np.abs(i-j)/1000) for j in self.ref_eigvals] for i in eigvals])
+            dev = np.array([[(np.abs(i-j)/1000)/(1.0+np.abs(i-j)/1000) for j in eigvals] for i in self.ref_eigvals])
             for i in range(dev.shape[0]):
                 dev[i, :] /= max(dev[i, :])
 
@@ -173,7 +173,7 @@ class Vibration(Target):
                 # that are mapped to the row numbers (calculated mode numbers).
                 # Highly similar eigenvectors are assigned small values because
                 # the assignment problem is a cost minimization problem.
-                a = np.array([[(1.0-self.vib_overlap(v1, v2)) for v2 in self.ref_eigvecs] for v1 in eigvecs])
+                a = np.array([[(1.0-self.vib_overlap(v1, v2)) for v2 in eigvecs] for v1 in self.ref_eigvecs])
                 a += dev
                 if self.reassign == 'permute':
                     row, c2r = optimize.linear_sum_assignment(a)
