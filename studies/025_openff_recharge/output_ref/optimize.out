@@ -9,18 +9,18 @@
 #| [1m           Arthur Vigil, Erik G. Brandt, Johnny Israeli           [0m |#
 #======================================================================#
 
-                          [44m     [0m
-                       [44m        [0m      [43m     [0m
-                    [44m        [0m   [44m  [0m    [43m         [0m
-                 [44m       [0m    [44m      [0m      [43m         [0m
-             [44m        [0m    [44m        [0m          [43m         [0m
-          [44m        [0m    [44m        [0m                 [43m        [0m
-       [44m        [0m    [44m       [0m                        [43m        [0m
-    [44m        [0m   [44m        [0m                              [43m         [0m
-   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m
-    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m
-      [44m        [0m         +################':`                    [43m [0m
-      [44m     [0m              `.,,...####+.
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
                                 ,#####      +##.               [44m   [0m   [44m   [0m
  [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
  [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
@@ -39,19 +39,19 @@
  [43m    [0m                            ####                          [44m   [0m   [44m   [0m
  [43m    [0m                            ####                          [44m   [0m   [44m   [0m
  [43m    [0m                            ####                          [44m   [0m   [44m   [0m
-      [44m    [0m                       ####
-     [44m        [0m                    ####
-    [44m [0m    [44m       [0m                 ####                       [43m     [0m
-   [44m     [0m    [44m        [0m             ####                    [43m        [0m
-   [44m        [0m    [44m        [0m          ###                  [43m         [0m
-      [44m        [0m    [44m        [0m        +`               [43m        [0m
-          [44m        [0m   [44m        [0m                   [43m        [0m
-             [44m        [0m   [44m         [0m           [43m         [0m
-                [44m        [0m    [44m       [0m      [43m         [0m
-                   [44m        [0m    [44m   [0m    [43m        [0m
-                      [44m        [0m       [43m      [0m
-                          [44m      [0m      [43m  [0m
-                             [44m  [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
 
 Reading options from file: optimize.in
 #========================================================#
@@ -77,26 +77,27 @@ Reading force field from file: forcefield.offxml
 #========================================================#
 #| [92m               Setup for force field                [0m |#
 #========================================================#
-fnms                      ['forcefield.offxml']
-priors                    OrderedDict([('ChargeIncrementModel/ChargeIncrement/charge_increment1', 1.0)])
+fnms                      ['forcefield.offxml'] 
+priors                    OrderedDict([('ChargeIncrementModel/ChargeIncrement/charge_increment1', 1.0)]) 
 ----------------------------------------------------------
+Backing up: optimize.tmp/methane-esp to: optimize.bak/methane-esp_0.tar.bz2
 #========================================================#
 #| [92m           Setup for target methane-esp :           [0m |#
 #========================================================#
-name                      methane-esp
-type                      RECHARGE_SMIRNOFF
-tgtdir                    targets/methane-esp
-recharge_esp_store        esp-store.sqlite
-recharge_property         esp
+name                      methane-esp 
+type                      RECHARGE_SMIRNOFF 
+tgtdir                    targets/methane-esp 
+recharge_esp_store        esp-store.sqlite 
+recharge_property         esp 
 ----------------------------------------------------------
 #========================================================#
 #| [92m          Setup for target methane-field :          [0m |#
 #========================================================#
-name                      methane-field
-type                      RECHARGE_SMIRNOFF
-tgtdir                    targets/methane-field
-recharge_esp_store        esp-store.sqlite
-recharge_property         electric-field
+name                      methane-field 
+type                      RECHARGE_SMIRNOFF 
+tgtdir                    targets/methane-field 
+recharge_esp_store        esp-store.sqlite 
+recharge_property         electric-field 
 ----------------------------------------------------------
 #========================================================#
 #| [92m        SMIRNOFF Parameter Coverage Analysis        [0m |#
@@ -111,24 +112,24 @@ Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+
 #========================================================#
 #| [92m           Setup for objective function :           [0m |#
 #========================================================#
-penalty_additive          1.0
-normalize_weights         False
+penalty_additive          1.0 
+normalize_weights         False 
 ----------------------------------------------------------
 #========================================================#
 #| [92m                Setup for optimizer                 [0m |#
 #========================================================#
-jobtype                   OPTIMIZE
-trust0                    0.25
-mintrust                  5e-05
-eps                       0.01
-convergence_gradient      0.0001
-adapt_fac                 0.2
-adapt_damp                1.0
-print_hess                True
-err_tol                   1.0
-input_file                optimize.in
+jobtype                   OPTIMIZE 
+trust0                    0.25 
+mintrust                  5e-05 
+eps                       0.01 
+convergence_gradient      0.0001 
+adapt_fac                 0.2 
+adapt_damp                1.0 
+print_hess                True 
+err_tol                   1.0 
+input_file                optimize.in 
 ----------------------------------------------------------
-Calculation started at 2020-09-03 05:53 PM
+Calculation started at 2020-10-01 02:21 PM
 #========================================================#
 #| [1m                  Main Optimizer                    [0m |#
 #| [1m   Newton-Raphson Method (Adaptive Trust Radius)    [0m |#
@@ -154,23 +155,23 @@ Calculation started at 2020-09-03 05:53 PM
 #| [1;94m                       SMILES                       [0m |#
 #| [1;94m                         X                          [0m |#
 #========================================================#
-C               -6.287e-02
+C               5.681e-04 
 ----------------------------------------------------------
 
 #========================================================#
 #| [1;94m                       SMILES                       [0m |#
 #| [1;94m                         X                          [0m |#
 #========================================================#
-C               -1.318e-02
+C               7.437e-04 
 ----------------------------------------------------------
 #====================================================================#
 #| [94m                  Objective Function Breakdown                  [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
 #====================================================================#
-methane-esp                    0.00057      1.000 [94m     5.68107e-04[0m
-methane-field                  0.00074      1.000 [94m     7.43711e-04[0m
-Regularization                 0.00000      1.000 [94m     0.00000e+00[0m
-Total                                             [94m     1.31182e-03[0m
+methane-esp                    0.00057      1.000 [94m     5.68107e-04[0m 
+methane-field                  0.00074      1.000 [94m     7.43711e-04[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     1.31182e-03[0m 
 ----------------------------------------------------------------------
 
   Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
@@ -184,7 +185,7 @@ Total                                             [94m     1.31182e-03[0m
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 2.00011052e+00
+ 2.00011052e+00 
 ----------------------------------------------------------
 Calculating nonlinear optimization step
 Newton-Raphson step found (length 1.0488e-02)
@@ -208,23 +209,23 @@ Input file with saved parameters: optimize.sav
 #| [1;94m                       SMILES                       [0m |#
 #| [1;94m                         X                          [0m |#
 #========================================================#
-C               -5.484e-02
+C               4.705e-04 
 ----------------------------------------------------------
 
 #========================================================#
 #| [1;94m                       SMILES                       [0m |#
 #| [1;94m                         X                          [0m |#
 #========================================================#
-C               -1.253e-02
+C               6.315e-04 
 ----------------------------------------------------------
 #===================================================================================#
 #| [94m                         Objective Function Breakdown                          [0m |#
 #| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
 #===================================================================================#
-methane-esp                    0.00047      1.000 [92m     4.70486e-04[0m ( -9.762e-05 )
-methane-field                  0.00063      1.000 [92m     6.31464e-04[0m ( -1.122e-04 )
-Regularization                 0.00011      1.000 [91m     1.09991e-04[0m ( +1.100e-04 )
-Total                                             [92m     1.21194e-03[0m ( -9.988e-05 )
+methane-esp                    0.00047      1.000 [92m     4.70486e-04[0m ( -9.762e-05 ) 
+methane-field                  0.00063      1.000 [92m     6.31464e-04[0m ( -1.122e-04 ) 
+Regularization                 0.00011      1.000 [91m     1.09991e-04[0m ( +1.100e-04 ) 
+Total                                             [92m     1.21194e-03[0m ( -9.988e-05 ) 
 -------------------------------------------------------------------------------------
 Creating the directory /Users/boothros/PyCharmProjects/forcebalance/studies/025_openff_recharge/result/optimize to print the force field
 #========================================================================#
@@ -243,7 +244,7 @@ Creating the directory /Users/boothros/PyCharmProjects/forcebalance/studies/025_
 #========================================================#
 #| [94m                   Total Hessian                    [0m |#
 #========================================================#
- 2.00009114e+00
+ 2.00009114e+00 
 ----------------------------------------------------------
 Convergence criterion reached for objective function (1.00e-04)
 #========================================================#
@@ -265,7 +266,7 @@ Backing up result/optimize/forcefield.offxml -> result/optimize/forcefield_1.off
 #|  The force field has been written to the result/optimize directory.  |#
 #|    Input file with optimization parameters saved to optimize.sav.    |#
 #========================================================================#
-Wall time since calculation start: 0.0 seconds
+Wall time since calculation start: 0.1 seconds
 #========================================================#
 #| [1;44;93m               Calculation Finished.                [0m |#
 #| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
