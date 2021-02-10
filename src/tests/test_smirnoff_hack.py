@@ -1,21 +1,21 @@
 import pytest
 
-has_openforcefield = True
+has_openff_toolkit = True
 try:
-    import openforcefield
+    import openff.toolkit
 except ModuleNotFoundError:
-    has_openforcefield = False
+    has_openff_toolkit = False
 
 
 @pytest.mark.skipif(
-    not has_openforcefield, reason="openforcefield/openff.toolkit module not found"
+    not has_openff_toolkit, reason="openff.toolkit module not found"
 )
 def test_smirnoff_hack():
     """Test basic behavior of smirnoff_hack.py, in particular
     the compatibility with Molecule API"""
-    from openforcefield.topology import Molecule, Topology
-    from openforcefield.typing.engines.smirnoff import ForceField
-    from openforcefield.utils.toolkits import (AmberToolsToolkitWrapper,
+    from openff.toolkit.topology import Molecule, Topology
+    from openff.toolkit.typing.engines.smirnoff import ForceField
+    from openff.toolkit.utils.toolkits import (AmberToolsToolkitWrapper,
                                                RDKitToolkitWrapper,
                                                ToolkitRegistry)
 
@@ -27,4 +27,4 @@ def test_smirnoff_hack():
     registry = ToolkitRegistry()
     registry.register_toolkit(RDKitToolkitWrapper)
     registry.register_toolkit(AmberToolsToolkitWrapper)
-    out = parsley.create_openmm_system(top, toolkit_registry=registry)
+    parsley.create_openmm_system(top, toolkit_registry=registry)
