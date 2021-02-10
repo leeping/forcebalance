@@ -25,9 +25,9 @@ except ImportError:
     warn_once("Note: Failed to import the optional openff.recharge package.")
 
 try:
-    from openforcefield.typing.engines import smirnoff
+    from openff.toolkit.typing.engines import smirnoff
 except ImportError:
-    warn_once("Note: Failed to import the optional openforcefield package. ")
+    warn_once("Note: Failed to import the optional openff-toolkit package. ")
 
 logger = getLogger(__name__)
 
