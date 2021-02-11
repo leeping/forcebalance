@@ -146,7 +146,9 @@ class Vibration(Target):
         float
             Overlap between mass-weighted eigenvectors
         """
-        sqrtm = np.sqrt(np.array(self.engine.AtomLists['Mass']))
+        if hasattr(self.engine, 'realAtomIdxs'): realAtoms = self.engine.realAtomIdxs
+        else: realAtoms = [i for i in range(len(self.engine.AtomLists['Mass']))]
+        sqrtm = np.sqrt(np.array(self.engine.AtomLists['Mass'])[realAtoms])
         v1m = v1.copy()
         v1m *= sqrtm[:, np.newaxis]
         v1m /= np.linalg.norm(v1m)
