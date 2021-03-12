@@ -314,6 +314,10 @@ class TINKER(Engine):
         self.warn_vn = False
         super(TINKER,self).__init__(name=name, **kwargs)
 
+    def CheckEnvironmentTinker(self):
+        tinkerpath = os.getenv("TINKERPATH", default="")
+        return tinkerpath
+
     def setopts(self, **kwargs):
         
         """ Called by __init__ ; Set TINKER-specific options. """
@@ -350,7 +354,12 @@ class TINKER(Engine):
         # Sometimes the engine changes dirs and the key goes missing, so we link it.
         if "%s.key" % self.name in csplit and not os.path.exists("%s.key" % self.name):
             LinkFile(self.abskey, "%s.key" % self.name)
-        prog = os.path.join(self.tinkerpath, csplit[0])
+        tinkpath=self.CheckEnvironmentTinker()
+        if tinkpath!='' and tinkpath!=None:
+           tinkerpath=tinkpath
+        else:
+           tinkerpath=self.tinkerpath 
+        prog = os.path.join(tinkerpath, csplit[0])
         csplit[0] = prog
         o = _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, rbytes=1024, **kwargs)
         # Determine the TINKER version number.
@@ -360,10 +369,10 @@ class TINKER(Engine):
                 if len(vw.split('.')) <= 2:
                     vn = float(vw)
                 else:
-                    ls = vw.split('.')
-                    last = ls[1:]
-                    first = ls[0]
-                    vn = first+'.'+''.join(last)
+                    ls=vw.split('.')
+                    last=ls[1:]
+                    first=ls[0]
+                    vn=first+'.'+''.join(last)
                     vn = float(vn)
                 vn_need = 6.3
                 try:
