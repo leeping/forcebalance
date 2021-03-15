@@ -325,7 +325,7 @@ class TINKER(Engine):
         ## The directory containing TINKER executables (e.g. dynamic)
         if 'tinkerpath' in kwargs:
             self.tinkerpath = kwargs['tinkerpath']
-            if not os.path.exists(os.path.join(self.tinkerpath,"dynamic")):
+            if not os.path.exists(os.path.join(self.tinkerpath,"dynamic")) and 'dynamic' not in os.environ.keys():
                 warn_press_key("The 'dynamic' executable indicated by %s doesn't exist! (Check tinkerpath)" \
                                    % os.path.join(self.tinkerpath,"dynamic"))
         else:
@@ -919,13 +919,13 @@ class TINKER(Engine):
         if temperature is not None:
             md_defs["integrator"] = "stochastic"
         else:
-            md_defs["integrator"] = "beeman"
+            md_defs["integrator"] = "respa"
             md_opts["thermostat"] = None
         # Periodic boundary conditions.
         if self.pbc:
             md_opts["vdw-correction"] = ''
             if temperature is not None and pressure is not None: 
-                md_defs["integrator"] = "beeman"
+                md_defs["integrator"] = "respa"
                 md_defs["thermostat"] = "bussi"
                 md_defs["barostat"] = "montecarlo"
                 if anisotropic:
@@ -942,7 +942,7 @@ class TINKER(Engine):
 
         eq_opts = deepcopy(md_opts)
         if self.pbc and temperature is not None and pressure is not None: 
-            eq_opts["integrator"] = "beeman"
+            eq_opts["integrator"] = "respa"
             eq_opts["thermostat"] = "bussi"
             eq_opts["barostat"] = "berendsen"
 
@@ -956,22 +956,37 @@ class TINKER(Engine):
         if nequil > 0:
             write_key("%s-eq.key" % self.name, eq_opts, "%s.key" % self.name, md_defs)
             if verbose: printcool("Running equilibration dynamics", color=0)
-            if self.pbc and pressure is not None:
-                self.calltinker("dynamic %s -k %s-eq %i %f %f 4 %f %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000, 
-                                                                          temperature, pressure), print_to_screen=verbose)
+            if 'OPENMM_CUDA_COMPILER' in os.environ.keys() and 'gas' not in self.name:
+                dynamickeyword='dynamic_omm'
             else:
-                self.calltinker("dynamic %s -k %s-eq %i %f %f 2 %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,
-                                                                       temperature), print_to_screen=verbose)
+                dynamickeyword='dynamic'
+            if self.pbc and pressure is not None:
+                if 'OPENMM_CUDA_COMPILER' in os.environ.keys():
+                    self.calltinker(dynamickeyword+" %s -k %s-eq %i %f %f 4 %f %f N" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,temperature, pressure), print_to_screen=verbose)
+
+
+                else:
+                    self.calltinker(dynamickeyword+" %s -k %s-eq %i %f %f 4 %f %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,temperature, pressure), print_to_screen=verbose)
+            else:
+                self.calltinker(dynamickeyword+" %s -k %s-eq %i %f %f 2 %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,temperature), print_to_screen=verbose)
             os.system("rm -f %s.arc" % (self.name))
 
         # Run production.
         if verbose: printcool("Running production dynamics", color=0)
         write_key("%s-md.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
-        if self.pbc and pressure is not None:
-            odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 4 %f %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
-                                                                             temperature, pressure), print_to_screen=verbose)
+        if 'OPENMM_CUDA_COMPILER' in os.environ.keys() and 'gas' not in self.name:
+             dynamickeyword='dynamic_omm'
         else:
-            odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 2 %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
+             dynamickeyword='dynamic'
+
+        if self.pbc and pressure is not None:
+            if 'OPENMM_CUDA_COMPILER' in os.environ.keys():
+                odyn = self.calltinker(dynamickeyword+" %s -k %s-md %i %f %f 4 %f %f N" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000),temperature, pressure), print_to_screen=verbose)
+
+            else:
+                odyn = self.calltinker(dynamickeyword+" %s -k %s-md %i %f %f 4 %f %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000),temperature, pressure), print_to_screen=verbose)
+        else:
+            odyn = self.calltinker(dynamickeyword+" %s -k %s-md %i %f %f 2 %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
                                                                           temperature), print_to_screen=verbose)
             
         # Gather information.
@@ -986,8 +1001,7 @@ class TINKER(Engine):
                 edyn.append(float(s[2]))
             if 'Current Kinetic' in line:
                 kdyn.append(float(s[2]))
-            if len(s) > 0 and s[0] == 'Temperature' and s[2] == 'Kelvin':
-                temps.append(float(s[1]))
+                temps.append(temperature) # GPU version does not print out Temperature (or just new dynamic doesnt)
 
         # Potential and kinetic energies converted to kJ/mol.
         edyn = np.array(edyn) * 4.184
@@ -1005,6 +1019,10 @@ class TINKER(Engine):
         havekeys = set()
         first_shot = True
         for ln, line in enumerate(oanl):
+            if 'Polarization' in line:
+                if 'MUTUAL' in line or 'THOLE' in line:
+                    continue
+
             strip = line.strip()
             s = line.split()
             if 'Total System Mass' in line:
@@ -1016,10 +1034,13 @@ class TINKER(Engine):
             if first_shot:
                 for key in eckeys:
                     if strip.startswith(key):
+                        
+
+                        value=float(s[-2])*4.184
                         if key in ecomp:
-                            ecomp[key].append(float(s[-2])*4.184)
+                            ecomp[key].append(value)
                         else:
-                            ecomp[key] = [float(s[-2])*4.184]
+                            ecomp[key] = [value]
                         if key in havekeys:
                             first_shot = False
                         havekeys.add(key)
