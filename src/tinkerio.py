@@ -355,7 +355,7 @@ class TINKER(Engine):
         if "%s.key" % self.name in csplit and not os.path.exists("%s.key" % self.name):
             LinkFile(self.abskey, "%s.key" % self.name)
         tinkpath=self.CheckEnvironmentTinker()
-        if tinkpath!='' and tinkpath!=None:
+        if self.tinkerpath==None and tinkpath!=None:
            tinkerpath=tinkpath
         else:
            tinkerpath=self.tinkerpath 
