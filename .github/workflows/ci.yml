@@ -71,7 +71,7 @@ jobs:
       shell: bash -l {0}
       run: |
         # This will not install double precision, needs to be replaced with a fresh build
-        conda install gromacs -c bioconda -c conda-forge -y
+        conda install gromacs=2019.1 -c bioconda -c conda-forge -y
 
     - name: Install Tinker
       run: |
