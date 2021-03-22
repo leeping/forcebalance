@@ -842,10 +842,10 @@ class OpenMM(Engine):
                     logger.info("Creating RPMD integrator with %i beads.\n" % rpmd_beads)
                     self.tdiv = rpmd_beads
                     integrator = RPMDIntegrator(rpmd_beads, temperature*kelvin, collision/picosecond, timestep*femtosecond)
-                elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeLangevinIntegrator(temperature*kelvin, collision/picosecond, 1*kelvin, collision/picosecond, 0.1*femtoseconds)
+                elif any(['Drude' in f.__class__.__name__ for f in self.system.getForces()]): integrator = DrudeLangevinIntegrator(temperature*kelvin, collision/picosecond, 1*kelvin, collision/picosecond, 0.1*femtoseconds)
                 else:
                     integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
-        elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeSCFIntegrator(0.1*femtoseconds)
+        elif any(['Drude' in f.__class__.__name__ for f in self.system.getForces()]): integrator = DrudeSCFIntegrator(0.1*femtoseconds)
         else:
             ## If no temperature control, default to the Verlet integrator.
             if rpmd_beads > 0:
@@ -969,7 +969,7 @@ class OpenMM(Engine):
         #have changed then the positions must be recomputed and
         #the simulation object must be remade.
         #----
-        if any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]):
+        if any(['Drude' in f.__class__.__name__ for f in self.system.getForces()]):
             drude_particle, drude_screen = GetDrudeParameters(self.system)
             if hasattr(self, 'simulation'):
                 if hasattr(self, 'drude_particle') and len(self.drude_particle)>0 and np.max(np.abs(self.drude_particle - drude_particle)) != 0:
