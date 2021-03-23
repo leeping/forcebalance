@@ -69,6 +69,9 @@ class TestAmber99SB(ForceBalanceTestCase):
         # gmx should be built with config -DGMX_DOUBLE=ON
         gmxpath = which('mdrun_d') or which('gmx_d')
         gmxsuffix = '_d'
+        # Tests will FAIL if use single precision gromacs
+        # gmxpath = which('mdrun') or which('gmx')
+        # gmxsuffix = ''
         # self.logger.debug("\nBuilding options for target...\n")
         cls.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cls.cwd, "files", "amber_alaglu"))
