@@ -35,7 +35,6 @@ try:
     from openff.toolkit.typing.engines import smirnoff
     toolkit_import_success = True
 except ImportError:
-    warn_once("Note: Failed to import the optional openff-toolkit package. ")
     toolkit_import_success = False
 
 logger = getLogger(__name__)

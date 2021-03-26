@@ -21,13 +21,15 @@ try:
     from openff.recharge.esp.storage import MoleculeESPStore
     from openff.recharge.optimize import ElectricFieldOptimization, ESPOptimization
     from openff.recharge.smirnoff import from_smirnoff
+    recharge_import_success = True
 except ImportError:
-    warn_once("Note: Failed to import the optional openff.recharge package.")
+    recharge_import_success = False
 
 try:
     from openff.toolkit.typing.engines import smirnoff
+    toolkit_import_success = True
 except ImportError:
-    warn_once("Note: Failed to import the optional openff-toolkit package. ")
+    toolkit_import_success = False
 
 logger = getLogger(__name__)
 
@@ -38,6 +40,12 @@ class Recharge_SMIRNOFF(Target):
     electrostatic potential data."""
 
     def __init__(self, options, tgt_opts, forcefield):
+
+        if not recharge_import_success:
+            warn_once("Note: Failed to import the OpenFF Recharge package - FB Recharge_SMIRNOFF target will not work. ")
+
+        if not toolkit_import_success:
+            warn_once("Note: Failed to import the OpenFF Toolkit - FB Recharge_SMIRNOFF target will not work. ")
 
         super(Recharge_SMIRNOFF, self).__init__(options, tgt_opts, forcefield)
 
