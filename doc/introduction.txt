@@ -210,6 +210,9 @@ other features. (2012-2015)
 - Johnny Israeli contributed the XmlScript functionality that allows
 adjustable parameters to be read from embedded scripts in OpenMM XML files. (2012)
 
+- John Stoppelman contributed the Reopt.py script to re-compute QM single point energies
+at MM optimized minima and also added Psi4 input parsing / writing capabilities in molecule.py. (2020)
+
 - Matt Welborn contributed the parallelization-over-snapshots
 functionality in the general force matching module (2011, only
 in the older ForTune code).

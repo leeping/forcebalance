@@ -455,7 +455,7 @@ class FF(forcebalance.BaseClass):
                 warn_press_key("There should only be one SMIRNOFF XML file - confused!!")
             else:
                 # OpenFF force field wants parameters to be modified using its API, so we enable that here
-                from openforcefield.typing.engines.smirnoff import ForceField as OpenFF_ForceField
+                from openff.toolkit.typing.engines.smirnoff import ForceField as OpenFF_ForceField
                 self.offxml = ffname
                 self.openff_forcefield = OpenFF_ForceField(os.path.join(self.root, self.ffdir, self.offxml),
                                                            allow_cosmetic_attributes=True)
@@ -735,7 +735,7 @@ class FF(forcebalance.BaseClass):
                 self.offxml_unit_strs[dest] = unit_str
 
         for e in self.ffdata[ffname].getroot().xpath('//@parameter_eval/..'):
-            for field in e.get('parameter_eval').split(','):
+            for field in split(r',(?![^\[]*[\]])', e.get('parameter_eval')):
                 parameter_name = field.strip().split('=', 1)[0]
                 if parameter_name not in e.attrib:
                     logger.error("Parameter \'%s\' is not found for \'%s\', please check %s" % (parameter_name, e.get('type'), ffname) )
@@ -839,7 +839,7 @@ class FF(forcebalance.BaseClass):
             if self.ffdata_isxml[fnm]:
                 # offxml files with version higher than 0.3 may have unit strings in the field
                 xml_lines[fnm][ln].attrib[fld] = OMMFormat % (wval) + self.offxml_unit_strs[pid]
-                # If this is a SMIRNOFF parameter, assign it directly in the openforcefield.ForceField object
+                # If this is a SMIRNOFF parameter, assign it directly in the OpenFF ForceField object
                 # as well as writing out the file.
                 if hasattr(self, 'offxml') and fnm == self.offxml:
                     assign_openff_parameter(self.openff_forcefield, wval, pid)

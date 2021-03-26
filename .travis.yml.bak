@@ -1,0 +1,178 @@
+# After changing this file, check it on:
+#   http://lint.travis-ci.org/
+
+language: python
+
+
+matrix:
+  include:
+  # Test osx
+  # Tinker on mac has some sort of different behavior, which requires using the ByteStream.read1 function to
+  # interface with it. However, python 2.7 doesn't support read1, so this will always fail.
+#  - os: osx
+#    language: generic
+#    env: PYTHON_VER=2.7
+  - os: osx
+    language: generic
+    env: PYTHON_VER=3.5
+  - os: osx
+    language: generic
+    env: PYTHON_VER=3.6
+  - os: osx
+    language: generic
+    env: PYTHON_VER=3.7
+
+  # Test linux
+  - os: linux
+    language: generic
+    env: PYTHON_VER=2.7
+  - os: linux
+    language: generic
+    env: PYTHON_VER=3.5
+  - os: linux
+    language: generic
+    env: PYTHON_VER=3.6
+  - os: linux
+    language: generic
+    env: PYTHON_VER=3.7
+
+env:
+  global:
+  - OE_LICENSE="$HOME/oe_license.txt"
+
+
+before_install:
+  - ls
+  - pwd
+  - uname -a
+  - df -h
+  - ulimit -a
+  - source devtools/travis-ci/before_install.sh
+  - python -V
+
+install:
+
+    # Create test environment for package
+  - echo "Calling create_conda_env.py with PYTHON_VER=$PYTHON_VER"
+  - python devtools/scripts/create_conda_env.py -n=test -p=$PYTHON_VER devtools/conda-envs/test_env.yaml
+    # Activate the test environment
+  - conda activate test
+  - conda list
+
+    # Unencrypt OE license
+  - if [ "$TRAVIS_SECURE_ENV_VARS" == true ]; then openssl aes-256-cbc -K $encrypted_cce4609bc972_key -iv
+    $encrypted_cce4609bc972_iv -in devtools/travis-ci/oe_license.txt.enc -out $OE_LICENSE -d; fi
+    # swig: for building CCTools
+    # future: for builtins
+    
+#  - conda create -q -n forcebalance_env python=$TRAVIS_PYTHON_VERSION numpy scipy lxml networkx swig future
+#  - source activate forcebalance_env
+#
+#    # Add conda-forge and omnia to your channel list
+#  - conda config --add channels omnia --add channels conda-forge
+#
+#    # Update to conda-forge versions of packages
+#  - conda update --yes --all
+
+  # If were using python 3.6 or higher and we're decrypting an OE key, install OFF toolkit and
+  # OETK (there aren't OFFTK packages for python<3.6)
+  - if [ ${PYTHON_VER} != "2.7" ] && [ ${PYTHON_VER} != "3.5" ] && [ "$TRAVIS_SECURE_ENV_VARS" == true ] ; then conda install --yes -c omnia -c omnia/label/alpha -c openeye openforcefield openeye-toolkits openff-recharge; python -c "from openeye import oechem; assert oechem.OEChemIsLicensed()"; fi
+  - if [ ${PYTHON_VER} != "2.7" ] && [ ${PYTHON_VER} != "3.5" ] && [ ${PYTHON_VER} != "3.6" ] && [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_SECURE_ENV_VARS" == true ] ; then conda install --yes -c omnia openff-evaluator; fi
+
+  # Install Work Queue
+  - wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
+  - bash install-cctools.sh
+  - echo "Checking for Work Queue import; if successful, no message will be printed"
+  - python -c "import work_queue"
+  - export PATH="$HOME/opt/cctools/current/bin:$PATH"
+  # Hopefully in the future, the customizations that LPW adds in `lpwgroup/cctools`
+  # can be folded back into the main repo. Then the cctools install will be as simple as
+  # - conda install -c cclnd cctools
+  # More info at https://github.com/cooperative-computing-lab/cctools/issues/1617
+
+#    # Omnia packages
+#  - conda install -c omnia pymbar openmm
+
+    # Gromacs
+    # GitHub file hosting may be more reliable than Gromacs FTP
+  - wget https://github.com/gromacs/gromacs/archive/v4.6.7.tar.gz -O gromacs-4.6.7.tar.gz
+  # - wget ftp://ftp.gromacs.org/pub/gromacs/gromacs-4.6.7.tar.gz
+  - echo "Extracting Gromacs - log suppressed.."
+  - tar xvzf gromacs-4.6.7.tar.gz &> untar.log
+  - cd gromacs-4.6.7
+  - mkdir build_d
+  - cd build_d
+    # Build double precision version
+  - echo "Building Gromacs double precision - logs suppressed..."
+  - cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/opt/gromacs/4.6.7 -DGMX_DOUBLE=ON -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
+  - tail -500 config.log
+  - make -j 2 &> make.log
+  - tail -500 make.log
+  - make install # &> install.log
+  # - tail -500 install.log
+  - cd ..
+  - mkdir build_s
+  - cd build_s
+    # Build double precision version
+  - echo "Building Gromacs single precision - log suppressed.."
+  - cmake .. -DCMAKE_INSTALL_PREFIX=$HOME/opt/gromacs/4.6.7 -DGMX_DOUBLE=OFF -DGMX_GPU=OFF -DGMX_BUILD_OWN_FFTW=ON &> config.log
+  - make -j 2 &> make.log
+  - make install &> install.log
+  - tail -500 install.log
+  - cd ../..
+  - . $HOME/opt/gromacs/4.6.7/bin/GMXRC.bash
+  - which mdrun
+  - which mdrun_d
+  
+    # Tinker binaries
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.2.1.tar.gz -O tinker.tar.gz; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.2.1.tar.gz -O tinker.tar.gz; fi
+  #- wget https://dasher.wustl.edu/tinker/downloads/bin-${OS}-8.2.1.tar.gz -O tinker.tar.gz
+  - tar xvzf tinker.tar.gz &> untar.log
+    # The macos files are also gzipped inside the tarball.
+  - mkdir -p $HOME/opt/tinker/8.2.1
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then gunzip bin-macos/*gz; mv bin-macos $HOME/opt/tinker/8.2.1/bin; fi ;
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then mv bin-linux64 $HOME/opt/tinker/8.2.1/bin; fi ;
+  - export PATH="$HOME/opt/tinker/8.2.1/bin:$PATH"
+
+#    # Amber (now in test_env.yaml)
+#  - conda install -c ambermd ambertools
+#
+#    # Install anything not in conda
+#  # - pip install pint
+#  - pip install codecov
+#  # - pip install pytest-cov
+#  # - conda list
+
+
+    # Extract data archives
+  - cd studies/001_water_tutorial
+  - tar xvjf targets.tar.bz2
+  - cd -
+
+    # Install ForceBalance
+  #- python setup.py develop --no-deps
+  -  python setup.py install
+
+
+before_script:
+  - python -V
+  - python -c 'import numpy; print(numpy.version.version)'
+  # - pip install -e .
+
+script:
+  - cd studies/001_water_tutorial
+  - tar xvjf targets.tar.bz2
+  - ForceBalance very_simple.in
+  - cd -
+  - pytest --cov=forcebalance --cov-config=setup.cfg --durations=0
+  # Allow tests to run for up to 30 minutes
+  # - travis_wait 30 pytest --cov=forcebalance --cov-config=setup.cfg --durations=0
+  # - python test
+  # - py.test -v --cov=eex/ --durations=5
+
+notifications:
+  email: false
+
+after_success:
+  - codecov

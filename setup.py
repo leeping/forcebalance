@@ -12,14 +12,6 @@ import glob
 import argparse
 import subprocess
 
-try:
-    import numpy
-    import scipy
-except ImportError:
-    print("Error importing numpy and scipy but these are required to install ForceBalance")
-    print("Please make sure the numpy and scipy modules are installed and try again")
-    exit()
-    
 #===================================#
 #|   ForceBalance version number   |#
 #| Make sure to update the version |#
@@ -29,7 +21,7 @@ except ImportError:
 #| doc/api_header.tex              |#
 #| bin/ForceBalance.py             |#
 #===================================#
-__version__ = "v1.7.1"
+__version__ = "v1.8.1"
 try:
     # use git to find current version
     git_describe = subprocess.check_output(["git", "describe"]).strip()

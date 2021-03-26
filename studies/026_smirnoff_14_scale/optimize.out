@@ -1,0 +1,393 @@
+Note: Failed to import the optional openff.evaluator package. 
+Note: Failed to import the optional openff.recharge package.
+#======================================================================#
+#| [1m            Welcome to ForceBalance version 1.7.5! =D             [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Yudong Qiu, Keri A. McKiernan                   [0m |#
+#| [1m          Jeffrey R. Wagner, Hyesu Jang, Simon Boothroyd          [0m |#
+#| [1m                   Arthur Vigil, Erik G. Brandt                   [0m |#
+#| [1m                 Johnny Israeli, John Stoppelman                  [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: optimize.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: force-field.offxml
+Minor warning: Parameter ID vdW/scale14 doesn't contain any SMIRKS patterns, redundancies are possible
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  1.5000e+04 ] : /vdW/scale14
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   /vdW/scale14                         : 1.00000e+04
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    /vdW/scale14                  : 1.00000e+04 ] : /vdW/scale14
+----------------------------------------------------------
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['force-field.offxml'] 
+priors                    OrderedDict([('/vdW/scale14', 10000.0)]) 
+----------------------------------------------------------
+Referencing all energies to the snapshot 11 (minimum energy structure in QM)
+#========================================================#
+#| [92m           Setup for target formic-acid :           [0m |#
+#========================================================#
+mol2                      ['input.sdf'] 
+precision                 double 
+platname                  Reference 
+name                      formic-acid 
+type                      TORSIONPROFILE_SMIRNOFF 
+tgtdir                    targets/formic-acid 
+writelevel                2 
+attenuate                 True 
+energy_upper              5.0 
+----------------------------------------------------------
+#========================================================#
+#| [92m        SMIRNOFF Parameter Coverage Analysis        [0m |#
+#========================================================#
+Force field assignment data written to /Users/boothros/PyCharmProjects/forcebalance/studies/026_smirnoff_14_scale/smirnoff_parameter_assignments.json
+ idx Parameter                                                                                                   Count
+----------------------------------------------------------------------------------------------------------------------
+   0 /vdW/scale14                                                                                         :          0
+SNIRNOFF Parameter Coverage Analysis result: 0/1 parameters are covered.
+----------------------------------------------------------------------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          1.0 
+normalize_weights         False 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   OPTIMIZE 
+trust0                    0.25 
+mintrust                  0.05 
+eps                       0.01 
+convergence_objective     0.1 
+convergence_step          0.1 
+convergence_gradient      0.1 
+adapt_fac                 0.2 
+adapt_damp                1.0 
+print_hess                True 
+err_tol                   1.0 
+input_file                optimize.in 
+----------------------------------------------------------
+Calculation started at 2021-02-26 09:40 AM
+#========================================================#
+#| [1m                  Main Optimizer                    [0m |#
+#| [1m   Newton-Raphson Method (Adaptive Trust Radius)    [0m |#
+#| [1m                                                    [0m |#
+#| [1m       [0mConvergence criteria (1 of 3 needed):        [0m |#
+#| [1m          [0mObjective Function  : 1.000e-01           [0m |#
+#| [1m          [0mNorm of Gradient    : 1.000e-01           [0m |#
+#| [1m          [0mParameter step size : 1.000e-01           [0m |#
+#========================================================#
+#========================================================#
+#|       Color Key for Objective Function -=X2=-        |#
+#|  [1mBold[0m = Initial step                                 |#
+#|  [92mGreen = Current lowest value of objective function[0m  |#
+#|  [91mRed = Objective function rises, step rejected[0m       |#
+#|  [0mNo color = Not at the lowest value                  |#
+#========================================================#
+#========================================================#
+#| [94m     Iteration 0: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#==================================================================================================================================================#
+#| [92m                              Torsion Profile: formic-acid, Objective =  3.78465e+00, Units = kcal/mol, Angstrom                              [0m |#
+#| [92m System                                             Min(QM)    Min(MM)      Range(QM)          Range(MM)    Max-RMSD   Ene-RMSE    Obj-Fn     [0m |#
+#==================================================================================================================================================#
+formic-acid                                                 0          0     0.000 - 13.939    0.000 - 28.963     0.057     1.9454    3.7847 
+----------------------------------------------------------------------------------------------------------------------------------------------------
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+formic-acid                    3.78465      1.000 [94m     3.78465e+00[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     3.78465e+00[0m 
+----------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     0   0.000e+00   0.000e+00   5.891e+00[1m   3.78465e+00[0m   0.000e+00      0.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  5.89065784e+00 ] : /vdW/scale14
+----------------------------------------------------------
+#========================================================#
+#| [94m                   Total Hessian                    [0m |#
+#========================================================#
+ 6.58429003e+00 
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Finding trust radius: H+0.0000*I, length 8.9465e-01 (target 2.5000e-01)
+Finding trust radius: H+9.0000*I, length 3.7799e-01 (target 2.5000e-01)
+Finding trust radius: H+61.6869*I, length 8.6283e-02 (target 2.5000e-01)
+Finding trust radius: H+9.0000*I, length 3.7799e-01 (target 2.5000e-01)
+Finding trust radius: H+23.5623*I, length 1.9540e-01 (target 2.5000e-01)
+Finding trust radius: H+36.0000*I, length 1.3833e-01 (target 2.5000e-01)
+Finding trust radius: H+21.4006*I, length 2.1049e-01 (target 2.5000e-01)
+Finding trust radius: H+16.0398*I, length 2.6037e-01 (target 2.5000e-01)
+Finding trust radius: H+16.4848*I, length 2.5535e-01 (target 2.5000e-01)
+Finding trust radius: H+17.1391*I, length 2.4831e-01 (target 2.5000e-01)
+Finding trust radius: H+16.9718*I, length 2.5007e-01 (target 2.5000e-01)
+Finding trust radius: H+16.9805*I, length 2.4998e-01 (target 2.5000e-01)
+Finding trust radius: H+16.9784*I, length 2.5000e-01 (target 2.5000e-01)
+Finding trust radius: H+16.9783*I, length 2.5000e-01 (target 2.5000e-01)
+Finding trust radius: H+16.9784*I, length 2.5000e-01 (target 2.5000e-01)
+Trust-radius step found (length 2.5000e-01),  1.6978e+01 added to Hessian diagonal
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  0.0000e+00 - 2.5000e-01 = -2.5000e-01 ] : /vdW/scale14
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  1.5000e+04 - 2.5000e+03 =  1.2500e+04 ] : /vdW/scale14
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 1: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#==================================================================================================================================================#
+#| [92m                              Torsion Profile: formic-acid, Objective =  2.45519e+00, Units = kcal/mol, Angstrom                              [0m |#
+#| [92m System                                             Min(QM)    Min(MM)      Range(QM)          Range(MM)    Max-RMSD   Ene-RMSE    Obj-Fn     [0m |#
+#==================================================================================================================================================#
+formic-acid                                                 0          0     0.000 - 13.939    0.000 - 26.158     0.052     1.5669    2.4552 
+----------------------------------------------------------------------------------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+formic-acid                    2.45519      1.000 [92m     2.45519e+00[0m ( -1.329e+00 ) 
+Regularization                 0.06250      1.000 [91m     6.24999e-02[0m ( +6.250e-02 ) 
+Total                                             [92m     2.51769e+00[0m ( -1.267e+00 ) 
+-------------------------------------------------------------------------------------
+Creating the directory /Users/boothros/PyCharmProjects/forcebalance/studies/026_smirnoff_14_scale/result/optimize to print the force field
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     1   2.500e-01   2.500e-01   4.245e+00[92m   2.51769e+00[0m  -1.267e+00      1.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  4.24501104e+00 ] : /vdW/scale14
+----------------------------------------------------------
+#========================================================#
+#| [94m                   Total Hessian                    [0m |#
+#========================================================#
+ 6.58522357e+00 
+----------------------------------------------------------
+Increasing trust radius to  3.0000e-01
+Calculating nonlinear optimization step
+Finding trust radius: H+0.0000*I, length 6.4463e-01 (target 3.0000e-01)
+Finding trust radius: H+9.0000*I, length 2.7237e-01 (target 3.0000e-01)
+Finding trust radius: H+61.6869*I, length 6.2178e-02 (target 3.0000e-01)
+Finding trust radius: H+9.0000*I, length 2.7237e-01 (target 3.0000e-01)
+Finding trust radius: H+23.5623*I, length 1.4081e-01 (target 3.0000e-01)
+Finding trust radius: H+3.4377*I, length 4.2353e-01 (target 3.0000e-01)
+Finding trust radius: H+9.9826*I, length 2.5622e-01 (target 3.0000e-01)
+Finding trust radius: H+8.0791*I, length 2.8948e-01 (target 3.0000e-01)
+Finding trust radius: H+6.0757*I, length 3.3528e-01 (target 3.0000e-01)
+Finding trust radius: H+7.6517*I, length 2.9817e-01 (target 3.0000e-01)
+Finding trust radius: H+7.5294*I, length 3.0075e-01 (target 3.0000e-01)
+Finding trust radius: H+7.5639*I, length 3.0002e-01 (target 3.0000e-01)
+Finding trust radius: H+7.5649*I, length 3.0000e-01 (target 3.0000e-01)
+Finding trust radius: H+7.5648*I, length 3.0000e-01 (target 3.0000e-01)
+Finding trust radius: H+7.5648*I, length 3.0000e-01 (target 3.0000e-01)
+Finding trust radius: H+7.5648*I, length 3.0000e-01 (target 3.0000e-01)
+Trust-radius step found (length 3.0000e-01),  7.5648e+00 added to Hessian diagonal
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [ -2.5000e-01 - 3.0000e-01 = -5.5000e-01 ] : /vdW/scale14
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  1.2500e+04 - 3.0000e+03 =  9.5000e+03 ] : /vdW/scale14
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 2: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#==================================================================================================================================================#
+#| [92m                              Torsion Profile: formic-acid, Objective =  1.23796e+00, Units = kcal/mol, Angstrom                              [0m |#
+#| [92m System                                             Min(QM)    Min(MM)      Range(QM)          Range(MM)    Max-RMSD   Ene-RMSE    Obj-Fn     [0m |#
+#==================================================================================================================================================#
+formic-acid                                                 0          0     0.000 - 13.939    0.000 - 22.772     0.049     1.1126    1.2380 
+----------------------------------------------------------------------------------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+formic-acid                    1.23796      1.000 [92m     1.23796e+00[0m ( -1.217e+00 ) 
+Regularization                 0.30250      1.000 [91m     3.02500e-01[0m ( +2.400e-01 ) 
+Total                                             [92m     1.54046e+00[0m ( -9.772e-01 ) 
+-------------------------------------------------------------------------------------
+Backing up result/optimize/force-field.offxml -> result/optimize/force-field_1.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     2   5.500e-01   3.000e-01   2.270e+00[92m   1.54046e+00[0m  -9.772e-01      1.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  2.26976007e+00 ] : /vdW/scale14
+----------------------------------------------------------
+#========================================================#
+#| [94m                   Total Hessian                    [0m |#
+#========================================================#
+ 6.58630579e+00 
+----------------------------------------------------------
+Increasing trust radius to  3.4912e-01
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 3.4462e-01)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [ -5.5000e-01 - 3.4462e-01 = -8.9462e-01 ] : /vdW/scale14
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  9.5000e+03 - 3.4462e+03 =  6.0538e+03 ] : /vdW/scale14
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 3: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#==================================================================================================================================================#
+#| [92m                              Torsion Profile: formic-acid, Objective =  3.48977e-01, Units = kcal/mol, Angstrom                              [0m |#
+#| [92m System                                             Min(QM)    Min(MM)      Range(QM)          Range(MM)    Max-RMSD   Ene-RMSE    Obj-Fn     [0m |#
+#==================================================================================================================================================#
+formic-acid                                                 0          0     0.000 - 13.939    0.000 - 18.876     0.048     0.5907    0.3490 
+----------------------------------------------------------------------------------------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+formic-acid                    0.34898      1.000 [92m     3.48977e-01[0m ( -8.890e-01 ) 
+Regularization                 0.80034      1.000 [91m     8.00341e-01[0m ( +4.978e-01 ) 
+Total                                             [92m     1.14932e+00[0m ( -3.911e-01 ) 
+-------------------------------------------------------------------------------------
+Backing up result/optimize/force-field.offxml -> result/optimize/force-field_2.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     3   8.946e-01   3.446e-01   1.321e-04[92m   1.14932e+00[0m  -3.911e-01      1.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  1.32131964e-04 ] : /vdW/scale14
+----------------------------------------------------------
+#========================================================#
+#| [94m                   Total Hessian                    [0m |#
+#========================================================#
+ 6.58752138e+00 
+----------------------------------------------------------
+Convergence criterion reached for gradient norm (1.00e-01)
+#========================================================#
+#| [92m               [0m[1mOptimization Converged[0m               [0m |#
+#| [92m           Final objective function value           [0m |#
+#| [92m  Full:  1.149319e+00  Un-penalized:  3.489774e-01  [0m |#
+#========================================================#
+#========================================================#
+#| [94m           Final optimization parameters:           [0m |#
+#========================================================#
+   0 [ -8.9462e-01 ] : /vdW/scale14
+#========================================================#
+#| [94m             Final physical parameters:             [0m |#
+#========================================================#
+   0 [  6.0538e+03 ] : /vdW/scale14
+----------------------------------------------------------
+Backing up result/optimize/force-field.offxml -> result/optimize/force-field_3.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+Wall time since calculation start: 2.9 seconds
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#

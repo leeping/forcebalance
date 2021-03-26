@@ -360,7 +360,11 @@ class TINKER(Engine):
                 if len(vw.split('.')) <= 2:
                     vn = float(vw)
                 else:
-                    vn = float(vw.split('.')[:2])
+                    ls = vw.split('.')
+                    last = ls[1:]
+                    first = ls[0]
+                    vn = first+'.'+''.join(last)
+                    vn = float(vn)
                 vn_need = 6.3
                 try:
                     if vn < vn_need:

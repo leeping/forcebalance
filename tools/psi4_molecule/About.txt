@@ -1,0 +1,21 @@
+#========================#
+#|   Code Description   |#
+#========================#
+Author: John Stoppelman
+
+Simple demonstration of the Molecule Psi4 input/ouput reader 
+and input writer.
+
+psi4_grad contains a calculation output with two gradient jobs.
+The Psi4 output reader can read output files with multiple jobs,
+but they should generally be the of the same type (i.e. all 
+energy or gradient calculations.) The get_p4out.py file located
+in the directory shows how to read in the output and then write 
+a qdata.txt file.
+
+The psi4_opt directory contains the output from a Psi4 geometry
+optimization. The "mk_qdata.py" file shows how to read in the 
+geometry optimization output, write out a xyz file with all the 
+structures from the optimization, change Psi4 calculation settings 
+and run a new type of calculation on the final structure from the 
+geometry optimization. 

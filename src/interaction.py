@@ -48,9 +48,7 @@ class Interaction(Target):
         self.set_option(tgt_opts,'shots','ns')
         ## Do we call Q-Chem for dielectric energies? (Currently needs to be fixed)
         self.set_option(tgt_opts,'do_cosmo','do_cosmo')
-        ## Do we put the reference energy into the denominator?
-        self.set_option(tgt_opts,'cauchy','cauchy')
-        ## Do we put the reference energy into the denominator?
+        ## Attenuate weights for positive interaction energies
         self.set_option(tgt_opts,'attenuate','attenuate')
         ## Divide by the number of snapshots?
         self.set_option(tgt_opts, 'normalize')
@@ -103,25 +101,18 @@ class Interaction(Target):
         self.read_reference_data()
         logger.info("The energy denominator is: %s kcal/mol\n"  % str(self.energy_denom))
         denom = self.energy_denom
-        # Create the denominator.
-        if self.cauchy:
-            self.divisor = np.sqrt(self.eqm**2 + denom**2)
-            if self.attenuate:
-                logger.error('attenuate and cauchy are mutually exclusive\n')
-                raise RuntimeError
-        elif self.attenuate:
-            # Attenuate only large repulsions.
+        if self.attenuate:
+            # The attenuation function for weights is constant for energies up to energy_denom, then falls off smoothly in the shape of a "mesa".
             self.divisor = np.zeros(len(self.eqm))
             for i in range(len(self.eqm)):
                 if self.eqm[i] < denom:
                     self.divisor[i] = denom
                 else:
                     self.divisor[i] = np.sqrt(denom**2 + (self.eqm[i]-denom)**2)
+            logger.info("Interaction energies more positive than %.1f will have reduced weight going as: 1.0 / (%.1f^2 + (energy-%.1f)^2)\n" % (denom, denom, denom))
         else:
             self.divisor = np.ones(len(self.eqm)) * denom
 
-        if self.cauchy:
-            logger.info("Each contribution to the interaction energy objective function will be scaled by 1.0 / ( energy_denom**2 + reference**2 )\n")
         if self.energy_upper > 0:
             ecut = self.energy_upper
             self.prefactor = 1.0 * (self.eqm < ecut)

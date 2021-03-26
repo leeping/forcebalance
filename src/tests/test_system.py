@@ -37,6 +37,14 @@ EXPECTED_LIPID_RESULTS = array([-6.7553e-03, -2.4070e-02])
 # expected results taken from OpenFF torsion profile optimization using OpenFF toolkit 0.4.1 and OpenEye toolkit 2019.10.2. (updated 11/02/19)
 EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([-9.4238e-02, 7.3350e-03, -7.9467e-05, 1.7172e-02, -1.3309e-01, 6.0076e-02, 1.7895e-02, 6.5866e-02, -1.4084e-01, -2.2906e-02])
 
+# expected objective function from 025 recharge methane study. (updated 08/04/20)
+EXPECTED_RECHARGE_METHANE_ESP_OBJECTIVE = array([5.68107e-04])
+EXPECTED_RECHARGE_METHANE_FIELD_OBJECTIVE = array([7.43711e-04])
+
+# expected gradient elements from 025 recharge methane. (updated 08/04/20)
+EXPECTED_RECHARGE_METHANE_ESP_GRADIENT = array([9.76931016e-03])
+EXPECTED_RECHARGE_METHANE_FIELD_GRADIENT = array([1.12071584e-02])
+
 
 class ForceBalanceSystemTest(ForceBalanceTestCase):
     def teardown_method(self):
@@ -150,7 +158,7 @@ class TestBromineStudy(ForceBalanceSystemTest):
         self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
         self.expected_results_name = "EXPECTED_BROMINE_RESULTS"
         self.expected_results = EXPECTED_BROMINE_RESULTS
-        self.absolute_tolerance = 0.05
+        self.absolute_tolerance = 0.10
 
     def test_bromine_study(self):
         """Check liquid bromine study converges to expected results"""
@@ -239,7 +247,7 @@ class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
 
 class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
-        pytest.importorskip("openforcefield", minversion="0.4")
+        pytest.importorskip("openff.toolkit", minversion="0.4")
         pytest.importorskip("openeye.oechem")
         super(TestOpenFFTorsionProfileStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
@@ -256,3 +264,59 @@ class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
     def test_openff_torsionprofile_study(self):
         """Check OpenFF torsion profile optimization converges to expected results"""
         self.run_optimizer(check_iter=False)
+
+class TestRechargeMethaneStudy(ForceBalanceSystemTest):
+
+    def setup_method(self, method):
+
+        pytest.importorskip("openff.recharge")
+
+        super(TestRechargeMethaneStudy, self).setup_method(method)
+
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies', '025_openff_recharge'))
+
+        ## Extract targets archive.
+        targets = tarfile.open('targets.tar.gz','r')
+        targets.extractall()
+        targets.close()
+
+        self.input_file='optimize.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
+
+    def test_study(self):
+
+        objective = self.get_objective()
+        data      = objective.Full(np.zeros(objective.FF.np),1,verbose=True)
+        X, G, H   = data['X'], data['G'], data['H']
+
+        msgX=(
+            "\nCalculated objective function is outside expected range.\n "
+            "If this seems reasonable, update EXPECTED_RECHARGE_METHANE_ESP_OBJECTIVE "
+            "and EXPECTED_RECHARGE_METHANE_FIELD_OBJECTIVE in test_system.py with "
+            "these values"
+        )
+        np.testing.assert_allclose(
+            (
+                EXPECTED_RECHARGE_METHANE_ESP_OBJECTIVE
+                + EXPECTED_RECHARGE_METHANE_FIELD_OBJECTIVE
+            ),
+            X,
+            rtol=5.0e-7,
+            err_msg=msgX
+        )
+        msgG = (
+            "\nCalculated gradient is outside expected range.\n "
+            "If this seems reasonable, update EXPECTED_RECHARGE_METHANE_ESP_GRADIENT "
+            "and EXPECTED_RECHARGE_METHANE_FIELD_GRADIENT in test_system.py with "
+            "these values"
+        )
+        np.testing.assert_allclose(
+            (
+                EXPECTED_RECHARGE_METHANE_ESP_GRADIENT
+                + EXPECTED_RECHARGE_METHANE_FIELD_GRADIENT
+            ),
+            G,
+            rtol=5.0e-7,
+            err_msg=msgG
+        )

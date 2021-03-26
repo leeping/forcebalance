@@ -632,13 +632,13 @@ class FrcMod_Reader(BaseReader):
             else:
                 self.haveAtomLine = False
                 self.itype = 'PDIHS%i' % int(np.abs(float(s[3])))
+        else:
+            self.haveAtomLine = True
 
         if self.itype in self.pdict:
-            if 'Atom' in self.pdict[self.itype]:
-                # Use the previously stored atoms if not on this line.
-                if '-' in s[0]:
-                    # List the atoms in the interaction.
-                    self.atom = [s[i].replace(" -","-") for i in self.pdict[self.itype]['Atom']]
+            if 'Atom' in self.pdict[self.itype] and self.haveAtomLine:
+                # List the atoms in the interaction.
+                self.atom = [s[i].replace(" -","-") for i in self.pdict[self.itype]['Atom']]
 
             # The suffix of the parameter ID is built from the atom    #
             # types/classes involved in the interaction.

@@ -98,8 +98,6 @@ class AbInitio(Target):
 
         ## Number of snapshots
         self.set_option(tgt_opts,'shots','ns')
-        ## Whether to match Absolute Energies (make sure you know what you're doing)
-        self.set_option(tgt_opts,'absolute','absolute')
         ## Number of atoms that we are fitting
         self.set_option(tgt_opts,'fitatoms','fitatoms_in')
         ## Whether to fit Energies.
@@ -132,22 +130,33 @@ class AbInitio(Target):
         self.set_option(tgt_opts,'run_internal','run_internal')
         ## Whether we have virtual sites (set at the global option level)
         self.set_option(options,'have_vsite','have_vsite')
-        ## Attenuate the weights as a function of energy
-        self.set_option(tgt_opts,'attenuate','attenuate')
-        ## What is the energy denominator? (Valid for 'attenuate')
-        self.set_option(tgt_opts,'energy_denom','energy_denom')
-        ## Set upper cutoff energy
-        self.set_option(tgt_opts,'energy_upper','energy_upper')
+        ## Choose how the energy gap between MM and QM energies is treated.
+        self.set_option(tgt_opts,'energy_mode')
+        if self.energy_mode == 'average':
+            logger.info("Relative energy fitting: Subtracting (MM - QM) energy gap from all relative energy calculations - this is the default.\n")
+        elif self.energy_mode == 'qm_minimum':
+            logger.info("Relative energy fitting: MM and QM relative energies are referenced to the minimum energy QM structure.\n")
+        elif self.energy_mode == 'absolute':
+            logger.info("Relative energy fitting: Using absolute energies - make sure you know what you're doing!\n")
+        else:
+            raise RuntimeError('Invalid selection of energy_mode : valid options are "average", "qm_minimum", "absolute"')
         ## Assign a greater weight to MM snapshots that underestimate the QM energy (surfaces referenced to QM absolute minimum)
         self.set_option(tgt_opts,'energy_asymmetry')
-        self.savg = (self.energy_asymmetry == 1.0 and not self.absolute)
-        self.asym = (self.energy_asymmetry != 1.0)
-        if self.asym:
+        if self.energy_asymmetry != 1.0:
+            if self.energy_mode != 'qm_minimum':
+                raise RuntimeError('energy_asymmetry can only be used when energy_mode is set to qm_minimum')
             if not self.all_at_once:
-                logger.error("Asymmetric weights only work when all_at_once is enabled")
-                raise RuntimeError
-        # allow user to overwrite the force denominator
-        self.set_option(tgt_opts,'force_denom','force_denom')
+                raise RuntimeError("energy_asymmetry can only be used when all_at_once is enabled")
+            if self.energy_asymmetry < 1.0:
+                warn_press_key("energy_asymmetry is intended to be greater than 1.0")
+        ## Attenuate the weights as a function of QM relative energy.
+        self.set_option(tgt_opts,'attenuate')
+        ## Energy lower cutoff for starting to attenuate weights.
+        self.set_option(tgt_opts,'energy_denom')
+        ## Energy upper cutoff for setting weights to zero.
+        self.set_option(tgt_opts,'energy_upper')
+        if not self.attenuate and self.energy_denom != 1.0:
+            warn_press_key("To override the normalization of the energy objective function, please use energy_rms_override.")
         #======================================#
         #     Variables which are set here     #
         #======================================#
@@ -376,14 +385,16 @@ class AbInitio(Target):
         # Turn everything into arrays, convert to kJ/mol, and subtract the mean energy from the energy arrays
         self.eqm = np.array(self.eqm)
         self.eqm *= eqcgmx
-        if self.asym:
+        if self.energy_mode == 'qm_minimum':
             self.eqm  -= np.min(self.eqm)
             self.smin  = np.argmin(self.eqm)
-            logger.info("Referencing all energies to the snapshot %i (minimum energy structure in QM)\n" % self.smin)
-        elif self.absolute:
-            logger.info("Fitting absolute energies.  Make sure you know what you are doing!\n")
-        else:
+            logger.info("Referencing all energies to structure number %i (minimum energy structure in QM)\n" % self.smin)
+        elif self.energy_mode == 'average':
             self.eqm -= np.mean(self.eqm)
+        elif self.energy_mode == 'absolute':
+            pass
+        else:
+            raise RuntimeError('Not sure what to do with energy_mode %s' % self.energy_mode)
 
         if len(self.fqm) > 0:
             self.fqm = np.array(self.fqm)
@@ -427,16 +438,17 @@ class AbInitio(Target):
             # Attenuate energies by an amount proportional to their
             # value above the minimum.
             eqm1 = self.eqm - np.min(self.eqm)
-            denom = self.energy_denom * 4.184 # kcal/mol to kJ/mol
+            lower = self.energy_denom * 4.184 # kcal/mol to kJ/mol
             upper = self.energy_upper * 4.184 # kcal/mol to kJ/mol
             self.boltz_wts = np.ones(self.ns)
             for i in range(self.ns):
                 if eqm1[i] > upper:
                     self.boltz_wts[i] = 0.0
-                elif eqm1[i] < denom:
-                    self.boltz_wts[i] = 1.0 / denom
+                elif eqm1[i] < lower:
+                    self.boltz_wts[i] = 1.0 / lower
                 else:
-                    self.boltz_wts[i] = 1.0 / np.sqrt(denom**2 + (eqm1[i]-denom)**2)
+                    self.boltz_wts[i] = 1.0 / np.sqrt(lower**2 + (eqm1[i]-lower)**2)
+            logger.info('Energy lower/upper limit for attenuating/cutting off weights is set to %.1f/%.1f kcal/mol.\n' % (lower, upper))
         else:
             self.boltz_wts = np.ones(self.ns)
 
@@ -687,7 +699,7 @@ class AbInitio(Target):
         if self.all_at_once:
             logger.debug("\rExecuting\r")
             M_all = self.energy_force_transform()
-            if self.asym:
+            if self.energy_mode == 'qm_minimum':
                 M_all[:, 0] -= M_all[self.smin, 0]
             if AGrad or AHess:
                 def callM(mvals_):
@@ -696,7 +708,7 @@ class AbInitio(Target):
                     return self.energy_force_transform()
                 for p in self.pgrad:
                     dM_all[:,p,:], ddM_all[:,p,:] = f12d3p(fdwrap(callM, mvals, p), h = self.h, f0 = M_all)
-                    if self.asym:
+                    if self.energy_mode == 'qm_minimum':
                         dM_all[:, p, 0] -= dM_all[self.smin, p, 0]
                         ddM_all[:, p, 0] -= ddM_all[self.smin, p, 0]
         if self.force and not in_fd():
@@ -725,10 +737,8 @@ class AbInitio(Target):
                 M_all[i,:] = M.copy()
             # MM - QM difference
             X     = M-Q
-            boost   = 1.0
             # For asymmetric fit, MM energies lower than QM are given a boost factor
-            if self.asym and X[0] < 0.0:
-                boost = self.energy_asymmetry
+            boost = self.energy_asymmetry if X[0] < 0.0 else 1.0
             # Save information about forces
             if self.force:
                 # Norm-squared of force differences for each atom
@@ -791,20 +801,19 @@ class AbInitio(Target):
         #         STEP 2b: Write energies and forces to disk.          #
         #==============================================================#
         M_all_print = M_all.copy()
-        if self.savg:
-            M_all_print[:,0] -= np.average(M_all_print[:,0], weights=self.boltz_wts)
         if self.force:
             Q_all_print = np.hstack((col(self.eqm),self.fref))
         else:
             Q_all_print = col(self.eqm)
-        if self.savg:
-            QEtmp = np.array(Q_all_print[:,0]).flatten()
-            Q_all_print[:,0] -= np.average(QEtmp, weights=self.boltz_wts)
-        if self.attenuate:
-            QEtmp = np.array(Q_all_print[:,0]).flatten()
-            Q_all_print[:,0] -= np.min(QEtmp)
-            MEtmp = np.array(M_all_print[:,0]).flatten()
-            M_all_print[:,0] -= np.min(MEtmp)
+        if self.energy_mode == 'average':
+            M_all_print[:,0] -= np.average(M_all_print[:,0], weights=self.boltz_wts)
+            Q_all_print[:,0] -= np.average(Q_all_print[:,0], weights=self.boltz_wts)
+        elif self.energy_mode == 'qm_minimum':
+            M_all_print[:,0] -= M_all_print[self.smin,0]
+            Q_all_print[:,0] -= Q_all_print[self.smin,0]
+        if self.writelevel > 1:
+            np.savetxt('M.txt',M_all_print)
+            np.savetxt('Q.txt',Q_all_print)
         if self.writelevel > 1:
             np.savetxt('M.txt',M_all_print)
             np.savetxt('Q.txt',Q_all_print)
@@ -877,7 +886,7 @@ class AbInitio(Target):
         def compute_objective(SPX_like,divide=1,L=None,R=None,L2=None,R2=None):
             a = 0
             n = 1
-            X2E = compute_objective_part(SPX_like,QQ0,Q0,Z,a,n,energy=True,subtract_mean=self.savg,
+            X2E = compute_objective_part(SPX_like,QQ0,Q0,Z,a,n,energy=True,subtract_mean=(self.energy_mode=='average'),
                                          divide=divide,L=L,R=R,L2=L2,R2=R2)
             objs = [X2E]
             if self.force:

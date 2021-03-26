@@ -13,9 +13,30 @@ http://leeping.github.io/forcebalance/doc/html/index.html
 You can also download the documentation in pdf format here:
 http://leeping.github.io/forcebalance/doc/ForceBalance-Manual.pdf
 
-#==================#
-#|   Quick Help   |#
-#==================#
+#================================#
+#|   Conda / pip installation   |#
+#================================#
+
+As of version 1.7.4, ForceBalance is available as a package on the conda-forge channel.
+To install the package, make sure you are using an Anaconda/Miniconda Python distribution
+for Python versions 2.7, 3.5, 3.6, or 3.7, then run:
+
+`conda install --strict-channel-priority -c conda-forge forcebalance`
+
+This will install ForceBalance and all of the required dependencies.  It will not install
+optional dependencies such as OpenMM, Gromacs, AMBER, Tinker, CCTools/Work Queue,
+or the Open Force Field toolkit.
+
+(Note: If you were installing ForceBalance from the omnia repository previously,
+you may need to clear your index cache using `conda clean -i`.)
+
+Similarly, to install from PyPI (Python Package Index), run the command:
+
+`pip install forcebalance`
+
+#=========================================#
+#|   Building / installing from source   |#
+#=========================================#
 
 To build the package:
 
