@@ -27,13 +27,15 @@ try:
     from evaluator.utils.openmm import openmm_quantity_to_pint
     from evaluator.utils.serialization import TypedJSONDecoder, TypedJSONEncoder
     from evaluator.forcefield import ParameterGradientKey
+    evaluator_import_success = True
 except ImportError:
-    warn_once("Note: Failed to import the optional evaluator package. ")
+    evaluator_import_success = False
 
 try:
     from openforcefield.typing.engines import smirnoff
-except ImportError:
-    warn_once("Note: Failed to import the optional openforcefield package. ")
+    toolkit_import_success = True
+except ImportError: 
+    toolkit_import_success = False
 
 logger = getLogger(__name__)
 
@@ -153,6 +155,12 @@ class Evaluator_SMIRNOFF(Target):
             return value
 
     def __init__(self, options, tgt_opts, forcefield):
+
+        if not evaluator_import_success:
+            warn_once("Note: Failed to import the OpenFF Evaluator - FB Evaluator target will not work. ")
+
+        if not toolkit_import_success:
+            warn_once("Note: Failed to import the OpenFF Toolkit - FB Evaluator target will not work. ")
 
         super(Evaluator_SMIRNOFF, self).__init__(options, tgt_opts, forcefield)
 
