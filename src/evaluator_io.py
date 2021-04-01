@@ -438,13 +438,13 @@ class Evaluator_SMIRNOFF(Target):
         self.FF.make(mvals)
 
         force_field = smirnoff.ForceField(
-            self.FF.offxml, allow_cosmetic_attributes=True
+            self.FF.offxml, allow_cosmetic_attributes=True, load_plugins=True
         )
 
         # strip out cosmetic attributes
         with tempfile.NamedTemporaryFile(mode="w", suffix=".offxml") as file:
             force_field.to_file(file.name, discard_cosmetic_attributes=True)
-            force_field = smirnoff.ForceField(file.name)
+            force_field = smirnoff.ForceField(file.name, load_plugins=True)
 
         # Determine which gradients (if any) we should be estimating.
         parameter_gradient_keys = []

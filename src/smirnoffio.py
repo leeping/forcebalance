@@ -324,7 +324,7 @@ class SMIRNOFF(OpenMM):
             self.forcefield = self.FF.openff_forcefield
         else:
             self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
-            self.forcefield = OpenFF_ForceField(*self.offxml)
+            self.forcefield = OpenFF_ForceField(*self.offxml, load_plugins=True)
 
         ## Load mol2 files for smirnoff topology
         openff_mols = []
