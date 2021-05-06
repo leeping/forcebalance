@@ -355,7 +355,7 @@ class TINKER(Engine):
         if "%s.key" % self.name in csplit and not os.path.exists("%s.key" % self.name):
             LinkFile(self.abskey, "%s.key" % self.name)
         tinkpath=self.CheckEnvironmentTinker()
-        if self.tinkerpath==None and tinkpath!=None:
+        if tinkpath!=None: # need to override input masterhost tinkerpath, otherwise if worker node has different )S/ libraries then will crash
            tinkerpath=tinkpath
         else:
            tinkerpath=self.tinkerpath 
@@ -951,22 +951,19 @@ class TINKER(Engine):
             self.optimize(0, method="bfgs", crit=1)
             os.system("mv %s.xyz_2 %s.xyz" % (self.name, self.name))
             if verbose: logger.info("Done\n")
+        if 'OPENMM_CUDA_COMPILER' in os.environ.keys() and 'gas' not in self.name:
+            dynamickeyword='dynamic_omm'
+            suffix=' N'
+        else:
+            dynamickeyword='dynamic'
+            suffix=''
 
         # Run equilibration.
         if nequil > 0:
             write_key("%s-eq.key" % self.name, eq_opts, "%s.key" % self.name, md_defs)
             if verbose: printcool("Running equilibration dynamics", color=0)
-            if 'OPENMM_CUDA_COMPILER' in os.environ.keys() and 'gas' not in self.name:
-                dynamickeyword='dynamic_omm'
-            else:
-                dynamickeyword='dynamic'
             if self.pbc and pressure is not None:
-                if 'OPENMM_CUDA_COMPILER' in os.environ.keys():
-                    self.calltinker(dynamickeyword+" %s -k %s-eq %i %f %f 4 %f %f N" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,temperature, pressure), print_to_screen=verbose)
-
-
-                else:
-                    self.calltinker(dynamickeyword+" %s -k %s-eq %i %f %f 4 %f %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,temperature, pressure), print_to_screen=verbose)
+                self.calltinker(dynamickeyword+" %s -k %s-eq %i %f %f 4 %f %f%s" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,temperature, pressure,suffix), print_to_screen=verbose)
             else:
                 self.calltinker(dynamickeyword+" %s -k %s-eq %i %f %f 2 %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,temperature), print_to_screen=verbose)
             os.system("rm -f %s.arc" % (self.name))
@@ -974,17 +971,9 @@ class TINKER(Engine):
         # Run production.
         if verbose: printcool("Running production dynamics", color=0)
         write_key("%s-md.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
-        if 'OPENMM_CUDA_COMPILER' in os.environ.keys() and 'gas' not in self.name:
-             dynamickeyword='dynamic_omm'
-        else:
-             dynamickeyword='dynamic'
 
         if self.pbc and pressure is not None:
-            if 'OPENMM_CUDA_COMPILER' in os.environ.keys():
-                odyn = self.calltinker(dynamickeyword+" %s -k %s-md %i %f %f 4 %f %f N" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000),temperature, pressure), print_to_screen=verbose)
-
-            else:
-                odyn = self.calltinker(dynamickeyword+" %s -k %s-md %i %f %f 4 %f %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000),temperature, pressure), print_to_screen=verbose)
+            odyn = self.calltinker(dynamickeyword+" %s -k %s-md %i %f %f 4 %f %f%s" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000),temperature, pressure,suffix), print_to_screen=verbose)
         else:
             odyn = self.calltinker(dynamickeyword+" %s -k %s-md %i %f %f 2 %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
                                                                           temperature), print_to_screen=verbose)
