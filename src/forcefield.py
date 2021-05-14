@@ -777,6 +777,8 @@ class FF(forcebalance.BaseClass):
             raise RuntimeError
         if use_pvals or self.use_pvals:
             logger.info("Using physical parameters directly!\r")
+            if isinstance(vals, list):
+                vals = np.array(vals)            
             pvals = vals.copy().flatten()
         else:
             pvals = self.create_pvals(vals)
