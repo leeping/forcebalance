@@ -255,6 +255,7 @@ class Liquid(Target):
         # Read the 'data.csv' file. The file should contain guidelines.
         with open(os.path.join(self.tgtdir,'data.csv'),'rU') as f: R0 = list(csv.reader(f))
         # All comments are erased.
+        R0=[i for i in R0 if len(i)>0] # remove lines without any content first, otherwise it crashes
         R1 = [[sub('#.*$','',word) for word in line] for line in R0 if len(line[0]) > 0 and line[0][0] != "#"]
         # All empty lines are deleted and words are converted to lowercase.
         R = [[wrd.lower() for wrd in line] for line in R1 if any([len(wrd) for wrd in line]) > 0]
