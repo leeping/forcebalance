@@ -1123,7 +1123,7 @@ class OpenMM(Engine):
         Result = self.evaluate_(dipole=True, traj=True)
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
-    def build_mass_weighted_hessian(self, shot=0, optimize=True):
+    def build_mass_weighted_hessian(self, shot=0, optimize=True, mass_weighted_hessian_only=True):
         """OpenMM single frame hessian evaluation
         Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
 
@@ -1142,130 +1142,6 @@ class OpenMM(Engine):
         """
         self.update_simulation()
         if optimize is True:
-            self.optimize(shot, crit=1e-8)
-        else:
-            warn_once("Computing mass-weighted hessian without geometry optimization")
-            self.set_positions(shot)
-        context = self.simulation.context
-        pos = context.getState(getPositions=True).getPositions(asNumpy=True)
-        # pull real atoms and their mass
-        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
-        # initialize an empty hessian matrix
-        noa = len(self.realAtomIdxs)
-        hessian = np.empty((noa*3, noa*3), dtype=float)
-        # finite difference step size
-        diff = Quantity(0.0001, unit=nanometer)
-        coef = 1.0 / (0.0001 * 2) # 1/2h
-        for i, i_atom in enumerate(self.realAtomIdxs):
-            massWeight = 1.0 / np.sqrt(massList * massList[i])
-            # loop over the x, y, z coordinates
-            for j in range(3):
-                # plus perturbation
-                pos[i_atom][j] += diff
-                context.setPositions(pos)
-                grad_plus = context.getState(getForces=True).getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole))
-                grad_plus = -grad_plus[self.realAtomIdxs] # gradients are negative forces
-                # minus perturbation
-                pos[i_atom][j] -= 2*diff
-                context.setPositions(pos)
-                grad_minus = context.getState(getForces=True).getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole))
-                grad_minus = -grad_minus[self.realAtomIdxs] # gradients are negative forces
-                # set the perturbation back to zero
-                pos[i_atom][j] += diff
-                # fill one row of the hessian matrix
-                hessian[i*3+j] = np.ravel((grad_plus - grad_minus) * coef * massWeight[:, np.newaxis])
-        # make hessian symmetric by averaging upper right and lower left
-        hessian += hessian.T
-        hessian *= 0.5
-        # recover the original position
-        context.setPositions(pos)
-        return hessian
-
-    def normal_modes(self, shot=0, optimize=True):
-        """OpenMM Normal Mode Analysis
-        Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
-
-        Parameters
-        ----------
-        shot: int
-            The frame number in the trajectory of this target
-        optimize: bool, default True
-            Optimize the geometry before evaluating the normal modes
-
-        Returns
-        -------
-        freqs: np.array with shape (3N - 6) x 1, N = number of "real" atoms
-            Harmonic frequencies, sorted from smallest to largest, with the 6 smallest removed, in unit cm^-1
-        normal_modes: np.array with shape (3N - 6) x (3N), N = number of "real" atoms
-            The normal modes corresponding to each of the frequencies, scaled by mass^-1/2.
-        """
-        if self.precision == 'single':
-            warn_once("Single-precision OpenMM engine used for normal mode analysis - recommend that you use mix or double precision.")
-        if not optimize:
-            warn_once("Asking for normal modes without geometry optimization?")
-        # step 0: check number of real atoms
-        noa = len(self.realAtomIdxs)
-        if noa < 2:
-            error('normal mode analysis not suitable for system with one or less atoms')
-        # step 1: build a full hessian matrix
-        hessian_matrix = self.build_mass_weighted_hessian(shot=shot, optimize=optimize)
-        # step 2: diagonalize the hessian matrix
-        eigvals, eigvecs = np.linalg.eigh(hessian_matrix)
-        # step 3: convert eigenvalues to frequencies
-        coef = 0.5 / np.pi * 33.3564095 # 10^12 Hz => cm-1
-        negatives = (eigvals >= 0).astype(int) * 2 - 1 # record the negative ones
-        freqs = np.sqrt(np.abs(eigvals)) * coef * negatives
-        # step 4: convert eigenvectors to normal modes
-        # re-arange to row index and shape
-        normal_modes = eigvecs.T.reshape(noa*3, noa, 3)
-        # step 5: Remove mass weighting from eigenvectors
-        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
-        for i in range(normal_modes.shape[0]):
-            mode = normal_modes[i]
-            mode /= np.sqrt(massList[:,np.newaxis])
-            mode /= np.linalg.norm(mode)
-        # step 5: remove the 6 freqs with smallest abs value and corresponding normal modes
-        n_remove = 5 if len(self.realAtomIdxs) == 2 else 6
-        larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])
-        freqs = freqs[larger_freq_idxs]
-        normal_modes = normal_modes[larger_freq_idxs]
-        return freqs, normal_modes
-
-    def hessian(self, shot=0, optimize=True):
-        if self.precision == 'single':
-            warn_once("Single-precision OpenMM engine used for normal mode analysis - recommend that you use mix or double precision.")
-        if not optimize:
-            warn_once("Asking for normal modes without geometry optimization?")
-
-        # step 1: build a full hessian matrix, mass_weighted_hessian
-        coords, gradient, hessian, mass_weighted_hessian, M_opt = self.build_hessian(shot=shot, optimize=optimize)
-        # step 2: diagonalize the hessian matrix
-        eigvals, eigvecs = np.linalg.eigh(mass_weighted_hessian)
-        # step 3: convert eigenvalues to frequencies
-        coef = 0.5 / np.pi * 33.3564095 # 10^12 Hz => cm-1
-        negatives = (eigvals >= 0).astype(int) * 2 - 1 # record the negative ones
-        freqs = np.sqrt(np.abs(eigvals)) * coef * negatives
-        # step 4: convert eigenvectors to normal modes
-        # re-arange to row index and shape
-        noa = len(self.realAtomIdxs)
-        normal_modes = eigvecs.T.reshape(noa*3, noa, 3)
-        # step 5: Remove mass weighting from eigenvectors
-        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
-        for i in range(normal_modes.shape[0]):
-            mode = normal_modes[i]
-            mode /= np.sqrt(massList[:,np.newaxis])
-            mode /= np.linalg.norm(mode)
-        # step 5: remove the 6 freqs with smallest abs value and corresponding normal modes
-        n_remove = 5 if len(self.realAtomIdxs) == 2 else 6
-        larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])
-        freqs = freqs[larger_freq_idxs]
-        normal_modes = normal_modes[larger_freq_idxs]
-
-        return coords, gradient, hessian, freqs, normal_modes, M_opt
-
-    def build_hessian(self, shot=0, optimize=True):
-        self.update_simulation()
-        if optimize is True:
             _, _, M_opt = self.optimize(shot, crit=1e-8)
         else:
             warn_once("Computing mass-weighted hessian without geometry optimization")
@@ -1277,8 +1153,8 @@ class OpenMM(Engine):
             
         context = self.simulation.context
         pos = context.getState(getPositions=True).getPositions(asNumpy=True)
+        # pull real atoms and their mass
         massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
-
         # initialize an empty hessian matrix
         noa = len(self.realAtomIdxs)
         hessian = np.empty((noa*3, noa*3), dtype=float)
@@ -1316,8 +1192,64 @@ class OpenMM(Engine):
         # recover the original position
         context.setPositions(pos)
         gradient  = context.getState(getForces=True).getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole)).flatten()
+        if mass_weighted_hessian_only: 
+            return mass_weighted_hessian
+        else: 
+            return pos, gradient, hessian, mass_weighted_hessian, M_opt
 
-        return pos, gradient, hessian, mass_weighted_hessian, M_opt
+    def normal_modes(self, shot=0, optimize=True, for_hessian_target=False):
+        """OpenMM Normal Mode Analysis
+        Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
+
+        Parameters
+        ----------
+        shot: int
+            The frame number in the trajectory of this target
+        optimize: bool, default True
+            Optimize the geometry before evaluating the normal modes
+
+        Returns
+        -------
+        freqs: np.array with shape (3N - 6) x 1, N = number of "real" atoms
+            Harmonic frequencies, sorted from smallest to largest, with the 6 smallest removed, in unit cm^-1
+        normal_modes: np.array with shape (3N - 6) x (3N), N = number of "real" atoms
+            The normal modes corresponding to each of the frequencies, scaled by mass^-1/2.
+        """
+        if self.precision == 'single':
+            warn_once("Single-precision OpenMM engine used for normal mode analysis - recommend that you use mix or double precision.")
+        if not optimize:
+            warn_once("Asking for normal modes without geometry optimization?")
+        # step 0: check number of real atoms
+        noa = len(self.realAtomIdxs)
+        if noa < 2:
+            error('normal mode analysis not suitable for system with one or less atoms')
+        # step 1: build a full hessian matrix
+        coords, gradient, hessian, mass_weighted_hessian, M_opt = self.build_mass_weighted_hessian(shot=shot, optimize=optimize, mass_weighted_hessian_only=False)
+
+        # step 2: diagonalize the hessian matrix
+        eigvals, eigvecs = np.linalg.eigh(mass_weighted_hessian)
+        # step 3: convert eigenvalues to frequencies
+        coef = 0.5 / np.pi * 33.3564095 # 10^12 Hz => cm-1
+        negatives = (eigvals >= 0).astype(int) * 2 - 1 # record the negative ones
+        freqs = np.sqrt(np.abs(eigvals)) * coef * negatives
+        # step 4: convert eigenvectors to normal modes
+        # re-arange to row index and shape
+        normal_modes = eigvecs.T.reshape(noa*3, noa, 3)
+        # step 5: Remove mass weighting from eigenvectors
+        massList = np.array(self.AtomLists['Mass'])[self.realAtomIdxs] # unit in dalton
+        for i in range(normal_modes.shape[0]):
+            mode = normal_modes[i]
+            mode /= np.sqrt(massList[:,np.newaxis])
+            mode /= np.linalg.norm(mode)
+        # step 5: remove the 6 freqs with smallest abs value and corresponding normal modes
+        n_remove = 5 if len(self.realAtomIdxs) == 2 else 6
+        larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])
+        freqs = freqs[larger_freq_idxs]
+        normal_modes = normal_modes[larger_freq_idxs]
+        if not for_hessian_target:
+            return freqs, normal_modes
+        else: 
+            return coords, gradient, hessian, freqs, normal_modes, M_opt
 
     def optimize(self, shot, crit=1e-4, disable_vsite=False, align=True, include_restraint_energy=False):
 
