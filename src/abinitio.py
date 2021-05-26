@@ -287,7 +287,7 @@ class AbInitio(Target):
             frc1 = force.reshape(-1,3)[mask][:nft].flatten()
 
         if nxp not in [npr, nat]:
-            logger.error('Coordinates contains %i particles but expected %i or %i\n' % (nfp, npr, nat))
+            logger.error('Coordinates contains %i particles but expected %i or %i\n' % (nxp, npr, nat))
             raise RuntimeError
         elif nxp == nat:
             xyz1 = xyz[:nft]
