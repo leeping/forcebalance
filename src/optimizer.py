@@ -10,6 +10,7 @@ contained inside.
 from __future__ import division
 from __future__ import print_function
 
+import shutil
 from builtins import str
 from builtins import range
 from builtins import object
@@ -147,6 +148,8 @@ class Optimizer(forcebalance.BaseClass):
         self.set_option(options,'read_pvals')
         ## Whether to make backup files
         self.set_option(options, 'backup')
+        ## Whether to retain the output files of completed iterations
+        self.set_option(options, 'retain_micro_outputs')
         ## Name of the original input file
         self.set_option(options, 'input_file')
         ## Number of convergence criteria that must be met
@@ -882,6 +885,10 @@ class Optimizer(forcebalance.BaseClass):
             # This is our trial step.
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False,customdir="micro_%02i" % search_fun.micro)['X'] - data['X']
+
+            if not self.retain_micro_outputs:
+                shutil.rmtree("micro_%02i" % search_fun.micro)
+
             logger.info("Hessian diagonal search: H%+.4f*I, length %.4e, result % .4e\n" % ((L-1)**2,np.linalg.norm(dx),Result))
             search_fun.micro += 1
             return Result
