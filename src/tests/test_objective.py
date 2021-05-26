@@ -48,6 +48,7 @@ class TestImplemented(ForceBalanceTestCase):
                             'BindingEnergy',
                             'LeastSquares',
                             'Vibration',
+                            'Hessian',
                             'Thermo',
                             'Hydration',
                             'Moments', 

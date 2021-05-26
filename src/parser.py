@@ -199,6 +199,7 @@ tgt_opts_types = {
                  "md_steps"           : (50000, 0, 'Number of time steps for the production run.', 'Thermodynamic property targets', 'thermo'),
                  "n_sim_chain"        : (1, 0, 'Number of simulations required to calculate quantities.', 'Thermodynamic property targets', 'thermo'),
                  "n_molecules"        : (-1, 0, 'Provide the number of molecules in the structure (defaults to auto-detect).', 'Condensed phase properties', 'Liquid'),
+                 "hess_normalize_type": (0, -150, 'Specify an hessian target objective function normalization method.', 'Hessian targets', 'Hessian'),
                  },
     'bools'   : {"fdgrad"           : (0, -100, 'Finite difference gradient of objective function w/r.t. specified parameters', 'Use together with fd_ptypes (advanced usage)'),
                  "fdhess"           : (0, -100, 'Finite difference Hessian of objective function w/r.t. specified parameters', 'Use together with fd_ptypes (advanced usage)'),

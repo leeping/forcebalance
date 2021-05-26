@@ -16,6 +16,7 @@ from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
 from forcebalance.vibration import Vibration
+from forcebalance.hessian import Hessian
 from forcebalance.opt_geo_target import OptGeoTarget
 from forcebalance.torsion_profile import TorsionProfileTarget
 import networkx as nx
@@ -552,7 +553,7 @@ class AbInitio_SMIRNOFF(AbInitio):
         smirnoff_update_pgrads(self)
 
 class Vibration_SMIRNOFF(Vibration):
-    """ Vibrational frequency matching using TINKER. """
+    """ Vibrational frequency matching using using SMIRNOFF format powered by OpenMM. """
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="input.pdb")
@@ -568,6 +569,23 @@ class Vibration_SMIRNOFF(Vibration):
         # we update the self.pgrads here so it's not overwritten in rtarget.py
         smirnoff_update_pgrads(self)
 
+class Hessian_SMIRNOFF(Hessian):
+    """ Internal coordinate Hessian matching using SMIRNOFF format powered by OpenMM. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'coords',default="input.pdb")
+        self.set_option(tgt_opts,'pdb',default="conf.pdb")
+        self.set_option(tgt_opts,'mol2',forceprint=True)
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.engine_ = SMIRNOFF
+        ## Initialize base class.
+        super(Hessian_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
+
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        # we update the self.pgrads here so it's not overwritten in rtarget.py
+        smirnoff_update_pgrads(self)
+        
 class OptGeoTarget_SMIRNOFF(OptGeoTarget):
     """ Optimized geometry fitting using SMIRNOFF format powered by OpenMM """
     def __init__(self,options,tgt_opts,forcefield):

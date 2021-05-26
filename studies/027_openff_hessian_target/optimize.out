@@ -1,0 +1,692 @@
+#======================================================================#
+#| [1m            Welcome to ForceBalance version 1.8.1! =D             [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Yudong Qiu, Keri A. McKiernan                   [0m |#
+#| [1m          Jeffrey R. Wagner, Hyesu Jang, Simon Boothroyd          [0m |#
+#| [1m          Arthur Vigil, Erik G. Brandt, John Stoppelman           [0m |#
+#| [1m                  Johnny Israeli, Matt Thompson                   [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: optimize.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: smirnoff99Frosst_experimental.offxml
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  9.3800e+02 ] : Bonds/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.4000e+00 ] : Bonds/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  9.0000e+02 ] : Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3230e+00 ] : Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.8000e+02 ] : Bonds/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0900e+00 ] : Bonds/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.3400e+02 ] : Bonds/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0800e+00 ] : Bonds/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0950e+02 ] : Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  7.0000e+01 ] : Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2000e+02 ] : Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.4000e+02 ] : Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.2000e+02 ] : Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  1.0000e+02 ] : Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.2000e+02 ] : Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4000e+02 ] : Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]
+  17 [  3.6250e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  18 [  2.5000e+00 ] : ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]
+  19 [  1.4870e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.5700e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+  21 [  1.4590e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.5000e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X3]
+  23 [  1.9080e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+  24 [  1.0940e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+  25 [  1.6837e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
+  26 [  1.7000e-01 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   ProperTorsions/Proper/k1             : 3.62500e+00
+   vdW/Atom/rmin_half                   : 1.90800e+00
+   vdW/Atom/epsilon                     : 1.70000e-01
+   Bonds/Bond/k                         : 1.00000e+02
+   Bonds/Bond/length                    : 1.00000e-01
+   Angles/Angle/k                       : 5.00000e+01
+   Angles/Angle/angle                   : 1.00000e+01
+   ProperTorsions/Proper/k              : 2.00000e+00
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    Bonds/Bond/k                  : 1.00000e+02 ] : Bonds/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [    Bonds/Bond/length             : 1.00000e-01 ] : Bonds/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [    Bonds/Bond/k                  : 1.00000e+02 ] : Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [    Bonds/Bond/length             : 1.00000e-01 ] : Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [    Bonds/Bond/k                  : 1.00000e+02 ] : Bonds/Bond/k/[#6X4:1]-[#1:2]
+   5 [    Bonds/Bond/length             : 1.00000e-01 ] : Bonds/Bond/length/[#6X4:1]-[#1:2]
+   6 [    Bonds/Bond/k                  : 1.00000e+02 ] : Bonds/Bond/k/[#6X3:1]-[#1:2]
+   7 [    Bonds/Bond/length             : 1.00000e-01 ] : Bonds/Bond/length/[#6X3:1]-[#1:2]
+   8 [    Angles/Angle/angle            : 1.00000e+01 ] : Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [    Angles/Angle/k                : 5.00000e+01 ] : Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [    Angles/Angle/angle            : 1.00000e+01 ] : Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [    Angles/Angle/k                : 5.00000e+01 ] : Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [    Angles/Angle/angle            : 1.00000e+01 ] : Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [    Angles/Angle/k                : 5.00000e+01 ] : Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [    Angles/Angle/angle            : 1.00000e+01 ] : Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [    Angles/Angle/k                : 5.00000e+01 ] : Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [    ProperTorsions/Proper/k       : 2.00000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]
+  17 [    ProperTorsions/Proper/k       : 2.00000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  18 [    ProperTorsions/Proper/k       : 2.00000e+00 ] : ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]
+  19 [    vdW/Atom/rmin_half            : 1.90800e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [    vdW/Atom/epsilon              : 1.70000e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+  21 [    vdW/Atom/rmin_half            : 1.90800e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [    vdW/Atom/epsilon              : 1.70000e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X3]
+  23 [    vdW/Atom/rmin_half            : 1.90800e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+  24 [    vdW/Atom/epsilon              : 1.70000e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+  25 [    vdW/Atom/rmin_half            : 1.90800e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
+  26 [    vdW/Atom/epsilon              : 1.70000e-01 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['smirnoff99Frosst_experimental.offxml'] 
+priors                    OrderedDict([('Bonds/Bond/k', 100.0), ('Bonds/Bond/length', 0.1), ('Angles/Angle/k', 50.0), ('Angles/Angle/angle', 10.0), ('ProperTorsions/Proper/k', 2.0)]) 
+----------------------------------------------------------
+#========================================================#
+#| [92m             Setup for target ethene :              [0m |#
+#========================================================#
+coords                    conf.pdb 
+mol2                      ['input.mol2'] 
+precision                 double 
+platname                  Reference 
+name                      ethene 
+type                      HESSIAN_SMIRNOFF 
+weight                    500.0 
+h                         0.01 
+tgtdir                    targets/ethene 
+writelevel                1 
+----------------------------------------------------------
+#========================================================#
+#| [92m        SMIRNOFF Parameter Coverage Analysis        [0m |#
+#========================================================#
+Force field assignment data written to /Users/hyesu/Project/git-repo/fb-factories/hessian/studies/027_openff_hessian_target/smirnoff_parameter_assignments.json
+ idx Parameter                                                                                                   Count
+----------------------------------------------------------------------------------------------------------------------
+   0 Bonds/Bond/k/[#6X3:1]:[#6X3:2]                                                                       :          0
+   1 Bonds/Bond/length/[#6X3:1]:[#6X3:2]                                                                  :          0
+   2 Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]                                                                    :          0
+   3 Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]                                                               :          0
+   4 Bonds/Bond/k/[#6X4:1]-[#1:2]                                                                         :          0
+   5 Bonds/Bond/length/[#6X4:1]-[#1:2]                                                                    :          0
+   6 Bonds/Bond/k/[#6X3:1]-[#1:2]                                                                         :          4
+   7 Bonds/Bond/length/[#6X3:1]-[#1:2]                                                                    :          4
+   8 Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]                                                            :          0
+   9 Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]                                                                :          0
+  10 Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]                                                              :          0
+  11 Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]                                                                  :          0
+  12 Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]                                                             :          4
+  13 Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]                                                                 :          4
+  14 Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]                                              :          0
+  15 Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]                                                  :          0
+  16 ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]                                               :          0
+  17 ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]                                               :          0
+  18 ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]                                               :          0
+  19 vdW/Atom/rmin_half/[#1:1]-[#6X4]                                                                     :          0
+  20 vdW/Atom/epsilon/[#1:1]-[#6X4]                                                                       :          0
+  21 vdW/Atom/rmin_half/[#1:1]-[#6X3]                                                                     :          4
+  22 vdW/Atom/epsilon/[#1:1]-[#6X3]                                                                       :          4
+  23 vdW/Atom/rmin_half/[#6X4:1]                                                                          :          0
+  24 vdW/Atom/epsilon/[#6X4:1]                                                                            :          0
+  25 vdW/Atom/rmin_half/[#8X2H0+0:1]                                                                      :          0
+  26 vdW/Atom/epsilon/[#8X2H0+0:1]                                                                        :          0
+SNIRNOFF Parameter Coverage Analysis result: 6/27 parameters are covered.
+----------------------------------------------------------------------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+penalty_additive          1.0 
+normalize_weights         False 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   OPTIMIZE 
+trust0                    0.25 
+mintrust                  0.05 
+eps                       0.01 
+h                         0.01 
+h0                        0.01 
+convergence_objective     0.1 
+convergence_step          0.01 
+convergence_gradient      0.1 
+adapt_fac                 0.2 
+adapt_damp                1.0 
+err_tol                   1.0 
+input_file                optimize.in 
+----------------------------------------------------------
+Calculation started at 2021-05-25 09:10 PM
+#========================================================#
+#| [1m                  Main Optimizer                    [0m |#
+#| [1m   Newton-Raphson Method (Adaptive Trust Radius)    [0m |#
+#| [1m                                                    [0m |#
+#| [1m       [0mConvergence criteria (1 of 3 needed):        [0m |#
+#| [1m          [0mObjective Function  : 1.000e-01           [0m |#
+#| [1m          [0mNorm of Gradient    : 1.000e-01           [0m |#
+#| [1m          [0mParameter step size : 1.000e-02           [0m |#
+#========================================================#
+#========================================================#
+#|       Color Key for Objective Function -=X2=-        |#
+#|  [1mBold[0m = Initial step                                 |#
+#|  [92mGreen = Current lowest value of objective function[0m  |#
+#|  [91mRed = Objective function rises, step rejected[0m       |#
+#|  [0mNo color = Not at the lowest value                  |#
+#========================================================#
+#========================================================#
+#| [94m     Iteration 0: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#=====================================================================#
+#|                              Hessian                              |#
+#|  Target: ethene  Type: Hessian_SMIRNOFF  Objective = 1.56265e-03  |#
+#|  Diagonal          Reference   Calculated   Difference            |#
+#=====================================================================#
+    0                    0.6290       0.4919      -0.1371 
+    1                    0.3608       0.3278      -0.0330 
+    2                    0.3608       0.3278      -0.0330 
+    3                    0.3608       0.3278      -0.0330 
+    4                    0.3608       0.3278      -0.0330 
+    5                    0.2521       0.3262       0.0741 
+    6                    0.2264       0.2746       0.0482 
+    7                    0.2521       0.3262       0.0741 
+    8                    0.2264       0.2746       0.0482 
+    9                    0.0071       0.0067      -0.0004 
+    10                   0.0071       0.0067      -0.0004 
+    11                   0.0215       0.0195      -0.0020 
+    12                   0.0178       0.0193       0.0016 
+    13                   0.0178       0.0193       0.0016 
+    14                   0.0215       0.0195      -0.0020 
+    15                   0.0000      -0.0000      -0.0000 
+    16                   0.0000       0.0000       0.0000 
+    17                   0.0000      -0.0000      -0.0000 
+    18                  -0.0000       0.0000       0.0000 
+    19                  -0.0000       0.0000       0.0000 
+    20                  -0.0000       0.0000       0.0000 
+-----------------------------------------------------------------------
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+ethene                         0.00156    500.000 [94m     7.81324e-01[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     7.81324e-01[0m 
+----------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     0   0.000e+00   0.000e+00   1.240e+00[1m   7.81324e-01[0m   0.000e+00      0.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  0.00000000e+00 ] : Bonds/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  0.00000000e+00 ] : Bonds/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  0.00000000e+00 ] : Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  0.00000000e+00 ] : Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  0.00000000e+00 ] : Bonds/Bond/k/[#6X4:1]-[#1:2]
+   5 [  0.00000000e+00 ] : Bonds/Bond/length/[#6X4:1]-[#1:2]
+   6 [ -1.60355757e-01 ] : Bonds/Bond/k/[#6X3:1]-[#1:2]
+   7 [ -1.31938231e-02 ] : Bonds/Bond/length/[#6X3:1]-[#1:2]
+   8 [  0.00000000e+00 ] : Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  0.00000000e+00 ] : Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  0.00000000e+00 ] : Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  0.00000000e+00 ] : Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [ -3.69263660e-02 ] : Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  1.16644196e+00 ] : Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  0.00000000e+00 ] : Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  0.00000000e+00 ] : Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  0.00000000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]
+  17 [  0.00000000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  18 [  0.00000000e+00 ] : ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]
+  19 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  0.00000000e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+  21 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  3.87342203e-01 ] : vdW/Atom/epsilon/[#1:1]-[#6X3]
+  23 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+  24 [  0.00000000e+00 ] : vdW/Atom/epsilon/[#6X4:1]
+  25 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
+  26 [  0.00000000e+00 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Finding trust radius: H+0.0000*I, length 2.7505e-01 (target 2.5000e-01)
+Finding trust radius: H+9.0000*I, length 9.1300e-02 (target 2.5000e-01)
+Finding trust radius: H+23.5623*I, length 4.4048e-02 (target 2.5000e-01)
+Finding trust radius: H+0.0000*I, length 2.7505e-01 (target 2.5000e-01)
+Finding trust radius: H+3.4377*I, length 1.5492e-01 (target 2.5000e-01)
+Finding trust radius: H+1.3131*I, length 2.1165e-01 (target 2.5000e-01)
+Finding trust radius: H+0.1322*I, length 2.6687e-01 (target 2.5000e-01)
+Finding trust radius: H+0.1612*I, length 2.6515e-01 (target 2.5000e-01)
+Finding trust radius: H+0.4704*I, length 2.4816e-01 (target 2.5000e-01)
+Finding trust radius: H+0.5437*I, length 2.4446e-01 (target 2.5000e-01)
+Finding trust radius: H+0.4154*I, length 2.5101e-01 (target 2.5000e-01)
+Finding trust radius: H+0.4349*I, length 2.4999e-01 (target 2.5000e-01)
+Finding trust radius: H+0.4344*I, length 2.5001e-01 (target 2.5000e-01)
+Finding trust radius: H+0.4347*I, length 2.5000e-01 (target 2.5000e-01)
+Finding trust radius: H+0.4347*I, length 2.5000e-01 (target 2.5000e-01)
+Finding trust radius: H+0.4347*I, length 2.5000e-01 (target 2.5000e-01)
+Trust-radius step found (length 2.5000e-01),  4.3466e-01 added to Hessian diagonal
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/k/[#6X4:1]-[#1:2]
+   5 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/length/[#6X4:1]-[#1:2]
+   6 [  0.0000e+00 + 6.0707e-02 =  6.0707e-02 ] : Bonds/Bond/k/[#6X3:1]-[#1:2]
+   7 [  0.0000e+00 + 2.2920e-03 =  2.2920e-03 ] : Bonds/Bond/length/[#6X3:1]-[#1:2]
+   8 [  0.0000e+00 + 6.4283e-17 =  6.4283e-17 ] : Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  0.0000e+00 - 2.8683e-19 = -2.8683e-19 ] : Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  0.0000e+00 + 1.2986e-19 =  1.2986e-19 ] : Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  0.0000e+00 + 9.3155e-21 =  9.3155e-21 ] : Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  0.0000e+00 + 8.1348e-03 =  8.1348e-03 ] : Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  0.0000e+00 - 2.2860e-01 = -2.2860e-01 ] : Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]
+  17 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  18 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]
+  19 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+  21 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  0.0000e+00 - 8.0534e-02 = -8.0534e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X3]
+  23 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+  24 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/epsilon/[#6X4:1]
+  25 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
+  26 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  9.3800e+02 + 0.0000e+00 =  9.3800e+02 ] : Bonds/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.4000e+00 + 0.0000e+00 =  1.4000e+00 ] : Bonds/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  9.0000e+02 + 0.0000e+00 =  9.0000e+02 ] : Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3230e+00 + 0.0000e+00 =  1.3230e+00 ] : Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.8000e+02 + 0.0000e+00 =  6.8000e+02 ] : Bonds/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0900e+00 + 0.0000e+00 =  1.0900e+00 ] : Bonds/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.3400e+02 + 6.0707e+00 =  7.4007e+02 ] : Bonds/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0800e+00 + 2.2920e-04 =  1.0802e+00 ] : Bonds/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0950e+02 + 0.0000e+00 =  1.0950e+02 ] : Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  7.0000e+01 + 0.0000e+00 =  7.0000e+01 ] : Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2000e+02 + 0.0000e+00 =  1.2000e+02 ] : Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.4000e+02 + 0.0000e+00 =  1.4000e+02 ] : Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.2000e+02 + 8.1348e-02 =  1.2008e+02 ] : Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  1.0000e+02 - 1.1430e+01 =  8.8570e+01 ] : Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.2000e+02 + 0.0000e+00 =  1.2000e+02 ] : Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4000e+02 + 0.0000e+00 =  1.4000e+02 ] : Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]
+  17 [  3.6250e+00 + 0.0000e+00 =  3.6250e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  18 [  2.5000e+00 + 0.0000e+00 =  2.5000e+00 ] : ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]
+  19 [  1.4870e+00 + 0.0000e+00 =  1.4870e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.5700e-02 + 0.0000e+00 =  1.5700e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+  21 [  1.4590e+00 + 0.0000e+00 =  1.4590e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.5000e-02 - 1.3691e-02 =  1.3092e-03 ] : vdW/Atom/epsilon/[#1:1]-[#6X3]
+  23 [  1.9080e+00 + 0.0000e+00 =  1.9080e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+  24 [  1.0940e-01 + 0.0000e+00 =  1.0940e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+  25 [  1.6837e+00 + 0.0000e+00 =  1.6837e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
+  26 [  1.7000e-01 + 0.0000e+00 =  1.7000e-01 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 1: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#=====================================================================#
+#|                              Hessian                              |#
+#|  Target: ethene  Type: Hessian_SMIRNOFF  Objective = 1.10254e-03  |#
+#|  Diagonal          Reference   Calculated   Difference            |#
+#=====================================================================#
+    0                    0.6290       0.4907      -0.1382 
+    1                    0.3608       0.3303      -0.0304 
+    2                    0.3608       0.3303      -0.0304 
+    3                    0.3608       0.3303      -0.0304 
+    4                    0.3608       0.3303      -0.0304 
+    5                    0.2521       0.2860       0.0339 
+    6                    0.2264       0.2545       0.0282 
+    7                    0.2521       0.2860       0.0339 
+    8                    0.2264       0.2545       0.0282 
+    9                    0.0071       0.0068      -0.0004 
+    10                   0.0071       0.0068      -0.0004 
+    11                   0.0215       0.0195      -0.0020 
+    12                   0.0178       0.0194       0.0016 
+    13                   0.0178       0.0194       0.0016 
+    14                   0.0215       0.0195      -0.0020 
+    15                   0.0000      -0.0000      -0.0000 
+    16                   0.0000      -0.0000      -0.0000 
+    17                   0.0000       0.0000       0.0000 
+    18                  -0.0000       0.0000       0.0000 
+    19                  -0.0000       0.0000       0.0000 
+    20                  -0.0000       0.0000       0.0000 
+-----------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+ethene                         0.00110    500.000 [92m     5.51269e-01[0m ( -2.301e-01 ) 
+Regularization                 0.06250      1.000 [91m     6.25000e-02[0m ( +6.250e-02 ) 
+Total                                             [92m     6.13769e-01[0m ( -1.676e-01 ) 
+-------------------------------------------------------------------------------------
+Creating the directory /Users/hyesu/Project/git-repo/fb-factories/hessian/studies/027_openff_hessian_target/result/optimize to print the force field
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     1   2.500e-01   2.500e-01   1.045e-01[92m   6.13769e-01[0m  -1.676e-01      1.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  0.00000000e+00 ] : Bonds/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  0.00000000e+00 ] : Bonds/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  0.00000000e+00 ] : Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  0.00000000e+00 ] : Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  0.00000000e+00 ] : Bonds/Bond/k/[#6X4:1]-[#1:2]
+   5 [  0.00000000e+00 ] : Bonds/Bond/length/[#6X4:1]-[#1:2]
+   6 [ -2.63952160e-02 ] : Bonds/Bond/k/[#6X3:1]-[#1:2]
+   7 [  4.86413615e-03 ] : Bonds/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.28566078e-16 ] : Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [ -5.73662646e-19 ] : Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  2.59727595e-19 ] : Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.86310876e-20 ] : Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.22459988e-02 ] : Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  9.91254934e-02 ] : Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  0.00000000e+00 ] : Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  0.00000000e+00 ] : Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  0.00000000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]
+  17 [  0.00000000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  18 [  0.00000000e+00 ] : ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]
+  19 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  0.00000000e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+  21 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.49162717e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X3]
+  23 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+  24 [  0.00000000e+00 ] : vdW/Atom/epsilon/[#6X4:1]
+  25 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
+  26 [  0.00000000e+00 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
+----------------------------------------------------------
+Increasing trust radius to  3.0000e-01
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 2.6226e-02)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/k/[#6X4:1]-[#1:2]
+   5 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Bonds/Bond/length/[#6X4:1]-[#1:2]
+   6 [  6.0707e-02 + 1.1909e-02 =  7.2615e-02 ] : Bonds/Bond/k/[#6X3:1]-[#1:2]
+   7 [  2.2920e-03 - 2.4548e-03 = -1.6278e-04 ] : Bonds/Bond/length/[#6X3:1]-[#1:2]
+   8 [  6.4283e-17 - 3.7533e-17 =  2.6750e-17 ] : Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [ -2.8683e-19 + 9.8095e-19 =  6.9412e-19 ] : Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2986e-19 + 9.1839e-19 =  1.0483e-18 ] : Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  9.3155e-21 - 1.7977e-20 = -8.6618e-21 ] : Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  8.1348e-03 - 6.2181e-03 =  1.9166e-03 ] : Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [ -2.2860e-01 - 2.2385e-02 = -2.5098e-01 ] : Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]
+  17 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  18 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]
+  19 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+  21 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [ -8.0534e-02 - 4.4454e-04 = -8.0979e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X3]
+  23 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+  24 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/epsilon/[#6X4:1]
+  25 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
+  26 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  9.3800e+02 + 0.0000e+00 =  9.3800e+02 ] : Bonds/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.4000e+00 + 0.0000e+00 =  1.4000e+00 ] : Bonds/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  9.0000e+02 + 0.0000e+00 =  9.0000e+02 ] : Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3230e+00 + 0.0000e+00 =  1.3230e+00 ] : Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.8000e+02 + 0.0000e+00 =  6.8000e+02 ] : Bonds/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0900e+00 + 0.0000e+00 =  1.0900e+00 ] : Bonds/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.4007e+02 + 1.1909e+00 =  7.4126e+02 ] : Bonds/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0802e+00 - 2.4548e-04 =  1.0800e+00 ] : Bonds/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0950e+02 + 0.0000e+00 =  1.0950e+02 ] : Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  7.0000e+01 + 0.0000e+00 =  7.0000e+01 ] : Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2000e+02 + 0.0000e+00 =  1.2000e+02 ] : Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.4000e+02 + 0.0000e+00 =  1.4000e+02 ] : Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.2008e+02 - 6.2181e-02 =  1.2002e+02 ] : Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  8.8570e+01 - 1.1192e+00 =  8.7451e+01 ] : Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.2000e+02 + 0.0000e+00 =  1.2000e+02 ] : Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4000e+02 + 0.0000e+00 =  1.4000e+02 ] : Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  0.0000e+00 + 0.0000e+00 =  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]
+  17 [  3.6250e+00 + 0.0000e+00 =  3.6250e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  18 [  2.5000e+00 + 0.0000e+00 =  2.5000e+00 ] : ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]
+  19 [  1.4870e+00 + 0.0000e+00 =  1.4870e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.5700e-02 + 0.0000e+00 =  1.5700e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+  21 [  1.4590e+00 + 0.0000e+00 =  1.4590e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.3092e-03 - 7.5572e-05 =  1.2336e-03 ] : vdW/Atom/epsilon/[#1:1]-[#6X3]
+  23 [  1.9080e+00 + 0.0000e+00 =  1.9080e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+  24 [  1.0940e-01 + 0.0000e+00 =  1.0940e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+  25 [  1.6837e+00 + 0.0000e+00 =  1.6837e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
+  26 [  1.7000e-01 + 0.0000e+00 =  1.7000e-01 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 2: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+
+#=====================================================================#
+#|                              Hessian                              |#
+#|  Target: ethene  Type: Hessian_SMIRNOFF  Objective = 1.07524e-03  |#
+#|  Diagonal          Reference   Calculated   Difference            |#
+#=====================================================================#
+    0                    0.6290       0.4907      -0.1382 
+    1                    0.3608       0.3309      -0.0299 
+    2                    0.3608       0.3309      -0.0299 
+    3                    0.3608       0.3309      -0.0299 
+    4                    0.3608       0.3309      -0.0299 
+    5                    0.2521       0.2824       0.0303 
+    6                    0.2264       0.2528       0.0264 
+    7                    0.2521       0.2824       0.0303 
+    8                    0.2264       0.2528       0.0264 
+    9                    0.0071       0.0067      -0.0004 
+    10                   0.0071       0.0067      -0.0004 
+    11                   0.0215       0.0195      -0.0020 
+    12                   0.0178       0.0194       0.0016 
+    13                   0.0178       0.0194       0.0016 
+    14                   0.0215       0.0195      -0.0020 
+    15                   0.0000      -0.0000      -0.0000 
+    16                   0.0000       0.0000       0.0000 
+    17                   0.0000       0.0000       0.0000 
+    18                  -0.0000       0.0000       0.0000 
+    19                  -0.0000       0.0000       0.0000 
+    20                  -0.0000       0.0000       0.0000 
+-----------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+ethene                         0.00108    500.000 [92m     5.37618e-01[0m ( -1.365e-02 ) 
+Regularization                 0.07483      1.000 [91m     7.48272e-02[0m ( +1.233e-02 ) 
+Total                                             [92m     6.12445e-01[0m ( -1.324e-03 ) 
+-------------------------------------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_1.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     2   2.735e-01   2.623e-02   3.065e-03[92m   6.12445e-01[0m  -1.324e-03      1.008
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [  0.00000000e+00 ] : Bonds/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  0.00000000e+00 ] : Bonds/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  0.00000000e+00 ] : Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  0.00000000e+00 ] : Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  0.00000000e+00 ] : Bonds/Bond/k/[#6X4:1]-[#1:2]
+   5 [  0.00000000e+00 ] : Bonds/Bond/length/[#6X4:1]-[#1:2]
+   6 [ -4.20685236e-07 ] : Bonds/Bond/k/[#6X3:1]-[#1:2]
+   7 [  2.88630878e-05 ] : Bonds/Bond/length/[#6X3:1]-[#1:2]
+   8 [  5.34995150e-17 ] : Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  1.38824062e-18 ] : Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  2.09651237e-18 ] : Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [ -1.73236936e-20 ] : Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  9.32369107e-05 ] : Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [ -3.05650316e-05 ] : Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  0.00000000e+00 ] : Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  0.00000000e+00 ] : Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  0.00000000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]
+  17 [  0.00000000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  18 [  0.00000000e+00 ] : ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]
+  19 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  0.00000000e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+  21 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [ -3.06378951e-03 ] : vdW/Atom/epsilon/[#1:1]-[#6X3]
+  23 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+  24 [  0.00000000e+00 ] : vdW/Atom/epsilon/[#6X4:1]
+  25 [  0.00000000e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
+  26 [  0.00000000e+00 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
+----------------------------------------------------------
+Convergence criterion reached for gradient norm (1.00e-01)
+Convergence criterion reached for objective function (1.00e-01)
+#========================================================#
+#| [92m               [0m[1mOptimization Converged[0m               [0m |#
+#| [92m           Final objective function value           [0m |#
+#| [92m  Full:  6.124454e-01  Un-penalized:  5.376182e-01  [0m |#
+#========================================================#
+#========================================================#
+#| [94m           Final optimization parameters:           [0m |#
+#========================================================#
+   0 [  0.0000e+00 ] : Bonds/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  0.0000e+00 ] : Bonds/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  0.0000e+00 ] : Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  0.0000e+00 ] : Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  0.0000e+00 ] : Bonds/Bond/k/[#6X4:1]-[#1:2]
+   5 [  0.0000e+00 ] : Bonds/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.2615e-02 ] : Bonds/Bond/k/[#6X3:1]-[#1:2]
+   7 [ -1.6278e-04 ] : Bonds/Bond/length/[#6X3:1]-[#1:2]
+   8 [  2.6750e-17 ] : Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  6.9412e-19 ] : Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.0483e-18 ] : Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [ -8.6618e-21 ] : Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.9166e-03 ] : Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [ -2.5098e-01 ] : Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  0.0000e+00 ] : Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  0.0000e+00 ] : Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]
+  17 [  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  18 [  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]
+  19 [  0.0000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  0.0000e+00 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+  21 [  0.0000e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [ -8.0979e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X3]
+  23 [  0.0000e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+  24 [  0.0000e+00 ] : vdW/Atom/epsilon/[#6X4:1]
+  25 [  0.0000e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
+  26 [  0.0000e+00 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
+#========================================================#
+#| [94m             Final physical parameters:             [0m |#
+#========================================================#
+   0 [  9.3800e+02 ] : Bonds/Bond/k/[#6X3:1]:[#6X3:2]
+   1 [  1.4000e+00 ] : Bonds/Bond/length/[#6X3:1]:[#6X3:2]
+   2 [  9.0000e+02 ] : Bonds/Bond/k/[#6X3a:1]-[#8X2H0:2]
+   3 [  1.3230e+00 ] : Bonds/Bond/length/[#6X3a:1]-[#8X2H0:2]
+   4 [  6.8000e+02 ] : Bonds/Bond/k/[#6X4:1]-[#1:2]
+   5 [  1.0900e+00 ] : Bonds/Bond/length/[#6X4:1]-[#1:2]
+   6 [  7.4126e+02 ] : Bonds/Bond/k/[#6X3:1]-[#1:2]
+   7 [  1.0800e+00 ] : Bonds/Bond/length/[#6X3:1]-[#1:2]
+   8 [  1.0950e+02 ] : Angles/Angle/angle/[#1:1]-[#6X4:2]-[#1:3]
+   9 [  7.0000e+01 ] : Angles/Angle/k/[#1:1]-[#6X4:2]-[#1:3]
+  10 [  1.2000e+02 ] : Angles/Angle/angle/[*:1]~[#6X3:2]~[*:3]
+  11 [  1.4000e+02 ] : Angles/Angle/k/[*:1]~[#6X3:2]~[*:3]
+  12 [  1.2002e+02 ] : Angles/Angle/angle/[#1:1]-[#6X3:2]~[*:3]
+  13 [  8.7451e+01 ] : Angles/Angle/k/[#1:1]-[#6X3:2]~[*:3]
+  14 [  1.2000e+02 ] : Angles/Angle/angle/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  15 [  1.4000e+02 ] : Angles/Angle/k/[#6X3,#7:1]~;@[#8;r:2]~;@[#6X3,#7:3]
+  16 [  0.0000e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]-[#6X4:3]-[*:4]
+  17 [  3.6250e+00 ] : ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
+  18 [  2.5000e+00 ] : ProperTorsions/Proper/k1/[*:1]-[#8X2:2]@[#6X3:3]~[*:4]
+  19 [  1.4870e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X4]
+  20 [  1.5700e-02 ] : vdW/Atom/epsilon/[#1:1]-[#6X4]
+  21 [  1.4590e+00 ] : vdW/Atom/rmin_half/[#1:1]-[#6X3]
+  22 [  1.2336e-03 ] : vdW/Atom/epsilon/[#1:1]-[#6X3]
+  23 [  1.9080e+00 ] : vdW/Atom/rmin_half/[#6X4:1]
+  24 [  1.0940e-01 ] : vdW/Atom/epsilon/[#6X4:1]
+  25 [  1.6837e+00 ] : vdW/Atom/rmin_half/[#8X2H0+0:1]
+  26 [  1.7000e-01 ] : vdW/Atom/epsilon/[#8X2H0+0:1]
+----------------------------------------------------------
+Backing up result/optimize/smirnoff99Frosst_experimental.offxml -> result/optimize/smirnoff99Frosst_experimental_2.offxml
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+Wall time since calculation start: 4.4 seconds
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#

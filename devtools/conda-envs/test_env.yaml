@@ -27,3 +27,4 @@ dependencies:
   #- openeye-toolkits
 
   - ndcctools
+  - geometric

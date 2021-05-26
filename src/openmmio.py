@@ -1123,7 +1123,7 @@ class OpenMM(Engine):
         Result = self.evaluate_(dipole=True, traj=True)
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
-    def build_mass_weighted_hessian(self, shot=0, optimize=True):
+    def build_mass_weighted_hessian(self, shot=0, optimize=True, mass_weighted_hessian_only=True):
         """OpenMM single frame hessian evaluation
         Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
 
@@ -1142,10 +1142,15 @@ class OpenMM(Engine):
         """
         self.update_simulation()
         if optimize is True:
-            self.optimize(shot, crit=1e-8)
+            _, _, M_opt = self.optimize(shot, crit=1e-8)
         else:
             warn_once("Computing mass-weighted hessian without geometry optimization")
             self.set_positions(shot)
+            #it returns M_opt with original position 
+            M_opt = deepcopy(self.mol[0])
+            X0 = self.simulation.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(angstrom)[self.realAtomIdxs]
+            M_opt.xyzs = [X0]
+            
         context = self.simulation.context
         pos = context.getState(getPositions=True).getPositions(asNumpy=True)
         # pull real atoms and their mass
@@ -1153,12 +1158,13 @@ class OpenMM(Engine):
         # initialize an empty hessian matrix
         noa = len(self.realAtomIdxs)
         hessian = np.empty((noa*3, noa*3), dtype=float)
+        mass_weighted_hessian = np.empty((noa*3, noa*3), dtype=float)
         # finite difference step size
         diff = Quantity(0.0001, unit=nanometer)
         coef = 1.0 / (0.0001 * 2) # 1/2h
         for i, i_atom in enumerate(self.realAtomIdxs):
             massWeight = 1.0 / np.sqrt(massList * massList[i])
-            # loop over the x, y, z coordinates
+            # loop over the x, y, z coordinates            
             for j in range(3):
                 # plus perturbation
                 pos[i_atom][j] += diff
@@ -1173,15 +1179,25 @@ class OpenMM(Engine):
                 # set the perturbation back to zero
                 pos[i_atom][j] += diff
                 # fill one row of the hessian matrix
-                hessian[i*3+j] = np.ravel((grad_plus - grad_minus) * coef * massWeight[:, np.newaxis])
+                hessian[i*3+j] = np.ravel((grad_plus - grad_minus) * coef)
+                mass_weighted_hessian[i*3+j] = np.ravel((grad_plus - grad_minus) * coef * massWeight[:, np.newaxis])
+
         # make hessian symmetric by averaging upper right and lower left
         hessian += hessian.T
         hessian *= 0.5
+
+        mass_weighted_hessian += mass_weighted_hessian.T
+        mass_weighted_hessian *= 0.5
+
         # recover the original position
         context.setPositions(pos)
-        return hessian
+        gradient  = context.getState(getForces=True).getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole)).flatten()
+        if mass_weighted_hessian_only: 
+            return mass_weighted_hessian
+        else: 
+            return pos, gradient, hessian, mass_weighted_hessian, M_opt
 
-    def normal_modes(self, shot=0, optimize=True):
+    def normal_modes(self, shot=0, optimize=True, for_hessian_target=False):
         """OpenMM Normal Mode Analysis
         Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
 
@@ -1208,9 +1224,10 @@ class OpenMM(Engine):
         if noa < 2:
             error('normal mode analysis not suitable for system with one or less atoms')
         # step 1: build a full hessian matrix
-        hessian_matrix = self.build_mass_weighted_hessian(shot=shot, optimize=optimize)
+        coords, gradient, hessian, mass_weighted_hessian, M_opt = self.build_mass_weighted_hessian(shot=shot, optimize=optimize, mass_weighted_hessian_only=False)
+
         # step 2: diagonalize the hessian matrix
-        eigvals, eigvecs = np.linalg.eigh(hessian_matrix)
+        eigvals, eigvecs = np.linalg.eigh(mass_weighted_hessian)
         # step 3: convert eigenvalues to frequencies
         coef = 0.5 / np.pi * 33.3564095 # 10^12 Hz => cm-1
         negatives = (eigvals >= 0).astype(int) * 2 - 1 # record the negative ones
@@ -1229,7 +1246,10 @@ class OpenMM(Engine):
         larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])
         freqs = freqs[larger_freq_idxs]
         normal_modes = normal_modes[larger_freq_idxs]
-        return freqs, normal_modes
+        if not for_hessian_target:
+            return freqs, normal_modes
+        else: 
+            return coords, gradient, hessian, freqs, normal_modes, M_opt
 
     def optimize(self, shot, crit=1e-4, disable_vsite=False, align=True, include_restraint_energy=False):
 
