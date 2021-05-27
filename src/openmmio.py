@@ -1251,17 +1251,6 @@ class OpenMM(Engine):
         else: 
             return coords, gradient, hessian, freqs, normal_modes, M_opt
 
-    def _update_positions(self, X1, disable_vsite):
-        """A convenience method for updating the positions of the simulation context."""
-
-        if disable_vsite:
-            self.simulation.context.setPositions(X1 * angstrom)
-        else:
-            # Create virtual sites before setting positions
-            mod = Modeller(self.pdb.topology, X1*angstrom)
-            mod.addExtraParticles(self.forcefield)
-            self.simulation.context.setPositions(ResetVirtualSites_fast(mod.getPositions(), self.vsinfo))
-
     def optimize(self, shot, crit=1e-4, disable_vsite=False, align=True, include_restraint_energy=False):
 
         """
@@ -1326,9 +1315,13 @@ class OpenMM(Engine):
         if not self.pbc and align:
             M.align(center=False)
         X1 = M.xyzs[1]
-
-        self._update_positions(X1, disable_vsite)
-
+        if disable_vsite:
+            self.simulation.context.setPositions(X1 * angstrom)
+        else:
+            # Create virtual sites before setting positions
+            mod = Modeller(self.pdb.topology, X1*angstrom)
+            mod.addExtraParticles(self.forcefield)
+            self.simulation.context.setPositions(ResetVirtualSites_fast(mod.getPositions(), self.vsinfo))
         return E, M.ref_rmsd(0)[1], M[1]
 
     def getContextPosition(self, removeVirtual=False):
