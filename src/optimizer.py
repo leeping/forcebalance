@@ -21,7 +21,7 @@ from numpy.linalg import multi_dot
 from copy import deepcopy
 import forcebalance
 from forcebalance.parser import parse_inputs
-from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd, wopen, bak, est124
+from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd, wopen, bak, est124, lp_load
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
@@ -1568,7 +1568,7 @@ class Optimizer(forcebalance.BaseClass):
         if self.rchk_fnm is not None:
             absfnm = os.path.join(self.root,self.rchk_fnm)
             if os.path.exists(absfnm):
-                self.chk = pickle.load(open(absfnm))
+                self.chk = lp_load(absfnm)
             else:
                 logger.info("\x1b[40m\x1b[1;92mWARNING:\x1b[0m read_chk is set to True, but checkpoint file not loaded (wrong filename or doesn't exist?)\n")
         return self.chk
