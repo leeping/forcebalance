@@ -526,9 +526,9 @@ class SMIRNOFF(OpenMM):
         n_v_sites = (
             self.mod.getTopology().getNumAtoms() - self.pdb.topology.getNumAtoms()
         )
-
-        # Add placeholder positions for an v-sites.
-        X1 = (X1 + [Vec3(0.0, 0.0, 0.0)] * n_v_sites) * angstrom
+        if n_v_sites > 0:
+            # Add placeholder positions for any v-sites.
+            X1 = (X1 + [Vec3(0.0, 0.0, 0.0)] * n_v_sites) * angstrom
 
         self.simulation.context.setPositions(X1)
         self.simulation.context.computeVirtualSites()
