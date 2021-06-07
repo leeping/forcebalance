@@ -518,6 +518,7 @@ class SMIRNOFF(OpenMM):
             self.create_simulation(**self.simkwargs)
 
     def _update_positions(self, X1, disable_vsite):
+        # X1 is a numpy ndarray not vec3
 
         if disable_vsite:
             super(SMIRNOFF, self)._update_positions(X1, disable_vsite)
@@ -526,9 +527,10 @@ class SMIRNOFF(OpenMM):
         n_v_sites = (
             self.mod.getTopology().getNumAtoms() - self.pdb.topology.getNumAtoms()
         )
-        if n_v_sites > 0:
-            # Add placeholder positions for any v-sites.
-            X1 = (X1 + [Vec3(0.0, 0.0, 0.0)] * n_v_sites)
+
+        # Add placeholder positions for any v-sites.
+        sites = np.zeros((n_v_sites, 3))
+        X1 = np.vstack((X1, sites))
 
         self.simulation.context.setPositions(X1 * angstrom)
         self.simulation.context.computeVirtualSites()
