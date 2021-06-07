@@ -528,9 +528,9 @@ class SMIRNOFF(OpenMM):
         )
         if n_v_sites > 0:
             # Add placeholder positions for any v-sites.
-            X1 = (X1 + [Vec3(0.0, 0.0, 0.0)] * n_v_sites) * angstrom
+            X1 = (X1 + [Vec3(0.0, 0.0, 0.0)] * n_v_sites)
 
-        self.simulation.context.setPositions(X1)
+        self.simulation.context.setPositions(X1 * angstrom)
         self.simulation.context.computeVirtualSites()
 
     def interaction_energy(self, fraga, fragb):
