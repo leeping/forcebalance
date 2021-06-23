@@ -1,0 +1,30 @@
+Global,eps0_denom,1
+Global,cp_denom,1
+Global,kappa_denom,1
+Global,alpha_denom,1
+Global,surf_ten_denom,1
+Global,rho_denom,1
+Global,hvap_denom,1
+
+# Name,Water
+# Ref,Unknown
+# 295.16,1 atm
+# Cp_err,Surf_Ten_err,Rho_err
+# 0,0,0
+
+# Name,Water
+# Ref,Unknown
+# 273.16,1 atm
+# Cp_err,Surf_Ten_err,Rho_err
+# 0,0,0
+
+# Name,Water
+# Ref,Unknown
+# 305.16,1 atm
+# Cp_err,Surf_Ten_err,Rho_err
+# 0,0,0
+
+T,P,Cp,Cp_wt,Surf_Ten,Surf_Ten_wt,Rho,Rho_wt
+295.16,1 atm,0.075359,1,5.246249761,1,997.73,1
+273.16,1 atm,0.076023,1,5.722317316000001,1,999.79,1
+305.16,1 atm,0.075299,1,5.023549128999999,1,994.98,1
