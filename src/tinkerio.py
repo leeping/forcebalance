@@ -951,8 +951,8 @@ class TINKER(Engine):
             self.optimize(0, method="bfgs", crit=1)
             os.system("mv %s.xyz_2 %s.xyz" % (self.name, self.name))
             if verbose: logger.info("Done\n")
-        if 'OPENMM_CUDA_COMPILER' in os.environ.keys() and 'gas' not in self.name:
-            dynamickeyword='dynamic_omm'
+        if 'GPUDYNAMICS' in os.environ.keys() and 'gas' not in self.name:
+            dynamickeyword='dynamic_gpu'
             suffix=' N'
         else:
             dynamickeyword='dynamic'
