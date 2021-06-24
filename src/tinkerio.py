@@ -373,6 +373,28 @@ class TINKER(Engine):
                     last=ls[1:]
                     first=ls[0]
                     vn=first+'.'+''.join(last)
+                    versionstr=''
+                    for e in vn:
+                        if e.isdigit() or e=='.':
+                            versionstr+=e
+                    count=versionstr.count('.')
+                    if count==2:
+                        newversionstr=''
+                        for eidx in range(len(versionstr)):
+                            e=versionstr[eidx]
+                            if eidx>1:
+                                if e!='.':
+                                    newversionstr+=e
+                            else:
+                                newversionstr+=e
+                        versionstr=newversionstr
+                    vn=versionstr
+                    vn = float(vn)
+                if 'GPUDYNAMICS' in os.environ.keys(): # then tinker 9 version
+                    vn_need=1
+                else:
+                    vn_need = 6.3
+
                     vn = float(vn)
                 vn_need = 6.3
                 try:
