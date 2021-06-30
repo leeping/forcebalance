@@ -519,7 +519,10 @@ class SMIRNOFF(OpenMM):
         )
 
         # Add placeholder positions for an v-sites.
-        X1 = (X1 + [Vec3(0.0, 0.0, 0.0)] * n_v_sites) * angstrom
+        if isinstance(X1, np.ndarray):
+            X1 = numpy.vstack([X1, np.zeros((n_v_sites, 3))]) * angstrom
+        else:
+            X1 = (X1 + [Vec3(0.0, 0.0, 0.0)] * n_v_sites) * angstrom
 
         self.simulation.context.setPositions(X1)
         self.simulation.context.computeVirtualSites()
