@@ -23,11 +23,6 @@ from collections import OrderedDict
 from forcebalance.output import getLogger
 from forcebalance.optimizer import Counter
 from forcebalance.vibration import read_reference_vdata, vib_overlap
-from geometric.internal import PrimitiveInternalCoordinates, Distance, Angle, Dihedral, OutOfPlane
-
-import matplotlib.pyplot as plt
-import matplotlib.colors as colors
-from mpl_toolkits.axes_grid1 import make_axes_locatable, axes_size
 
 import copy
 logger = getLogger(__name__)
@@ -39,7 +34,7 @@ Hartree2kJmol = 2625.4996394798254
 class Hessian(Target):
     def __init__(self,options,tgt_opts,forcefield):
         """Initialization."""
-        
+
         # Initialize the SuperClass!
         super(Hessian,self).__init__(options,tgt_opts,forcefield)
         #======================================#
@@ -73,11 +68,14 @@ class Hessian(Target):
         self.denom = 1
 
     def _build_internal_coordinates(self):
+
+        from geometric.internal import PrimitiveInternalCoordinates
+
         m  = Molecule(os.path.join(self.tgtdir, "input.mol2"))
         IC = PrimitiveInternalCoordinates(m)
         self.IC = IC
 
-    def read_reference_data(self): # HJ: copied from vibration.py and modified 
+    def read_reference_data(self): # HJ: copied from vibration.py and modified
         """ Read the reference hessian data from a file. """
         self.ref_Hq_flat = np.loadtxt(self.hfnm)
         Hq_size =int(np.sqrt(len(self.ref_Hq_flat)))
@@ -89,15 +87,16 @@ class Hessian(Target):
         return
 
     def get_wts(self):
-        
+
+        from geometric.internal import Distance, Angle, Dihedral
         nb = len([ic for ic in self.IC.Internals if isinstance(ic,Distance) ])
         nba = nb + len([ic for ic in self.IC.Internals if isinstance(ic,Angle) ])
         nbap = nba + len([ic for ic in self.IC.Internals if isinstance(ic,Dihedral) ])
 
         Hq_size =int(np.sqrt(len(self.ref_Hq_flat)))
-        if  self.hess_normalize_type == 0 : 
+        if  self.hess_normalize_type == 0 :
             self.wts = np.ones(len(self.ref_Hq_flat))
-        else: 
+        else:
             raise NotImplementedError
         # normalize weights
         self.wts /= np.sum(self.wts)
@@ -113,7 +112,7 @@ class Hessian(Target):
 
     def hessian_driver(self):
         if hasattr(self, 'engine') and hasattr(self.engine, 'normal_modes'):
-            if self.optimize_geometry == 1: 
+            if self.optimize_geometry == 1:
                 return self.engine.normal_modes(for_hessian_target=True)
             else:
                 return self.engine.normal_modes(optimize=False, for_hessian_target=True)
@@ -127,10 +126,11 @@ class Hessian(Target):
         dq = multi_dot([Bmat,dx])
         return dq
 
-    def calc_int_normal_mode(self, xyz, cart_normal_mode):                
+    def calc_int_normal_mode(self, xyz, cart_normal_mode):
+        from geometric.internal import Distance, Angle, Dihedral, OutOfPlane
         ninternals_eff= len([ic for ic in self.IC.Internals if isinstance(ic,(Distance, Angle, Dihedral, OutOfPlane))])
         int_normal_mode = []
-        for idx, vec in enumerate(cart_normal_mode): 
+        for idx, vec in enumerate(cart_normal_mode):
             # convert cartesian coordinates displacement to internal coordinates
             dq = self.converting_to_int_vec(xyz, vec)
             int_normal_mode.append(dq[:ninternals_eff]) # disregard Translations and Rotations
@@ -141,14 +141,14 @@ class Hessian(Target):
         Answer = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np, self.FF.np))}
         def compute(mvals_):
             self.FF.make(mvals_)
-            Xx, Gx, Hx, freqs, normal_modes, M_opt = self.hessian_driver()   
-            # convert into internal hessian 
+            Xx, Gx, Hx, freqs, normal_modes, M_opt = self.hessian_driver()
+            # convert into internal hessian
             Xx *= 1/ Bohr2nm
             Gx *= Bohr2nm/ Hartree2kJmol
             Hx *= Bohr2nm**2/ Hartree2kJmol
             Hq = self.IC.calcHess(Xx, Gx, Hx)
             compute.Hq_flat = Hq.flatten()
-            compute.freqs = freqs  
+            compute.freqs = freqs
             compute.normal_modes = normal_modes
             compute.M_opt = M_opt
             diff = Hq - self.ref_Hq
@@ -167,13 +167,13 @@ class Hessian(Target):
             Answer['G'][p] = 2*np.dot(V, dV[p,:]) * len(compute.freqs)
             for q in self.pgrad:
                 Answer['H'][p,q] = 2*np.dot(dV[p,:], dV[q,:]) * len(compute.freqs)
-                    
+
         if not in_fd():
             self.Hq_flat = compute.Hq_flat
             self.Hq = self.Hq_flat.reshape(self.ref_Hq.shape)
             self.objective = Answer['X']
             self.FF.make(mvals)
-        
+
         if self.writelevel > 0:
             # 1. write HessianCompare.txt
             hessian_comparison = np.array([
@@ -183,11 +183,11 @@ class Hessian(Target):
                 np.sqrt(self.wts)/self.denom
             ]).T
             np.savetxt("HessianCompare.txt", hessian_comparison, header="%11s  %12s  %12s  %12s" % ("QMHessian", "MMHessian", "Delta(MM-QM)", "Weight"), fmt="% 12.6e")
-                    
-            # 2. rearrange MM vibrational frequencies using overlap between normal modes in redundant internal coordinates 
+
+            # 2. rearrange MM vibrational frequencies using overlap between normal modes in redundant internal coordinates
             ref_int_normal_modes = self.calc_int_normal_mode(self.ref_xyz, self.ref_eigvecs)
             int_normal_modes = self.calc_int_normal_mode(np.array(compute.M_opt.xyzs[0]), compute.normal_modes)
-            a = np.array([[(1.0-np.abs(np.dot(v1/np.linalg.norm(v1),v2/np.linalg.norm(v2)))) for v2 in int_normal_modes] for v1 in ref_int_normal_modes]) 
+            a = np.array([[(1.0-np.abs(np.dot(v1/np.linalg.norm(v1),v2/np.linalg.norm(v2)))) for v2 in int_normal_modes] for v1 in ref_int_normal_modes])
             row, c2r = optimize.linear_sum_assignment(a)
             # old arrangement method, which uses overlap between mass weighted vibrational modes in cartesian coordinates
             # a = np.array([[(1.0-self.vib_overlap(v1, v2)) for v2 in compute.normal_modes] for v1 in self.ref_eigvecs])
@@ -195,9 +195,9 @@ class Hessian(Target):
 
             freqs_rearr = compute.freqs[c2r]
             normal_modes_rearr = compute.normal_modes[c2r]
-            
+
             # 3. Save rearranged frequencies and normal modes into a file for post-analysis
-            with open('mm_vdata.txt', 'w') as outfile: 
+            with open('mm_vdata.txt', 'w') as outfile:
                 outfile.writelines('%s\n' % line for line in compute.M_opt.write_xyz([0]))
                 outfile.write('\n')
                 for freq, normal_mode in zip(freqs_rearr, normal_modes_rearr):
@@ -211,12 +211,12 @@ class Hessian(Target):
             draw_vibfreq_scatter_plot_n_overlap_matrix(self.name, self.engine, self.ref_eigvals, self.ref_eigvecs, freqs_rearr, normal_modes_rearr)
             return Answer
 
-def cal_corr_coef(A): 
+def cal_corr_coef(A):
     # equations from https://math.stackexchange.com/a/1393907
     size = len(A)
     j = np.ones(size)
     r = np.array(range(1,size+1))
-    r2 = r*r 
+    r2 = r*r
     n  = np.dot(np.dot(j, A),j.T)
     sumx=np.dot(np.dot(r, A),j.T)
     sumy=np.dot(np.dot(j, A),r.T)
@@ -226,7 +226,10 @@ def cal_corr_coef(A):
     r = (n*sumxy - sumx*sumy)/(np.sqrt(n*sumx2 - (sumx)**2)* np.sqrt(n*sumy2 - (sumy)**2))
     return r
 
-def draw_normal_modes(elem, ref_xyz, ref_eigvals, ref_eigvecs, mm_xyz, freqs_rearr, normal_modes_rearr): 
+def draw_normal_modes(elem, ref_xyz, ref_eigvals, ref_eigvecs, mm_xyz, freqs_rearr, normal_modes_rearr):
+
+    import matplotlib.pyplot as plt
+
     # draw qm and mm normal mode overlay
     fig, axs = plt.subplots(len(normal_modes_rearr), 1, figsize=(4, 4*len(normal_modes_rearr)), subplot_kw={'projection':'3d'})
     def render_normal_modes(elem, xyz, eigvecs, color, qm=False, ref_eigvals=None, eigvals_rearr=None):
@@ -235,10 +238,10 @@ def draw_normal_modes(elem, ref_xyz, ref_eigvals, ref_eigvecs, mm_xyz, freqs_rea
             u, v, w = eigvec.T *5
             origin = np.array([x, y, z])
             axs[idx].quiver(*origin, u, v, w, color=color)
-            
+
             axs[idx].set_xlabel('x')
             axs[idx].set_ylabel('y')
-            axs[idx].set_zlabel('z')    
+            axs[idx].set_zlabel('z')
             if qm:
                 axs[idx].set_title(f'normal mode #{idx} (blue:QM({ref_eigvals[idx]:.2f}), red:MM({eigvals_rearr[idx]:.2f}))')
                 axs[idx].scatter(x, y, z, color='black', s=30)
@@ -250,11 +253,15 @@ def draw_normal_modes(elem, ref_xyz, ref_eigvals, ref_eigvecs, mm_xyz, freqs_rea
 
     render_normal_modes(elem, ref_xyz, ref_eigvecs, 'blue', qm=True, ref_eigvals=ref_eigvals, eigvals_rearr=freqs_rearr)
     render_normal_modes(elem, np.array(mm_xyz), normal_modes_rearr, 'red')
-    
+
     plt.tight_layout()
-    plt.savefig('mm_vdata.pdf') 
+    plt.savefig('mm_vdata.pdf')
 
 def draw_vibfreq_scatter_plot_n_overlap_matrix(name, engine, ref_eigvals, ref_eigvecs, freqs_rearr, normal_modes_rearr):
+
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.axes_grid1 import make_axes_locatable, axes_size
+
     plt.switch_backend('agg')
     fig, axs = plt.subplots(1,2, figsize=(10,6))
     overlap_matrix = np.array([[(vib_overlap(engine, v1, v2)) for v2 in normal_modes_rearr] for v1 in ref_eigvecs])
@@ -265,15 +272,15 @@ def draw_vibfreq_scatter_plot_n_overlap_matrix(name, engine, ref_eigvals, ref_ei
     axs[0].legend()
     axs[0].set_xlabel(r'QM vibrational frequency ($cm^{-1}$)')
     axs[0].set_ylabel(r'MM vibrational frequency ($cm^{-1}$)')
-    mae = np.sum(np.abs(ref_eigvals - freqs_rearr))/ len(ref_eigvals) 
+    mae = np.sum(np.abs(ref_eigvals - freqs_rearr))/ len(ref_eigvals)
     axs[0].set_title(f'QM vs. MM vibrational frequencies\n MAE= {mae:.2f}')
     x0,x1 = axs[0].get_xlim()
     y0,y1 = axs[0].get_ylim()
     axs[0].set_aspect((x1-x0)/(y1-y0))
 
-    # move ax x axis to top 
-    axs[1].xaxis.tick_top() 
-    # move ax x ticks inside 
+    # move ax x axis to top
+    axs[1].xaxis.tick_top()
+    # move ax x ticks inside
     axs[1].tick_params(axis="y", direction='in')
     axs[1].tick_params(axis="x", direction='in')
     # draw matrix
@@ -286,15 +293,15 @@ def draw_vibfreq_scatter_plot_n_overlap_matrix(name, engine, ref_eigvals, ref_ei
     pad = axes_size.Fraction(pad_fraction, width)
     cax = divider.append_axes("right", size=width, pad=pad)
     cax.yaxis.tick_right()
-    cax.xaxis.set_visible(False) 
-    plt.colorbar(im, cax=cax) 
+    cax.xaxis.set_visible(False)
+    plt.colorbar(im, cax=cax)
     corr_coef = cal_corr_coef(overlap_matrix)
     err = np.linalg.norm(qm_overlap_matrix - overlap_matrix)/np.linalg.norm(qm_overlap_matrix) # measure of error in matrix (Relative error)
     axs[1].set_title(f'QM vs. MM normal modes\n Correlation coef. ={corr_coef:.4f}, Error={err:.4f}')
 
-    # # move ax x axis to top 
-    # axs[2].xaxis.tick_top() 
-    # # move ax x ticks inside 
+    # # move ax x axis to top
+    # axs[2].xaxis.tick_top()
+    # # move ax x ticks inside
     # axs[2].tick_params(axis="y", direction='in')
     # axs[2].tick_params(axis="x", direction='in')
     # # draw matrix
@@ -307,11 +314,11 @@ def draw_vibfreq_scatter_plot_n_overlap_matrix(name, engine, ref_eigvals, ref_ei
     # pad = axes_size.Fraction(pad_fraction, width)
     # cax = divider.append_axes("right", size=width, pad=pad)
     # cax.yaxis.tick_right()
-    # cax.xaxis.set_visible(False) 
-    # plt.colorbar(im, cax=cax) 
+    # cax.xaxis.set_visible(False)
+    # plt.colorbar(im, cax=cax)
     # axs[2].set_title(f'(QM normal modes for reference)')
 
-    plt.tight_layout() 
+    plt.tight_layout()
     plt.subplots_adjust(top=0.85)
     fig.suptitle('Hessian: iteration %i\nSystem: %s' % (Counter(), name))
     fig.savefig('vibfreq_scatter_plot_n_overlap_matrix.pdf')
