@@ -83,7 +83,9 @@ class Recharge_SMIRNOFF(Target):
 
         # Determine which BCC parameters are being optimized.
         force_field = smirnoff.ForceField(
-            os.path.join(self.FF.ffdir, self.FF.offxml), allow_cosmetic_attributes=True
+            os.path.join(self.FF.ffdir, self.FF.offxml),
+            allow_cosmetic_attributes=True,
+            load_plugins=True
         )
 
         bcc_handler = force_field.get_parameter_handler("ChargeIncrementModel")
