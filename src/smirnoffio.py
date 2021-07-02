@@ -281,13 +281,14 @@ class SMIRNOFF(OpenMM):
             This could be the same as the pdb argument from above.
         """
 
-        pdbfnm = kwargs.get('pdb')
+        pdbfnm = None
         # Determine the PDB file name.
-        if not pdbfnm:
-            raise RuntimeError('Name of PDB file not provided.')
-        elif not os.path.exists(pdbfnm):
-            logger.error("%s specified but doesn't exist\n" % pdbfnm)
-            raise RuntimeError
+        if 'pdb' in kwargs and os.path.exists(kwargs['pdb']):
+            # Case 1. The PDB file name is provided explicitly
+            pdbfnm = kwargs['pdb']
+            if not os.path.exists(pdbfnm):
+                logger.error("%s specified but doesn't exist\n" % pdbfnm)
+                raise RuntimeError
 
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
@@ -314,10 +315,11 @@ class SMIRNOFF(OpenMM):
         else:
             logger.error("Must provide a list of .mol2 files.\n")
 
-        self.abspdb = os.path.abspath(pdbfnm)
-        mpdb = Molecule(pdbfnm)
-        for i in ["chain", "atomname", "resid", "resname", "elem"]:
-            self.mol.Data[i] = mpdb.Data[i]
+        if pdbfnm is not None:
+            self.abspdb = os.path.abspath(pdbfnm)
+            mpdb = Molecule(pdbfnm)
+            for i in ["chain", "atomname", "resid", "resname", "elem"]:
+                self.mol.Data[i] = mpdb.Data[i]
 
         # Store a separate copy of the molecule for reference restraint positions.
         self.ref_mol = deepcopy(self.mol)
@@ -363,7 +365,14 @@ class SMIRNOFF(OpenMM):
         but we are calling ForceField() from the OpenFF toolkit and ignoring
         AMOEBA stuff.
         """
-        self.pdb = PDBFile(self.abspdb)
+
+        if hasattr(self, 'abspdb'):
+            self.pdb = PDBFile(self.abspdb)
+        else:
+            pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
+            self.mol[0].write(pdb1)
+            self.pdb = PDBFile(pdb1)
+            os.unlink(pdb1)
 
         # Create the OpenFF ForceField object.
         if hasattr(self, 'FF'):
@@ -371,7 +380,7 @@ class SMIRNOFF(OpenMM):
             self.forcefield = self.FF.openff_forcefield
         else:
             self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
-            self.forcefield = OpenFF_ForceField(*self.offxml)
+            self.forcefield = OpenFF_ForceField(*self.offxml, load_plugins=True)
 
         ## Load mol2 files for smirnoff topology
         openff_mols = []
@@ -509,6 +518,7 @@ class SMIRNOFF(OpenMM):
             self.create_simulation(**self.simkwargs)
 
     def _update_positions(self, X1, disable_vsite):
+        # X1 is a numpy ndarray not vec3
 
         if disable_vsite:
             super(SMIRNOFF, self)._update_positions(X1, disable_vsite)
@@ -524,7 +534,7 @@ class SMIRNOFF(OpenMM):
         else:
             X1 = (X1 + [Vec3(0.0, 0.0, 0.0)] * n_v_sites) * angstrom
 
-        self.simulation.context.setPositions(X1)
+        self.simulation.context.setPositions(X1 * angstrom)
         self.simulation.context.computeVirtualSites()
 
     def interaction_energy(self, fraga, fragb):

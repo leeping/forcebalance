@@ -458,7 +458,7 @@ class FF(forcebalance.BaseClass):
                 from openff.toolkit.typing.engines.smirnoff import ForceField as OpenFF_ForceField
                 self.offxml = ffname
                 self.openff_forcefield = OpenFF_ForceField(os.path.join(self.root, self.ffdir, self.offxml),
-                                                           allow_cosmetic_attributes=True)
+                                                           allow_cosmetic_attributes=True, load_plugins=True)
 
         self.amber_mol2 = []
         if fftype == "mol2":

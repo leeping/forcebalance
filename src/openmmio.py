@@ -151,6 +151,34 @@ def PrepareVirtualSites(system):
                     v2 = pos[idx_[2]] - pos[idx_[0]]
                     cross = np.array([v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1]-v1[1]*v2[0]])
                     return pos[idx_[0]] + wt_[0]*v1 + wt_[1]*v2 + wt_[2]*cross
+            elif isinstance(vs, LocalCoordinatesSite):
+                vsidx = [_openmm.VirtualSite_getParticle(vs, i) for i in range(_openmm.VirtualSite_getNumParticles(vs))]
+                vswt = [np.array(_openmm.LocalCoordinatesSite_getOriginWeights(vs)), np.array(_openmm.LocalCoordinatesSite_getXWeights(vs)), np.array(_openmm.LocalCoordinatesSite_getYWeights(vs)), np.array(_openmm.LocalCoordinatesSite_getLocalPosition(vs))]
+                def vsfunc(pos, idx_, wt_):
+                    """Calculate the vsite position within a orthonormal coordinate system described here
+                    http://docs.openmm.org/latest/api-c++/generated/OpenMM.LocalCoordinatesSite.html#localcoordinatessite"""
+                    # origin weights
+                    ows = wt_[0]
+                    # xdir weights
+                    xws = wt_[1]
+                    # ydir weights
+                    yws = wt_[2]
+                    # vs position in local coordinates
+                    vpos = wt_[3]
+                    # dependent atom positions
+                    dpos = np.array([pos[j] for j in idx_])
+                    origin = np.array(dpos * ows[:, None]).sum(axis=0)
+                    xdir = np.array(dpos * xws[:, None]).sum(axis=0)
+                    ydir = np.array(dpos * yws[:, None]).sum(axis=0)
+                    zdir = np.cross(xdir, ydir)
+                    ydir = np.cross(zdir, xdir)
+                    xdir /= np.linalg.norm(xdir)
+                    ydir /= np.linalg.norm(ydir)
+                    zdir /= np.linalg.norm(zdir)
+                    return origin + np.array(np.array([xdir, ydir, zdir]) * vpos[:, None]).sum(axis=0)
+            else:
+                raise NotImplementedError(f"The virtual site type {vs.__class__.__name__} is not currently supported.")
+
         else:
             isvsites.append(0)
             vsfunc = None
