@@ -21,9 +21,6 @@ conda install -c conda-forge rdkit --yes
 export GPUDYNAMICS=True
 ```
 
-* https://ilthermo.boulder.nist.gov/
-* Be careful by default tries first name it finds with molecule match, but may not be correct name. Use printnames to find possible names that are found in database. Use truename to only grab data from the correct molecule name (according to the database)
-
 * Make sure Tinker is sourced in your path so program can use xyzedit!
 * Environment Bashrc Example For CPU Tinker
 ```
