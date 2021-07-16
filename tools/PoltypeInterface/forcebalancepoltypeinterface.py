@@ -452,7 +452,7 @@ def ReadInPoltypeFiles(poltypepathlist):
         molnamelist.append(molname)
         molfilelist.append(molfile)
 
-    return keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist
+    return keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist,dimersplogfileslist
  
 
 def GrabMonomerEnergy(line,Hartree2kcal_mol):
@@ -1111,8 +1111,62 @@ def ShiftTypes(typeslist,oldtypetonewtypelist):
 
     return newtypeslist
 
+def FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfileslist):
+    tol=15 # kcal/mol
+    newdimertinkerxyzfileslistoflist=[]
+    newdimerenergieslistoflist=[]
+    for j in range(len(dimertinkerxyzfileslist)):
+        newdimertinkerxyzfileslist=[]
+        newdimerenergieslist=[]
+
+        prefixtoxyzfilelist={}
+        prefixtoenergylist={}
+        prefixtooriginalenergylist={}
+        xyzfilelist=dimertinkerxyzfileslist[j]
+        energylist=dimerenergieslist[j]
+        splogfilelist=dimersplogfileslist[j]
+        for i in range(len(xyzfilelist)):
+            xyzfile=xyzfilelist[i]
+            energy=energylist[i]
+            splogfile=splogfilelist[i]
+         
+            filesplit=splogfile.split('_')
+            filesplit=filesplit[:-2]
+            prefix=''.join(filesplit)
+            if prefix not in prefixtoxyzfilelist.keys():
+                prefixtoxyzfilelist[prefix]=[]
+                prefixtoenergylist[prefix]=[]
+            prefixtoxyzfilelist[prefix].append(xyzfile)
+            prefixtoenergylist[prefix].append(energy)
+        for prefix,energyarray in prefixtoenergylist.items():
+            normenergyarray=[i-min(energyarray) for i in energyarray]
+            prefixtoenergylist[prefix]=normenergyarray
+            prefixtooriginalenergylist[prefix]=energyarray
+
+        for prefix,energyarray in prefixtoenergylist.items():
+            normenergyarray=prefixtoenergylist[prefix]
+            energyarray=prefixtooriginalenergylist[prefix]
+
+            xyzfilelist=prefixtoxyzfilelist[prefix]
+            for eidx in range(len(normenergyarray)):
+                e=normenergyarray[eidx]
+                originale=energyarray[eidx]
+                xyzfile=xyzfilelist[eidx]
+                if e>=tol:
+                    pass
+                else:
+                    newdimertinkerxyzfileslist.append(xyzfile)    
+                    newdimerenergieslist.append(originale)
+        newdimertinkerxyzfileslistoflist.append(newdimertinkerxyzfileslist)
+        newdimerenergieslistoflist.append(newdimerenergieslist)
+
+
+    return newdimertinkerxyzfileslistoflist,newdimerenergieslistoflist
+
+
 if poltypepathlist!=None:
-    keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist=ReadInPoltypeFiles(poltypepathlist)
+    keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist,dimersplogfileslist=ReadInPoltypeFiles(poltypepathlist)
+    dimertinkerxyzfileslist,dimerenergieslist=FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfileslist)
     densitylist=[ls[0] for ls in density_list] # just grab first density 
     GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist)
     prmfilepath=os.path.join(os.path.split(__file__)[0],'amoebabio18.prm')

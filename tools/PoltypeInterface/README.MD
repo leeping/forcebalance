@@ -52,6 +52,8 @@ fittypestogether=401 402 , 401 402
 * Isothermal compressibility units are 1/bar
 * Isobaric heat capacity units are kJ/mol.K
 * pressure units are atm
+* Experimental data can be found at https://webbook.nist.gov/ or https://www.aiche.org/dippr
+* QM energies from dimers in poltype (normalized) >=15 kcal/mol are removed and not use for forcebalance.
 ```
 poltypepathlist                                      Comma seperated list of Paths to completed poltypejobs
 vdwtypes                                             Comma seperated list of vdw types lists to parameterize
