@@ -995,7 +995,7 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
         results.append('$target'+'\n')
         results.append('name '+qmfolder+'\n')
         results.append('type Interaction_TINKER'+'\n')
-        results.append('weight 1.0'+'\n')
+        results.append('weight .5'+'\n')
         results.append('energy_denom 1.0'+'\n')
         results.append('energy_upper 20.0'+'\n')
         results.append('attenuate'+'\n')
