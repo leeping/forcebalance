@@ -36,7 +36,7 @@ python /home/bdw2292/FBInterface/forcebalancepoltypeinterface.py
 ```
 * Example input
 ```
-poltypepathlist=/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CBr4,/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CF4 
+poltypepathlist=/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CHI3,/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CF4 
 vdwtypeslist=401 402 , 401 402  
 temperature_list= 300 250 , 300 230 350 
 pressure_list= 1 1 , 1 1 1 
@@ -44,6 +44,14 @@ density_list=1000 1000 , 1000 1000 1000
 fittypestogether=401 402 , 401 402
 ```
 * In the example above, fittypestogether reads fit 401 from molecule 1 and 401 from molecule 2 together, and also fit 402 from molecule 1 and 402 from molecule 2 together
+* Alternative example input
+```
+poltypepathlist=/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CHI3,/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CF4 
+csvexpdatafile=ExpHalogenData.csv
+vdwtypeslist=401 402 , 401 402  
+```
+* Can use UNK for when unknown data property for input arrays
+* If using csvexpdatafile, please use correct units as below and the column headers in example csv file, make sure the molecule name under the Name column are same as poltype molecule folder name
 * By default all types in key files are reassigned new type numbers so there is no overlap while fitting together. So input types will be converted internally.
 * temperature_list, pressure_list and density_list are required.
 * Density units are Kg/m^3

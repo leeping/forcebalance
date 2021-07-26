@@ -11,6 +11,7 @@ import numpy as np
 from rdkit import Chem
 import subprocess
 import itertools 
+import csv
 
 poltypepathlist=None
 vdwtypeslist=None
@@ -32,7 +33,7 @@ density_list=None
 density_err_list=None
 citation_list=None
 fittypestogether=None
-
+csvexpdatafile=None
 liquid_equ_steps=10000
 liquid_prod_steps=5000000
 liquid_timestep=1.0
@@ -46,6 +47,116 @@ liquid_prod_time=.1 #ns
 gas_prod_time=1 #ns
 nvtprops=False # NPT for most props, surface tension requires NVT and force balance complains
 addwaterprms=True
+
+def GrabMoleculeOrder(poltypepathlist,nametopropsarray):
+    nametoarrayindexorder={}
+    for name in nametopropsarray.keys():
+        foundname=False
+        for poltypepathidx in range(len(poltypepathlist)):
+            poltypepath=poltypepathlist[poltypepathidx]
+            if name in poltypepath:
+                foundname=True
+                break
+        if foundname==False:
+            continue
+        nametoarrayindexorder[name]=poltypepathidx 
+    return nametoarrayindexorder
+
+
+def GrabArrayInputs(nametopropsarray,nametoarrayindexorder):
+    arrayindexordertoname = {v: k for k, v in nametoarrayindexorder.items()}
+    temperature_list=[]
+    pressure_list=[]
+    enthalpy_of_vaporization_list=[]
+    heat_capacity_at_constant_pressure_list=[]
+    density_list=[]
+    tempstring='Temperature (K)'
+    pressurestring='Pressure (atm)'
+    densitystring='Density (Kg/m^3)'
+    enthalpystring='Enthalpy (kJ/mol)'
+    heatcapstring='Heat Capacity (Isobaric kJ/mol.K)'
+    sortednametoarrayindexorder={k: v for k, v in sorted(arrayindexordertoname.items(), key=lambda item: item[0])}
+    for arrayidx,name in sortednametoarrayindexorder.items():
+        propsdict=nametopropsarray[name]
+        temp=propsdict[tempstring]
+        pressure=propsdict[pressurestring]
+        density=propsdict[densitystring]
+        enthalpy=propsdict[enthalpystring]
+        heatcap=propsdict[heatcapstring]
+        temperature_list.append(temp)
+        pressure_list.append(pressure)
+        enthalpy_of_vaporization_list.append(enthalpy)
+        heat_capacity_at_constant_pressure_list.append(heatcap)
+        density_list.append(density)   
+
+    return temperature_list,pressure_list,enthalpy_of_vaporization_list,heat_capacity_at_constant_pressure_list,density_list
+
+
+def FindIndexWithString(string,array):
+    found=False
+    for i in range(len(array)):
+        e=array[i]
+        if string in e:
+            found=True
+            break
+    if found==False:
+        raise ValueError(string+'  was not found in header')
+    return i
+
+
+def CheckNoneValue(value):
+    try:
+        float(value)
+    except:
+        value='UNK'
+    return value 
+
+def ReadCSVFile(csvfileread):
+    with open(csvfileread, newline='') as csvfile:
+        reader = list(csv.reader(csvfile, delimiter=',', quotechar='|'))
+        header=reader[0]
+        namestring='Name'
+        tempstring='Temperature (K)'
+        pressurestring='Pressure (atm)'
+        densitystring='Density (Kg/m^3)'
+        enthalpystring='Enthalpy (kJ/mol)'
+        heatcapstring='Heat Capacity (Isobaric kJ/mol.K)'
+        nameindex=FindIndexWithString(namestring,header)
+        tempindex=FindIndexWithString(tempstring,header)
+        pressureindex=FindIndexWithString(pressurestring,header)
+        densityindex=FindIndexWithString(densitystring,header)
+        enthalpyindex=FindIndexWithString(enthalpystring,header)
+        heatcapindex=FindIndexWithString(heatcapstring,header)
+        nametopropsarray={} 
+        for rowidx in range(1,len(reader)):
+            row=reader[rowidx]
+            name=row[nameindex]
+            temp=CheckNoneValue(row[tempindex])
+            pressure=CheckNoneValue(row[pressureindex])
+            density=CheckNoneValue(row[densityindex])
+            enthalpy=CheckNoneValue(row[enthalpyindex])
+            heatcap=CheckNoneValue(row[heatcapindex])
+            if name not in nametopropsarray.keys():
+                nametopropsarray[name]={}
+            if tempstring not in nametopropsarray[name].keys():
+                nametopropsarray[name][tempstring]=[]
+            nametopropsarray[name][tempstring].append(temp)
+            if pressurestring not in nametopropsarray[name].keys():
+                nametopropsarray[name][pressurestring]=[]
+            nametopropsarray[name][pressurestring].append(pressure)
+            if densitystring not in nametopropsarray[name].keys():
+                nametopropsarray[name][densitystring]=[]
+            nametopropsarray[name][densitystring].append(density)
+            if enthalpystring not in nametopropsarray[name].keys():
+                nametopropsarray[name][enthalpystring]=[]
+            nametopropsarray[name][enthalpystring].append(enthalpy)
+            if heatcapstring not in nametopropsarray[name].keys():
+                nametopropsarray[name][heatcapstring]=[]
+            nametopropsarray[name][heatcapstring].append(heatcap)
+
+    return nametopropsarray
+
+
 
 def ReturnListOfList(string):
     newlist=string.split(',')
@@ -75,6 +186,8 @@ for line in results:
 
     if  "poltypepathlist" in newline:
         poltypepathlist=a.split(',')
+    elif "csvexpdatafile" in newline:
+        csvexpdatafile=a
     elif "fittypestogether" in newline:
         fittypestogether=ReturnListOfList(a)
     elif "vdwtypeslist" in newline:
@@ -138,13 +251,6 @@ for line in results:
     elif 'nvtprops' in newline:
         nvtprops=True
 
-if temperature_list==None:
-    raise ValueError('No temperature data')
-if pressure_list==None:
-    raise ValueError('No pressure data')
-if density_list==None:
-    raise ValueError('No density data')
-
 def ShapeOfArray(array):
     dimlist=[]
     rows=len(array)
@@ -177,55 +283,6 @@ def GenerateNoneList(targetshape):
         ls.append(newls)
     return ls 
 
-
-
-CheckInputShapes([temperature_list,pressure_list,density_list])
-numberofmolecules=len(poltypepathlist)
-targetshape=ShapeOfArray(temperature_list)
-if enthalpy_of_vaporization_list==None:
-    enthalpy_of_vaporization_list=GenerateNoneList(targetshape)
-
-if enthalpy_of_vaporization_err_list==None:
-    enthalpy_of_vaporization_err_list=GenerateNoneList(targetshape)
-
-if surface_tension_list==None:
-    surface_tension_list=GenerateNoneList(targetshape)
-
-if surface_tension_err_list==None:
-    surface_tension_err_list=GenerateNoneList(targetshape)
-
-if relative_permittivity_list==None:
-    relative_permittivity_list=GenerateNoneList(targetshape)
-
-if relative_permittivity_err_list==None:
-    relative_permittivity_err_list=GenerateNoneList(targetshape)
-
-if isothermal_compressibility_list==None:
-    isothermal_compressibility_list=GenerateNoneList(targetshape)
-
-if isothermal_compressibility_err_list==None:
-    isothermal_compressibility_err_list=GenerateNoneList(targetshape)
-
-if isobaric_coefficient_of_volume_expansion_list==None:
-    isobaric_coefficient_of_volume_expansion_list=GenerateNoneList(targetshape)
-
-if isobaric_coefficient_of_volume_expansion_err_list==None:
-    isobaric_coefficient_of_volume_expansion_err_list=GenerateNoneList(targetshape)
-
-if heat_capacity_at_constant_pressure_list==None:
-    heat_capacity_at_constant_pressure_list=GenerateNoneList(targetshape)
-
-if heat_capacity_at_constant_pressure_err_list==None:
-    heat_capacity_at_constant_pressure_err_list=GenerateNoneList(targetshape)
-
-if density_list==None:
-    density_list=GenerateNoneList(targetshape)
-
-if density_err_list==None:
-    density_err_list=GenerateNoneList(targetshape)
-
-if citation_list==None:
-    citation_list=GenerateNoneList(targetshape)
 
 
 gas_prod_steps=int(1000000*gas_prod_time/gas_timestep)
@@ -295,7 +352,6 @@ def CombineData(temperature_list,pressure_list,enthalpy_of_vaporization_list,ent
         listoftptopropdics.append(tptoproptovalue)
     return listoftptopropdics
 
-listoftptopropdics=CombineData(temperature_list,pressure_list,enthalpy_of_vaporization_list,enthalpy_of_vaporization_err_list,surface_tension_list,surface_tension_err_list,relative_permittivity_list,relative_permittivity_err_list,isothermal_compressibility_list,isothermal_compressibility_err_list,isobaric_coefficient_of_volume_expansion_list,isobaric_coefficient_of_volume_expansion_err_list,heat_capacity_at_constant_pressure_list,heat_capacity_at_constant_pressure_err_list,density_list,density_err_list,citation_list)
 
        
 def AddDefaultValues(tptoproptovalue):
@@ -356,8 +412,10 @@ def WriteCSVFile(listoftpdics,nvtprops,molname):
                 ls=[refls,commentpropvaluels]
                 for prop,value in proptovalue.items():
                     if prop!='cite' and 'wt' not in prop and 'err' not in prop and prop!='T' and prop!='P' and 'global' not in prop:
-                        if value==None:
-                            continue
+                        #if value==None:
+                        #    continue
+                        if value=='UNK':
+                            value=None
                         if nvtprops==False and prop in nvtproperties:
                             continue
 
@@ -392,12 +450,26 @@ def WriteCSVFile(listoftpdics,nvtprops,molname):
                         
 
 def GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist):
+    indextogeneratecsv={}
     for i in range(len(listoftptopropdics)):
         tptoproptovalue=listoftptopropdics[i]
+        allunknown=True
+        for tp,proptovalue in tptoproptovalue.items():
+            t=tp[0]
+            p=tp[1]
+            if t!='UNK' and p!='UNK':
+                allunknown=False
+
         molname=molnamelist[i]
-        tptoproptovalue=AddDefaultValues(tptoproptovalue)
-        WriteCSVFile([tptoproptovalue],nvtprops,molname)
-    
+        if allunknown==False:
+            tptoproptovalue=AddDefaultValues(tptoproptovalue)
+            WriteCSVFile([tptoproptovalue],nvtprops,molname)
+        if allunknown==False:
+            gencsv=True
+        else:
+            gencsv=False
+        indextogeneratecsv[i]=gencsv
+    return indextogeneratecsv
 
 def ReadInPoltypeFiles(poltypepathlist):
     dimertinkerxyzfileslist=[]
@@ -628,9 +700,10 @@ def CommentOutVdwLines(keypath,vdwtypes):
     os.rename(tempname,keypath)  
 
 
-def GenerateLiquidTargetsFolder(gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist,densitylist,originalliquidfolder,prmfilepath,moleculeprmfilename,vdwtypeslist,addwaterprms,molnamelist):
+def GenerateLiquidTargetsFolder(gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist,densitylist,originalliquidfolder,prmfilepath,moleculeprmfilename,vdwtypeslist,addwaterprms,molnamelist,indextogeneratecsv):
     liquidfolderlist=[]
     for i in range(len(gaskeyfilelist)):
+        gencsv=indextogeneratecsv[i]
         gaskeyfile=gaskeyfilelist[i]
         gasxyzfile=gasxyzfilelist[i]
         liquidkeyfile=liquidkeyfilelist[i]
@@ -643,6 +716,9 @@ def GenerateLiquidTargetsFolder(gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,
         os.chdir('targets')
         liquidfolder=originalliquidfolder+'_'+molname
         liquidfolderlist.append(liquidfolder) 
+        if gencsv==False:
+            os.chdir('..')
+            continue
         if not os.path.isdir(liquidfolder):
             os.mkdir(liquidfolder)
         os.chdir(liquidfolder)
@@ -658,10 +734,12 @@ def GenerateLiquidTargetsFolder(gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,
         AddKeyWord(os.path.join(os.getcwd(),'gas.key'),string)
         CommentOutVdwLines(os.path.join(os.getcwd(),'gas.key'),vdwtypes)
         shutil.copy(gasxyzfile,os.path.join(os.getcwd(),'gas.xyz'))
-        shutil.copy(liquidkeyfile,os.path.join(os.getcwd(),'liquid.key'))
-        CommentOutVdwLines(os.path.join(os.getcwd(),'liquid.key'),vdwtypes)
-        shutil.copy(liquidxyzfile,os.path.join(os.getcwd(),'liquid.xyz'))
-        os.remove(liquidxyzfile)
+        if liquidkeyfile!=None: 
+            shutil.copy(liquidkeyfile,os.path.join(os.getcwd(),'liquid.key'))
+            CommentOutVdwLines(os.path.join(os.getcwd(),'liquid.key'),vdwtypes)
+        if liquidxyzfile!=None:
+            shutil.copy(liquidxyzfile,os.path.join(os.getcwd(),'liquid.xyz'))
+            os.remove(liquidxyzfile)
         if datacsvpath!=None:
             shutil.copy(datacsvpath,os.path.join(os.getcwd(),'data.csv'))
             os.remove(datacsvpath)
@@ -813,23 +891,27 @@ def GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms
 
     return liquidkeyfile
 
-def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist):
+def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv):
     gaskeyfilelist=[]
     gasxyzfilelist=[]
     liquidkeyfilelist=[]
     liquidxyzfilelist=[] 
-    datacsvpathlist=[] 
+    datacsvpathlist=[]
     for i in range(len(rdkitmollist)):
+        gencsv=indextogeneratecsv[i]
         rdkitmol=rdkitmollist[i]
         xyzfile=xyzfilelist[i]
         keyfile=keyfilelist[i]
-        density=densitylist[i]
         molname=molnamelist[i]
-        mass=Descriptors.ExactMolWt(rdkitmol)*1.66054*10**(-27) # convert daltons to Kg
-        axis=ComputeBoxLength(xyzfile)
-        boxlength=axis*10**-10 # convert angstroms to m
-        numbermolecules=int(density*boxlength**3/mass)
-        liquidxyzfile=CreateSolventBox(axis,numbermolecules,prmfilepath,xyzeditpath,xyzfile,molname)
+        if gencsv==True:
+            density=float(densitylist[i])
+            mass=Descriptors.ExactMolWt(rdkitmol)*1.66054*10**(-27) # convert daltons to Kg
+            axis=ComputeBoxLength(xyzfile)
+            boxlength=axis*10**-10 # convert angstroms to m
+            numbermolecules=int(density*boxlength**3/mass)
+            liquidxyzfile=CreateSolventBox(axis,numbermolecules,prmfilepath,xyzeditpath,xyzfile,molname)
+        else:
+            liquidxyzfile=None
         gaskeyfile=keyfile.replace('final',molname+'Gas')
         gasxyzfile=xyzfile.replace('final',molname+'Gas')
         shutil.copy(keyfile,gaskeyfile)
@@ -840,7 +922,10 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
             datacsvpath=os.path.join(os.getcwd(),name)
         else:
             datacsvpath=None
-        liquidkeyfile=GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms,molname)
+        if gencsv==True: 
+            liquidkeyfile=GenerateNewKeyFile(keyfile,prmfilepath,moleculeprmfilename,axis,addwaterprms,molname)
+        else:
+            liquidkeyfile=None
         gaskeyfilelist.append(gaskeyfile)
         gasxyzfilelist.append(gasxyzfile)
         liquidkeyfilelist.append(liquidkeyfile)
@@ -899,9 +984,10 @@ def GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyf
             energywriter.write(secondline)
             energywriter.write('\n')
         energywriter.close()
-        shutil.copy(liquidkeyfile,os.path.join(os.getcwd(),'liquid.key'))
-        CommentOutVdwLines(os.path.join(os.getcwd(),'liquid.key'),vdwtypes)
-        os.remove(liquidkeyfile)
+        if liquidkeyfile!=None:
+            shutil.copy(liquidkeyfile,os.path.join(os.getcwd(),'liquid.key'))
+            CommentOutVdwLines(os.path.join(os.getcwd(),'liquid.key'),vdwtypes)
+            os.remove(liquidkeyfile)
         os.chdir('..')
         os.chdir('..')
  
@@ -971,7 +1057,7 @@ def which(program):
 
 
 
-def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads):
+def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads,indextogeneratecsv):
     head,tail=os.path.split(optimizefilepath)
     newoptimizefilepath=os.path.join(os.getcwd(),tail)
     shutil.copy(optimizefilepath,newoptimizefilepath)
@@ -989,8 +1075,8 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
            
     temp=open(newoptimizefilepath,'a')
     for i in range(len(qmfolderlist)):
+        gencsv=indextogeneratecsv[i]
         qmfolder=qmfolderlist[i]
-        liquidfolder=liquidfolderlist[i] 
         atomnum=atomnumlist[i]
         results.append('$target'+'\n')
         results.append('name '+qmfolder+'\n')
@@ -1005,22 +1091,24 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
         results.append('fragment1 '+'1'+'-'+lastindex+'\n')
         results.append('fragment2 '+str(newindex)+'-'+lastnewindex+'\n')
         results.append('$end'+'\n')
-        results.append('$target'+'\n')
-        results.append('name '+liquidfolder+'\n')
-        results.append('type Liquid_TINKER'+'\n')
-        results.append('weight 1.0'+'\n')
-        results.append('w_rho 1.0'+'\n')
-        results.append('w_hvap 1.0'+'\n')
-        results.append('liquid_equ_steps '+str(liquid_equ_steps)+'\n')
-        results.append('liquid_prod_steps '+str(liquid_prod_steps)+'\n')
-        results.append('liquid_timestep '+str(liquid_timestep)+'\n')
-        results.append('liquid_interval '+str(liquid_interval)+'\n')
-        results.append('gas_equ_steps '+str(gas_equ_steps)+'\n')
-        results.append('gas_prod_steps '+str(gas_prod_steps)+'\n')
-        results.append('gas_timestep '+str(gas_timestep)+'\n')
-        results.append('gas_interval '+str(gas_interval)+'\n')
-        results.append('md_threads '+str(md_threads)+'\n')
-        results.append('$end'+'\n')
+        if gencsv==True:
+            liquidfolder=liquidfolderlist[i] 
+            results.append('$target'+'\n')
+            results.append('name '+liquidfolder+'\n')
+            results.append('type Liquid_TINKER'+'\n')
+            results.append('weight 1.0'+'\n')
+            results.append('w_rho 1.0'+'\n')
+            results.append('w_hvap 1.0'+'\n')
+            results.append('liquid_equ_steps '+str(liquid_equ_steps)+'\n')
+            results.append('liquid_prod_steps '+str(liquid_prod_steps)+'\n')
+            results.append('liquid_timestep '+str(liquid_timestep)+'\n')
+            results.append('liquid_interval '+str(liquid_interval)+'\n')
+            results.append('gas_equ_steps '+str(gas_equ_steps)+'\n')
+            results.append('gas_prod_steps '+str(gas_prod_steps)+'\n')
+            results.append('gas_timestep '+str(gas_timestep)+'\n')
+            results.append('gas_interval '+str(gas_interval)+'\n')
+            results.append('md_threads '+str(md_threads)+'\n')
+            results.append('$end'+'\n')
     for line in results:
         temp.write(line)
     temp.close()
@@ -1164,11 +1252,87 @@ def FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfilesli
     return newdimertinkerxyzfileslistoflist,newdimerenergieslistoflist
 
 
+def GrabNumericDensity(density_list):
+    densitylist=[]
+    for ls in density_list:
+        for value in ls:
+            if value.isnumeric():
+                break
+        densitylist.append(value)
+
+
+    return densitylist
+
+
+if csvexpdatafile!=None: 
+    nametopropsarray=ReadCSVFile(csvexpdatafile)
+    nametoarrayindexorder=GrabMoleculeOrder(poltypepathlist,nametopropsarray)
+    temperature_list,pressure_list,enthalpy_of_vaporization_list,heat_capacity_at_constant_pressure_list,density_list=GrabArrayInputs(nametopropsarray,nametoarrayindexorder)
+
+if temperature_list==None:
+    raise ValueError('No temperature data')
+if pressure_list==None:
+    raise ValueError('No pressure data')
+if density_list==None:
+    raise ValueError('No density data')
+
+
+CheckInputShapes([temperature_list,pressure_list,density_list])
+numberofmolecules=len(poltypepathlist)
+targetshape=ShapeOfArray(temperature_list)
+if enthalpy_of_vaporization_list==None:
+    enthalpy_of_vaporization_list=GenerateNoneList(targetshape)
+
+if enthalpy_of_vaporization_err_list==None:
+    enthalpy_of_vaporization_err_list=GenerateNoneList(targetshape)
+
+if surface_tension_list==None:
+    surface_tension_list=GenerateNoneList(targetshape)
+
+if surface_tension_err_list==None:
+    surface_tension_err_list=GenerateNoneList(targetshape)
+
+if relative_permittivity_list==None:
+    relative_permittivity_list=GenerateNoneList(targetshape)
+
+if relative_permittivity_err_list==None:
+    relative_permittivity_err_list=GenerateNoneList(targetshape)
+
+if isothermal_compressibility_list==None:
+    isothermal_compressibility_list=GenerateNoneList(targetshape)
+
+if isothermal_compressibility_err_list==None:
+    isothermal_compressibility_err_list=GenerateNoneList(targetshape)
+
+if isobaric_coefficient_of_volume_expansion_list==None:
+    isobaric_coefficient_of_volume_expansion_list=GenerateNoneList(targetshape)
+
+if isobaric_coefficient_of_volume_expansion_err_list==None:
+    isobaric_coefficient_of_volume_expansion_err_list=GenerateNoneList(targetshape)
+
+if heat_capacity_at_constant_pressure_list==None:
+    heat_capacity_at_constant_pressure_list=GenerateNoneList(targetshape)
+
+if heat_capacity_at_constant_pressure_err_list==None:
+    heat_capacity_at_constant_pressure_err_list=GenerateNoneList(targetshape)
+
+if density_list==None:
+    density_list=GenerateNoneList(targetshape)
+
+if density_err_list==None:
+    density_err_list=GenerateNoneList(targetshape)
+
+if citation_list==None:
+    citation_list=GenerateNoneList(targetshape)
+
+
+
+listoftptopropdics=CombineData(temperature_list,pressure_list,enthalpy_of_vaporization_list,enthalpy_of_vaporization_err_list,surface_tension_list,surface_tension_err_list,relative_permittivity_list,relative_permittivity_err_list,isothermal_compressibility_list,isothermal_compressibility_err_list,isobaric_coefficient_of_volume_expansion_list,isobaric_coefficient_of_volume_expansion_err_list,heat_capacity_at_constant_pressure_list,heat_capacity_at_constant_pressure_err_list,density_list,density_err_list,citation_list)
 if poltypepathlist!=None:
     keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist,dimersplogfileslist=ReadInPoltypeFiles(poltypepathlist)
     dimertinkerxyzfileslist,dimerenergieslist=FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfileslist)
-    densitylist=[ls[0] for ls in density_list] # just grab first density 
-    GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist)
+    densitylist=GrabNumericDensity(density_list)
+    indextogeneratecsv=GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist)
     prmfilepath=os.path.join(os.path.split(__file__)[0],'amoebabio18.prm')
     optimizefilepath=os.path.join(os.path.split(__file__)[0],'optimize.in')
     xyzeditpath='xyzedit'
@@ -1183,10 +1347,10 @@ if poltypepathlist!=None:
     GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether)
     rdkitmollist=GenerateRdkitMolList(molfilelist)
     atomnumlist=[rdkitmol.GetNumAtoms() for rdkitmol in rdkitmollist]
-    gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist=GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist)
+    gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist=GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfilepath,xyzeditpath,moleculeprmfilename,addwaterprms,molnamelist,indextogeneratecsv)
     liquidfolder='Liquid'
     qmfolder='QM'
     
-    liquidfolderlist=GenerateLiquidTargetsFolder(gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist,densitylist,liquidfolder,prmfilepath,moleculeprmfilename,vdwtypeslist,addwaterprms,molnamelist)
+    liquidfolderlist=GenerateLiquidTargetsFolder(gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist,densitylist,liquidfolder,prmfilepath,moleculeprmfilename,vdwtypeslist,addwaterprms,molnamelist,indextogeneratecsv)
     qmfolderlist=GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyfilelist,qmfolder,vdwtypeslist,molnamelist)    
-    GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads) 
+    GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads,indextogeneratecsv) 
