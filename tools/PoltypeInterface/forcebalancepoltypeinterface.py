@@ -600,7 +600,6 @@ def GrabVdwTypeLinesFromFinalKey(keyfilelist,vdwtypeslist):
     return vdwtypelineslist
 
 def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogether):
-
     try:
         length=len(fittypestogether)
         array=np.array(fittypestogether)
@@ -640,7 +639,7 @@ def GenerateForceFieldFiles(vdwtypelineslist,moleculeprmfilename,fittypestogethe
                 vdwtypetored[vdwtype]=False
 
             newline=' '.join(linesplit)+'\n'
-            vdwtypetoline[vdwtype]=newline    
+            vdwtypetoline[vdwtype]=newline   
     if len(array)!=0:
         for row in array:
             firsttype=row[0] # this one we reference and dont append
@@ -1149,6 +1148,7 @@ def GenerateTypeMaps(keyfilelist):
     for keyfilename in keyfilelist:
         maxnumberfromkey=GrabMaxTypeNumber(keyfilename)
         minnumberfromkey=GrabMinTypeNumber(keyfilename)
+
         if firsttime==True:
             shift=np.abs(currentmax-maxnumberfromkey)+1+prevmaxnumberfromkey-prevminnumberfromkey
         else:
@@ -1160,6 +1160,8 @@ def GenerateTypeMaps(keyfilelist):
             currentmax=maxnumberfromkey
         types=np.arange(minnumberfromkey,maxnumberfromkey+1,1)
         shiftedtypes=types+shift
+        maxtype=max(shiftedtypes)
+        currentmax=maxtype
         oldtypetonewtype=dict(zip(types,shiftedtypes))
         oldtypetonewtypelist.append(oldtypetonewtype)
         prevmaxnumberfromkey=maxnumberfromkey
@@ -1264,11 +1266,10 @@ def GrabNumericDensity(density_list):
     return densitylist
 
 
-if csvexpdatafile!=None: 
+if csvexpdatafile!=None:
     nametopropsarray=ReadCSVFile(csvexpdatafile)
     nametoarrayindexorder=GrabMoleculeOrder(poltypepathlist,nametopropsarray)
     temperature_list,pressure_list,enthalpy_of_vaporization_list,heat_capacity_at_constant_pressure_list,density_list=GrabArrayInputs(nametopropsarray,nametoarrayindexorder)
-
 if temperature_list==None:
     raise ValueError('No temperature data')
 if pressure_list==None:

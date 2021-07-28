@@ -50,7 +50,7 @@ poltypepathlist=/home/bdw2292/PoltypeJobs/HalogenPaperMolecules/CHI3,/home/bdw22
 csvexpdatafile=ExpHalogenData.csv
 vdwtypeslist=401 402 , 401 402  
 ```
-* Can use UNK for when unknown data property for input arrays
+* Dont let property values be blank for some TP points (need value for FB to read).
 * If using csvexpdatafile, please use correct units as below and the column headers in example csv file, make sure the molecule name under the Name column are same as poltype molecule folder name
 * By default all types in key files are reassigned new type numbers so there is no overlap while fitting together. So input types will be converted internally.
 * temperature_list, pressure_list and density_list are required.
