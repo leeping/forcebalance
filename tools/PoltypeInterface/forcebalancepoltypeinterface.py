@@ -43,8 +43,8 @@ gas_prod_steps=1000000
 gas_timestep=1.0
 gas_interval=0.1
 md_threads=4
-liquid_prod_time=.1 #ns
-gas_prod_time=1 #ns
+liquid_prod_time=5 #ns
+gas_prod_time=5 #ns
 nvtprops=False # NPT for most props, surface tension requires NVT and force balance complains
 addwaterprms=True
 
@@ -937,58 +937,66 @@ def GenerateTargetFiles(keyfilelist,xyzfilelist,densitylist,rdkitmollist,prmfile
 def GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyfilelist,originalqmfolder,vdwtypeslist,molnamelist):
     qmfolderlist=[]
     for j in range(len(dimertinkerxyzfileslist)):
-        dimertinkerxyzfiles=dimertinkerxyzfileslist[j]
-        dimerenergies=dimerenergieslist[j]
+        moldimertinkerxyzfiles=dimertinkerxyzfileslist[j]
+        moldimerenergies=dimerenergieslist[j]
         liquidkeyfile=liquidkeyfilelist[j]
         molname=molnamelist[j]
         vdwtypes=vdwtypeslist[j]
-        os.chdir('targets')
-        qmfolder=originalqmfolder+'_'+molname
-        qmfolderlist.append(qmfolder)
-        if not os.path.isdir(qmfolder):
-            os.mkdir(qmfolder)
-        os.chdir(qmfolder)
-        newnamearray=[]
-        newenergyarray=[]
-        arr=np.arange(0,len(dimertinkerxyzfiles))
-        arcwriter=open('all.arc','w')
-        for i in range(len(arr)):
-            value=arr[i]
-            tinkerxyzfile=dimertinkerxyzfiles[i]
-            dimerenergy=dimerenergies[i]
-            head,tail=os.path.split(tinkerxyzfile)
-            tinkerxyzfileprefix=tail.split('.')[0]
-            newname=tinkerxyzfileprefix+str(value)
-            temp=open(tinkerxyzfile,'r')
-            results=temp.readlines()
-            temp.close() 
-            firstline=results[0]
-            firstlinesplit=firstline.split()
-            firstlinesplit.append(newname)
-            newfirstline=' '.join(firstlinesplit)+'\n'
-            results[0]=newfirstline
-            newnamearray.append(newname)
-            newenergyarray.append(dimerenergy) 
-            for line in results:
-                arcwriter.write(line)
-        
-        arcwriter.close()
-        energywriter=open('qdata.txt','w')
-        for i in range(len(arr)):
-            value=arr[i]
-            energy=newenergyarray[i]
-            firstline='LABEL'+' '+str(value)+'\n'
-            secondline='INTERACTION'+' '+str(energy)+'\n'
-            energywriter.write(firstline)
-            energywriter.write(secondline)
-            energywriter.write('\n')
-        energywriter.close()
-        if liquidkeyfile!=None:
-            shutil.copy(liquidkeyfile,os.path.join(os.getcwd(),'liquid.key'))
-            CommentOutVdwLines(os.path.join(os.getcwd(),'liquid.key'),vdwtypes)
-            os.remove(liquidkeyfile)
-        os.chdir('..')
-        os.chdir('..')
+        for k in range(len(moldimertinkerxyzfiles)):
+            dimertinkerxyzfiles=moldimertinkerxyzfiles[k]
+            dimerenergies=moldimerenergies[k]
+            if k==0:
+                indexname='_water'
+            elif k==1:
+                indexname='_homodimer'
+            os.chdir('targets')
+            qmfolder=originalqmfolder+'_'+molname+indexname
+            qmfolderlist.append(qmfolder)
+            if not os.path.isdir(qmfolder):
+                os.mkdir(qmfolder)
+            os.chdir(qmfolder)
+            newnamearray=[]
+            newenergyarray=[]
+            arr=np.arange(0,len(dimertinkerxyzfiles))
+            arcwriter=open('all.arc','w')
+            for i in range(len(arr)):
+                value=arr[i]
+                tinkerxyzfile=dimertinkerxyzfiles[i]
+                dimerenergy=dimerenergies[i]
+                head,tail=os.path.split(tinkerxyzfile)
+                tinkerxyzfileprefix=tail.split('.')[0]
+                newname=tinkerxyzfileprefix+str(value)
+                temp=open(tinkerxyzfile,'r')
+                results=temp.readlines()
+                temp.close() 
+                firstline=results[0]
+                firstlinesplit=firstline.split()
+                firstlinesplit.append(newname)
+                newfirstline=' '.join(firstlinesplit)+'\n'
+                results[0]=newfirstline
+                newnamearray.append(newname)
+                newenergyarray.append(dimerenergy) 
+                for line in results:
+                    arcwriter.write(line)
+            
+            arcwriter.close()
+            energywriter=open('qdata.txt','w')
+            for i in range(len(arr)):
+                value=arr[i]
+                energy=newenergyarray[i]
+                firstline='LABEL'+' '+str(value)+'\n'
+                secondline='INTERACTION'+' '+str(energy)+'\n'
+                energywriter.write(firstline)
+                energywriter.write(secondline)
+                energywriter.write('\n')
+            energywriter.close()
+            if liquidkeyfile!=None:
+                shutil.copy(liquidkeyfile,os.path.join(os.getcwd(),'liquid.key'))
+                CommentOutVdwLines(os.path.join(os.getcwd(),'liquid.key'),vdwtypes)
+                if k==1:
+                    os.remove(liquidkeyfile)
+            os.chdir('..')
+            os.chdir('..')
  
     return qmfolderlist
 
@@ -1056,7 +1064,7 @@ def which(program):
 
 
 
-def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads,indextogeneratecsv):
+def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads,indextogeneratecsv,qmfoldertoindex):
     head,tail=os.path.split(optimizefilepath)
     newoptimizefilepath=os.path.join(os.getcwd(),tail)
     shutil.copy(optimizefilepath,newoptimizefilepath)
@@ -1073,10 +1081,12 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
     
            
     temp=open(newoptimizefilepath,'a')
+    liquidtargettoappend=dict(zip(liquidfolderlist,[False for i in range(len(liquidfolderlist))]))
     for i in range(len(qmfolderlist)):
-        gencsv=indextogeneratecsv[i]
         qmfolder=qmfolderlist[i]
-        atomnum=atomnumlist[i]
+        index=qmfoldertoindex[qmfolder]
+        gencsv=indextogeneratecsv[index]
+        atomnum=atomnumlist[index]
         results.append('$target'+'\n')
         results.append('name '+qmfolder+'\n')
         results.append('type Interaction_TINKER'+'\n')
@@ -1087,27 +1097,36 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
         lastindex=str(atomnum)
         newindex=str(atomnum+1)
         lastnewindex=str(atomnum+1+2)
-        results.append('fragment1 '+'1'+'-'+lastindex+'\n')
-        results.append('fragment2 '+str(newindex)+'-'+lastnewindex+'\n')
+        homodimerlastindex=str(atomnum+1+atomnum)
+        if 'water' in qmfolder:
+            results.append('fragment1 '+'1'+'-'+lastindex+'\n')
+            results.append('fragment2 '+str(newindex)+'-'+lastnewindex+'\n')
+        elif 'homodimer' in qmfolder:
+            results.append('fragment1 '+'1'+'-'+lastindex+'\n')
+            results.append('fragment2 '+str(newindex)+'-'+homodimerlastindex+'\n')
+
         results.append('$end'+'\n')
         if gencsv==True:
-            liquidfolder=liquidfolderlist[i] 
-            results.append('$target'+'\n')
-            results.append('name '+liquidfolder+'\n')
-            results.append('type Liquid_TINKER'+'\n')
-            results.append('weight 1.0'+'\n')
-            results.append('w_rho 1.0'+'\n')
-            results.append('w_hvap 1.0'+'\n')
-            results.append('liquid_equ_steps '+str(liquid_equ_steps)+'\n')
-            results.append('liquid_prod_steps '+str(liquid_prod_steps)+'\n')
-            results.append('liquid_timestep '+str(liquid_timestep)+'\n')
-            results.append('liquid_interval '+str(liquid_interval)+'\n')
-            results.append('gas_equ_steps '+str(gas_equ_steps)+'\n')
-            results.append('gas_prod_steps '+str(gas_prod_steps)+'\n')
-            results.append('gas_timestep '+str(gas_timestep)+'\n')
-            results.append('gas_interval '+str(gas_interval)+'\n')
-            results.append('md_threads '+str(md_threads)+'\n')
-            results.append('$end'+'\n')
+            liquidfolder=liquidfolderlist[index] 
+            value=liquidtargettoappend[liquidfolder]
+            if value==False:
+                liquidtargettoappend[liquidfolder]=True
+                results.append('$target'+'\n')
+                results.append('name '+liquidfolder+'\n')
+                results.append('type Liquid_TINKER'+'\n')
+                results.append('weight 1.0'+'\n')
+                results.append('w_rho 1.0'+'\n')
+                results.append('w_hvap 1.0'+'\n')
+                results.append('liquid_equ_steps '+str(liquid_equ_steps)+'\n')
+                results.append('liquid_prod_steps '+str(liquid_prod_steps)+'\n')
+                results.append('liquid_timestep '+str(liquid_timestep)+'\n')
+                results.append('liquid_interval '+str(liquid_interval)+'\n')
+                results.append('gas_equ_steps '+str(gas_equ_steps)+'\n')
+                results.append('gas_prod_steps '+str(gas_prod_steps)+'\n')
+                results.append('gas_timestep '+str(gas_timestep)+'\n')
+                results.append('gas_interval '+str(gas_interval)+'\n')
+                results.append('md_threads '+str(md_threads)+'\n')
+                results.append('$end'+'\n')
     for line in results:
         temp.write(line)
     temp.close()
@@ -1266,6 +1285,50 @@ def GrabNumericDensity(density_list):
     return densitylist
 
 
+def SeperateHomoDimerAndWater(dimertinkerxyzfileslist,dimerenergieslist):
+    newdimertinkerxyzfileslist=[]
+    newdimerenergieslist=[]
+    for i in range(len(dimertinkerxyzfileslist)):
+        moldimertinkerxyzfileslist=dimertinkerxyzfileslist[i]
+        moldimerenergieslist=dimerenergieslist[i]
+        waterlist=[]
+        homodimerlist=[]
+        waterenergylist=[]
+        homodimerenergylist=[]
+        for j in range(len(moldimertinkerxyzfileslist)):
+            xyzfile=moldimertinkerxyzfileslist[j]
+            eng=moldimerenergieslist[j]
+            if 'water' in xyzfile:
+                waterlist.append(xyzfile)
+                waterenergylist.append(eng)
+            else:
+                homodimerlist.append(xyzfile)
+                homodimerenergylist.append(eng)      
+        newlist=[waterlist,homodimerlist]
+        newenergylist=[waterenergylist,homodimerenergylist]
+        newdimertinkerxyzfileslist.append(newlist)
+        newdimerenergieslist.append(newenergylist)  
+
+    return newdimertinkerxyzfileslist,newdimerenergieslist
+
+
+def GenerateQMFolderToCSVIndex(qmfolderlist):
+    qmfoldertoindex={}
+    prefixtoarray={}
+    for i in range(len(qmfolderlist)):
+        folder=qmfolderlist[i]
+        foldersplit=folder.split('_')
+        folderprefix='_'.join(foldersplit[:-1])
+        if folderprefix not in prefixtoarray.keys():
+            prefixtoarray[folderprefix]=[]
+        prefixtoarray[folderprefix].append(folder)
+    index=0
+    for prefix,array in prefixtoarray.items():
+        for folder in array:
+            qmfoldertoindex[folder]=index
+        index+=1
+    return qmfoldertoindex
+
 if csvexpdatafile!=None:
     nametopropsarray=ReadCSVFile(csvexpdatafile)
     nametoarrayindexorder=GrabMoleculeOrder(poltypepathlist,nametopropsarray)
@@ -1331,7 +1394,9 @@ if citation_list==None:
 listoftptopropdics=CombineData(temperature_list,pressure_list,enthalpy_of_vaporization_list,enthalpy_of_vaporization_err_list,surface_tension_list,surface_tension_err_list,relative_permittivity_list,relative_permittivity_err_list,isothermal_compressibility_list,isothermal_compressibility_err_list,isobaric_coefficient_of_volume_expansion_list,isobaric_coefficient_of_volume_expansion_err_list,heat_capacity_at_constant_pressure_list,heat_capacity_at_constant_pressure_err_list,density_list,density_err_list,citation_list)
 if poltypepathlist!=None:
     keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist,dimersplogfileslist=ReadInPoltypeFiles(poltypepathlist)
+    
     dimertinkerxyzfileslist,dimerenergieslist=FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfileslist)
+    dimertinkerxyzfileslist,dimerenergieslist=SeperateHomoDimerAndWater(dimertinkerxyzfileslist,dimerenergieslist)
     densitylist=GrabNumericDensity(density_list)
     indextogeneratecsv=GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist)
     prmfilepath=os.path.join(os.path.split(__file__)[0],'amoebabio18.prm')
@@ -1354,4 +1419,5 @@ if poltypepathlist!=None:
     
     liquidfolderlist=GenerateLiquidTargetsFolder(gaskeyfilelist,gasxyzfilelist,liquidkeyfilelist,liquidxyzfilelist,datacsvpathlist,densitylist,liquidfolder,prmfilepath,moleculeprmfilename,vdwtypeslist,addwaterprms,molnamelist,indextogeneratecsv)
     qmfolderlist=GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyfilelist,qmfolder,vdwtypeslist,molnamelist)    
-    GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads,indextogeneratecsv) 
+    qmfoldertoindex=GenerateQMFolderToCSVIndex(qmfolderlist) # need way to keep track of liquid to QM 
+    GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderlist,optimizefilepath,atomnumlist,liquid_equ_steps,liquid_prod_steps,liquid_timestep,liquid_interval,gas_equ_steps,gas_timestep,gas_interval,md_threads,indextogeneratecsv,qmfoldertoindex) 
