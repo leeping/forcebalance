@@ -1097,7 +1097,7 @@ def GenerateForceBalanceInputFile(moleculeprmfilename,qmfolderlist,liquidfolderl
         lastindex=str(atomnum)
         newindex=str(atomnum+1)
         lastnewindex=str(atomnum+1+2)
-        homodimerlastindex=str(atomnum+1+atomnum)
+        homodimerlastindex=str(atomnum+atomnum)
         if 'water' in qmfolder:
             results.append('fragment1 '+'1'+'-'+lastindex+'\n')
             results.append('fragment2 '+str(newindex)+'-'+lastnewindex+'\n')
