@@ -111,7 +111,7 @@ def CheckNoneValue(value):
         value='UNK'
     return value 
 
-def ReadCSVFile(csvfileread):
+def ReadCSVFile(csvfileread,poltypepathlist):
     with open(csvfileread, newline='') as csvfile:
         reader = list(csv.reader(csvfile, delimiter=',', quotechar='|'))
         header=reader[0]
@@ -153,6 +153,21 @@ def ReadCSVFile(csvfileread):
             if heatcapstring not in nametopropsarray[name].keys():
                 nametopropsarray[name][heatcapstring]=[]
             nametopropsarray[name][heatcapstring].append(heatcap)
+        for path in poltypepathlist:
+            head,name=os.path.split(path)
+            if name not in nametopropsarray.keys():
+                nametopropsarray[name]={}
+            if tempstring not in nametopropsarray[name].keys():
+                nametopropsarray[name][tempstring]=[]
+            if pressurestring not in nametopropsarray[name].keys():
+                nametopropsarray[name][pressurestring]=[]
+            if densitystring not in nametopropsarray[name].keys():
+                nametopropsarray[name][densitystring]=[]
+            if enthalpystring not in nametopropsarray[name].keys():
+                nametopropsarray[name][enthalpystring]=[]
+            if heatcapstring not in nametopropsarray[name].keys():
+                nametopropsarray[name][heatcapstring]=[]
+
 
     return nametopropsarray
 
@@ -451,7 +466,7 @@ def WriteCSVFile(listoftpdics,nvtprops,molname):
 
 def GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist):
     indextogeneratecsv={}
-    for i in range(len(listoftptopropdics)):
+    for i in range(len(molnamelist)):
         tptoproptovalue=listoftptopropdics[i]
         allunknown=True
         for tp,proptovalue in tptoproptovalue.items():
@@ -943,7 +958,6 @@ def GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyf
         liquidkeyfile=liquidkeyfilelist[j]
         molname=molnamelist[j]
         vdwtypes=vdwtypeslist[j]
-        removeliquid=False
         for k in range(len(moldimertinkerxyzfiles)):
             dimertinkerxyzfiles=moldimertinkerxyzfiles[k]
             dimerenergies=moldimerenergies[k]
@@ -1002,8 +1016,7 @@ def GenerateQMTargetsFolder(dimertinkerxyzfileslist,dimerenergieslist,liquidkeyf
                 if liquidkeyfile!=None:
                     shutil.copy(liquidkeyfile,os.path.join(os.getcwd(),'liquid.key'))
                     CommentOutVdwLines(os.path.join(os.getcwd(),'liquid.key'),vdwtypes)
-                    if removeliquid==False:
-                        removeliquid=True
+                    if k==1:
                         os.remove(liquidkeyfile)
                 os.chdir('..')
                 os.chdir('..')
@@ -1288,9 +1301,12 @@ def FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfilesli
 def GrabNumericDensity(density_list):
     densitylist=[]
     for ls in density_list:
-        for value in ls:
-            if value.isnumeric():
-                break
+        if len(ls)!=0:
+            for value in ls:
+                if value.isnumeric():
+                    break
+        else:
+            value=0 # this wont be used for liquid sims anyway
         densitylist.append(value)
 
 
@@ -1342,9 +1358,10 @@ def GenerateQMFolderToCSVIndex(qmfolderlist):
     return qmfoldertoindex
 
 if csvexpdatafile!=None:
-    nametopropsarray=ReadCSVFile(csvexpdatafile)
+    nametopropsarray=ReadCSVFile(csvexpdatafile,poltypepathlist)
     nametoarrayindexorder=GrabMoleculeOrder(poltypepathlist,nametopropsarray)
     temperature_list,pressure_list,enthalpy_of_vaporization_list,heat_capacity_at_constant_pressure_list,density_list=GrabArrayInputs(nametopropsarray,nametoarrayindexorder)
+   
 if temperature_list==None:
     raise ValueError('No temperature data')
 if pressure_list==None:
@@ -1401,16 +1418,13 @@ if density_err_list==None:
 if citation_list==None:
     citation_list=GenerateNoneList(targetshape)
 
-
-
 listoftptopropdics=CombineData(temperature_list,pressure_list,enthalpy_of_vaporization_list,enthalpy_of_vaporization_err_list,surface_tension_list,surface_tension_err_list,relative_permittivity_list,relative_permittivity_err_list,isothermal_compressibility_list,isothermal_compressibility_err_list,isobaric_coefficient_of_volume_expansion_list,isobaric_coefficient_of_volume_expansion_err_list,heat_capacity_at_constant_pressure_list,heat_capacity_at_constant_pressure_err_list,density_list,density_err_list,citation_list)
 if poltypepathlist!=None:
     keyfilelist,xyzfilelist,dimertinkerxyzfileslist,dimerenergieslist,molnamelist,molfilelist,dimersplogfileslist=ReadInPoltypeFiles(poltypepathlist)
     dimertinkerxyzfileslist,dimerenergieslist=FilterHighEnergy(dimertinkerxyzfileslist,dimerenergieslist,dimersplogfileslist)
     dimertinkerxyzfileslist,dimerenergieslist=SeperateHomoDimerAndWater(dimertinkerxyzfileslist,dimerenergieslist)
-
-    densitylist=GrabNumericDensity(density_list)
     indextogeneratecsv=GenerateLiquidCSVFile(nvtprops,listoftptopropdics,molnamelist)
+    densitylist=GrabNumericDensity(density_list)
     prmfilepath=os.path.join(os.path.split(__file__)[0],'amoebabio18.prm')
     optimizefilepath=os.path.join(os.path.split(__file__)[0],'optimize.in')
     xyzeditpath='xyzedit'
