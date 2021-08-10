@@ -91,10 +91,10 @@ if _SHOULD_CACHE:
     # Cache for OETK assign_partial_charges
     oe_original_assign_partial_charges = OpenEyeToolkitWrapper.assign_partial_charges
     OE_TOOLKIT_CACHE_assign_partial_charges = {}
-    def oe_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, strict_n_conformers=False, _cls=Molecule):
-        cache_key = hash((hash_molecule(molecule), partial_charge_method, str(use_conformers), strict_n_conformers))
+    def oe_cached_assign_partial_charges(self, molecule, partial_charge_method=None, normalize_partial_charges=True, use_conformers=None, strict_n_conformers=False, _cls=Molecule):
+        cache_key = hash((hash_molecule(molecule), partial_charge_method, str(use_conformers), strict_n_conformers, normalize_partial_charges))
         if cache_key not in OE_TOOLKIT_CACHE_assign_partial_charges:
-            oe_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers, _cls=_cls)
+            oe_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, normalize_partial_charges=normalize_partial_charges, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers, _cls=_cls)
             OE_TOOLKIT_CACHE_assign_partial_charges[cache_key] = molecule.partial_charges
         else:
             molecule.partial_charges = OE_TOOLKIT_CACHE_assign_partial_charges[cache_key]
@@ -105,10 +105,10 @@ if _SHOULD_CACHE:
     # Cache for AmberTools assign_partial_charges
     at_original_assign_partial_charges = AmberToolsToolkitWrapper.assign_partial_charges
     AT_TOOLKIT_CACHE_assign_partial_charges = {}
-    def at_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, strict_n_conformers=False, _cls=Molecule):
-        cache_key = hash((hash_molecule(molecule), partial_charge_method, str(use_conformers), strict_n_conformers))
+    def at_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, normalize_partial_charges=True, strict_n_conformers=False, _cls=Molecule):
+        cache_key = hash((hash_molecule(molecule), partial_charge_method, str(use_conformers), strict_n_conformers, normalize_partial_charges))
         if cache_key not in AT_TOOLKIT_CACHE_assign_partial_charges:
-            at_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers, _cls=_cls)
+            at_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, normalize_partial_charges=normalize_partial_charges, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers, _cls=_cls)
             AT_TOOLKIT_CACHE_assign_partial_charges[cache_key] = molecule.partial_charges
         else:
             molecule.partial_charges = AT_TOOLKIT_CACHE_assign_partial_charges[cache_key]
