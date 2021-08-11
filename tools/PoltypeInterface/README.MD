@@ -94,4 +94,5 @@ md_threads                                           CPU cores
 liquid_prod_time                                     Total time liquid sim
 gas_prod_time                                        Total time gas sim
 nvtprops                                             This controls whether to include surface tension or not (NVT) property
+debugmode                                            Sets MD to very short time for testing ForceBalance (.001 ns)
 ```
