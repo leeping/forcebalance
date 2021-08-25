@@ -1281,12 +1281,15 @@ class OpenMM(Engine):
 
     def _update_positions(self, X1, disable_vsite):
         """A convenience method for updating the positions of the simulation context."""
+        # check if we have units
+        if isinstance(X1, numpy.ndarray):
+            X1 = X1 * angstrom
 
         if disable_vsite:
-            self.simulation.context.setPositions(X1 * angstrom)
+            self.simulation.context.setPositions(X1)
         else:
             # Create virtual sites before setting positions
-            mod = Modeller(self.pdb.topology, X1*angstrom)
+            mod = Modeller(self.pdb.topology, X1)
             mod.addExtraParticles(self.forcefield)
             self.simulation.context.setPositions(ResetVirtualSites_fast(mod.getPositions(), self.vsinfo))
 
