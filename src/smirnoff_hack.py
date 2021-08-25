@@ -33,6 +33,12 @@ def hash_molecule(molecule):
     return cmiles
 
 
+def hash_molecule_args_and_kwargs(molecule, *args, **kwargs):
+    arguments = [str(arg) for arg in args]
+    keywords = [str(keyword) for keyword in kwargs.values()]
+    return hash((hash_molecule(molecule), *arguments, *keywords))
+
+
 if _SHOULD_CACHE:
 
     print(
@@ -44,10 +50,10 @@ if _SHOULD_CACHE:
     # cache for OE find_smarts_matches (save 300+ s)
     oe_original_find_smarts_matches = OpenEyeToolkitWrapper.find_smarts_matches
     OE_TOOLKIT_CACHE_find_smarts_matches = {}
-    def oe_cached_find_smarts_matches(self, molecule, smarts, aromaticity_model='OEAroModel_MDL'):
-        cache_key = hash((hash_molecule(molecule), smarts, aromaticity_model))
+    def oe_cached_find_smarts_matches(self, molecule, *args, **kwargs):
+        cache_key = hash_molecule_args_and_kwargs(molecule, args, kwargs)
         if cache_key not in OE_TOOLKIT_CACHE_find_smarts_matches:
-            OE_TOOLKIT_CACHE_find_smarts_matches[cache_key] = oe_original_find_smarts_matches(self, molecule, smarts, aromaticity_model=aromaticity_model)
+            OE_TOOLKIT_CACHE_find_smarts_matches[cache_key] = oe_original_find_smarts_matches(self, molecule, *args, **kwargs)
         return OE_TOOLKIT_CACHE_find_smarts_matches[cache_key]
     # replace the original function with new one
     OpenEyeToolkitWrapper.find_smarts_matches = oe_cached_find_smarts_matches
@@ -55,10 +61,10 @@ if _SHOULD_CACHE:
     # cache for RDK find_smarts_matches
     rdk_original_find_smarts_matches = RDKitToolkitWrapper.find_smarts_matches
     RDK_TOOLKIT_CACHE_find_smarts_matches = {}
-    def rdk_cached_find_smarts_matches(self, molecule, smarts, aromaticity_model='OEAroModel_MDL'):
-        cache_key = hash((hash_molecule(molecule), smarts, aromaticity_model))
+    def rdk_cached_find_smarts_matches(self, molecule, *args, **kwargs):
+        cache_key = hash_molecule_args_and_kwargs(molecule, args, kwargs)
         if cache_key not in RDK_TOOLKIT_CACHE_find_smarts_matches:
-            RDK_TOOLKIT_CACHE_find_smarts_matches[cache_key] = rdk_original_find_smarts_matches(self, molecule, smarts, aromaticity_model=aromaticity_model)
+            RDK_TOOLKIT_CACHE_find_smarts_matches[cache_key] = rdk_original_find_smarts_matches(self, molecule, *args, **kwargs)
         return RDK_TOOLKIT_CACHE_find_smarts_matches[cache_key]
     # replace the original function with new one
     RDKitToolkitWrapper.find_smarts_matches = rdk_cached_find_smarts_matches
@@ -91,10 +97,10 @@ if _SHOULD_CACHE:
     # Cache for OETK assign_partial_charges
     oe_original_assign_partial_charges = OpenEyeToolkitWrapper.assign_partial_charges
     OE_TOOLKIT_CACHE_assign_partial_charges = {}
-    def oe_cached_assign_partial_charges(self, molecule, partial_charge_method=None, normalize_partial_charges=True, use_conformers=None, strict_n_conformers=False, _cls=Molecule):
-        cache_key = hash((hash_molecule(molecule), partial_charge_method, str(use_conformers), strict_n_conformers, normalize_partial_charges))
+    def oe_cached_assign_partial_charges(self, molecule, *args, **kwargs):
+        cache_key = hash_molecule_args_and_kwargs(molecule, args, kwargs)
         if cache_key not in OE_TOOLKIT_CACHE_assign_partial_charges:
-            oe_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, normalize_partial_charges=normalize_partial_charges, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers, _cls=_cls)
+            oe_original_assign_partial_charges(self, molecule, *args, **kwargs)
             OE_TOOLKIT_CACHE_assign_partial_charges[cache_key] = molecule.partial_charges
         else:
             molecule.partial_charges = OE_TOOLKIT_CACHE_assign_partial_charges[cache_key]
@@ -105,10 +111,10 @@ if _SHOULD_CACHE:
     # Cache for AmberTools assign_partial_charges
     at_original_assign_partial_charges = AmberToolsToolkitWrapper.assign_partial_charges
     AT_TOOLKIT_CACHE_assign_partial_charges = {}
-    def at_cached_assign_partial_charges(self, molecule, partial_charge_method=None, use_conformers=None, normalize_partial_charges=True, strict_n_conformers=False, _cls=Molecule):
-        cache_key = hash((hash_molecule(molecule), partial_charge_method, str(use_conformers), strict_n_conformers, normalize_partial_charges))
+    def at_cached_assign_partial_charges(self, molecule, *args, **kwargs):
+        cache_key = hash_molecule_args_and_kwargs(molecule, args, kwargs)
         if cache_key not in AT_TOOLKIT_CACHE_assign_partial_charges:
-            at_original_assign_partial_charges(self, molecule, partial_charge_method=partial_charge_method, normalize_partial_charges=normalize_partial_charges, use_conformers=use_conformers, strict_n_conformers=strict_n_conformers, _cls=_cls)
+            at_original_assign_partial_charges(self, molecule, *args, **kwargs)
             AT_TOOLKIT_CACHE_assign_partial_charges[cache_key] = molecule.partial_charges
         else:
             molecule.partial_charges = AT_TOOLKIT_CACHE_assign_partial_charges[cache_key]
