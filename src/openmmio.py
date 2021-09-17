@@ -33,18 +33,19 @@ from collections import OrderedDict
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
 
-from simtk.unit import *
 # Handle simtk namespace change around 7.6 release
 try:
     try:
         # Try importing openmm using >=7.6 namespace
         from openmm.app import *
         from openmm import *
+        from openmm.unit import *
         import openmm._openmm as _openmm
     except ImportError:
         # Try importing openmm using <7.6 namespace
         from simtk.openmm.app import *
         from simtk.openmm import *
+        from simtk.unit import *
         import simtk.openmm._openmm as _openmm
 except ImportError:
     # Need to have "pass" conditional if neither is installed so that non-openmm builds can parse this file
