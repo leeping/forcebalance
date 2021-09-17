@@ -308,11 +308,15 @@ class Evaluator_SMIRNOFF(Target):
         bool
             Returns True if the parameter is a cosmetic one.
         """
+        import simtk.unit as simtk_unit
 
         parameter_handler = self.FF.openff_forcefield.get_parameter_handler(
             gradient_key.tag
         )
-        parameter = parameter_handler.parameters[gradient_key.smirks]
+        parameter = (
+            parameter_handler if gradient_key.smirks is None
+            else parameter_handler.parameters[gradient_key.smirks]
+        )
 
         attribute_split = re.split(r"(\d+)", gradient_key.attribute)
         attribute_split = list(filter(None, attribute_split))
@@ -342,6 +346,9 @@ class Evaluator_SMIRNOFF(Target):
             or parameter_attribute in parameter._cosmetic_attribs
         ):
             is_cosmetic = True
+
+        if not isinstance(parameter_value, simtk_unit.Quantity):
+            parameter_value = parameter_value * simtk_unit.dimensionless
 
         return openmm_quantity_to_pint(parameter_value), is_cosmetic
 
@@ -461,9 +468,16 @@ class Evaluator_SMIRNOFF(Target):
                 string_key = field_list[0]
                 key_split = string_key.split("/")
 
-                parameter_tag = key_split[0].strip()
-                parameter_smirks = key_split[3].strip()
-                parameter_attribute = key_split[2].strip()
+                if len(key_split) == 3 and key_split[0] == "":
+                    parameter_tag = key_split[1].strip()
+                    parameter_smirks = None
+                    parameter_attribute = key_split[2].strip()
+                elif len(key_split) == 4:
+                    parameter_tag = key_split[0].strip()
+                    parameter_smirks = key_split[3].strip()
+                    parameter_attribute = key_split[2].strip()
+                else:
+                    raise NotImplementedError()
 
                 # Use the full attribute name (e.g. k1) for the gradient key.
                 parameter_gradient_key = ParameterGradientKey(
