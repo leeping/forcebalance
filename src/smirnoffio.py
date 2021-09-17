@@ -534,7 +534,7 @@ class SMIRNOFF(OpenMM):
         else:
             X1 = (X1 + [Vec3(0.0, 0.0, 0.0)] * n_v_sites) * angstrom
 
-        self.simulation.context.setPositions(X1 * angstrom)
+        self.simulation.context.setPositions(X1)
         self.simulation.context.computeVirtualSites()
 
     def interaction_energy(self, fraga, fragb):
