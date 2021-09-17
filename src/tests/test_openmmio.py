@@ -1,10 +1,20 @@
 from __future__ import absolute_import
 import forcebalance
 from forcebalance.openmmio import PrepareVirtualSites, ResetVirtualSites_fast
-import simtk.openmm as mm
-from simtk.openmm import app
+
 import numpy as np
 from simtk import unit
+
+try:
+    # Try importing openmm using >=7.6 namespace
+    from openmm import app
+    import openmm as mm
+except ImportError:
+    # Try importing openmm using <7.6 namespace
+    import simtk.openmm as mm
+    from simtk.openmm import app
+
+
 import os
 import shutil
 from .test_target import TargetTests # general targets tests defined in test_target.py
