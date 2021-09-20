@@ -23,7 +23,7 @@ class TestLiquid_OpenMM(TargetTests):
                 'forcefield': ['dms.xml']})
 
         self.tgt_opt.update({'type':'LIQUID_OPENMM',
-            'name':'dms-liquid', 'liquid_md_steps':500})
+            'name':'dms-liquid', 'liquid_eq_steps':100, 'liquid_md_steps':200, 'gas_eq_steps':100, 'gas_md_steps':200})
 
         self.ff = forcebalance.forcefield.FF(self.options)
 
