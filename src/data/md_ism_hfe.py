@@ -89,9 +89,14 @@ engname = TgtOpts['engname']
 # Import modules and create the correct Engine object.
 if engname == "openmm":
     try:
-        from simtk.unit import *
-        from simtk.openmm import *
-        from simtk.openmm.app import *
+        try:
+            from openmm.unit import *
+            from openmm import *
+            from openmm.app import *
+        except ImportError:
+            from simtk.unit import *
+            from simtk.openmm import *
+            from simtk.openmm.app import *
     except:
         traceback.print_exc()
         raise Exception("Cannot import OpenMM modules")

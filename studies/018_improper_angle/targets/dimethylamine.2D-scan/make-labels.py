@@ -5,9 +5,15 @@ import numpy as np
 import sys
 
 # Import OpenMM tools
-from simtk import openmm, unit
-from simtk.openmm import Platform
-from simtk.openmm.app import *
+try:
+    import openmm
+    from openmm import unit
+    from openmm import Platform
+    from openmm.app import *
+except ImportError:
+    from simtk import openmm, unit
+    from simtk.openmm import Platform
+    from simtk.openmm.app import *
 
 # Use MDTraj to write simulation trajectories
 from mdtraj.reporters import NetCDFReporter
