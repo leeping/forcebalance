@@ -17,6 +17,7 @@ class TargetTests(ForceBalanceTestCase):
         self.tgt_opt = forcebalance.parser.tgt_opts_defaults.copy()
         self.ff = None  # Forcefield this target is fitting
         self.options.update({'root': os.path.join(os.getcwd(), 'files')})
+        self.check_grad_fd = True # Whether to check gradient vs. finite difference. Set to False for liquid targets.
 
         os.chdir(self.options['root'])
 
@@ -24,7 +25,6 @@ class TargetTests(ForceBalanceTestCase):
         """Check target get() function output"""
         #os.chdir(self.target.tempdir)
         os.chdir('temp/%s' % self.tgt_opt['name'])
-
 
         self.logger.debug("Evaluating objective function for target...\n")
         objective = self.target.get(self.mvals)
@@ -76,16 +76,17 @@ class TargetTests(ForceBalanceTestCase):
         assert G.any() # with AGrad=True, G should not be [0]
         g = numpy.zeros(self.ff.np)
 
-        print(">ASSERT objective['G'] approximately matches finite difference calculations\n")
-        for p in range(self.ff.np):
-            mvals_lo = self.mvals[:]
-            mvals_hi = self.mvals[:]
-            mvals_lo[p]-=(self.mvals[p]/200.)
-            mvals_hi[p]+=(self.mvals[p]/200.)
-
-            Xlo = self.target.get(mvals_lo)['X']
-            Xhi = self.target.get(mvals_hi)['X']
-            g[p] = (Xhi-Xlo)/(self.mvals[p]/100.)
-            assert abs(g[p]-G[p]) < X*.01 +1e-7
-
+        if self.check_grad_fd:
+            print(">ASSERT objective['G'] approximately matches finite difference calculations\n")
+            for p in range(self.ff.np):
+                mvals_lo = self.mvals[:]
+                mvals_hi = self.mvals[:]
+                mvals_lo[p]-=(self.mvals[p]/200.)
+                mvals_hi[p]+=(self.mvals[p]/200.)
+    
+                Xlo = self.target.get(mvals_lo)['X']
+                Xhi = self.target.get(mvals_hi)['X']
+                g[p] = (Xhi-Xlo)/(self.mvals[p]/100.)
+                assert abs(g[p]-G[p]) < X*.01 +1e-7
+    
         os.chdir('../..')

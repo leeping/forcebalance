@@ -23,26 +23,28 @@ import pytest
 """
 The testing functions for this class are located in test_target.py.
 """
+
 class TestLiquid_OpenMM(TargetTests):
     def setup_method(self, method):
-        pytest.skip("Needs optimizing to reduce runtime")
         super(TestLiquid_OpenMM, self).setup_method(method)
+        self.check_grad_fd = False
         # settings specific to this target
         self.options.update({
                 'jobtype': 'NEWTON',
                 'forcefield': ['dms.xml']})
 
         self.tgt_opt.update({'type':'LIQUID_OPENMM',
-            'name':'dms-liquid'})
+            'name':'dms-liquid', 'liquid_eq_steps':100, 'liquid_md_steps':200, 'gas_eq_steps':100, 'gas_md_steps':200})
 
         self.ff = forcebalance.forcefield.FF(self.options)
 
         self.ffname = self.options['forcefield'][0][:-3]
         self.filetype = self.options['forcefield'][0][-3:]
-        self.mvals = [.5]*self.ff.np
+        self.mvals = np.array([.5]*self.ff.np)
 
         self.target = forcebalance.openmmio.Liquid_OpenMM(self.options, self.tgt_opt, self.ff)
-        self.target.stage(self.mvals)
+        self.target.stage(self.mvals, AGrad=True, use_iterdir=False)
+
 
     def teardown_method(self):
         shutil.rmtree('temp')

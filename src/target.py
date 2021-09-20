@@ -598,7 +598,7 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
         return
 
-    def stage(self, mvals, AGrad=False, AHess=False, customdir=None, firstIteration=False):
+    def stage(self, mvals, AGrad=False, AHess=False, use_iterdir=True, customdir=None, firstIteration=False):
         """
 
         Stages the directory for the target, and then launches Work Queue processes if any.
@@ -614,7 +614,7 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         cwd = os.getcwd()
 
         absgetdir = os.path.join(self.root,self.tempdir)
-        if Counter() is not None:
+        if use_iterdir and Counter() is not None:
             ## Not expecting more than ten thousand iterations
             iterdir = "iter_%04i" % Counter()
             absgetdir = os.path.join(absgetdir,iterdir)
