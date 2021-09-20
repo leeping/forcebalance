@@ -107,6 +107,7 @@ jobs:
         # python setup.py install
         python -m pip install --no-deps .
         python -c "import forcebalance; print(forcebalance.__version__)"
+        conda remove --force openmm
 
     - name: Run water study
       shell: bash -l {0}
