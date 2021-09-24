@@ -5,16 +5,21 @@ from forcebalance.openmmio import PrepareVirtualSites, ResetVirtualSites_fast
 import numpy as np
 
 try:
-    # Try importing openmm using >=7.6 namespace
-    from openmm import app
-    import openmm as mm
-    from openmm import unit
+    try:
+        # Try importing openmm using >=7.6 namespace
+        from openmm import app
+        import openmm as mm
+        from openmm import unit
+    except ImportError:
+        # Try importing openmm using <7.6 namespace
+        import simtk.openmm as mm
+        from simtk.openmm import app
+        from simtk import unit
+    no_openmm = False
 except ImportError:
-    # Try importing openmm using <7.6 namespace
-    import simtk.openmm as mm
-    from simtk.openmm import app
-    from simtk import unit
-
+    # If OpenMM classes cannot be imported, then set this flag 
+    # so the testing classes/functions can use to skip.
+    no_openmm = True
 
 import os
 import shutil
@@ -26,6 +31,7 @@ The testing functions for this class are located in test_target.py.
 
 class TestLiquid_OpenMM(TargetTests):
     def setup_method(self, method):
+        if no_openmm: pytest.skip("No OpenMM modules found.")
         super(TestLiquid_OpenMM, self).setup_method(method)
         self.check_grad_fd = False
         # settings specific to this target
@@ -53,6 +59,7 @@ class TestLiquid_OpenMM(TargetTests):
 class TestInteraction_OpenMM(TargetTests):
 
     def setup_method(self, method):
+        if no_openmm: pytest.skip("No OpenMM modules found.")
         super(TestInteraction_OpenMM, self).setup_method(method)
         # TargetTests.setup_class(cls)
         # settings specific to this target
@@ -77,9 +84,10 @@ class TestInteraction_OpenMM(TargetTests):
         shutil.rmtree('temp')
         super(TestInteraction_OpenMM, self).teardown_method()
 
-
+        
 def test_local_coord_sites():
     """Make sure that the internal prep of vs positions matches that given by OpenMM."""
+    if no_openmm: pytest.skip("No OpenMM modules found.")
     # make a system
     mol = app.PDBFile(os.path.join("files", "vs_mol.pdb"))
     modeller = app.Modeller(topology=mol.topology, positions=mol.positions)

@@ -192,7 +192,7 @@ class Lipid(Target):
 
     def read_data(self):
         # Read the 'data.csv' file. The file should contain guidelines.
-        with open(os.path.join(self.tgtdir,'data.csv'),'rU') as f: R0 = list(csv.reader(f))
+        with open(os.path.join(self.tgtdir,'data.csv'),'r') as f: R0 = list(csv.reader(f))
         # All comments are erased.
         R1 = [[sub('#.*$','',word) for word in line] for line in R0 if len(line[0]) > 0 and line[0][0] != "#"]
         # All empty lines are deleted and words are converted to lowercase.
