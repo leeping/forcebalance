@@ -20,7 +20,7 @@ dependencies:
   - swig
   - future
   - pymbar
-  - openmm
+  - openmm =7.5
   - ambertools
   # The following two are not compatible with python 2.7 and 3.5, so they are conditionally installed in .travis.yml
   #- openforcefield
