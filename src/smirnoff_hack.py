@@ -40,11 +40,11 @@ def hash_molecule_args_and_kwargs(molecule, *args, **kwargs):
 
 
 if _SHOULD_CACHE:
-
-    print(
-        "SMIRNOFF functions will be replaced with cached versions to improve their "
-        "performance."
-    )
+    # Commented out because it is printed even for non-SMIRNOFF calculations.
+    # print(
+    #     "SMIRNOFF functions will be replaced with cached versions to improve their "
+    #     "performance."
+    # )
 
     # time based on total 540s evaluation
     # cache for OE find_smarts_matches (save 300+ s)

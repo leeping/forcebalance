@@ -518,7 +518,7 @@ class FF(forcebalance.BaseClass):
                 extranum += 1
             def warn_or_err(*args):
                 if self.duplicate_pnames:
-                    logger.warn(*args)
+                    logger.warning(*args)
                 else:
                     logger.error(*args)
             warn_or_err("Encountered an duplicate parameter ID (%s)\n" % pid_)
@@ -527,7 +527,7 @@ class FF(forcebalance.BaseClass):
             for dupfnm, dupln, dupfld in zip(dupfnms, duplns, dupflds):
                 warn_or_err("file %s line %i field %i\n" % (dupfnm, dupln+1, dupfld))
             if self.duplicate_pnames:
-                logger.warn("Parameter name has been changed to %s\n" % pid)
+                logger.warning("Parameter name has been changed to %s\n" % pid)
             else:
                 raise RuntimeError
         return pid
