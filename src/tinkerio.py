@@ -360,7 +360,8 @@ class TINKER(Engine):
         else:
            tinkerpath=self.tinkerpath 
         prog = os.path.join(tinkerpath, csplit[0])
-        csplit[0] = prog
+        if 'dynamic_gpu' not in csplit[0]:
+            csplit[0] = prog
         o = _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, rbytes=1024, **kwargs)
         # Determine the TINKER version number.
         for line in o[:10]:
@@ -975,7 +976,7 @@ class TINKER(Engine):
             if verbose: logger.info("Done\n")
         if 'GPUDYNAMICS' in os.environ.keys() and 'gas' not in self.name:
             dynamickeyword='dynamic_gpu'
-            suffix=' N'
+            suffix=''
         else:
             dynamickeyword='dynamic'
             suffix=''
@@ -1139,10 +1140,14 @@ class Liquid_TINKER(Liquid):
             dynsrc = self.DynDict[(temperature, pressure)]
             dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
             logger.info("Copying .dyn file: %s to %s\n" % (dynsrc, dyndest))
+            print('right here about to copy dyn file',flush=True)
             shutil.copy2(dynsrc,dyndest)
+            print('after file copy ',flush=True)
             self.nptfiles.append(dyndest)
         self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
+        print('about to submit new sim',flush=True)
         super(Liquid_TINKER, self).npt_simulation(temperature, pressure, simnum)
+        print('new sim done',flush=True)
         self.last_traj = [i for i in self.last_traj if '.dyn' not in i]
 
 class AbInitio_TINKER(AbInitio):

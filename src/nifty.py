@@ -788,6 +788,7 @@ def multiD_statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=Tr
 #========================================#
 
 def lp_dump(obj, fnm, protocol=0):
+    print('right here',flush=True)
     """ Write an object to a zipped pickle file specified by the path. """
     # Safeguard against overwriting files?  Nah.
     # if os.path.exists(fnm):
@@ -804,6 +805,7 @@ def lp_dump(obj, fnm, protocol=0):
         f = open(fnm, 'wb')
     Pickler(f, protocol).dump(obj)
     f.close()
+    print('down here',flush=True)
 
 def lp_load(fnm):
     """ Read an object from a bzipped file specified by the path. """
@@ -923,6 +925,8 @@ def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose
     if tag is None: tag = command
     task.specify_tag(tag)
     task.print_time = print_time
+    if 'GPUDYNAMICS' in os.environ.keys() and 'gas' not in command:
+        task.specify_gpus(1)  
     taskid = wq.submit(task)
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, %staskid %i\n" % (command, "tag %s, " % tag if tag != command else "", taskid))
