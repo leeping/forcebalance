@@ -788,7 +788,6 @@ def multiD_statisticalInefficiency(A_n, B_n=None, fast=False, mintime=3, warn=Tr
 #========================================#
 
 def lp_dump(obj, fnm, protocol=0):
-    print('right here',flush=True)
     """ Write an object to a zipped pickle file specified by the path. """
     # Safeguard against overwriting files?  Nah.
     # if os.path.exists(fnm):
@@ -805,7 +804,6 @@ def lp_dump(obj, fnm, protocol=0):
         f = open(fnm, 'wb')
     Pickler(f, protocol).dump(obj)
     f.close()
-    print('down here',flush=True)
 
 def lp_load(fnm):
     """ Read an object from a bzipped file specified by the path. """

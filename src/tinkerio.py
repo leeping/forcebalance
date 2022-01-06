@@ -1140,14 +1140,10 @@ class Liquid_TINKER(Liquid):
             dynsrc = self.DynDict[(temperature, pressure)]
             dyndest = os.path.join(os.getcwd(), 'liquid.dyn')
             logger.info("Copying .dyn file: %s to %s\n" % (dynsrc, dyndest))
-            print('right here about to copy dyn file',flush=True)
             shutil.copy2(dynsrc,dyndest)
-            print('after file copy ',flush=True)
             self.nptfiles.append(dyndest)
         self.DynDict_New[(temperature, pressure)] = os.path.join(os.getcwd(),'liquid.dyn')
-        print('about to submit new sim',flush=True)
         super(Liquid_TINKER, self).npt_simulation(temperature, pressure, simnum)
-        print('new sim done',flush=True)
         self.last_traj = [i for i in self.last_traj if '.dyn' not in i]
 
 class AbInitio_TINKER(AbInitio):
