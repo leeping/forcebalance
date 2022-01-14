@@ -27,13 +27,15 @@ try:
     from openff.evaluator.utils.openmm import openmm_quantity_to_pint
     from openff.evaluator.utils.serialization import TypedJSONDecoder, TypedJSONEncoder
     from openff.evaluator.forcefield import ParameterGradientKey
+    evaluator_import_success = True
 except ImportError:
-    warn_once("Note: Failed to import the optional openff.evaluator package. ")
+    evaluator_import_success = False
 
 try:
     from openff.toolkit.typing.engines import smirnoff
+    toolkit_import_success = True
 except ImportError:
-    warn_once("Note: Failed to import the optional openff-toolkit package. ")
+    toolkit_import_success = False
 
 logger = getLogger(__name__)
 
@@ -165,6 +167,12 @@ class Evaluator_SMIRNOFF(Target):
             return value
 
     def __init__(self, options, tgt_opts, forcefield):
+
+        if not evaluator_import_success:
+            warn_once("Note: Failed to import the OpenFF Evaluator - FB Evaluator target will not work. ")
+
+        if not toolkit_import_success:
+            warn_once("Note: Failed to import the OpenFF Toolkit - FB Evaluator target will not work. ")
 
         super(Evaluator_SMIRNOFF, self).__init__(options, tgt_opts, forcefield)
 
@@ -300,11 +308,18 @@ class Evaluator_SMIRNOFF(Target):
         bool
             Returns True if the parameter is a cosmetic one.
         """
+        try:
+            import openmm.unit as simtk_unit
+        except ImportError:
+            import simtk.unit as simtk_unit
 
         parameter_handler = self.FF.openff_forcefield.get_parameter_handler(
             gradient_key.tag
         )
-        parameter = parameter_handler.parameters[gradient_key.smirks]
+        parameter = (
+            parameter_handler if gradient_key.smirks is None
+            else parameter_handler.parameters[gradient_key.smirks]
+        )
 
         attribute_split = re.split(r"(\d+)", gradient_key.attribute)
         attribute_split = list(filter(None, attribute_split))
@@ -334,6 +349,9 @@ class Evaluator_SMIRNOFF(Target):
             or parameter_attribute in parameter._cosmetic_attribs
         ):
             is_cosmetic = True
+
+        if not isinstance(parameter_value, simtk_unit.Quantity):
+            parameter_value = parameter_value * simtk_unit.dimensionless
 
         return openmm_quantity_to_pint(parameter_value), is_cosmetic
 
@@ -430,13 +448,13 @@ class Evaluator_SMIRNOFF(Target):
         self.FF.make(mvals)
 
         force_field = smirnoff.ForceField(
-            self.FF.offxml, allow_cosmetic_attributes=True
+            self.FF.offxml, allow_cosmetic_attributes=True, load_plugins=True
         )
 
         # strip out cosmetic attributes
         with tempfile.NamedTemporaryFile(mode="w", suffix=".offxml") as file:
             force_field.to_file(file.name, discard_cosmetic_attributes=True)
-            force_field = smirnoff.ForceField(file.name)
+            force_field = smirnoff.ForceField(file.name, load_plugins=True)
 
         # Determine which gradients (if any) we should be estimating.
         parameter_gradient_keys = []
@@ -453,9 +471,16 @@ class Evaluator_SMIRNOFF(Target):
                 string_key = field_list[0]
                 key_split = string_key.split("/")
 
-                parameter_tag = key_split[0].strip()
-                parameter_smirks = key_split[3].strip()
-                parameter_attribute = key_split[2].strip()
+                if len(key_split) == 3 and key_split[0] == "":
+                    parameter_tag = key_split[1].strip()
+                    parameter_smirks = None
+                    parameter_attribute = key_split[2].strip()
+                elif len(key_split) == 4:
+                    parameter_tag = key_split[0].strip()
+                    parameter_smirks = key_split[3].strip()
+                    parameter_attribute = key_split[2].strip()
+                else:
+                    raise NotImplementedError()
 
                 # Use the full attribute name (e.g. k1) for the gradient key.
                 parameter_gradient_key = ParameterGradientKey(

@@ -3,7 +3,7 @@ from __future__ import absolute_import
 from builtins import str
 import os, shutil
 import tarfile
-from .__init__ import ForceBalanceTestCase
+from .__init__ import ForceBalanceTestCase, check_for_openmm
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
@@ -181,7 +181,7 @@ class TestThermoBromineStudy(ForceBalanceSystemTest):
 
 class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
-        pytest.importorskip("evaluator")
+        pytest.importorskip("openff.evaluator")
         super(TestEvaluatorBromineStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '..', '..', 'studies', '003d_evaluator_liquid_bromine'))
@@ -213,7 +213,7 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         msgX="\nCalculated objective function is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_OBJECTIVE in test_system.py with these values"
         np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_OBJECTIVE, X, atol=120, err_msg=msgX)
         msgG="\nCalculated gradient is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_GRADIENT in test_system.py with these values"
-        np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_GRADIENT, G, atol=2000, err_msg=msgG)
+        np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_GRADIENT, G, atol=4000, err_msg=msgG)
 
 class TestLipidStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
@@ -232,6 +232,7 @@ class TestLipidStudy(ForceBalanceSystemTest):
 
 class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
+        if not check_for_openmm(): pytest.skip("No OpenMM modules found.")
         super(TestImplicitSolventHFEStudy, self).setup_method(method)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '..', '..', 'studies', '012_implicit_solvent_hfe'))

@@ -32,12 +32,23 @@ from forcebalance.nifty import _exec
 from collections import OrderedDict
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
+
+# Handle simtk namespace change around 7.6 release
 try:
-    from simtk.openmm.app import *
-    from simtk.openmm import *
-    from simtk.unit import *
-    import simtk.openmm._openmm as _openmm
-except:
+    try:
+        # Try importing openmm using >=7.6 namespace
+        from openmm.app import *
+        from openmm import *
+        from openmm.unit import *
+        import openmm._openmm as _openmm
+    except ImportError:
+        # Try importing openmm using <7.6 namespace
+        from simtk.openmm.app import *
+        from simtk.openmm import *
+        from simtk.unit import *
+        import simtk.openmm._openmm as _openmm
+except ImportError:
+    # Need to have "pass" conditional if neither is installed so that non-openmm builds can parse this file
     pass
 
 def get_mask(grps):
@@ -151,6 +162,34 @@ def PrepareVirtualSites(system):
                     v2 = pos[idx_[2]] - pos[idx_[0]]
                     cross = np.array([v1[1]*v2[2]-v1[2]*v2[1], v1[2]*v2[0]-v1[0]*v2[2], v1[0]*v2[1]-v1[1]*v2[0]])
                     return pos[idx_[0]] + wt_[0]*v1 + wt_[1]*v2 + wt_[2]*cross
+            elif isinstance(vs, LocalCoordinatesSite):
+                vsidx = [_openmm.VirtualSite_getParticle(vs, i) for i in range(_openmm.VirtualSite_getNumParticles(vs))]
+                vswt = [np.array(_openmm.LocalCoordinatesSite_getOriginWeights(vs)), np.array(_openmm.LocalCoordinatesSite_getXWeights(vs)), np.array(_openmm.LocalCoordinatesSite_getYWeights(vs)), np.array(_openmm.LocalCoordinatesSite_getLocalPosition(vs))]
+                def vsfunc(pos, idx_, wt_):
+                    """Calculate the vsite position within a orthonormal coordinate system described here
+                    http://docs.openmm.org/latest/api-c++/generated/OpenMM.LocalCoordinatesSite.html#localcoordinatessite"""
+                    # origin weights
+                    ows = wt_[0]
+                    # xdir weights
+                    xws = wt_[1]
+                    # ydir weights
+                    yws = wt_[2]
+                    # vs position in local coordinates
+                    vpos = wt_[3]
+                    # dependent atom positions
+                    dpos = np.array([pos[j] for j in idx_])
+                    origin = np.array(dpos * ows[:, None]).sum(axis=0)
+                    xdir = np.array(dpos * xws[:, None]).sum(axis=0)
+                    ydir = np.array(dpos * yws[:, None]).sum(axis=0)
+                    zdir = np.cross(xdir, ydir)
+                    ydir = np.cross(zdir, xdir)
+                    xdir /= np.linalg.norm(xdir)
+                    ydir /= np.linalg.norm(ydir)
+                    zdir /= np.linalg.norm(zdir)
+                    return origin + np.array(np.array([xdir, ydir, zdir]) * vpos[:, None]).sum(axis=0)
+            else:
+                raise NotImplementedError(f"The virtual site type {vs.__class__.__name__} is not currently supported.")
+
         else:
             isvsites.append(0)
             vsfunc = None
@@ -842,10 +881,10 @@ class OpenMM(Engine):
                     logger.info("Creating RPMD integrator with %i beads.\n" % rpmd_beads)
                     self.tdiv = rpmd_beads
                     integrator = RPMDIntegrator(rpmd_beads, temperature*kelvin, collision/picosecond, timestep*femtosecond)
-                elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeLangevinIntegrator(temperature*kelvin, collision/picosecond, 1*kelvin, collision/picosecond, 0.1*femtoseconds)
+                elif any(['Drude' in f.__class__.__name__ for f in self.system.getForces()]): integrator = DrudeLangevinIntegrator(temperature*kelvin, collision/picosecond, 1*kelvin, collision/picosecond, 0.1*femtoseconds)
                 else:
                     integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
-        elif any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]): integrator = DrudeSCFIntegrator(0.1*femtoseconds)
+        elif any(['Drude' in f.__class__.__name__ for f in self.system.getForces()]): integrator = DrudeSCFIntegrator(0.1*femtoseconds)
         else:
             ## If no temperature control, default to the Verlet integrator.
             if rpmd_beads > 0:
@@ -969,7 +1008,7 @@ class OpenMM(Engine):
         #have changed then the positions must be recomputed and
         #the simulation object must be remade.
         #----
-        if any(['Drude' in f.__class__.__name__ for f in self.forcefield._forces]):
+        if any(['Drude' in f.__class__.__name__ for f in self.system.getForces()]):
             drude_particle, drude_screen = GetDrudeParameters(self.system)
             if hasattr(self, 'simulation'):
                 if hasattr(self, 'drude_particle') and len(self.drude_particle)>0 and np.max(np.abs(self.drude_particle - drude_particle)) != 0:
@@ -1123,7 +1162,7 @@ class OpenMM(Engine):
         Result = self.evaluate_(dipole=True, traj=True)
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
-    def build_mass_weighted_hessian(self, shot=0, optimize=True):
+    def build_mass_weighted_hessian(self, shot=0, optimize=True, mass_weighted_hessian_only=True):
         """OpenMM single frame hessian evaluation
         Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
 
@@ -1142,10 +1181,15 @@ class OpenMM(Engine):
         """
         self.update_simulation()
         if optimize is True:
-            self.optimize(shot, crit=1e-8)
+            _, _, M_opt = self.optimize(shot, crit=1e-8)
         else:
             warn_once("Computing mass-weighted hessian without geometry optimization")
             self.set_positions(shot)
+            #it returns M_opt with original position 
+            M_opt = deepcopy(self.mol[0])
+            X0 = self.simulation.context.getState(getPositions=True).getPositions(asNumpy=True).value_in_unit(angstrom)[self.realAtomIdxs]
+            M_opt.xyzs = [X0]
+            
         context = self.simulation.context
         pos = context.getState(getPositions=True).getPositions(asNumpy=True)
         # pull real atoms and their mass
@@ -1153,12 +1197,13 @@ class OpenMM(Engine):
         # initialize an empty hessian matrix
         noa = len(self.realAtomIdxs)
         hessian = np.empty((noa*3, noa*3), dtype=float)
+        mass_weighted_hessian = np.empty((noa*3, noa*3), dtype=float)
         # finite difference step size
         diff = Quantity(0.0001, unit=nanometer)
         coef = 1.0 / (0.0001 * 2) # 1/2h
         for i, i_atom in enumerate(self.realAtomIdxs):
             massWeight = 1.0 / np.sqrt(massList * massList[i])
-            # loop over the x, y, z coordinates
+            # loop over the x, y, z coordinates            
             for j in range(3):
                 # plus perturbation
                 pos[i_atom][j] += diff
@@ -1173,15 +1218,25 @@ class OpenMM(Engine):
                 # set the perturbation back to zero
                 pos[i_atom][j] += diff
                 # fill one row of the hessian matrix
-                hessian[i*3+j] = np.ravel((grad_plus - grad_minus) * coef * massWeight[:, np.newaxis])
+                hessian[i*3+j] = np.ravel((grad_plus - grad_minus) * coef)
+                mass_weighted_hessian[i*3+j] = np.ravel((grad_plus - grad_minus) * coef * massWeight[:, np.newaxis])
+
         # make hessian symmetric by averaging upper right and lower left
         hessian += hessian.T
         hessian *= 0.5
+
+        mass_weighted_hessian += mass_weighted_hessian.T
+        mass_weighted_hessian *= 0.5
+
         # recover the original position
         context.setPositions(pos)
-        return hessian
+        gradient  = context.getState(getForces=True).getForces(asNumpy=True).value_in_unit(kilojoule/(nanometer*mole)).flatten()
+        if mass_weighted_hessian_only: 
+            return mass_weighted_hessian
+        else: 
+            return pos, gradient, hessian, mass_weighted_hessian, M_opt
 
-    def normal_modes(self, shot=0, optimize=True):
+    def normal_modes(self, shot=0, optimize=True, for_hessian_target=False):
         """OpenMM Normal Mode Analysis
         Since OpenMM doesnot provide a Hessian evaluation method, we used finite difference on forces
 
@@ -1208,9 +1263,10 @@ class OpenMM(Engine):
         if noa < 2:
             error('normal mode analysis not suitable for system with one or less atoms')
         # step 1: build a full hessian matrix
-        hessian_matrix = self.build_mass_weighted_hessian(shot=shot, optimize=optimize)
+        coords, gradient, hessian, mass_weighted_hessian, M_opt = self.build_mass_weighted_hessian(shot=shot, optimize=optimize, mass_weighted_hessian_only=False)
+
         # step 2: diagonalize the hessian matrix
-        eigvals, eigvecs = np.linalg.eigh(hessian_matrix)
+        eigvals, eigvecs = np.linalg.eigh(mass_weighted_hessian)
         # step 3: convert eigenvalues to frequencies
         coef = 0.5 / np.pi * 33.3564095 # 10^12 Hz => cm-1
         negatives = (eigvals >= 0).astype(int) * 2 - 1 # record the negative ones
@@ -1229,7 +1285,24 @@ class OpenMM(Engine):
         larger_freq_idxs = np.sort(np.argpartition(np.abs(freqs), n_remove)[n_remove:])
         freqs = freqs[larger_freq_idxs]
         normal_modes = normal_modes[larger_freq_idxs]
-        return freqs, normal_modes
+        if not for_hessian_target:
+            return freqs, normal_modes
+        else: 
+            return coords, gradient, hessian, freqs, normal_modes, M_opt
+
+    def _update_positions(self, X1, disable_vsite):
+        """A convenience method for updating the positions of the simulation context."""
+        # check if we have units
+        if isinstance(X1, numpy.ndarray):
+            X1 = X1 * angstrom
+
+        if disable_vsite:
+            self.simulation.context.setPositions(X1)
+        else:
+            # Create virtual sites before setting positions
+            mod = Modeller(self.pdb.topology, X1)
+            mod.addExtraParticles(self.forcefield)
+            self.simulation.context.setPositions(ResetVirtualSites_fast(mod.getPositions(), self.vsinfo))
 
     def optimize(self, shot, crit=1e-4, disable_vsite=False, align=True, include_restraint_energy=False):
 
@@ -1295,13 +1368,9 @@ class OpenMM(Engine):
         if not self.pbc and align:
             M.align(center=False)
         X1 = M.xyzs[1]
-        if disable_vsite:
-            self.simulation.context.setPositions(X1 * angstrom)
-        else:
-            # Create virtual sites before setting positions
-            mod = Modeller(self.pdb.topology, X1*angstrom)
-            mod.addExtraParticles(self.forcefield)
-            self.simulation.context.setPositions(ResetVirtualSites_fast(mod.getPositions(), self.vsinfo))
+
+        self._update_positions(X1, disable_vsite)
+
         return E, M.ref_rmsd(0)[1], M[1]
 
     def getContextPosition(self, removeVirtual=False):

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This file was created from the default "openff_unconstrained-1.3.0.offxml" force field, and then modified
+     to only contain the parameters relevant to formic acid and so that the vdW 1-4 scale factor large enough
+     to make a significant difference to the formic acid torsion scan.
+ -->
+<SMIRNOFF version="0.3" aromaticity_model="OEAroModel_MDL">
+	<Bonds version="0.3" potential="harmonic" fractional_bondorder_method="AM1-Wiberg" fractional_bondorder_interpolation="linear">
+		<Bond smirks="[#6X3:1]-[#8X2H1:2]" id="b17" length="1.369468156503 * angstrom" k="790.2138705471 * angstrom**-2 * mole**-1 * kilocalorie"/>
+		<Bond smirks="[#6:1]=[#8X1+0,#8X2+1:2]" id="b20" length="1.228792915057 * angstrom" k="1176.748901628 * angstrom**-2 * mole**-1 * kilocalorie"/>
+		<Bond smirks="[#6X3:1]-[#1:2]" id="b84" length="1.08559714475 * angstrom" k="808.490631655 * angstrom**-2 * mole**-1 * kilocalorie"/>
+		<Bond smirks="[#8:1]-[#1:2]" id="b87" length="0.9713231822139 * angstrom" k="1111.356329629 * angstrom**-2 * mole**-1 * kilocalorie"/>
+	</Bonds>
+	<Angles version="0.3" potential="harmonic">
+		<Angle smirks="[#1:1]-[#6X3:2]~[*:3]" angle="131.2812074392 * degree" k="66.08632381676 * mole**-1 * radian**-2 * kilocalorie" id="a11"/>
+		<Angle smirks="[#8X1:1]~[#6X3:2]~[#8:3]" angle="128.7000354956 * degree" k="409.8799740915 * mole**-1 * radian**-2 * kilocalorie" id="a15"/>
+		<Angle smirks="[*:1]-[#8:2]-[*:3]" angle="110.2898389197 * degree" k="134.5019777341 * mole**-1 * radian**-2 * kilocalorie" id="a27"/>
+	</Angles>
+	<ProperTorsions version="0.3" potential="k*(1+cos(periodicity*theta-phase))" default_idivf="auto" fractional_bondorder_method="AM1-Wiberg" fractional_bondorder_interpolation="linear">
+		<Proper smirks="[*:1]~[#6X3:2](=[#8,#16,#7])-[#8:3]-[#1:4]" periodicity1="2" phase1="180.0 * degree" id="t99" k1="2.529549774939 * mole**-1 * kilocalorie" idivf1="1.0"/>
+		<Proper smirks="[#1:1]-[#8X2:2]-[#6X3:3]=[#8X1:4]" periodicity1="2" periodicity2="1" phase1="180.0 * degree" phase2="0.0 * degree" id="t100" k1="2.23244140273 * mole**-1 * kilocalorie" k2="1.2372604498 * mole**-1 * kilocalorie" idivf1="1.0" idivf2="1.0"/>
+	</ProperTorsions>
+	<ImproperTorsions version="0.3" potential="k*(1+cos(periodicity*theta-phase))" default_idivf="auto">
+		<Improper smirks="[*:1]~[#6X3:2](~[#8X1:3])~[#8:4]" periodicity1="2" phase1="180.0 * degree" k1="10.5 * mole**-1 * kilocalorie" id="i2"/>
+	</ImproperTorsions>
+	<vdW version="0.3" potential="Lennard-Jones-12-6" combining_rules="Lorentz-Berthelot" scale12="0.0" scale13="0.0" scale14="15000" scale15="1.0" cutoff="9.0 * angstrom" switch_width="1.0 * angstrom" method="cutoff" parameterize="scale14">
+		<Atom smirks="[#1:1]-[#6X3](~[#7,#8,#9,#16,#17,#35])~[#7,#8,#9,#16,#17,#35]" epsilon="0.015 * mole**-1 * kilocalorie" id="n9" rmin_half="1.359 * angstrom"/>
+		<Atom smirks="[#1:1]-[#8]" epsilon="5.27e-05 * mole**-1 * kilocalorie" id="n12" rmin_half="0.3 * angstrom"/>
+		<Atom smirks="[#6:1]" epsilon="0.086 * mole**-1 * kilocalorie" id="n14" rmin_half="1.908 * angstrom"/>
+		<Atom smirks="[#8:1]" epsilon="0.21 * mole**-1 * kilocalorie" id="n17" rmin_half="1.6612 * angstrom"/>
+		<Atom smirks="[#8X2H1+0:1]" epsilon="0.2104 * mole**-1 * kilocalorie" id="n19" rmin_half="1.721 * angstrom"/>
+	</vdW>
+	<Electrostatics version="0.3" scale12="0.0" scale13="0.0" scale14="0.8333333333" scale15="1.0" cutoff="9.0 * angstrom" switch_width="0.0 * angstrom" method="PME"/>
+	<ToolkitAM1BCC version="0.3"/>
+</SMIRNOFF>

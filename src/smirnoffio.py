@@ -16,6 +16,7 @@ from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
 from forcebalance.vibration import Vibration
+from forcebalance.hessian import Hessian
 from forcebalance.opt_geo_target import OptGeoTarget
 from forcebalance.torsion_profile import TorsionProfileTarget
 import networkx as nx
@@ -52,7 +53,9 @@ try:
     # QYD: name of class are modified to avoid colliding with ForceBalance Molecule
     from openff.toolkit.topology import Molecule as OffMolecule
     from openff.toolkit.topology import Topology as OffTopology
+    toolkit_import_success = True
 except ImportError:
+    toolkit_import_success = False
     pass
 
 ## pdict is a useless variable if the force field is XML.
@@ -86,10 +89,16 @@ def smirnoff_analyze_parameter_coverage(forcefield, tgt_opts):
             for mol_idx, mol_forces in enumerate(molecule_force_list):
                 for force_tag, force_dict in mol_forces.items():
                     # e.g. force_tag = 'Bonds'
-                    for atom_indices, parameter in force_dict.items():
-                        param_dict = {'id': parameter.id, 'smirks': parameter.smirks, 'type':force_tag, 'atoms': list(atom_indices),}
-                        parameter_assignment_data[mol_fnm].append(param_dict)
-                        parameter_counter[parameter.smirks] += 1
+                    for atom_indices, parameters in force_dict.items():
+
+                        if not isinstance(parameters, list):
+                            parameters = [parameters]
+
+                        for parameter in parameters:
+
+                            param_dict = {'id': parameter.id, 'smirks': parameter.smirks, 'type':force_tag, 'atoms': list(atom_indices),}
+                            parameter_assignment_data[mol_fnm].append(param_dict)
+                            parameter_counter[parameter.smirks] += 1
     # write out parameter assignment data
     out_json_path = os.path.join(forcefield.root, 'smirnoff_parameter_assignments.json')
     with open(out_json_path, 'w') as jsonfile:
@@ -127,6 +136,7 @@ class SMIRNOFF_Reader(BaseReader):
             logger.info("Minor warning: Parameter ID %s doesn't contain any SMIRKS patterns, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
             return "/".join([ParentType, InteractionType, parameter])
 
+
 def assign_openff_parameter(ff, new_value, pid):
     """
     Assign a SMIRNOFF parameter given the OpenFF ForceField object, the desired parameter value,
@@ -145,39 +155,102 @@ def assign_openff_parameter(ff, new_value, pid):
     if not hasattr(ff, '_forcebalance_assign_parameter_map'):
         ff._forcebalance_assign_parameter_map = dict()
     if pid not in ff._forcebalance_assign_parameter_map:
-        (handler_name, tag_name, value_name, smirks) = pid.split('/')
-        # Get the OpenFF parameter object
-        parameter = ff.get_parameter_handler(handler_name).parameters[smirks]
-        if hasattr(parameter, value_name):
+
+        if pid.startswith("/"):
+            # Handle the case were we are optimizing a handler attribute directly such
+            # as the 1-4 scaling factor.
+            handler_name, value_name = pid[1:].split('/')
+
+            # Get the OpenFF parameter handler.
+            parameter_container = ff.get_parameter_handler(handler_name)
+
+        else:
+            (handler_name, tag_name, value_name, smirks) = pid.split('/')
+
+            from openff.toolkit.typing.engines.smirnoff import ParameterList
+
+            # Get the OpenFF parameter object
+
+            # Temporary workaround for OpenFF issue #884
+            if not isinstance(ff.get_parameter_handler(handler_name).parameters, ParameterList):
+
+                ff.get_parameter_handler(handler_name)._parameters = ParameterList(
+                    ff.get_parameter_handler(handler_name).parameters
+                )
+
+            parameter_container = ff.get_parameter_handler(handler_name).parameters[smirks]
+
+        if hasattr(parameter_container, value_name):
             # If the value name is an attribute of the parameter then we set it directly.
-            unit = getattr(parameter, value_name).unit
             # Get the quantity of the parameter in the OpenFF forcefield object
-            param_quantity = getattr(parameter, value_name)
-        elif value_name in parameter._cosmetic_attribs:
+            param_quantity = getattr(parameter_container, value_name)
+
+        elif (hasattr(parameter_container, "_cosmetic_attribs") and
+              value_name in parameter_container._cosmetic_attribs):
+
+            param_quantity = None
+
+        else:
+            raise KeyError(
+                "The {} attribute is not supported by the {} handler".format(
+                    value_name, handler_name
+                )
+            )
+
+        # We can't use the caching approach when the parameter is a simple float,
+        # hence we set it directly here.
+        if isinstance(param_quantity, (float, int)):
+            setattr(parameter_container, value_name, new_value)
             param_quantity = None
         else:
-            # If the value name is a periodic attribute (say, k1) then we need to use
-            # a regex to split the value name into 'k' and '1', then set the appropriate
-            # value in the k-list
-            attribute_split = re.split(r'(\d+)', value_name)
-            # print(attribute_split)
-            # assert len(attribute_split) == 2
-            assert hasattr(parameter, attribute_split[0]), "%s.%s not exist" % (parameter, attribute_split[0])
-            # attribute_split[0] is a string such as 'k'
-            value_name = attribute_split[0]
-            # parameter_index is the position of k1 in the values associated with 'k'
-            parameter_index = int(attribute_split[1]) - 1
-            # Get the list of values, update the appropriate one and then set the new attribute to the updated list
-            value_list = getattr(parameter, value_name)
-            # Get the quantity of the parameter in the OpenFF forcefield object
-            param_quantity = value_list[parameter_index]
-        # save the found quantity in cache
-        ff._forcebalance_assign_parameter_map[pid] = param_quantity
+            # save the found quantity in cache
+            ff._forcebalance_assign_parameter_map[pid] = param_quantity
     else:
         param_quantity = ff._forcebalance_assign_parameter_map[pid]
     # set new_value directly in the quantity
     if param_quantity is not None:
         param_quantity._value = new_value
+
+def smirnoff_update_pgrads(target):
+    """
+    Updates a targets pgrads based on smirks present in mol2 files
+
+    This can greatly improve gradients evaluation in big optimizations
+
+    Note
+    ----
+    1. This function assumes the names of the forcefield parameters has the smirks as the last item
+    2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
+    """
+    orig_pgrad_set = set(target.pgrad)
+    pgrads_set = set()
+
+    # smirks to param_idxs map
+    smirks_params_map = defaultdict(list)
+    # New code for mapping smirks to mathematical parameter IDs
+    for pname in target.FF.pTree:
+
+        # Make sure we compute the gradients of global parameters such as 1-4 scale
+        # factors.
+        if pname.startswith('/'):
+            pgrads_set.update(target.FF.get_mathid(pname))
+        else:
+            smirks = pname.rsplit('/',maxsplit=1)[-1]
+
+            for pidx in target.FF.get_mathid(pname):
+                smirks_params_map[smirks].append(pidx)
+
+    # get the smirks for this target, keep only the pidx corresponding to these smirks
+    smirks_counter = target.engine.get_smirks_counter()
+    for smirks in smirks_counter:
+        if smirks_counter[smirks] > 0:
+            pidx_list = smirks_params_map[smirks]
+            # update the set of parameters present in this target
+            pgrads_set.update(pidx_list)
+    # this ensure we do not add any new items into self.pgrad
+    pgrads_set.intersection_update(orig_pgrad_set)
+    target.pgrad = sorted(list(pgrads_set))
+
 
 class SMIRNOFF(OpenMM):
 
@@ -185,6 +258,8 @@ class SMIRNOFF(OpenMM):
 
     def __init__(self, name="openmm", **kwargs):
         self.valkwd = ['ffxml', 'pdb', 'mol2', 'platname', 'precision', 'mmopts', 'vsite_bonds', 'implicit_solvent', 'restrain_k', 'freeze_atoms']
+        if not toolkit_import_success:
+            warn_once("Note: Failed to import the OpenFF Toolkit - SMIRNOFF Engine will not work. ")
         super(SMIRNOFF,self).__init__(name=name, **kwargs)
 
     def readsrc(self, **kwargs):
@@ -206,13 +281,14 @@ class SMIRNOFF(OpenMM):
             This could be the same as the pdb argument from above.
         """
 
-        pdbfnm = kwargs.get('pdb')
+        pdbfnm = None
         # Determine the PDB file name.
-        if not pdbfnm:
-            raise RuntimeError('Name of PDB file not provided.')
-        elif not os.path.exists(pdbfnm):
-            logger.error("%s specified but doesn't exist\n" % pdbfnm)
-            raise RuntimeError
+        if 'pdb' in kwargs and os.path.exists(kwargs['pdb']):
+            # Case 1. The PDB file name is provided explicitly
+            pdbfnm = kwargs['pdb']
+            if not os.path.exists(pdbfnm):
+                logger.error("%s specified but doesn't exist\n" % pdbfnm)
+                raise RuntimeError
 
         if 'mol' in kwargs:
             self.mol = kwargs['mol']
@@ -239,13 +315,44 @@ class SMIRNOFF(OpenMM):
         else:
             logger.error("Must provide a list of .mol2 files.\n")
 
-        self.abspdb = os.path.abspath(pdbfnm)
-        mpdb = Molecule(pdbfnm)
-        for i in ["chain", "atomname", "resid", "resname", "elem"]:
-            self.mol.Data[i] = mpdb.Data[i]
+        if pdbfnm is not None:
+            self.abspdb = os.path.abspath(pdbfnm)
+            mpdb = Molecule(pdbfnm)
+            for i in ["chain", "atomname", "resid", "resname", "elem"]:
+                self.mol.Data[i] = mpdb.Data[i]
 
         # Store a separate copy of the molecule for reference restraint positions.
         self.ref_mol = deepcopy(self.mol)
+
+    @staticmethod
+    def _openff_to_openmm_topology(openff_topology):
+        """Convert an OpenFF topology to an OpenMM topology. Currently this requires
+        manually adding the v-sites as OpenFF currently does not."""
+
+        from openff.toolkit.topology import TopologyAtom
+
+        openmm_topology = openff_topology.to_openmm()
+
+        # Return the topology if the number of OpenMM particles matches the number
+        # expected by the OpenFF topology. This may happen if there are no virtual sites
+        # in the system OR if a new version of the the OpenFF toolkit includes virtual
+        # sites in the OpenMM topology it returns.
+        if openmm_topology.getNumAtoms() == openff_topology.n_topology_particles:
+            return openmm_topology
+
+        openmm_chain = openmm_topology.addChain()
+        openmm_residue = openmm_topology.addResidue("", chain=openmm_chain)
+
+        for particle in openff_topology.topology_particles:
+
+            if isinstance(particle, TopologyAtom):
+                continue
+
+            openmm_topology.addAtom(
+                particle.virtual_site.name, app.Element.getByMass(0), openmm_residue
+            )
+            
+        return openmm_topology
 
     def prepare(self, pbc=False, mmopts={}, **kwargs):
 
@@ -258,7 +365,14 @@ class SMIRNOFF(OpenMM):
         but we are calling ForceField() from the OpenFF toolkit and ignoring
         AMOEBA stuff.
         """
-        self.pdb = PDBFile(self.abspdb)
+
+        if hasattr(self, 'abspdb'):
+            self.pdb = PDBFile(self.abspdb)
+        else:
+            pdb1 = "%s-1.pdb" % os.path.splitext(os.path.basename(self.mol.fnm))[0]
+            self.mol[0].write(pdb1)
+            self.pdb = PDBFile(pdb1)
+            os.unlink(pdb1)
 
         # Create the OpenFF ForceField object.
         if hasattr(self, 'FF'):
@@ -266,7 +380,7 @@ class SMIRNOFF(OpenMM):
             self.forcefield = self.FF.openff_forcefield
         else:
             self.offxml = listfiles(kwargs.get('offxml'), 'offxml', err=True)
-            self.forcefield = OpenFF_ForceField(*self.offxml)
+            self.forcefield = OpenFF_ForceField(*self.offxml, load_plugins=True)
 
         ## Load mol2 files for smirnoff topology
         openff_mols = []
@@ -278,9 +392,6 @@ class SMIRNOFF(OpenMM):
                 raise e
             openff_mols.append(mol)
         self.off_topology = OffTopology.from_openmm(self.pdb.topology, unique_molecules=openff_mols)
-
-        # used in create_simulation()
-        self.mod = Modeller(self.pdb.topology, self.pdb.positions)
 
         ## OpenMM options for setting up the System.
         self.mmopts = dict(mmopts)
@@ -307,15 +418,23 @@ class SMIRNOFF(OpenMM):
         if 'nonbonded_cutoff' in kwargs:
             logger.warning("nonbonded_cutoff keyword ignored because it's set in the offxml file\n")
 
+        # Apply the FF parameters to the system. Currently this is the only way to
+        # determine if the FF will apply virtual sites to the system.
+        _, openff_topology = self.forcefield.create_openmm_system(
+            self.off_topology, return_topology=True
+        )
+
         ## Generate OpenMM-compatible positions
         self.xyz_omms = []
+
         for I in range(len(self.mol)):
-            position = self.mol.xyzs[I] * angstrom
-            # xyz_omm = [Vec3(i[0],i[1],i[2]) for i in xyz]*angstrom
-            # An extra step with adding virtual particles
-            # mod = Modeller(self.pdb.topology, xyz_omm)
-            # LPW commenting out because we don't have virtual sites yet.
-            # mod.addExtraParticles(self.forcefield)
+            xyz = self.mol.xyzs[I]
+            xyz_omm = (
+                [Vec3(i[0],i[1],i[2]) for i in xyz]
+                # Add placeholder positions for an v-sites.
+                + [Vec3(0.0, 0.0, 0.0)] * openff_topology.n_topology_virtual_sites
+            ) * angstrom
+
             if self.pbc:
                 # Obtain the periodic box
                 if self.mol.boxes[I].alpha != 90.0 or self.mol.boxes[I].beta != 90.0 or self.mol.boxes[I].gamma != 90.0:
@@ -325,12 +444,21 @@ class SMIRNOFF(OpenMM):
             else:
                 box_omm = None
             # Finally append it to list.
-            self.xyz_omms.append((position, box_omm))
+            self.xyz_omms.append((xyz_omm, box_omm))
+
+        # used in create_simulation()
+        openmm_topology = SMIRNOFF._openff_to_openmm_topology(openff_topology)
+        openmm_positions = (
+            self.pdb.positions.value_in_unit(angstrom) +
+            # Add placeholder positions for an v-sites.
+            [Vec3(0.0, 0.0, 0.0)] * openff_topology.n_topology_virtual_sites
+        ) * angstrom
+
+        self.mod = Modeller(openmm_topology, openmm_positions)
 
         ## Build a topology and atom lists.
-        Top = self.pdb.topology
+        Top = self.mod.getTopology()
         Atoms = list(Top.atoms())
-        Bonds = [(a.index, b.index) for a, b in list(Top.bonds())]
 
         # vss = [(i, [system.getVirtualSite(i).getParticle(j) for j in range(system.getVirtualSite(i).getNumParticles())]) \
         #            for i in range(system.getNumParticles()) if system.isVirtualSite(i)]
@@ -357,7 +485,9 @@ class SMIRNOFF(OpenMM):
         # Because self.forcefield is being updated in forcebalance.forcefield.FF.make()
         # there is no longer a need to create a new force field object here.
         try:
-            self.system = self.forcefield.create_openmm_system(self.off_topology)
+            self.system, openff_topology = self.forcefield.create_openmm_system(
+                self.off_topology, return_topology=True
+            )
         except Exception as error:
             logger.error("Error when creating system for %s" % self.mol2)
             raise error
@@ -375,13 +505,37 @@ class SMIRNOFF(OpenMM):
         #         delattr(self, 'simulation')
         # self.vsprm = vsprm.copy()
 
+        if openff_topology.n_topology_virtual_sites > 0:
+            # For now always assume that the v-sites have changed. This is currently
+            # needed as the FB checks don't support the ``LocalCoordinatesSite`` based
+            # virtual sites that OpenFF uses.
+            if hasattr(self, 'simulation'):
+                delattr(self, 'simulation')
+
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)
         else:
             self.create_simulation(**self.simkwargs)
 
-    def optimize(self, shot=0, align=True, crit=1e-4):
-        return super(SMIRNOFF,self).optimize(shot=shot, align=align, crit=crit, disable_vsite=True)
+    def _update_positions(self, X1, disable_vsite):
+        # X1 is a numpy ndarray not vec3
+
+        if disable_vsite:
+            super(SMIRNOFF, self)._update_positions(X1, disable_vsite)
+            return
+
+        n_v_sites = (
+            self.mod.getTopology().getNumAtoms() - self.pdb.topology.getNumAtoms()
+        )
+
+        # Add placeholder positions for an v-sites.
+        if isinstance(X1, np.ndarray):
+            X1 = numpy.vstack([X1, np.zeros((n_v_sites, 3))]) * angstrom
+        else:
+            X1 = (X1 + [Vec3(0.0, 0.0, 0.0)] * n_v_sites) * angstrom
+
+        self.simulation.context.setPositions(X1)
+        self.simulation.context.computeVirtualSites()
 
     def interaction_energy(self, fraga, fragb):
 
@@ -425,8 +579,14 @@ class SMIRNOFF(OpenMM):
         for mol_idx, mol_forces in enumerate(molecule_force_list):
             for force_tag, force_dict in mol_forces.items():
                 # e.g. force_tag = 'Bonds'
-                for parameter in force_dict.values():
-                    smirks_counter[parameter.smirks] += 1
+                for parameters in force_dict.values():
+
+                    if not isinstance(parameters, list):
+                        parameters = [parameters]
+
+                    for parameter in parameters:
+                        smirks_counter[parameter.smirks] += 1
+
         return smirks_counter
 
 class Liquid_SMIRNOFF(Liquid):
@@ -491,42 +651,10 @@ class AbInitio_SMIRNOFF(AbInitio):
 
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
         # we update the self.pgrads here so it's not overwritten in rtarget.py
-        self.smirnoff_update_pgrads()
-
-    def smirnoff_update_pgrads(self):
-        """
-        Update self.pgrads based on smirks present in mol2 files
-
-        This can greatly improve gradients evaluation in big optimizations
-
-        Note
-        ----
-        1. This function assumes the names of the forcefield parameters has the smirks as the last item
-        2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
-        """
-        orig_pgrad_set = set(self.pgrad)
-        # smirks to param_idxs map
-        smirks_params_map = defaultdict(list)
-        # New code for mapping smirks to mathematical parameter IDs
-        for pname in self.FF.pTree:
-            smirks = pname.rsplit('/',maxsplit=1)[-1]
-            for pidx in self.FF.get_mathid(pname):
-                smirks_params_map[smirks].append(pidx)
-        pgrads_set = set()
-        # get the smirks for this target, keep only the pidx corresponding to these smirks
-        smirks_counter = self.engine.get_smirks_counter()
-        for smirks in smirks_counter:
-            if smirks_counter[smirks] > 0:
-                pidx_list = smirks_params_map[smirks]
-                # update the set of parameters present in this target
-                pgrads_set.update(pidx_list)
-        # this ensure we do not add any new items into self.pgrad
-        pgrads_set.intersection_update(orig_pgrad_set)
-        self.pgrad = sorted(list(pgrads_set))
-
+        smirnoff_update_pgrads(self)
 
 class Vibration_SMIRNOFF(Vibration):
-    """ Vibrational frequency matching using TINKER. """
+    """ Vibrational frequency matching using using SMIRNOFF format powered by OpenMM. """
     def __init__(self,options,tgt_opts,forcefield):
         ## Default file names for coordinates and key file.
         self.set_option(tgt_opts,'coords',default="input.pdb")
@@ -540,39 +668,25 @@ class Vibration_SMIRNOFF(Vibration):
 
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
         # we update the self.pgrads here so it's not overwritten in rtarget.py
-        self.smirnoff_update_pgrads()
+        smirnoff_update_pgrads(self)
 
-    def smirnoff_update_pgrads(self):
-        """
-        Update self.pgrads based on smirks present in mol2 files
+class Hessian_SMIRNOFF(Hessian):
+    """ Internal coordinate Hessian matching using SMIRNOFF format powered by OpenMM. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'coords',default="input.pdb")
+        self.set_option(tgt_opts,'pdb',default="conf.pdb")
+        self.set_option(tgt_opts,'mol2',forceprint=True)
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.engine_ = SMIRNOFF
+        ## Initialize base class.
+        super(Hessian_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
 
-        This can greatly improve gradients evaluation in big optimizations
-
-        Note
-        ----
-        1. This function assumes the names of the forcefield parameters has the smirks as the last item
-        2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
-        """
-        orig_pgrad_set = set(self.pgrad)
-        # smirks to param_idxs map
-        smirks_params_map = defaultdict(list)
-        for pname in self.FF.pTree:
-            smirks = pname.rsplit('/',maxsplit=1)[-1]
-            for pidx in self.FF.get_mathid(pname):
-                smirks_params_map[smirks].append(pidx)
-        pgrads_set = set()
-        # get the smirks for this target, keep only the pidx corresponding to these smirks
-        smirks_counter = self.engine.get_smirks_counter()
-        for smirks in smirks_counter:
-            if smirks_counter[smirks] > 0:
-                pidx_list = smirks_params_map[smirks]
-                # update the set of parameters present in this target
-                pgrads_set.update(pidx_list)
-        # this ensure we do not add any new items into self.pgrad
-        pgrads_set.intersection_update(orig_pgrad_set)
-        self.pgrad = sorted(list(pgrads_set))
-
-
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        # we update the self.pgrads here so it's not overwritten in rtarget.py
+        smirnoff_update_pgrads(self)
+        
 class OptGeoTarget_SMIRNOFF(OptGeoTarget):
     """ Optimized geometry fitting using SMIRNOFF format powered by OpenMM """
     def __init__(self,options,tgt_opts,forcefield):
@@ -621,10 +735,20 @@ class OptGeoTarget_SMIRNOFF(OptGeoTarget):
         smirks_params_map = defaultdict(list)
         # New code for mapping smirks to mathematical parameter IDs
         for pname in self.FF.pTree:
-            smirks = pname.rsplit('/',maxsplit=1)[-1]
-            # print("pname %s mathid %s -> smirks %s" % (pname, str(self.FF.get_mathid(pname)), smirks))
-            for pidx in self.FF.get_mathid(pname):
-                smirks_params_map[smirks].append(pidx)
+
+            # Make sure we compute the gradients of global parameters such as 1-4 scale
+            # factors.
+            if pname.startswith('/'):
+
+                for sysname in self.sys_opts:
+                    pidx_list = [pidx for pidx in self.FF.get_mathid(pname)]
+                    system_mval_masks[sysname][pidx_list] = True
+
+            else:
+                smirks = pname.rsplit('/',maxsplit=1)[-1]
+                # print("pname %s mathid %s -> smirks %s" % (pname, str(self.FF.get_mathid(pname)), smirks))
+                for pidx in self.FF.get_mathid(pname):
+                    smirks_params_map[smirks].append(pidx)
         # Old code for mapping smirks to mathematical parameter IDs
         # for pname, pidx in self.FF.map.items():
         #     smirks = pname.rsplit('/',maxsplit=1)[-1]
@@ -658,38 +782,7 @@ class TorsionProfileTarget_SMIRNOFF(TorsionProfileTarget):
 
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
         # we update the self.pgrads here so it's not overwritten in rtarget.py
-        self.smirnoff_update_pgrads()
-
-    def smirnoff_update_pgrads(self):
-        """
-        Update self.pgrads based on smirks present in mol2 files
-
-        This can greatly improve gradients evaluation in big optimizations
-
-        Note
-        ----
-        1. This function assumes the names of the forcefield parameters has the smirks as the last item
-        2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
-        """
-        orig_pgrad_set = set(self.pgrad)
-        # smirks to param_idxs map
-        smirks_params_map = defaultdict(list)
-        # New code for mapping smirks to mathematical parameter IDs
-        for pname in self.FF.pTree:
-            smirks = pname.rsplit('/',maxsplit=1)[-1]
-            for pidx in self.FF.get_mathid(pname):
-                smirks_params_map[smirks].append(pidx)
-        pgrads_set = set()
-        # get the smirks for this target, keep only the pidx corresponding to these smirks
-        smirks_counter = self.engine.get_smirks_counter()
-        for smirks in smirks_counter:
-            if smirks_counter[smirks] > 0:
-                pidx_list = smirks_params_map[smirks]
-                # update the set of parameters present in this target
-                pgrads_set.update(pidx_list)
-        # this ensure we do not add any new items into self.pgrad
-        pgrads_set.intersection_update(orig_pgrad_set)
-        self.pgrad = sorted(list(pgrads_set))
+        smirnoff_update_pgrads(self)
 
 # class BindingEnergy_SMIRNOFF(BindingEnergy):
 #     """ Binding energy matching using OpenMM. """

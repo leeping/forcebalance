@@ -38,9 +38,14 @@
 
 from math import pi
 import numpy as np
-from simtk import openmm as mm
-from simtk.openmm import app
-from simtk import unit as u
+try:
+    import openmm as mm
+    from openmm import app
+    from openmm import unit as u
+except ImportError:
+    from simtk import openmm as mm
+    from simtk.openmm import app
+    from simtk import unit as u
 
 epsilon = 8.854187817620E-12*u.farad/u.meter
 COULOMB_CONSTANT = (u.AVOGADRO_CONSTANT_NA/(4.0*pi*epsilon)).value_in_unit_system(u.md_unit_system)

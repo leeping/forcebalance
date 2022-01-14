@@ -10,6 +10,7 @@ contained inside.
 from __future__ import division
 from __future__ import print_function
 
+import shutil
 from builtins import str
 from builtins import range
 from builtins import object
@@ -20,7 +21,7 @@ from numpy.linalg import multi_dot
 from copy import deepcopy
 import forcebalance
 from forcebalance.parser import parse_inputs
-from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd, wopen, bak, est124
+from forcebalance.nifty import col, flat, row, printcool, printcool_dictionary, pvec1d, pmat2d, warn_press_key, invert_svd, wopen, bak, est124, lp_load
 from forcebalance.finite_difference import f1d7p, f1d5p, fdwrap
 from collections import OrderedDict
 import random
@@ -147,6 +148,8 @@ class Optimizer(forcebalance.BaseClass):
         self.set_option(options,'read_pvals')
         ## Whether to make backup files
         self.set_option(options, 'backup')
+        ## Whether to retain the output files of completed iterations
+        self.set_option(options, 'retain_micro_outputs')
         ## Name of the original input file
         self.set_option(options, 'input_file')
         ## Number of convergence criteria that must be met
@@ -882,6 +885,10 @@ class Optimizer(forcebalance.BaseClass):
             # This is our trial step.
             xk_ = dx + xk
             Result = self.Objective.Full(xk_,0,verbose=False,customdir="micro_%02i" % search_fun.micro)['X'] - data['X']
+
+            if not self.retain_micro_outputs:
+                shutil.rmtree("micro_%02i" % search_fun.micro)
+
             logger.info("Hessian diagonal search: H%+.4f*I, length %.4e, result % .4e\n" % ((L-1)**2,np.linalg.norm(dx),Result))
             search_fun.micro += 1
             return Result
@@ -1561,7 +1568,7 @@ class Optimizer(forcebalance.BaseClass):
         if self.rchk_fnm is not None:
             absfnm = os.path.join(self.root,self.rchk_fnm)
             if os.path.exists(absfnm):
-                self.chk = pickle.load(open(absfnm))
+                self.chk = lp_load(absfnm)
             else:
                 logger.info("\x1b[40m\x1b[1;92mWARNING:\x1b[0m read_chk is set to True, but checkpoint file not loaded (wrong filename or doesn't exist?)\n")
         return self.chk

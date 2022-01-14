@@ -7,7 +7,7 @@ from forcebalance.gmxio import GMX
 from forcebalance.tinkerio import TINKER
 from forcebalance.openmmio import OpenMM
 from collections import OrderedDict
-from .__init__ import ForceBalanceTestCase
+from .__init__ import ForceBalanceTestCase, check_for_openmm
 
 # Set SAVEDATA to True and run the tests in order to save data
 # to a file for future reference. This is easier to use for troubleshooting
@@ -69,6 +69,9 @@ class TestAmber99SB(ForceBalanceTestCase):
         # gmx should be built with config -DGMX_DOUBLE=ON
         gmxpath = which('mdrun_d') or which('gmx_d')
         gmxsuffix = '_d'
+        # Tests will FAIL if use single precision gromacs
+        # gmxpath = which('mdrun') or which('gmx')
+        # gmxsuffix = ''
         # self.logger.debug("\nBuilding options for target...\n")
         cls.cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cls.cwd, "files", "amber_alaglu"))
@@ -83,18 +86,21 @@ class TestAmber99SB(ForceBalanceTestCase):
         if gmxpath != '':
             cls.engines['GMX'] = GMX(coords="all.gro", gmx_top="topol.top", gmx_mdp="shot.mdp", gmxpath=gmxpath, gmxsuffix=gmxsuffix)
         else:
-            logger.warn("GROMACS cannot be found, skipping GMX tests.")
+            logger.warning("GROMACS cannot be found, skipping GMX tests.")
         # Set up TINKER engine
         if tinkerpath != '':
             cls.engines['TINKER'] = TINKER(coords="all.arc", tinker_key="alaglu.key", tinkerpath=tinkerpath)
         else:
-            logger.warn("TINKER cannot be found, skipping TINKER tests.")
+            logger.warning("TINKER cannot be found, skipping TINKER tests.")
         # Set up OpenMM engine
         try:
-            import simtk.openmm
+            try:
+                import openmm
+            except ImportError:
+                import simtk.openmm
             cls.engines['OpenMM'] = OpenMM(coords="all.gro", pdb="conf.pdb", ffxml="a99sb.xml", platname="Reference", precision="double")
         except:
-            logger.warn("OpenMM cannot be imported, skipping OpenMM tests.")
+            logger.warning("OpenMM cannot be imported, skipping OpenMM tests.")
 
     @classmethod
     def teardown_class(cls):
@@ -345,6 +351,7 @@ class TestAmoebaWater6(ForceBalanceTestCase):
     """
     @classmethod
     def setup_class(cls):
+        if not check_for_openmm(): pytest.skip("No OpenMM modules found.")
         super(TestAmoebaWater6, cls).setup_class()
         #self.logger.debug("\nBuilding options for target...\n")
         cls.cwd = os.path.dirname(os.path.realpath(__file__))

@@ -3,7 +3,6 @@ from __future__ import division
 from __future__ import print_function
 
 import copy
-import imp
 import itertools
 import os
 import re
@@ -20,13 +19,19 @@ from numpy import sin, cos, arccos
 from numpy.linalg import multi_dot
 from pkg_resources import parse_version
 
-# For Python 3 compatibility
+# For Python 2/3 compatibility
 try:
     from itertools import zip_longest as zip_longest
 except ImportError:
     from itertools import izip_longest as zip_longest
 
-# For Python 2 backwards-compatibility
+try:
+    import importlib
+    package_install_dir = os.path.split(importlib.util.find_spec(__name__.split('.')[0]).origin)[0]
+except ImportError: # importlib is new in version 3.1
+    import imp
+    package_install_dir = imp.find_module(__name__.split('.')[0])[1]
+
 try:
     input = raw_input
 except NameError:
@@ -305,8 +310,8 @@ if "forcebalance" in __name__:
     # or from the same directory as this module.
     have_dcdlib = False
     for fnm in ["_dcdlib.so",
-                os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib.so"),
-                os.path.join(imp.find_module(__name__.split('.')[0])[1],"_dcdlib"+str(sysconfig.get_config_var('EXT_SUFFIX'))),
+                os.path.join(package_install_dir,"_dcdlib.so"),
+                os.path.join(package_install_dir,"_dcdlib"+str(sysconfig.get_config_var('EXT_SUFFIX'))),
                 os.path.join(os.path.dirname(__file__),"_dcdlib.so"),
                 os.path.join(os.path.dirname(__file__),"_dcdlib"+str(sysconfig.get_config_var('EXT_SUFFIX')))]:
         if os.path.exists(fnm):
@@ -336,9 +341,14 @@ if "forcebalance" in __name__:
     #| OpenMM interface functions |#
     #==============================#
     try:
-        from simtk.unit import *
-        from simtk.openmm import *
-        from simtk.openmm.app import *
+        try:
+            from openmm.unit import *
+            from openmm import *
+            from openmm.app import *
+        except ImportError:
+            from simtk.unit import *
+            from simtk.openmm import *
+            from simtk.openmm.app import *
     except ImportError:
         logger.debug('Note: Cannot import optional OpenMM module.\n')
 
@@ -354,9 +364,14 @@ elif "geometric" in __name__:
     #| OpenMM interface functions |#
     #==============================#
     try:
-        from simtk.unit import *
-        from simtk.openmm import *
-        from simtk.openmm.app import *
+        try:
+            from openmm.unit import *
+            from openmm import *
+            from openmm.app import *
+        except ImportError:
+            from simtk.unit import *
+            from simtk.openmm import *
+            from simtk.openmm.app import *
     except ImportError:
         logger.debug('Note: Failed to import optional OpenMM module.\n')
 
