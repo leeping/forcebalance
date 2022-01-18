@@ -273,6 +273,7 @@ def read_frq_psi(psiout):
         if line.strip().startswith("Geometry (in Angstrom)"):
             XMode = 1
             EMode = len(elem) == 0
+    #Eigenvectors are now normalized and non-mass weighted, so can just supply these directly without modification
     modes = [np.array(i) for i in modes]
     return np.array(frqs), modes, np.zeros_like(frqs), elem, np.array(xyzs[-1])
 
