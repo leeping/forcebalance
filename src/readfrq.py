@@ -197,7 +197,7 @@ def read_frq_qc(qcout):
     unnorm = [np.array(i) for i in modes]
     return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm], np.array(intens), elem, xyz
 
-def read_frq_psi(psiout):
+def read_frq_psi_current(psiout):
     """ """
     VMode = 0
     XMode = 0
@@ -276,6 +276,56 @@ def read_frq_psi(psiout):
     #Eigenvectors are now normalized and non-mass weighted, so can just supply these directly without modification
     modes = [np.array(i) for i in modes]
     return np.array(frqs), modes, np.zeros_like(frqs), elem, np.array(xyzs[-1])
+
+def read_frq_psi_legacy(psiout):
+    """ """
+    VMode = 0
+    XMode = 0
+    EMode = 0
+    frqs = []
+    modes = []
+    xyzs = []
+    xyz = []
+    elem = []
+    for line in open(psiout).readlines():
+        VModeNxt = None
+        if 'Frequency:' in line:
+            VModeNxt = 1
+            if line.split()[-1].endswith('i'):
+                frqs.append(-1*float(line.split()[-1][:-1]))
+                # frqs.append(0.0) # After the optimization this mode is going to be useless...
+            else:
+                frqs.append(float(line.split()[-1]))
+        if VMode == 1:
+            if re.match('^[ \t]+X', line):
+                VModeNxt = 2
+                readmode = []
+        if VMode == 2:
+            s = line.split()
+            if len(s) != 5:
+                VMode = 0
+                modes.append(readmode[:])
+            else:
+                m = float(s[-1])
+                # Un-massweight the eigenvectors so that the output matches Q-Chem or Gaussian.
+                readmode.append([float(i)/np.sqrt(m) for i in s[1:4]])
+        if VModeNxt is not None: VMode = VModeNxt
+        if XMode == 1:
+            s = line.split()
+            if len(s) == 4 and isfloat(s[1]) and isfloat(s[2]) and isfloat(s[3]):
+                e = s[0]
+                xyz.append([float(i) for i in s[1:4]])
+                if EMode == 1:
+                    elem.append(e)
+            elif len(xyz) > 0:
+                xyzs.append(np.array(xyz))
+                xyz = []
+                XMode = 0
+        if line.strip().startswith("Geometry (in Angstrom)"):
+            XMode = 1
+            EMode = len(elem) == 0
+    unnorm = [np.array(i) for i in modes]
+    return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm], np.zeros_like(frqs), elem, np.array(xyzs[-1])
 
 def read_frq_fb(vfnm):
     """ Read ForceBalance-formatted vibrational data from a vdata.txt file. """
@@ -379,8 +429,13 @@ def read_frq_gen(fout):
             return read_frq_tc(fout)
         elif 'Q-Chem' in line:
             return read_frq_qc(fout)
-        elif 'Psi4' in line:
-            return read_frq_psi(fout)
+        elif 'Psi4' in line and 'release' in line:
+            ls = line.split()
+            version = ls[1]
+            if version >= '1.2':
+                return read_frq_psi_current(fout)
+            else:
+                return read_frq_psi_legacy(fout)
         elif 'Gaussian' in line:
             return read_frq_gau(fout)
         elif 'ForceBalance' in line:
