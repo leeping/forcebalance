@@ -358,10 +358,23 @@ class TINKER(Engine):
         if tinkpath!=None: # need to override input masterhost tinkerpath, otherwise if worker node has different )S/ libraries then will crash
            tinkerpath=tinkpath
         else:
-           tinkerpath=self.tinkerpath 
-        prog = os.path.join(tinkerpath, csplit[0])
-        if 'dynamic_gpu' not in csplit[0]:
+           tinkerpath=self.tinkerpath
+        
+        if 'analyze' in command:
+            gpuvergood=False
+            if stdin=='E,M':
+                gpuvergood=True
+            if command[-1]=='E' or command[-1]=='M':
+                gpuvergood=True
+            if 'GPUDYNAMICS' in os.environ.keys() and gpuvergood==True:
+                csplit[0]='analyze_gpu'
+            else:
+                csplit[0]='analyze'
+        command=' '.join(csplit)
+        if '_gpu' not in command:
+            prog = os.path.join(tinkerpath, csplit[0])
             csplit[0] = prog
+
         o = _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, rbytes=1024, **kwargs)
         # Determine the TINKER version number.
         for line in o[:10]:
@@ -391,13 +404,12 @@ class TINKER(Engine):
                         versionstr=newversionstr
                     vn=versionstr
                     vn = float(vn)
-                if 'GPUDYNAMICS' in os.environ.keys(): # then tinker 9 version
+                if '_gpu' in command: # then tinker 9 version
                     vn_need=1
                 else:
                     vn_need = 6.3
 
                     vn = float(vn)
-                vn_need = 6.3
                 try:
                     if vn < vn_need:
                         if self.warn_vn: 
@@ -675,7 +687,7 @@ class TINKER(Engine):
         Result = OrderedDict()
         # If we want the dipoles (or just energies), analyze is the way to go.
         if dipole or (not force):
-            oanl = self.calltinker("analyze %s -k %s" % (xyzin, self.name), stdin="G,E,M", print_to_screen=False)
+            oanl = self.calltinker("analyze %s -k %s" % (xyzin, self.name), stdin="E,M", print_to_screen=False)
             # Read potential energy and dipole from file.
             eanl = []
             dip = []
@@ -1021,7 +1033,18 @@ class TINKER(Engine):
         temps = np.array(temps)
     
         if verbose: logger.info("Post-processing to get the dipole moments\n")
-        oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="G,E,M", print_to_screen=False)
+        oanl = self.calltinker("analyze %s " % self.name, stdin="G,E,M", print_to_screen=False)
+        for ln, line in enumerate(oanl):
+            if 'Polarization' in line:
+                if 'MUTUAL' in line or 'THOLE' in line:
+                    continue
+
+            strip = line.strip()
+            s = line.split()
+            if 'Total System Mass' in line:
+                mass = float(s[-1])
+
+        oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="E,M", print_to_screen=False)
 
         # Read potential energy and dipole from file.
         eanl = []
