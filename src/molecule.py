@@ -3971,7 +3971,7 @@ class Molecule(object):
             Answer['qm_grads'] = Mats['gradient_scf']['All']
         # Mayer bond order matrix from SCF_FINAL_PRINT=1
         if len(Mats['mayer']['All']) > 0:
-            Answer['qm_bondorder'] = Mats['mayer']['All'][-1]
+            Answer['qm_bondorder'] = Mats['mayer']['All']
         if len(Mats['hessian_scf']['All']) > 0:
             Answer['qm_hessians'] = Mats['hessian_scf']['All']
         #else:
