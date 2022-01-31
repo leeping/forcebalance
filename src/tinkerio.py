@@ -773,6 +773,9 @@ class TINKER(Engine):
             x = "%s.xyz" % self.name
             self.mol.write(x, ftype="tinker")
         Result = self.evaluate_(x, dipole=True)
+        print('Result',Result,flush=True)
+        print('Result["Energy"]',Result["Energy"],flush=True)
+        print('Result["Dipole"]',Result["Dipole"],flush=True)
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
     def normal_modes(self, shot=0, optimize=True):
@@ -1032,13 +1035,14 @@ class TINKER(Engine):
         kdyn = np.array(kdyn) * 4.184
         temps = np.array(temps)
     
+        mass = 0.0
         if verbose: logger.info("Post-processing to get the dipole moments\n")
         oanl = self.calltinker("analyze %s " % self.name, stdin="G,E,M", print_to_screen=False)
         for ln, line in enumerate(oanl):
             if 'Polarization' in line:
                 if 'MUTUAL' in line or 'THOLE' in line:
                     continue
-
+           
             strip = line.strip()
             s = line.split()
             if 'Total System Mass' in line:
@@ -1049,7 +1053,6 @@ class TINKER(Engine):
         # Read potential energy and dipole from file.
         eanl = []
         dip = []
-        mass = 0.0
         ecomp = OrderedDict()
         havekeys = set()
         first_shot = True
