@@ -387,8 +387,13 @@ class Liquid(Target):
                         mol2_send = self.mol2
                 else:
                     mol2_send = []
+                inputs=self.nptfiles + self.scripts + mol2_send
+                for input in inputs:
+                    if '.xyz' in input:
+                        output=input.replace('.xyz','.arc')
+                        self.extra_output.append(output)
                 queue_up(wq, command = cmdstr+' > npt.out 2>&1 ',
-                         input_files = self.nptfiles + self.scripts + mol2_send + ['forcebalance.p'],
+                         input_files = inputs + ['forcebalance.p'],
                          output_files = ['npt_result.p', 'npt.out'] + self.extra_output, tgt=self)
 
     def nvt_simulation(self, temperature):
@@ -409,8 +414,14 @@ class Liquid(Target):
                         mol2_send = self.mol2
                 else:
                     mol2_send = []
+                inputs=self.nvtfiles + self.scripts + mol2_send
+                for input in inputs:
+                    if '.xyz' in input:
+                        output=input.replace('.xyz','.arc')
+                        self.extra_output.append(output)
+
                 queue_up(wq, command = cmdstr+' > nvt.out 2>&1 ',
-                         input_files = self.nvtfiles + self.scripts + mol2_send + ['forcebalance.p'],
+                         input_files = inputs + ['forcebalance.p'],
                          output_files = ['nvt_result.p', 'nvt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):
