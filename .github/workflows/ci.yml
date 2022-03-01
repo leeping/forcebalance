@@ -95,7 +95,7 @@ jobs:
       shell: bash -l {0}
       run: |
         # python setup.py install
-        python -m pip install --no-deps .
+        python -m pip install --no-deps --use-pep517 .
         python -c "import forcebalance; print(forcebalance.__version__)"
 
     - name: Run tests
