@@ -30,11 +30,12 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - uses: conda-incubator/setup-miniconda@v2.1.1
+    - name: Install dependencies with Minicondna
+      uses: conda-incubator/setup-miniconda@v2.1.1
       with:
         python-version: ${{ matrix.python-version }}
-        activate-environment: test
-        channel-priority: true
+        mamba-version: "*"
+        activate-environment: forcebalance-test
         environment-file: devtools/conda-envs/test_env.yaml
         auto-activate-base: false
 
@@ -51,12 +52,6 @@ jobs:
         conda info --all
         conda list
 
-    - name: Install OpenFF stack and OpenEye on Python 3.7+
-      if: ${{ matrix.python-version != 3.6}}
-      shell: bash -l {0}
-      run: |
-        conda install openff-toolkit -c conda-forge -y
-
 #       Need to replace ndcctools with this block
 #    - name: Install Work Queue
 #      shell: bash -l {0}
@@ -66,12 +61,6 @@ jobs:
 #        echo "Checking for Work Queue import; if successful, no message will be printed"
 #        python -c "import work_queue"
 #        export PATH="$GITHUB_WORKSPACE/opt/cctools/current/bin:$PATH"
-
-    - name: Install GROMACS
-      shell: bash -l {0}
-      run: |
-        # This will not install double precision, needs to be replaced with a fresh build
-        conda install gromacs=2019.1 -c bioconda -c conda-forge -y
 
     - name: Install Tinker
       run: |
@@ -108,6 +97,11 @@ jobs:
         python -m pip install --no-deps .
         python -c "import forcebalance; print(forcebalance.__version__)"
 
+    - name: Run tests
+      shell: bash -l {0}
+      run: |
+        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
+
     - name: Run water study
       shell: bash -l {0}
       run: |
@@ -115,11 +109,6 @@ jobs:
         tar xvjf targets.tar.bz2
         ForceBalance very_simple.in
         cd ../../
-
-    - name: Run tests
-      shell: bash -l {0}
-      run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
 
     - name: Codecov
       uses: codecov/codecov-action@v2.1.0
