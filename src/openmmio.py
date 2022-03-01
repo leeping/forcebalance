@@ -980,7 +980,18 @@ class OpenMM(Engine):
         #printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
         # for b in list(self.mod.topology.bonds()):
         #     print b[0].index, b[1].index
-        self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
+        try:
+            self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
+        # This try/except block catches a failure case introduced by the release of openmm 7.7
+        # where a ValueError would be raised if createSystem was given an unused kwarg.
+        # Now, when that error occurs, we remove the unused kwargs from mmopts.
+        # More info at https://github.com/leeping/forcebalance/issues/246
+        except ValueError as e:
+            if 'useSwitchingFunction' not in str(e):
+                raise e
+            self.mmopts.pop('useSwitchingFunction')
+            self.mmopts.pop('switchingDistance')
+            self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
 

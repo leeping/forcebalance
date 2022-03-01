@@ -1,13 +1,12 @@
-name: test
+name: forcebalance-test
 channels:
   - conda-forge
-  - omnia
-  - ambermd
+  - bioconda
+  - openeye
 dependencies:
     # Base depends
   - python
   - pip
-
     # Testing
   - pytest
   - pytest-cov
@@ -22,9 +21,10 @@ dependencies:
   - pymbar
   - openmm
   - ambertools
-  # The following two are not compatible with python 2.7 and 3.5, so they are conditionally installed in .travis.yml
-  #- openforcefield
-  #- openeye-toolkits
-
   - ndcctools
   - geometric
+  - gromacs =2019.1
+  - openff-toolkit >=0.10.3|<=0.10.0
+  - openff-evaluator-base
+  - openff-recharge
+  - openeye-toolkits
