@@ -128,7 +128,7 @@ if _SHOULD_CACHE:
     def oe_cached_generate_conformers(self, molecule, n_conformers=1, rms_cutoff=None, clear_existing=True, make_carboxylic_acids_cis=False):
         cache_key = hash((hash_molecule(molecule), n_conformers, str(rms_cutoff), clear_existing, make_carboxylic_acids_cis))
         if cache_key not in OE_TOOLKIT_CACHE_molecule_conformers:
-            oe_original_generate_conformers(self, molecule, n_conformers=n_conformers,                     rms_cutoff=rms_cutoff, clear_existing=clear_existing, make_carboxylic_acids_cis=make_carboxylic_acids_cis)
+            oe_original_generate_conformers(self, molecule, n_conformers=n_conformers, rms_cutoff=rms_cutoff, clear_existing=clear_existing, make_carboxylic_acids_cis=make_carboxylic_acids_cis)
             OE_TOOLKIT_CACHE_molecule_conformers[cache_key] = molecule._conformers
         molecule._conformers = OE_TOOLKIT_CACHE_molecule_conformers[cache_key]
     OpenEyeToolkitWrapper.generate_conformers = oe_cached_generate_conformers
