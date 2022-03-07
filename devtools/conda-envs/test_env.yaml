@@ -23,4 +23,4 @@ dependencies:
   - ndcctools
   - geometric
   - gromacs =2019.1
-  - openff-toolkit >=0.10.3,<=0.10.0
+  - openff-toolkit >=0.10.3|<=0.10.0
