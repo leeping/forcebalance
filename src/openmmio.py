@@ -980,6 +980,8 @@ class OpenMM(Engine):
         #printcool_dictionary(self.mmopts, title="Creating/updating simulation in engine %s with system settings:" % (self.name))
         # for b in list(self.mod.topology.bonds()):
         #     print b[0].index, b[1].index
+        self.mmopts['useSwitchingFunction'] = False
+        self.mmopts['switchingDistance'] = 0.0 * self.mmopts['switchingDistance']
         self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
