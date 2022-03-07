@@ -98,22 +98,8 @@ jobs:
         python -m pip install --no-deps --use-pep517 .
         python -c "import forcebalance; print(forcebalance.__version__)"
 
-    - name: Run just one test
+    - name: Run only some tests
       shell: bash -l {0}
       run: |
-        pytest -v src/tests/test_openmmio.py::test_local_coord_sites
+        pytest -v src/tests/test_openmmio.py src/tests/test_parser.py
         # pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
-
-    - name: Run water study
-      shell: bash -l {0}
-      run: |
-        cd studies/001_water_tutorial
-        tar xvjf targets.tar.bz2
-        ForceBalance very_simple.in
-        cd ../../
-
-    - name: Codecov
-      uses: codecov/codecov-action@v2.1.0
-      with:
-        file: ./coverage.xml
-        fail_ci_if_error: true
