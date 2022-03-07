@@ -18,7 +18,7 @@ dependencies:
   - swig
   - future
   - pymbar
-  - openmm =7.6
+  - openmm =>7.7
   - ambertools
   - ndcctools
   - geometric
