@@ -5,7 +5,7 @@ channels:
 dependencies:
     # Base depends
   - python
-  - pip >=22
+  - pip
     # Testing
   - pytest
   - pytest-cov
