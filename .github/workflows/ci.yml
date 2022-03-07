@@ -8,6 +8,10 @@ on:
     branches:
       - "master"
 
+defaults:
+  run:
+    shell: bash -l {0}
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -48,14 +52,12 @@ jobs:
         ulimit -a
 
     - name: Environment Information
-      shell: bash -l {0}
       run: |
         conda info --all
         conda list
 
 #       Need to replace ndcctools with this block
 #    - name: Install Work Queue
-#      shell: bash -l {0}
 #      run: |
 #        wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
 #        bash install-cctools.sh
@@ -63,15 +65,50 @@ jobs:
 #        python -c "import work_queue"
 #        export PATH="$GITHUB_WORKSPACE/opt/cctools/current/bin:$PATH"
 
-    - name: Install package
-      shell: bash -l {0}
+      - name: Install Tinker
       run: |
-        # python setup.py install
+        if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
+          wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
+        fi
+        if [[ "$CI_OS" == 'macOS-latest' ]]; then
+          wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
+        fi
+        tar xvzf tinker.tar.gz &> untar.log
+        mkdir -p $GITHUB_WORKSPACE/opt/tinker/8.8.3
+        if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
+          mv bin-linux $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
+        fi
+        if [[ "$CI_OS" == 'macOS-latest' ]]; then
+          mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
+        fi
+        echo "appending to GITHUB_PATH ... "
+        echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
+        echo "successfully appended to GITHUB_PATH"
+
+    - name: Extract data archives
+      run: |
+        cd studies/001_water_tutorial
+        tar xvjf targets.tar.bz2
+        cd ../../
+
+    - name: Install package
+      run: |
         python -m pip install --no-deps --use-pep517 .
         python -c "import forcebalance; print(forcebalance.__version__)"
 
-    - name: Run only some tests
-      shell: bash -l {0}
+    - name: Run tests
       run: |
-        pytest -v src/tests/test_openmmio.py src/tests/test_parser.py
-        # pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
+        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
+
+    - name: Run water study
+      run: |
+        cd studies/001_water_tutorial
+        tar xvjf targets.tar.bz2
+        ForceBalance very_simple.in
+        cd ../../
+
+    - name: Codecov
+      uses: codecov/codecov-action@v2.1.0
+      with:
+        file: ./coverage.xml
+        fail_ci_if_error: true
