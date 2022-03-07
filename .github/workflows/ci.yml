@@ -98,10 +98,11 @@ jobs:
         python -m pip install --no-deps --use-pep517 .
         python -c "import forcebalance; print(forcebalance.__version__)"
 
-    - name: Run tests
+    - name: Run just one test
       shell: bash -l {0}
       run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
+        pytest -v src/tests/test_openmmio.py::test_local_coord_sites
+        # pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
 
     - name: Run water study
       shell: bash -l {0}
