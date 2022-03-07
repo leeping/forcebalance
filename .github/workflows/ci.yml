@@ -94,6 +94,11 @@ jobs:
         tar xvjf targets.tar.bz2
         cd ../../
 
+    - name: Install backport of dataclasses
+      if: ${{ matrix.python-version == 3.6}}
+      run: |
+        pip install dataclasses
+
     - name: Install package
       run: |
         python -m pip install --no-deps .
