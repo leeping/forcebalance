@@ -984,6 +984,7 @@ class OpenMM(Engine):
             self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
         except ValueError:
             print(mmopts)
+            assert False
             self.mmopts.pop('useSwitchingFunction')
             self.mmopts.pop('switchingDistance')
             self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
