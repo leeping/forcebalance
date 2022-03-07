@@ -982,7 +982,13 @@ class OpenMM(Engine):
         #     print b[0].index, b[1].index
         try:
             self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
-        except ValueError:
+        # This try/except block catches a failure case introduced by the release of openmm 7.7
+        # where a ValueError would be raised if createSystem was given an unused kwarg.
+        # Now, when that error occurs, we remove the unused kwargs from mmopts.
+        # More info at https://github.com/leeping/forcebalance/issues/246
+        except ValueError as e:
+            if 'useSwitchingFunction' not in str(e):
+                raise e
             self.mmopts.pop('useSwitchingFunction')
             self.mmopts.pop('switchingDistance')
             self.system = self.forcefield.createSystem(self.mod.topology, **self.mmopts)
