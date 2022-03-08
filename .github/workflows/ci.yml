@@ -14,6 +14,7 @@ defaults:
 
 jobs:
   test:
+    name: Test on ${{ matrix.os }}, Python ${{ matrix.python-version }}, pymbar ${{ matrix.pymbar-version }}
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -22,10 +23,11 @@ jobs:
           - macOS-latest
           - ubuntu-latest
         python-version:
-          - "3.6"
-          - "3.7"
           - "3.8"
           - "3.9"
+        pymbar-version:
+          - "3"
+          - "4"
 
     env:
       CI_OS: ${{ matrix.os }}
@@ -45,8 +47,12 @@ jobs:
         environment-file: devtools/conda-envs/test_env.yaml
         auto-activate-base: false
 
+    - name: Optionally install pymbar 3
+      if: ${{ matrix.pymbar-version == 3 }}
+      run: |
+        micromamba install "pymbar =3" -c conda-forge -yq
+
     - name: Additional info about the build
-      shell: bash
       run: |
         uname -a
         df -h
@@ -93,11 +99,6 @@ jobs:
         cd studies/001_water_tutorial
         tar xvjf targets.tar.bz2
         cd ../../
-
-    - name: Install backport of dataclasses
-      if: ${{ matrix.python-version == 3.6}}
-      run: |
-        pip install dataclasses
 
     - name: Install package
       run: |

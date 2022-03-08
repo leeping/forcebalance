@@ -24,7 +24,6 @@ from subprocess import PIPE
 try:
     from lxml import etree
 except: pass
-from pymbar import pymbar
 import itertools
 from forcebalance.optimizer import Counter
 from collections import defaultdict, namedtuple, OrderedDict
@@ -894,8 +893,31 @@ class Liquid(Target):
         W1 = None
         if len(BPoints) > 1:
             logger.info("Running MBAR analysis on %i states...\n" % len(BPoints))
-            mbar = pymbar.MBAR(U_kln, N_k, verbose=mbar_verbose, relative_tolerance=5.0e-8)
-            W1 = mbar.getWeights()
+            try:
+                from pymbar import pymbar
+
+                # pymbar 3
+                mbar = pymbar.MBAR(
+                    U_kln,
+                    N_k,
+                    verbose=mbar_verbose,
+                    relative_tolerance=5.0e-8,
+                )
+                W1 = mbar.getWeights()
+            except ImportError:
+                import pymbar
+
+                # pymbar 4
+                mbar = pymbar.MBAR(
+                    U_kln,
+                    N_k,
+                    verbose=mbar_verbose,
+                    relative_tolerance=5.0e-8,
+                    solver_protocol=(
+                        {'method': 'adaptive'},
+                    )
+                )
+                W1 = mbar.weights()
             logger.info("Done\n")
         elif len(BPoints) == 1:
             W1 = np.ones((Shots,1))
@@ -935,8 +957,16 @@ class Liquid(Target):
                         mU_kln[k, m, :]  = mE[mE_idx]
                         mU_kln[k, m, :] *= beta
                 if np.abs(np.std(mE)) > 1e-6 and mBSims > 1:
-                    mmbar = pymbar.MBAR(mU_kln, mN_k, verbose=False, relative_tolerance=5.0e-8, method='self-consistent-iteration')
-                    mW1 = mmbar.getWeights()
+                    mmbar = pymbar.MBAR(
+                        mU_kln,
+                        mN_k,
+                        verbose=False,
+                        relative_tolerance=5.0e-8,
+                        solver_protocol=(
+                            {'method': 'adaptive'},
+                        ),
+                    )
+                    mW1 = mmbar.weights()
             elif len(mBPoints) == 1:
                 mW1 = np.ones((mShots,1))
                 mW1 /= mShots

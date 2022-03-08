@@ -25,7 +25,6 @@ from subprocess import PIPE
 try:
     from lxml import etree
 except: pass
-from pymbar import pymbar
 import itertools
 from collections import defaultdict, namedtuple, OrderedDict
 import csv
@@ -663,13 +662,33 @@ class Lipid(Target):
         W1 = None
         if len(BPoints) > 1:
             logger.info("Running MBAR analysis on %i states...\n" % len(BPoints))
-            mbar = pymbar.MBAR(U_kln, N_k, verbose=mbar_verbose, relative_tolerance=5.0e-8)
-            W1 = mbar.getWeights()
+            try:
+                from pymbar import pymbar
+
+                # pymbar 3
+                mbar = pymbar.MBAR(
+                    U_kln,
+                    N_k,
+                    verbose=mbar_verbose,
+                    relative_tolerance=5.0e-8,
+                )
+                W1 = mbar.getWeights()
+            except ImportError:
+                import pymbar
+
+                # pymbar 4
+                mbar = pymbar.MBAR(
+                    U_kln,
+                    N_k,
+                    verbose=mbar_verbose,
+                    relative_tolerance=5.0e-8,
+                )
+                W1 = mbar.weights()
             logger.info("Done\n")
         elif len(BPoints) == 1:
             W1 = np.ones((BPoints*Shots,BPoints))
             W1 /= BPoints*Shots
-        
+
         def fill_weights(weights, phase_points, mbar_points, snapshots):
             """ Fill in the weight matrix with MBAR weights where MBAR was run, 
             and equal weights otherwise. """
