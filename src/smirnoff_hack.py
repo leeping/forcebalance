@@ -125,10 +125,10 @@ if _SHOULD_CACHE:
     # cache the OE generate_conformers function (save 15s)
     OE_TOOLKIT_CACHE_molecule_conformers = {}
     oe_original_generate_conformers = OpenEyeToolkitWrapper.generate_conformers
-    def oe_cached_generate_conformers(self, molecule, n_conformers=1, rms_cutoff=None, clear_existing=True):
-        cache_key = hash((hash_molecule(molecule), n_conformers, str(rms_cutoff), clear_existing))
+    def oe_cached_generate_conformers(self, molecule, *args, **kwargs):
+        cache_key = hash_molecule_args_and_kwargs(molecule, args, kwargs)
         if cache_key not in OE_TOOLKIT_CACHE_molecule_conformers:
-            oe_original_generate_conformers(self, molecule, n_conformers=n_conformers, rms_cutoff=rms_cutoff, clear_existing=clear_existing)
+            oe_original_generate_conformers(self, molecule, *args, **kwargs)
             OE_TOOLKIT_CACHE_molecule_conformers[cache_key] = molecule._conformers
         molecule._conformers = OE_TOOLKIT_CACHE_molecule_conformers[cache_key]
     OpenEyeToolkitWrapper.generate_conformers = oe_cached_generate_conformers
@@ -137,10 +137,10 @@ if _SHOULD_CACHE:
     # cache the RDKit generate_conformers function
     RDK_TOOLKIT_CACHE_molecule_conformers = {}
     rdk_original_generate_conformers = RDKitToolkitWrapper.generate_conformers
-    def rdk_cached_generate_conformers(self, molecule, n_conformers=1, rms_cutoff=None, clear_existing=True):
-        cache_key = hash((hash_molecule(molecule), n_conformers, str(rms_cutoff), clear_existing))
+    def rdk_cached_generate_conformers(self, molecule, *args, **kwargs):
+        cache_key = hash_molecule_args_and_kwargs(molecule, args, kwargs)
         if cache_key not in RDK_TOOLKIT_CACHE_molecule_conformers:
-            rdk_original_generate_conformers(self, molecule, n_conformers=n_conformers, rms_cutoff=rms_cutoff, clear_existing=clear_existing)
+            rdk_original_generate_conformers(self, molecule, *args, **kwargs)
             RDK_TOOLKIT_CACHE_molecule_conformers[cache_key] = molecule._conformers
         molecule._conformers = RDK_TOOLKIT_CACHE_molecule_conformers[cache_key]
     RDKitToolkitWrapper.generate_conformers = rdk_cached_generate_conformers
