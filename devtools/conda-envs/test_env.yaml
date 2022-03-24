@@ -22,5 +22,5 @@ dependencies:
   - ambertools
   - ndcctools
   - geometric
-  - gromacs =2019.1
+  - gromacs =*=*nompi_dblprec*
   - openff-toolkit >=0.10.3|<=0.10.0
