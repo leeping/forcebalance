@@ -581,7 +581,10 @@ class Evaluator_SMIRNOFF(Target):
             request = self._submit_data_set(results.unsuccessful_properties)
             results, _ = request.results()
 
-            estimated_properties.add_properties(*results.estimated_properties)
+            estimated_properties.add_properties(
+                *results.estimated_properties.properties,
+                validate=False,
+            )
 
             if len(results.unsuccessful_properties) == 0:
                 break
