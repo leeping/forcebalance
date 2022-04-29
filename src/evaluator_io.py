@@ -447,7 +447,7 @@ class Evaluator_SMIRNOFF(Target):
         logger.info(
             "Requesting the estimation of {} properties (id={}).\n".format(
                 len(data_set),
-                self._pending_estimate_request.id
+                request.id
             )
         )
 
@@ -608,6 +608,16 @@ class Evaluator_SMIRNOFF(Target):
         """
         # Make sure the request actually finished and was error free.
         results = self._check_estimation_request()
+
+        assert len(results.estimated_properties) == len(self._reference_data_set)
+
+        estimated_ids = {
+            physical_property.id for physical_property in results.estimated_properties
+        }
+        reference_ids = {
+            physical_property.id for physical_property in self._reference_data_set
+        }
+        assert reference_ids == estimated_ids
 
         # Save a copy of the results to the temporary directory
         results_path = os.path.join(self.root, self.rundir, "results.json")
