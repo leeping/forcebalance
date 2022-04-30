@@ -574,9 +574,9 @@ class Evaluator_SMIRNOFF(Target):
             exceptions = "\n".join(str(result) for result in results.exceptions)
 
             logger.warning(
-                "Some properties could not be estimated:\n\n%s." % exceptions
+                "Some properties could not be estimated:\n\n%s" % exceptions
             )
-            logger.warning("Attempting to restart the failed properties")
+            logger.warning("Attempting to restart the failed properties\n")
 
             request = self._submit_data_set(results.unsuccessful_properties)
             results, _ = request.results()
