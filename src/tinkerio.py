@@ -366,10 +366,7 @@ class TINKER(Engine):
                 gpuvergood=True
             if command[-1]=='E' or command[-1]=='M':
                 gpuvergood=True
-            if 'GPUDYNAMICS' in os.environ.keys() and gpuvergood==True:
-                csplit[0]='analyze_gpu'
-            else:
-                csplit[0]='analyze'
+            csplit[0]='analyze'
         command=' '.join(csplit)
         if '_gpu' not in command:
             prog = os.path.join(tinkerpath, csplit[0])
