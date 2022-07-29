@@ -574,6 +574,10 @@ class GMX(Engine):
                 self.gmxpath = which('gmx'+self.gmxsuffix)
                 self.gmxversion = 5
                 havegmx = True
+            if which('gmx_d'+self.gmxsuffix) != '':
+                self.gmxpath = which('gmx_d'+self.gmxsuffix)
+                self.gmxversion = 5
+                havegmx = True
             elif which('mdrun'+self.gmxsuffix) != '':
                 self.gmxpath = which('mdrun'+self.gmxsuffix)
                 self.gmxversion = 4
