@@ -94,10 +94,7 @@ class TestAmber99SB(ForceBalanceTestCase):
             logger.warning("TINKER cannot be found, skipping TINKER tests.")
         # Set up OpenMM engine
         try:
-            try:
-                import openmm
-            except ImportError:
-                import simtk.openmm
+            import openmm
             cls.engines['OpenMM'] = OpenMM(coords="all.gro", pdb="conf.pdb", ffxml="a99sb.xml", platname="Reference", precision="double")
         except:
             logger.warning("OpenMM cannot be imported, skipping OpenMM tests.")

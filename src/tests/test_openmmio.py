@@ -5,16 +5,8 @@ from forcebalance.openmmio import PrepareVirtualSites, ResetVirtualSites_fast
 import numpy as np
 
 try:
-    try:
-        # Try importing openmm using >=7.6 namespace
-        from openmm import app
-        import openmm as mm
-        from openmm import unit
-    except ImportError:
-        # Try importing openmm using <7.6 namespace
-        import simtk.openmm as mm
-        from simtk.openmm import app
-        from simtk import unit
+    from openmm import app, unit
+    import openmm as mm
     no_openmm = False
 except ImportError:
     # If OpenMM classes cannot be imported, then set this flag 

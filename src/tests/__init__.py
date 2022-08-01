@@ -30,16 +30,8 @@ class ForceBalanceTestCase(object):
 
 def check_for_openmm():
     try:
-        try:
-            # Try importing openmm using >=7.6 namespace
-            from openmm import app
-            import openmm as mm
-            from openmm import unit
-        except ImportError:
-            # Try importing openmm using <7.6 namespace
-            import simtk.openmm as mm
-            from simtk.openmm import app
-            from simtk import unit
+        import openmm
+        from openmm import app, unit
         return True
     except ImportError:
         # If OpenMM classes cannot be imported, then set this flag 
