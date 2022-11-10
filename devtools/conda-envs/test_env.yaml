@@ -3,24 +3,19 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-    # Base depends
   - python
   - pip
-    # Testing
-  - pytest
   - pytest-cov
+  - pytest-randomly
   - codecov
-  - numpy
-  - scipy
   - lxml
-  - networkx
   - zlib
   - swig
   - future
-  - pymbar
+  - pymbar =3
   - openmm
-  - ambertools
   - ndcctools
   - geometric
   - gromacs =2019.1
-  - openff-toolkit >=0.10.3|<=0.10.0
+  - openff-toolkit =0.10.6
+  - openff-evaluator-base =0.3

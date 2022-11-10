@@ -1,29 +1,18 @@
 from __future__ import print_function
 from __future__ import absolute_import
 from builtins import object
-try:
-    __import__("numpy")
-except ImportError:
-    print("Could not load numpy module, exiting...")
-    exit()
-
-try:
-    __import__("scipy")
-except ImportError:
-    print("Could not load scipy module, exiting...")
-    exit()
 
 from re import split, findall
 from collections import defaultdict, OrderedDict
+
+from .parser import tgt_opts_defaults, gen_opts_defaults
+
 # try:
 #     import pkg_resources
 #     __version__ = pkg_resources.get_distribution("forcebalance").version
 # except:
 #     __version__ = "v1.3.0"
 # __version__ = "v1.4.0"
-
-from collections import OrderedDict
-from .parser import tgt_opts_defaults, gen_opts_defaults
 
 class BaseClass(object):
     """ Provides some nifty functions that are common to all ForceBalance classes. """

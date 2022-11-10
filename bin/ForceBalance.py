@@ -8,6 +8,7 @@ from __future__ import print_function
 from builtins import range
 import os, sys, re
 import argparse
+from forcebalance import __version__
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
@@ -60,7 +61,16 @@ def process(word, color):
     return Answer
 
 def main():
-    printcool("Welcome to ForceBalance version 1.9.2! =D\nForce Field Optimization System\n\nAuthors:\nLee-Ping Wang\nYudong Qiu, Keri A. McKiernan\nJeffrey R. Wagner, Hyesu Jang, Simon Boothroyd\nArthur Vigil, Erik G. Brandt, John Stoppelman\nJohnny Israeli, Matt Thompson", ansi="1", bold=True, minwidth=64)
+    printcool(
+        "Welcome to ForceBalance version {0}! =D\n"
+        "Force Field Optimization System\n\n"
+        "Authors:\nLee-Ping Wang\nYudong Qiu, Keri A. McKiernan\nJeffrey R. Wagner, Hyesu Jang, "
+        "Simon Boothroyd\nArthur Vigil, Erik G. Brandt, John Stoppelman\nJohnny Israeli, Matt "
+        "Thompson".format(__version__),
+        ansi="1",
+        bold=True,
+        minwidth=64,
+    )
     logostr = """
                           ,'+++                                        
                        ,++++++.      .:,,.                              
