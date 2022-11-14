@@ -17,10 +17,13 @@ dependencies:
   - zlib
   - swig
   - future
-  - pymbar
+  - pymbar =3
   - openmm
   - ambertools
   - ndcctools
   - geometric
   - gromacs =2019.1
-  - openff-toolkit >=0.10.3|<=0.10.0
+  - openff-toolkit =0.10.6
+  - openff-evaluator-base =0.3.8
+  # openff-recharge =0.3
+  # openff-utilities =0.1.5
