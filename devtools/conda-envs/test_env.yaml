@@ -19,3 +19,6 @@ dependencies:
   - gromacs =2019.1
   - openff-toolkit =0.10.6
   - openff-evaluator-base =0.3
+  - openff-evaluator-base =0.3.8
+  # openff-recharge =0.3
+  # openff-utilities =0.1.5
