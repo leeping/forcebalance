@@ -40,7 +40,7 @@ jobs:
         environment-file: devtools/conda-envs/test_env.yaml
         channel-priority: "flexible"
         extra-specs:
-          python-version=${{ matrix.python-version }}
+          python=${{ matrix.python-version }}
 
     - name: Additional info about the build
       shell: bash
