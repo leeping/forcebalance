@@ -58,11 +58,7 @@ setup(
     description="Automated force field optimization.",
     long_description=long_description,
     url="https://simtk.org/home/forcebalance",
-    packages=["forcebalance", "forcebalance.test", "forcebalance.gui"],
-    package_dir={
-        "forcebalance": "src",
-        "forcebalance.test": "src/tests",
-    },
+    packages=["forcebalance", "forcebalance.tests", "forcebalance.gui"],
     package_data={
         "forcebalance": [
             "AUTHORS",
@@ -73,11 +69,11 @@ setup(
             "data/uffparms.in",
             "data/oplsaa.ff/*",
         ],
-        "forcebalance.test": glob.glob("src/tests/files/*.*")
-        + glob.glob("src/tests/files/forcefield/*.*")
-        + glob.glob("src/tests/files/targets/*/*.*")
-        + glob.glob("src/tests/files/*.*")
-        + ["src/tests/files/work_queue_worker"],
+        "forcebalance.tests": glob.glob("forcebalance/tests/files/*.*")
+        + glob.glob("forcebalance/tests/files/forcefield/*.*")
+        + glob.glob("forcebalance/tests/files/targets/*/*.*")
+        + glob.glob("forcebalance/tests/files/*.*")
+        + ["forcebalance/tests/files/work_queue_worker"],
     },
     data_files=[],
     ext_modules=[DCD],
