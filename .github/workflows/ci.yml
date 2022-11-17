@@ -99,7 +99,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -vx --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml src/tests/
+        pytest -v --durations=20 --cov=src/ --cov-config=setup.cfg --cov-report=xml src/tests/
 
     - name: Run water study
       run: |
