@@ -11,7 +11,7 @@ class TargetTests(ForceBalanceTestCase):
 
     def setup_method(self, method):
         super(TargetTests, self).setup_method(method)
-        self.logger = forcebalance.output.getLogger('forcebalance.test.' + __name__[5:])
+        self.logger = forcebalance.output.getLogger('forcebalance.tests.' + __name__[5:])
         self.logger.debug("\nBuilding options for target...\n")
         self.options = forcebalance.parser.gen_opts_defaults.copy()
         self.tgt_opt = forcebalance.parser.tgt_opts_defaults.copy()

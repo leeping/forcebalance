@@ -2,7 +2,7 @@ from builtins import object
 import os, re
 import forcebalance.output
 
-forcebalance.output.getLogger("forcebalance.test").propagate=False
+forcebalance.output.getLogger("forcebalance.tests").propagate=False
 
 os.chdir(os.path.dirname(__file__))
 __all__ = [module[:-3] for module in sorted(os.listdir('.'))
@@ -15,7 +15,7 @@ class ForceBalanceTestCase(object):
         """Override default test case constructor to set longMessage=True, reset cwd after test
         @override unittest.TestCase.__init(methodName='runTest')"""
 
-        cls.logger = forcebalance.output.getLogger('forcebalance.test.' + __name__[5:])
+        cls.logger = forcebalance.output.getLogger('forcebalance.tests.' + __name__[5:])
         cls.start_directory = os.getcwd()
 
         # unset this env to prevent error in mdrun
