@@ -38,7 +38,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Install dependencies with Minicondna
+    - name: Install dependencies with Miniconda
       uses: conda-incubator/setup-miniconda@v2.1.1
       with:
         python-version: ${{ matrix.python-version }}
@@ -50,7 +50,8 @@ jobs:
     - name: Optionally install pymbar 3
       if: ${{ matrix.pymbar-version == 3 }}
       run: |
-        micromamba install "pymbar =3" -c conda-forge -yq
+        # TODO: Replace with micromamba
+        mamba install "pymbar =3" -c conda-forge -yq
 
     - name: Additional info about the build
       run: |
