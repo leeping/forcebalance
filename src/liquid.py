@@ -966,7 +966,10 @@ class Liquid(Target):
                             {'method': 'adaptive'},
                         ),
                     )
-                    mW1 = mmbar.weights()
+                    try:
+                        mW1 = mmbar.weights()
+                    except AttributeError:
+                        mW1 = mmbar.getWeights()
             elif len(mBPoints) == 1:
                 mW1 = np.ones((mShots,1))
                 mW1 /= mShots
