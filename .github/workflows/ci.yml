@@ -22,8 +22,6 @@ jobs:
           - macOS-latest
           - ubuntu-latest
         python-version:
-          - "3.6"
-          - "3.7"
           - "3.8"
           - "3.9"
 
@@ -34,10 +32,10 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
     - name: Install dependencies with Minicondna
-      uses: conda-incubator/setup-miniconda@v2.1.1
+      uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: ${{ matrix.python-version }}
         mamba-version: "*"
@@ -84,20 +82,13 @@ jobs:
           mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
         fi
 
-        echo "appending to GITHUB_PATH ... "
         echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
-        echo "successfully appended to GITHUB_PATH"
 
     - name: Extract data archives
       run: |
         cd studies/001_water_tutorial
         tar xvjf targets.tar.bz2
         cd ../../
-
-    - name: Install backport of dataclasses
-      if: ${{ matrix.python-version == 3.6}}
-      run: |
-        pip install dataclasses
 
     - name: Install package
       run: |
@@ -116,7 +107,7 @@ jobs:
         cd ../../
 
     - name: Codecov
-      uses: codecov/codecov-action@v2.1.0
+      uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
         fail_ci_if_error: true
