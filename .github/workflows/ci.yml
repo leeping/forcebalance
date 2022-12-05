@@ -22,8 +22,6 @@ jobs:
           - macOS-latest
           - ubuntu-latest
         python-version:
-          - "3.6"
-          - "3.7"
           - "3.8"
           - "3.9"
 
@@ -37,7 +35,7 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Install dependencies with Minicondna
-      uses: conda-incubator/setup-miniconda@v2.1.1
+      uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: ${{ matrix.python-version }}
         mamba-version: "*"
@@ -116,7 +114,7 @@ jobs:
         cd ../../
 
     - name: Codecov
-      uses: codecov/codecov-action@v2.1.0
+      uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
         fail_ci_if_error: true
