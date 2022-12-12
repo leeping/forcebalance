@@ -115,7 +115,7 @@ def smirnoff_analyze_parameter_coverage(forcefield, tgt_opts):
         logger.info('%4i %-100s : %10d\n' % (i, p, parameter_counter[smirks]))
         if parameter_counter[smirks] > 0:
             n_covered += 1
-    logger.info("SNIRNOFF Parameter Coverage Analysis result: %d/%d parameters are covered.\n" % (n_covered, len(forcefield.plist)))
+    logger.info("SMIRNOFF Parameter Coverage Analysis result: %d/%d parameters are covered.\n" % (n_covered, len(forcefield.plist)))
     logger.info("-"*118 + '\n')
 
 class SMIRNOFF_Reader(BaseReader):
