@@ -707,7 +707,7 @@ class FF(forcebalance.BaseClass):
                 self.map[pid] = self.np
                 # offxml file later than v0.3 may have unit strings in the field
                 quantity_str = e.get(p)
-                res = re.search(r'^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?', quantity_str)
+                res = re.search(r'^ *[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?', quantity_str)
                 value_str, unit_str = quantity_str[:res.end()], quantity_str[res.end():]
                 self.assign_p0(self.np, float(value_str))
                 self.offxml_unit_strs[pid] = unit_str
@@ -746,6 +746,8 @@ class FF(forcebalance.BaseClass):
                 quantity_str = e.get(parameter_name)
                 res = re.search(r'^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?', quantity_str)
                 value_str, unit_str = quantity_str[:res.end()], quantity_str[res.end():]
+                # LPW 2023-01-23: Behavior of parameter unit string for "evaluated" parameter is undefined.
+                unit_str = ""
                 quantity_str = e.get(parameter_name)
                 self.offxml_unit_strs[dest] = unit_str
 
@@ -841,6 +843,7 @@ class FF(forcebalance.BaseClass):
             if self.ffdata_isxml[fnm]:
                 # offxml files with version higher than 0.3 may have unit strings in the field
                 xml_lines[fnm][ln].attrib[fld] = OMMFormat % (wval) + self.offxml_unit_strs[pid]
+                
                 # If this is a SMIRNOFF parameter, assign it directly in the OpenFF ForceField object
                 # as well as writing out the file.
                 if hasattr(self, 'offxml') and fnm == self.offxml:

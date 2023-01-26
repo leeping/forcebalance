@@ -598,6 +598,22 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
         return
 
+    def remove_custom_dir(self, dnm, use_iterdir=True):
+        """
+        Removes a custom folder under the target folder; can be used to clean up microiteration folders.
+        """
+        ## Directory of the current iteration; if not None, then the simulation runs under
+        ## temp/target_name/iteration_number
+        ## The 'customdir' is customizable and can go below anything
+        absgetdir = os.path.join(self.root,self.tempdir)
+        if use_iterdir and Counter() is not None:
+            ## Not expecting more than ten thousand iterations
+            iterdir = "iter_%04i" % Counter()
+            absgetdir = os.path.join(absgetdir,iterdir)
+        # Append the folder name to be removed
+        absgetdir = os.path.join(absgetdir,dnm)
+        shutil.rmtree(absgetdir)
+
     def stage(self, mvals, AGrad=False, AHess=False, use_iterdir=True, customdir=None, firstIteration=False):
         """
 
