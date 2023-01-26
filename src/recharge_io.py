@@ -17,10 +17,10 @@ from forcebalance.output import getLogger
 from forcebalance.target import Target
 
 try:
-    from openff.recharge.charges.charges import ChargeSettings
+    from openff.recharge.charges import ChargeSettings
     from openff.recharge.esp.storage import MoleculeESPStore
-    from openff.recharge.optimize import ElectricFieldOptimization, ESPOptimization
-    from openff.recharge.smirnoff import from_smirnoff
+    from openff.recharge.optimize import ElectricFieldObjective, ESPObjective # ElectricFieldOptimization, ESPOptimization
+    from openff.recharge.charges.bcc import BCCCollection
     recharge_import_success = True
 except ImportError:
     recharge_import_success = False
@@ -96,7 +96,7 @@ class Recharge_SMIRNOFF(Target):
         # TODO: it is assumed that the MDL aromaticity model should be used
         #       rather than the once specified in the FF as the model is not
         #       currently exposed. See OpenFF toolkit issue #663.
-        bcc_collection = from_smirnoff(bcc_handler)
+        bcc_collection = BCCCollection.from_smirnoff(bcc_handler)
         bcc_smirks = [bcc.smirks for bcc in bcc_collection.parameters]
 
         # Determine the indices of the BCC parameters being refit.
@@ -136,8 +136,8 @@ class Recharge_SMIRNOFF(Target):
         # Pre-calculate the expensive operations which are needed to evaluate the
         # objective function, but do not depend on the current parameters.
         optimization_class = {
-            "esp": ESPOptimization,
-            "electric-field": ElectricFieldOptimization,
+            "esp": ESPObjective,
+            "electric-field": ElectricFieldObjective,
         }[self.recharge_property]
 
         objective_terms = [

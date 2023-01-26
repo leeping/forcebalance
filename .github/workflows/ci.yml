@@ -8,6 +8,10 @@ on:
     branches:
       - "master"
 
+defaults:
+  run:
+    shell: bash -l {0}
+
 jobs:
   test:
     runs-on: ${{ matrix.os }}
@@ -18,9 +22,9 @@ jobs:
           - macOS-latest
           - ubuntu-latest
         python-version:
-          - 3.6
-          - 3.7
-          - 3.8
+          - "3.8"
+          - "3.9"
+
     env:
       CI_OS: ${{ matrix.os }}
       PYVER: ${{ matrix.python-version }}
@@ -28,13 +32,14 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
 
-    - uses: conda-incubator/setup-miniconda@v2.1.1
+    - name: Install dependencies with Minicondna
+      uses: conda-incubator/setup-miniconda@v2
       with:
         python-version: ${{ matrix.python-version }}
-        activate-environment: test
-        channel-priority: true
+        mamba-version: "*"
+        activate-environment: forcebalance-test
         environment-file: devtools/conda-envs/test_env.yaml
         auto-activate-base: false
 
@@ -46,32 +51,18 @@ jobs:
         ulimit -a
 
     - name: Environment Information
-      shell: bash -l {0}
       run: |
         conda info --all
         conda list
 
-    - name: Install OpenFF stack and OpenEye on Python 3.6+
-      if: ${{ matrix.python-version != 2.7}}
-      shell: bash -l {0}
-      run: |
-        conda install openff-toolkit -c conda-forge -y
-
 #       Need to replace ndcctools with this block
 #    - name: Install Work Queue
-#      shell: bash -l {0}
 #      run: |
 #        wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
 #        bash install-cctools.sh
 #        echo "Checking for Work Queue import; if successful, no message will be printed"
 #        python -c "import work_queue"
 #        export PATH="$GITHUB_WORKSPACE/opt/cctools/current/bin:$PATH"
-
-    - name: Install GROMACS
-      shell: bash -l {0}
-      run: |
-        # This will not install double precision, needs to be replaced with a fresh build
-        conda install gromacs=2019.1 -c bioconda -c conda-forge -y
 
     - name: Install Tinker
       run: |
@@ -91,9 +82,7 @@ jobs:
           mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
         fi
 
-        echo "appending to GITHUB_PATH ... "
         echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
-        echo "successfully appended to GITHUB_PATH"
 
     - name: Extract data archives
       run: |
@@ -102,27 +91,23 @@ jobs:
         cd ../../
 
     - name: Install package
-      shell: bash -l {0}
       run: |
-        # python setup.py install
         python -m pip install --no-deps .
         python -c "import forcebalance; print(forcebalance.__version__)"
 
+    - name: Run tests
+      run: |
+        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
+
     - name: Run water study
-      shell: bash -l {0}
       run: |
         cd studies/001_water_tutorial
         tar xvjf targets.tar.bz2
         ForceBalance very_simple.in
         cd ../../
 
-    - name: Run tests
-      shell: bash -l {0}
-      run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
-
     - name: Codecov
-      uses: codecov/codecov-action@v2.1.0
+      uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
         fail_ci_if_error: true
