@@ -154,72 +154,82 @@ def assign_openff_parameter(ff, new_value, pid):
     # QYD: cache the parameter finding procedure, then directly change the _value of the quantity
     # Note: This cache requires the quantity does not get overwritten, which is True since this function is the only
     # place we modify the OpenFF ForceField parameters.
-    #if 1:
-    if not hasattr(ff, '_forcebalance_assign_parameter_map'):
+    if 1:
+    #if not hasattr(ff, '_forcebalance_assign_parameter_map'):
         ff._forcebalance_assign_parameter_map = dict()
-    value_name = 'empty_value_name'
-    smirks = 'empty_smirks'
-    if pid not in ff._forcebalance_assign_parameter_map:
+    #value_name = 'empty_value_name'
+    #smirks = 'empty_smirks'
+    (handler_name, tag_name, value_name, smirks) = pid.split('/')
+    old_units = getattr(ff[handler_name].parameters[smirks], value_name).units
+    setattr(ff[handler_name].parameters[smirks], value_name, new_value * old_units)
+    return
 
-        if pid.startswith("/"):
-            # Handle the case were we are optimizing a handler attribute directly such
-            # as the 1-4 scaling factor.
-            handler_name, value_name = pid[1:].split('/')
-
-            # Get the OpenFF parameter handler.
-            parameter_container = ff.get_parameter_handler(handler_name)
-
-        else:
-            (handler_name, tag_name, value_name, smirks) = pid.split('/')
-
-            from openff.toolkit.typing.engines.smirnoff import ParameterList
-
-            # Get the OpenFF parameter object
-
-            # Temporary workaround for OpenFF issue #884
-            if not isinstance(ff.get_parameter_handler(handler_name).parameters, ParameterList):
-                #print(f"{handler_name=}")
-                ff.get_parameter_handler(handler_name)._parameters = ParameterList(
-                    ff.get_parameter_handler(handler_name).parameters
-                )
-
-            parameter_container = ff.get_parameter_handler(handler_name).parameters[smirks]
-        #print(f"{parameter_container=}, {value_name=}")
-        if hasattr(parameter_container, value_name):
-            #print("actually set")
-            # If the value name is an attribute of the parameter then we set it directly.
-            # Get the quantity of the parameter in the OpenFF forcefield object
-            param_quantity = getattr(parameter_container, value_name)
-
-        elif (hasattr(parameter_container, "_cosmetic_attribs") and
-              value_name in parameter_container._cosmetic_attribs):
-
-            param_quantity = None
-
-        else:
-            raise KeyError(
-                "The {} attribute is not supported by the {} handler".format(
-                    value_name, handler_name
-                )
-            )
-
-        # We can't use the caching approach when the parameter is a simple float,
-        # hence we set it directly here.
-        if isinstance(param_quantity, (float, int)):
-            setattr(parameter_container, value_name, new_value)
-            param_quantity = None
-        else:
-            # save the found quantity in cache
-            ff._forcebalance_assign_parameter_map[pid] = param_quantity
-    else:
-        param_quantity = ff._forcebalance_assign_parameter_map[pid]
-    #print(f"{ff._forcebalance_assign_parameter_map=}")
-
-    # set new_value directly in the quantity
-    print(f"{param_quantity=}, {new_value=}, {value_name=}, {hex(hash(smirks))[:10]=}")
-
-    if param_quantity is not None:
-        param_quantity._value = new_value
+    # if pid not in ff._forcebalance_assign_parameter_map:
+    #
+    #     if pid.startswith("/"):
+    #         # Handle the case were we are optimizing a handler attribute directly such
+    #         # as the 1-4 scaling factor.
+    #         handler_name, value_name = pid[1:].split('/')
+    #
+    #         # Get the OpenFF parameter handler.
+    #         parameter_container = ff.get_parameter_handler(handler_name)
+    #
+    #     else:
+    #         (handler_name, tag_name, value_name, smirks) = pid.split('/')
+    #
+    #         from openff.toolkit.typing.engines.smirnoff import ParameterList
+    #
+    #         # Get the OpenFF parameter object
+    #
+    #         # Temporary workaround for OpenFF issue #884
+    #         if not isinstance(ff.get_parameter_handler(handler_name).parameters, ParameterList):
+    #             #print(f"{handler_name=}")
+    #             ff.get_parameter_handler(handler_name)._parameters = ParameterList(
+    #                 ff.get_parameter_handler(handler_name).parameters
+    #             )
+    #
+    #         parameter_container = ff.get_parameter_handler(handler_name).parameters[smirks]
+    #     #print(f"{parameter_container=}, {value_name=}")
+    #     if hasattr(parameter_container, value_name):
+    #         #print("actually set")
+    #         # If the value name is an attribute of the parameter then we set it directly.
+    #         # Get the quantity of the parameter in the OpenFF forcefield object
+    #         param_quantity = getattr(parameter_container, value_name)
+    #
+    #     elif (hasattr(parameter_container, "_cosmetic_attribs") and
+    #           value_name in parameter_container._cosmetic_attribs):
+    #
+    #         param_quantity = None
+    #
+    #     else:
+    #         raise KeyError(
+    #             "The {} attribute is not supported by the {} handler".format(
+    #                 value_name, handler_name
+    #             )
+    #         )
+    #
+    #     # We can't use the caching approach when the parameter is a simple float,
+    #     # hence we set it directly here.
+    #     print(f"smirnoffio.assign_openff_parameter 95 {(param_quantity, parameter_container, value_name, new_value, ff._forcebalance_assign_parameter_map, pid)=}")
+    #     #if isinstance(param_quantity, (float, int)):
+    #     if 1:
+    #         print(f"smirnoffio.assign_openff_parameter 100")
+    #         #setattr(parameter_container, value_name, new_value)
+    #         setattr(parameter_container, value_name, new_value * param_quantity.unit)
+    #         param_quantity = None
+    #     else:
+    #         print(f"smirnoffio.assign_openff_parameter 105")
+    #         # save the found quantity in cache
+    #         ff._forcebalance_assign_parameter_map[pid] = param_quantity
+    # else:
+    #     param_quantity = ff._forcebalance_assign_parameter_map[pid]
+    # #print(f"{ff._forcebalance_assign_parameter_map=}")
+    #
+    # # set new_value directly in the quantity
+    # print(f"{param_quantity=}, {new_value=}")# , {value_name=}, {hex(hash(smirks))[:10]=}")
+    #
+    # if param_quantity is not None:
+    #     param_quantity._value = new_value
 
 def smirnoff_update_pgrads(target):
     """
