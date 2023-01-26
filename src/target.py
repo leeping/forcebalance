@@ -634,7 +634,9 @@ class Target(with_metaclass(abc.ABCMeta, forcebalance.BaseClass)):
         self.rundir = absgetdir.replace(self.root+'/','')
         ## Submit jobs to the Work Queue.
         if self.rd is None or (not firstIteration):
+            print(f"In target.py stage 30 {(mvals, AGrad, AHess)=}")
             self.submit_jobs(mvals, AGrad, AHess)
+            print(f"In target.py stage 31 {(mvals, AGrad, AHess)=}")
         elif customdir is not None:
             # Allows us to submit micro-iteration jobs for remote targets
             self.submit_jobs(mvals, AGrad, AHess)
@@ -783,7 +785,6 @@ class RemoteTarget(Target):
         self.write_objective = False
 
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
-
         id_string = "%s_iter%04i" % (self.name, Counter())
 
         self.serialize_ff(mvals, outside="forcefield-remote")

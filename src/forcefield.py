@@ -814,9 +814,11 @@ class FF(forcebalance.BaseClass):
         #======================================#
 
         xml_lines = OrderedDict([(fnm, list(newffdata[fnm].iter())) for fnm in self.fnms if self.ffdata_isxml[fnm]])
-
+        #print(xml_lines)
         for i in range(len(self.pfields)):
             pfield = self.pfields[i]
+            #print(f"{pfield=}")
+
             pid,fnm,ln,fld,mult,cmd = pfield
             # XML force fields are easy to print.
             # Our 'pointer' to where to replace the value
@@ -844,7 +846,9 @@ class FF(forcebalance.BaseClass):
                 # If this is a SMIRNOFF parameter, assign it directly in the OpenFF ForceField object
                 # as well as writing out the file.
                 if hasattr(self, 'offxml') and fnm == self.offxml:
+                    print(f"In FF.make 50 {wval=}, {pid.split('/')[2]=}")
                     assign_openff_parameter(self.openff_forcefield, wval, pid)
+                    print(f"in FF.make 51 {self.openff_forcefield['ProperTorsions'].parameters[-1].k=}")
                 # list(newffdata[fnm].iter())[ln].attrib[fld] = OMMFormat % (wval)
             # Text force fields are a bit harder.
             # Our pointer is given by the line and field number.
@@ -879,6 +883,10 @@ class FF(forcebalance.BaseClass):
                 sline[fld] = newrd
                 # Replace the line in the new force field.
                 newffdata[fnm][ln] = ''.join([(whites[j] if (len(whites[j]) > 0 or j == 0) else ' ')+sline[j] for j in range(len(sline))])+'\n'
+                #if "#6H1X3x2r6+0a:1" in newffdata[fnm][ln]:
+                #if 1:
+                #    print(newffdata[fnm][ln])
+
 
         if printdir is not None:
             absprintdir = os.path.join(self.root,printdir)
@@ -914,6 +922,7 @@ class FF(forcebalance.BaseClass):
                 with wopen(os.path.join(absprintdir,fnmXml), binary=True) as f: newffdata[fnmXml].write(f)
             else:
                 with wopen(os.path.join(absprintdir,fnm)) as f: f.writelines(newffdata[fnm])
+        #print([*newffdata.values()][0])
 
         return pvals
 

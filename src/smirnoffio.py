@@ -154,8 +154,11 @@ def assign_openff_parameter(ff, new_value, pid):
     # QYD: cache the parameter finding procedure, then directly change the _value of the quantity
     # Note: This cache requires the quantity does not get overwritten, which is True since this function is the only
     # place we modify the OpenFF ForceField parameters.
+    #if 1:
     if not hasattr(ff, '_forcebalance_assign_parameter_map'):
         ff._forcebalance_assign_parameter_map = dict()
+    value_name = 'empty_value_name'
+    smirks = 'empty_smirks'
     if pid not in ff._forcebalance_assign_parameter_map:
 
         if pid.startswith("/"):
@@ -175,14 +178,15 @@ def assign_openff_parameter(ff, new_value, pid):
 
             # Temporary workaround for OpenFF issue #884
             if not isinstance(ff.get_parameter_handler(handler_name).parameters, ParameterList):
-
+                #print(f"{handler_name=}")
                 ff.get_parameter_handler(handler_name)._parameters = ParameterList(
                     ff.get_parameter_handler(handler_name).parameters
                 )
 
             parameter_container = ff.get_parameter_handler(handler_name).parameters[smirks]
-
+        #print(f"{parameter_container=}, {value_name=}")
         if hasattr(parameter_container, value_name):
+            #print("actually set")
             # If the value name is an attribute of the parameter then we set it directly.
             # Get the quantity of the parameter in the OpenFF forcefield object
             param_quantity = getattr(parameter_container, value_name)
@@ -209,7 +213,11 @@ def assign_openff_parameter(ff, new_value, pid):
             ff._forcebalance_assign_parameter_map[pid] = param_quantity
     else:
         param_quantity = ff._forcebalance_assign_parameter_map[pid]
+    #print(f"{ff._forcebalance_assign_parameter_map=}")
+
     # set new_value directly in the quantity
+    print(f"{param_quantity=}, {new_value=}, {value_name=}, {hex(hash(smirks))[:10]=}")
+
     if param_quantity is not None:
         param_quantity._value = new_value
 
@@ -237,7 +245,7 @@ def smirnoff_update_pgrads(target):
         if pname.startswith('/'):
             pgrads_set.update(target.FF.get_mathid(pname))
         else:
-            smirks = pname.rsplit('/',maxsplit=1)[-1]
+            smirks = pname.rsplit('/', maxsplit=1)[-1]
 
             for pidx in target.FF.get_mathid(pname):
                 smirks_params_map[smirks].append(pidx)
@@ -332,6 +340,7 @@ class SMIRNOFF(OpenMM):
         manually adding the v-sites as OpenFF currently does not."""
 
         from openff.toolkit.topology import TopologyAtom
+        #from openff.toolkit.topology import Atom
 
         openmm_topology = openff_topology.to_openmm()
 
@@ -348,7 +357,8 @@ class SMIRNOFF(OpenMM):
         for particle in openff_topology.topology_particles:
 
             if isinstance(particle, TopologyAtom):
-                continue
+            #if isinstance(particle, Atom):
+                    continue
 
             openmm_topology.addAtom(
                 particle.virtual_site.name, app.Element.getByMass(0), openmm_residue
@@ -453,6 +463,9 @@ class SMIRNOFF(OpenMM):
                 box_omm = None
             # Finally append it to list.
             self.xyz_omms.append((xyz_omm, box_omm))
+        #for i, xyz in enumerate(self.xyz_omms):
+        #    print(i, xyz[0])
+        #1/0
         # positions = ensure_quantity(interchange.positions, "openmm")
         # self.xyz_omms = [(ensure_quantity(interchange.positions, "openmm"),
         #                  ensure_quantity(interchange.box, "openmm"))]
@@ -469,6 +482,7 @@ class SMIRNOFF(OpenMM):
         # self.xyz_omms.append((positions, box))
 
         openmm_topology = interchange.to_openmm_topology()
+        #openmm_topology = SMIRNOFF._openff_to_openmm_topology(self.off_topology)
         openmm_positions = (
                                    self.pdb.positions.value_in_unit(angstrom) +
                                    # Add placeholder positions for an v-sites.
@@ -505,10 +519,12 @@ class SMIRNOFF(OpenMM):
 
         # Because self.forcefield is being updated in forcebalance.forcefield.FF.make()
         # there is no longer a need to create a new force field object here.
+        #print(self.forcefield["ProperTorsions"].parameters[-1])
         try:
             self.system, openff_topology = self.forcefield.create_openmm_system(
                 self.off_topology, return_topology=True
             )
+            #print(f"{hex(hash(self.forcefield.to_string()))=}")
         except Exception as error:
             logger.error("Error when creating system for %s" % self.mol2)
             raise error
@@ -539,11 +555,14 @@ class SMIRNOFF(OpenMM):
         #     # virtual sites that OpenFF uses.
         #     if hasattr(self, 'simulation'):
         #         delattr(self, 'simulation')
-
+        #print(f"{hex(hash(XmlSerializer.serialize(self.system)))=}")
         if hasattr(self, 'simulation'):
+            #print('AAAAA')
             UpdateSimulationParameters(self.system, self.simulation)
         else:
+            #print('BBBBB')
             self.create_simulation(**self.simkwargs)
+
 
     def _update_positions(self, X1, disable_vsite):
         # X1 is a numpy ndarray not vec3

@@ -214,6 +214,7 @@ class Objective(forcebalance.BaseClass):
         Objective = {'X':0.0, 'G':np.zeros(self.FF.np), 'H':np.zeros((self.FF.np,self.FF.np))}
         # Loop through the targets, stage the directories and submit the Work Queue processes.
         for Tgt in self.Targets:
+            print(f"In objective.py Target_Terms 2 {(mvals, Order >= 1,  Order >= 2, customdir)=}")
             Tgt.stage(mvals, AGrad = Order >= 1, AHess = Order >= 2, customdir=customdir)
         if self.asynchronous:
             # Asynchronous evaluation of objective function and Work Queue tasks.
@@ -252,7 +253,9 @@ class Objective(forcebalance.BaseClass):
                 # List of functions that I can call.
                 Funcs   = [Tgt.get_X, Tgt.get_G, Tgt.get_H]
                 # Call the appropriate function
+                print(f"in objkective Target Terms 100 {(mvals, customdir)=}")
                 Ans = Funcs[Order](mvals, customdir=customdir)
+                print(f"in objkective Target Terms 101 {(Ans, Order, mvals, customdir)=}")
                 # Print out the qualitative indicators
                 if verbose:
                     Tgt.meta_indicate(customdir=customdir)
@@ -311,6 +314,7 @@ class Objective(forcebalance.BaseClass):
         return
 
     def Full(self, vals, Order=0, verbose=False, customdir=None):
+        print(f"{vals=}")
         Objective = self.Target_Terms(vals, Order, verbose, customdir)
         ## Compute the penalty function.
         if self.FF.use_pvals:

@@ -2810,6 +2810,7 @@ class Molecule(object):
         Positions = []
         self.require('xyzs')
         for xyz in self.xyzs:
+            #print(f"In molecule.openmm_positions 5 {xyz[0]=}")
             Pos = []
             for xyzi in xyz:
                 Pos.append(Vec3(xyzi[0]/10,xyzi[1]/10,xyzi[2]/10))

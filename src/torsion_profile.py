@@ -123,6 +123,8 @@ class TorsionProfileTarget(Target):
             compute.rmsd = []
             for i in range(self.ns):
                 energy, rmsd, M_opt = self.engine.optimize(shot=i, align=False)
+                #print(f"In torsion_profile.compute {(energy, rmsd, M_opt.openmm_positions()[0])=}")
+                print(f"In torsion_profile.compute {(energy, rmsd, M_opt)=}")
                 # Create a molecule object to hold the MM-optimized structures
                 compute.emm.append(energy)
                 compute.rmsd.append(rmsd)
@@ -169,6 +171,7 @@ class TorsionProfileTarget(Target):
         compute.rmsd = None
 
         V = compute(mvals, indicate=True)
+        print(f"In torsionprofiletarget.get 50 {V=}")
 
         Answer['X'] = np.dot(V,V)
 
@@ -183,6 +186,7 @@ class TorsionProfileTarget(Target):
         dV = np.zeros((self.FF.np,len(V)))
         if AGrad or AHess:
             for p in self.pgrad:
+                print(f"In torsionprofiletarget.get 70 {(compute, mvals, p, self.h, V)=}")
                 dV[p,:], _ = f12d3p(fdwrap(compute, mvals, p), h = self.h, f0 = V)
 
         for p in self.pgrad:

@@ -493,6 +493,7 @@ class Optimizer(forcebalance.BaseClass):
             else:
                 self.adjh(trust)
                 printcool("Iteration %i: Evaluating objective function\nand derivatives through %s order" % (ITERATION, "first" if Ord == 1 else "second"), color=4, bold=0)
+                print(f"xk30 {xk=} {Ord=}")
                 data        = self.Objective.Full(xk,Ord,verbose=True)
                 X, G, H = data['X'], data['G'], data['H']
             trustprint = ''
@@ -500,6 +501,7 @@ class Optimizer(forcebalance.BaseClass):
             #|   Assess optimization step.  |#
             #================================#
             if ITERATION > self.iterinit:
+                print(f"{ITERATION=}")
                 dX_actual = X - X_prev
                 Best_Step = X < np.min(X_hist[Best_Start:])
                 try:
@@ -543,6 +545,7 @@ class Optimizer(forcebalance.BaseClass):
                         if ITERATION == self.maxstep:
                             logger.info("Maximum number of optimization steps reached (%i)\n" % ITERATION)
                             break
+                        print(f"xk50 {xk=}")
                         data        = self.Objective.Full(xk,Ord,verbose=True)
                         self.set_goodstep(1)
                         X, G, H = data['X'], data['G'], data['H']
