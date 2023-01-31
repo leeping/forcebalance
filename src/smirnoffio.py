@@ -409,26 +409,43 @@ class SMIRNOFF(OpenMM):
         # determine if the FF will apply virtual sites to the system.
         interchange = self.forcefield.create_interchange(self.off_topology)
 
+        n_virtual_sites = 0
         self._has_virtual_sites = False
         if 'VirtualSites' in interchange.handlers:
-            if len(interchange['VirtualSites'].slot_map) > 0:
+            n_virtual_sites = len(interchange['VirtualSites'].slot_map)
+            if n_virtual_sites > 0:
                 self._has_virtual_sites = True
 
-        positions = ensure_quantity(interchange.positions, "openmm")
-        self.xyz_omms = ensure_quantity(interchange.positions, "openmm")
+        ## Generate OpenMM-compatible positions
+        self.xyz_omms = []
 
-        if interchange.box:
-            if not np.all(interchange.box.m.diagonal() * np.eye(3) == interchange.box.m):
-                logger.error('Nonorthogonal boxes not implemented.\n')
-                raise RuntimeError
-            box = np.diag(interchange.box.m_as(unit.angstrom))
-        else:
-            box = None
+        for I in range(len(self.mol)):
+            xyz = self.mol.xyzs[I]
+            xyz_omm = (
+                              [Vec3(i[0], i[1], i[2]) for i in xyz]
+                              # Add placeholder positions for an v-sites.
+                              + [Vec3(0.0, 0.0, 0.0)] * n_virtual_sites
+                      ) * angstrom
 
-        self.xyz_omms.append((positions, box))
+            if self.pbc:
+                # Obtain the periodic box
+                if self.mol.boxes[I].alpha != 90.0 or self.mol.boxes[I].beta != 90.0 or self.mol.boxes[
+                    I].gamma != 90.0:
+                    logger.error('OpenMM cannot handle nonorthogonal boxes.\n')
+                    raise RuntimeError
+                box_omm = np.diag([self.mol.boxes[I].a, self.mol.boxes[I].b, self.mol.boxes[I].c]) * angstrom
+            else:
+                box_omm = None
+            # Finally append it to list.
+            self.xyz_omms.append((xyz_omm, box_omm))
 
         openmm_topology = interchange.to_openmm_topology()
-        self.mod = openmm.app.Modeller(openmm_topology, positions)
+        openmm_positions = (
+                                   self.pdb.positions.value_in_unit(angstrom) +
+                                   # Add placeholder positions for an v-sites.
+                                   [Vec3(0.0, 0.0, 0.0)] * n_virtual_sites
+                           ) * angstrom
+        self.mod = app.modeller.Modeller(openmm_topology, openmm_positions)
 
         ## Build a topology and atom lists.
         Top = self.mod.getTopology()
@@ -479,12 +496,14 @@ class SMIRNOFF(OpenMM):
         #         delattr(self, 'simulation')
         # self.vsprm = vsprm.copy()
 
-        if openff_topology.n_topology_virtual_sites > 0:
-            # For now always assume that the v-sites have changed. This is currently
-            # needed as the FB checks don't support the ``LocalCoordinatesSite`` based
-            # virtual sites that OpenFF uses.
-            if hasattr(self, 'simulation'):
-                delattr(self, 'simulation')
+        has_vsites = False
+        for particle_idx in range(self.system.getNumParticles()):
+            if self.system.isVirtualSite(particle_idx):
+                has_vsites = True
+
+        if has_vsites:
+            raise Exception("ForceBalance can't currently handle SMIRNOFF vsites. "
+                            "Downgrade to ForceBalance 1.9.3 or earlier to handle those.")
 
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)
