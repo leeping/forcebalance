@@ -1179,8 +1179,6 @@ class OpenMM(Engine):
         for I in range(len(self.xyz_omms)):
             self.set_positions(I)
             R1 = self.evaluate_one_(force, dipole)
-            # if I == 0:
-            #     printcool_dictionary(energy_components(self.simulation), title='Energy component analysis, shot %i' % I)
             Energies.append(R1["Energy"])
             if force: Forces.append(R1["Force"])
             if dipole: Dipoles.append(R1["Dipole"])
