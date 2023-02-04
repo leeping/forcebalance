@@ -106,7 +106,7 @@ Force field assignment data written to /Users/boothros/PyCharmProjects/forcebala
  idx Parameter                                                                                                   Count
 ----------------------------------------------------------------------------------------------------------------------
    0 ChargeIncrementModel/ChargeIncrement/charge_increment1/[#6X4:1]-[#1:2]                               :          0
-SNIRNOFF Parameter Coverage Analysis result: 0/1 parameters are covered.
+SMIRNOFF Parameter Coverage Analysis result: 0/1 parameters are covered.
 ----------------------------------------------------------------------------------------------------------------------
 Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
 #========================================================#

@@ -145,7 +145,7 @@ Force field assignment data written to XXX/smirnoff_parameter_assignments.json
    7 vdW/Atom/rmin_half/[#6X4:1]                                                                          :          0
    8 vdW/Atom/epsilon/[#8X2H1+0:1]                                                                        :          0
    9 vdW/Atom/rmin_half/[#8X2H1+0:1]                                                                      :          0
-SNIRNOFF Parameter Coverage Analysis result: 0/10 parameters are covered.
+SMIRNOFF Parameter Coverage Analysis result: 0/10 parameters are covered.
 ----------------------------------------------------------------------------------------------------------------------
 Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
 

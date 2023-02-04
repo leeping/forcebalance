@@ -308,10 +308,6 @@ class Evaluator_SMIRNOFF(Target):
         bool
             Returns True if the parameter is a cosmetic one.
         """
-        try:
-            import openmm.unit as simtk_unit
-        except ImportError:
-            import simtk.unit as simtk_unit
 
         parameter_handler = self.FF.openff_forcefield.get_parameter_handler(
             gradient_key.tag
@@ -350,10 +346,7 @@ class Evaluator_SMIRNOFF(Target):
         ):
             is_cosmetic = True
 
-        if not isinstance(parameter_value, simtk_unit.Quantity):
-            parameter_value = parameter_value * simtk_unit.dimensionless
-
-        return openmm_quantity_to_pint(parameter_value), is_cosmetic
+        return parameter_value, is_cosmetic
 
     def _extract_physical_parameter_values(self):
         """Extracts an array of the values of the physical parameters

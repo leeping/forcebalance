@@ -187,7 +187,7 @@ Force field assignment data written to /Users/hyesu/Project/git-repo/fb-factorie
   24 vdW/Atom/epsilon/[#6X4:1]                                                                            :          0
   25 vdW/Atom/rmin_half/[#8X2H0+0:1]                                                                      :          0
   26 vdW/Atom/epsilon/[#8X2H0+0:1]                                                                        :          0
-SNIRNOFF Parameter Coverage Analysis result: 6/27 parameters are covered.
+SMIRNOFF Parameter Coverage Analysis result: 6/27 parameters are covered.
 ----------------------------------------------------------------------------------------------------------------------
 Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
 #========================================================#
