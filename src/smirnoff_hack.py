@@ -36,7 +36,9 @@ def hash_molecule(molecule):
 def hash_molecule_args_and_kwargs(molecule, *args, **kwargs):
     arguments = [str(arg) for arg in args]
     keywords = [str(keyword) for keyword in kwargs.values()]
-    return hash((hash_molecule(molecule), *arguments, *keywords))
+    arguments_plus_keywords = arguments + keywords
+    # Deleted * in front of arguments_plus_keywords for Python 2.7 compatibility
+    return hash((hash_molecule(molecule), arguments_plus_keywords))
 
 
 if _SHOULD_CACHE:

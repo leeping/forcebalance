@@ -28,7 +28,7 @@ except ImportError:
 try:
     import importlib
     package_install_dir = os.path.split(importlib.util.find_spec(__name__.split('.')[0]).origin)[0]
-except ImportError: # importlib is new in version 3.1
+except AttributeError: # importlib is new in version 3.1
     import imp
     package_install_dir = imp.find_module(__name__.split('.')[0])[1]
 
