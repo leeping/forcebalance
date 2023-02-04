@@ -225,7 +225,8 @@ tgt_opts_types = {
                  "minimize_energy"  : (1, 0, 'Minimize the energy of the system prior to running dynamics', 'Condensed phase property targets (advanced usage)', 'liquid_openmm', 'liquid_tinker'),
                  "remote"           : (0, 50, 'Evaluate target as a remote work_queue task', 'All targets (optional)'),
                  "adapt_errors"     : (0, 50, 'Adapt to simulation uncertainty by combining property estimations and adjusting simulation length.', 'Condensed phase property targets', 'liquid'),
-                 "force_average"    : (0, -50, 'Average over all atoms when normalizing force errors.', 'Force matching', 'abinitio'),
+                 # This is forced to ON as of 2020-08-20
+                 # "force_average"    : (0, -50, 'Average over all atoms when normalizing force errors.', 'Force matching', 'abinitio'),
                  "remote_backup"    : (0, -50, 'When running remote target, back up files at the remote location.', 'Liquid, lipid and remote targets', 'liquid, lipid, remote'),
                  "pure_num_grad"    : (0, -50, 'Pure numerical gradients -- launch two additional simulations for each perturbed forcefield parameter, and compute derivatives using 3-point formula. (This is very expensive and should only serve as a sanity check)')
                  },
