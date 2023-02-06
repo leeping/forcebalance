@@ -3405,6 +3405,7 @@ class Molecule(object):
                 # comms and xyzs should only be incremented when we encounter the END of a TITLE or POSITION section
                 if read_mode == 'POSITION':
                     xyzs.append(np.array(xyz))
+                    xyz = []
                 elif read_mode == 'TITLE':
                     comms.append(title)
                 read_mode = 'None'
