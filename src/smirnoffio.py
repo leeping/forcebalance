@@ -38,10 +38,18 @@ import json
 
 logger = getLogger(__name__)
 try:
-    from simtk.openmm.app import *
-    from simtk.openmm import *
-    from simtk.unit import *
-    import simtk.openmm._openmm as _openmm
+    try:
+        # Try importing openmm using >=7.6 namespace
+        from openmm.app import *
+        from openmm import *
+        from openmm.unit import *
+        import openmm._openmm as _openmm
+    except ImportError:
+        # Try importing openmm using <7.6 namespace
+        from simtk.openmm.app import *
+        from simtk.openmm import *
+        from simtk.unit import *
+        import simtk.openmm._openmm as _openmm
 except:
     pass
 
