@@ -45,7 +45,8 @@ commblk = """#==========================================#
 fout = sys.argv[1]
 
 frqs, modes, intens, elem, xyz = read_frq_gen(fout)
-frqs1 = scale_freqs(frqs)
+frqs1 = frqs.copy()
+# frqs1 = scale_freqs(frqs)
 
 if list(frqs1) != sorted(list(frqs1)):
     print("Warning, sorted freqs are out of order.")
