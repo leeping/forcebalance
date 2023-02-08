@@ -21,10 +21,10 @@ import subprocess
 #| doc/api_header.tex              |#
 #| bin/ForceBalance.py             |#
 #===================================#
-__version__ = "v1.9.4"
+__version__ = "v1.9.5"
 try:
     # use git to find current version
-    git_describe = subprocess.check_output(["git", "describe"]).strip()
+    git_describe = subprocess.check_output(["git", "describe", "--tags"]).strip()
     __version__ = re.sub('-g[0-9a-f]*$','',git_describe)
 except: pass
 

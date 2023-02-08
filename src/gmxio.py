@@ -544,7 +544,7 @@ class GMX(Engine):
         if 'gmxsuffix' in kwargs:
             self.gmxsuffix = kwargs['gmxsuffix']
         else:
-            warn_once("The 'gmxsuffix' option were not provided; using default.")
+            warn_once("The 'gmxsuffix' option were not provided; using default (blank).")
             self.gmxsuffix = ''
         
         ## Barostat keyword for equilibration
@@ -893,11 +893,12 @@ class GMX(Engine):
 
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-min -nt 1" % self.name)
-        self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
+        # self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
+        self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.g96" % (self.name, self.name, self.name), stdin="System")
         self.callgmx("g_energy -xvg no -f %s-min.edr -o %s-min-e.xvg" % (self.name, self.name), stdin='Potential')
         
         E = float(open("%s-min-e.xvg" % self.name).readlines()[-1].split()[1])
-        M = Molecule("%s.gro" % self.name, build_topology=False) + Molecule("%s-min.gro" % self.name, build_topology=False)
+        M = Molecule("%s.gro" % self.name, build_topology=False) + Molecule("%s-min.g96" % self.name)
         if not self.pbc:
             M.align(center=False)
         rmsd = M.ref_rmsd(0)[1]
@@ -967,15 +968,6 @@ class GMX(Engine):
                 traj = "%s-all.gro" % self.name
         self.mol[0].write("%s.gro" % self.name)
         return self.evaluate_(force, dipole, traj)
-
-    def make_gro_trajectory(self, fout=None):
-        """ Return the MD trajectory as a Molecule object. """
-        if fout is None:
-            fout = "%s-mdtraj.gro" % self.name
-        if not hasattr(self, 'mdtraj'):
-            raise RuntimeError('Engine does not have an associated trajectory.')
-        self.callgmx("trjconv -f %s -o %s -ndec 9 -pbc mol -novel -noforce" % (self.mdtraj, fout), stdin='System')
-        return fout
 
     def energy_one(self, shot):
 
@@ -1126,8 +1118,8 @@ class GMX(Engine):
         self.callgmx("mdrun -deffnm %s-nm -nt 1 -mtx %s-nm.mtx -v" % (self.name, self.name))
         self.callgmx("g_nmeig -s %s-nm.tpr -f %s-nm.mtx -of %s-nm.xvg -v %s-nm.trr -last 10000 -xvg no" % \
                          (self.name, self.name, self.name, self.name))
-        self.callgmx("trjconv -s %s-nm.tpr -f %s-nm.trr -o %s-nm.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
-        NM = Molecule("%s-nm.gro" % self.name, build_topology=False)
+        self.callgmx("trjconv -s %s-nm.tpr -f %s-nm.trr -o %s-nm.g96" % (self.name, self.name, self.name), stdin="System")
+        NM = Molecule("%s-nm.g96" % self.name, build_topology=False)
         
         calc_eigvals = np.array([float(line.split()[1]) for line in open("%s-nm.xvg" % self.name).readlines()])
         calc_eigvecs = NM.xyzs[1:]
@@ -1148,8 +1140,8 @@ class GMX(Engine):
         ## Call grompp followed by mdrun.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
-        self.callgmx("trjconv -f %s.trr -o %s-out.gro -ndec 9 -novel -noforce" % (self.name, self.name), stdin='System')
-        NewMol = Molecule("%s-out.gro" % self.name)
+        self.callgmx("trjconv -f %s.trr -o %s-out.g96 -novel -noforce" % (self.name, self.name), stdin='System')
+        NewMol = Molecule("%s-out.g96" % self.name, build_topology-False)
         return NewMol.xyzs
 
     def n_snaps(self, nsteps, step_interval, timestep):

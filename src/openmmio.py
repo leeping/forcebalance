@@ -199,7 +199,7 @@ def PrepareVirtualSites(system):
                     zdir /= np.linalg.norm(zdir)
                     return origin + np.array(np.array([xdir, ydir, zdir]) * vpos[:, None]).sum(axis=0)
             else:
-                raise NotImplementedError(f"The virtual site type {vs.__class__.__name__} is not currently supported.")
+                raise NotImplementedError("The virtual site type %s is not currently supported." % vs.__class__.__name__)
 
         else:
             isvsites.append(0)
