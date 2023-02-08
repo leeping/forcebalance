@@ -197,7 +197,87 @@ def read_frq_qc(qcout):
     unnorm = [np.array(i) for i in modes]
     return np.array(frqs), [i/np.linalg.norm(i) for i in unnorm], np.array(intens), elem, xyz
 
-def read_frq_psi(psiout):
+def read_frq_psi_current(psiout):
+    """ """
+    VMode = 0
+    XMode = 0
+    EMode = 0
+    frq_num = 0
+    mode_num = 0
+    skip_modes = 0
+    frqs = []
+    modes = []
+    xyzs = []
+    xyz = []
+    elem = []
+    readmodes = {}
+    for line in open(psiout).readlines():
+        VModeNxt = None
+        if 'rotation-like modes' in line:
+            #Output may contain rotation modes, skip these if so
+            skip_modes = int(line.split('include ')[1].split('un-projected')[0])
+        if 'Freq [cm^-1]' in line:
+            VModeNxt = 1
+            s = line.split()
+            for mode in s[2:]:
+                frq_num += 1
+                if frq_num > skip_modes:
+                    if mode.endswith('i'):
+                        frqs.append(-1*float(mode[:-1]))
+                        # frqs.append(0.0) # After the optimization this mode is going to be useless...
+                    else:
+                        frqs.append(float(mode))
+        if VMode == 1:
+            if re.match('^\s*[0-9]', line) and mode_num >= skip_modes:
+                s = line.split()
+                line_modes = int(len(s[2:])/3)
+                for mode in range(line_modes):
+                    if mode not in readmodes:
+                        readmodes[mode] = []
+                    readmodes[mode].append([float(m) for m in s[2+mode*3:2+mode*3+3]])
+            elif re.match('^\s*[0-9]', line):
+                s = line.split()
+                mode_num += int(len(s[2:])/3)
+                VMode = 0
+                VModeNxt = None
+            elif re.match('^[ \t\r\n\s]*$', line):
+                VMode = 0
+                VModeNxt = None
+                for mode in readmodes.keys():
+                    modes.append(readmodes[mode])
+                readmodes = {}
+        if VModeNxt is not None: VMode = VModeNxt
+        if XMode == 1:
+            s = line.split()
+            if len(s) == 5 and isfloat(s[1]) and isfloat(s[2]) and isfloat(s[3]):
+                e = s[0]
+                xyz.append([float(i) for i in s[1:4]])
+                if EMode == 1:
+                    elem.append(e)
+            elif len(xyz) > 0:
+                xyzs.append(np.array(xyz))
+                xyz = []
+                XMode = 0
+        if line.strip().startswith("Geometry (in Angstrom)"):
+            XMode = 1
+            s = line.split()
+            if len(s) == 5 and isfloat(s[1]) and isfloat(s[2]) and isfloat(s[3]):
+                e = s[0]
+                xyz.append([float(i) for i in s[1:4]])
+                if EMode == 1:
+                    elem.append(e)
+            elif len(xyz) > 0:
+                xyzs.append(np.array(xyz))
+                xyz = []
+                XMode = 0
+        if line.strip().startswith("Geometry (in Angstrom)"):
+            XMode = 1
+            EMode = len(elem) == 0
+    #Eigenvectors are now normalized and non-mass weighted, so can just supply these directly without modification
+    modes = [np.array(i) for i in modes]
+    return np.array(frqs), modes, np.zeros_like(frqs), elem, np.array(xyzs[-1])
+
+def read_frq_psi_legacy(psiout):
     """ """
     VMode = 0
     XMode = 0
@@ -349,8 +429,13 @@ def read_frq_gen(fout):
             return read_frq_tc(fout)
         elif 'Q-Chem' in line:
             return read_frq_qc(fout)
-        elif 'PSI4' in line:
-            return read_frq_psi(fout)
+        elif 'Psi4' in line and 'release' in line:
+            ls = line.split()
+            version = ls[1]
+            if version >= '1.2':
+                return read_frq_psi_current(fout)
+            else:
+                return read_frq_psi_legacy(fout)
         elif 'Gaussian' in line:
             return read_frq_gau(fout)
         elif 'ForceBalance' in line:

@@ -314,6 +314,7 @@ class Evaluator_SMIRNOFF(Target):
         #     import simtk.unit as simtk_unit
         from openff.units import unit as openff_unit
 
+
         parameter_handler = self.FF.openff_forcefield.get_parameter_handler(
             gradient_key.tag
         )
