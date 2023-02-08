@@ -544,7 +544,7 @@ class GMX(Engine):
         if 'gmxsuffix' in kwargs:
             self.gmxsuffix = kwargs['gmxsuffix']
         else:
-            warn_once("The 'gmxsuffix' option were not provided; using default.")
+            warn_once("The 'gmxsuffix' option were not provided; using default (blank).")
             self.gmxsuffix = ''
         
         ## Barostat keyword for equilibration
