@@ -794,16 +794,25 @@ class TorsionProfileTarget_SMIRNOFF(TorsionProfileTarget):
 #         ## Initialize base class.
 #         super(BindingEnergy_OpenMM,self).__init__(options,tgt_opts,forcefield)
 
-# class Interaction_SMIRNOFF(Interaction):
-#     """ Interaction matching using OpenMM. """
-#     def __init__(self,options,tgt_opts,forcefield):
-#         ## Default file names for coordinates and key file.
-#         self.set_option(tgt_opts,'coords',default="all.pdb")
-#         self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
-#         self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
-#         self.engine_ = OpenMM
-#         ## Initialize base class.
-#         super(Interaction_OpenMM,self).__init__(options,tgt_opts,forcefield)
+class Interaction_SMIRNOFF(Interaction):
+    """ Interaction matching using OpenMM. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        # file for the whole topology
+        self.set_option(tgt_opts, 'pdb', default="top.pdb")
+        # cords of the system along some scan coordinate
+        self.set_option(tgt_opts,'coords',default="scan.xyz")
+        # a list of the separate mol2 files
+        self.set_option(tgt_opts, 'mol2', forceprint=True)
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.engine_ = OpenMM
+        ## Initialize base class.
+        super(Interaction_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
+
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        # we update the self.pgrads here so it's not overwritten in rtarget.py
+        smirnoff_update_pgrads(self)
 
 # class Moments_SMIRNOFF(Moments):
 #     """ Multipole moment matching using OpenMM. """
