@@ -22,11 +22,11 @@ import subprocess
 #| bin/ForceBalance.py             |#
 #===================================#
 __version__ = "v1.9.5"
-try:
-    # use git to find current version
-    git_describe = subprocess.check_output(["git", "describe", "--tags"]).strip()
-    __version__ = re.sub('-g[0-9a-f]*$','',git_describe)
-except: pass
+# try:
+#     # use git to find current version
+#     git_describe = subprocess.check_output(["git", "describe", "--tags"]).strip()
+#     __version__ = re.sub('-g[0-9a-f]*$','',git_describe)
+# except: pass
 
 # The versioning file logic does not work.  
 # Commenting out until further notice.
