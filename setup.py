@@ -21,7 +21,7 @@ import subprocess
 #| doc/api_header.tex              |#
 #| bin/ForceBalance.py             |#
 #===================================#
-__version__ = "v1.9.5"
+__version__ = "1.9.5"
 # try:
 #     # use git to find current version
 #     git_describe = subprocess.check_output(["git", "describe", "--tags"]).strip()
@@ -46,8 +46,7 @@ __version__ = "v1.9.5"
 DCD = Extension('forcebalance/_dcdlib',
                 sources = [ "ext/molfile_plugin/dcdplugin_s.c" ],
                 libraries=['m'],
-                include_dirs = ["ext/molfile_plugin/include/","ext/molfile_plugin"] 
-                )
+                include_dirs = ["ext/molfile_plugin/include/","ext/molfile_plugin"])
 
 # Hungarian algorithm for permutations
 # Used for identifying normal modes
@@ -152,9 +151,9 @@ def main():
 
     ## Install options
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', '--dirty', action='store_true', help="don't remove previously installed forcebalance installation first")
-    parser.add_argument('-t', '--test', action='store_true', help='install forcebalance test suite')
-    parser.add_argument('-g', '--gui', action='store_true', help='install forcebalance gui module')
+    parser.add_argument('--dirty', action='store_true', help="don't remove previously installed forcebalance installation first")
+    parser.add_argument('--test', action='store_true', help='install forcebalance test suite')
+    parser.add_argument('--gui', action='store_true', help='install forcebalance gui module')
     args, sys.argv= parser.parse_known_args(sys.argv)
     setupKeywords=buildKeywordDictionary(args)
     ## Run setuptools command.
