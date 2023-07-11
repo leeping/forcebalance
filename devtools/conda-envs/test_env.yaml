@@ -18,7 +18,6 @@ dependencies:
   - zlib
   - swig
   - future
-  - fftw
   - pymbar =3
   - openmm >= 8
   - ambertools

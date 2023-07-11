@@ -89,7 +89,7 @@ jobs:
         wget http://ftp.gromacs.org/pub/gromacs/gromacs-5.1.5.tar.gz
         tar xvzf gromacs-5.1.5.tar.gz
         cd gromacs-5.1.5/cmake
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON ..
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON ..
         make -j 4 && make install
         . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
         echo "$GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin" >> $GITHUB_PATH
