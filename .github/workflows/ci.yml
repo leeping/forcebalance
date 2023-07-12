@@ -91,10 +91,14 @@ jobs:
         cd gromacs-5.1.5/cmake
         cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON ..
         make -j 4 && make install
+        cd ..
+        mkdir cmake_s
+        cd cmake_s
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON ..
+        make -j 4 && make install
+        cd ..
         . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
         echo "$GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin" >> $GITHUB_PATH
-        which gmx
-        gmx mdrun -v 2>&1
 
     - name: Extract data archives
       run: |
