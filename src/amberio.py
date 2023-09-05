@@ -28,7 +28,10 @@ from forcebalance.vibration import Vibration
 from forcebalance.molecule import Molecule
 from collections import OrderedDict, defaultdict, namedtuple
 # Rudimentary NetCDF file usage
-from scipy.io.netcdf import netcdf_file
+try:
+    from scipy.io import netcdf_file
+except ImportError:
+    from scipy.io.netcdf import netcdf_file
 import warnings
 try:
     # Some functions require the Python API to sander "pysander"

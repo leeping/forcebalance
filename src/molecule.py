@@ -3432,7 +3432,10 @@ class Molecule(object):
         if len(xyzs) != len(boxes):
             raise IOError('in read_g96: xyzs and boxes should have the same length')
         if len(xyzs) != len(comms):
-            raise IOError('in read_g96: xyzs and comms should have the same length')
+            if len(comms) < len(xyzs):
+                comms += [comms[-1] for i in range(len(comms), len(xyzs))]
+            else:
+                raise IOError('comms is longer than xyzs')
         Answer = {'xyzs'     : xyzs,
                   'boxes'    : boxes,
                   'comms'    : comms}
