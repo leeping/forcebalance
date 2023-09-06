@@ -28,7 +28,7 @@ except ImportError:
 try:
     import importlib
     package_install_dir = os.path.split(importlib.util.find_spec(__name__.split('.')[0]).origin)[0]
-except ImportError: # importlib is new in version 3.1
+except AttributeError: # importlib is new in version 3.1
     import imp
     package_install_dir = imp.find_module(__name__.split('.')[0])[1]
 
@@ -1209,6 +1209,7 @@ class Molecule(object):
         ## The table of file readers
         self.Read_Tab = {'gaussian' : self.read_com,
                          'gromacs'  : self.read_gro,
+                         'g96'      : self.read_g96,
                          'charmm'   : self.read_charmm,
                          'dcd'      : self.read_dcd,
                          'mdcrd'    : self.read_mdcrd,
@@ -3378,6 +3379,64 @@ class Molecule(object):
                   'atomname' : atomname,
                   'resid'    : resid,
                   'resname'  : resname,
+                  'boxes'    : boxes,
+                  'comms'    : comms}
+        return Answer
+
+    def read_g96(self, fnm, **kwargs):
+        """ Read a GROMACS .g96 file.
+        This was implemented because as of 2018, GROMACS no longer writes .gro files in variable precision
+        therefore we need to write out .g96 files to get precise coordinates.
+        """
+        xyzs     = []
+        comms    = []
+        boxes    = []
+        xyz      = []
+        read_mode = 'None'
+        for line in open(fnm):
+            sline = line.split()
+            if len(sline) == 1 and sline[0] == 'TITLE':
+                read_mode = 'TITLE'
+            elif len(sline) == 1 and sline[0] in ['POSITION', 'POSITIONRED']:
+                read_mode = 'POSITION'
+            elif len(sline) == 1 and sline[0] == 'BOX':
+                read_mode = 'BOX'
+            elif len(sline) == 1 and sline[0] == 'END':
+                # comms and xyzs should only be incremented when we encounter the END of a TITLE or POSITION section
+                if read_mode == 'POSITION':
+                    xyzs.append(np.array(xyz))
+                    xyz = []
+                elif read_mode == 'TITLE':
+                    comms.append(title)
+                read_mode = 'None'
+            elif read_mode == 'BOX' and len(sline) > 0:
+                # Read box information (should be on a single line)
+                box = [float(i)*10 for i in sline]
+                if len(box) == 3:
+                    a = box[0]
+                    b = box[1]
+                    c = box[2]
+                    alpha = 90.0
+                    beta = 90.0
+                    gamma = 90.0
+                    boxes.append(BuildLatticeFromLengthsAngles(a, b, c, alpha, beta, gamma))
+                elif len(box) == 9:
+                    v1 = np.array([box[0], box[3], box[4]])
+                    v2 = np.array([box[5], box[1], box[6]])
+                    v3 = np.array([box[7], box[8], box[2]])
+                    boxes.append(BuildLatticeFromVectors(v1, v2, v3))
+            elif read_mode == 'POSITION' and len(sline) > 0:
+                xyz.append([float(i)*10 for i in sline])
+            elif read_mode == 'TITLE':
+                title = line.strip()
+        if len(xyzs) != len(boxes):
+            raise IOError('in read_g96: xyzs and boxes should have the same length')
+        if len(xyzs) != len(comms):
+            if len(comms) < len(xyzs):
+                comms += [comms[-1] for i in range(len(comms), len(xyzs))]
+            else:
+                raise IOError('comms is longer than xyzs')
+        Answer = {'xyzs'     : xyzs,
                   'boxes'    : boxes,
                   'comms'    : comms}
         return Answer

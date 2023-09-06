@@ -1621,7 +1621,7 @@ Force field assignment data written to /home/leeping/src/forcebalance/studies/02
  501 ProperTorsions/Proper/k1/[*:1]-[*:2]#[*:3]-[*:4]                                                     :          0
  502 ProperTorsions/Proper/k1/[*:1]~[*:2]-[*:3]#[*:4]                                                     :          0
  503 ProperTorsions/Proper/k1/[*:1]~[*:2]=[#6,#7,#16,#15;X2:3]=[*:4]                                      :          0
-SNIRNOFF Parameter Coverage Analysis result: 19/504 parameters are covered.
+SMIRNOFF Parameter Coverage Analysis result: 19/504 parameters are covered.
 ----------------------------------------------------------------------------------------------------------------------
 Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
 #========================================================#

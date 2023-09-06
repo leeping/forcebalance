@@ -36,7 +36,9 @@ def hash_molecule(molecule):
 def hash_molecule_args_and_kwargs(molecule, *args, **kwargs):
     arguments = [str(arg) for arg in args]
     keywords = [str(keyword) for keyword in kwargs.values()]
-    return hash((hash_molecule(molecule), *arguments, *keywords))
+    arguments_plus_keywords = arguments + keywords
+    # Deleted * in front of arguments_plus_keywords for Python 2.7 compatibility, convert list to tuple.
+    return hash((hash_molecule(molecule), tuple(arguments_plus_keywords)))
 
 
 if _SHOULD_CACHE:
@@ -71,15 +73,16 @@ if _SHOULD_CACHE:
 
 
     # cache for the validate function (save 94s)
-    from openff.toolkit.typing.chemistry.environment import ChemicalEnvironment
-    original_validate = ChemicalEnvironment.validate
-    TOOLKIT_CACHE_ChemicalEnvironment_validate = {}
-    def cached_validate(smirks, validate_valence_type=True, toolkit_registry=OpenEyeToolkitWrapper):
-        cache_key = hash((smirks, validate_valence_type, toolkit_registry))
-        if cache_key not in TOOLKIT_CACHE_ChemicalEnvironment_validate:
-            TOOLKIT_CACHE_ChemicalEnvironment_validate[cache_key] = original_validate(smirks, validate_valence_type=validate_valence_type, toolkit_registry=toolkit_registry)
-        return TOOLKIT_CACHE_ChemicalEnvironment_validate[cache_key]
-    ChemicalEnvironment.validate = cached_validate
+    # The ChemicalEnvironment class has been deprecated in the OpenFF Toolkit 0.14 release.
+    # from openff.toolkit.typing.chemistry.environment import ChemicalEnvironment
+    # original_validate = ChemicalEnvironment.validate
+    # TOOLKIT_CACHE_ChemicalEnvironment_validate = {}
+    # def cached_validate(smirks, validate_valence_type=True, toolkit_registry=OpenEyeToolkitWrapper):
+    #     cache_key = hash((smirks, validate_valence_type, toolkit_registry))
+    #     if cache_key not in TOOLKIT_CACHE_ChemicalEnvironment_validate:
+    #         TOOLKIT_CACHE_ChemicalEnvironment_validate[cache_key] = original_validate(smirks, validate_valence_type=validate_valence_type, toolkit_registry=toolkit_registry)
+    #     return TOOLKIT_CACHE_ChemicalEnvironment_validate[cache_key]
+    # ChemicalEnvironment.validate = cached_validate
 
 
     # cache for compute_partial_charges_am1bcc (save 69s)

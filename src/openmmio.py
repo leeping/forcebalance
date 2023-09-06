@@ -43,15 +43,26 @@ try:
         from openmm import *
         from openmm.unit import *
         import openmm._openmm as _openmm
+        openmm_post76 = True
     except ImportError:
         # Try importing openmm using <7.6 namespace
         from simtk.openmm.app import *
         from simtk.openmm import *
         from simtk.unit import *
         import simtk.openmm._openmm as _openmm
+        openmm_post76 = False
 except ImportError:
     # Need to have "pass" conditional if neither is installed so that non-openmm builds can parse this file
     pass
+
+def force_name(force):
+    if openmm_post76:
+        name = force.getName()
+        if "Force" not in name:
+            name = name + "Force"
+        return name
+    else:
+        return force.__class__.__name__
 
 def get_mask(grps):
     """ Given a list of booleans [1, 0, 1] return the bitmask that sets
@@ -71,7 +82,7 @@ def energy_components(Sim, verbose=False):
     EnergyTerms = OrderedDict()
     if type(Sim.integrator) in [LangevinIntegrator, VerletIntegrator]:
         for i in range(Sim.system.getNumForces()):
-            EnergyTerms[Sim.system.getForce(i).__class__.__name__] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
+            EnergyTerms[force_name(Sim.system.getForce(i))] = Sim.context.getState(getEnergy=True,groups=2**i).getPotentialEnergy() / kilojoules_per_mole
     return EnergyTerms
 
 def get_multipoles(simulation,q=None,mass=None,positions=None,rmcom=True):
@@ -190,7 +201,7 @@ def PrepareVirtualSites(system):
                     zdir /= np.linalg.norm(zdir)
                     return origin + np.array(np.array([xdir, ydir, zdir]) * vpos[:, None]).sum(axis=0)
             else:
-                raise NotImplementedError(f"The virtual site type {vs.__class__.__name__} is not currently supported.")
+                raise NotImplementedError("The virtual site type %s is not currently supported." % vs.__class__.__name__)
 
         else:
             isvsites.append(0)
@@ -276,7 +287,7 @@ def GetDrudeParameters(system):
     drude_particle = []
     drude_screen = []
     for f in system.getForces():
-        if f.__class__.__name__ == "DrudeForce":
+        if force_name(f) == "DrudeForce":
             for i in range(f.getNumParticles()):
                 drude_particle.append(f.getParticleParameters(i)[5]._value)
                 drude_particle.append(f.getParticleParameters(i)[6]._value)
@@ -321,6 +332,15 @@ def CopyAmoebaInPlaneAngleParameters(src, dest):
 def CopyAmoebaVdwParameters(src, dest):
     for i in range(src.getNumParticles()):
         dest.setParticleParameters(i,*src.getParticleParameters(i))
+    # As of OpenMM 7.7(?) the API has changed so that the proper way to copy all interactions
+    # is to copy particle type and type pair parameters.
+    if hasattr(src, 'getParticleTypeParameters'):
+        for i in range(src.getNumParticleTypes()):
+            # print(src.getParticleTypeParameters(i))
+            dest.setParticleTypeParameters(i,*src.getParticleTypeParameters(i))
+    if hasattr(src, 'getTypePairParameters'):
+        for i in range(src.getNumTypePairs()):
+            dest.setTypePairParameters(i,*src.getTypePairParameters(i))
 
 def CopyAmoebaMultipoleParameters(src, dest):
     for i in range(src.getNumMultipoles()):
@@ -377,6 +397,14 @@ def CopyCustomBondParameters(src, dest):
     for i in range(src.getNumBonds()):
         dest.setBondParameters(i,*src.getBondParameters(i))
 
+def CopyCustomAngleParameters(src, dest):
+    '''
+    copy whatever updateParametersInContext can update:
+        PerAngleParameters
+    '''
+    for i in range(src.getNumAngles()):
+        dest.setAngleParameters(i,*src.getAngleParameters(i))
+
 def do_nothing(src, dest):
     return
 
@@ -397,11 +425,16 @@ def CopySystemParameters(src,dest):
                'RBTorsionForce':CopyRBTorsionParameters,
                'NonbondedForce':CopyNonbondedParameters,
                'CustomBondForce':CopyCustomBondParameters,
+               'CustomAngleForce':CopyCustomAngleParameters,
+               'CustomCompoundBondForce':CopyCustomBondParameters,
                'CustomNonbondedForce':CopyCustomNonbondedParameters,
                'GBSAOBCForce':CopyGBSAOBCParameters,
                'CMMotionRemover':do_nothing}
     for i in range(src.getNumForces()):
+        # Here we want to use the "implemented name"
+        # due to OpenMM 7.6's reimplementation of Amoeba_x_Force using Custom Forces
         nm = src.getForce(i).__class__.__name__
+        # print("In CopySystemParameters: Force %i Name %s" % (i, force_name(src.getForce(i))))
         if nm in Copiers:
             Copiers[nm](src.getForce(i),dest.getForce(i))
         else:
@@ -412,7 +445,7 @@ def UpdateSimulationParameters(src_system, dest_simulation):
     for i in range(src_system.getNumForces()):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
             dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
-        if isinstance(dest_simulation.system.getForce(i), CustomNonbondedForce):
+        if isinstance(dest_simulation.system.getForce(i), (CustomNonbondedForce, CustomBondForce)):
             force = src_system.getForce(i)
             for j in range(force.getNumGlobalParameters()):
                 pName = force.getGlobalParameterName(j)
@@ -421,12 +454,12 @@ def UpdateSimulationParameters(src_system, dest_simulation):
 
 
 def SetAmoebaVirtualExclusions(system):
-    if any([f.__class__.__name__ == "AmoebaMultipoleForce" for f in system.getForces()]):
+    if any([force_name(f) == "AmoebaMultipoleForce" for f in system.getForces()]):
         # logger.info("Cajoling AMOEBA covalent maps so they work with virtual sites.\n")
         vss = [(i, [system.getVirtualSite(i).getParticle(j) for j in range(system.getVirtualSite(i).getNumParticles())]) \
                    for i in range(system.getNumParticles()) if system.isVirtualSite(i)]
         for f in system.getForces():
-            if f.__class__.__name__ == "AmoebaMultipoleForce":
+            if force_name(f) == "AmoebaMultipoleForce":
                 # logger.info("--- Before ---\n")
                 # for i in range(f.getNumMultipoles()):
                 #     logger.info("%s\n" % f.getCovalentMaps(i))
@@ -458,10 +491,10 @@ def SetAmoebaNonbondedExcludeAll(system, topology):
     atom_residue_index = [a.residue.index for a in topology.atoms()]
     residue_atoms = [[a.index for a in r.atoms()] for r in topology.residues()]
     for f in system.getForces():
-        if f.__class__.__name__ == "AmoebaVdwForce":
+        if force_name(f) == "AmoebaVdwForce":
             for i in range(f.getNumParticles()):
                 f.setParticleExclusions(i, residue_atoms[atom_residue_index[i]])
-        elif f.__class__.__name__ == "AmoebaMultipoleForce":
+        elif force_name(f) == "AmoebaMultipoleForce":
             for i in range(f.getNumMultipoles()):
                 f.setCovalentMap(i, 0, residue_atoms[atom_residue_index[i]])
                 for m in range(1, 4):
@@ -502,12 +535,12 @@ def MTSVVVRIntegrator(temperature, collision_rate, timestep, system, ninnersteps
     """
     # Multiple timestep Langevin integrator.
     for i in system.getForces():
-        if i.__class__.__name__ in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce"]:
+        if force_name(i) in ["NonbondedForce", "CustomNonbondedForce", "AmoebaVdwForce", "AmoebaMultipoleForce"]:
             # Slow force.
-            logger.info(i.__class__.__name__ + " is a Slow Force\n")
+            logger.info(force_name(i) + " is a Slow Force\n")
             i.setForceGroup(1)
         else:
-            logger.info(i.__class__.__name__ + " is a Fast Force\n")
+            logger.info(force_name(i) + " is a Fast Force\n")
             # Fast force.
             i.setForceGroup(0)
 
@@ -575,6 +608,8 @@ suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 "AmoebaBondForce" : {"Bond" : ["class1","class2"]},
                 "AmoebaAngleForce" : {"Angle" : ["class1","class2","class3"]},
                 "AmoebaStretchBendForce" : {"StretchBend" : ["class1","class2","class3"]},
+                "AmoebaOutOfPlaneBendForce" : {"Angle" : ["class1","class2","class3","class4"]},
+                "AmoebaPiTorsionForce" : {"PiTorsion" : ["class1","class2"]},
                 "AmoebaVdwForce" : {"Vdw" : ["class"]},
                 "AmoebaMultipoleForce" : {"Multipole" : ["type","kz","kx"], "Polarize" : ["type"]},
                 "AmoebaUreyBradleyForce" : {"UreyBradley" : ["class1","class2","class3"]},
@@ -583,6 +618,8 @@ suffix_dict = { "HarmonicBondForce" : {"Bond" : ["class1","class2"]},
                 ## LPW's custom parameter definitions
                 "ForceBalance" : {"GB": ["type"]},
                 }
+
+interaction_type_subs = {"AmoebaOutOfPlaneBendForce":"OutOfPlane"}
 
 ## pdict is a useless variable if the force field is XML.
 pdict = "XML_Override"
@@ -613,10 +650,13 @@ class OpenMM_Reader(BaseReader):
                 Involved3 = '.'.join([element.attrib[i] for i in suffix3 if i in element.attrib])
                 # Keep the Involved string that is the longest (assuming that is the one that properly matched)
                 Involved = [Involved1, Involved2, Involved3][np.argmax(np.array([len(Involved1),len(Involved2),len(Involved3)]))]
-            return "/".join([InteractionType, parameter, Involved])
+            # For things like AmoebaOutOfPlaneBendForce, Angle is not descriptive enough so we try to sub in a more descriptive name.
+            InteractionName = interaction_type_subs.get(ParentType, InteractionType)
+            return "/".join([InteractionName, parameter, Involved])
         except:
             logger.info("Minor warning: Parameter ID %s doesn't contain any atom types, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
-            return "/".join([InteractionType, parameter])
+            InteractionName = interaction_type_subs.get(ParentType, InteractionType)
+            return "/".join([InteractionName, parameter])
 
 class OpenMM(Engine):
 
@@ -883,10 +923,10 @@ class OpenMM(Engine):
                     logger.info("Creating RPMD integrator with %i beads.\n" % rpmd_beads)
                     self.tdiv = rpmd_beads
                     integrator = RPMDIntegrator(rpmd_beads, temperature*kelvin, collision/picosecond, timestep*femtosecond)
-                elif any(['Drude' in f.__class__.__name__ for f in self.system.getForces()]): integrator = DrudeLangevinIntegrator(temperature*kelvin, collision/picosecond, 1*kelvin, collision/picosecond, 0.1*femtoseconds)
+                elif any(['Drude' in force_name(f) for f in self.system.getForces()]): integrator = DrudeLangevinIntegrator(temperature*kelvin, collision/picosecond, 1*kelvin, collision/picosecond, 0.1*femtoseconds)
                 else:
                     integrator = LangevinIntegrator(temperature*kelvin, collision/picosecond, timestep*femtosecond)
-        elif any(['Drude' in f.__class__.__name__ for f in self.system.getForces()]): integrator = DrudeSCFIntegrator(0.1*femtoseconds)
+        elif any(['Drude' in force_name(f) for f in self.system.getForces()]): integrator = DrudeSCFIntegrator(0.1*femtoseconds)
         else:
             ## If no temperature control, default to the Verlet integrator.
             if rpmd_beads > 0:
@@ -931,13 +971,14 @@ class OpenMM(Engine):
         if not mts:
             for j in self.system.getForces():
                 i = -1
-                if j.__class__.__name__ in GrpTogether:
+                if force_name(j) in GrpTogether:
                     for k in GrpNums:
                         if k in GrpTogether:
                             i = GrpNums[k]
                             break
                 if i == -1: i = len(set(GrpNums.values()))
-                GrpNums[j.__class__.__name__] = i
+                GrpNums[force_name(j)] = i
+                # print("Setting %s force group to %i" % (force_name(j), i))
                 j.setForceGroup(i)
 
         ## If virtual particles are used with AMOEBA...
@@ -1021,7 +1062,7 @@ class OpenMM(Engine):
         #have changed then the positions must be recomputed and
         #the simulation object must be remade.
         #----
-        if any(['Drude' in f.__class__.__name__ for f in self.system.getForces()]):
+        if any(['Drude' in force_name(f) for f in self.system.getForces()]):
             drude_particle, drude_screen = GetDrudeParameters(self.system)
             if hasattr(self, 'simulation'):
                 if hasattr(self, 'drude_particle') and len(self.drude_particle)>0 and np.max(np.abs(self.drude_particle - drude_particle)) != 0:

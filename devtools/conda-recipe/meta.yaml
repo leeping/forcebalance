@@ -1,6 +1,6 @@
 package:
   name: forcebalance-dev
-  version: !!str 1.9.2
+  version: !!str 1.9.5
 
 source:
   path: ../..

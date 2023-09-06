@@ -818,11 +818,24 @@ class AbInitio(Target):
             np.savetxt('M.txt',M_all_print)
             np.savetxt('Q.txt',Q_all_print)
         if self.writelevel > 0:
-            EnergyComparison = np.hstack((col(Q_all_print[:,0]),
-                                          col(M_all_print[:,0]),
-                                          col(M_all_print[:,0])-col(Q_all_print[:,0]),
-                                          col(self.boltz_wts)))
-            np.savetxt("EnergyCompare.txt", EnergyComparison, header="%11s  %12s  %12s  %12s" % ("QMEnergy", "MMEnergy", "Delta(MM-QM)", "Weight"), fmt="% 12.6e")
+            if self.force:
+                Mforce = np.array(M_all_print[:,1:3*nat+1])
+                Qforce = np.array(Q_all_print[:,1:3*nat+1])
+                Dforce_rms = np.sqrt(np.sum((Qforce-Mforce)**2, axis=1) / nat)
+                EnergyComparison = np.hstack((col(np.arange(NS)),
+                                              col(Q_all_print[:,0]),
+                                              col(M_all_print[:,0]),
+                                              col(M_all_print[:,0])-col(Q_all_print[:,0]),
+                                              col(Dforce_rms),
+                                              col(self.boltz_wts)))
+                np.savetxt("EnergyCompare.txt", EnergyComparison, fmt=" %12i  % 12.5f  % 12.5f  % 13.5f  % 13.5f  % 12.5e", header="%11s  %12s  %12s  %13s  %13s  %12s" % ("Num", "QMEnergy", "MMEnergy", "DeltaE(MM-QM)", "RMS_dF(MM-QM)", "Weight"))
+            else:
+                EnergyComparison = np.hstack((col(np.arange(NS)),
+                                              col(Q_all_print[:,0]),
+                                              col(M_all_print[:,0]),
+                                              col(M_all_print[:,0])-col(Q_all_print[:,0]),
+                                              col(self.boltz_wts)))
+                np.savetxt("EnergyCompare.txt", EnergyComparison, header=" %12i  % 12.5f  % 12.5f  % 13.5f  % 12.5e" % ("Num", "QMEnergy", "MMEnergy", "DeltaE(MM-QM)", "Weight"))
             if self.writelevel > 1:
                 plot_qm_vs_mm(Q_all_print[:,0], M_all_print[:,0],
                               M_orig=self.M_orig[:,0] if self.M_orig is not None else None,

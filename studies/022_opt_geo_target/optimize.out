@@ -197,7 +197,7 @@ Force field assignment data written to /home2/qyd/projects/forcebalance-dev/stud
   24 vdW/Atom/rmin_half/[#6X4:1]                                                                          :          2
   25 vdW/Atom/epsilon/[#8X2H0+0:1]                                                                        :          2
   26 vdW/Atom/rmin_half/[#8X2H0+0:1]                                                                      :          2
-SNIRNOFF Parameter Coverage Analysis result: 27/27 parameters are covered.
+SMIRNOFF Parameter Coverage Analysis result: 27/27 parameters are covered.
 ----------------------------------------------------------------------------------------------------------------------
 Using parabolic regularization (Gaussian prior) with strength 1.0e+00 (+), 0.0e+00 (x)
 #========================================================#

@@ -201,9 +201,9 @@ class Hessian(Target):
                 outfile.writelines('%s\n' % line for line in compute.M_opt.write_xyz([0]))
                 outfile.write('\n')
                 for freq, normal_mode in zip(freqs_rearr, normal_modes_rearr):
-                    outfile.write(f'{freq}\n')
+                    outfile.write("%13.4f\n" % freq)
                     for nx, ny, nz in normal_mode:
-                        outfile.write(f'{nx:13.4f} {ny:13.4f} {nz:13.4f}\n')
+                        outfile.write("%13.4f %13.4f %13.4f\n" % (nx, ny, nz))
                     outfile.write('\n')
             outfile.close()
 
@@ -237,13 +237,13 @@ def draw_normal_modes(elem, ref_xyz, ref_eigvals, ref_eigvecs, mm_xyz, freqs_rea
             x, y, z = xyz.T
             u, v, w = eigvec.T *5
             origin = np.array([x, y, z])
-            axs[idx].quiver(*origin, u, v, w, color=color)
+            axs[idx].quiver(origin[0], origin[1], origin[2], u, v, w, color=color)
 
             axs[idx].set_xlabel('x')
             axs[idx].set_ylabel('y')
             axs[idx].set_zlabel('z')
             if qm:
-                axs[idx].set_title(f'normal mode #{idx} (blue:QM({ref_eigvals[idx]:.2f}), red:MM({eigvals_rearr[idx]:.2f}))')
+                axs[idx].set_title('normal mode #%i (blue:QM(%.2f), red:MM(%.2f))' % (idx, ref_eigvals[idx], eigvals_rearr[idx]))
                 axs[idx].scatter(x, y, z, color='black', s=30)
                 axs[idx].set_xlim(min(u+x), max(u+x))
                 axs[idx].set_ylim(min(v+y), max(v+y))
@@ -273,7 +273,7 @@ def draw_vibfreq_scatter_plot_n_overlap_matrix(name, engine, ref_eigvals, ref_ei
     axs[0].set_xlabel(r'QM vibrational frequency ($cm^{-1}$)')
     axs[0].set_ylabel(r'MM vibrational frequency ($cm^{-1}$)')
     mae = np.sum(np.abs(ref_eigvals - freqs_rearr))/ len(ref_eigvals)
-    axs[0].set_title(f'QM vs. MM vibrational frequencies\n MAE= {mae:.2f}')
+    axs[0].set_title('QM vs. MM vibrational frequencies\n MAE= %2f' % mae)
     x0,x1 = axs[0].get_xlim()
     y0,y1 = axs[0].get_ylim()
     axs[0].set_aspect((x1-x0)/(y1-y0))
@@ -297,7 +297,7 @@ def draw_vibfreq_scatter_plot_n_overlap_matrix(name, engine, ref_eigvals, ref_ei
     plt.colorbar(im, cax=cax)
     corr_coef = cal_corr_coef(overlap_matrix)
     err = np.linalg.norm(qm_overlap_matrix - overlap_matrix)/np.linalg.norm(qm_overlap_matrix) # measure of error in matrix (Relative error)
-    axs[1].set_title(f'QM vs. MM normal modes\n Correlation coef. ={corr_coef:.4f}, Error={err:.4f}')
+    axs[1].set_title('QM vs. MM normal modes\n Correlation coef. =%.4f, Error=%.4f' % (corr_coef, err))
 
     # # move ax x axis to top
     # axs[2].xaxis.tick_top()
