@@ -34,15 +34,14 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Install dependencies with Miniconda
-      uses: conda-incubator/setup-miniconda@v2
+    - name: Set up conda environment
+      uses: mamba-org/provision-with-micromamba@main
       with:
-        python-version: ${{ matrix.python-version }}
-        mamba-version: "*"
-        activate-environment: forcebalance-test
         environment-file: devtools/conda-envs/test_env.yaml
-        auto-activate-base: false
-
+        channel-priority: "flexible"
+        extra-specs:
+          python=${{ matrix.python-version }}
+          
     - name: Additional info about the build
       shell: bash
       run: |
@@ -115,7 +114,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
+        pytest -vx --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml src/tests/
 
     - name: Run water study
       run: |
