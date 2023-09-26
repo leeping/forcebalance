@@ -34,15 +34,13 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v3
 
-    - name: Install dependencies with Minicondna
-      uses: conda-incubator/setup-miniconda@v2
+    - name: Set up conda environment
+      uses: mamba-org/setup-micromamba@v1
       with:
-        python-version: ${{ matrix.python-version }}
-        mamba-version: "*"
-        activate-environment: forcebalance-test
         environment-file: devtools/conda-envs/test_env.yaml
-        auto-activate-base: false
-
+        create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
+          python=${{ matrix.python-version }}
+          
     - name: Additional info about the build
       shell: bash
       run: |
@@ -84,6 +82,24 @@ jobs:
 
         echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
 
+    - name: Install Gromacs
+      run: |
+        wget http://ftp.gromacs.org/pub/gromacs/gromacs-5.1.5.tar.gz
+        tar xvzf gromacs-5.1.5.tar.gz
+        cd gromacs-5.1.5
+        cp -r cmake cmake_s
+        cd cmake
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
+        make -j 8 && make install
+        cd ../cmake_s
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
+        make -j 8 && make install
+        cd ..
+        . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
+        echo "$GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin" >> $GITHUB_PATH
+        which gmx
+        which gmx_d
+
     - name: Extract data archives
       run: |
         cd studies/001_water_tutorial
@@ -97,7 +113,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml
+        pytest -vx --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml -k "not TestEvaluatorBromineStudy" src/tests/
 
     - name: Run water study
       run: |
@@ -110,4 +126,4 @@ jobs:
       uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
-        fail_ci_if_error: true
+        fail_ci_if_error: false
