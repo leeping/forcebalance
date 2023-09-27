@@ -785,7 +785,7 @@ class OpenMM(Engine):
         self.mmopts = dict(mmopts)
 
         ## Are we using AMOEBA?
-        self.AMOEBA = any(['Amoeba' in f.__class__.__name__ for f in self.forcefield._forces])
+        self.AMOEBA = any(['AmoebaMultipoleForce' in f.__class__.__name__ for f in self.forcefield._forces])
 
         ## Specify frozen atoms and restraint force constant
         if 'restrain_k' in kwargs:
@@ -1381,6 +1381,12 @@ class OpenMM(Engine):
             RMSD of the system (w/r.t. starting geometry) in Angstrom
         """
 
+        # The unit of force is small, so using the same criterion as for energy minimization can lead to convergence failure.
+        if 'force' in LocalEnergyMinimizer.minimize.__doc__:
+            crit = max(crit, 1e-2)
+        else:
+            crit = max(crit, 1e-8)
+
         steps = int(max(1, -1*np.log10(crit)))
         self.update_simulation()
         self.set_positions(shot)
@@ -1391,12 +1397,12 @@ class OpenMM(Engine):
         # printcool_dictionary(energy_components(self.simulation), title='Energy component analysis before minimization, shot %i' % shot)
         # Minimize the energy.  Optimizer works best in "steps".
         for logc in np.linspace(0, np.log10(crit), steps):
-            self.simulation.minimizeEnergy(tolerance=10**logc*kilojoule/mole, maxIterations=100000)
+            self.simulation.minimizeEnergy(tolerance=10**logc, maxIterations=100000)
         # check if energy minimization is successful
         # try 1000 times with 10 steps each as openmm minimizer is not very stable at the tolerance
         for _ in range(1000):
             e_minimized = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
-            self.simulation.minimizeEnergy(tolerance=crit*kilojoule_per_mole, maxIterations=10)
+            self.simulation.minimizeEnergy(tolerance=crit, maxIterations=10)
             e_new = self.simulation.context.getState(getEnergy=True).getPotentialEnergy().value_in_unit(kilojoule_per_mole)
             if abs(e_new - e_minimized) < crit * 10:
                 break

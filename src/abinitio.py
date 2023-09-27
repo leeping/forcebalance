@@ -835,7 +835,7 @@ class AbInitio(Target):
                                               col(M_all_print[:,0]),
                                               col(M_all_print[:,0])-col(Q_all_print[:,0]),
                                               col(self.boltz_wts)))
-                np.savetxt("EnergyCompare.txt", EnergyComparison, header=" %12i  % 12.5f  % 12.5f  % 13.5f  % 12.5e" % ("Num", "QMEnergy", "MMEnergy", "DeltaE(MM-QM)", "Weight"))
+                np.savetxt("EnergyCompare.txt", EnergyComparison, fmt=" %12i  % 12.5f  % 12.5f  % 13.5f  % 12.5e", header="%11s  %12s  %12s  %13s  %12s" % ("Num", "QMEnergy", "MMEnergy", "DeltaE(MM-QM)", "Weight"))
             if self.writelevel > 1:
                 plot_qm_vs_mm(Q_all_print[:,0], M_all_print[:,0],
                               M_orig=self.M_orig[:,0] if self.M_orig is not None else None,
@@ -849,9 +849,11 @@ class AbInitio(Target):
             Qforce_obj = QMTraj[:]
             Mforce_print = np.array(M_all_print[:,1:3*nat+1])
             Qforce_print = np.array(Q_all_print[:,1:3*nat+1])
-            MaxComp = np.max(np.abs(np.vstack((Mforce_print,Qforce_print)).flatten()))
-            Mforce_print /= MaxComp
-            Qforce_print /= MaxComp
+            Mforce_print /= fqcgmx
+            Qforce_print /= fqcgmx
+            #MaxComp = np.max(np.abs(np.vstack((Mforce_print,Qforce_print)).flatten()))
+            #Mforce_print /= MaxComp
+            #Qforce_print /= MaxComp
             for i in range(NS):
                 Mforce_obj.xyzs[i] = Mforce_print[i, :].reshape(-1,3)
                 Qforce_obj.xyzs[i] = Qforce_print[i, :].reshape(-1,3)
