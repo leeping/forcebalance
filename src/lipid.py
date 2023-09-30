@@ -326,7 +326,7 @@ class Lipid(Target):
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='npt.out')
             else:
-                queue_up(wq, command = cmdstr+' &> npt.out',
+                queue_up(wq, command = cmdstr+' > npt.out 2>&1',
                          input_files = self.nptfiles + self.scripts + ['forcebalance.p'],
                          output_files = ['npt_result.p', 'npt.out'] + self.extra_output, tgt=self)
 

@@ -210,7 +210,7 @@ class Hydration(Target):
                 logger.info("You may tail -f %s/npt.out in another terminal window\n" % os.getcwd())
                 _exec(cmdstr, copy_stderr=True, outfnm='md.out')
             else:
-                queue_up(wq, command = cmdstr+' &> md.out', tag='%s:%s/%s' % (self.name, label, "liq" if liq else "gas"),
+                queue_up(wq, command = cmdstr+' > md.out 2>&1', tag='%s:%s/%s' % (self.name, label, "liq" if liq else "gas"),
                          input_files = self.scripts + ['simulation.p', 'forcefield.p', os.path.basename(self.molecules[label])],
                          output_files = ['md_result.p', 'md.out'] + self.extra_output, tgt=self, verbose=False, print_time=3600)
         os.chdir('..')
