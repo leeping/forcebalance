@@ -873,6 +873,8 @@ WORK_QUEUE = None
 
 # Global variable containing a mapping from target names to Work Queue task IDs
 WQIDS = defaultdict(list)
+taskidtooutputfilepathslist={}
+
 
 def getWorkQueue():
     global WORK_QUEUE
@@ -911,19 +913,27 @@ def queue_up(wq, command, input_files, output_files, tag=None, tgt=None, verbose
     @param[in] input_files (list of files) A list of locations of the input files.
     @param[in] output_files (list of files) A list of locations of the output files.
     """
+    outputfilepaths=[]
     global WQIDS
+    global taskidtooutputfilepathslist
     task = work_queue.Task(command)
     cwd = os.getcwd()
     for f in input_files:
         lf = os.path.join(cwd,f)
-        task.specify_input_file(lf,f,cache=False)
+        head,f=os.path.split(f)
+        task.specify_file(lf,f, work_queue.WORK_QUEUE_INPUT, cache=False)
     for f in output_files:
         lf = os.path.join(cwd,f)
-        task.specify_output_file(lf,f,cache=False)
+        outputfilepaths.append(lf)
+        task.specify_file(f,f, work_queue.WORK_QUEUE_OUTPUT, cache=False)
+
     if tag is None: tag = command
     task.specify_tag(tag)
     task.print_time = print_time
+    if 'GPUDYNAMICS' in os.environ.keys() and 'gas' not in command:
+        task.specify_gpus(1)  
     taskid = wq.submit(task)
+    taskidtooutputfilepathslist[taskid]=outputfilepaths
     if verbose:
         logger.info("Submitting command '%s' to the Work Queue, %staskid %i\n" % (command, "tag %s, " % tag if tag != command else "", taskid))
     if tgt is not None:
@@ -965,6 +975,7 @@ def queue_up_src_dest(wq, command, input_files, output_files, tag=None, tgt=None
 def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
     """ This function waits ten seconds to see if a task in the Work Queue has finished. """
     global WQIDS
+    global taskidtooutputfilepathslist
     if verbose: logger.info('---\n')
     if wait_intvl >= wait_time:
         wait_time = wait_intvl
@@ -996,6 +1007,7 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                 logger.warning("Task '%s' (task %i) failed on host %s (%i seconds), resubmitted: taskid %i\n" % (task.tag, oldid, oldhost, exectime, taskid))
                 WQIDS[tgtname].append(taskid)
             else:
+                taskid=task.id
                 if hasattr(task, 'print_time'):
                     print_time = task.print_time
                 if exectime > print_time: # Assume that we're only interested in printing jobs that last longer than a minute.
@@ -1004,6 +1016,24 @@ def wq_wait1(wq, wait_time=10, wait_intvl=1, print_time=60, verbose=False):
                     if task.id in WQIDS[tnm]:
                         WQIDS[tnm].remove(task.id)
                 del task
+                newoutputfilepaths=[] # sort by largest file size and move largest first (like move arc first so dont submit next job before arc and dyn are returned
+                if taskid in taskidtooutputfilepathslist.keys():
+                    outputfilepaths=taskidtooutputfilepathslist[taskid]
+                    if outputfilepaths!=None:
+                        for outputfilepath in outputfilepaths:
+                            head,tail=os.path.split(outputfilepath)
+                            if os.path.isdir(head):
+                                if os.path.isfile(tail):
+                                   newoutputfilepaths.append(outputfilepath) 
+                newfiles=[os.path.split(i)[1] for i in newoutputfilepaths]
+                newfilestofilepaths=dict(zip(newfiles,newoutputfilepaths))
+                filesizes=[os.stat(thefile).st_size for thefile in newfiles]
+                newfilestofilesizes=dict(zip(newfiles,filesizes))
+                sorteddic={k: v for k, v in sorted(newfilestofilesizes.items(), key=lambda item: item[1],reverse=True)}  
+                for filename in sorteddic.keys():
+                    filepath=newfilestofilepaths[filename]
+                    shutil.move(os.path.join(os.getcwd(),filename),filepath)
+
 
         # LPW 2018-09-10 Updated to use stats fields from CCTools 6.2.10
         # Please upgrade CCTools version if errors are encountered during runtime.
@@ -1559,7 +1589,7 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
     return Out
 _exec.returncode = None
 
-def warn_press_key(warning, timeout=10):
+def warn_press_key(warning, timeout=1):
     logger.warning(warning + '\n')
     if sys.stdin.isatty():
         logger.warning("\x1b[1;91mPress Enter or wait %i seconds (I assume no responsibility for what happens after this!)\x1b[0m\n" % timeout)
