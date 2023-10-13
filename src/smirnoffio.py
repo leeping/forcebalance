@@ -504,15 +504,6 @@ class SMIRNOFF(OpenMM):
         #         delattr(self, 'simulation')
         # self.vsprm = vsprm.copy()
 
-        has_vsites = False
-        for particle_idx in range(self.system.getNumParticles()):
-            if self.system.isVirtualSite(particle_idx):
-                has_vsites = True
-
-        if has_vsites:
-            raise Exception("ForceBalance can't currently handle SMIRNOFF vsites. "
-                            "Downgrade to ForceBalance 1.9.3 or earlier to handle those.")
-
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)
         else:
