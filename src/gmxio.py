@@ -580,7 +580,10 @@ class GMX(Engine):
                 havegmx = True
             else:
                 warn_press_key("Please add GROMACS executables to the PATH or specify gmxpath.")
-                logger.error("Cannot find the GROMACS executables!\n")
+                logger.error(
+                    "Cannot find the GROMACS executables!\n"
+                    f"\tTried 'gmx{self.gmxsuffix}' and 'mdrun{self.gmxsuffix}'\n"
+                )
                 raise RuntimeError
 
     def readsrc(self, **kwargs):

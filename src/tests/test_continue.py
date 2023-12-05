@@ -45,6 +45,7 @@ class TestWaterTutorial(ForceBalanceTestCase):
         self.logger.debug("Parsing inputs...\n")
         options, tgt_opts = parse_inputs(input_file)
         options['continue'] = True
+        options['gmxsuffix'] = '_d'
         self.logger.debug("options:\n%s\n\ntgt_opts:\n%s\n\n" % (str(options), str(tgt_opts)))
 
         assert isinstance(options, dict), "Parser gave incorrect type for options"
