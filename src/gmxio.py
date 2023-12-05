@@ -602,7 +602,7 @@ class GMX(Engine):
 
         self.gmx_defs = OrderedDict([("integrator", "md"), ("dt", "0.001"), ("nsteps", "0"),
                                      ("nstxout", "0"), ("nstfout", "0"), ("nstenergy", "1"), 
-                                     ("nstxtcout", "0"), ("constraints", "none"), ("cutoff-scheme", "group")])
+                                     ("nstxtcout", "0"), ("constraints", "none"), ("cutoff-scheme", "Verlet")])
         gmx_opts = OrderedDict([])
         warnings = []
         self.pbc = pbc
@@ -1250,9 +1250,7 @@ class GMX(Engine):
             md_opts["comm_mode"] = "None"
             md_opts["nstcomm"] = 0
 
-        # In gromacs version 5, default cutoff scheme becomes verlet. 
-        # Need to set to group for backwards compatibility
-        md_defs["cutoff-scheme"] = 'group'
+        md_defs["cutoff-scheme"] = "Verlet"
         md_opts["nstenergy"] = nsave
         md_opts["nstcalcenergy"] = nsave
         md_opts["nstxout"] = nsave
