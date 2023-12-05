@@ -249,7 +249,27 @@ def smirnoff_update_pgrads(target):
 
 class SMIRNOFF(OpenMM):
 
-    """ Derived from Engine object for carrying out OpenMM calculations that use the SMIRNOFF force field. """
+    """
+    Derived from Engine object for carrying out OpenMM calculations that use the SMIRNOFF force field.
+
+    Parameters
+    ----------
+    name : str
+    ffxml : str
+    pdb : str
+    mol :
+    mol2 : list[str]
+    mol : Molecule
+    coords : str
+    platname : string
+    precision : string
+    nonbonded_cutoff
+    mmopts : dict
+    vsite_bonds : list
+    implicit_solvent : string
+    restrain_k : float
+    freeze_atoms : list
+    """
 
     def __init__(self, name="openmm", **kwargs):
         self.valkwd = ['ffxml', 'pdb', 'mol2', 'platname', 'precision', 'mmopts', 'vsite_bonds', 'implicit_solvent', 'restrain_k', 'freeze_atoms']
