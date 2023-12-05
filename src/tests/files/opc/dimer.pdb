@@ -1,0 +1,13 @@
+REMARK   1 CREATED WITH OPENMM 8.1, 2023-12-05
+CRYST1   93.604   93.604   93.604  90.00  90.00  90.00 P 1           1 
+HETATM    1  O   HOH A   1      11.960   8.353   7.666  1.00  0.00           O  
+HETATM    2  H1  HOH A   1      11.880   7.439   7.396  1.00  0.00           H  
+HETATM    3  H2  HOH A   1      11.547   8.850   6.960  1.00  0.00           H  
+HETATM    4 EP   HOH A   1      10.092  10.131   9.547  1.00  0.00          EP  
+TER       5      HOH A   1
+HETATM    6  O   HOH B   1       9.316   9.651   9.837  1.00  0.00           O  
+HETATM    7  H1  HOH B   1      10.743   9.452   9.373  1.00  0.00           H  
+HETATM    8  H2  HOH B   1      11.893   8.296   7.533  1.00  0.00           H  
+HETATM    9 EP   HOH B   1      10.075   9.973   9.563  1.00  0.00          EP  
+TER      10      HOH B   1
+END
