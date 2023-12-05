@@ -82,24 +82,6 @@ jobs:
 
         echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
 
-    - name: Install Gromacs
-      run: |
-        wget http://ftp.gromacs.org/pub/gromacs/gromacs-5.1.5.tar.gz
-        tar xvzf gromacs-5.1.5.tar.gz
-        cd gromacs-5.1.5
-        cp -r cmake cmake_s
-        cd cmake
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
-        make -j 8 && make install
-        cd ../cmake_s
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
-        make -j 8 && make install
-        cd ..
-        . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
-        echo "$GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin" >> $GITHUB_PATH
-        which gmx
-        which gmx_d
-
     - name: Extract data archives
       run: |
         cd studies/001_water_tutorial
