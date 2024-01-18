@@ -1,5 +1,7 @@
 import os
 
+import pytest
+
 from forcebalance.nifty import logger
 from forcebalance.smirnoffio import SMIRNOFF
 
@@ -26,6 +28,11 @@ class TestSMIRNOFF(ForceBalanceTestCase):
 
         os.chdir(cls.tmpfolder)
 
+        pytest.importorskip("openeye.oechem")
+        from openeye import oechem
+
+        if not oechem.OEChemIsLicensed():
+            pytest.skip("Need OEChem license to run this test")
         for file in ["dimer.pdb", "dimer.mol2", "opc.offxml"]:
             os.system(f"ln -fs ../{file}")
 
@@ -46,4 +53,7 @@ class TestSMIRNOFF(ForceBalanceTestCase):
             logger.warning("OpenMM cannot be imported, skipping OpenMM tests.")
 
     def test_energy_with_virtual_sites(self):
-        pass
+
+        data = {name: eng.energy_force() for name, eng in self.engines.items()}
+
+        assert data['SMIRNOFF'] is not None
