@@ -3170,7 +3170,7 @@ class Molecule(object):
             elif result == -1:
                 break
             #npa    = np.array(xyzvec)
-            xyz    = np.asfarray(xyzvec)
+            xyz    = np.asarray(xyzvec, dtype=float)
             xyzs.append(xyz.reshape(-1, 3))
             boxes.append(BuildLatticeFromLengthsAngles(ts.A, ts.B, ts.C, 90.0, 90.0, 90.0))
         _dcdlib.close_file_read(dcd)
