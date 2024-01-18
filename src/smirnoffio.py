@@ -249,7 +249,27 @@ def smirnoff_update_pgrads(target):
 
 class SMIRNOFF(OpenMM):
 
-    """ Derived from Engine object for carrying out OpenMM calculations that use the SMIRNOFF force field. """
+    """
+    Derived from Engine object for carrying out OpenMM calculations that use the SMIRNOFF force field.
+
+    Parameters
+    ----------
+    name : str
+    ffxml : str
+    pdb : str
+    mol :
+    mol2 : list[str]
+    mol : Molecule
+    coords : str
+    platname : string
+    precision : string
+    nonbonded_cutoff
+    mmopts : dict
+    vsite_bonds : list
+    implicit_solvent : string
+    restrain_k : float
+    freeze_atoms : list
+    """
 
     def __init__(self, name="openmm", **kwargs):
         self.valkwd = ['ffxml', 'pdb', 'mol2', 'platname', 'precision', 'mmopts', 'vsite_bonds', 'implicit_solvent', 'restrain_k', 'freeze_atoms']
@@ -419,8 +439,8 @@ class SMIRNOFF(OpenMM):
 
         n_virtual_sites = 0
         self._has_virtual_sites = False
-        if 'VirtualSites' in interchange.handlers:
-            n_virtual_sites = len(interchange['VirtualSites'].slot_map)
+        if 'VirtualSites' in interchange.collections:
+            n_virtual_sites = len(interchange['VirtualSites'].key_map)
             if n_virtual_sites > 0:
                 self._has_virtual_sites = True
 
@@ -503,15 +523,6 @@ class SMIRNOFF(OpenMM):
         #     if hasattr(self, 'simulation'):
         #         delattr(self, 'simulation')
         # self.vsprm = vsprm.copy()
-
-        has_vsites = False
-        for particle_idx in range(self.system.getNumParticles()):
-            if self.system.isVirtualSite(particle_idx):
-                has_vsites = True
-
-        if has_vsites:
-            raise Exception("ForceBalance can't currently handle SMIRNOFF vsites. "
-                            "Downgrade to ForceBalance 1.9.3 or earlier to handle those.")
 
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)
