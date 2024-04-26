@@ -606,9 +606,9 @@ class AbInitio(Target):
 
         In equation form, the objective function is given by:
 
-        \[ = {W_E}\left[ {\frac{{\left( {\sum\limits_{i \in {N_s}}
-        {{w_i}{{\left( {E_i^{MM} - E_i^{QM}} \right)}^2}} } \right) -
-        {{\left( {{{\bar E}^{MM}} - {{\bar E}^{QM}}} \right)}^2}}}
+        \[ = {W_E}\left[ {\frac{{{\sum\limits_{i \in {N_s}}
+        {{w_i}{{\left( {E_i^{MM} - E_i^{QM}}
+        - \left( {{{\bar E}^{MM}} - {{\bar E}^{QM}}} \right) \right)}^2}}}}}
         {{\sum\limits_{i \in {N_s}} {{w_i}{{\left(
         {E_i^{QM} - {{\bar E}^{QM}}} \right)}^2}} }}} \right] +
         {W_F}\left[ {\frac{{\sum\limits_{i \in {N_s}} {{w_i}\sum\limits_{a \in {N_a}}
