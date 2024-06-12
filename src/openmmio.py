@@ -8,6 +8,8 @@ from __future__ import division
 from builtins import zip
 from builtins import range
 import os
+
+import openmm
 from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
 from forcebalance.binding import BindingEnergy
