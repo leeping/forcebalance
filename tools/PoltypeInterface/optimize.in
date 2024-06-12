@@ -1,0 +1,55 @@
+# ForceBalance input file
+# The octothorpe '#' is a comment symbol
+# Note: If the specified value is 'None' then the option will truly be set to None - not the string 'None'
+# Note: 'Section' option types are more complicated and may require you to read the documentation
+# Note: Boolean option types require no value, the key being present implies 'True'
+
+$options
+# (string) Type of the penalty, L2 or L1 in the optimizer
+penalty_type L2
+finite_difference_h 1e-4
+
+# tinkerpath /home/leeping/opt/tinker-6.1.01-intel/bin
+tinkerpath NONE
+# (allcap) The job type
+jobtype newton
+
+# (list) The names of force fields, corresponding to directory forcefields/file_name.(itp|gen)
+# Make sure to tag the parameters that you wish to optimize
+forcefield
+# (int) Maximum number of steps in an optimization
+maxstep 100
+
+# (float) Factor for multiplicative penalty function in objective function
+penalty_additive 0.01
+
+# Negative trust radius means to search over the Levenberg-Marquardt parameter
+trust0 0.1
+
+# Normalize the objective function using the sum of weights?  I usually don't.
+normalize_weights no
+
+# Disable the rudimentary charge constraint code.  Even if we had charges,
+# I think it's better to use 'evals' to take care of this.
+constrain_charge false
+
+# Priors.  THESE ARE IMPORTANT!  They dictate how much the parameter is allowed to vary,
+# in conjunction with the penalty_additive parameter.
+priors
+   VDWS                                 : 5.0
+   VDWT                                 : 0.5
+   VDWD                                 : 1.0
+/priors
+
+criteria 2
+convergence_objective 1e-1
+convergence_gradient 1e-2
+convergence_step 1e-2
+
+amoeba_pol mutual
+amoeba_eps 1e-5
+
+$end
+
+
+

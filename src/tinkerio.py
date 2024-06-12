@@ -314,6 +314,10 @@ class TINKER(Engine):
         self.warn_vn = False
         super(TINKER,self).__init__(name=name, **kwargs)
 
+    def CheckEnvironmentTinker(self):
+        tinkerpath = os.getenv("TINKERPATH", default="")
+        return tinkerpath
+
     def setopts(self, **kwargs):
         
         """ Called by __init__ ; Set TINKER-specific options. """
@@ -321,7 +325,7 @@ class TINKER(Engine):
         ## The directory containing TINKER executables (e.g. dynamic)
         if 'tinkerpath' in kwargs:
             self.tinkerpath = kwargs['tinkerpath']
-            if not os.path.exists(os.path.join(self.tinkerpath,"dynamic")):
+            if not os.path.exists(os.path.join(self.tinkerpath,"dynamic")) and 'dynamic' not in os.environ.keys():
                 warn_press_key("The 'dynamic' executable indicated by %s doesn't exist! (Check tinkerpath)" \
                                    % os.path.join(self.tinkerpath,"dynamic"))
         else:
@@ -350,8 +354,24 @@ class TINKER(Engine):
         # Sometimes the engine changes dirs and the key goes missing, so we link it.
         if "%s.key" % self.name in csplit and not os.path.exists("%s.key" % self.name):
             LinkFile(self.abskey, "%s.key" % self.name)
-        prog = os.path.join(self.tinkerpath, csplit[0])
-        csplit[0] = prog
+        tinkpath=self.CheckEnvironmentTinker()
+        if tinkpath!=None: # need to override input masterhost tinkerpath, otherwise if worker node has different )S/ libraries then will crash
+           tinkerpath=tinkpath
+        else:
+           tinkerpath=self.tinkerpath
+        
+        if 'analyze' in command:
+            gpuvergood=False
+            if stdin=='E,M':
+                gpuvergood=True
+            if command[-1]=='E' or command[-1]=='M':
+                gpuvergood=True
+            csplit[0]='analyze'
+        command=' '.join(csplit)
+        if '_gpu' not in command:
+            prog = os.path.join(tinkerpath, csplit[0])
+            csplit[0] = prog
+
         o = _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, rbytes=1024, **kwargs)
         # Determine the TINKER version number.
         for line in o[:10]:
@@ -360,12 +380,33 @@ class TINKER(Engine):
                 if len(vw.split('.')) <= 2:
                     vn = float(vw)
                 else:
-                    ls = vw.split('.')
-                    last = ls[1:]
-                    first = ls[0]
-                    vn = first+'.'+''.join(last)
+                    ls=vw.split('.')
+                    last=ls[1:]
+                    first=ls[0]
+                    vn=first+'.'+''.join(last)
+                    versionstr=''
+                    for e in vn:
+                        if e.isdigit() or e=='.':
+                            versionstr+=e
+                    count=versionstr.count('.')
+                    if count==2:
+                        newversionstr=''
+                        for eidx in range(len(versionstr)):
+                            e=versionstr[eidx]
+                            if eidx>1:
+                                if e!='.':
+                                    newversionstr+=e
+                            else:
+                                newversionstr+=e
+                        versionstr=newversionstr
+                    vn=versionstr
                     vn = float(vn)
-                vn_need = 6.3
+                if '_gpu' in command: # then tinker 9 version
+                    vn_need=1
+                else:
+                    vn_need = 6.3
+
+                    vn = float(vn)
                 try:
                     if vn < vn_need:
                         if self.warn_vn: 
@@ -643,7 +684,7 @@ class TINKER(Engine):
         Result = OrderedDict()
         # If we want the dipoles (or just energies), analyze is the way to go.
         if dipole or (not force):
-            oanl = self.calltinker("analyze %s -k %s" % (xyzin, self.name), stdin="G,E,M", print_to_screen=False)
+            oanl = self.calltinker("analyze %s -k %s" % (xyzin, self.name), stdin="E,M", print_to_screen=False)
             # Read potential energy and dipole from file.
             eanl = []
             dip = []
@@ -729,6 +770,9 @@ class TINKER(Engine):
             x = "%s.xyz" % self.name
             self.mol.write(x, ftype="tinker")
         Result = self.evaluate_(x, dipole=True)
+        print('Result',Result,flush=True)
+        print('Result["Energy"]',Result["Energy"],flush=True)
+        print('Result["Dipole"]',Result["Dipole"],flush=True)
         return np.hstack((Result["Energy"].reshape(-1,1), Result["Dipole"]))
 
     def normal_modes(self, shot=0, optimize=True):
@@ -910,13 +954,13 @@ class TINKER(Engine):
         if temperature is not None:
             md_defs["integrator"] = "stochastic"
         else:
-            md_defs["integrator"] = "beeman"
+            md_defs["integrator"] = "respa"
             md_opts["thermostat"] = None
         # Periodic boundary conditions.
         if self.pbc:
             md_opts["vdw-correction"] = ''
             if temperature is not None and pressure is not None: 
-                md_defs["integrator"] = "beeman"
+                md_defs["integrator"] = "respa"
                 md_defs["thermostat"] = "bussi"
                 md_defs["barostat"] = "montecarlo"
                 if anisotropic:
@@ -933,7 +977,7 @@ class TINKER(Engine):
 
         eq_opts = deepcopy(md_opts)
         if self.pbc and temperature is not None and pressure is not None: 
-            eq_opts["integrator"] = "beeman"
+            eq_opts["integrator"] = "respa"
             eq_opts["thermostat"] = "bussi"
             eq_opts["barostat"] = "berendsen"
 
@@ -942,27 +986,31 @@ class TINKER(Engine):
             self.optimize(0, method="bfgs", crit=1)
             os.system("mv %s.xyz_2 %s.xyz" % (self.name, self.name))
             if verbose: logger.info("Done\n")
+        if 'GPUDYNAMICS' in os.environ.keys() and 'gas' not in self.name:
+            dynamickeyword='dynamic_gpu'
+            suffix=''
+        else:
+            dynamickeyword='dynamic'
+            suffix=''
 
         # Run equilibration.
         if nequil > 0:
             write_key("%s-eq.key" % self.name, eq_opts, "%s.key" % self.name, md_defs)
             if verbose: printcool("Running equilibration dynamics", color=0)
             if self.pbc and pressure is not None:
-                self.calltinker("dynamic %s -k %s-eq %i %f %f 4 %f %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000, 
-                                                                          temperature, pressure), print_to_screen=verbose)
+                self.calltinker(dynamickeyword+" %s -k %s-eq %i %f %f 4 %f %f%s" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,temperature, pressure,suffix), print_to_screen=verbose)
             else:
-                self.calltinker("dynamic %s -k %s-eq %i %f %f 2 %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,
-                                                                       temperature), print_to_screen=verbose)
+                self.calltinker(dynamickeyword+" %s -k %s-eq %i %f %f 2 %f" % (self.name, self.name, nequil, timestep, float(nsave*timestep)/1000,temperature), print_to_screen=verbose)
             os.system("rm -f %s.arc" % (self.name))
 
         # Run production.
         if verbose: printcool("Running production dynamics", color=0)
         write_key("%s-md.key" % self.name, md_opts, "%s.key" % self.name, md_defs)
+
         if self.pbc and pressure is not None:
-            odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 4 %f %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
-                                                                             temperature, pressure), print_to_screen=verbose)
+            odyn = self.calltinker(dynamickeyword+" %s -k %s-md %i %f %f 4 %f %f%s" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000),temperature, pressure,suffix), print_to_screen=verbose)
         else:
-            odyn = self.calltinker("dynamic %s -k %s-md %i %f %f 2 %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
+            odyn = self.calltinker(dynamickeyword+" %s -k %s-md %i %f %f 2 %f" % (self.name, self.name, nsteps, timestep, float(nsave*timestep/1000), 
                                                                           temperature), print_to_screen=verbose)
             
         # Gather information.
@@ -977,25 +1025,39 @@ class TINKER(Engine):
                 edyn.append(float(s[2]))
             if 'Current Kinetic' in line:
                 kdyn.append(float(s[2]))
-            if len(s) > 0 and s[0] == 'Temperature' and s[2] == 'Kelvin':
-                temps.append(float(s[1]))
+                temps.append(temperature) # GPU version does not print out Temperature (or just new dynamic doesnt)
 
         # Potential and kinetic energies converted to kJ/mol.
         edyn = np.array(edyn) * 4.184
         kdyn = np.array(kdyn) * 4.184
         temps = np.array(temps)
     
+        mass = 0.0
         if verbose: logger.info("Post-processing to get the dipole moments\n")
-        oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="G,E,M", print_to_screen=False)
+        oanl = self.calltinker("analyze %s " % self.name, stdin="G,E,M", print_to_screen=False)
+        for ln, line in enumerate(oanl):
+            if 'Polarization' in line:
+                if 'MUTUAL' in line or 'THOLE' in line:
+                    continue
+           
+            strip = line.strip()
+            s = line.split()
+            if 'Total System Mass' in line:
+                mass = float(s[-1])
+
+        oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="E,M", print_to_screen=False)
 
         # Read potential energy and dipole from file.
         eanl = []
         dip = []
-        mass = 0.0
         ecomp = OrderedDict()
         havekeys = set()
         first_shot = True
         for ln, line in enumerate(oanl):
+            if 'Polarization' in line:
+                if 'MUTUAL' in line or 'THOLE' in line:
+                    continue
+
             strip = line.strip()
             s = line.split()
             if 'Total System Mass' in line:
@@ -1007,10 +1069,13 @@ class TINKER(Engine):
             if first_shot:
                 for key in eckeys:
                     if strip.startswith(key):
+                        
+
+                        value=float(s[-2])*4.184
                         if key in ecomp:
-                            ecomp[key].append(float(s[-2])*4.184)
+                            ecomp[key].append(value)
                         else:
-                            ecomp[key] = [float(s[-2])*4.184]
+                            ecomp[key] = [value]
                         if key in havekeys:
                             first_shot = False
                         havekeys.add(key)
