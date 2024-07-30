@@ -20,7 +20,7 @@ jobs:
       matrix:
         os:
           - macOS-latest
-          - ubuntu-latest
+          - ubuntu-20.04
         python-version:
           - "3.8"
           - "3.9"
