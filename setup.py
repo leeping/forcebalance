@@ -12,6 +12,8 @@ import glob
 import argparse
 import subprocess
 
+import versioneer
+
 #===================================#
 #|   ForceBalance version number   |#
 #| Make sure to update the version |#
@@ -19,28 +21,7 @@ import subprocess
 #|                                 |#
 #| doc/header.tex                  |#
 #| doc/api_header.tex              |#
-#| bin/ForceBalance.py             |#
 #===================================#
-__version__ = "1.9.6"
-# try:
-#     # use git to find current version
-#     git_describe = subprocess.check_output(["git", "describe", "--tags"]).strip()
-#     __version__ = re.sub('-g[0-9a-f]*$','',git_describe)
-# except: pass
-
-# The versioning file logic does not work.  
-# Commenting out until further notice.
-# versioning_file = os.path.join(os.path.dirname(__file__), '.__version__')
-# try:
-#     git_describe = subprocess.check_output(["git", "describe"]).strip()
-#     __version__ = re.sub('-g[0-9a-f]*$','',git_describe)
-#     with open(versioning_file, 'w') as fh:
-#         fh.write(__version__)
-#     #subprocess.call(["git", "add", ".__version__"])
-# except:
-#     with open(versioning_file, 'r') as fh:
-#         __version__ = fh.read().strip()
-
 
 # DCD file reading module
 DCD = Extension('forcebalance/_dcdlib',
@@ -78,8 +59,6 @@ DCD = Extension('forcebalance/_dcdlib',
 def buildKeywordDictionary(args):
     setupKeywords = {}
     setupKeywords["name"]              = "forcebalance"
-    # Don't create a separate installed version number for every commit
-    setupKeywords["version"]           = re.sub('-[0-9]*$','',__version__)
     setupKeywords["author"]            = "Lee-Ping Wang"
     setupKeywords["author_email"]      = "leeping@ucdavis.edu"
     setupKeywords["license"]           = "BSD 2.0"
@@ -158,7 +137,11 @@ def main():
     setupKeywords=buildKeywordDictionary(args)
     ## Run setuptools command.
     ## Refer to setup.cfg for customizing installation behavior
-    setup(**setupKeywords)
+    setup(
+        version=versioneer.get_version(),
+        cmdclass=versioneer.get_cmdclass(),
+        **setupKeywords,
+    )
 
     if os.path.exists('build'):
         shutil.rmtree('build')
