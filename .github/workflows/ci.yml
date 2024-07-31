@@ -89,10 +89,10 @@ jobs:
         cd gromacs-5.1.5
         cp -r cmake cmake_s
         cd cmake
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON ..
         make -j 8 && make install
         cd ../cmake_s
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON ..
         make -j 8 && make install
         cd ..
         . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
@@ -113,7 +113,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -vx --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml -k "not TestEvaluatorBromineStudy" src/tests/
+        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml -k "not TestEvaluatorBromineStudy" src/tests/
 
     - name: Run water study
       run: |
