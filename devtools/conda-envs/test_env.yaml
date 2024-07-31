@@ -23,7 +23,7 @@ dependencies:
   - ambertools
   - ndcctools
   - geometric
-  - cmake
+  - cmake <=3.27
   # - gromacs =2019.1
   - openff-toolkit >=0.11.3
   - openff-evaluator-base >= 0.4.1
