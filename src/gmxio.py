@@ -722,6 +722,9 @@ class GMX(Engine):
         for line in o:
             if 'double precision' in line:
                 self.double = 1
+        print("AAAAA")
+        print(o)
+        print("BBBBB")
         o = self.callgmx("gmxdump -s %s.tpr -sys" % self.name, copy_stderr=True)
         self.AtomMask = []
         self.AtomLists = defaultdict(list)
