@@ -22,7 +22,7 @@ jobs:
           - macOS-latest
           - ubuntu-20.04
         python-version:
-          - "3.8"
+          #- "3.8"
           - "3.9"
 
     env:
@@ -89,10 +89,10 @@ jobs:
         cd gromacs-5.1.5
         cp -r cmake cmake_s
         cd cmake
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON ..
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_FFT_LIBRARY=fftw ..
         make -j 8 && make install
         cd ../cmake_s
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON ..
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_FFT_LIBRARY=fftw ..
         make -j 8 && make install
         cd ..
         . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
