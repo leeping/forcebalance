@@ -23,7 +23,7 @@ dependencies:
   - ambertools
   - ndcctools
   - geometric
-  - mkl
+  - mkl =2020
   #- cmake <=3.27
   #- libglib <2.79
   #- libgcc-ng <14
