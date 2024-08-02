@@ -89,10 +89,10 @@ jobs:
         cd gromacs-5.1.5
         cp -r cmake cmake_s
         cd cmake
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_FFT_LIBRARY=fftw3 ..
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_FFT_LIBRARY=mkl ..
         make -j 8 && make install
         cd ../cmake_s
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_FFT_LIBRARY=fftw3 ..
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_FFT_LIBRARY=mkl ..
         make -j 8 && make install
         cd ..
         . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
