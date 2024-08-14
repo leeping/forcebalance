@@ -1,7 +1,6 @@
 name: forcebalance-test
 channels:
   - conda-forge
-  - bioconda
   - openeye
 dependencies:
     # Base depends
@@ -23,7 +22,7 @@ dependencies:
   - ambertools
   - ndcctools
   - geometric
-  # - gromacs =2019.1
+  - gromacs
   - openff-toolkit >=0.11.3
   - openff-evaluator-base >= 0.4.1
   - pint =0.20

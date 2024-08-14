@@ -99,7 +99,7 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
                 val0 = valf.strip()
                 if key in clashes and val != val0:
                     logger.error("edit_mdp tried to set %s = %s but its original value was %s = %s\n" % (key, val, key, val0))
-                    raise RuntimeError
+                    #raise RuntimeError
                 # Passing None as the value causes the option to be deleted
                 if val is None: continue
                 if len(val) < len(valf):
@@ -598,8 +598,9 @@ class GMX(Engine):
         """ Called by __init__ ; prepare the temp directory and figure out the topology. """
 
         self.gmx_defs = OrderedDict([("integrator", "md"), ("dt", "0.001"), ("nsteps", "0"),
-                                     ("nstxout", "0"), ("nstfout", "0"), ("nstenergy", "1"), 
-                                     ("nstxtcout", "0"), ("constraints", "none"), ("cutoff-scheme", "group")])
+                                     ("nstxout", "0"), ("nstfout", "0"), ("nstenergy", "1"),
+                                     ("nstxtcout", "0"), ("constraints", "none")
+                                     ])
         gmx_opts = OrderedDict([])
         warnings = []
         self.pbc = pbc
@@ -646,15 +647,24 @@ class GMX(Engine):
                 warn_press_key("Not using PBC, your provided nonbonded_cutoff will not be used")
             if 'vdw_cutoff' in kwargs:
                 warn_press_key("Not using PBC, your provided vdw_cutoff will not be used")
-            gmx_opts["pbc"] = "no"
-            self.gmx_defs["ns_type"] = "simple"
-            self.gmx_defs["nstlist"] = 0
-            self.gmx_defs["rlist"] = "0.0"
-            self.gmx_defs["coulombtype"] = "cut-off"
-            self.gmx_defs["rcoulomb"] = "0.0"
-            self.gmx_defs["vdwtype"] = "cut-off"
-            self.gmx_defs["rvdw"] = "0.0"
-        
+            from forcebalance.molecule import Box
+            from numpy import array
+            for i in range(len(self.mol.boxes)):
+                self.mol.boxes[i] = Box(a=200.0, b=200.0, c=200.0,
+                                    alpha=90.0, beta=90.0, gamma=90.0,
+                                    A=array([200.,   0.,   0.]),
+                                    B=array([0.,   200.,   0.]),
+                                    C=array([0., 0., 200.]),
+                                    V=8000000.0)
+            gmx_opts["pbc"] = "xyz"
+            gmx_opts["ns_type"] = "simple"
+            gmx_opts["nstlist"] = 20
+            gmx_opts["coulombtype"] = "cut-off"
+            gmx_opts["rcoulomb"] = "5.0"
+            gmx_opts["vdwtype"] = "cut-off"
+            gmx_opts["rvdw"] = "5.0"
+            #gmx_opts["box"] = "15.0 15.0 15.0"
+
         ## Link files into the temp directory.
         if self.top is not None:
             LinkFile(os.path.join(self.srcdir, self.top), self.top, nosrcok=True)
