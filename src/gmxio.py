@@ -634,12 +634,17 @@ class GMX(Engine):
             self.gmx_defs["nstlist"] = 20
             self.gmx_defs["rlist"] = "%.2f" % rlist
             self.gmx_defs["coulombtype"] = "pme"
-            self.gmx_defs["rcoulomb"] = "%.2f" % rlist
+            #self.gmx_defs["rcoulomb"] = "%.2f" % rlist
+            gmx_opts["rcoulomb"] = "%.2f" % rvdw
             # self.gmx_defs["coulombtype"] = "pme-switch"
             # self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
             # self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
-            self.gmx_defs["vdwtype"] = "switch"
-            self.gmx_defs["rvdw"] = "%.2f" % rvdw
+            #self.gmx_defs["vdwtype"] = "switch"
+            #self.gmx_defs["vdwtype"] = "Cut-off"
+            #self.gmx_defs["vdw_modifier"] = "Potential-switch"
+            #self.gmx_defs["rvdw"] = "%.2f" % rvdw
+            gmx_opts["rvdw"] = "%.2f" % rvdw
+            #gmx_opts["rvdw"] = "%.2f" % rlist
             self.gmx_defs["rvdw_switch"] = "%.2f" % rvdw_switch
             self.gmx_defs["DispCorr"] = "EnerPres"
         else:
@@ -1259,7 +1264,7 @@ class GMX(Engine):
 
         # In gromacs version 5, default cutoff scheme becomes verlet. 
         # Need to set to group for backwards compatibility
-        md_defs["cutoff-scheme"] = 'group'
+        md_defs["cutoff-scheme"] = 'verlet'
         md_opts["nstenergy"] = nsave
         md_opts["nstcalcenergy"] = nsave
         md_opts["nstxout"] = nsave
