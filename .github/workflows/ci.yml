@@ -22,15 +22,12 @@ jobs:
           - macOS-latest
           - ubuntu-latest
         python-version:
-          - "3.8"
-          - "3.9"
           - "3.10"
           - "3.11"
           - "3.12"
 
     env:
       CI_OS: ${{ matrix.os }}
-      PYVER: ${{ matrix.python-version }}
       PACKAGE: forcebalance
 
     steps:
@@ -56,15 +53,6 @@ jobs:
         conda info --all
         conda list
 
-#       Need to replace ndcctools with this block
-#    - name: Install Work Queue
-#      run: |
-#        wget https://raw.githubusercontent.com/leeping/forcebalance/master/tools/install-cctools.sh
-#        bash install-cctools.sh
-#        echo "Checking for Work Queue import; if successful, no message will be printed"
-#        python -c "import work_queue"
-#        export PATH="$GITHUB_WORKSPACE/opt/cctools/current/bin:$PATH"
-
     - name: Install Tinker
       run: |
         if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
@@ -84,24 +72,6 @@ jobs:
         fi
 
         echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
-
-    - name: Install Gromacs
-      run: |
-        wget http://ftp.gromacs.org/pub/gromacs/gromacs-5.1.5.tar.gz
-        tar xvzf gromacs-5.1.5.tar.gz
-        cd gromacs-5.1.5
-        cp -r cmake cmake_s
-        cd cmake
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
-        make -j 8 && make install
-        cd ../cmake_s
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
-        make -j 8 && make install
-        cd ..
-        . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
-        echo "$GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin" >> $GITHUB_PATH
-        which gmx
-        which gmx_d
 
     - name: Extract data archives
       run: |
