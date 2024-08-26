@@ -32,9 +32,6 @@ class TestWaterTutorial(ForceBalanceTestCase):
 
     def test_liquid(self):
         """Check liquid target with existing simulation data"""
-        if sys.version_info <= (2,7):
-            pytest.skip("Existing pickle file only works with Python 3")
-
         self.logger.debug("Setting input file to 'single.in'\n")
         input_file ='single.in'
 
