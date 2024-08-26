@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 from builtins import str
-import os, sys, shutil
+import os, shutil
 from .__init__ import ForceBalanceTestCase
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
@@ -36,6 +36,9 @@ class TestWaterTutorial(ForceBalanceTestCase):
 
     def test_continue(self):
         """Check continuation from a previous run"""
+        if not shutil.which("gmx"):
+            pytest.skip("Skipping test, GROMACS executable `gmx` not found.")
+
         self.logger.debug("\nSetting input file to 'test_continue.in'\n")
         input_file='test_continue.in'
 

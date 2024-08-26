@@ -1325,11 +1325,13 @@ def remove_if_exists(fnm):
         os.remove(fnm)
 
 def which(fnm):
-    # Get the location of a file.  Works only on UNIX-like file systems.
-    try:
-        return os.path.split(os.popen('which %s 2> /dev/null' % fnm).readlines()[0].strip())[0]
-    except:
+    """Get the location of a file."""
+    path = shutil.which(fnm)
+
+    if path is None:
         return ''
+    else:
+        return path
 
 def copy_tree_over(src, dest):
     """
