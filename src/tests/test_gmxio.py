@@ -1,10 +1,14 @@
-from __future__ import absolute_import
+import pytest
 import forcebalance
 import shutil
 from .test_target import TargetTests # general targets tests defined in test_target.py
+
+from forcebalance.gmxio import has_gromacs
+
 """
 The testing functions for this class are located in test_target.py.
 """
+@pytest.mark.skipif(has_gromacs is None, reason="Gromacs not found, skipping AbInitio_GMX tests")
 class TestAbInitio_GMX(TargetTests):
     def setup_method(self, method):
         super(TestAbInitio_GMX, self).setup_method(method)
@@ -28,4 +32,3 @@ class TestAbInitio_GMX(TargetTests):
     def teardown_method(self):
         shutil.rmtree('temp')
         super(TestAbInitio_GMX, self).teardown_method()
-

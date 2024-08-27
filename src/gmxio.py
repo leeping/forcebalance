@@ -5,9 +5,6 @@
 @author Lee-Ping Wang
 @date 12/2011
 """
-from __future__ import division
-from __future__ import print_function
-
 from builtins import zip
 from builtins import str
 from builtins import range
@@ -32,10 +29,13 @@ import itertools
 from collections import defaultdict, OrderedDict
 import traceback
 import random
-#import IPython
+import shutil
 
 from forcebalance.output import getLogger
 logger = getLogger(__name__)
+
+has_gromacs: str | None = shutil.which("gmx")
+
 
 def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
     """
@@ -551,37 +551,6 @@ class GMX(Engine):
         if 'gmx_eq_barostat' in kwargs:
             self.gmx_eq_barostat = kwargs['gmx_eq_barostat']
 
-        ## The directory containing GROMACS executables (e.g. mdrun)
-        havegmx = False
-        if 'gmxpath' in kwargs:
-            self.gmxpath = kwargs['gmxpath']
-
-            if type(self.gmxpath) is str and len(self.gmxpath) > 0:
-                ## Figure out the GROMACS version - it will determine how programs are called.
-                if os.path.exists(os.path.join(self.gmxpath,"gmx"+self.gmxsuffix)):
-                    self.gmxversion = 5
-                    havegmx = True
-                elif os.path.exists(os.path.join(self.gmxpath,"mdrun"+self.gmxsuffix)):
-                    self.gmxversion = 4
-                    havegmx = True
-                else:
-                    warn_press_key("The mdrun executable indicated by %s doesn't exist! (Check gmxpath and gmxsuffix)" \
-                                   % os.path.join(self.gmxpath,"mdrun"+self.gmxsuffix))
-
-        if not havegmx:
-            warn_once("The 'gmxpath' option was not specified; using default.")
-            if which('gmx'+self.gmxsuffix) != '':
-                self.gmxpath = which('gmx'+self.gmxsuffix)
-                self.gmxversion = 5
-                havegmx = True
-            elif which('mdrun'+self.gmxsuffix) != '':
-                self.gmxpath = which('mdrun'+self.gmxsuffix)
-                self.gmxversion = 4
-                havegmx = True
-            else:
-                warn_press_key("Please add GROMACS executables to the PATH or specify gmxpath.")
-                logger.error("Cannot find the GROMACS executables!\n")
-                raise RuntimeError
 
     def readsrc(self, **kwargs):
         """ Called by __init__ ; read files from the source directory. """
