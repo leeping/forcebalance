@@ -35,7 +35,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set up conda environment
-      uses: mamba-org/setup-micromamba@v1
+      uses: mamba-org/setup-micromamba@v2
       with:
         environment-file: devtools/conda-envs/test_env.yaml
         create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
