@@ -973,8 +973,8 @@ class GMX(Engine):
             self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
             val = []
             for line in open("%s-f.xvg" % self.name).readlines():
+                val2 = []
                 for i, j in enumerate(line.split()[1:]):
-                    val2 = []
                     if self.AtomMask[int(i / 3)]:
                         val2.append(float(j))
                 val.append(val2)
