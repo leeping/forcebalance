@@ -765,6 +765,17 @@ class GMX(Engine):
                 ai = [int(i) for i in line.split("{")[1].split("}")[0].split("..")]
                 mn = int(line.split('[')[1].split(']')[0])
                 for i in range(ai[1]-ai[0]+1) : self.AtomLists['MoleculeNumber'].append(mn)
+        #import parmed
+        #struct = parmed.load_file('%s.top' % self.name)
+        #for atom in struct.atoms:
+        #    self.AtomMask.append(atom.mass != 0)
+        #    self.AtomLists['ResidueNumber'].append(atom.residue.number)
+        #    if atom.mass == 0:
+        #        self.AtomLists['ParticleType'].append('vsite')
+        #    else:
+        #        self.AtomLists['ParticleType'].append('atom')
+        #    self.AtomLists['Charge'].append(atom.charge)
+        #    self.AtomLists['Mass'].append(atom.mass)
         os.unlink('mdout.mdp')
         os.unlink('%s.tpr' % self.name)
         if hasattr(self,'FF') and itptmp:
@@ -785,6 +796,11 @@ class GMX(Engine):
                 charge = float(s[s.index("q=")+1].replace(',','').lower())
                 charges.append(charge)
         os.unlink('%s.tpr' % self.name)
+        #import parmed
+        #struct = parmed.load_file('%s.top' % self.name)
+        #for atom in struct.atoms:
+        #    charges.append(atom.charge)
+
         return np.array(charges)
 
     def links(self):
@@ -955,8 +971,19 @@ class GMX(Engine):
         ## Calculate and record force
         if force:
             self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
-            Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[int(i/3)]] \
-                                        for line in open("%s-f.xvg" % self.name).readlines()])
+            val = []
+            for line in open("%s-f.xvg" % self.name).readlines():
+                for i, j in enumerate(line.split()[1:]):
+                    val2 = []
+                    if self.AtomMask[int(i / 3)]:
+                        val2.append(float(j))
+                val.append(val2)
+            Result["Force"] = np.array(val)
+            #import ipdb; ipdb.set_trace()
+
+
+            #Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[int(i/3)]] \
+            #                            for line in open("%s-f.xvg" % self.name).readlines()])
         ## Calculate and record dipole
         if dipole:
             self.callgmx("g_dipoles -s %s.tpr -f %s -o %s-d.xvg -xvg no" % (self.name, traj if traj else '%s.gro' % self.name, self.name), stdin="System\n")
