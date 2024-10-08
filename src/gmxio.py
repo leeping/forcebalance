@@ -971,19 +971,19 @@ class GMX(Engine):
         ## Calculate and record force
         if force:
             self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
-            val = []
-            for line in open("%s-f.xvg" % self.name).readlines():
-                val2 = []
-                for i, j in enumerate(line.split()[1:]):
-                    if self.AtomMask[int(i / 3)]:
-                        val2.append(float(j))
-                val.append(val2)
-            Result["Force"] = np.array(val)
+            #val = []
+            #for line in open("%s-f.xvg" % self.name).readlines():
+            #    val2 = []
+            #    for i, j in enumerate(line.split()[1:]):
+            #        if self.AtomMask[int(i / 3)]:
+            #            val2.append(float(j))
+            #    val.append(val2)
+            #Result["Force"] = np.array(val)
             #import ipdb; ipdb.set_trace()
 
 
-            #Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[int(i/3)]] \
-            #                            for line in open("%s-f.xvg" % self.name).readlines()])
+            Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[int(i/3)]] \
+                                        for line in open("%s-f.xvg" % self.name).readlines()])
         ## Calculate and record dipole
         if dipole:
             self.callgmx("g_dipoles -s %s.tpr -f %s -o %s-d.xvg -xvg no" % (self.name, traj if traj else '%s.gro' % self.name, self.name), stdin="System\n")
