@@ -21,11 +21,12 @@ dependencies:
   - openmm =8
   - ambertools
   - ndcctools
-  - geometric
+  - geometric ==1.0
   - gromacs >=2024.3
   - openff-toolkit =0.12.1
   - openff-interchange =0.2.3
   - openff-evaluator-base =0.4.3
   - pint =0.20
+  - zstandard =0.18
   # - openff-recharge
   # - openeye-toolkits (Don't have a license file to use with GH Actions.)
