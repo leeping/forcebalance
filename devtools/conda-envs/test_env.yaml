@@ -1,7 +1,6 @@
 name: forcebalance-test
 channels:
   - conda-forge
-  - bioconda
   - openeye
 dependencies:
     # Base depends
@@ -19,13 +18,15 @@ dependencies:
   - swig
   - future
   - pymbar =3
-  - openmm >= 8
+  - openmm =8
   - ambertools
   - ndcctools
-  - geometric
-  # - gromacs =2019.1
-  - openff-toolkit >=0.11.3
-  - openff-evaluator-base >= 0.4.1
+  - geometric ==1.0
+  - gromacs >=2024.3
+  - openff-toolkit =0.12.1
+  - openff-interchange =0.2.3
+  - openff-evaluator-base =0.4.3
   - pint =0.20
+  - zstandard =0.18
   # - openff-recharge
   # - openeye-toolkits (Don't have a license file to use with GH Actions.)
