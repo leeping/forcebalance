@@ -68,7 +68,7 @@ jobs:
         if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
           wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
         fi
-        if [[ "$CI_OS" == 'macOS-latest' ]]; then
+        if [[ "$CI_OS" == 'macOS-12' ]]; then
           wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
         fi
         tar xvzf tinker.tar.gz &> untar.log
