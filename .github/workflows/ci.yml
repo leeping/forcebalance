@@ -19,7 +19,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macOS-latest
+          #- macOS-latest
+          - macOS-12
           - ubuntu-latest
         python-version:
           - "3.8"
@@ -76,7 +77,10 @@ jobs:
         if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
           mv bin-linux $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
         fi
-        if [[ "$CI_OS" == 'macOS-latest' ]]; then
+        #if [[ "$CI_OS" == 'macOS-latest' ]]; then
+        #  mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
+        #fi
+        if [[ "$CI_OS" == 'macOS-12' ]]; then
           mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
         fi
 
