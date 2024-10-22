@@ -131,7 +131,7 @@ class TestWaterTutorial(ForceBalanceSystemTest):
         self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
         self.expected_results_name = "EXPECTED_WATER_RESULTS"
         self.expected_results = EXPECTED_WATER_RESULTS
-        self.absolute_tolerance = 0.005
+        self.absolute_tolerance = 0.001
 
     def test_water_tutorial(self):
         """Check water tutorial study runs without errors"""
