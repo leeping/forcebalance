@@ -24,7 +24,7 @@ jobs:
           #- macOS-12 # osx-64
           #- ubuntu-20.04
           #- ubuntu-22.04
-          #- ubuntu-24.04
+          - ubuntu-24.04
         python-version:
           #- "3.8"
           - "3.9"
@@ -44,7 +44,7 @@ jobs:
         environment-file: devtools/conda-envs/test_env.yaml
         create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
           python=${{ matrix.python-version }}
-          --platform osx-64
+          #--platform osx-64
           
     - name: Additional info about the build
       shell: bash
