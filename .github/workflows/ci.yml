@@ -44,8 +44,7 @@ jobs:
         environment-file: devtools/conda-envs/test_env.yaml
         create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
           python=${{ matrix.python-version }}
-          #--platform osx-64
-          
+
     - name: Additional info about the build
       shell: bash
       run: |
