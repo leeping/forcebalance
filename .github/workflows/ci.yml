@@ -19,14 +19,11 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - macOS-15 # osx-arm64
-          #- macOS-13 # osx-64
-          #- macOS-12 # osx-64
-          #- ubuntu-20.04
-          #- ubuntu-22.04
-          - ubuntu-24.04
+          - macOS-latest # osx-arm64
+          - macOS-13 # osx-64
+          - ubuntu-latest # intel-64 presumably
         python-version:
-          #- "3.8"
+          - "3.8"
           - "3.9"
 
     env:
@@ -68,71 +65,29 @@ jobs:
 
     - name: Install Tinker
       run: |
-        if [[ "$CI_OS" == 'ubuntu-20.04' ]]; then
+        if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
           wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
-        fi
-        if [[ "$CI_OS" == 'ubuntu-22.04' ]]; then
-          wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
-        fi
-        if [[ "$CI_OS" == 'ubuntu-24.04' ]]; then
-          wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
-        fi
-        if [[ "$CI_OS" == 'macOS-12' ]]; then
-          wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
         fi
         if [[ "$CI_OS" == 'macOS-13' ]]; then
           wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
         fi
-        if [[ "$CI_OS" == 'macOS-14' ]]; then
-          wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
-        fi
-        if [[ "$CI_OS" == 'macOS-15' ]]; then
+        if [[ "$CI_OS" == 'macOS-latest' ]]; then
           wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
         fi
         tar xvzf tinker.tar.gz &> untar.log
 
         mkdir -p $GITHUB_WORKSPACE/opt/tinker/8.8.3
-        if [[ "$CI_OS" == 'ubuntu-20.04' ]]; then
+        if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
           mv bin-linux $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
-        fi
-        if [[ "$CI_OS" == 'ubuntu-22.04' ]]; then
-          mv bin-linux $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
-        fi
-        if [[ "$CI_OS" == 'ubuntu-24.04' ]]; then
-          mv bin-linux $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
-        fi
-        if [[ "$CI_OS" == 'macOS-12' ]]; then
-          mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
         fi
         if [[ "$CI_OS" == 'macOS-13' ]]; then
           mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
         fi
-        if [[ "$CI_OS" == 'macOS-14' ]]; then
-          mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
-        fi
-        if [[ "$CI_OS" == 'macOS-15' ]]; then
+        if [[ "$CI_OS" == 'macOS-latest' ]]; then
           mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
         fi
 
         echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
-
-    #- name: Install Gromacs
-    #  run: |
-    #    wget http://ftp.gromacs.org/pub/gromacs/gromacs-5.1.5.tar.gz
-    #    tar xvzf gromacs-5.1.5.tar.gz
-    #    cd gromacs-5.1.5
-    #    cp -r cmake cmake_s
-    #    cd cmake
-    #    cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
-    #    make -j 8 && make install
-    #    cd ../cmake_s
-    #    cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
-    #    make -j 8 && make install
-    #    cd ..
-    #    . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
-    #    echo "$GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin" >> $GITHUB_PATH
-    #    which gmx
-    #    which gmx_d
 
     - name: Extract data archives
       run: |
