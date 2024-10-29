@@ -20,7 +20,6 @@ jobs:
       matrix:
         os:
           - macOS-latest # osx-arm64
-          - macOS-13 # osx-64
           - ubuntu-latest # intel-64 presumably
         python-version:
           - "3.8"
@@ -68,9 +67,6 @@ jobs:
         if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
           wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
         fi
-        if [[ "$CI_OS" == 'macOS-13' ]]; then
-          wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
-        fi
         if [[ "$CI_OS" == 'macOS-latest' ]]; then
           wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
         fi
@@ -79,9 +75,6 @@ jobs:
         mkdir -p $GITHUB_WORKSPACE/opt/tinker/8.8.3
         if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
           mv bin-linux $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
-        fi
-        if [[ "$CI_OS" == 'macOS-13' ]]; then
-          mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
         fi
         if [[ "$CI_OS" == 'macOS-latest' ]]; then
           mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
