@@ -640,12 +640,8 @@ class GMX(Engine):
             # self.gmx_defs["coulombtype"] = "pme-switch"
             # self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
             # self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
-            #self.gmx_defs["vdwtype"] = "switch"
-            #self.gmx_defs["vdwtype"] = "Cut-off"
-            #self.gmx_defs["vdw_modifier"] = "Potential-switch"
             #self.gmx_defs["rvdw"] = "%.2f" % rvdw
             gmx_opts["rvdw"] = "%.2f" % rvdw
-            #gmx_opts["rvdw"] = "%.2f" % rlist
             self.gmx_defs["rvdw_switch"] = "%.2f" % rvdw_switch
             self.gmx_defs["DispCorr"] = "EnerPres"
         else:
@@ -669,7 +665,6 @@ class GMX(Engine):
             gmx_opts["rcoulomb"] = "5.0"
             gmx_opts["vdwtype"] = "cut-off"
             gmx_opts["rvdw"] = "5.0"
-            #gmx_opts["box"] = "15.0 15.0 15.0"
 
         ## Link files into the temp directory.
         if self.top is not None:
@@ -766,17 +761,6 @@ class GMX(Engine):
                 ai = [int(i) for i in line.split("{")[1].split("}")[0].split("..")]
                 mn = int(line.split('[')[1].split(']')[0])
                 for i in range(ai[1]-ai[0]+1) : self.AtomLists['MoleculeNumber'].append(mn)
-        #import parmed
-        #struct = parmed.load_file('%s.top' % self.name)
-        #for atom in struct.atoms:
-        #    self.AtomMask.append(atom.mass != 0)
-        #    self.AtomLists['ResidueNumber'].append(atom.residue.number)
-        #    if atom.mass == 0:
-        #        self.AtomLists['ParticleType'].append('vsite')
-        #    else:
-        #        self.AtomLists['ParticleType'].append('atom')
-        #    self.AtomLists['Charge'].append(atom.charge)
-        #    self.AtomLists['Mass'].append(atom.mass)
         os.unlink('mdout.mdp')
         os.unlink('%s.tpr' % self.name)
         if hasattr(self,'FF') and itptmp:
@@ -797,11 +781,6 @@ class GMX(Engine):
                 charge = float(s[s.index("q=")+1].replace(',','').lower())
                 charges.append(charge)
         os.unlink('%s.tpr' % self.name)
-        #import parmed
-        #struct = parmed.load_file('%s.top' % self.name)
-        #for atom in struct.atoms:
-        #    charges.append(atom.charge)
-
         return np.array(charges)
 
     def links(self):
@@ -972,17 +951,6 @@ class GMX(Engine):
         ## Calculate and record force
         if force:
             self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
-            #val = []
-            #for line in open("%s-f.xvg" % self.name).readlines():
-            #    val2 = []
-            #    for i, j in enumerate(line.split()[1:]):
-            #        if self.AtomMask[int(i / 3)]:
-            #            val2.append(float(j))
-            #    val.append(val2)
-            #Result["Force"] = np.array(val)
-            #import ipdb; ipdb.set_trace()
-
-
             Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[int(i/3)]] \
                                         for line in open("%s-f.xvg" % self.name).readlines()])
         ## Calculate and record dipole
