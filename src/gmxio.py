@@ -540,6 +540,7 @@ class GMX(Engine):
         os.environ["GMX_NO_SOLV_OPT"] = "TRUE"
         os.environ["GMX_NO_ALLVSALL"] = "TRUE"
 
+        kwargs['gmxsuffix'] = '_d'
         ## The suffix to GROMACS executables, e.g. '_d' for double precision.
         if 'gmxsuffix' in kwargs:
             self.gmxsuffix = kwargs['gmxsuffix']
