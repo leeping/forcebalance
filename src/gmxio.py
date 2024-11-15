@@ -621,7 +621,7 @@ class GMX(Engine):
             if 'nonbonded_cutoff' in kwargs:
                 rlist = kwargs['nonbonded_cutoff'] / 10
             # Gromacs likes rvdw to be a bit smaller than rlist
-            rvdw = rlist - 0.05
+            rvdw = rlist# - 0.05
             if rlist > 0.05*(float(int(minbox - 1))):
                 warn_press_key("nonbonded_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (rlist*10, minbox))
             # Override with user-provided vdw_cutoff if exist
@@ -635,8 +635,9 @@ class GMX(Engine):
             self.gmx_defs["nstlist"] = 20
             self.gmx_defs["rlist"] = "%.2f" % rlist
             self.gmx_defs["coulombtype"] = "pme"
-            #self.gmx_defs["rcoulomb"] = "%.2f" % rlist
-            gmx_opts["rcoulomb"] = "%.2f" % rvdw
+            #self.gmx_defs["rcoulomb"] = "%.2f" % rvdw
+            gmx_opts["rcoulomb"] = "%.2f" % rlist
+
             # self.gmx_defs["coulombtype"] = "pme-switch"
             # self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
             # self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
