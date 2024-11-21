@@ -255,6 +255,7 @@ class Liquid(Target):
         # Read the 'data.csv' file. The file should contain guidelines.
         with open(os.path.join(self.tgtdir,'data.csv'),'r') as f: R0 = list(csv.reader(f))
         # All comments are erased.
+        R0=[i for i in R0 if len(i)>0] # remove lines without any content first, otherwise it crashes
         R1 = [[sub('#.*$','',word) for word in line] for line in R0 if len(line[0]) > 0 and line[0][0] != "#"]
         # All empty lines are deleted and words are converted to lowercase.
         R = [[wrd.lower() for wrd in line] for line in R1 if any([len(wrd) for wrd in line]) > 0]
@@ -386,8 +387,13 @@ class Liquid(Target):
                         mol2_send = self.mol2
                 else:
                     mol2_send = []
+                inputs=self.nptfiles + self.scripts + mol2_send
+                #for input in inputs:
+                #    if '.xyz' in input:
+                #        output=input.replace('.xyz','.arc')
+                #        self.extra_output.append(output)
                 queue_up(wq, command = cmdstr+' > npt.out 2>&1 ',
-                         input_files = self.nptfiles + self.scripts + mol2_send + ['forcebalance.p'],
+                         input_files = inputs + ['forcebalance.p'],
                          output_files = ['npt_result.p', 'npt.out'] + self.extra_output, tgt=self)
 
     def nvt_simulation(self, temperature):
@@ -408,8 +414,14 @@ class Liquid(Target):
                         mol2_send = self.mol2
                 else:
                     mol2_send = []
+                inputs=self.nvtfiles + self.scripts + mol2_send
+                #for input in inputs:
+                #    if '.xyz' in input:
+                #        output=input.replace('.xyz','.arc')
+                #        self.extra_output.append(output)
+
                 queue_up(wq, command = cmdstr+' > nvt.out 2>&1 ',
-                         input_files = self.nvtfiles + self.scripts + mol2_send + ['forcebalance.p'],
+                         input_files = inputs + ['forcebalance.p'],
                          output_files = ['nvt_result.p', 'nvt.out'] + self.extra_output, tgt=self)
 
     def polarization_correction(self,mvals):
