@@ -20,7 +20,7 @@ jobs:
       matrix:
         os:
           - macOS-latest # osx-arm64
-          - ubuntu-latest # intel-64 presumably
+          - ubuntu-latest # intel-64
         python-version:
           - "3.8"
           - "3.9"
@@ -95,7 +95,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml -k "not TestEvaluatorBromineStudy" src/tests/
+        pytest -vx --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml -k "not TestEvaluatorBromineStudy" src/tests/
 
     - name: Run water study
       run: |
