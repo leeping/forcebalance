@@ -654,25 +654,52 @@ class GMX(Engine):
             from forcebalance.molecule import Box
             from numpy import array
             for i in range(len(self.mol.boxes)):
+                # This makes test_engine.py::TestAmber99SB::test_optimized_geometries pass (at atol=0.005)
+                # But makes the below water tutorial fail with the following error message:
+                # (when running ['gmx_d', 'mdrun', '-deffnm', 'gmx', '-nt', '1', '-rerunvsite', '-rerun', 'gmx-all.gro'])
+                # Standard library logic error (bug):
+                # (exception type: St12length_error)
+                # vector
+
+                # self.mol.boxes[i] = Box(a=99999.0, b=99999.0, c=99999.0,
+                #                         alpha=90.0, beta=90.0, gamma=90.0,
+                #                         A=array([99999.0, 0., 0.]),
+                #                         B=array([0., 99999.0, 0.]),
+                #                         C=array([0., 0., 99999.0]),
+                #                         V=1000000000000)
+
+
+                # This makes test_system.py::TestWaterTutorial::test_water_tutorial pass
+                # But it makes the optimized geometry test fail with
+                # E           AssertionError:
+                # E           Not equal to tolerance rtol=0, atol=0.005
+                # E           GMX optimized energies do not match the reference
+                # E           Mismatched elements: 1 / 1 (100%)
+                # E           Max absolute difference: 3.3206305
+                # E           Max relative difference: 0.04965867
+                # E            x: array(-70.189723)
+                # E            y: array(-66.869092)
                 self.mol.boxes[i] = Box(a=9999.0, b=9999.0, c=9999.0,
-                                    alpha= 90.0, beta=90.0, gamma=90.0,
-                                    A=array([9999.0,   0.,   0.]),
-                                    B=array([0.,   9999.0,   0.]),
-                                    C=array([0., 0., 9999.0]),
-                                    V=1000000000000)
+                                        alpha=90.0, beta=90.0, gamma=90.0,
+                                        A=array([9999.0, 0., 0.]),
+                                        B=array([0., 9999.0, 0.]),
+                                        C=array([0., 0., 9999.0]),
+                                        V=1000000000000)
             gmx_opts["pbc"] = "xyz"
             gmx_opts["coulombtype"] = "cut-off"
+            gmx_opts["vdwtype"] = "cut-off"
+            gmx_opts["nstlist"] = 20
 
-            # This makes TestWaterTutorial::test_water_tutorial pass
+            # This makes test_system.py::TestWaterTutorial::test_water_tutorial pass
             gmx_opts["rcoulomb"] = "5.0"
             gmx_opts["rvdw"] = "5.0"
 
             # This makes test_engine.py::TestAmber99SB::test_optimized_geometries pass
-            # gmx_opts["rcoulomb"] = "4750.0"
-            # gmx_opts["rvdw"] = "4750.0"
+            #gmx_opts["rcoulomb"] = "4500.0"
+            #gmx_opts["rvdw"] = "4500.0"
 
             # Maybe gmx_defs+commenting sections in input mdps is a way to thread the needle and get both to pass?
-            #self.gmx_defs['rcoulomb'] = "4750.0"
+            # self.gmx_defs['rcoulomb'] = "4750.0"
             # self.gmx_defs['rvdw'] = "4750.0"
 
             gmx_opts["vdwtype"] = "cut-off"
