@@ -160,9 +160,16 @@ class TestAmber99SB(ForceBalanceTestCase):
         for n1 in self.engines.keys():
             print("%s vs Reference energies:" % n1, Data[n1][0], RefData[0])
         for n1 in self.engines.keys():
-            np.testing.assert_allclose(Data[n1][0], RefData[0], rtol=0, atol=0.001,
+            # As of 2020, Gromacs no longer offers true vacuum conditions, so switching to
+            # pseudovacuum makes the results of this test deviate a bit.
+            if n1 == "GMX":
+                atol = 0.005
+            else:
+                atol = 0.001
+
+            np.testing.assert_allclose(Data[n1][0], RefData[0], rtol=0, atol=atol,
                                    err_msg="%s optimized energies do not match the reference" % n1)
-            np.testing.assert_allclose(Data[n1][1], RefData[1], rtol=0, atol=0.001,
+            np.testing.assert_allclose(Data[n1][1], RefData[1], rtol=0, atol=atol,
                                    err_msg="%s RMSD from starting structure do not match the reference" % n1)
 
     def test_interaction_energies(self):
