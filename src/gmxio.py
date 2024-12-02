@@ -702,31 +702,6 @@ class GMX(Engine):
             # self.gmx_defs['rcoulomb'] = "4750.0"
             # self.gmx_defs['rvdw'] = "4750.0"
 
-            gmx_opts["vdwtype"] = "cut-off"
-            gmx_opts["nstlist"] = 20
-
-            #gmx_opts["pbc"] = "xyz"
-            #gmx_opts["pbc"] = "no"
-            #gmx_opts["pbc"] = "xy"
-            #gmx_opts["ns_type"] = "simple"
-            #del self.gmx_defs["ns_type"]
-            #gmx_opts["nstlist"] = 20
-            #del self.gmx_defs["nstlist"]
-            #gmx_opts["coulombtype"] = "pme"
-            #gmx_opts["coulombtype"] = "cut-off"
-            #gmx_opts["coulombtype"] = "reaction-field"
-            #gmx_opts["rlist"] = "4499"
-            #gmx_opts["epsilon-rf"] = "1.0"
-            #gmx_opts["epsilon-rf"] = "1.01"
-            #gmx_opts["coulomb-modifier"] = "potential-shift"
-            #gmx_opts["rcoulomb"] = "4499"
-            #gmx_opts["rcoulomb"] = "100"
-            #gmx_opts["vdwtype"] = "cut-off"
-            #gmx_opts["rvdw"] = "4499"
-            #gmx_opts["rvdw"] = "100"
-            #gmx_opts["fourierspacing"] = "10"
-            #gmx_opts["pme-order"] = "3"
-
 
         ## Link files into the temp directory.
         if self.top is not None:
@@ -861,15 +836,21 @@ class GMX(Engine):
         ## files which don't exist at object creation)
         self.links()
         ## Call a GROMACS program as you would from the command line.
+        #command = command.replace("mdrun", 'mdrun -reprod -nb cpu -pme cpu -ntmpi 1')
         csplit = command.split()
         prog = os.path.join(self.gmxpath, csplit[0])
+        #prog = os.path.join('gmx_d', csplit[0])
+
         if self.gmxversion == 5:
             csplit[0] = csplit[0].replace('g_','').replace('gmxdump','dump')
             csplit = ['gmx' + self.gmxsuffix] + csplit
+            #csplit = ['GMX_FORCE_CPU=true gmx' + self.gmxsuffix] + csplit
         elif self.gmxversion == 4:
             csplit[0] = prog + self.gmxsuffix
         else:
             raise RuntimeError('gmxversion can only be 4 or 5')
+        #csplit = ["GMX_USE_REF_KERNEL=1", "GMX_CPU_ACCELERATION=None", "FENV_ACCESS=STRICT"] + csplit
+        print(csplit)
         return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
 
     def warngmx(self, command, warnings=[], maxwarn=1, **kwargs):
