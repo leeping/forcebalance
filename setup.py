@@ -96,6 +96,7 @@ def buildKeywordDictionary(args):
     setupKeywords["ext_modules"]       = [DCD]
     setupKeywords["platforms"]         = ["Linux"]
     setupKeywords["description"]       = "Automated force field optimization."
+    setupKeywords["install_requires"]  = ["packaging"]
     # setupKeywords["install_requires"]  = ['networkx>=1.9,<2.0', 'decorator>=3.4.0']
     setupKeywords["long_description"]  = """
 
