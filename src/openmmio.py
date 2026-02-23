@@ -444,7 +444,7 @@ def UpdateSimulationParameters(src_system, dest_simulation):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
             try:
                 dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
-            except OpenMMException:
+            except OpenMMException as e:
                 # if this fails for any reason, such as the issue below, then we reinitialize instead
                 # https://github.com/openmm/openmm/issues/5204
                 dest_simulation.context.reinitialize(preserveState=True)
