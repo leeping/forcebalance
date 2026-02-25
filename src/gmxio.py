@@ -717,7 +717,9 @@ class GMX(Engine):
         edit_mdp(fin=self.mdp, fout="%s.mdp" % self.name, options=gmx_opts, defaults=self.gmx_defs)
 
         ## Call grompp followed by gmxdump to read the trajectory
-        o = self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name), warnings=warnings)
+        grompp_command = "grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name)
+        o = self.warngmx(grompp_command, warnings=warnings)
+        self._require_output_file('%s.tpr' % self.name, grompp_command)
         self.double = 0
         for line in o:
             if 'double precision' in line:
@@ -758,7 +760,9 @@ class GMX(Engine):
 
     def get_charges(self):
         # Call gmxdump to get system information and read the charges.
-        self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
+        grompp_command = "grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name)
+        self.warngmx(grompp_command)
+        self._require_output_file('%s.tpr' % self.name, grompp_command)
         o = self.callgmx("gmxdump -s %s.tpr -sys" % self.name, copy_stderr=True)
         # List of charges obtained from reading gmxdump.
         charges = []
@@ -777,6 +781,11 @@ class GMX(Engine):
         LinkFile(topfile, "%s.top" % self.name)
         mdpfile = onefile('%s.mdp' % self.name, 'mdp', err=True)
         LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
+
+    def _require_output_file(self, filename, command):
+        if not os.path.isfile(filename):
+            logger.error("Expected output file '%s' was not created by command: %s\n" % (filename, command))
+            raise RuntimeError
 
     def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
 
@@ -813,6 +822,7 @@ class GMX(Engine):
             csplit += ['-maxwarn', '%i' % maxwarn]
         command = ' '.join(csplit)
         o = self.callgmx(command, persist=True, copy_stderr=True, print_error=False, **kwargs)
+        returncode = _exec.returncode
         warnthis = []
         fatal = 0
         warn = 0
@@ -837,6 +847,11 @@ class GMX(Engine):
             for line in o:
                 logger.error(line+'\n')
             logger.error('grompp encountered a fatal error!\n')
+            raise RuntimeError
+        elif returncode != 0:
+            for line in o:
+                logger.error(line+'\n')
+            logger.error('grompp returned a nonzero exit code (%i) without a recognized fatal error marker.\n' % returncode)
             raise RuntimeError
         return o
 
