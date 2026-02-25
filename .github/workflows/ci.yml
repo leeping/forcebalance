@@ -51,8 +51,8 @@ jobs:
 
     - name: Environment Information
       run: |
-        conda info --all
-        conda list
+        micromamba info
+        micromamba list
 
 #       Need to replace ndcctools with this block
 #    - name: Install Work Queue
