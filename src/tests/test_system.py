@@ -213,11 +213,11 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
                     % self.estimator_process.returncode
                 )
             try:
-                with socket.create_connection(("127.0.0.1", 8012), timeout=1):
+                with socket.create_connection(("127.0.0.1", 8000), timeout=1):
                     return
             except OSError:
                 time.sleep(1)
-        raise RuntimeError("Timed out waiting for Evaluator server on 127.0.0.1:8012")
+        raise RuntimeError("Timed out waiting for Evaluator server on 127.0.0.1:8000")
 
     def teardown_method(self):
         try:
