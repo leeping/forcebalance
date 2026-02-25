@@ -27,6 +27,7 @@ dependencies:
   # - openff-evaluator >= 0.4.1
   # - openff-recharge
   # - openeye-toolkits (Don't have a license file to use with GH Actions.)
+  - pint <0.25
 
   - pip:
     # install branch of evaluator
