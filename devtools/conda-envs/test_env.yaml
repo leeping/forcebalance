@@ -30,7 +30,7 @@ dependencies:
   - pint <0.25
 
   # evaluator dependencies
-  - dask >=2.7.0
+  - dask ==2024.2.1
   - distributed >=2.7.0
   - dask-jobqueue >=0.8.0
   - dask-kubernetes
