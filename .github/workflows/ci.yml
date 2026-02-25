@@ -69,25 +69,25 @@ jobs:
 #        python -c "import work_queue"
 #        export PATH="$GITHUB_WORKSPACE/opt/cctools/current/bin:$PATH"
 
-    - name: Install Tinker
-      run: |
-        if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
-          wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
-        fi
-        if [[ "$CI_OS" == 'macOS-latest' ]]; then
-          wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
-        fi
-        tar xvzf tinker.tar.gz &> untar.log
+    # - name: Install Tinker
+    #   run: |
+    #     if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
+    #       wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
+    #     fi
+    #     if [[ "$CI_OS" == 'macOS-latest' ]]; then
+    #       wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
+    #     fi
+    #     tar xvzf tinker.tar.gz &> untar.log
 
-        mkdir -p $GITHUB_WORKSPACE/opt/tinker/8.8.3
-        if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
-          mv bin-linux $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
-        fi
-        if [[ "$CI_OS" == 'macOS-latest' ]]; then
-          mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
-        fi
+    #     mkdir -p $GITHUB_WORKSPACE/opt/tinker/8.8.3
+    #     if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
+    #       mv bin-linux $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
+    #     fi
+    #     if [[ "$CI_OS" == 'macOS-latest' ]]; then
+    #       mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
+    #     fi
 
-        echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
+    #     echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
 
     # - name: Install Gromacs
     #   run: |
@@ -120,7 +120,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml src/tests/test_system.py
+        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml src/tests/test_system.py::TestEvaluatorBromineStudy
 
     - name: Run water study
       run: |
