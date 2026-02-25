@@ -55,6 +55,11 @@ jobs:
         micromamba info
         micromamba list
 
+    - name: Install package
+      run: |
+        python -m pip install --no-deps .
+        python -c "import forcebalance; print(forcebalance.__version__)"
+
 #       Need to replace ndcctools with this block
 #    - name: Install Work Queue
 #      run: |
@@ -112,11 +117,6 @@ jobs:
         cd studies/001_water_tutorial
         tar xvjf targets.tar.bz2
         cd ../../
-
-    - name: Install package
-      run: |
-        python -m pip install --no-deps .
-        python -c "import forcebalance; print(forcebalance.__version__)"
 
     - name: Run tests
       run: |
