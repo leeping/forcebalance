@@ -71,6 +71,99 @@ except ImportError:
 ## pdict is a useless variable if the force field is XML.
 pdict = "XML_Override"
 
+VIRTUAL_SITE_ATTRIBUTE_ORDER = ("type", "name", "match")
+
+def select_virtual_site_parameter(
+    parameters,
+    smirks,
+    virtual_site_type,
+    virtual_site_name,
+    virtual_site_match,
+    error_context="",
+):
+    """Select a unique VirtualSite parameter from a parameter collection.
+
+    Parameters
+    ----------
+    parameters
+        A parameter collection (e.g. OpenFF ``ParameterList``) containing
+        VirtualSite parameter objects.
+    smirks: str
+        The SMIRKS pattern of the VirtualSite parameter.
+    virtual_site_type: str
+        The VirtualSite ``type`` value.
+    virtual_site_name: str
+        The VirtualSite ``name`` value.
+    virtual_site_match: str
+        The VirtualSite ``match`` value.
+    error_context: str, optional
+        Extra text to include in error messages for easier debugging.
+
+    Returns
+    -------
+    object
+        The uniquely matched VirtualSite parameter object.
+
+    Raises
+    ------
+    KeyError
+        If required identifiers are missing, no parameter matches, or multiple
+        parameters match the requested identity.
+    """
+
+    identifiers = {
+        "smirks": smirks,
+        "type": virtual_site_type,
+        "name": virtual_site_name,
+        "match": virtual_site_match,
+    }
+
+    missing = [key for key, value in identifiers.items() if value is None]
+    if missing:
+        context = f" for {error_context}" if error_context else ""
+        raise KeyError(
+            f"VirtualSites parameter selection requires non-None identifiers{context}: "
+            f"missing {', '.join(missing)}"
+        )
+
+    matches = []
+
+    for parameter in parameters:
+        # Ignore incomplete entries: identity-based matching only works when all
+        # VirtualSite identity fields are explicitly present.
+        if (
+            parameter.smirks is None
+            or parameter.type is None
+            or parameter.name is None
+            or parameter.match is None
+        ):
+            continue
+
+        if (
+            parameter.smirks == smirks
+            and parameter.type == virtual_site_type
+            and parameter.name == virtual_site_name
+            and parameter.match == virtual_site_match
+        ):
+            matches.append(parameter)
+
+    context = f" ({error_context})" if error_context else ""
+
+    if len(matches) == 1:
+        return matches[0]
+
+    # Include the full requested identity to make ambiguity diagnostics actionable.
+    identity = (
+        f"smirks={smirks}, type={virtual_site_type}, "
+        f"name={virtual_site_name}, match={virtual_site_match}"
+    )
+
+    if len(matches) == 0:
+        raise KeyError(f"No VirtualSites parameter matched {identity}{context}")
+
+    raise KeyError(f"Multiple VirtualSites parameters matched {identity}{context}")
+
+
 def smirnoff_analyze_parameter_coverage(forcefield, tgt_opts):
     printcool("SMIRNOFF Parameter Coverage Analysis")
     assert hasattr(forcefield, 'offxml'), "Only SMIRNOFF Force Field is supported"
@@ -141,7 +234,14 @@ class SMIRNOFF_Reader(BaseReader):
         InteractionType = element.tag
         try:
             Involved = element.attrib["smirks"]
-            return "/".join([ParentType, InteractionType, parameter, Involved])
+            pid_parts = [ParentType, InteractionType, parameter, Involved]
+
+            if ParentType == "VirtualSites":
+                for key in VIRTUAL_SITE_ATTRIBUTE_ORDER:
+                    if key in element.attrib:
+                        pid_parts.append(element.attrib[key])
+
+            return "/".join(pid_parts)
         except:
             logger.info("Minor warning: Parameter ID %s doesn't contain any SMIRKS patterns, redundancies are possible\n" % ("/".join([InteractionType, parameter])))
             return "/".join([ParentType, InteractionType, parameter])
@@ -152,6 +252,8 @@ def assign_openff_parameter(ff, new_value, pid):
     Assign a SMIRNOFF parameter given the OpenFF ForceField object, the desired parameter value,
     and the parameter's unique ID.
     """
+    from openff.toolkit.typing.engines.smirnoff import ParameterList
+
     # Split the parameter's unique ID into four fields using a slash:
     # Input: ProperTorsions/Proper/k1/[*:1]~[#6X3:2]:[#6X3:3]~[*:4]
     # Output: ProperTorsions, Proper, k1, [*:1]~[#6X3:2]:[#6X3:3]~[*:4]
@@ -168,9 +270,28 @@ def assign_openff_parameter(ff, new_value, pid):
         parameter_container = ff.get_parameter_handler(handler_name)
 
     else:
-        (handler_name, tag_name, value_name, smirks) = pid.split('/')
+        pid_parts = pid.split('/')
 
-        from openff.toolkit.typing.engines.smirnoff import ParameterList
+        if len(pid_parts) < 4:
+            raise ValueError(f"Unsupported SMIRNOFF parameter ID format: {pid}")
+
+        handler_name = pid_parts[0]
+        tag_name = pid_parts[1]
+        value_name = pid_parts[2]
+        smirks = pid_parts[3]
+
+        key_metadata = {}
+        if handler_name == "VirtualSites":
+            # VirtualSite IDs must include positional metadata in the same order
+            # emitted by `build_pid`.
+            if len(pid_parts) != 7:
+                raise ValueError(
+                    f"VirtualSites parameter ID must include type/name/match: {pid}"
+                )
+            for attrname, attrvalue in zip(
+                VIRTUAL_SITE_ATTRIBUTE_ORDER, pid_parts[4:7]
+            ):
+                key_metadata[attrname] = attrvalue
 
         # Get the OpenFF parameter object
 
@@ -181,7 +302,19 @@ def assign_openff_parameter(ff, new_value, pid):
                 ff.get_parameter_handler(handler_name).parameters
             )
 
-        parameter_container = ff.get_parameter_handler(handler_name).parameters[smirks]
+        handler_parameters = ff.get_parameter_handler(handler_name).parameters
+
+        if handler_name != "VirtualSites":
+            parameter_container = handler_parameters[smirks]
+        else:
+            parameter_container = select_virtual_site_parameter(
+                parameters=handler_parameters,
+                smirks=smirks,
+                virtual_site_type=key_metadata["type"],
+                virtual_site_name=key_metadata["name"],
+                virtual_site_match=key_metadata["match"],
+                error_context=f"ID: {pid}",
+            )
 
     # Get param_quantity so we can inspect the type and apply units later if appropriate.
     # Also check for a few special cases and handle them individually.
@@ -195,9 +328,7 @@ def assign_openff_parameter(ff, new_value, pid):
         return
     else:
         raise KeyError(
-            "The {} attribute is not supported by the {} handler".format(
-                value_name, handler_name
-            )
+            f"The {value_name} attribute is not supported by the {handler_name} handler"
         )
 
     if hasattr(param_quantity, "units"):
@@ -418,11 +549,11 @@ class SMIRNOFF(OpenMM):
         interchange = self.forcefield.create_interchange(self.off_topology)
 
         n_virtual_sites = 0
-        self._has_virtual_sites = False
-        if 'VirtualSites' in interchange.handlers:
-            n_virtual_sites = len(interchange['VirtualSites'].slot_map)
-            if n_virtual_sites > 0:
-                self._has_virtual_sites = True
+        virtual_site_collection = interchange.collections.get("VirtualSites")
+        if virtual_site_collection is not None:
+            # Interchange stores applied virtual sites in the collection key map.
+            n_virtual_sites = len(virtual_site_collection.key_map)
+        self._n_virtual_sites = n_virtual_sites
 
         ## Generate OpenMM-compatible positions
         self.xyz_omms = []
@@ -485,7 +616,8 @@ class SMIRNOFF(OpenMM):
         # there is no longer a need to create a new force field object here.
         try:
             interchange = self.forcefield.create_interchange(self.off_topology)
-            self.system = interchange.to_openmm()
+            # Use the explicit OpenMM export entrypoint from modern Interchange.
+            self.system = interchange.to_openmm_system()
             self.off_topology = interchange.topology
         except Exception as error:
             logger.error("Error when creating system for %s" % self.mol2)
@@ -498,20 +630,11 @@ class SMIRNOFF(OpenMM):
         # If the virtual site parameters have changed,
         # the simulation object must be remade.
         #----
-        # vsprm = GetVirtualSiteParameters(self.system)
-        # if hasattr(self,'vsprm') and len(self.vsprm) > 0 and np.max(np.abs(vsprm - self.vsprm)) != 0.0:
-        #     if hasattr(self, 'simulation'):
-        #         delattr(self, 'simulation')
-        # self.vsprm = vsprm.copy()
-
-        has_vsites = False
-        for particle_idx in range(self.system.getNumParticles()):
-            if self.system.isVirtualSite(particle_idx):
-                has_vsites = True
-
-        if has_vsites:
-            raise Exception("ForceBalance can't currently handle SMIRNOFF vsites. "
-                            "Downgrade to ForceBalance 1.9.3 or earlier to handle those.")
+        vsprm = GetVirtualSiteParameters(self.system)
+        if hasattr(self,'vsprm') and len(self.vsprm) > 0 and np.max(np.abs(vsprm - self.vsprm)) != 0.0:
+            if hasattr(self, 'simulation'):
+                delattr(self, 'simulation')
+        self.vsprm = vsprm.copy()
 
         if hasattr(self, 'simulation'):
             UpdateSimulationParameters(self.system, self.simulation)

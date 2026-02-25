@@ -16,6 +16,7 @@ import tempfile
 import numpy as np
 from forcebalance.nifty import warn_once, printcool, printcool_dictionary
 from forcebalance.output import getLogger
+from forcebalance.smirnoffio import select_virtual_site_parameter
 from forcebalance.target import Target
 
 try:
@@ -308,20 +309,40 @@ class Evaluator_SMIRNOFF(Target):
         bool
             Returns True if the parameter is a cosmetic one.
         """
-        # try:
-        #     import openmm.unit as simtk_unit
-        # except ImportError:
-        #     import simtk.unit as simtk_unit
         from openff.units import unit as openff_unit
-
 
         parameter_handler = self.FF.openff_forcefield.get_parameter_handler(
             gradient_key.tag
         )
-        parameter = (
-            parameter_handler if gradient_key.smirks is None
-            else parameter_handler.parameters[gradient_key.smirks]
-        )
+
+        if gradient_key.smirks is None:
+            parameter = parameter_handler
+        elif gradient_key.tag != "VirtualSites":
+            parameter = parameter_handler.parameters[gradient_key.smirks]
+        else:
+            # VirtualSite parameters are not uniquely identifiable by SMIRKS alone.
+            # Require explicit type/name/match metadata in every VirtualSites key.
+            if gradient_key.virtual_site_type is None:
+                raise KeyError(
+                    f"Gradient key {gradient_key} is missing required virtual_site_type"
+                )
+            if gradient_key.virtual_site_name is None:
+                raise KeyError(
+                    f"Gradient key {gradient_key} is missing required virtual_site_name"
+                )
+            if gradient_key.virtual_site_match is None:
+                raise KeyError(
+                    f"Gradient key {gradient_key} is missing required virtual_site_match"
+                )
+
+            parameter = select_virtual_site_parameter(
+                parameters=parameter_handler.parameters,
+                smirks=gradient_key.smirks,
+                virtual_site_type=gradient_key.virtual_site_type,
+                virtual_site_name=gradient_key.virtual_site_name,
+                virtual_site_match=gradient_key.virtual_site_match,
+                error_context=f"gradient key {gradient_key}",
+            )
 
         attribute_split = re.split(r"(\d+)", gradient_key.attribute)
         attribute_split = list(filter(None, attribute_split))
@@ -474,14 +495,27 @@ class Evaluator_SMIRNOFF(Target):
                 string_key = field_list[0]
                 key_split = string_key.split("/")
 
+                virtual_site_kwargs = {}
+
                 if len(key_split) == 3 and key_split[0] == "":
                     parameter_tag = key_split[1].strip()
                     parameter_smirks = None
                     parameter_attribute = key_split[2].strip()
-                elif len(key_split) == 4:
+                elif len(key_split) >= 4:
                     parameter_tag = key_split[0].strip()
                     parameter_smirks = key_split[3].strip()
                     parameter_attribute = key_split[2].strip()
+
+                    if parameter_tag == "VirtualSites":
+                        # VirtualSites keys must include positional identity metadata:
+                        # VirtualSites/<tag>/<attribute>/<smirks>/<type>/<name>/<match>
+                        if len(key_split) != 7:
+                            raise KeyError(
+                                f"VirtualSites parameter key must include type/name/match: {string_key}"
+                            )
+                        virtual_site_kwargs["virtual_site_type"] = key_split[4].strip()
+                        virtual_site_kwargs["virtual_site_name"] = key_split[5].strip()
+                        virtual_site_kwargs["virtual_site_match"] = key_split[6].strip()
                 else:
                     raise NotImplementedError()
 
@@ -490,6 +524,7 @@ class Evaluator_SMIRNOFF(Target):
                     tag=parameter_tag,
                     smirks=parameter_smirks,
                     attribute=parameter_attribute,
+                    **virtual_site_kwargs,
                 )
 
                 # Find the unit of the gradient parameter.
