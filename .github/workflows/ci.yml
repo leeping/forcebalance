@@ -90,10 +90,13 @@ jobs:
         cd gromacs-5.1.5
         cp -r cmake cmake_s
         cd cmake
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF ..
+        # replace http:/w with https://w
+        sed -i 's|http:/w|https://w|g' CMakeCache.txt
         make -j 8 && make install
         cd ../cmake_s
-        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON -DGMX_USE_RDTSCP=OFF ..
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF ..
+        sed -i 's|http:/w|https://w|g' CMakeCache.txt
         make -j 8 && make install
         cd ..
         . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
