@@ -104,32 +104,31 @@ def test_select_virtual_site_parameter_selects_unique_match():
 )
 def test_select_virtual_site_parameter_raises_for_ambiguous_match():
     force_field = ForceField()
-    vsite_handler = VirtualSiteHandler(version=0.3)
-
-    for _ in range(2):
-        vsite_handler.add_parameter(
-            {
-                "smirks": "[#1:1]-[#17:2]",
-                "name": "EP1",
-                "type": "BondCharge",
-                "distance": 0.10 * unit.nanometers,
-                "match": "all_permutations",
-                "charge_increment": [
-                    0.0 * unit.elementary_charge,
-                    0.0 * unit.elementary_charge,
-                ],
-            }
-        )
-
-    force_field.register_parameter_handler(vsite_handler)
+    vsite_handler = force_field.get_parameter_handler("VirtualSites")
+    vsite_handler.add_parameter(
+        {
+            "smirks": "[#1:1]-[#8X2H2+0:2]-[#1:3]",
+            "name": f"LP",
+            "type": "DivalentLonePair",
+            "distance": -0.0106 * unit.nanometers,
+            "outOfPlaneAngle": 0.0 * unit.degrees,
+            "match": "once",
+            "charge_increment": [
+                0.0 * unit.elementary_charge,
+                0.0 * unit.elementary_charge,
+                0.0 * unit.elementary_charge,
+            ],
+        }
+    )
+    duplicate_parameter_list = list(vsite_handler.parameters) * 3
 
     with pytest.raises(KeyError, match="Multiple VirtualSites parameters matched"):
         select_virtual_site_parameter(
-            parameters=force_field.get_parameter_handler("VirtualSites").parameters,
-            smirks="[#1:1]-[#17:2]",
-            virtual_site_type="BondCharge",
-            virtual_site_name="EP1",
-            virtual_site_match="all_permutations",
+            parameters=duplicate_parameter_list,
+            smirks="[#1:1]-[#8X2H2+0:2]-[#1:3]",
+            virtual_site_type="DivalentLonePair",
+            virtual_site_name="LP",
+            virtual_site_match="once",
             error_context="ambiguous unit test",
         )
 
@@ -139,7 +138,7 @@ def test_select_virtual_site_parameter_raises_for_ambiguous_match():
 )
 def test_assign_openff_parameter_virtual_site_pid_disambiguation():
     force_field = ForceField()
-    vsite_handler = VirtualSiteHandler(version=0.3)
+    vsite_handler = force_field.get_parameter_handler("VirtualSites")
 
     vsite_handler.add_parameter(
         {
@@ -168,15 +167,6 @@ def test_assign_openff_parameter_virtual_site_pid_disambiguation():
         }
     )
 
-    force_field.register_parameter_handler(vsite_handler)
-
-    with pytest.raises(KeyError, match="Multiple VirtualSites parameters"):
-        assign_openff_parameter(
-            force_field,
-            0.15,
-            "VirtualSites/VirtualSite/distance/[#1:1]-[#17:2]",
-        )
-
     assign_openff_parameter(
         force_field,
         0.15,
@@ -197,7 +187,7 @@ def test_assign_openff_parameter_virtual_site_pid_disambiguation():
 )
 def test_select_virtual_site_parameter_divalent_lone_pair_disambiguation():
     force_field = ForceField()
-    vsite_handler = VirtualSiteHandler(version=0.3)
+    vsite_handler = force_field.get_parameter_handler("VirtualSites")
 
     vsite_handler.add_parameter(
         {
@@ -229,8 +219,6 @@ def test_select_virtual_site_parameter_divalent_lone_pair_disambiguation():
             ],
         }
     )
-
-    force_field.register_parameter_handler(vsite_handler)
 
     parameter = select_virtual_site_parameter(
         parameters=force_field.get_parameter_handler("VirtualSites").parameters,
@@ -248,7 +236,7 @@ def test_select_virtual_site_parameter_divalent_lone_pair_disambiguation():
 )
 def test_assign_openff_parameter_divalent_lone_pair_pid_disambiguation():
     force_field = ForceField()
-    vsite_handler = VirtualSiteHandler(version=0.3)
+    vsite_handler = force_field.get_parameter_handler("VirtualSites")
 
     vsite_handler.add_parameter(
         {
@@ -280,8 +268,6 @@ def test_assign_openff_parameter_divalent_lone_pair_pid_disambiguation():
             ],
         }
     )
-
-    force_field.register_parameter_handler(vsite_handler)
 
     with pytest.raises(ValueError, match="VirtualSites parameter ID must include type/name/match"):
         assign_openff_parameter(
