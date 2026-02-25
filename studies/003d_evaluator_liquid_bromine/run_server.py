@@ -27,16 +27,17 @@ def main():
         number_of_workers=1, resources_per_worker=worker_resources
     )
 
-    with calculation_backend:
+    calculation_backend.start()
+    assert calculation_backend._started
 
-        server = EvaluatorServer(
-            calculation_backend=calculation_backend,
-            working_directory=working_directory,
-            port=8000,
-        )
+    server = EvaluatorServer(
+        calculation_backend=calculation_backend,
+        working_directory=working_directory,
+        port=8000,
+    )
 
-        # Tell the server to start listening for estimation requests.
-        server.start()
+    # Tell the server to start listening for estimation requests.
+    server.start()
 
 
 if __name__ == "__main__":
