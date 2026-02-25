@@ -197,7 +197,7 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         import subprocess, time
         self.estimator_process = subprocess.Popen([
             "python", "run_server.py", "-ngpus=0", "-ncpus=1"
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        ])#, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         ## Give the server time to start.
         time.sleep(5)
         self.input_file='gradient.in'
