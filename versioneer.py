@@ -217,7 +217,7 @@ with the python package.
 
 These both work as expected when using modern setuptools. When using
 setuptools-18.5 or earlier, however, certain operations will cause
-`pkg_resources.DistributionNotFound` errors when running the entrypoint
+`importlib.metadata.PackageNotFoundError` errors when running the entrypoint
 script, which must be resolved by re-installing the package. This happens
 when the install happens with one version, then the egg_info data is
 regenerated while a different version is checked out. Many setup.py commands

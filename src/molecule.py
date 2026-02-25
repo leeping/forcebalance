@@ -17,7 +17,7 @@ from warnings import warn
 import numpy as np
 from numpy import sin, cos, arccos
 from numpy.linalg import multi_dot
-from pkg_resources import parse_version
+from packaging.version import parse as parse_version
 
 # For Python 2/3 compatibility
 try:
