@@ -119,7 +119,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml -k "not TestEvaluatorBromineStudy" src/tests/
+        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml src/tests/
 
     - name: Run water study
       run: |
