@@ -240,6 +240,24 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         self.input_file='gradient.in'
         self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
+    def _wait_for_server_startup(self, timeout=60):
+        import time
+        start = time.time()
+        while time.time() - start < timeout:
+            # If process exited, surface logs for easier diagnosis.
+            if self.estimator_process.poll() is not None:
+                out, err = self.estimator_process.communicate()
+                raise RuntimeError(
+                    "Evaluator server exited during startup.\nstdout:\n%s\nstderr:\n%s"
+                    % (out.decode('utf-8', errors='replace'), err.decode('utf-8', errors='replace'))
+                )
+            try:
+                with socket.create_connection(("127.0.0.1", 8000), timeout=1):
+                    return
+            except OSError:
+                time.sleep(1)
+        raise RuntimeError("Timed out waiting for Evaluator server on 127.0.0.1:8000")
+
     def teardown_method(self):
         try:
             if hasattr(self, 'estimator_process') and self.estimator_process is not None:
