@@ -55,11 +55,6 @@ jobs:
         micromamba info
         micromamba list
 
-    - name: Install package
-      run: |
-        python -m pip install --no-deps .
-        python -c "import forcebalance; print(forcebalance.__version__)"
-
 #       Need to replace ndcctools with this block
 #    - name: Install Work Queue
 #      run: |
@@ -69,48 +64,48 @@ jobs:
 #        python -c "import work_queue"
 #        export PATH="$GITHUB_WORKSPACE/opt/cctools/current/bin:$PATH"
 
-    # - name: Install Tinker
-    #   run: |
-    #     if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
-    #       wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
-    #     fi
-    #     if [[ "$CI_OS" == 'macOS-latest' ]]; then
-    #       wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
-    #     fi
-    #     tar xvzf tinker.tar.gz &> untar.log
+    - name: Install Tinker
+      run: |
+        if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
+          wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
+        fi
+        if [[ "$CI_OS" == 'macOS-latest' ]]; then
+          wget https://dasher.wustl.edu/tinker/downloads/bin-macos-8.8.3.tar.gz -O tinker.tar.gz
+        fi
+        tar xvzf tinker.tar.gz &> untar.log
 
-    #     mkdir -p $GITHUB_WORKSPACE/opt/tinker/8.8.3
-    #     if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
-    #       mv bin-linux $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
-    #     fi
-    #     if [[ "$CI_OS" == 'macOS-latest' ]]; then
-    #       mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
-    #     fi
+        mkdir -p $GITHUB_WORKSPACE/opt/tinker/8.8.3
+        if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
+          mv bin-linux $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
+        fi
+        if [[ "$CI_OS" == 'macOS-latest' ]]; then
+          mv bin-macos $GITHUB_WORKSPACE/opt/tinker/8.8.3/bin
+        fi
 
-    #     echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
+        echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
 
-    # - name: Install Gromacs
-    #   run: |
-    #     wget http://ftp.gromacs.org/pub/gromacs/gromacs-5.1.5.tar.gz
-    #     tar xvzf gromacs-5.1.5.tar.gz
-    #     cd gromacs-5.1.5
-    #     cp -r cmake cmake_s
-    #     cd cmake
-    #     cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF -DGMX_SIMD=None ..
-    #     # replace http:/w with https://w
-    #     sed -i.bak 's|http:/w|https://w|g' CMakeCache.txt && rm -f CMakeCache.txt.bak
-    #     make -j 8 && make install
-    #     cd ../cmake_s
-    #     cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF -DGMX_SIMD=None ..
-    #     sed -i.bak 's|http:/w|https://w|g' CMakeCache.txt && rm -f CMakeCache.txt.bak
-    #     make -j 8 && make install
-    #     cd ..
-    #     . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
-    #     echo "$GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin" >> $GITHUB_PATH
-    #     which gmx
-    #     which gmx_d
-    #     gmx help
-    #     gmx dump -h
+    - name: Install Gromacs
+      run: |
+        wget http://ftp.gromacs.org/pub/gromacs/gromacs-5.1.5.tar.gz
+        tar xvzf gromacs-5.1.5.tar.gz
+        cd gromacs-5.1.5
+        cp -r cmake cmake_s
+        cd cmake
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF -DGMX_SIMD=None ..
+        # replace http:/w with https://w
+        sed -i.bak 's|http:/w|https://w|g' CMakeCache.txt && rm -f CMakeCache.txt.bak
+        make -j 8 && make install
+        cd ../cmake_s
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF -DGMX_SIMD=None ..
+        sed -i.bak 's|http:/w|https://w|g' CMakeCache.txt && rm -f CMakeCache.txt.bak
+        make -j 8 && make install
+        cd ..
+        . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
+        echo "$GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin" >> $GITHUB_PATH
+        which gmx
+        which gmx_d
+        gmx help
+        gmx dump -h
 
     - name: Extract data archives
       run: |
@@ -118,9 +113,14 @@ jobs:
         tar xvjf targets.tar.bz2
         cd ../../
 
+    - name: Install package
+      run: |
+        python -m pip install --no-deps .
+        python -c "import forcebalance; print(forcebalance.__version__)"
+
     - name: Run tests
       run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml src/tests/test_system.py::TestEvaluatorBromineStudy
+        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml -k "not TestEvaluatorBromineStudy" src/tests/
 
     - name: Run water study
       run: |
