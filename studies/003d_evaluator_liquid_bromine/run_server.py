@@ -33,7 +33,7 @@ def main():
     server = EvaluatorServer(
         calculation_backend=calculation_backend,
         working_directory=working_directory,
-        port=8000,
+        port=8012,
     )
 
     # Tell the server to start listening for estimation requests.
