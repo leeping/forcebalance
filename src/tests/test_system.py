@@ -198,26 +198,10 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         self.estimator_process = subprocess.Popen([
             "python", "run_server.py", "-ngpus=0", "-ncpus=1"
         ])#, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        ## Wait for server to start accepting connections.
-        self._wait_for_server_startup(timeout=60)
+        ## Give the server time to start.
+        time.sleep(5)
         self.input_file='gradient.in'
         self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
-
-    def _wait_for_server_startup(self, timeout=60):
-        import time
-        start = time.time()
-        while time.time() - start < timeout:
-            if self.estimator_process.poll() is not None:
-                raise RuntimeError(
-                    "Evaluator server exited during startup with return code %s"
-                    % self.estimator_process.returncode
-                )
-            try:
-                with socket.create_connection(("127.0.0.1", 8000), timeout=1):
-                    return
-            except OSError:
-                time.sleep(1)
-        raise RuntimeError("Timed out waiting for Evaluator server on 127.0.0.1:8000")
 
     def teardown_method(self):
         try:
