@@ -24,7 +24,8 @@ jobs:
         python-version:
           - "3.11"
           - "3.12"
-          - "3.13"
+          # pymbar 3 does not support Python 3.13
+          # - "3.13"
 
     env:
       CI_OS: ${{ matrix.os }}
