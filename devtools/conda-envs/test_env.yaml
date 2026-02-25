@@ -29,6 +29,21 @@ dependencies:
   # - openeye-toolkits (Don't have a license file to use with GH Actions.)
   - pint <0.25
 
+  # evaluator dependencies
+  - dask >=2.7.0
+  - distributed >=2.7.0
+  - dask-jobqueue >=0.8.0
+  - dask-kubernetes
+  - uncertainties
+  - openmmtools
+  - pyyaml
+  - requests
+  - python-dateutil
+  - pydantic =2,<2.12
+  - taproom
+  - dataclasses
+  - pandas =2
+
   - pip:
     # install branch of evaluator
     - git+https://github.com/openforcefield/openff-evaluator.git@fix-vsite-fits
