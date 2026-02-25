@@ -31,4 +31,4 @@ dependencies:
 
   - pip:
     # install branch of evaluator
-    - git+https://github.com/openforcefield/openff-evaluator.git@update-vsite-parameter-gradients
+    - git+https://github.com/openforcefield/openff-evaluator.git@fix-vsite-fits
