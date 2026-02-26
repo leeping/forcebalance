@@ -49,6 +49,8 @@ print_hessian
 # Charge constraints are taken care of using "evals".
 constrain_charge false
 
+gmxsuffix _d
+gmxpath /Users/lilywang/miniforge3/envs/forcebalance-test-gmx2024/bin.ARM_NEON_ASIMD
 $end
 
 $target
