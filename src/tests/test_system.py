@@ -192,19 +192,30 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         targets.extractall()
         targets.close()
         ## Start the estimator server.
-        import subprocess, time
+        import subprocess, socket, time
         self.estimator_process = subprocess.Popen([
             "python", "run_server.py", "-ngpus=0", "-ncpus=1"
         ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        ## Give the server time to start.
-        time.sleep(5)
+        ## Poll until the server is accepting connections (or timeout after 120s).
+        server_port = 8000
+        deadline = time.time() + 120
+        while time.time() < deadline:
+            try:
+                with socket.create_connection(('localhost', server_port), timeout=1):
+                    break
+            except (ConnectionRefusedError, OSError):
+                time.sleep(1)
+        else:
+            self.estimator_process.terminate()
+            pytest.fail("Evaluator server did not start within 120 seconds")
         self.input_file='gradient.in'
         self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
     def teardown_method(self):
         self.estimator_process.terminate()
-        shutil.rmtree("working_directory")
-        shutil.rmtree("stored_data")
+        for dnm in ["working_directory", "stored_data"]:
+            if os.path.exists(dnm):
+                shutil.rmtree(dnm)
         super(TestEvaluatorBromineStudy, self).teardown_method()
 
     def test_bromine_study(self):
