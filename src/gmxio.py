@@ -651,6 +651,10 @@ class GMX(Engine):
             self.gmx_defs["rvdw_switch"] = "%.2f" % rvdw_switch
             self.gmx_defs["DispCorr"] = "EnerPres"
         else:
+            # Vacuum simulations were removed in gromacs 2020.
+            # We use a pseudovacuum simulation approach where we put the molecule in a very large box
+            # and use cutoffs to effectively turn off interactions between periodic images.
+
             if 'nonbonded_cutoff' in kwargs:
                 warn_press_key("Not using PBC, your provided nonbonded_cutoff will not be used")
             if 'vdw_cutoff' in kwargs:
