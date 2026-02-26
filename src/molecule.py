@@ -572,7 +572,7 @@ def format_gro_coord(resid, resname, aname, seqno, xyz):
     @param[in] xyz A 3-element array containing x, y, z coordinates of that atom
 
     """
-    return "%5i%-5s%5s%5i % 13.9f % 13.9f % 13.9f" % (resid,resname,aname,seqno,xyz[0],xyz[1],xyz[2])
+    return f"{resid:5d}{resname:<5s}{aname:>5s}{seqno:5d} {xyz[0]: 13.9f} {xyz[1]: 13.9f} {xyz[2]: 13.9f}"
 
 def format_xyzgen_coord(element,xyzgen):
     """ Print a line consisting of (element, p, q, r, s, t, ...) where
