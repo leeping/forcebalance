@@ -14,7 +14,7 @@ defaults:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }} (py=${{ matrix.python-version }},gmx=${{ matrix.gmx-version }})
+    name: Test on ${{ matrix.os }} (py=${{ matrix.python-version }}, gmx=${{ matrix.gmx-version }})
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
