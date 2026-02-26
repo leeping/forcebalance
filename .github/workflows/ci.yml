@@ -22,6 +22,8 @@ jobs:
           - macOS-latest
           - ubuntu-latest
         python-version:
+          - "3.9"
+          - "3.10"
           - "3.11"
           - "3.12"
           # pymbar 3 does not support Python 3.13
