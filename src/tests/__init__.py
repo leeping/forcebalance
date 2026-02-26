@@ -22,10 +22,18 @@ class ForceBalanceTestCase(object):
         if 'OMP_NUM_THREADS' in os.environ:
             os.environ.pop('OMP_NUM_THREADS')
 
+
     def setup_method(self, method):
-        pass
+        # Change to the test files directory before each test
+        self._test_files_dir = os.path.join(os.path.dirname(__file__), "files")
+        if os.path.isdir(self._test_files_dir):
+            os.chdir(self._test_files_dir)
+        else:
+            # If the files directory does not exist, stay in the current directory
+            self._test_files_dir = None
 
     def teardown_method(self):
+        # Restore the original directory after each test
         os.chdir(self.start_directory)
 
 def check_for_openmm():
