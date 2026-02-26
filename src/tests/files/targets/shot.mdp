@@ -16,4 +16,4 @@ coulombtype	= cut-off
 rcoulomb	= 0.0
 rvdw		= 0.0
 constraints	= none
-pbc		= no
+pbc		= xyz

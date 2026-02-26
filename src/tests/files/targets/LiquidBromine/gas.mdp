@@ -20,7 +20,7 @@ rcoulomb	= 0.0
 rvdw		= 0.0
 rvdw_switch     = 0.0
 constraints	= all-bonds
-pbc		= no
+pbc		= xyz
 
 tcoupl		= v-rescale
 tc_grps		= System
