@@ -68,6 +68,9 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
     clashes = ["pbc"]
     # Make sure that the keys are lowercase, and the values are all strings.
     options = OrderedDict([(key.lower().replace('-','_'), str(val) if val is not None else None) for key, val in options.items()])
+    # Always enforce cutoff-scheme = Verlet for GROMACS >=2020
+    options = dict(options)
+    options["cutoff-scheme"] = "Verlet"
     # List of lines in the output file.
     out = []
     # List of options in the output file.
@@ -599,7 +602,7 @@ class GMX(Engine):
 
         self.gmx_defs = OrderedDict([("integrator", "md"), ("dt", "0.001"), ("nsteps", "0"),
                                      ("nstxout", "0"), ("nstfout", "0"), ("nstenergy", "1"), 
-                                     ("nstxtcout", "0"), ("constraints", "none"), ("cutoff-scheme", "group")])
+                                     ("nstxtcout", "0"), ("constraints", "none"), ("cutoff-scheme", "verlet")])
         gmx_opts = OrderedDict([])
         warnings = []
         self.pbc = pbc
@@ -646,14 +649,36 @@ class GMX(Engine):
                 warn_press_key("Not using PBC, your provided nonbonded_cutoff will not be used")
             if 'vdw_cutoff' in kwargs:
                 warn_press_key("Not using PBC, your provided vdw_cutoff will not be used")
-            gmx_opts["pbc"] = "no"
-            self.gmx_defs["ns_type"] = "simple"
-            self.gmx_defs["nstlist"] = 0
-            self.gmx_defs["rlist"] = "0.0"
-            self.gmx_defs["coulombtype"] = "cut-off"
-            self.gmx_defs["rcoulomb"] = "0.0"
-            self.gmx_defs["vdwtype"] = "cut-off"
-            self.gmx_defs["rvdw"] = "0.0"
+
+            from forcebalance.molecule import Box
+            from numpy import array
+
+            BOX_LENGTH = 1e5 - 1
+            NSTLIST = int(1e5)
+            CUTOFF = (BOX_LENGTH / 3.0 - 1.0) / 10
+
+            for i in range(len(self.mol.boxes)):
+                self.mol.boxes[i] = Box(a=BOX_LENGTH, b=BOX_LENGTH, c=BOX_LENGTH,
+                                        alpha=90.0, beta=90.0, gamma=90.0,
+                                        A=array([BOX_LENGTH, 0., 0.]),
+                                        B=array([0., BOX_LENGTH, 0.]),
+                                        C=array([0., 0., BOX_LENGTH]),
+                                        V=1000000000000)
+            gmx_opts["pbc"] = "xyz"
+            gmx_opts["coulombtype"] = "cut-off"
+            gmx_opts["vdwtype"] = "cut-off"
+            gmx_opts["nstlist"] = NSTLIST
+            gmx_opts["rcoulomb"] = "%.2f" % CUTOFF
+            gmx_opts["rvdw"] = "%.2f" % CUTOFF
+
+            # gmx_opts["pbc"] = "no"
+            # self.gmx_defs["ns_type"] = "simple"
+            # self.gmx_defs["nstlist"] = 1
+            # self.gmx_defs["rlist"] = "0.0"
+            # self.gmx_defs["coulombtype"] = "cut-off"
+            # self.gmx_defs["rcoulomb"] = "0.0"
+            # self.gmx_defs["vdwtype"] = "cut-off"
+            # self.gmx_defs["rvdw"] = "0.0"
         
         ## Link files into the temp directory.
         if self.top is not None:
@@ -1015,38 +1040,58 @@ class GMX(Engine):
 
     def interaction_energy(self, fraga, fragb):
 
-        """ Computes the interaction energy between two fragments over a trajectory. """
+        """Computes the interaction energy between two fragments over a trajectory using modern GROMACS (2020+)."""
 
         self.mol[0].write("%s.gro" % self.name)
 
-        ## Create an index file with the requisite groups.
-        write_ndx('%s.ndx' % self.name, OrderedDict([('A',[i+1 for i in fraga]),('B',[i+1 for i in fragb])]))
+        # Create an index file with the requisite groups.
+        write_ndx(f"{self.name}.ndx", OrderedDict([
+            ("A", [i+1 for i in fraga]),
+            ("B", [i+1 for i in fragb])
+        ]))
 
-        ## .mdp files for fully interacting and interaction-excluded systems.
-        edit_mdp(fin='%s.mdp' % self.name, fout='%s-i.mdp' % self.name, options={'xtc_grps':'A B', 'energygrps':'A B'})
-        edit_mdp(fin='%s.mdp' % self.name, fout='%s-x.mdp' % self.name, options={'xtc_grps':'A B', 'energygrps':'A B', 'energygrp-excl':'A B'})
+        # Prepare .mdp file with energygrps
+        edit_mdp(fin=f"{self.name}.mdp", fout=f"{self.name}-i.mdp", options={
+            'xtc_grps': 'A B',
+            'energygrps': 'A B'
+        })
 
-        ## Call grompp followed by mdrun for interacting system.
-        self.warngmx("grompp -c %s.gro -p %s.top -f %s-i.mdp -n %s.ndx -o %s-i.tpr" % \
-                         (self.name, self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s-i -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
-        self.callgmx("g_energy -f %s-i.edr -o %s-i-e.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
-        I = []
-        for line in open('%s-i-e.xvg' % self.name):
-            I.append(sum([float(i) for i in line.split()[1:]]))
-        I = np.array(I)
+        # Run grompp and mdrun
+        self.warngmx(f"grompp -c {self.name}.gro -p {self.name}.top -f {self.name}-i.mdp -n {self.name}.ndx -o {self.name}-i.tpr")
+        self.callgmx(f"mdrun -deffnm {self.name}-i -nt 1 -rerunvsite -rerun {self.name}-all.gro")
 
-        ## Call grompp followed by mdrun for noninteracting system.
-        self.warngmx("grompp -c %s.gro -p %s.top -f %s-x.mdp -n %s.ndx -o %s-x.tpr" % \
-                         (self.name, self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s-x -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
-        self.callgmx("g_energy -f %s-x.edr -o %s-x-e.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
-        X = []
-        for line in open('%s-x-e.xvg' % self.name):
-            X.append(sum([float(i) for i in line.split()[1:]]))
-        X = np.array(X)
+        # Extract available energy terms
+        # Use gmx energy -f ... -xvg no, parse the prompt for available terms
+        # We'll use subprocess to interact with gmx energy
+        import subprocess
+        edrfile = f"{self.name}-i.edr"
+        # Get list of terms
+        a_b_terms = [
+            "Coul-SR:A-B", "LJ-SR:A-B", "Coul-14:A-B", "LJ-14:A-B"
+        ]
+        a_b_term_str = "\n".join(a_b_terms) + "\n\n"
+        xvgfile = f"{self.name}-i-interaction.xvg"
+        # for term in a_b_terms:
+        proc = subprocess.Popen([
+            os.path.join(self.gmxpath, f"gmx{self.gmxsuffix}"), "energy", "-f", edrfile, "-o", xvgfile, #"-n", f"{self.name}.ndx"
+        ], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        proc.communicate(input=a_b_term_str)
 
-        return (I - X) / 4.184 # kcal/mol
+        # Read the .xvg file and sum the columns for each frame
+        energies = []
+        with open(xvgfile) as fin:
+            for line in fin:
+                if line.startswith("#") or line.startswith("@"): continue
+                fields = line.split()
+                if len(fields) < len(a_b_terms) + 1: continue
+                try:
+                    # Sum all interaction terms for this frame (skip time column)
+                    energies.append(sum(float(fields[i+1]) for i in range(len(a_b_terms))))
+                except Exception:
+                    continue
+        energies = np.array(energies)
+        # Convert from kJ/mol to kcal/mol
+        return energies / 4.184
 
     def multipole_moments(self, shot=0, optimize=True, polarizability=False):
         
@@ -1249,7 +1294,7 @@ class GMX(Engine):
 
         # In gromacs version 5, default cutoff scheme becomes verlet. 
         # Need to set to group for backwards compatibility
-        md_defs["cutoff-scheme"] = 'group'
+        md_defs["cutoff-scheme"] = 'verlet'
         md_opts["nstenergy"] = nsave
         md_opts["nstcalcenergy"] = nsave
         md_opts["nstxout"] = nsave
@@ -1291,8 +1336,11 @@ class GMX(Engine):
         self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
 
         self.mdtraj = '%s-md.trr' % self.name
-
-        if verbose: logger.info("Production run finished, calculating properties...\n")
+        self.mdene  = '%s-md.edr' % self.name
+         
+        # Run post-processing.
+        if verbose:
+            logger.info("Production run finished, calculating properties...\n")
         # Figure out dipoles - note we use g_dipoles and not the multipole_moments function.
         self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % (self.name, self.name, self.name), stdin="System\n")
 
