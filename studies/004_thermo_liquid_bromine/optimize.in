@@ -59,6 +59,9 @@ adaptive_damping 1.0
 normalize_weights no
 print_hessian
 
+# Use double precision GROMACS
+gmxsuffix _d
+
 # Charge constraints are taken care of using "evals".
 constrain_charge false
 verbose_options True

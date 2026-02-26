@@ -53,6 +53,10 @@ constrain_charge false
 rigid_water true
 
 backup False
+
+# Use double precision GROMACS
+gmxsuffix _d
+
 $end
 
 $target
