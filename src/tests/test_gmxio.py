@@ -1,4 +1,5 @@
 from __future__ import absolute_import
+import os
 import forcebalance
 import shutil
 from .test_target import TargetTests # general targets tests defined in test_target.py
@@ -26,6 +27,10 @@ class TestAbInitio_GMX(TargetTests):
         self.target = forcebalance.gmxio.AbInitio_GMX(self.options, self.tgt_opt, self.ff)
 
     def teardown_method(self):
-        shutil.rmtree('temp')
+        # Use an absolute path so this works even if the test left us inside
+        # the temp directory (e.g. because it errored before os.chdir('../..')).
+        temp_dir = os.path.join(os.path.dirname(__file__), 'files', 'temp')
+        if os.path.isdir(temp_dir):
+            shutil.rmtree(temp_dir)
         super(TestAbInitio_GMX, self).teardown_method()
 
