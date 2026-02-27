@@ -191,15 +191,26 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         targets = tarfile.open('targets.tar.gz','r')
         targets.extractall()
         targets.close()
-        ## Start the estimator server.
+        ## Start the estimator server, redirecting output to a log file to
+        ## avoid filling the OS pipe buffer (which would deadlock the server
+        ## when Dask workers inherit and write to the same pipe fd).
         import subprocess, socket, time
-        self.estimator_process = subprocess.Popen([
-            "python", "run_server.py", "-ngpus=0", "-ncpus=1"
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        self._server_log = open("server.log", "w")
+        self.estimator_process = subprocess.Popen(
+            ["python", "run_server.py", "-ngpus=0", "-ncpus=1"],
+            stdout=self._server_log, stderr=self._server_log,
+        )
         ## Poll until the server is accepting connections (or timeout after 120s).
         server_port = 8000
         deadline = time.time() + 120
         while time.time() < deadline:
+            if self.estimator_process.poll() is not None:
+                self._server_log.flush()
+                log_contents = open("server.log").read()
+                pytest.fail(
+                    "Evaluator server process exited prematurely (rc=%d). Log:\n%s"
+                    % (self.estimator_process.returncode, log_contents[-2000:])
+                )
             try:
                 with socket.create_connection(('localhost', server_port), timeout=1):
                     break
@@ -208,11 +219,17 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         else:
             self.estimator_process.terminate()
             pytest.fail("Evaluator server did not start within 120 seconds")
+        ## Give the server a moment to fully initialise after the port opens.
+        time.sleep(2)
         self.input_file='gradient.in'
         self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
     def teardown_method(self):
         self.estimator_process.terminate()
+        self._server_log.close()
+        for fnm in ["server.log"]:
+            if os.path.exists(fnm):
+                os.remove(fnm)
         for dnm in ["working_directory", "stored_data"]:
             if os.path.exists(dnm):
                 shutil.rmtree(dnm)
