@@ -193,17 +193,22 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         targets = tarfile.open('targets.tar.gz','r')
         targets.extractall()
         targets.close()
-        ## Start the estimator server, redirecting output to a log file to
-        ## avoid filling the OS pipe buffer (which would deadlock the server
-        ## when Dask workers inherit and write to the same pipe fd).
-        import subprocess, socket, time
+        ## Start the estimator server.
+        ## - Redirect output to a log file (not PIPE) so Dask worker subprocesses
+        ##   that inherit the fd don't fill the pipe buffer and deadlock.
+        ## - Use 'python -u' so each log line is flushed immediately to disk.
+        import subprocess, time
         self._server_log = open("server.log", "w")
         self.estimator_process = subprocess.Popen(
-            ["python", "run_server.py", "-ngpus=0", "-ncpus=1"],
+            ["python", "-u", "run_server.py", "-ngpus=0", "-ncpus=1"],
             stdout=self._server_log, stderr=self._server_log,
         )
-        ## Poll until the server is accepting connections (or timeout after 120s).
+        ## Wait for the server to log that it is ready.  We intentionally avoid
+        ## making a raw TCP probe: a bare connect+disconnect causes recvall() in
+        ## _handle_stream to return None, which crashes struct.unpack and kills
+        ## the _handle_connections loop because the except is outside the while.
         server_port = 8000
+        ready_marker = "listening at port {}".format(server_port)
         deadline = time.time() + 120
         while time.time() < deadline:
             if self.estimator_process.poll() is not None:
@@ -213,16 +218,17 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
                     "Evaluator server process exited prematurely (rc=%d). Log:\n%s"
                     % (self.estimator_process.returncode, log_contents[-2000:])
                 )
-            try:
-                with socket.create_connection(('localhost', server_port), timeout=1):
+            with open("server.log") as f:
+                if ready_marker in f.read():
                     break
-            except (ConnectionRefusedError, OSError):
-                time.sleep(1)
+            time.sleep(0.5)
         else:
             self.estimator_process.terminate()
-            pytest.fail("Evaluator server did not start within 120 seconds")
-        ## Give the server a moment to fully initialise after the port opens.
-        time.sleep(2)
+            log_contents = open("server.log").read()
+            pytest.fail(
+                "Evaluator server did not start within 120 seconds. Log:\n%s"
+                % log_contents[-2000:]
+            )
         self.input_file='gradient.in'
         self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
