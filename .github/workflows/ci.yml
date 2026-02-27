@@ -47,12 +47,7 @@ jobs:
       with:
         environment-file: devtools/conda-envs/test_env.yaml
         create-args: >-
-          python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }}.*=nompi_dblprec_*
-
-    - name: Check Gromacs executable
-      run: |
-        which gmx
-        gmx_d --version
+          python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }}.*=nompi_dblprec*
 
     - name: Additional info about the build
       shell: bash
@@ -129,9 +124,22 @@ jobs:
         python -m pip install --no-deps .
         python -c "import forcebalance; print(forcebalance.__version__)"
 
+    - name: Set up swap space
+      if: runner.os == 'Linux'
+      run: |
+        sudo fallocate -l 8G /swapfile
+        sudo chmod 600 /swapfile
+        sudo mkswap /swapfile
+        sudo swapon /swapfile
+        free -h
+
+    - name: Run engine tests
+      run: |
+        pytest -v --timeout=900 src/tests/test_engine.py
+
     - name: Run tests
       run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml --timeout=900 src/tests/
+        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml --timeout=900 --ignore=src/tests/test_engine.py src/tests/
 
     - name: Run water study
       run: |
