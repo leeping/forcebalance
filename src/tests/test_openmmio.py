@@ -88,6 +88,9 @@ class TestInteraction_OpenMM(TargetTests):
 def test_local_coord_sites():
     """Make sure that the internal prep of vs positions matches that given by OpenMM."""
     if no_openmm: pytest.skip("No OpenMM modules found.")
+    # make sure we're in the right place
+    test_root = os.path.dirname(os.path.realpath(__file__))
+    os.chdir(test_root)
     # make a system
     mol = app.PDBFile(os.path.join("files", "vs_mol.pdb"))
     modeller = app.Modeller(topology=mol.topology, positions=mol.positions)
@@ -106,3 +109,41 @@ def test_local_coord_sites():
     vsinfo = PrepareVirtualSites(system=system)
     new_pos = ResetVirtualSites_fast(positions=modeller.positions, vsinfo=vsinfo)[-1]
     assert np.allclose(vs_pos._value, np.array([new_pos.x, new_pos.y, new_pos.z]))
+
+
+def test_update_simulation_twice_water_box():
+    """Ensure update_simulation can be called repeatedly for an existing water box fixture."""
+    if no_openmm: pytest.skip("No OpenMM modules found.")
+
+    test_root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files")
+    water_box_dir = os.path.join(test_root, "targets", "dms-liquid")
+    ffxml = os.path.join(test_root, "forcefield", "dms.xml")
+
+    cwd = os.getcwd()
+    os.chdir(water_box_dir)
+    try:
+        engine = forcebalance.openmmio.OpenMM(
+            coords="liquid.pdb",
+            pdb="liquid.pdb",
+            ffxml=ffxml,
+            platname="Reference",
+            precision="double",
+            pbc=True,
+        )
+
+        engine.update_simulation(temperature=300.0, pressure=1.0)
+        simulation_id = id(engine.simulation)
+        n_particles = engine.simulation.system.getNumParticles()
+        engine.set_positions(0)
+        energy_1 = engine.simulation.context.getState(getEnergy=True).getPotentialEnergy()._value
+
+        engine.update_simulation()
+        engine.set_positions(0)
+        energy_2 = engine.simulation.context.getState(getEnergy=True).getPotentialEnergy()._value
+
+        assert id(engine.simulation) == simulation_id
+        assert engine.simulation.system.getNumParticles() == n_particles
+        assert np.isfinite(energy_1)
+        assert np.isfinite(energy_2)
+    finally:
+        os.chdir(cwd)
