@@ -6,7 +6,7 @@ nstxout = 1000
 nstenergy = 1000
 nstlog = 1000
 nstvout = 1000
-nstxtcout = 0
+;nstxtcout = 0
 
 ns_type	= grid
 nstlist	= 5	
