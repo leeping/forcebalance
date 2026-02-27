@@ -8,7 +8,6 @@ nstfout		= 0
 nstlog		= 0
 nstenergy	= 100
 nstcomm         = 0
-xtc_grps        = System
 energygrps      = System
 
 nstlist		= 0
