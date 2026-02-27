@@ -47,7 +47,7 @@ jobs:
       with:
         environment-file: devtools/conda-envs/test_env.yaml
         create-args: >-
-          python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }}
+          python=${{ matrix.python-version }} 'gromacs=${{ matrix.gmx-version }}.*=*dblprec*'
 
     - name: Additional info about the build
       shell: bash
@@ -126,7 +126,7 @@ jobs:
 
     - name: Run tests
       run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml src/tests/
+        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml --timeout=900 src/tests/
 
     - name: Run water study
       run: |
