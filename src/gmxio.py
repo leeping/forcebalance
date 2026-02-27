@@ -582,6 +582,15 @@ class GMX(Engine):
                 self.gmxpath = which('mdrun'+self.gmxsuffix)
                 self.gmxversion = 4
                 havegmx = True
+            elif self.gmxsuffix == '' and which('gmx_d') != '':
+                # Fallback: if only the double-precision build is installed (e.g.
+                # conda-forge's *dblprec* variant which ships gmx_d but not gmx),
+                # use it automatically rather than failing.
+                warn_once("Single-precision 'gmx' not found; falling back to double-precision 'gmx_d'.")
+                self.gmxsuffix = '_d'
+                self.gmxpath = which('gmx_d')
+                self.gmxversion = 5
+                havegmx = True
             else:
                 warn_press_key("Please add GROMACS executables to the PATH or specify gmxpath.")
                 logger.error("Cannot find the GROMACS executables!\n")
@@ -604,7 +613,7 @@ class GMX(Engine):
         # cutoff-scheme defaults to "verlet" (required for GROMACS >= 2021; group scheme removed).
         self.gmx_defs = OrderedDict([("integrator", "md"), ("dt", "0.001"), ("nsteps", "0"),
                                      ("nstxout", "0"), ("nstfout", "0"), ("nstenergy", "1"),
-                                     ("nstxtcout", "0"), ("constraints", "none"), ("cutoff-scheme", "verlet")])
+                                     ("nstxout-compressed", "0"), ("constraints", "none"), ("cutoff-scheme", "verlet")])
         gmx_opts = OrderedDict([])
         warnings = []
         self.pbc = pbc
@@ -983,7 +992,7 @@ class GMX(Engine):
         Result: Dictionary containing energies, forces and/or dipoles.
         """
 
-        shot_opts = OrderedDict([("nsteps", 0), ("nstxout", 0), ("nstxtcout", 0), ("nstenergy", 1)])
+        shot_opts = OrderedDict([("nsteps", 0), ("nstxout", 0), ("nstxout-compressed", 0), ("nstenergy", 1)])
         shot_opts["nstfout"] = 1 if force else 0
         edit_mdp(fin="%s.mdp" % self.name, fout="%s-1.mdp" % self.name, options=shot_opts)
 
@@ -1340,7 +1349,9 @@ class GMX(Engine):
         md_opts["nstxout"] = nsave
         md_opts["nstvout"] = nsave
         md_opts["nstfout"] = 0
-        md_opts["nstxtcout"] = 0
+        # nstxtcout was renamed to nstxout-compressed in GROMACS 5.0; using the
+        # new name avoids an "Unknown mdp parameter" warning in GROMACS 2022+.
+        md_opts["nstxout-compressed"] = 0
 
         # Minimize the energy.
         if minimize:
