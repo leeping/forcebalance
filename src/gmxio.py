@@ -672,13 +672,14 @@ class GMX(Engine):
             from forcebalance.molecule import Box
             from numpy import array
 
-            maxbox = max([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
+            maxbox = max([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c]) # Angstrom
             if maxbox > 1e3:
                 warn_press_key("The box size of the molecule is larger than 100 nm.  Are you sure you want to run a vacuum simulation with this molecule?")
 
-            BOX_LENGTH = (maxbox + 1) * 20
-            NSTLIST = int(1e6)
+            BOX_LENGTH = (maxbox + 20) * 2
+            NSTLIST = int(1e2)
             CUTOFF = BOX_LENGTH / 25 # nm
+            # raise ValueError(BOX_LENGTH, NSTLIST, CUTOFF)
 
             box_center = array([BOX_LENGTH/2, BOX_LENGTH/2, BOX_LENGTH/2])
             for i in range(len(self.mol.boxes)):
