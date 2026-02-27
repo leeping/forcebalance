@@ -47,7 +47,12 @@ jobs:
       with:
         environment-file: devtools/conda-envs/test_env.yaml
         create-args: >-
-          python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }}.*=*dblprec*
+          python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }}.*=nompi_dblprec_*
+
+    - name: Check Gromacs executable
+      run: |
+        which gmx
+        gmx_d --version
 
     - name: Additional info about the build
       shell: bash
