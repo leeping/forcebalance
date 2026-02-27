@@ -672,9 +672,13 @@ class GMX(Engine):
             from forcebalance.molecule import Box
             from numpy import array
 
-            BOX_LENGTH = 1e3 - 1
+            maxbox = max([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c])
+            if maxbox > 1e3:
+                warn_press_key("The box size of the molecule is larger than 100 nm.  Are you sure you want to run a vacuum simulation with this molecule?")
+
+            BOX_LENGTH = (maxbox * 10) * 1.2 + 20
             NSTLIST = int(1e6)
-            CUTOFF = BOX_LENGTH / 25
+            CUTOFF = BOX_LENGTH / 25 # nm
 
             box_center = array([BOX_LENGTH/2, BOX_LENGTH/2, BOX_LENGTH/2])
             for i in range(len(self.mol.boxes)):
@@ -683,12 +687,9 @@ class GMX(Engine):
                                         A=array([BOX_LENGTH, 0., 0.]),
                                         B=array([0., BOX_LENGTH, 0.]),
                                         C=array([0., 0., BOX_LENGTH]),
-                                        V=1000000000000)
+                                        V=BOX_LENGTH**3)
                 # Shift all atoms to the center of the large box so no atom starts near
-                # a periodic boundary.  Without this, atoms with negative coordinates
-                # get wrapped to the far side (~9000 nm) by GROMACS, and after
-                # minimization the system can straddle the boundary, making the RMSD
-                # calculation garbage.
+                # a periodic boundary.
                 centroid = self.mol.xyzs[i].mean(0)
                 self.mol.xyzs[i] = self.mol.xyzs[i] - centroid + box_center
             gmx_opts["pbc"] = "xyz"
