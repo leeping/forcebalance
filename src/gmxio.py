@@ -1353,7 +1353,8 @@ class GMX(Engine):
         md_opts["nstfout"] = 0
         # nstxtcout was renamed to nstxout-compressed in GROMACS 5.0; using the
         # new name avoids an "Unknown mdp parameter" warning in GROMACS 2022+.
-        md_opts["nstxout-compressed"] = 0
+        if "nstxtcout" in md_opts:
+            md_opts["nxtxout_compressed"] = md_opts.pop("nstxtcout")
 
         # Minimize the energy.
         if minimize:
