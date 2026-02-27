@@ -2,6 +2,15 @@
 import shutil
 from os import path
 
+# Setting this attribute bypasses multiprocessing.Manager() +
+# multiprocessing.Process() in _Multiprocessor.run() (backends/dask.py).
+# Without it, forking from the multi-threaded Dask/Tornado process
+# deadlocks on Python 3.9/3.10 due to fork-safety issues (locked mutexes
+# inherited by the child process). With it, tasks run directly in the
+# Dask worker thread instead of being dispatched to a subprocess.
+import openff.evaluator
+openff.evaluator._called_from_test = True
+
 from openff.evaluator.backends import ComputeResources
 from openff.evaluator.backends.dask import DaskLocalCluster
 from openff.evaluator.server import EvaluatorServer
