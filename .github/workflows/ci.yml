@@ -16,6 +16,7 @@ jobs:
   test:
     name: Test on ${{ matrix.os }} (py=${{ matrix.python-version }}, gmx=${{ matrix.gmx-version }})
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
@@ -124,22 +125,9 @@ jobs:
         python -m pip install --no-deps .
         python -c "import forcebalance; print(forcebalance.__version__)"
 
-    - name: Set up swap space
-      if: runner.os == 'Linux'
-      run: |
-        sudo fallocate -l 8G /swapfile
-        sudo chmod 600 /swapfile
-        sudo mkswap /swapfile
-        sudo swapon /swapfile
-        free -h
-
-    - name: Run engine tests
-      run: |
-        pytest -v --timeout=2000 src/tests/test_engine.py
-
     - name: Run tests
       run: |
-        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml --timeout=900 --ignore=src/tests/test_engine.py src/tests/
+        pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml --timeout=2000 src/tests/
 
     - name: Run water study
       run: |
