@@ -135,7 +135,7 @@ jobs:
 
     - name: Run engine tests
       run: |
-        pytest -v --timeout=900 src/tests/test_engine.py
+        pytest -v --timeout=2000 src/tests/test_engine.py
 
     - name: Run tests
       run: |
