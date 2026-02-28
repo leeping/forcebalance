@@ -253,7 +253,15 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
     def test_bromine_study(self):
         """Check bromine study produces objective function and gradient in expected range """
         objective = self.get_objective()
-        data      = objective.Full(np.zeros(objective.FF.np),1,verbose=True)
+        try:
+            data = objective.Full(np.zeros(objective.FF.np),1,verbose=True)
+        except Exception as exc:
+            self._server_log.flush()
+            log_contents = open("server.log").read()
+            raise RuntimeError(
+                "objective.Full raised %s: %s\nServer log (last 2000 chars):\n%s"
+                % (type(exc).__name__, exc, log_contents[-2000:])
+            ) from exc
         X, G, H   = data['X'], data['G'], data['H']
         msgX="\nCalculated objective function is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_OBJECTIVE in test_system.py with these values"
         np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_OBJECTIVE, X, atol=200, err_msg=msgX)
