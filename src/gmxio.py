@@ -128,6 +128,7 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
     for key, val in defaults.items():
         key = key.lower().replace('-','_')
         options[key] = val
+        # replace
         if key not in haveopts:
             out.append("%-20s = %s" % (key, val))
             all_options[key] = val
@@ -1109,7 +1110,7 @@ class GMX(Engine):
 
         # energygrps causes GROMACS to write per-pair interaction energies to the .edr.
         edit_mdp(fin=f"{self.name}.mdp", fout=f"{self.name}-i.mdp", options={
-            'xtc_grps': 'A B',
+            # 'xtc_grps': 'A B',
             'energygrps': 'A B'
         })
 
