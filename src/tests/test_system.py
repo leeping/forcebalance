@@ -196,7 +196,8 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         ##   that inherit the fd don't fill the pipe buffer and deadlock.
         ## - Use 'python -u' so each log line is flushed immediately to disk.
         import subprocess, time
-        self._server_log = open("server.log", "w")
+        self._server_log_path = os.path.abspath("server.log")
+        self._server_log = open(self._server_log_path, "w")
         self.estimator_process = subprocess.Popen(
             ["python", "-u", "run_server.py", "-ngpus=0", "-ncpus=1"],
             stdout=self._server_log, stderr=self._server_log,
@@ -211,18 +212,18 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         while time.time() < deadline:
             if self.estimator_process.poll() is not None:
                 self._server_log.flush()
-                log_contents = open("server.log").read()
+                log_contents = open(self._server_log_path).read()
                 pytest.fail(
                     "Evaluator server process exited prematurely (rc=%d). Log:\n%s"
                     % (self.estimator_process.returncode, log_contents[-2000:])
                 )
-            with open("server.log") as f:
+            with open(self._server_log_path) as f:
                 if ready_marker in f.read():
                     break
             time.sleep(0.5)
         else:
             self.estimator_process.terminate()
-            log_contents = open("server.log").read()
+            log_contents = open(self._server_log_path).read()
             pytest.fail(
                 "Evaluator server did not start within 120 seconds. Log:\n%s"
                 % log_contents[-2000:]
@@ -233,9 +234,8 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
     def teardown_method(self):
         self.estimator_process.terminate()
         self._server_log.close()
-        for fnm in ["server.log"]:
-            if os.path.exists(fnm):
-                os.remove(fnm)
+        if os.path.exists(self._server_log_path):
+            os.remove(self._server_log_path)
         for dnm in ["working_directory", "stored_data"]:
             if os.path.exists(dnm):
                 shutil.rmtree(dnm)
@@ -248,7 +248,7 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
             data = objective.Full(np.zeros(objective.FF.np),1,verbose=True)
         except Exception as exc:
             self._server_log.flush()
-            log_contents = open("server.log").read()
+            log_contents = open(self._server_log_path).read()
             raise RuntimeError(
                 "objective.Full raised %s: %s\nServer log (last 2000 chars):\n%s"
                 % (type(exc).__name__, exc, log_contents[-2000:])
