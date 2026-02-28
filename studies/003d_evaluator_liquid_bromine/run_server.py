@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+import multiprocessing
+
+# Use "spawn" instead of the Linux default "fork". When forking from the
+# multi-threaded Dask/Tornado process, child processes inherit locked mutexes
+# from sibling threads and deadlock immediately. "spawn" starts a fresh
+# interpreter with no inherited thread state, avoiding the deadlock entirely.
+# This is the primary fix for Python 3.9 / older openff-evaluator versions.
+multiprocessing.set_start_method("spawn", force=True)
+
 import shutil
 from os import path
 
