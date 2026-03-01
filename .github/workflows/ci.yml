@@ -54,7 +54,7 @@ jobs:
       # AmberTools is not available for Python 3.9, so we install it separately for Python 3.10 and above
       if: matrix.python-version != '3.9'
       shell: bash -l {0}
-      run: mamba install -c conda-forge ambertools
+      run: micromamba install -c conda-forge ambertools
           
     - name: Additional info about the build
       shell: bash
