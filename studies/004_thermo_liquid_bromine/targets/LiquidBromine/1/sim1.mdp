@@ -12,7 +12,6 @@ nstenergy	= 50
 xtc_grps        = System
 energygrps      = System
 nstlist		= 20
-ns_type		= grid
 rlist		= 0.9
 vdwtype		= switch
 coulombtype	= cut-off

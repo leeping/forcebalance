@@ -12,7 +12,6 @@ xtc_grps        = System
 energygrps      = System
 
 nstlist		= 10
-ns_type		= grid
 rlist		= 0.9
 vdwtype		= cut-off
 coulombtype	= cut-off

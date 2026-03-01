@@ -1009,17 +1009,20 @@ class GMX(Engine):
         ## Calculate and record energy
         self.callgmx("g_energy -xvg no -f %s.edr -o %s-e.xvg" % (self.name, self.name), stdin='Potential')
         Efile = open("%s-e.xvg" % self.name).readlines()
-        Result["Energy"] = np.array([float(Eline.split()[1]) for Eline in Efile])
+        Result["Energy"] = np.array([float(Eline.split()[1]) for Eline in Efile
+                                     if Eline.strip() and not Eline.startswith('#') and not Eline.startswith('@')])
 
         ## Calculate and record force
         if force:
             self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
             Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[int(i/3)]] \
-                                        for line in open("%s-f.xvg" % self.name).readlines()])
+                                        for line in open("%s-f.xvg" % self.name).readlines()
+                                        if line.strip() and not line.startswith('#') and not line.startswith('@')])
         ## Calculate and record dipole
         if dipole:
             self.callgmx("g_dipoles -s %s.tpr -f %s -o %s-d.xvg -xvg no" % (self.name, traj if traj else '%s.gro' % self.name, self.name), stdin="System\n")
-            Result["Dipole"] = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-d.xvg" % self.name)])
+            Result["Dipole"] = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-d.xvg" % self.name)
+                                         if line.strip() and not line.startswith('#') and not line.startswith('@')])
 
         return Result
 
