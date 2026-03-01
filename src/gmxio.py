@@ -597,6 +597,7 @@ class GMX(Engine):
                 logger.error("Cannot find the GROMACS executables!\n")
                 raise RuntimeError
 
+
     def readsrc(self, **kwargs):
         """ Called by __init__ ; read files from the source directory. """
 
@@ -790,28 +791,50 @@ class GMX(Engine):
         ptype_dict = {'atom': 'A', 'vsite': 'D', 'shell': 'S'}
 
         ## Here we recognize the residues and charge groups.
+        ## Handles both GROMACS <2022 format (all fields on one line):
+        ##   atom[   0]={type=0, ptype=Atom, m=1.6e+01, q=-8.34e-01, resind=0, ...}
+        ## and GROMACS 2022+ format (one field per indented line):
+        ##   atom[0]:
+        ##       ptype                          = Atom
+        ##       m                              = 1.60000e+01
+        ##       q                              = -8.34000e-01
+        ##       resind                         = 0
+        pending_atom = {}  # accumulates per-atom fields across multiple lines
+        def flush_atom():
+            if all(k in pending_atom for k in ('ptype', 'resind', 'm', 'q')):
+                ptype = pending_atom['ptype'].lower()
+                self.AtomMask.append(ptype == 'atom')
+                self.AtomLists['ResidueNumber'].append(int(pending_atom['resind']))
+                self.AtomLists['ParticleType'].append(ptype_dict.get(ptype, 'A'))
+                self.AtomLists['Charge'].append(float(pending_atom['q']))
+                self.AtomLists['Mass'].append(float(pending_atom['m']))
+            pending_atom.clear()
+
         for line in o:
-            line = line.replace("=", "= ")
-            if "ptype=" in line:
-                s = line.split()
-                ptype = s[s.index("ptype=")+1].replace(',','').lower()
-                resind = int(s[s.index("resind=")+1].replace(',','').lower())
-                mass = float(s[s.index("m=")+1].replace(',','').lower())
-                charge = float(s[s.index("q=")+1].replace(',','').lower())
-                # Gather data for residue number.
-                self.AtomMask.append(ptype=='atom')
-                self.AtomLists['ResidueNumber'].append(resind)
-                self.AtomLists['ParticleType'].append(ptype_dict[ptype])
-                self.AtomLists['Charge'].append(charge)
-                self.AtomLists['Mass'].append(mass)
+            # Detect start of a new atom block: "atom[N]={" (old) or "atom[N]:" (new)
+            if re.match(r'\s*atom\s*\[\s*\d', line):
+                flush_atom()
+                # Old GROMACS format: all fields on a single line
+                for m in re.finditer(
+                        r'(?<![a-zA-Z])(ptype|resind|m|q)(?![a-zA-Z])\s*=\s*([^\s,}]+)', line):
+                    pending_atom[m.group(1)] = m.group(2).strip(',')
+                if all(k in pending_atom for k in ('ptype', 'resind', 'm', 'q')):
+                    flush_atom()  # all fields found on one line, flush immediately
+            else:
+                # GROMACS 2022+ format: each field on its own indented line
+                m = re.match(r'\s+(ptype|resind|m|q)(?![a-zA-Z])\s*=\s*(.+?)\s*$', line)
+                if m:
+                    pending_atom[m.group(1)] = m.group(2).strip()
+            # Charge groups (GROMACS 4/5 only; removed in GROMACS 2021+)
             if "cgs[" in line:
                 ai = [int(i) for i in line.split("{")[1].split("}")[0].split("..")]
                 cg = int(line.split('[')[1].split(']')[0])
-                for i in range(ai[1]-ai[0]+1) : self.AtomLists['ChargeGroupNumber'].append(cg)
+                for i in range(ai[1]-ai[0]+1): self.AtomLists['ChargeGroupNumber'].append(cg)
             if "mols[" in line:
                 ai = [int(i) for i in line.split("{")[1].split("}")[0].split("..")]
                 mn = int(line.split('[')[1].split(']')[0])
-                for i in range(ai[1]-ai[0]+1) : self.AtomLists['MoleculeNumber'].append(mn)
+                for i in range(ai[1]-ai[0]+1): self.AtomLists['MoleculeNumber'].append(mn)
+        flush_atom()  # flush the last pending atom
         os.unlink('mdout.mdp')
         os.unlink('%s.tpr' % self.name)
         if hasattr(self,'FF') and itptmp:
@@ -823,14 +846,25 @@ class GMX(Engine):
         self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
         o = self.callgmx("gmxdump -s %s.tpr -sys" % self.name, copy_stderr=True)
         # List of charges obtained from reading gmxdump.
+        # Handles both GROMACS <2022 (all fields on one line) and 2022+ (one per line) formats.
         charges = []
+        pending_q = None
         for line in o:
-            line = line.replace("=", "= ")
-            # These lines contain the charges
-            if "ptype=" in line:
-                s = line.split()
-                charge = float(s[s.index("q=")+1].replace(',','').lower())
-                charges.append(charge)
+            if re.match(r'\s*atom\s*\[\s*\d', line):
+                if pending_q is not None:
+                    charges.append(pending_q)
+                pending_q = None
+                # Old GROMACS format: q on the same line as the atom header
+                m = re.search(r'(?<![a-zA-Z])q(?![a-zA-Z])\s*=\s*([^\s,}]+)', line)
+                if m:
+                    pending_q = float(m.group(1).strip(','))
+            else:
+                # GROMACS 2022+ format: "    q                              = -8.34000e-01"
+                m = re.match(r'\s+q(?![a-zA-Z])\s*=\s*(.+?)\s*$', line)
+                if m:
+                    pending_q = float(m.group(1))
+        if pending_q is not None:
+            charges.append(pending_q)
         os.unlink('%s.tpr' % self.name)
         return np.array(charges)
 
@@ -1001,7 +1035,7 @@ class GMX(Engine):
 
         ## Call grompp followed by mdrun.
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-1.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite %s" % (self.name, "-rerun %s" % traj if traj else ''))
+        self.callgmx(("mdrun -deffnm %s -nt 1 -rerunvsite %s" % (self.name, "-rerun %s" % traj if traj else '')).strip())
 
         ## Gather information
         Result = OrderedDict()
@@ -1085,7 +1119,7 @@ class GMX(Engine):
         else:
             self.mol[shot].write("%s.gro" % self.name)
             self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s-1.tpr" % (self.name, self.name, self.name, self.name))
-            self.callgmx("mdrun -deffnm %s-1 -nt 1 -rerunvsite" % (self.name, self.name))
+            self.callgmx("mdrun -deffnm %s-1 -nt 1 -rerunvsite" % self.name)
             self.callgmx("g_energy -xvg no -f %s-1.edr -o %s-1-e.xvg" % (self.name, self.name), stdin='Potential')
             E = float(open("%s-1-e.xvg" % self.name).readlines()[0].split()[1])
             return E, 0.0
