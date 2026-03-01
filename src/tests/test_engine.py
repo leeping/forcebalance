@@ -1,6 +1,8 @@
 from __future__ import absolute_import
 from builtins import zip
 from builtins import range
+import re
+import subprocess
 import pytest
 from forcebalance.nifty import *
 from forcebalance.gmxio import GMX
@@ -14,6 +16,19 @@ from .__init__ import ForceBalanceTestCase, check_for_openmm
 # vs. comparing multiple programs against each other, b/c we don't know
 # which one changed.
 SAVEDATA=False
+
+
+def is_gromacs_2022_or_2023(gmxpath):
+    """Check if the GROMACS version is 2022 or 2023."""
+    try:
+        result = subprocess.run([gmxpath, '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        version_output = result.stdout
+        match = re.search(r'GROMACS\s+(\d{4})', version_output)
+        if match and match.group(1) in ['2022', '2023']:
+            return True
+    except Exception:
+        pass
+    return False
 
 class TestAmber99SB(ForceBalanceTestCase):
     """ Amber99SB unit test consisting of ten structures of
@@ -174,6 +189,11 @@ class TestAmber99SB(ForceBalanceTestCase):
                 missing_pkgs.append(eng)
         if len(missing_pkgs) > 0:
             pytest.skip("Missing packages: %s" % ', '.join(missing_pkgs))
+        # also test if GROMACS version is 2022 or 2023, a bug in the 1-4 energy groupings
+        # makes this test fail
+        # https://gitlab.com/gromacs/gromacs/-/issues/5109
+        if 'GMX' in self.engines and not is_gromacs_2022_or_2023(self.engines['GMX'].gmxpath):
+            pytest.skip("GROMACS version is not 2022 or 2023, skipping GMX interaction energy test")
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.interaction_energy(fraga=list(range(22)), fragb=list(range(22, 49)))
