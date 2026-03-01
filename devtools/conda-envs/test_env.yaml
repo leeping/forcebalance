@@ -21,7 +21,7 @@ dependencies:
   - openmm >= 8
   - ndcctools
   - geometric
-  - rdkit # needed for openff toolkit
+  - rdkit!=2024.03.6,<2025.09
   # - gromacs =2019.1
   - openff-toolkit >=0.11.3
   # - openff-evaluator-base >= 0.4.5
