@@ -2,6 +2,7 @@ from __future__ import absolute_import
 
 from builtins import str
 import os, shutil
+import sys
 import tarfile
 from .__init__ import ForceBalanceTestCase, check_for_openmm
 from forcebalance.parser import parse_inputs
@@ -11,6 +12,11 @@ from forcebalance.optimizer import Optimizer, Counter
 from numpy import array
 import numpy as np
 import pytest
+
+skip_openff_py39 = pytest.mark.skipif(
+    sys.version_info < (3, 10),
+    reason="openff packages require ambertools which requires Python >= 3.10",
+)
 
 # expected results (mvals) taken from previous runs. Update this if it changes and seems reasonable (updated 10/24/13)
 #EXPECTED_WATER_RESULTS = array([3.3192e-02, 4.3287e-02, 5.5072e-03, -4.5933e-02, 1.5499e-02, -3.7655e-01, 2.4720e-03, 1.1914e-02, 1.5066e-01])
@@ -181,6 +187,8 @@ class TestThermoBromineStudy(ForceBalanceSystemTest):
         """Check liquid bromine study (Thermo target) converges to expected results"""
         self.run_optimizer()
 
+
+@skip_openff_py39
 class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         pytest.importorskip("openff.evaluator")
@@ -290,6 +298,7 @@ class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
         """Check implicit hydration free energy study (Hydration target) converges to expected results"""
         self.run_optimizer(check_result=False, check_iter=False, use_pvals=True)
 
+@skip_openff_py39
 class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         pytest.importorskip("openff.toolkit", minversion="0.4")
@@ -310,6 +319,7 @@ class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
         """Check OpenFF torsion profile optimization converges to expected results"""
         self.run_optimizer(check_iter=False)
 
+@skip_openff_py39
 class TestRechargeMethaneStudy(ForceBalanceSystemTest):
 
     def setup_method(self, method):
