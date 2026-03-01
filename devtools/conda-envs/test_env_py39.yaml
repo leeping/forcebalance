@@ -19,11 +19,12 @@ dependencies:
   - future
   - pymbar =3
   - openmm >= 8
-  - ambertools
+  # ambertools has no Python 3.9 builds on conda-forge
   - ndcctools
   - geometric
   # - gromacs =2019.1
-  - openff-toolkit >=0.11.3
-  - openff-evaluator-base >= 0.4.5
+  # openff packages require Python >= 3.10; tests are skipped on 3.9
+  # - openff-toolkit-base
+  # - openff-evaluator-base
   # - openff-recharge
   # - openeye-toolkits (Don't have a license file to use with GH Actions.)

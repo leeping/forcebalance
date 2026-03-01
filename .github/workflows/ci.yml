@@ -41,7 +41,8 @@ jobs:
     - name: Set up conda environment
       uses: mamba-org/setup-micromamba@v1
       with:
-        environment-file: devtools/conda-envs/test_env.yaml
+        # ambertools has no Python 3.9 builds; use a separate env file for 3.9
+        environment-file: ${{ matrix.python-version == '3.9' && 'devtools/conda-envs/test_env_py39.yaml' || 'devtools/conda-envs/test_env.yaml' }}
         create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
           python=${{ matrix.python-version }}
 
@@ -49,12 +50,6 @@ jobs:
       if: matrix.python-version == '3.9' || matrix.python-version == '3.10'
       shell: bash -l {0}
       run: pip install "setuptools<82"
-
-    - name: Install ambertools for Python > 3.9
-      # AmberTools is not available for Python 3.9, so we install it separately for Python 3.10 and above
-      if: matrix.python-version != '3.9'
-      shell: bash -l {0}
-      run: micromamba install -c conda-forge ambertools
           
     - name: Additional info about the build
       shell: bash
