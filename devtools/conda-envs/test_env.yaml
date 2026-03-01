@@ -19,7 +19,6 @@ dependencies:
   - future
   - pymbar =3
   - openmm >= 8
-  - ambertools
   - ndcctools
   - geometric
   # - gromacs =2019.1
