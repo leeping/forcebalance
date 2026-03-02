@@ -747,7 +747,7 @@ class FF(forcebalance.BaseClass):
                 res = re.search(r'^[-+]?[0-9]*\.?[0-9]*([eEdD][-+]?[0-9]+)?', quantity_str)
                 value_str, unit_str = quantity_str[:res.end()], quantity_str[res.end():]
                 # LPW 2023-01-23: Behavior of parameter unit string for "evaluated" parameter is undefined.
-                unit_str = ""
+                # unit_str = ""
                 quantity_str = e.get(parameter_name)
                 self.offxml_unit_strs[dest] = unit_str
 
