@@ -33,7 +33,7 @@ from forcebalance.nifty import *
 from forcebalance.nifty import _exec
 from collections import OrderedDict, defaultdict, Counter
 from forcebalance.output import getLogger
-from forcebalance.openmmio import OpenMM, UpdateSimulationParameters
+from forcebalance.openmmio import OpenMM, UpdateSimulationParameters, GetVirtualSiteParameters
 import json
 
 logger = getLogger(__name__)
