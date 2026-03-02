@@ -1050,7 +1050,7 @@ class GMX(Engine):
         # Only pass -rerunvsite when performing an actual trajectory rerun;
         # GROMACS 2025 rejects the flag for a standalone 0-step mdrun (no -rerun).
         rerunvsite_flag = "-rerunvsite" if traj else ""
-        self.callgmx(("mdrun -deffnm %s -nt 1 -noappend %s %s" % (self.name, rerunvsite_flag, "-rerun %s" % traj if traj else '')).strip())
+        self.callgmx(("mdrun -deffnm %s -nt 1 %s %s" % (self.name, rerunvsite_flag, "-rerun %s" % traj if traj else '')).strip())
 
         ## Gather information
         Result = OrderedDict()
