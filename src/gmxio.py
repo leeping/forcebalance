@@ -1031,6 +1031,10 @@ class GMX(Engine):
 
         shot_opts = OrderedDict([("nsteps", 0), ("nstxout", 0), ("nstxout-compressed", 0), ("nstenergy", 1)])
         shot_opts["nstfout"] = 1 if force else 0
+        # Disable pressure coupling for 0-step energy evaluation: Parrinello-Rahman
+        # requires box matrix velocities from a checkpoint, which don't exist for a
+        # fresh 0-step run. GROMACS 2025 added strict validation that rejects this.
+        shot_opts["pcoupl"] = "no"
         edit_mdp(fin="%s.mdp" % self.name, fout="%s-1.mdp" % self.name, options=shot_opts)
 
         ## Call grompp followed by mdrun.
