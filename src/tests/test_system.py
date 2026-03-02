@@ -31,6 +31,12 @@ EXPECTED_EVALUATOR_BROMINE_OBJECTIVE = array([1000])
 # expected gradient elements from 003d evaluator bromine study. Very large uncertainties of +/- 2000 (updated 11/23/19)
 EXPECTED_EVALUATOR_BROMINE_GRADIENT = array([4500, 5500])
 
+# expected objective function from 028 evaluator water vsite study. Update after first run.
+EXPECTED_EVALUATOR_WATER_VSITE_OBJECTIVE = array([0])
+
+# expected gradient elements from 028 evaluator water vsite study (3 vsite params). Update after first run.
+EXPECTED_EVALUATOR_WATER_VSITE_GRADIENT = array([0, 0, 0])
+
 # expected result (pvals) taken from ethanol GB parameter optimization. Update this if it changes and seems reasonable (updated 09/05/14)
 EXPECTED_ETHANOL_RESULTS = array([1.2286e-01, 8.3624e-01, 1.0014e-01, 8.4533e-01, 1.8740e-01, 6.8820e-01, 1.4606e-01, 8.3518e-01])
 
@@ -384,3 +390,81 @@ class TestRechargeMethaneStudy(ForceBalanceSystemTest):
             rtol=5.0e-7,
             err_msg=msgG
         )
+
+@skip_openff_py39
+class TestEvaluatorWaterVSiteStudy(ForceBalanceSystemTest):
+    def setup_method(self, method):
+        pytest.importorskip("openff.evaluator")
+        pytest.importorskip("openff.toolkit")
+        super(TestEvaluatorWaterVSiteStudy, self).setup_method(method)
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies', '028_smirnoff_tip4p_geometry_fit'))
+        self.study_directory = os.getcwd()
+        ## Start the estimator server.
+        ## - Redirect output to a log file (not PIPE) so Dask worker subprocesses
+        ##   that inherit the fd don't fill the pipe buffer and deadlock.
+        ## - Use 'python -u' so each log line is flushed immediately to disk.
+        import subprocess, time
+        self._server_log_path = os.path.abspath("server.log")
+        self._server_log = open(self._server_log_path, "w")
+        self.estimator_process = subprocess.Popen(
+            ["python", "-u", "run_server.py", "-ngpus=0", "-ncpus=1"],
+            stdout=self._server_log, stderr=self._server_log,
+        )
+        ## Wait for the server to log that it is ready.
+        server_port = 8000
+        ready_marker = "listening at port {}".format(server_port)
+        deadline = time.time() + 120
+        while time.time() < deadline:
+            if self.estimator_process.poll() is not None:
+                self._server_log.flush()
+                log_contents = open(self._server_log_path).read()
+                pytest.fail(
+                    "Evaluator server process exited prematurely (rc=%d). Log:\n%s"
+                    % (self.estimator_process.returncode, log_contents[-2000:])
+                )
+            with open(self._server_log_path) as f:
+                if ready_marker in f.read():
+                    break
+            time.sleep(0.5)
+        else:
+            self.estimator_process.terminate()
+            log_contents = open(self._server_log_path).read()
+            pytest.fail(
+                "Evaluator server did not start within 120 seconds. Log:\n%s"
+                % log_contents[-2000:]
+            )
+        self.input_file = 'optimize.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
+
+    def teardown_method(self):
+        self.estimator_process.terminate()
+        self._server_log.close()
+        if os.path.exists(self._server_log_path):
+            os.remove(self._server_log_path)
+        for dnm in ["working_directory", "stored_data"]:
+            if os.path.exists(dnm):
+                shutil.rmtree(dnm)
+        super(TestEvaluatorWaterVSiteStudy, self).teardown_method()
+
+    def test_water_vsite_study(self):
+        """Check water virtual site study produces objective function and gradient in expected range"""
+        objective = self.get_objective()
+        try:
+            data = objective.Full(np.zeros(objective.FF.np), 1, verbose=True)
+        except Exception as exc:
+            self._server_log.flush()
+            log_contents = open(self._server_log_path).read()
+            raise RuntimeError(
+                "objective.Full raised %s: %s\nServer log (last 2000 chars):\n%s"
+                % (type(exc).__name__, exc, log_contents[-2000:])
+            ) from exc
+        X, G, H = data['X'], data['G'], data['H']
+        msgX = ("\nCalculated objective function is outside expected range.\n"
+                " If this seems reasonable, update EXPECTED_EVALUATOR_WATER_VSITE_OBJECTIVE"
+                " in test_system.py with these values")
+        np.testing.assert_allclose(EXPECTED_EVALUATOR_WATER_VSITE_OBJECTIVE, X, atol=1e6, err_msg=msgX)
+        msgG = ("\nCalculated gradient is outside expected range.\n"
+                " If this seems reasonable, update EXPECTED_EVALUATOR_WATER_VSITE_GRADIENT"
+                " in test_system.py with these values")
+        np.testing.assert_allclose(EXPECTED_EVALUATOR_WATER_VSITE_GRADIENT, G, atol=1e6, err_msg=msgG)
