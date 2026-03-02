@@ -1,0 +1,53 @@
+# ForceBalance input file for gradient evaluation (used by test_system.py)
+# Based on optimize.in with jobtype changed to gradient
+
+$options
+ffdir forcefield
+penalty_type L2
+jobtype gradient
+forcefield force-field.offxml
+maxstep 2
+convergence_step 0.1
+convergence_objective 0.1
+convergence_gradient 0.1
+eig_lowerbound 0.01
+finite_difference_h 0.001
+penalty_additive 1.0
+trust0 0.25
+mintrust 0.05
+error_tolerance 1.0
+adaptive_factor 0.2
+adaptive_damping 1.0
+normalize_weights no
+print_hessian
+constrain_charge false
+backup false
+
+priors
+    /VirtualSites/VirtualSite/charge_increment2  :  0.1
+    /VirtualSites/VirtualSite/distance  :  0.1
+    /VirtualSites/VirtualSite/outOfPlaneAngle  :  0.1
+/priors
+
+$end
+
+$target
+name water
+type AbInitio_SMIRNOFF
+mol2 input.sdf
+pdb water.pdb
+weight 1.0
+w_force 0.1 # Reflects intrinsically small QM force
+force_average # Average force over all atoms
+attenuate
+energy_denom 5.0
+energy_upper 20.0
+writelevel 2
+$end
+
+$target
+name phys-prop
+type Evaluator_SMIRNOFF
+weight 1.0
+evaluator_input options.json
+$end
