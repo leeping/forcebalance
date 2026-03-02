@@ -874,7 +874,7 @@ class GMX(Engine):
         mdpfile = onefile('%s.mdp' % self.name, 'mdp', err=True)
         LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
 
-    def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
+    def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, copy_stderr=True, **kwargs):
 
         """ Call GROMACS; prepend the gmxpath to the call to the GROMACS program. """
 
@@ -898,7 +898,7 @@ class GMX(Engine):
             csplit[0] = prog + self.gmxsuffix
         else:
             raise RuntimeError('gmxversion must be 4 (standalone mdrun) or 5 (gmx wrapper, valid for GROMACS 5.x and all 20xx releases)')
-        return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
+        return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, copy_stderr=copy_stderr, **kwargs)
 
     def warngmx(self, command, warnings=[], maxwarn=1, **kwargs):
         
