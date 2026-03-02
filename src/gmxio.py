@@ -1038,27 +1038,33 @@ class GMX(Engine):
         edit_mdp(fin="%s.mdp" % self.name, fout="%s-1.mdp" % self.name, options=shot_opts)
 
         ## Call grompp followed by mdrun.
-        self.warngmx("grompp -c %s.gro -p %s.top -f %s-1.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
-        self.callgmx(("mdrun -deffnm %s -nt 1 -rerunvsite %s" % (self.name, "-rerun %s" % traj if traj else '')).strip())
+        # Use %s-1 naming consistently (matching the .mdp) so that mdrun never
+        # picks up a %s.cpt checkpoint left by a previous evaluate_() call with
+        # different parameters, which GROMACS 2025 rejects at startup.
+        self.warngmx("grompp -c %s.gro -p %s.top -f %s-1.mdp -o %s-1.tpr" % (self.name, self.name, self.name, self.name))
+        # Only pass -rerunvsite when performing an actual trajectory rerun;
+        # GROMACS 2025 rejects the flag for a standalone 0-step mdrun.
+        rerunvsite_flag = "-rerunvsite" if traj else ""
+        self.callgmx(("mdrun -deffnm %s-1 -nt 1 %s %s" % (self.name, rerunvsite_flag, "-rerun %s" % traj if traj else '')).strip())
 
         ## Gather information
         Result = OrderedDict()
 
         ## Calculate and record energy
-        self.callgmx("g_energy -xvg no -f %s.edr -o %s-e.xvg" % (self.name, self.name), stdin='Potential')
+        self.callgmx("g_energy -xvg no -f %s-1.edr -o %s-e.xvg" % (self.name, self.name), stdin='Potential')
         Efile = open("%s-e.xvg" % self.name).readlines()
         Result["Energy"] = np.array([float(Eline.split()[1]) for Eline in Efile
                                      if Eline.strip() and not Eline.startswith('#') and not Eline.startswith('@')])
 
         ## Calculate and record force
         if force:
-            self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
+            self.callgmx("g_traj -xvg no -s %s-1.tpr -f %s-1.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
             Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[int(i/3)]] \
                                         for line in open("%s-f.xvg" % self.name).readlines()
                                         if line.strip() and not line.startswith('#') and not line.startswith('@')])
         ## Calculate and record dipole
         if dipole:
-            self.callgmx("g_dipoles -s %s.tpr -f %s -o %s-d.xvg -xvg no" % (self.name, traj if traj else '%s.gro' % self.name, self.name), stdin="System\n")
+            self.callgmx("g_dipoles -s %s-1.tpr -f %s -o %s-d.xvg -xvg no" % (self.name, traj if traj else '%s.gro' % self.name, self.name), stdin="System\n")
             Result["Dipole"] = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-d.xvg" % self.name)
                                          if line.strip() and not line.startswith('#') and not line.startswith('@')])
 
