@@ -12,7 +12,8 @@ energygrps      = System
 
 nstlist		= 20
 rlist		= 0.9
-vdwtype		= switch
+vdwtype		= Cut-off
+vdw_modifier    = Potential-switch
 coulombtype	= cut-off
 rcoulomb	= 0.9
 rvdw		= 0.9
