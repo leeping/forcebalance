@@ -110,6 +110,10 @@ def test_local_coord_sites():
 def test_update_simulation_twice_water_box():
     """Ensure update_simulation can be called repeatedly on the test_liquid water box fixture."""
     if no_openmm: pytest.skip("No OpenMM modules found.")
+    try:
+        mm.Platform.getPlatformByName("CUDA")
+    except mm.OpenMMException:
+        pytest.skip("CUDA platform not available.")
 
     test_root = os.path.join(os.path.dirname(os.path.realpath(__file__)), "files")
     liquid_pdb = os.path.join(test_root, "liquid.pdb")
