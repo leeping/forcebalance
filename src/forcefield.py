@@ -1497,9 +1497,9 @@ class FF(forcebalance.BaseClass):
             # Matches dictionary keys in a string like this: 
             # Given string: PRM['Bonds/Bond/k/[#6X3:1]-[#6X3:2]']*np.arccos(PRM["[*:1]~[#7X3$(*~[#6X3]):2](~[*:3])~[*:4]"])
             # Returns: (['Bonds/Bond/k/[#6X3:1]-[#6X3:2]'], ["[*:1]~[#7X3$(*~[#6X3]):2](~[*:3])~[*:4]"])
-            matches = re.findall("\[['\"][^'\"]*['\"]\]", cmd)
+            matches = re.findall(r"\[['\"][^'\"]*['\"]\]", cmd)
             for word in matches:
-                src_param_name = re.sub("\[['\"]|['\"]\]", "", word)
+                src_param_name = re.sub(r"\[['\"]|['\"]\]", "", word)
                 src_nodes = [x for x in self.pTree.nodes() if x==src_param_name]
                 if len(src_nodes) > 1:
                     raise RuntimeError('Detected multiple nodes in pTree with the same name; this should not happen')

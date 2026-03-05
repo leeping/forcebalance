@@ -237,7 +237,7 @@ class Optimizer(forcebalance.BaseClass):
                 if os.path.exists(os.path.join(T.absrd(), 'mvals.txt')):
                     tmvals = np.loadtxt(os.path.join(T.absrd(), 'mvals.txt'))
                     if len(tmvals) > 0 and np.max(np.abs(tmvals - self.mvals0) > 1e-4):
-                        warn_press_key("mvals.txt in %s does not match loaded parameters.\nSave file : %s\Parameters : %s\n" % (T.absrd(), tmvals, self.mvals0))
+                        warn_press_key("mvals.txt in %s does not match loaded parameters.\nSave file : %s\nParameters : %s\n" % (T.absrd(), tmvals, self.mvals0))
                 else:
                     warn_press_key("mvals.txt does not exist in %s." % (T.absrd()))
         self.iterinit = maxrd
@@ -807,13 +807,13 @@ class Optimizer(forcebalance.BaseClass):
                 t0 = time.time()
                 # Opt1 = optimize.fmin_bfgs(HYP.compute_val,dx0,fprime=HYP.compute_grad,gtol=1e-5*np.sqrt(len(dx0)),full_output=True,disp=1)
                 # Opt1 = optimize.fmin_l_bfgs_b(HYP.compute_val,dx0,fprime=HYP.compute_grad,m=30,factr=1e7,pgtol=1e-4,iprint=0,disp=1,maxfun=1e5,maxiter=1e5)
-                Opt1 = optimize.fmin_l_bfgs_b(HYP.compute_val,dx0,fprime=HYP.compute_grad,m=30,factr=1e7,pgtol=1e-4,iprint=-1,disp=0,maxfun=1e5,maxiter=1e5)
+                Opt1 = optimize.fmin_l_bfgs_b(HYP.compute_val,dx0,fprime=HYP.compute_grad,m=30,factr=1e7,pgtol=1e-4,maxfun=int(1e5),maxiter=int(1e5))
                 logger.info("%.3f s (L-BFGS 1) ", time.time() - t0)
 
                 t0 = time.time()
                 # Opt2 = optimize.fmin_bfgs(HYP.compute_val,-xkd,fprime=HYP.compute_grad,gtol=1e-5*np.sqrt(len(dx0)),full_output=True,disp=1)
                 # Opt2 = optimize.fmin_l_bfgs_b(HYP.compute_val,-xkd,fprime=HYP.compute_grad,m=30,factr=1e7,pgtol=1e-4,iprint=0,disp=1,maxfun=1e5,maxiter=1e5)
-                Opt2 = optimize.fmin_l_bfgs_b(HYP.compute_val,-xkd,fprime=HYP.compute_grad,m=30,factr=1e7,pgtol=1e-4,iprint=-1,disp=0,maxfun=1e5,maxiter=1e5)
+                Opt2 = optimize.fmin_l_bfgs_b(HYP.compute_val,-xkd,fprime=HYP.compute_grad,m=30,factr=1e7,pgtol=1e-4,maxfun=int(1e5),maxiter=int(1e5))
                 logger.info("%.3f s (L-BFGS 2) ", time.time() - t0)
 
                 dx1, sol1 = Opt1[0], Opt1[1]

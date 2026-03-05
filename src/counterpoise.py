@@ -76,7 +76,7 @@ class Counterpoise(Target):
             if match('^[0-9]+$',strip):
                 ## Number of atoms
                 self.na = int(strip)
-            elif match('[A-Z][a-z]*( +[-+]?([0-9]*\.[0-9]+|[0-9]+)){3}$',strip):
+            elif match(r'[A-Z][a-z]*( +[-+]?([0-9]*\.[0-9]+|[0-9]+)){3}$',strip):
                 xyz.append([float(i) for i in sline[1:]])
                 if len(elem) < self.na:
                     elem.append(sline[0])

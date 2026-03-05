@@ -248,7 +248,7 @@ def parse_amber_namelist(fin):
         # Matches the following:
         # variable name (may include alphanumeric characters or underscore)
         # 
-        block_split = re.findall("[A-Za-z0-9_]+ *= *(?:\'[^']*\'|[+-]?[0-9]+\.?[0-9]*),", block_string)
+        block_split = re.findall(r"[A-Za-z0-9_]+ *= *(?:\'[^']*\'|[+-]?[0-9]+\.?[0-9]*),", block_string)
         #block_split = re.findall("[A-Za-z0-9_ ]+= *(?:(?:\'.*\')*[+-]?[0-9]+\.*[0-9]*,)+", block_string)
         #block_split = re.findall("[A-Za-z0-9_ ]+= *(?:(?:\'.*\')*[^ ]*,)+", block_string)
         # print(block_string)
@@ -655,7 +655,7 @@ class FrcMod_Reader(BaseReader):
 #=============================================================================================
 
 # A regex for extracting print format info from the FORMAT lines.
-FORMAT_RE_PATTERN=re.compile("([0-9]+)([a-zA-Z]+)([0-9]+)\.?([0-9]*)")
+FORMAT_RE_PATTERN=re.compile(r"([0-9]+)([a-zA-Z]+)([0-9]+)\.?([0-9]*)")
 
 # Pointer labels which map to pointer numbers at top of prmtop files
 POINTER_LABELS  = """

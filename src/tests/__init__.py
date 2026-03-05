@@ -6,7 +6,7 @@ forcebalance.output.getLogger("forcebalance.test").propagate=False
 
 os.chdir(os.path.dirname(__file__))
 __all__ = [module[:-3] for module in sorted(os.listdir('.'))
-           if re.match("^test_.*\.py$",module)]
+           if re.match(r"^test_.*\.py$",module)]
 
 
 class ForceBalanceTestCase(object):
