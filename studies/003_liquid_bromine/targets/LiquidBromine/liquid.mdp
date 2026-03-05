@@ -7,7 +7,6 @@ nstvout		= 0
 nstfout		= 0
 nstlog		= 0
 nstenergy	= 1000
-xtc_grps        = System
 energygrps      = System
 
 nstlist		= 20
@@ -33,7 +32,8 @@ gen_seed        = 123456
 
 pcoupl          = parrinello-rahman
 pcoupltype      = isotropic
+nstpcouple      = 100
 compressibility = 4.5e-5
 ref_p           = 1.0
-tau_p           = 1.5
+tau_p           = 40.0
 

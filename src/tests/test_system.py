@@ -14,20 +14,6 @@ from numpy import array
 import numpy as np
 import pytest
 
-
-def _get_gromacs_major_year():
-    """Return the GROMACS release year (e.g. 2025) or 0 if not detectable."""
-    for exe in ('gmx_d', 'gmx'):
-        try:
-            result = subprocess.run([exe, '--version'], capture_output=True, text=True, timeout=10)
-            m = re.search(r'GROMACS version[:\s]+(\d{4})', result.stdout + result.stderr, re.IGNORECASE)
-            if m:
-                return int(m.group(1))
-        except Exception:
-            pass
-    return 0
-
-
 # expected results (mvals) taken from previous runs. Update this if it changes and seems reasonable (updated 10/24/13)
 #EXPECTED_WATER_RESULTS = array([3.3192e-02, 4.3287e-02, 5.5072e-03, -4.5933e-02, 1.5499e-02, -3.7655e-01, 2.4720e-03, 1.1914e-02, 1.5066e-01])
 EXPECTED_WATER_RESULTS = array([4.2370e-02, 3.1217e-02, 5.6925e-03, -4.8114e-02, 1.6735e-02, -4.1722e-01, 6.2716e-03, 4.6306e-03, 2.5960e-01])
@@ -177,16 +163,10 @@ class TestBromineStudy(ForceBalanceSystemTest):
         self.expected_results_name = "EXPECTED_BROMINE_RESULTS"
         self.expected_results = EXPECTED_BROMINE_RESULTS
         self.absolute_tolerance = 0.10
-        # GROMACS 2025 changed the VDW switch function handling (Verlet scheme only),
-        # altering the energy landscape such that the optimizer overshoots on the
-        # first Newton step and converges back to the initial parameters [0, 0].
-        # The code is correct; only the convergence value differs.
-        self._gmx_year = _get_gromacs_major_year()
 
     def test_bromine_study(self):
         """Check liquid bromine study converges to expected results"""
-        check = self._gmx_year < 2025
-        self.run_optimizer(check_result=check)
+        self.run_optimizer()
 
 class TestThermoBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
@@ -198,12 +178,10 @@ class TestThermoBromineStudy(ForceBalanceSystemTest):
         self.expected_results_name = "EXPECTED_BROMINE_RESULTS"
         self.expected_results = EXPECTED_BROMINE_RESULTS
         self.absolute_tolerance = 0.05
-        self._gmx_year = _get_gromacs_major_year()
 
     def test_thermo_bromine_study(self):
         """Check liquid bromine study (Thermo target) converges to expected results"""
-        check = self._gmx_year < 2025
-        self.run_optimizer(check_result=check)
+        self.run_optimizer()
 
 class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
