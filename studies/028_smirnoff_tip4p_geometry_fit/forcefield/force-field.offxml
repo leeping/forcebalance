@@ -391,9 +391,9 @@
         <LibraryCharge smirks="[#1]-[#8X2H2+0:1]-[#1]" charge1="0 * elementary_charge ** 1" id="q-tip4p-fb-O"></LibraryCharge>
         <LibraryCharge smirks="[#1:1]-[#8X2H2+0]-[#1]" charge1="0 * elementary_charge ** 1" id="q-tip4p-fb-H"></LibraryCharge>
     </LibraryCharges>
-    <ToolkitAM1BCC version="0.3"></ToolkitAM1BCC>
     <VirtualSites version="0.3" exclusion_policy="parents">
         <VirtualSite smirks="[#1:2]-[#8X2H2+0:1]-[#1:3]" epsilon="0.0 * kilocalorie_per_mole ** 1" type="DivalentLonePair" match="once" distance="-0.010527445756662016 * nanometer ** 1" outOfPlaneAngle="0.0 * degree ** 1" inPlaneAngle="None" charge_increment1="0.0 * elementary_charge ** 1" charge_increment2="0.5758681106763001 * elementary_charge ** 1" charge_increment3="0.5758681106763001 * elementary_charge ** 1" sigma="1.0 * angstrom ** 1" name="EP" parameterize="distance,charge_increment2" parameter_eval="charge_increment3=PRM['VirtualSites/VirtualSite/charge_increment2/[#1:2]-[#8X2H2+0:1]-[#1:3]/DivalentLonePair/EP/once']"></VirtualSite>
         <VirtualSite smirks="[#1:2]-[#8X2H2+0:1]-[#1:3]" epsilon="0.0 * kilocalorie_per_mole ** 1" type="DivalentLonePair" match="all_permutations" distance="0.09572 * nanometer ** 1" outOfPlaneAngle="52.25999999987184 * degree ** 1" inPlaneAngle="None" charge_increment1="0 * elementary_charge ** 1" charge_increment2="-0.28793405533815003 * elementary_charge ** 1" charge_increment3="-0.28793405533815003 * elementary_charge ** 1" sigma="1.0 * angstrom ** 1" name="EP-L"></VirtualSite>
     </VirtualSites>
+    <NAGLCharges model_file="openff-gnn-am1bcc-1.0.0.pt" model_file_hash="7981e7f5b0b1e424c9e10a40d9e7606d96dcd3dd2b095cb4eeff6829f92238ee" version="0.3"></NAGLCharges>
 </SMIRNOFF>
