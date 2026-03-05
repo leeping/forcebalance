@@ -1035,6 +1035,15 @@ class GMX(Engine):
         # requires box matrix velocities from a checkpoint, which don't exist for a
         # fresh 0-step run. GROMACS 2025 added strict validation that rejects this.
         shot_opts["pcoupl"] = "no"
+        # Set nstlist=1 so GROMACS does not auto-tune the neighbor-list interval or
+        # expand rlist beyond the value in the MDP.  GROMACS 2025.3+ added a fatal
+        # check in rerun.cpp that aborts when any trajectory frame's box is smaller
+        # than 2*rlist; the auto-tuner can inflate rlist (e.g. 0.9→0.979 nm) to
+        # match a larger nstlist, causing the check to fail for frames whose box
+        # shrank slightly during NPT equilibration.  With nstlist=1 the neighbor
+        # list is rebuilt every frame, no buffer expansion is needed, and rlist
+        # stays at the value in the MDP (typically 0.9 nm).
+        shot_opts["nstlist"] = 1
         edit_mdp(fin="%s.mdp" % self.name, fout="%s-1.mdp" % self.name, options=shot_opts)
 
         ## Call grompp followed by mdrun.
@@ -1047,23 +1056,10 @@ class GMX(Engine):
         if os.path.exists(cpt_file):
             os.remove(cpt_file)
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-1.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
-        # Diagnostic: verify TPR was created and log key file presence to stderr.
-        tpr_file = "%s.tpr" % self.name
-        diag_files = [tpr_file, "%s.gro" % self.name, "%s-1.mdp" % self.name]
-        if traj:
-            diag_files.append(traj)
-        for f in diag_files:
-            sys.stderr.write("[FB evaluate_ diag] %s: %s\n" % (f, "EXISTS" if os.path.exists(f) else "MISSING"))
-        sys.stderr.flush()
-        if not os.path.exists(tpr_file):
-            raise RuntimeError("grompp failed to produce %s; cannot run mdrun" % tpr_file)
         # Only pass -rerunvsite when performing an actual trajectory rerun;
         # GROMACS 2025 rejects the flag for a standalone 0-step mdrun (no -rerun).
         rerunvsite_flag = "-rerunvsite" if traj else ""
-        mdrun_cmd = ("mdrun -deffnm %s -nt 1 %s %s" % (self.name, rerunvsite_flag, "-rerun %s" % traj if traj else '')).strip()
-        sys.stderr.write("[FB evaluate_ diag] Running: gmx%s %s\n" % (self.gmxsuffix, mdrun_cmd))
-        sys.stderr.flush()
-        self.callgmx(mdrun_cmd, print_to_screen=True)
+        self.callgmx(("mdrun -deffnm %s -nt 1 %s %s" % (self.name, rerunvsite_flag, "-rerun %s" % traj if traj else '')).strip())
 
         ## Gather information
         Result = OrderedDict()
