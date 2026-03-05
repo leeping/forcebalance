@@ -23,7 +23,7 @@ dependencies:
   - ndcctools
   - geometric
   # - gromacs =2019.1
-  # openff packages require Python >= 3.10; tests are skipped on 3.9
+  # openff packages require Python >= 3.11; tests are skipped on 3.9 and 3.10
   # - openff-toolkit-base
   # - openff-evaluator-base
   # - openff-recharge
