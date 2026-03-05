@@ -403,7 +403,7 @@ class Evaluator_SMIRNOFF(Target):
 
         return parameter_values
 
-    def _build_pvals_jacobian(self, mvals, perturbation_amount=1.0e-3):
+    def _build_pvals_jacobian(self, mvals, perturbation_amount=1.0e-4):
         """Build the matrix which maps the gradients of properties with
         respect to physical parameters to gradients with respect to
         force balance mathematical parameters.
