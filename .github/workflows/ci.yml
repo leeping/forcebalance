@@ -33,6 +33,11 @@ jobs:
           - "2024"
           - "2025"
 
+        exclude:
+          # a 2022 build doesn't seem to exist for mac
+          - os: macOS-latest
+            gmx-version: "2022"
+
     env:
       CI_OS: ${{ matrix.os }}
       PYVER: ${{ matrix.python-version }}
