@@ -6,7 +6,7 @@ import forcebalance
 import numpy
 import inspect
 import pytest
-from .__init__ import ForceBalanceTestCase
+from .__init__ import ForceBalanceTestCase, is_buggy_gmx_dump_version, get_gromacs_version
 
 class TestImplemented(ForceBalanceTestCase):
     def test_implemented_targets_derived_from_target(self):
@@ -126,6 +126,10 @@ class ObjectiveTests(object):
         """Check objective.indicate() runs without errors"""
         self.objective.Indicate()
 
+@pytest.mark.skipif(
+    is_buggy_gmx_dump_version(get_gromacs_version()),
+    reason="Skipping for GROMACS versions affected by gmx dump -sys bug: https://gitlab.com/gromacs/gromacs/-/issues/5124"
+)
 class TestWaterObjective(ForceBalanceTestCase, ObjectiveTests):
     def setup_method(self, method):
         super(TestWaterObjective, self).setup_method(method)
