@@ -680,7 +680,6 @@ class GMX(Engine):
             BOX_LENGTH = (maxbox + 20) * 2
             NSTLIST = int(1e2)
             CUTOFF = BOX_LENGTH / 25 # nm
-            # raise ValueError(BOX_LENGTH, NSTLIST, CUTOFF)
 
             box_center = array([BOX_LENGTH/2, BOX_LENGTH/2, BOX_LENGTH/2])
             for i in range(len(self.mol.boxes)):
@@ -707,15 +706,6 @@ class GMX(Engine):
             # energies match the original pbc=no results.
             gmx_opts["coulomb-modifier"] = "None"
             gmx_opts["vdw-modifier"] = "None"
-
-            # gmx_opts["pbc"] = "no"
-            # self.gmx_defs["ns_type"] = "simple"
-            # self.gmx_defs["nstlist"] = 1
-            # self.gmx_defs["rlist"] = "0.0"
-            # self.gmx_defs["coulombtype"] = "cut-off"
-            # self.gmx_defs["rcoulomb"] = "0.0"
-            # self.gmx_defs["vdwtype"] = "cut-off"
-            # self.gmx_defs["rvdw"] = "0.0"
         
         ## Link files into the temp directory.
         if self.top is not None:
@@ -970,11 +960,8 @@ class GMX(Engine):
 
         E = float(open("%s-min-e.xvg" % self.name).readlines()[-1].split()[1])
         M = Molecule("%s.gro" % self.name, build_topology=False) + Molecule("%s-min.g96" % self.name)
-        # ref_rmsd() handles its own centering/rotation internally, so this call only affects the .gro
-        # file written below (useful for visualization).
         if not self.pbc:
             M.align(center=False)
-
         rmsd = M.ref_rmsd(0)[1]
         M[1].write("%s-min.gro" % self.name)
 
