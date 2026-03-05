@@ -32,8 +32,8 @@ gen_seed        = 123456
 
 pcoupl          = parrinello-rahman
 pcoupltype      = isotropic
-nstpcouple      = 100
+nstpcouple      = 10
 compressibility = 4.5e-5
 ref_p           = 1.0
-tau_p           = 40.0
+tau_p           = 4.0
 
