@@ -23,6 +23,8 @@ import networkx as nx
 import numpy as np
 import sys
 from forcebalance.finite_difference import *
+import copyreg
+from packaging.version import Version
 import pickle
 import shutil
 from copy import deepcopy
@@ -70,6 +72,16 @@ except ImportError:
 
 ## pdict is a useless variable if the force field is XML.
 pdict = "XML_Override"
+
+
+# === pickle Versions ===
+# this is necessary for pickling openff force fields which
+# now use packaging.version.Version for versions.
+# Since packaging>=26.0 Version objects define __slots__
+# without __getstate__, which causes pickling to fail
+# with protocol=0.
+# note: normal pickling default protocol is 4
+copyreg.pickle(Version, lambda v: (Version, (str(v),)))
 
 VIRTUAL_SITE_ATTRIBUTE_ORDER = ("type", "name", "match")
 
