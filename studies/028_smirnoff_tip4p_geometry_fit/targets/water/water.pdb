@@ -1,0 +1,9 @@
+ATOM      1  O1  HOH 1   1       0.352  -0.079  -1.180                          
+ATOM      2  H2  HOH 1   1       0.136  -1.005  -1.286                          
+ATOM      3  H3  HOH 1   1      -0.231   0.374  -1.790                          
+ATOM      4  O4  HOH 1   2      -0.250   0.123   1.273                          
+ATOM      5  H5  HOH 1   2      -0.161  -0.068   0.340                          
+ATOM      6  H6  HOH 1   2      -1.193   0.089   1.436                          
+ENDMDL
+CONECT    1    2    3
+CONECT    4    5    6
