@@ -170,7 +170,7 @@ class Recharge_SMIRNOFF(Target):
 
             residual_counter += len(self._molecule_residual_ranges[smiles_pattern])
 
-    def _compute_gradient_jacobian(self, mvals, perturbation_amount=1.0e-4):
+    def _compute_gradient_jacobian(self, mvals, perturbation_amount=1.0e-3):
         """Build the matrix which maps the gradient w.r.t. physical parameters to
         a gradient w.r.t mathematical parameters.
 

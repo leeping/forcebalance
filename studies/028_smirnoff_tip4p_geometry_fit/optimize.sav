@@ -37,6 +37,14 @@ priors
     VirtualSites/VirtualSite/outOfPlaneAngle  :  0.1
 /priors
 
+read_mvals
+   0 [  1.70508046e-05 ] : vdW/Atom/epsilon/[#6X4:1]
+   1 [  2.91614378e-06 ] : vdW/Atom/sigma/[#6X4:1]
+   2 [  1.02582056e-03 ] : vdW/Atom/epsilon/[#1]-[#8X2H2+0:1]-[#1]
+   3 [  3.73145020e-02 ] : vdW/Atom/sigma/[#1]-[#8X2H2+0:1]-[#1]
+   4 [  2.14322272e-01 ] : VirtualSites/VirtualSite/distance/[#1:2]-[#8X2H2+0:1]-[#1:3]/DivalentLonePair/EP/once
+   5 [  3.12299464e-02 ] : VirtualSites/VirtualSite/charge_increment2/[#1:2]-[#8X2H2+0:1]-[#1:3]/DivalentLonePair/EP/once
+/read_mvals
 $end
 
 $target

@@ -1,0 +1,28 @@
+$options
+ffdir forcefield_tip4p
+jobtype gradient
+forcefield tip4pfb.xml
+backup false
+finite_difference_h 0.001
+penalty_additive 1.0
+normalize_weights no
+constrain_charge false
+
+priors
+    tip4pfb/NonbondedForce/Atom/charge : 0.1
+/priors
+
+$end
+
+$target
+name water
+type AbInitio_OpenMM
+pdb water.pdb
+coords all.gro
+weight 1.0
+w_force 0.1
+attenuate
+energy_denom 5.0
+energy_upper 20.0
+openmm_platform Reference
+$end

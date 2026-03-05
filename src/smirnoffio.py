@@ -181,8 +181,42 @@ def smirnoff_analyze_parameter_coverage(forcefield, tgt_opts):
             optgeo_options_txt = os.path.join(target_path, tgt_option['optgeo_options_txt'])
             sys_opts = forcebalance.opt_geo_target.OptGeoTarget.parse_optgeo_options(optgeo_options_txt)
             mol2_paths = [os.path.join(target_path,fnm) for sysopt in sys_opts.values() for fnm in sysopt['mol2']]
+        elif tgt_option['type'] == 'EVALUATOR_SMIRNOFF':
+            # Molecules are stored in the evaluator training-set.json, not mol2 files.
+            # Read the options file to find the training set path, then extract component SMILES.
+            options_path = os.path.join(target_path, tgt_option.get('evaluator_input', 'options.json'))
+            if os.path.exists(options_path):
+                with open(options_path) as f:
+                    evaluator_opts = json.load(f)
+                data_set_path = os.path.join(target_path, evaluator_opts.get('data_set_path', 'training-set.json'))
+                if os.path.exists(data_set_path):
+                    with open(data_set_path) as f:
+                        data_set = json.load(f)
+                    smiles_set = set()
+                    for prop in data_set.get('properties', []):
+                        for component in prop.get('substance', {}).get('components', []):
+                            smiles = component.get('smiles')
+                            if smiles:
+                                smiles_set.add(smiles)
+                    for smiles in smiles_set:
+                        try:
+                            openff_mol = OffMolecule.from_smiles(smiles)
+                            off_topology = OffTopology.from_molecules([openff_mol])
+                            molecule_force_list = ff.label_molecules(off_topology)
+                            mol_key = os.path.join(target_path, smiles)
+                            for mol_idx, mol_forces in enumerate(molecule_force_list):
+                                for force_tag, force_dict in mol_forces.items():
+                                    for atom_indices, parameters in force_dict.items():
+                                        if not isinstance(parameters, list):
+                                            parameters = [parameters]
+                                        for parameter in parameters:
+                                            param_dict = {'id': parameter.id, 'smirks': parameter.smirks, 'type': force_tag, 'atoms': list(atom_indices)}
+                                            parameter_assignment_data[mol_key].append(param_dict)
+                                            parameter_counter[parameter.smirks] += 1
+                        except Exception:
+                            pass
         elif tgt_option['type'].endswith('_SMIRNOFF'):
-            mol2_paths = [os.path.join(target_path,fnm) for fnm in tgt_option['mol2']]
+            mol2_paths = [os.path.join(target_path,fnm) for fnm in tgt_option.get('mol2', [])]
         # analyze SMIRKs terms
         for mol_fnm in mol2_paths:
             # we work with one file at a time to avoid the topology sliently combine "same" molecules
@@ -212,7 +246,9 @@ def smirnoff_analyze_parameter_coverage(forcefield, tgt_opts):
     logger.info("-"*118 + '\n')
     n_covered = 0
     for i,p in enumerate(forcefield.plist):
-        smirks = p.split('/')[-1]
+        parts = p.split('/')
+        # account for virtual sites
+        smirks = parts[3] if len(parts) > 3 else parts[-1]
         logger.info('%4i %-100s : %10d\n' % (i, p, parameter_counter[smirks]))
         if parameter_counter[smirks] > 0:
             n_covered += 1
@@ -345,7 +381,10 @@ def smirnoff_update_pgrads(target):
 
     Note
     ----
-    1. This function assumes the names of the forcefield parameters has the smirks as the last item
+    1. This function extracts the SMIRKS as the first path component starting with '['.
+       For standard parameters (e.g. vdW) the SMIRKS is the last component; for
+       VirtualSite parameters it is not, so rsplit('/', maxsplit=1)[-1] would return
+       a suffix like "once" or "all_permutations" instead of the actual SMIRKS.
     2. This function assumes params only affect the smirks of its own. This might not be true if parameter_eval is used.
     """
     orig_pgrad_set = set(target.pgrad)
@@ -361,7 +400,12 @@ def smirnoff_update_pgrads(target):
         if pname.startswith('/'):
             pgrads_set.update(target.FF.get_mathid(pname))
         else:
-            smirks = pname.rsplit('/',maxsplit=1)[-1]
+            # Extract the SMIRKS pattern: it is the first path component starting with '['.
+            # This correctly handles VirtualSite parameters whose names have additional
+            # components (type, name, match) after the SMIRKS, e.g.:
+            #   VirtualSites/VirtualSite/distance/[#1:2]-[#8X2H2+0:1]-[#1:3]/DivalentLonePair/EP/once
+            smirks = next((p for p in pname.split('/') if p.startswith('[')),
+                          pname.rsplit('/', maxsplit=1)[-1])
 
             for pidx in target.FF.get_mathid(pname):
                 smirks_params_map[smirks].append(pidx)

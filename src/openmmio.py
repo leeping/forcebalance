@@ -270,6 +270,11 @@ def GetVirtualSiteParameters(system):
                 vsprm.append(_openmm.OutOfPlaneSite_getWeight12(vs))
                 vsprm.append(_openmm.OutOfPlaneSite_getWeight13(vs))
                 vsprm.append(_openmm.OutOfPlaneSite_getWeightCross(vs))
+            elif vstype == 'LocalCoordinatesSite':
+                vsprm.extend(_openmm.LocalCoordinatesSite_getOriginWeights(vs))
+                vsprm.extend(_openmm.LocalCoordinatesSite_getXWeights(vs))
+                vsprm.extend(_openmm.LocalCoordinatesSite_getYWeights(vs))
+                vsprm.extend(_openmm.LocalCoordinatesSite_getLocalPosition(vs))
     return np.array(vsprm)
 
 def GetDrudeParameters(system):
