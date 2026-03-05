@@ -2,10 +2,16 @@ from __future__ import absolute_import
 import os
 import forcebalance
 import shutil
+import pytest
 from .test_target import TargetTests # general targets tests defined in test_target.py
+from .__init__ import get_gromacs_version, is_buggy_gmx_dump_version
 """
 The testing functions for this class are located in test_target.py.
 """
+@pytest.mark.skipif(
+    is_buggy_gmx_dump_version(get_gromacs_version()),
+    reason="Skipping for GROMACS versions affected by gmx dump -sys bug: https://gitlab.com/gromacs/gromacs/-/issues/5124"
+)
 class TestAbInitio_GMX(TargetTests):
     def setup_method(self, method):
         super(TestAbInitio_GMX, self).setup_method(method)

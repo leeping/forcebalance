@@ -4,44 +4,19 @@ from builtins import range
 import re
 import subprocess
 import pytest
+from packaging.version import Version
 from forcebalance.nifty import *
 from forcebalance.gmxio import GMX
 from forcebalance.tinkerio import TINKER
 from forcebalance.openmmio import OpenMM
 from collections import OrderedDict
-from .__init__ import ForceBalanceTestCase, check_for_openmm
+from .__init__ import ForceBalanceTestCase, check_for_openmm, get_gromacs_version_from_path
 
 # Set SAVEDATA to True and run the tests in order to save data
 # to a file for future reference. This is easier to use for troubleshooting
 # vs. comparing multiple programs against each other, b/c we don't know
 # which one changed.
 SAVEDATA=False
-
-
-def is_gromacs_2022_or_2023(gmxpath):
-    """Check if the GROMACS version is 2022 or 2023.
-
-    gmxpath may be a directory containing the gmx executable, or the full path
-    to the executable itself.
-    """
-    import os
-    # Build candidate executable paths: gmxpath itself, or gmx_d/gmx inside it
-    candidates = [gmxpath]
-    if os.path.isdir(gmxpath):
-        candidates = [
-            os.path.join(gmxpath, 'gmx_d'),
-            os.path.join(gmxpath, 'gmx'),
-        ]
-    for candidate in candidates:
-        try:
-            result = subprocess.run([candidate, '--version'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            version_output = result.stdout + result.stderr
-            match = re.search(r'GROMACS\s+version:?\s*(\d{4})', version_output, re.IGNORECASE)
-            if match and match.group(1) in ['2022', '2023']:
-                return True
-        except Exception:
-            continue
-    return False
 
 class TestAmber99SB(ForceBalanceTestCase):
     """ Amber99SB unit test consisting of ten structures of
@@ -204,7 +179,8 @@ class TestAmber99SB(ForceBalanceTestCase):
             pytest.skip("Missing packages: %s" % ', '.join(missing_pkgs))
         # Skip if GROMACS version is 2022 or 2023 due to a bug in the 1-4 energy groupings
         # https://gitlab.com/gromacs/gromacs/-/issues/5109
-        if 'GMX' in self.engines and is_gromacs_2022_or_2023(self.engines['GMX'].gmxpath):
+        gmx_version = get_gromacs_version_from_path(self.engines['GMX'].gmxpath) if 'GMX' in self.engines else None
+        if gmx_version is not None and Version("2022") <= gmx_version < Version("2024"):
             pytest.skip("Skipping GMX interaction energy test for GROMACS 2022/2023 due to bug https://gitlab.com/gromacs/gromacs/-/issues/5109")
         Data = OrderedDict()
         for name, eng in self.engines.items():

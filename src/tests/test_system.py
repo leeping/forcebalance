@@ -5,7 +5,7 @@ import os, shutil
 import subprocess
 import re
 import tarfile
-from .__init__ import ForceBalanceTestCase, check_for_openmm
+from .__init__ import ForceBalanceTestCase, check_for_openmm, get_gromacs_version, is_buggy_gmx_dump_version
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
@@ -121,6 +121,10 @@ class ForceBalanceSystemTest(ForceBalanceTestCase):
                 (ITERATIONS_TO_CONVERGE, Counter())
         return result
 
+@pytest.mark.skipif(
+    is_buggy_gmx_dump_version(get_gromacs_version()),
+    reason="Skipping for GROMACS versions affected by gmx dump -sys bug: https://gitlab.com/gromacs/gromacs/-/issues/5124"
+)
 class TestWaterTutorial(ForceBalanceSystemTest):
     def setup_method(self, method):
         super(TestWaterTutorial, self).setup_method(method)

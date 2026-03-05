@@ -128,7 +128,6 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
     for key, val in defaults.items():
         key = key.lower().replace('-','_')
         options[key] = val
-        # replace
         if key not in haveopts:
             out.append("%-20s = %s" % (key, val))
             all_options[key] = val
@@ -1074,8 +1073,7 @@ class GMX(Engine):
         if force:
             self.callgmx("g_traj -xvg no -s %s.tpr -f %s.trr -of %s-f.xvg -fp" % (self.name, self.name, self.name), stdin='System')
             Result["Force"] = np.array([[float(j) for i, j in enumerate(line.split()[1:]) if self.AtomMask[int(i/3)]] \
-                                        for line in open("%s-f.xvg" % self.name).readlines()
-                                        if line.strip() and not line.startswith('#') and not line.startswith('@')])
+                                        for line in open("%s-f.xvg" % self.name).readlines()])
         ## Calculate and record dipole
         if dipole:
             self.callgmx("g_dipoles -s %s.tpr -f %s -o %s-d.xvg -xvg no" % (self.name, traj if traj else '%s.gro' % self.name, self.name), stdin="System\n")
