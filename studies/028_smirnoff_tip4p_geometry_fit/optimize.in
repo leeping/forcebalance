@@ -40,6 +40,44 @@ priors
 $end
 
 $target
+# (string) The name of the target, which corresponds to the directory targets/dir_name
+name Liquid-H25-RTA
+
+# (allcap) The type of target, for instance AbInitio_GMXX2
+type Liquid_SMIRNOFF
+
+# (float) Weight of the current target (with respect to other targets)
+weight 6.0
+
+w_rho 1.0
+w_hvap 1.0
+w_alpha 1.0
+w_kappa 1.0
+w_cp 1.0
+w_eps0 1.0
+
+liquid_eq_steps 100
+liquid_md_steps 200
+liquid_timestep 2.0
+liquid_interval 0.1
+
+gas_eq_steps 100
+gas_prod_steps 200
+gas_timestep 2.0
+gas_interval 0.1
+
+# Parameters for self-polarization correction of nonpolarizable water
+self_pol_mu0 1.855
+self_pol_alpha 1.470
+
+adapt_errors
+
+pure_num_grad False
+mol2 water.sdf
+
+$end
+
+$target
 name water
 type AbInitio_SMIRNOFF
 mol2 input.sdf

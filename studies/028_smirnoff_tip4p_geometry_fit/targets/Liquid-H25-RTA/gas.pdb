@@ -1,0 +1,8 @@
+TITLE     Water Monomer
+REMARK    THIS IS A SIMULATION BOX
+MODEL        1
+ATOM      1  O   HOH     1       8.039   5.868   0.493  1.00  0.00            
+ATOM      2 H1   HOH     1       7.581   5.023   0.404  1.00  0.00            
+ATOM      3 H2   HOH     1       8.287   6.062  -0.397  1.00  0.00            
+TER
+ENDMDL
