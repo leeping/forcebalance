@@ -31,12 +31,6 @@ EXPECTED_EVALUATOR_BROMINE_OBJECTIVE = array([1000])
 # expected gradient elements from 003d evaluator bromine study. Very large uncertainties of +/- 2000 (updated 11/23/19)
 EXPECTED_EVALUATOR_BROMINE_GRADIENT = array([4500, 5500])
 
-# expected objective function from 028 evaluator water vsite study. Update after first run.
-EXPECTED_EVALUATOR_WATER_VSITE_OBJECTIVE = array([0])
-
-# expected gradient elements from 028 evaluator water vsite study (3 vsite params). Update after first run.
-EXPECTED_EVALUATOR_WATER_VSITE_GRADIENT = array([0, 0, 0])
-
 # expected objective values from 029 cross-engine consistency study. Update after first run.
 EXPECTED_TIP4P_OBJECTIVE = array([0.473572])
 EXPECTED_TIP5P_OBJECTIVE = array([0.360085])
