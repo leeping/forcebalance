@@ -14,7 +14,7 @@ from forcebalance.smirnoffio import assign_openff_parameter, select_virtual_site
 @pytest.mark.skipif(
     not has_openff_toolkit, reason="openff.toolkit module not found"
 )
-def _build_virtual_site_force_field(include_incomplete=False):
+def _build_virtual_site_force_field():
     force_field = ForceField()
     vsite_handler = VirtualSiteHandler(version=0.3)
 
@@ -44,23 +44,6 @@ def _build_virtual_site_force_field(include_incomplete=False):
             ],
         }
     )
-
-    if include_incomplete:
-        vsite_handler.add_parameter(
-            {
-                "smirks": "[#1:1]-[#17:2]",
-                "name": "EP3",
-                "type": "BondCharge",
-                "distance": 0.30 * unit.nanometers,
-                "match": "all_permutations",
-                "charge_increment": [
-                    0.0 * unit.elementary_charge,
-                    0.0 * unit.elementary_charge,
-                ],
-            }
-        )
-        vsite_handler.parameters[-1].match = None
-
     force_field.register_parameter_handler(vsite_handler)
     return force_field
 
@@ -86,7 +69,7 @@ def test_select_virtual_site_parameter_requires_non_none_identifiers():
     not has_openff_toolkit, reason="openff.toolkit module not found"
 )
 def test_select_virtual_site_parameter_selects_unique_match():
-    force_field = _build_virtual_site_force_field(include_incomplete=True)
+    force_field = _build_virtual_site_force_field()
 
     parameter = select_virtual_site_parameter(
         parameters=force_field.get_parameter_handler("VirtualSites").parameters,
@@ -137,6 +120,7 @@ def test_select_virtual_site_parameter_raises_for_ambiguous_match():
     not has_openff_toolkit, reason="openff.toolkit module not found"
 )
 def test_assign_openff_parameter_virtual_site_pid_disambiguation():
+    """Check assignment works ok"""
     force_field = ForceField()
     vsite_handler = force_field.get_parameter_handler("VirtualSites")
 

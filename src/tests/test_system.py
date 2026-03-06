@@ -63,6 +63,7 @@ EXPECTED_RECHARGE_METHANE_FIELD_OBJECTIVE = array([7.43711e-04])
 EXPECTED_RECHARGE_METHANE_ESP_GRADIENT = array([9.76931016e-03])
 EXPECTED_RECHARGE_METHANE_FIELD_GRADIENT = array([1.12071584e-02])
 
+# in practice these aren't hit, we don't simulate nearly long enough
 EXPECTED_VSITE_VDW_PARAMETERS = array([
     # CX4 epsilon, sigma
     0.1088406109251, 3.3795317616266205,
@@ -75,12 +76,12 @@ EXPECTED_VSITE_VDW_PARAMETERS = array([
 
 class ForceBalanceSystemTest(ForceBalanceTestCase):
     def teardown_method(self):
-        # for fnm in [self.input_file.replace('.in','.sav')]:
-        #     if os.path.exists(fnm):
-        #         os.remove(fnm)
-        # for dnm in [self.input_file.replace('.in','.bak'), self.input_file.replace('.in','.tmp'), "result"]:
-        #     if os.path.exists(dnm):
-        #         shutil.rmtree(dnm)
+        for fnm in [self.input_file.replace('.in','.sav')]:
+            if os.path.exists(fnm):
+                os.remove(fnm)
+        for dnm in [self.input_file.replace('.in','.bak'), self.input_file.replace('.in','.tmp'), "result"]:
+            if os.path.exists(dnm):
+                shutil.rmtree(dnm)
         super(ForceBalanceSystemTest, self).teardown_method()
         
     def get_objective(self):
