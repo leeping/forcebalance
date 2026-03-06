@@ -92,7 +92,7 @@
                                         "unit": "g / ml",
                                         "value": 0.95
                                     },
-                                    ".max_molecules": 100,
+                                    ".max_molecules": 80,
                                     ".retain_packmol_files": false,
                                     ".substance": {
                                         "@type": "openff.evaluator.workflow.utils.ProtocolPath",
@@ -148,12 +148,12 @@
                                         "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                         "full_path": "energy_minimisation.output_coordinate_file"
                                     },
-                                    ".output_frequency": 500,
+                                    ".output_frequency": 100,
                                     ".parameterized_system": {
                                         "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                         "full_path": "assign_parameters.parameterized_system"
                                     },
-                                    ".steps_per_iteration": 1000,
+                                    ".steps_per_iteration": 500,
                                     ".thermodynamic_state": {
                                         "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                         "full_path": "global.thermodynamic_state"
@@ -416,7 +416,7 @@
                                         "unit": "g / ml",
                                         "value": 0.95
                                     },
-                                    ".max_molecules": 100,
+                                    ".max_molecules": 80,
                                     ".retain_packmol_files": false,
                                     ".substance": {
                                         "@type": "openff.evaluator.workflow.utils.ProtocolPath",
@@ -472,12 +472,12 @@
                                         "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                         "full_path": "energy_minimisation_liquid.output_coordinate_file"
                                     },
-                                    ".output_frequency": 500,
+                                    ".output_frequency": 50,
                                     ".parameterized_system": {
                                         "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                         "full_path": "assign_parameters_liquid.parameterized_system"
                                     },
-                                    ".steps_per_iteration": 1000,
+                                    ".steps_per_iteration": 100,
                                     ".thermodynamic_state": {
                                         "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                         "full_path": "global.thermodynamic_state"
@@ -604,12 +604,12 @@
                                         "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                         "full_path": "energy_minimisation_gas.output_coordinate_file"
                                     },
-                                    ".output_frequency": 100,
+                                    ".output_frequency": 10,
                                     ".parameterized_system": {
                                         "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                         "full_path": "assign_parameters_gas.parameterized_system"
                                     },
-                                    ".steps_per_iteration": 5000,
+                                    ".steps_per_iteration": 1000,
                                     ".thermodynamic_state": {
                                         "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                         "full_path": "global.thermodynamic_state"
@@ -791,12 +791,12 @@
                                                 "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                                 "full_path": "equilibration_simulation_gas.output_coordinate_file"
                                             },
-                                            ".output_frequency": 100,
+                                            ".output_frequency": 10,
                                             ".parameterized_system": {
                                                 "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                                 "full_path": "assign_parameters_gas.parameterized_system"
                                             },
-                                            ".steps_per_iteration": 10000,
+                                            ".steps_per_iteration": 1000,
                                             ".thermodynamic_state": {
                                                 "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                                 "full_path": "global.thermodynamic_state"
@@ -841,7 +841,7 @@
                                                 "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                                 "full_path": "assign_parameters_liquid.parameterized_system"
                                             },
-                                            ".steps_per_iteration": 500,
+                                            ".steps_per_iteration": 100,
                                             ".thermodynamic_state": {
                                                 "@type": "openff.evaluator.workflow.utils.ProtocolPath",
                                                 "full_path": "global.thermodynamic_state"

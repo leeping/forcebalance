@@ -38,12 +38,10 @@ Global,use_cni,TRUE,,,,,,,,,,,,,,,,,
 ,,,,,,,,,,,,,,,,,,,
 T,P,MBAR,Rho,Rho_wt,Hvap,Hvap_wt,Cvib_intra,Cvib_inter,Cni,Alpha,Alpha_wt,Kappa,Kappa_wt,Cp,Cp_wt,dEvib_intra,dEvib_inter,Eps0,Eps0_wt
 293.15,1.0 atm,TRUE,998.204,1.0,44.203,1.0,3.541,-3.860,-0.021,2.068,1.0,45.892,1.0,18.015,1.0,0.040,-2.277,80.223,1.0
-298.15,1.0 atm,TRUE,997.045,30.0,43.989,1.0,3.542,-3.813,-0.025,2.572,1.0,45.247,1.0,18.002,1.0,0.045,-2.231,78.409,1.0
 301.15,1.0 atm,TRUE,996.234,1.0,43.861,1.0,3.542,-3.785,-0.028,2.853,1.0,44.943,1.0,17.998,1.0,0.048,-2.203,77.339,1.0
 # Data going all the way up to the critical point. ,,,,,,,,,,,,,,,,,,,
 # Above 600K the data for second order properties is not trustworthy; FreeSteam and Steam Tables Online have divergent results.,,,,,,,,,,,,,,,,,,,
 #380,1.3 atm,FALSE,953.327,1.0,40.322,1.0,3.546,-3.162,-0.277,7.876,1.0,50.205,1.0,18.195,1.0,0.155,-1.612,53.796,1.0
-#440,7.2 atm,FALSE,900.649,1.0,37.099,1.0,3.552,-2.799,-0.924,11.314,1.0,68.948,1.0,18.769,1.0,0.276,-1.293,40.687,1.0
 #490,21.5 atm,FALSE,844.219,0.1,33.706,0.1,3.557,-2.551,-2.031,15.368,0.0,102.758,0.0,19.764,0.0,0.396,-1.089,31.992,0.0
 # Pressure dependence data.  At very high pressures the weight is reduced because larger deviations from experiment are expected.,,,,,,,,,,,,,,,,,,,
 # The enthalpy of vaporization calculation is meaningless so it is given a weight of zero.,,,,,,,,,,,,,,,,,,,
