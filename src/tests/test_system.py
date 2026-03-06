@@ -461,6 +461,9 @@ class TestWaterVSiteGradients(ForceBalanceSystemTest):
         self.study_directory = os.getcwd()
         self.atol = 1e-6
 
+    def teardown_method(self):
+        os.chdir(self.start_directory)
+
     def _eval(self, input_file):
         """Parse input_file, build objective, evaluate at mvals=0, return (X, G)."""
         options, tgt_opts = parse_inputs(input_file)
