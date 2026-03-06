@@ -41,7 +41,7 @@ from loguru import logger
 @click.option(
     "--input-force-field",
     "-i",
-    default="openff-2.2.1.offxml",
+    default="openff-2.3.0.offxml",
     show_default=True,
     type=str,
     help="Input small-molecule OpenFF force field (.offxml).",
@@ -57,7 +57,7 @@ from loguru import logger
 @click.option(
     "--output-force-field",
     "-o",
-    default="force-field.offxml",
+    default="forcefield/force-field.offxml",
     show_default=True,
     type=click.Path(dir_okay=False, path_type=pathlib.Path),
     help="Path for the generated force field.",
