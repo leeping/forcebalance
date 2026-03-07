@@ -1,3 +1,4 @@
+import sys
 import pytest
 
 has_openff_toolkit = True
@@ -6,7 +7,10 @@ try:
 except ModuleNotFoundError:
     has_openff_toolkit = False
 
+from .test_system import skip_openff_py39
 
+
+@skip_openff_py39
 @pytest.mark.skipif(
     not has_openff_toolkit, reason="openff.toolkit module not found"
 )
