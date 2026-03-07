@@ -699,10 +699,9 @@ class GMX(Engine):
             gmx_opts["nstlist"] = NSTLIST
             gmx_opts["rcoulomb"] = "%.2f" % CUTOFF
             gmx_opts["rvdw"] = "%.2f" % CUTOFF
-            # GROMACS 2024 Verlet scheme auto-applies coulomb-modifier = Potential-shift,
-            # which shifts each Coulomb interaction energy by -kC*qi*qj/rc.  At rc=40 nm
-            # this introduces an error of ~5 kJ/mol relative to the infinite-cutoff
-            # (vacuum) reference.  Setting modifier = None restores a plain cutoff so
+            # GROMACS Verlet scheme auto-applies coulomb-modifier = Potential-shift,
+            # which shifts each Coulomb interaction energy by -kC*qi*qj/rc.
+            # Setting modifier = None restores a plain cutoff so
             # energies match the original pbc=no results.
             gmx_opts["coulomb-modifier"] = "None"
             gmx_opts["vdw-modifier"] = "None"
