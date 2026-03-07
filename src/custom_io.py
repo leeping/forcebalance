@@ -59,9 +59,9 @@ class Gen_Reader(BaseReader):
         # No sense in doing anything for an empty line or a comment line.
         if len(s) == 0 or match('^;',line): return None, None
         # Now go through all the cases.
-        if match('^\[.*\]',line):
+        if match(r'^\[.*\]',line):
             # Makes a word like "atoms", "bonds" etc.
-            self.sec = sub('[\[\] \n]','',line)
+            self.sec = sub(r'[\[\] \n]','',line)
         elif self.sec == 'counterpoise':
             self.itype = cptypes[int(s[2])]
             atom = [s[0],s[1]]

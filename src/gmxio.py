@@ -409,9 +409,9 @@ class ITP_Reader(BaseReader):
             delattr(self, 'overpfx')
             delattr(self, 'oversfx')
 
-        if re.match('^ *\[.*\]',line):
+        if re.match(r'^ *\[.*\]',line):
             # Makes a word like "atoms", "bonds" etc.
-            self.sec = re.sub('[\[\] \n]','',line.strip())
+            self.sec = re.sub(r'[\[\] \n]','',line.strip())
         elif self.sec == 'defaults':
             self.itype = 'DEF'
             self.nbtype = int(s[0])

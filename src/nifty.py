@@ -863,9 +863,12 @@ def lp_load(fnm):
 #|      Work Queue stuff      |#
 #==============================#
 try:
-    import work_queue
-except:
-    pass
+    import ndcctools.work_queue as work_queue
+except ImportError:
+    try:
+        import work_queue
+    except ImportError:
+        pass
     #logger.warning("Work Queue library import fail (You can't queue up jobs using Work Queue)\n")
 
 # Global variable corresponding to the Work Queue object
