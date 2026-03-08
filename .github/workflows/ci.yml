@@ -29,9 +29,10 @@ jobs:
           - "3.11"
           - "3.12"
         gmx-version:
+          - "5"
           - "2019"
-          - "2022"
-          - "2023"
+          # - "2022"
+          # - "2023"
           - "2024"
           - "2025"
 
@@ -50,13 +51,23 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v4
 
-    - name: Set up conda environment
+    - name: Set up conda environment with gromacs
+      if: matrix.gmx-version != '5'
       uses: mamba-org/setup-micromamba@v1
       with:
         # ambertools has no Python 3.9 builds; use a separate env file for 3.9
         environment-file: ${{ matrix.python-version == '3.9' && 'devtools/conda-envs/test_env_py39.yaml' || 'devtools/conda-envs/test_env.yaml' }}
         create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
           python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }}.*=nompi_dblprec*
+
+    - name: Set up conda environment without gromacs
+      if: matrix.gmx-version == '5'
+      uses: mamba-org/setup-micromamba@v1
+      with:
+        # ambertools has no Python 3.9 builds; use a separate env file for 3.9
+        environment-file: ${{ matrix.python-version == '3.9' && 'devtools/conda-envs/test_env_py39.yaml' || 'devtools/conda-envs/test_env.yaml' }}
+        create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
+          python=${{ matrix.python-version }}
 
     - name: Pin setuptools for Python < 3.10
       if: matrix.python-version == '3.9' || matrix.python-version == '3.10'
@@ -104,28 +115,29 @@ jobs:
 
         echo "$GITHUB_WORKSPACE/opt/tinker/8.8.3/bin" >> $GITHUB_PATH
 
-    # - name: Install Gromacs
-    #   run: |
-    #     wget http://ftp.gromacs.org/pub/gromacs/gromacs-5.1.5.tar.gz
-    #     tar xvzf gromacs-5.1.5.tar.gz
-    #     cd gromacs-5.1.5
-    #     cp -r cmake cmake_s
-    #     cd cmake
-    #     cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF -DGMX_SIMD=None ..
-    #     # replace http:/w with https://w
-    #     sed -i.bak 's|http:/w|https://w|g' CMakeCache.txt && rm -f CMakeCache.txt.bak
-    #     make -j 8 && make install
-    #     cd ../cmake_s
-    #     cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF -DGMX_SIMD=None ..
-    #     sed -i.bak 's|http:/w|https://w|g' CMakeCache.txt && rm -f CMakeCache.txt.bak
-    #     make -j 8 && make install
-    #     cd ..
-    #     . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
-    #     echo "$GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin" >> $GITHUB_PATH
-    #     which gmx
-    #     which gmx_d
-    #     gmx help
-    #     gmx dump -h
+    - name: Install Gromacs
+      if: matrix.gmx-version == '5'
+      run: |
+        wget http://ftp.gromacs.org/pub/gromacs/gromacs-5.1.5.tar.gz
+        tar xvzf gromacs-5.1.5.tar.gz
+        cd gromacs-5.1.5
+        cp -r cmake cmake_s
+        cd cmake
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF -DGMX_SIMD=None ..
+        # replace http:/w with https://w
+        sed -i.bak 's|http:/w|https://w|g' CMakeCache.txt && rm -f CMakeCache.txt.bak
+        make -j 8 && make install
+        cd ../cmake_s
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/5.1.5 -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF -DGMX_SIMD=None ..
+        sed -i.bak 's|http:/w|https://w|g' CMakeCache.txt && rm -f CMakeCache.txt.bak
+        make -j 8 && make install
+        cd ..
+        . $GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin/GMXRC.bash
+        echo "$GITHUB_WORKSPACE/opt/gromacs/5.1.5/bin" >> $GITHUB_PATH
+        which gmx
+        which gmx_d
+        gmx help
+        gmx dump -h
 
     - name: Extract data archives
       run: |
