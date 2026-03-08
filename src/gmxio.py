@@ -677,9 +677,13 @@ class GMX(Engine):
             if maxbox > 1e3:
                 warn_press_key("The box size of the molecule is larger than 100 nm.  Are you sure you want to run a vacuum simulation with this molecule?")
 
-            BOX_LENGTH = (maxbox + 20) * 2 # A
+            BOX_LENGTH = (maxbox + 20) * 4 # A -- to be safely more than double CUTOFF
             NSTLIST = int(1e2)
-            CUTOFF = (maxbox + 10) / 10 # nm
+            # cutoff: divide by 10 for nm
+            # then multiply by 1.8 --
+            # the longest possible diagonal is sqrt(3), approx 1.73,
+            # round to 1.8 to be safe.
+            CUTOFF = (maxbox / 10) * 1.8 
 
             box_center = array([BOX_LENGTH/2, BOX_LENGTH/2, BOX_LENGTH/2])
             for i in range(len(self.mol.boxes)):
