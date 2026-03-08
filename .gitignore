@@ -123,3 +123,12 @@ studies/*/targets/
 studies/*/*.tmp/
 studies/*/*.bak/
 sutdies/*/*.err
+
+# test files from running CI locally
+src/tests/files/XmlScript_out/TIP3G2w.xml
+src/tests/files/targets/dms-liquid/dms.xml
+src/tests/files/temp.bak/
+src/tests/files/test_liquid/targets/Liquid/TIP3G2w.xml
+src/tests/files/test_liquid/targets/Liquid/dms.xml
+src/tests/test.job
+studies/003d_evaluator_liquid_bromine/smirnoff_parameter_assignments.json

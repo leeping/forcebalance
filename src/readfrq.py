@@ -28,7 +28,7 @@ def read_frq_gau(gauout):
         line = line.strip().expandtabs()
         if XMode >= 1:
             # Perfectionist here; matches integer, element, and three floating points
-            if re.match("^[0-9]+ +[0-9]+ +[0-9]+( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
+            if re.match(r"^[0-9]+ +[0-9]+ +[0-9]+( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
                 XMode = 2
                 sline = line.split()
                 elemThis.append(Elements[int(sline[1])])
@@ -152,7 +152,7 @@ def read_frq_qc(qcout):
         line = line.strip().expandtabs()
         if XMode >= 1:
             # Perfectionist here; matches integer, element, and three floating points
-            if re.match("^[0-9]+ +[A-Z][A-Za-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
+            if re.match(r"^[0-9]+ +[A-Z][A-Za-z]?( +[-+]?([0-9]*\.)?[0-9]+){3}$", line):
                 XMode = 2
                 sline = line.split()
                 elemThis.append(sline[1])
@@ -228,19 +228,19 @@ def read_frq_psi_current(psiout):
                     else:
                         frqs.append(float(mode))
         if VMode == 1:
-            if re.match('^\s*[0-9]', line) and mode_num >= skip_modes:
+            if re.match(r'^\s*[0-9]', line) and mode_num >= skip_modes:
                 s = line.split()
                 line_modes = int(len(s[2:])/3)
                 for mode in range(line_modes):
                     if mode not in readmodes:
                         readmodes[mode] = []
                     readmodes[mode].append([float(m) for m in s[2+mode*3:2+mode*3+3]])
-            elif re.match('^\s*[0-9]', line):
+            elif re.match(r'^\s*[0-9]', line):
                 s = line.split()
                 mode_num += int(len(s[2:])/3)
                 VMode = 0
                 VModeNxt = None
-            elif re.match('^[ \t\r\n\s]*$', line):
+            elif re.match(r'^[ \t\r\n\s]*$', line):
                 VMode = 0
                 VModeNxt = None
                 for mode in readmodes.keys():

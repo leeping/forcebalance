@@ -4,6 +4,7 @@ from builtins import str
 import os, shutil
 import subprocess
 import re
+import sys
 import tarfile
 from .__init__ import ForceBalanceTestCase, check_for_openmm, get_gromacs_version, is_buggy_gmx_dump_version
 from forcebalance.parser import parse_inputs
@@ -13,6 +14,11 @@ from forcebalance.optimizer import Optimizer, Counter
 from numpy import array
 import numpy as np
 import pytest
+
+skip_openff_py39 = pytest.mark.skipif(
+    sys.version_info < (3, 10),
+    reason="openff packages require ambertools which requires Python >= 3.10",
+)
 
 # expected results (mvals) taken from previous runs. Update this if it changes and seems reasonable (updated 10/24/13)
 #EXPECTED_WATER_RESULTS = array([3.3192e-02, 4.3287e-02, 5.5072e-03, -4.5933e-02, 1.5499e-02, -3.7655e-01, 2.4720e-03, 1.1914e-02, 1.5066e-01])
@@ -187,6 +193,8 @@ class TestThermoBromineStudy(ForceBalanceSystemTest):
         """Check liquid bromine study (Thermo target) converges to expected results"""
         self.run_optimizer()
 
+
+@skip_openff_py39
 class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         pytest.importorskip("openff.evaluator")
@@ -198,25 +206,67 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
         targets.extractall()
         targets.close()
         ## Start the estimator server.
+        ## - Redirect output to a log file (not PIPE) so Dask worker subprocesses
+        ##   that inherit the fd don't fill the pipe buffer and deadlock.
+        ## - Use 'python -u' so each log line is flushed immediately to disk.
         import subprocess, time
-        self.estimator_process = subprocess.Popen([
-            "python", "run_server.py", "-ngpus=0", "-ncpus=1"
-        ], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        ## Give the server time to start.
-        time.sleep(5)
+        self._server_log_path = os.path.abspath("server.log")
+        self._server_log = open(self._server_log_path, "w")
+        self.estimator_process = subprocess.Popen(
+            ["python", "-u", "run_server.py", "-ngpus=0", "-ncpus=1"],
+            stdout=self._server_log, stderr=self._server_log,
+        )
+        ## Wait for the server to log that it is ready.  We intentionally avoid
+        ## making a raw TCP probe: a bare connect+disconnect causes recvall() in
+        ## _handle_stream to return None, which crashes struct.unpack and kills
+        ## the _handle_connections loop because the except is outside the while.
+        server_port = 8000
+        ready_marker = "listening at port {}".format(server_port)
+        deadline = time.time() + 120
+        while time.time() < deadline:
+            if self.estimator_process.poll() is not None:
+                self._server_log.flush()
+                log_contents = open(self._server_log_path).read()
+                pytest.fail(
+                    "Evaluator server process exited prematurely (rc=%d). Log:\n%s"
+                    % (self.estimator_process.returncode, log_contents[-2000:])
+                )
+            with open(self._server_log_path) as f:
+                if ready_marker in f.read():
+                    break
+            time.sleep(0.5)
+        else:
+            self.estimator_process.terminate()
+            log_contents = open(self._server_log_path).read()
+            pytest.fail(
+                "Evaluator server did not start within 120 seconds. Log:\n%s"
+                % log_contents[-2000:]
+            )
         self.input_file='gradient.in'
         self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
     def teardown_method(self):
         self.estimator_process.terminate()
-        shutil.rmtree("working_directory")
-        shutil.rmtree("stored_data")
+        self._server_log.close()
+        if os.path.exists(self._server_log_path):
+            os.remove(self._server_log_path)
+        for dnm in ["working_directory", "stored_data"]:
+            if os.path.exists(dnm):
+                shutil.rmtree(dnm)
         super(TestEvaluatorBromineStudy, self).teardown_method()
 
     def test_bromine_study(self):
         """Check bromine study produces objective function and gradient in expected range """
         objective = self.get_objective()
-        data      = objective.Full(np.zeros(objective.FF.np),1,verbose=True)
+        try:
+            data = objective.Full(np.zeros(objective.FF.np),1,verbose=True)
+        except Exception as exc:
+            self._server_log.flush()
+            log_contents = open(self._server_log_path).read()
+            raise RuntimeError(
+                "objective.Full raised %s: %s\nServer log (last 2000 chars):\n%s"
+                % (type(exc).__name__, exc, log_contents[-2000:])
+            ) from exc
         X, G, H   = data['X'], data['G'], data['H']
         msgX="\nCalculated objective function is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_OBJECTIVE in test_system.py with these values"
         np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_OBJECTIVE, X, atol=200, err_msg=msgX)
@@ -254,6 +304,7 @@ class TestImplicitSolventHFEStudy(ForceBalanceSystemTest):
         """Check implicit hydration free energy study (Hydration target) converges to expected results"""
         self.run_optimizer(check_result=False, check_iter=False, use_pvals=True)
 
+@skip_openff_py39
 class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
         pytest.importorskip("openff.toolkit", minversion="0.4")
@@ -274,6 +325,7 @@ class TestOpenFFTorsionProfileStudy(ForceBalanceSystemTest):
         """Check OpenFF torsion profile optimization converges to expected results"""
         self.run_optimizer(check_iter=False)
 
+@skip_openff_py39
 class TestRechargeMethaneStudy(ForceBalanceSystemTest):
 
     def setup_method(self, method):

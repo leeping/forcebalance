@@ -23,7 +23,7 @@ class TestImplemented(ForceBalanceTestCase):
         test case
         """
         forcebalance_modules=[module[:-3] for module in os.listdir(forcebalance.__path__[0])
-                    if re.compile(".*\.py$").match(module)
+                    if re.compile(r".*\.py$").match(module)
                     and module not in ["__init__.py"]]
         for module in forcebalance_modules:
             # LPW: I don't think dcdlib should be imported this way.
