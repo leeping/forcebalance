@@ -677,9 +677,9 @@ class GMX(Engine):
             if maxbox > 1e3:
                 warn_press_key("The box size of the molecule is larger than 100 nm.  Are you sure you want to run a vacuum simulation with this molecule?")
 
-            BOX_LENGTH = (maxbox + 20) * 2
+            BOX_LENGTH = (maxbox + 20) * 2 # A
             NSTLIST = int(1e2)
-            CUTOFF = BOX_LENGTH / 25 # nm
+            CUTOFF = (maxbox + 10) / 10 # nm
 
             box_center = array([BOX_LENGTH/2, BOX_LENGTH/2, BOX_LENGTH/2])
             for i in range(len(self.mol.boxes)):
