@@ -29,6 +29,7 @@ jobs:
           - "3.11"
           - "3.12"
         gmx-version:
+          - "4"
           - "5"
           - "2019"
           # - "2022"
@@ -138,6 +139,27 @@ jobs:
         which gmx_d
         gmx help
         gmx dump -h
+
+    - name: Install Gromacs
+      if: matrix.gmx-version == '4'
+      run: |
+        wget http://ftp.gromacs.org/pub/gromacs/gromacs-4.6.7.tar.gz
+        tar xvzf gromacs-4.6.7.tar.gz
+        cd gromacs-4.6.7
+        cp -r cmake cmake_s
+        cd cmake
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/4.6.7 -DGMX_DOUBLE=ON -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF -DGMX_SIMD=None ..
+        # replace http:/w with https://w
+        sed -i.bak 's|http:/w|https://w|g' CMakeCache.txt && rm -f CMakeCache.txt.bak
+        make -j 8 && make install
+        cd ../cmake_s
+        cmake -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/opt/gromacs/4.6.7 -DGMX_BUILD_OWN_FFTW=ON -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -DGMX_USE_RDTSCP=OFF -DGMX_SIMD=None ..
+        sed -i.bak 's|http:/w|https://w|g' CMakeCache.txt && rm -f CMakeCache.txt.bak
+        make -j 8 && make install
+        cd ..
+        . $GITHUB_WORKSPACE/opt/gromacs/4.6.7/bin/GMXRC.bash
+        echo "$GITHUB_WORKSPACE/opt/gromacs/4.6.7/bin" >> $GITHUB_PATH
+        which mdrun
 
     - name: Extract data archives
       run: |
