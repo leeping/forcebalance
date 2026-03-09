@@ -915,8 +915,8 @@ class GMX(Engine):
         if not os.path.exists(edrfile):
             logger.error('Cannot determine energy term names without an .edr file\n')
             raise RuntimeError
-        ## Figure out which energy terms need to be printed.
-        o = self.callgmx("g_energy -f %s -xvg no" % (edrfile), stdin="Total-Energy\n", copy_stdout=False, copy_stderr=True)
+        ## Figure out which energy terms need to be printed, use 1 as placeholder value
+        o = self.callgmx("g_energy -f %s -xvg no" % (edrfile), stdin="1\n", copy_stdout=False, copy_stderr=True)
         parsemode = 0
         energyterms = OrderedDict()
         for line in o:
