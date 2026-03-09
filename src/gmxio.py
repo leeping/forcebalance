@@ -673,17 +673,23 @@ class GMX(Engine):
             from forcebalance.molecule import Box
             from numpy import array
 
-            maxbox = max([self.mol.boxes[0].a, self.mol.boxes[0].b, self.mol.boxes[0].c]) # Angstrom
+            maxbox = 0.0
+            # iterate through all boxes to capture all configs
+            for xyz in self.mol.xyzs:
+                span = xyz.max(0) - xyz.min(0)
+                span_diag = float((span**2).sum()**0.5)
+                if span_diag > maxbox:
+                    maxbox = span_diag
             if maxbox > 1e3:
                 warn_press_key("The box size of the molecule is larger than 100 nm.  Are you sure you want to run a vacuum simulation with this molecule?")
-
-            BOX_LENGTH = (maxbox + 20) * 4 # A -- to be safely more than double CUTOFF
-            NSTLIST = int(1e2)
+ 
             # cutoff: divide by 10 for nm
-            # then multiply by 1.8 --
-            # the longest possible diagonal is sqrt(3), approx 1.73,
-            # round to 1.8 to be safe.
-            CUTOFF = (maxbox / 10) * 1.8 
+            # then multiply by 4 in case of conformational change and for buffer
+            # Use a minimum to avoid overly short cutoffs for small molecules.
+            CUTOFF = max((maxbox / 10) * 4, 1.0)
+            # box_length: A -- to be safely more than double CUTOFF
+            BOX_LENGTH = ((CUTOFF + 2) * 4) * 10
+            NSTLIST = int(1e2)
 
             box_center = array([BOX_LENGTH/2, BOX_LENGTH/2, BOX_LENGTH/2])
             for i in range(len(self.mol.boxes)):
@@ -1109,9 +1115,8 @@ class GMX(Engine):
 
         GROMACS 2021+ dropped the energygrp-excl mechanism that the old implementation
         relied on (running two separate mdrun calls — one fully-interacting, one with
-        A-B excluded — and differencing the potentials).  Instead we request the
-        cross-group energy terms (Coul-SR:A-B, LJ-SR:A-B, Coul-14:A-B, LJ-14:A-B)
-        directly from a single mdrun + gmx energy call.
+        A-B excluded — and differencing the potentials).  Instead we request all
+        cross-group ``A-B`` terms directly from a single mdrun + gmx energy call.
         """
 
         import subprocess
@@ -1137,7 +1142,11 @@ class GMX(Engine):
         # subprocess is used directly because callgmx() does not support piping
         # multi-line stdin in the way gmx energy expects.
         edrfile = f"{self.name}-i.edr"
-        a_b_terms = ["Coul-SR:A-B", "LJ-SR:A-B", "Coul-14:A-B", "LJ-14:A-B"]
+        energy_terms = self.energy_termnames(edrfile=edrfile)
+        a_b_terms = [term for term in energy_terms if term.endswith(":A-B") or term.endswith(":B-A")] # if B-A is possible?
+        if len(a_b_terms) == 0:
+            logger.error("No cross-group A-B energy terms were found in %s\n" % edrfile)
+            raise RuntimeError
         xvgfile = f"{self.name}-i-interaction.xvg"
         proc = subprocess.Popen(
             [os.path.join(self.gmxpath, f"gmx{self.gmxsuffix}"), "energy", "-f", edrfile, "-o", xvgfile],
@@ -1146,7 +1155,7 @@ class GMX(Engine):
         )
         proc.communicate(input="\n".join(a_b_terms) + "\n\n")
 
-        # Sum the four cross-group columns per frame (column 0 is time).
+        # Sum all selected cross-group columns per frame (column 0 is time).
         energies = []
         with open(xvgfile) as fin:
             for line in fin:
