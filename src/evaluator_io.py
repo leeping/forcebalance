@@ -198,9 +198,13 @@ class Evaluator_SMIRNOFF(Target):
 
         # Store a copy of the objective function details from the previous optimisation cycle.
         self._last_obj_details = {}
+        self._last_submission_options = None
+
+        self._n_estimation_attempts = 0
 
         # Get the filename for the evaluator input file.
         self.set_option(tgt_opts, "evaluator_input", forceprint=True)
+        self.set_option(tgt_opts, "evaluator_n_restarts", forceprint=True)
 
         # Initialize the target.
         self._initialize()
@@ -428,6 +432,38 @@ class Evaluator_SMIRNOFF(Target):
         jacobian = np.array(jacobian_list)
         return jacobian
 
+    def _submit_data_set(self, data_set):
+
+        if self._n_estimation_attempts >= self.evaluator_n_restarts:
+
+            raise RuntimeError(
+                "Data set estimation has been attempted too many times (n={})".format(
+                    self._n_estimation_attempts
+                )
+            )
+
+        request, _ = self._client.request_estimate(
+            property_set=data_set, **self._last_submission_options
+        )
+        self._n_estimation_attempts += 1
+
+        logger.info(
+            "Requesting the estimation of {} properties (id={}).\n".format(
+                len(data_set),
+                request.id
+            )
+        )
+
+        if request.results(True, polling_interval=self._options.polling_interval)[0] is None:
+
+            raise RuntimeError(
+                "No `EvaluatorServer` could be found to submit the calculations to. "
+                "Please double check that a server is running, and that the connection "
+                "settings specified in the input script are correct."
+            )
+
+        return request
+
     def submit_jobs(self, mvals, AGrad=True, AHess=True):
         """
         Submit jobs for evaluating the objective function
@@ -510,71 +546,62 @@ class Evaluator_SMIRNOFF(Target):
                 index_counter += 1
 
         # Submit the estimation request.
-        self._pending_estimate_request, _ = self._client.request_estimate(
-            property_set=self._reference_data_set,
+        self._n_estimation_attempts = 0
+
+        self._last_submission_options = dict(
             force_field_source=force_field,
             options=self._options.estimation_options,
             parameter_gradient_keys=parameter_gradient_keys,
         )
+        self._pending_estimate_request = self._submit_data_set(self._reference_data_set)
 
-        logger.info(
-            "Requesting the estimation of {} properties, and their "
-            "gradients with respect to {} parameters.\n".format(
-                len(self._reference_data_set), len(parameter_gradient_keys)
-            )
-        )
-
-        if (
-            self._pending_estimate_request.results(
-                True, polling_interval=self._options.polling_interval
-            )[0] is None
-        ):
-
-            raise RuntimeError(
-                "No `EvaluatorServer` could be found to submit the calculations to. "
-                "Please double check that a server is running, and that the connection "
-                "settings specified in the input script are correct."
-            )
-
-    @staticmethod
-    def _check_estimation_request(estimation_request):
+    def _check_estimation_request(self):
         """Checks whether an estimation request has finished with any exceptions.
 
-        Parameters
-        ----------
-        estimation_request: openff.evaluator.client.Request
-            The request to check.
+        Returns
+        -------
+            The data set of estimated properties
         """
-        results, _ = estimation_request.results()
+        results, _ = self._pending_estimate_request.results()
 
         if results is None:
             raise ValueError("Trying to extract the results of an unfinished request.")
 
-        # Check for any exceptions that were raised while estimating
-        # the properties.
-        if isinstance(results, EvaluatorException):
+        if len(results.unsuccessful_properties) == 0:
+            return results
 
-            raise ValueError(
-                "An uncaught exception occured within the evaluator "
-                "framework: %s" % str(results)
-            )
+        estimated_properties = results.estimated_properties
 
-        if len(results.unsuccessful_properties) > 0:
+        for _ in range(self.evaluator_n_restarts):
 
             exceptions = "\n".join(str(result) for result in results.exceptions)
 
-            raise ValueError(
-                "Some properties could not be estimated:\n\n%s." % exceptions
+            logger.warning(
+                "Some properties could not be estimated:\n\n%s" % exceptions
+            )
+            logger.warning("Attempting to restart the failed properties\n")
+
+            request = self._submit_data_set(results.unsuccessful_properties)
+            results, _ = request.results()
+
+            estimated_properties.add_properties(
+                *results.estimated_properties.properties,
+                validate=False,
             )
 
-    def _extract_property_data(self, estimation_request, mvals, AGrad):
+            if len(results.unsuccessful_properties) == 0:
+                break
+
+        from openff.evaluator.client import RequestResult
+
+        results = RequestResult()
+        results.estimated_properties = estimated_properties
+
+        return results
+
+    def _extract_property_data(self, mvals, AGrad):
         """Extract the property estimates #and their gradients#
         from a relevant evaluator request object.
-
-        Parameters
-        ----------
-        estimation_request: openff.evaluator.client.Request
-            The request to extract the data from.
 
         Returns
         -------
@@ -586,10 +613,17 @@ class Evaluator_SMIRNOFF(Target):
             (n_params,).
         """
         # Make sure the request actually finished and was error free.
-        Evaluator_SMIRNOFF._check_estimation_request(estimation_request)
+        results = self._check_estimation_request()
 
-        # Extract the results from the request.
-        results, _ = estimation_request.results()
+        assert len(results.estimated_properties) == len(self._reference_data_set)
+
+        estimated_ids = {
+            physical_property.id for physical_property in results.estimated_properties
+        }
+        reference_ids = {
+            physical_property.id for physical_property in self._reference_data_set
+        }
+        assert reference_ids == estimated_ids
 
         # Save a copy of the results to the temporary directory
         results_path = os.path.join(self.root, self.rundir, "results.json")
@@ -740,7 +774,7 @@ class Evaluator_SMIRNOFF(Target):
 
         # Extract the properties estimated using the unperturbed parameters.
         estimated_data_set, estimated_gradients = self._extract_property_data(
-            self._pending_estimate_request, mvals, AGrad
+            mvals, AGrad
         )
 
         # compute objective value
