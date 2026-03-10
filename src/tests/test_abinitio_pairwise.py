@@ -9,6 +9,7 @@ import numpy as np
 import pytest
 
 import forcebalance
+import forcebalance.smirnoffio
 from .__init__ import ForceBalanceTestCase
 from .test_target import TargetTests
 from .test_system import skip_openff_py39
@@ -50,7 +51,7 @@ class TestAbInitioPairwise_SMIRNOFF(TargetTests):
         self.tgt_opt.update({
             'type': 'ABINITIOPAIRWISE_SMIRNOFF',
             'name': 'ethanol-pairwise',
-            'mol2': ['ethanol.mol2'],
+            'mol2': ['ethanol.sdf'],
             'energy': True,
             'force': False,
             'w_energy': 1.0,
@@ -59,7 +60,6 @@ class TestAbInitioPairwise_SMIRNOFF(TargetTests):
         self.ff = forcebalance.forcefield.FF(self.options)
         self.mvals = np.array([0.0] * self.ff.np)
 
-        import forcebalance.smirnoffio
         self.target = forcebalance.smirnoffio.AbInitioPairwise_SMIRNOFF(
             self.options, self.tgt_opt, self.ff
         )
@@ -70,7 +70,6 @@ class TestAbInitioPairwise_SMIRNOFF(TargetTests):
 
     def test_force_raises(self):
         """Enabling force fitting should raise RuntimeError."""
-        import forcebalance.smirnoffio
         bad_opt = self.tgt_opt.copy()
         bad_opt['force'] = True
         with pytest.raises(RuntimeError):

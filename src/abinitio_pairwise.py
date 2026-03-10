@@ -34,17 +34,23 @@ class AbInitioPairwise(AbInitio):
         Initialization; set up pairwise references energies and weights.
         """
 
+        # Raise an error before base class init if force/nft fitting was requested,
+        # because AbInitio.__init__ resets self.force=0 when no force data exists,
+        # which would silently swallow the user's (invalid) request.
+        if tgt_opts.get('force', False) or tgt_opts.get('w_netforce', 0.0) > 0 or tgt_opts.get('w_torque', 0.0) > 0:
+            raise RuntimeError(
+                "Fitting using forces, net forces, or net torques is not "
+                "implemented for this target."
+            )
+
         # Initialize the base class
         super(AbInitioPairwise,self).__init__(options,tgt_opts,forcefield)
 
-        # Raise an error if the target tries to fit forces, net forces, or net
-        # torques
-        if self.force or self.use_nft:
-            raise(
-                RuntimeError(
-                    "Fitting using forces, net forces, or net torques is not "
-                    "implemented for this target."
-                )
+        # Also guard against use_nft set by the base class (e.g. via w_netforce/w_torque defaults)
+        if self.use_nft:
+            raise RuntimeError(
+                "Fitting using forces, net forces, or net torques is not "
+                "implemented for this target."
             )
 
         # Set up pairwise reference energies and weights
