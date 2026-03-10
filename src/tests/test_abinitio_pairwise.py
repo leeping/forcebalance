@@ -44,6 +44,9 @@ class TestAbInitioPairwise_SMIRNOFF(TargetTests):
 
     def setup_method(self, method):
         super(TestAbInitioPairwise_SMIRNOFF, self).setup_method(method)
+        test_files_root = os.path.join(os.path.dirname(__file__), 'files')
+        self.options['root'] = test_files_root
+        os.chdir(test_files_root)
         self.options.update({
             'jobtype': 'NEWTON',
             'forcefield': ['ethanol-smirnoff.offxml'],
