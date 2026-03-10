@@ -40,6 +40,7 @@ class TestImplemented(ForceBalanceTestCase):
                     # Basically, platform-independent targets are excluded.
                     exclude = ['Target',
                             'AbInitio',
+                            'AbInitioPairwise',
                             'Interaction',
                             'Interaction_GMX',
                             'Liquid',
