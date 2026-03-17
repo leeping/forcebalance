@@ -13,6 +13,8 @@ from builtins import str
 from builtins import range
 import os, sys
 import re
+import subprocess
+from packaging.version import Version
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
 from forcebalance import BaseReader
@@ -526,6 +528,50 @@ def rm_gmx_baks(dir):
             if re.match('^#',file):
                 os.remove(file)
 
+def _query_gmx_version(exe):
+    """Run ``exe --version`` and return a :class:`packaging.version.Version`.
+
+    Parameters
+    ----------
+    exe : str
+        Full path or name of the GROMACS executable (e.g. ``'gmx'``, ``'gmx_d'``).
+
+    Raises
+    ------
+    ValueError
+        If the version string cannot be parsed from the command output.
+    """
+    result = subprocess.run([exe, "--version"], capture_output=True, text=True, timeout=10)
+    output = result.stdout + result.stderr
+    # Matches both "GROMACS version:    2024.4" and "GROMACS:      gmx, version 5.1.5"
+    m = re.search(r'GROMACS(?:\s+version)?\s*:\s+(?:\S+,\s+version\s+)?(\d[\d.]+)', output, re.IGNORECASE)
+    if not m:
+        raise ValueError("Could not parse GROMACS version from output of '%s --version'" % exe)
+    return Version(m.group(1))
+
+
+def _check_gmx_version(ver):
+    """Raise :class:`RuntimeError` if *ver* is a known-incompatible GROMACS version.
+
+    Parameters
+    ----------
+    ver : packaging.version.Version
+        Parsed GROMACS version returned by :func:`_query_gmx_version`.
+    """
+    if ver < Version("5"):
+        raise RuntimeError(
+            f"GROMACS version 4 or lower (detected: {ver}) is no longer supported due to updates "
+            "in MDP option keywords. Please upgrade to GROMACS 5.x or 2024.4+."
+        )
+    if Version("2020") <= ver < Version("2024.4"):
+        raise RuntimeError(
+            f"GROMACS {ver} is not supported. Versions 2020–2024.3 contain a bug in "
+            "'gmx dump' that does not output all atoms in a system "
+            "(GROMACS GitLab issue #5124: https://gitlab.com/gromacs/gromacs/-/work_items/5124). "
+            "Please use GROMACS 2024.4 or later."
+        )
+
+
 class GMX(Engine):
 
     """ Derived from Engine object for carrying out general purpose GROMACS calculations. """
@@ -596,6 +642,14 @@ class GMX(Engine):
                 logger.error("Cannot find the GROMACS executables!\n")
                 raise RuntimeError
 
+        if havegmx:
+            exe = 'gmx' + self.gmxsuffix if self.gmxversion == 5 else 'mdrun' + self.gmxsuffix
+            try:
+                self.gmx_ver = _query_gmx_version(exe)
+            except ValueError as e:
+                warn_press_key("Could not determine GROMACS version: %s" % str(e))
+            else:
+                _check_gmx_version(self.gmx_ver)  # raises RuntimeError for unsupported versions
 
     def readsrc(self, **kwargs):
         """ Called by __init__ ; read files from the source directory. """

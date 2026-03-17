@@ -31,8 +31,6 @@ jobs:
         gmx-version:
           - "5"
           - "2019"
-          # - "2022"
-          # - "2023"
           - "2024"
           - "2025"
 
@@ -40,6 +38,21 @@ jobs:
           # a 2022 build doesn't seem to exist for mac
           - os: macOS-latest
             gmx-version: "2022"
+
+        include:
+          # just to test warnings
+          - os: ubuntu-latest
+            python-version: "3.11"
+            gmx-version: "4"
+          - os: ubuntu-latest
+            python-version: "3.11"
+            gmx-version: "2022"
+          - os: ubuntu-latest
+            python-version: "3.11"
+            gmx-version: "2023"
+          - os: ubuntu-latest
+            python-version: "3.11"
+            gmx-version: "2024.3"
 
     env:
       CI_OS: ${{ matrix.os }}
@@ -52,7 +65,7 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Set up conda environment with gromacs
-      if: matrix.gmx-version != '5' && matrix.gmx-version != '4'
+      if: matrix.gmx-version != '5' && matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023'
       uses: mamba-org/setup-micromamba@v1
       with:
         # ambertools has no Python 3.9 builds; use a separate env file for 3.9
@@ -68,6 +81,16 @@ jobs:
         environment-file: ${{ matrix.python-version == '3.9' && 'devtools/conda-envs/test_env_py39.yaml' || 'devtools/conda-envs/test_env.yaml' }}
         create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
           python=${{ matrix.python-version }}
+
+    - name: Set up conda environment with single-precision gromacs (rejected versions)
+      if: matrix.gmx-version == '2022' || matrix.gmx-version == '2023'
+      uses: mamba-org/setup-micromamba@v1
+      with:
+        # dblprec conda-forge builds don't exist for 2022/2023; single-precision is sufficient
+        # for the version-rejection test.
+        environment-file: ${{ matrix.python-version == '3.9' && 'devtools/conda-envs/test_env_py39.yaml' || 'devtools/conda-envs/test_env.yaml' }}
+        create-args: >-
+          python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }}
 
     - name: Pin setuptools for Python < 3.10
       if: matrix.python-version == '3.9' || matrix.python-version == '3.10'
@@ -171,11 +194,18 @@ jobs:
         python -m pip install --no-deps .
         python -c "import forcebalance; print(forcebalance.__version__)"
 
+    - name: Run version-rejection test
+      if: matrix.gmx-version == '4' || matrix.gmx-version == '2022' || matrix.gmx-version == '2023' || matrix.gmx-version == '2024.3'
+      run: |
+        pytest -v --run-gmx-rejected -k test_gmx_version_rejected src/tests/test_gmxio.py
+
     - name: Run tests
+      if: matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023' && matrix.gmx-version != '2024.3'
       run: |
         pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml --timeout=2000 src/tests/
 
     - name: Run water study
+      if: matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023' && matrix.gmx-version != '2024.3'
       run: |
         cd studies/001_water_tutorial
         tar xvjf targets.tar.bz2
@@ -183,6 +213,7 @@ jobs:
         cd ../../
 
     - name: Codecov
+      if: matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023' && matrix.gmx-version != '2024.3'
       uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml

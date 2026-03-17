@@ -3,15 +3,13 @@ import os
 import forcebalance
 import shutil
 import pytest
+from forcebalance.nifty import *
+from forcebalance.gmxio import GMX
 from .test_target import TargetTests # general targets tests defined in test_target.py
-from .__init__ import get_gromacs_version, is_buggy_gmx_dump_version
 """
 The testing functions for this class are located in test_target.py.
 """
-@pytest.mark.skipif(
-    is_buggy_gmx_dump_version(get_gromacs_version()),
-    reason="Skipping for GROMACS versions affected by gmx dump -sys bug: https://gitlab.com/gromacs/gromacs/-/issues/5124"
-)
+
 class TestAbInitio_GMX(TargetTests):
     def setup_method(self, method):
         super(TestAbInitio_GMX, self).setup_method(method)
@@ -39,4 +37,21 @@ class TestAbInitio_GMX(TargetTests):
         if os.path.isdir(temp_dir):
             shutil.rmtree(temp_dir)
         super(TestAbInitio_GMX, self).teardown_method()
+
+
+@pytest.mark.gmx_rejected
+def test_gmx_version_rejected():
+    """
+    GMX() must raise RuntimeError when a known-bad GROMACS version is installed.
+    Skipped by default; enable with `pytest --run-gmx-rejected`.
+    """
+    with pytest.raises(RuntimeError):
+        GMX()
+
+
+def test_gmx_version_accepted(monkeypatch):
+    """GMX() must not raise a version error for supported GROMACS versions (5.x, 2024.4+)."""
+    monkeypatch.setattr(GMX, 'readsrc', lambda self, **kw: None)
+    monkeypatch.setattr(GMX, 'prepare', lambda self, **kw: None)
+    GMX()  # version check passes; file I/O is monkeypatched out
 

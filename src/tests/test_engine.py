@@ -10,7 +10,7 @@ from forcebalance.gmxio import GMX
 from forcebalance.tinkerio import TINKER
 from forcebalance.openmmio import OpenMM
 from collections import OrderedDict
-from .__init__ import ForceBalanceTestCase, check_for_openmm, get_gromacs_version_from_path
+from .__init__ import ForceBalanceTestCase, check_for_openmm
 
 # Set SAVEDATA to True and run the tests in order to save data
 # to a file for future reference. This is easier to use for troubleshooting
@@ -177,11 +177,6 @@ class TestAmber99SB(ForceBalanceTestCase):
                 missing_pkgs.append(eng)
         if len(missing_pkgs) > 0:
             pytest.skip("Missing packages: %s" % ', '.join(missing_pkgs))
-        # Skip if GROMACS version is 2022 or 2023 due to a bug in the 1-4 energy groupings
-        # https://gitlab.com/gromacs/gromacs/-/issues/5109
-        gmx_version = get_gromacs_version_from_path(self.engines['GMX'].gmxpath) if 'GMX' in self.engines else None
-        if gmx_version is not None and Version("2022") <= gmx_version < Version("2024"):
-            pytest.skip("Skipping GMX interaction energy test for GROMACS 2022/2023 due to bug https://gitlab.com/gromacs/gromacs/-/issues/5109")
         Data = OrderedDict()
         for name, eng in self.engines.items():
             Data[name] = eng.interaction_energy(fraga=list(range(22)), fragb=list(range(22, 49)))
