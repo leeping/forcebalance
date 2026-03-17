@@ -88,6 +88,9 @@ class TestInteraction_OpenMM(TargetTests):
 def test_local_coord_sites():
     """Make sure that the internal prep of vs positions matches that given by OpenMM."""
     if no_openmm: pytest.skip("No OpenMM modules found.")
+    # make sure we're in the right place
+    test_root = os.path.dirname(os.path.realpath(__file__))
+    os.chdir(test_root)
     # make a system
     mol = app.PDBFile(os.path.join("files", "vs_mol.pdb"))
     modeller = app.Modeller(topology=mol.topology, positions=mol.positions)

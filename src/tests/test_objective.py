@@ -7,7 +7,6 @@ import numpy
 import inspect
 import pytest
 from .__init__ import ForceBalanceTestCase
-
 class TestImplemented(ForceBalanceTestCase):
     def test_implemented_targets_derived_from_target(self):
         """Check classes listed in Implemented_Targets are derived from Target"""
@@ -125,6 +124,7 @@ class ObjectiveTests(object):
     def test_indicate(self):
         """Check objective.indicate() runs without errors"""
         self.objective.Indicate()
+
 
 class TestWaterObjective(ForceBalanceTestCase, ObjectiveTests):
     def setup_method(self, method):

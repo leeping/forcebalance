@@ -6,13 +6,13 @@ nstxout = 1000
 nstenergy = 1000
 nstlog = 1000
 nstvout = 1000
-nstxtcout = 0
+;nstxtcout = 0
 
 ns_type	= grid
 nstlist	= 5	
 rlist = .75
 rcoulomb = .75
-rvdw = .6
+rvdw = .75
 coulombtype = PME		
 pme_order = 4		   
 fourierspacing = 0.16

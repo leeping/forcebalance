@@ -1540,11 +1540,13 @@ def _exec(command, print_to_screen = False, outfnm = None, logfnm = None, stdin 
 
     _exec.returncode = p.returncode
     if p.returncode != 0:
-        if process_err.stderr and print_error:
-            logger.warning("Received an error message:\n")
-            logger.warning("\n[====] \x1b[91mError Message\x1b[0m [====]\n")
-            logger.warning(process_err.stderr)
-            logger.warning("[====] \x1b[91mEnd o'Message\x1b[0m [====]\n")
+        if print_error:
+            output_to_log = process_err.stderr or process_out.stdout
+            if output_to_log:
+                logger.warning("Received an error message:\n")
+                logger.warning("\n[====] \x1b[91mError Message\x1b[0m [====]\n")
+                logger.warning(output_to_log)
+                logger.warning("[====] \x1b[91mEnd o'Message\x1b[0m [====]\n")
         if persist:
             if print_error:
                 logger.info("%s gave a return code of %i (it may have crashed) -- carrying on\n" % (command, p.returncode))
