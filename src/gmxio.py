@@ -914,6 +914,7 @@ class GMX(Engine):
         if self.gmxversion == 5:
             csplit[0] = csplit[0].replace('g_','').replace('gmxdump','dump')
             csplit = ['gmx' + self.gmxsuffix] + csplit
+        else:
             raise RuntimeError('gmxversion must be 5 (gmx wrapper, valid for GROMACS 5.x and all 20xx releases)')
         return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, copy_stderr=copy_stderr, **kwargs)
 
