@@ -910,13 +910,11 @@ class GMX(Engine):
         # Old-style program names (g_energy, gmxdump, …)
         # are mapped to their modern subcommand equivalents (energy, dump, …).
         # gmxversion == 4 means only a standalone mdrun was found (GROMACS 4.x).
+        # 2026-03-17: gmxversion == 4 is no longer supported.
         if self.gmxversion == 5:
             csplit[0] = csplit[0].replace('g_','').replace('gmxdump','dump')
             csplit = ['gmx' + self.gmxsuffix] + csplit
-        elif self.gmxversion == 4:
-            csplit[0] = prog + self.gmxsuffix
-        else:
-            raise RuntimeError('gmxversion must be 4 (standalone mdrun) or 5 (gmx wrapper, valid for GROMACS 5.x and all 20xx releases)')
+            raise RuntimeError('gmxversion must be 5 (gmx wrapper, valid for GROMACS 5.x and all 20xx releases)')
         return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, copy_stderr=copy_stderr, **kwargs)
 
     def warngmx(self, command, warnings=[], maxwarn=1, **kwargs):
