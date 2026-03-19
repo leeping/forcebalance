@@ -329,7 +329,7 @@ mainsections = ["SIMULATION","TARGET","OPTIONS","END","NONE"]
 def read_mvals(fobj):
     Answer = []
     for line in fobj:
-        if re.match("(/read_mvals)|(^\$end)",line):
+        if re.match(r"(/read_mvals)|(^\$end)",line):
             break
         Answer.append(float(line.split('[', maxsplit=1)[-1].split(']', maxsplit=1)[0].split()[-1]))
     return Answer
@@ -337,7 +337,7 @@ def read_mvals(fobj):
 def read_pvals(fobj):
     Answer = []
     for line in fobj:
-        if re.match("(/read_pvals)|(^\$end)",line):
+        if re.match(r"(/read_pvals)|(^\$end)",line):
             break
         Answer.append(float(line.split('[', maxsplit=1)[-1].split(']', maxsplit=1)[0].split()[-1]))
     return Answer
@@ -346,7 +346,7 @@ def read_priors(fobj):
     Answer = OrderedDict()
     for line in fobj:
         line = line.split("#")[0]
-        if re.match("(/priors)|(^\$end)",line):
+        if re.match(r"(/priors)|(^\$end)",line):
             break
         Answer[line.split()[0]] = float(line.split()[-1])
     return Answer
@@ -462,7 +462,7 @@ def parse_inputs(input_file=None):
     there is a 'section' variable type.
 
     There is only one set of general options, but multiple sets of target options.
-    Each target has its own section delimited by the \em $target keyword,
+    Each target has its own section delimited by the \\em $target keyword,
     and we build a list of target options.
 
     @param[in]  input_file The name of the input file.
@@ -498,8 +498,8 @@ def parse_inputs(input_file=None):
             if key in bkwd: # Do option replacement for backward compatibility.
                 key = bkwd[key]
             # If line starts with a $, this signifies that we're in a new section.
-            if re.match('^\$',line):
-                newsection = re.sub('^\$','',line).upper()
+            if re.match(r'^\$',line):
+                newsection = re.sub(r'^\$','',line).upper()
                 if section in ["SIMULATION","TARGET"] and newsection in mainsections:
                     tgt_opts.append(this_tgt_opt)
                     this_tgt_opt = deepcopy(tgt_opts_defaults)

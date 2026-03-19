@@ -8,9 +8,12 @@ from forcebalance.nifty import *
 from forcebalance.nifty import _exec
 
 try:
-    import work_queue
+    import ndcctools.work_queue as work_queue
 except ImportError:
-    work_queue = None
+    try:
+        import work_queue
+    except ImportError:
+        work_queue = None
 
 class TestNifty(ForceBalanceTestCase):
     def setup_method(self, method):

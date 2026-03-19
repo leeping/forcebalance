@@ -7,7 +7,6 @@ import numpy
 import inspect
 import pytest
 from .__init__ import ForceBalanceTestCase
-
 class TestImplemented(ForceBalanceTestCase):
     def test_implemented_targets_derived_from_target(self):
         """Check classes listed in Implemented_Targets are derived from Target"""
@@ -23,7 +22,7 @@ class TestImplemented(ForceBalanceTestCase):
         test case
         """
         forcebalance_modules=[module[:-3] for module in os.listdir(forcebalance.__path__[0])
-                    if re.compile(".*\.py$").match(module)
+                    if re.compile(r".*\.py$").match(module)
                     and module not in ["__init__.py"]]
         for module in forcebalance_modules:
             # LPW: I don't think dcdlib should be imported this way.
@@ -125,6 +124,7 @@ class ObjectiveTests(object):
     def test_indicate(self):
         """Check objective.indicate() runs without errors"""
         self.objective.Indicate()
+
 
 class TestWaterObjective(ForceBalanceTestCase, ObjectiveTests):
     def setup_method(self, method):

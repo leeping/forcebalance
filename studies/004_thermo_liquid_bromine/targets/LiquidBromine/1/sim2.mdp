@@ -7,12 +7,11 @@ nstvout		= 0
 nstfout		= 0
 nstlog		= 0
 nstenergy	= 50
-nstxtcout       = 50
+nstxout_compressed       = 50
 xtc_grps        = System
 energygrps      = System
 
 nstlist		= 10
-ns_type		= grid
 rlist		= 0.9
 vdwtype		= cut-off
 coulombtype	= cut-off

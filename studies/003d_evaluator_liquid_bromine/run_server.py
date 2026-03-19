@@ -6,6 +6,7 @@ import multiprocessing
 # from sibling threads and deadlock immediately. "spawn" starts a fresh
 # interpreter with no inherited thread state, avoiding the deadlock entirely.
 # This is the primary fix for Python 3.9 / older openff-evaluator versions.
+# LW 2026-03-07: this fix was suggested by Claude.
 multiprocessing.set_start_method("spawn", force=True)
 
 import shutil
@@ -17,6 +18,7 @@ from os import path
 # deadlocks on Python 3.9/3.10 due to fork-safety issues (locked mutexes
 # inherited by the child process). With it, tasks run directly in the
 # Dask worker thread instead of being dispatched to a subprocess.
+# LW 2026-03-07: backend/dask.py is from OpenFF Evaluator
 import openff.evaluator
 openff.evaluator._called_from_test = True
 

@@ -56,16 +56,16 @@ class CleanStreamHandler(StreamHandler):
     
     def emit(self, record):
         message = record.getMessage()
-        message = re.sub("\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m", "", message)
+        message = re.sub(r"\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m", "", message)
         self.stream.write(message)
         self.flush()
-        
+
 class CleanFileHandler(FileHandler):
     """File handler that does not write terminal escape codes and carriage returns
     to files. Use this when writing to a file that will probably not be viewed in a terminal"""
     def emit(self, record):
         message = record.getMessage()
-        message = re.sub("\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m", "", message)
+        message = re.sub(r"\x1b\[[0-9][0-9]?;?[0-9]?[0-9]?m", "", message)
         message = re.sub("\r", "\n", message)
         self.stream.write(message)
         self.flush()

@@ -7,16 +7,14 @@ nstvout		= 0
 nstfout		= 0
 nstlog		= 0
 nstenergy	= 1000
-xtc_grps        = System
 energygrps      = System
 
 nstlist		= 20
-ns_type		= grid
 rlist		= 0.9
 vdwtype		= switch
 coulombtype	= cut-off
 rcoulomb	= 0.9
-rvdw		= 0.85
+rvdw		= 0.9
 rvdw_switch     = 0.8
 constraints	= all-bonds
 pbc		= xyz

@@ -50,8 +50,8 @@ def parse_interactions(input_file):
             continue
         key = s[0].lower()
         # If line starts with a $, this signifies that we're in a new section.
-        if re.match('^\$',line):
-            word = re.sub('^\$','',line).upper()
+        if re.match(r'^\$',line):
+            word = re.sub(r'^\$','',line).upper()
             if word == "END": # End of a section, time to reinitialize variables.
                 if section == "GLOBAL": pass
                 elif section == "SYSTEM":

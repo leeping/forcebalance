@@ -4,6 +4,7 @@ forcefield water.itp             # Specify names of force field files (files wit
 penalty_additive 0.01            # Regularization prefactor.
 trust0 1.0                       # Trust radius.
 backup false                     # Don't back up any files.
+gmxsuffix _d
 $end
 
 $target

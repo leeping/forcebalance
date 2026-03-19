@@ -447,7 +447,14 @@ def UpdateSimulationParameters(src_system, dest_simulation):
     CopySystemParameters(src_system, dest_simulation.system)
     for i in range(src_system.getNumForces()):
         if hasattr(dest_simulation.system.getForce(i),'updateParametersInContext'):
-            dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
+            try:
+                dest_simulation.system.getForce(i).updateParametersInContext(dest_simulation.context)
+            except OpenMMException:
+                # if this fails for any reason, such as the issue below, then we reinitialize instead
+                # https://github.com/openmm/openmm/issues/5204
+                dest_simulation.context.reinitialize(preserveState=True)
+                break
+
         if isinstance(dest_simulation.system.getForce(i), (CustomNonbondedForce, CustomBondForce)):
             force = src_system.getForce(i)
             for j in range(force.getNumGlobalParameters()):

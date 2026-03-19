@@ -13,6 +13,8 @@ from builtins import str
 from builtins import range
 import os, sys
 import re
+import subprocess
+from packaging.version import Version
 from forcebalance.nifty import *
 from forcebalance.nifty import _exec
 from forcebalance import BaseReader
@@ -68,6 +70,10 @@ def edit_mdp(fin=None, fout=None, options={}, defaults={}, verbose=False):
     clashes = ["pbc"]
     # Make sure that the keys are lowercase, and the values are all strings.
     options = OrderedDict([(key.lower().replace('-','_'), str(val) if val is not None else None) for key, val in options.items()])
+    # The group cutoff scheme was removed in GROMACS 2021; always override to
+    # Verlet so that .mdp files written for older GROMACS versions still work.
+    options = dict(options)
+    options["cutoff-scheme"] = "Verlet"
     # List of lines in the output file.
     out = []
     # List of options in the output file.
@@ -409,9 +415,9 @@ class ITP_Reader(BaseReader):
             delattr(self, 'overpfx')
             delattr(self, 'oversfx')
 
-        if re.match('^ *\[.*\]',line):
+        if re.match(r'^ *\[.*\]',line):
             # Makes a word like "atoms", "bonds" etc.
-            self.sec = re.sub('[\[\] \n]','',line.strip())
+            self.sec = re.sub(r'[\[\] \n]','',line.strip())
         elif self.sec == 'defaults':
             self.itype = 'DEF'
             self.nbtype = int(s[0])
@@ -522,6 +528,50 @@ def rm_gmx_baks(dir):
             if re.match('^#',file):
                 os.remove(file)
 
+def _query_gmx_version(exe):
+    """Run ``exe --version`` and return a :class:`packaging.version.Version`.
+
+    Parameters
+    ----------
+    exe : str
+        Full path or name of the GROMACS executable (e.g. ``'gmx'``, ``'gmx_d'``).
+
+    Raises
+    ------
+    ValueError
+        If the version string cannot be parsed from the command output.
+    """
+    result = subprocess.run([exe, "--version"], capture_output=True, text=True, timeout=10)
+    output = result.stdout + result.stderr
+    # Matches both "GROMACS version:    2024.4" and "GROMACS:      gmx, version 5.1.5"
+    m = re.search(r'GROMACS(?:\s+version)?\s*:\s+(?:\S+,\s+version\s+)?(\d[\d.]+)', output, re.IGNORECASE)
+    if not m:
+        raise ValueError("Could not parse GROMACS version from output of '%s --version'" % exe)
+    return Version(m.group(1))
+
+
+def _check_gmx_version(ver):
+    """Raise :class:`RuntimeError` if *ver* is a known-incompatible GROMACS version.
+
+    Parameters
+    ----------
+    ver : packaging.version.Version
+        Parsed GROMACS version returned by :func:`_query_gmx_version`.
+    """
+    if ver < Version("5"):
+        raise RuntimeError(
+            f"GROMACS version 4 or lower (detected: {ver}) is no longer supported due to updates "
+            "in MDP option keywords. Please upgrade to GROMACS 5.x or 2024.4+."
+        )
+    if Version("2020") <= ver < Version("2024.4"):
+        raise RuntimeError(
+            f"GROMACS {ver} is not supported. Versions 2020–2024.3 contain a bug in "
+            "'gmx dump' that does not output all atoms in a system "
+            "(GROMACS GitLab issue #5124: https://gitlab.com/gromacs/gromacs/-/work_items/5124). "
+            "Please use GROMACS 2024.4 or later."
+        )
+
+
 class GMX(Engine):
 
     """ Derived from Engine object for carrying out general purpose GROMACS calculations. """
@@ -578,10 +628,28 @@ class GMX(Engine):
                 self.gmxpath = which('mdrun'+self.gmxsuffix)
                 self.gmxversion = 4
                 havegmx = True
+            elif self.gmxsuffix == '' and which('gmx_d') != '':
+                # Fallback: if only the double-precision build is installed (e.g.
+                # conda-forge's *dblprec* variant which ships gmx_d but not gmx),
+                # use it automatically rather than failing.
+                warn_once("Single-precision 'gmx' not found; falling back to double-precision 'gmx_d'.")
+                self.gmxsuffix = '_d'
+                self.gmxpath = which('gmx_d')
+                self.gmxversion = 5
+                havegmx = True
             else:
                 warn_press_key("Please add GROMACS executables to the PATH or specify gmxpath.")
                 logger.error("Cannot find the GROMACS executables!\n")
                 raise RuntimeError
+
+        if havegmx:
+            exe = 'gmx' + self.gmxsuffix if self.gmxversion == 5 else 'mdrun' + self.gmxsuffix
+            try:
+                self.gmx_ver = _query_gmx_version(exe)
+            except ValueError as e:
+                warn_press_key("Could not determine GROMACS version: %s" % str(e))
+            else:
+                _check_gmx_version(self.gmx_ver)  # raises RuntimeError for unsupported versions
 
     def readsrc(self, **kwargs):
         """ Called by __init__ ; read files from the source directory. """
@@ -597,9 +665,10 @@ class GMX(Engine):
     def prepare(self, pbc=False, **kwargs):
         """ Called by __init__ ; prepare the temp directory and figure out the topology. """
 
+        # cutoff-scheme defaults to "verlet" (required for GROMACS >= 2021; group scheme removed).
         self.gmx_defs = OrderedDict([("integrator", "md"), ("dt", "0.001"), ("nsteps", "0"),
-                                     ("nstxout", "0"), ("nstfout", "0"), ("nstenergy", "1"), 
-                                     ("nstxtcout", "0"), ("constraints", "none"), ("cutoff-scheme", "group")])
+                                     ("nstxout", "0"), ("nstfout", "0"), ("nstenergy", "1"),
+                                     ("nstxout-compressed", "0"), ("constraints", "none"), ("cutoff-scheme", "verlet")])
         gmx_opts = OrderedDict([])
         warnings = []
         self.pbc = pbc
@@ -618,8 +687,10 @@ class GMX(Engine):
             # Since user provides in Angstrom, divide by a factor of 10.
             if 'nonbonded_cutoff' in kwargs:
                 rlist = kwargs['nonbonded_cutoff'] / 10
-            # Gromacs likes rvdw to be a bit smaller than rlist
-            rvdw = rlist - 0.05
+            # With the Verlet scheme, rlist is managed automatically by GROMACS via
+            # verletbuf-tolerance; rvdw no longer needs to be slightly smaller than
+            # rlist as it did under the old group scheme.
+            rvdw = rlist
             if rlist > 0.05*(float(int(minbox - 1))):
                 warn_press_key("nonbonded_cutoff = %.1f should be smaller than half the box size = %.1f Angstrom" % (rlist*10, minbox))
             # Override with user-provided vdw_cutoff if exist
@@ -633,7 +704,9 @@ class GMX(Engine):
             self.gmx_defs["nstlist"] = 20
             self.gmx_defs["rlist"] = "%.2f" % rlist
             self.gmx_defs["coulombtype"] = "pme"
-            self.gmx_defs["rcoulomb"] = "%.2f" % rlist
+            # Keep rcoulomb consistent with rvdw (both equal to rlist now that the
+            # group-scheme offset is gone).
+            self.gmx_defs["rcoulomb"] = "%.2f" % rvdw
             # self.gmx_defs["coulombtype"] = "pme-switch"
             # self.gmx_defs["rcoulomb"] = "%.2f" % (rlist - 0.05)
             # self.gmx_defs["rcoulomb_switch"] = "%.2f" % (rlist - 0.1)
@@ -642,18 +715,60 @@ class GMX(Engine):
             self.gmx_defs["rvdw_switch"] = "%.2f" % rvdw_switch
             self.gmx_defs["DispCorr"] = "EnerPres"
         else:
+            # Vacuum simulations were removed in gromacs 2020.
+            # We use a pseudovacuum simulation approach where we put the molecule in a very large box
+            # and use cutoffs to effectively turn off interactions between periodic images.
+
             if 'nonbonded_cutoff' in kwargs:
                 warn_press_key("Not using PBC, your provided nonbonded_cutoff will not be used")
             if 'vdw_cutoff' in kwargs:
                 warn_press_key("Not using PBC, your provided vdw_cutoff will not be used")
-            gmx_opts["pbc"] = "no"
-            self.gmx_defs["ns_type"] = "simple"
-            self.gmx_defs["nstlist"] = 0
-            self.gmx_defs["rlist"] = "0.0"
-            self.gmx_defs["coulombtype"] = "cut-off"
-            self.gmx_defs["rcoulomb"] = "0.0"
-            self.gmx_defs["vdwtype"] = "cut-off"
-            self.gmx_defs["rvdw"] = "0.0"
+
+            from forcebalance.molecule import Box
+            from numpy import array
+
+            maxbox = 0.0
+            # iterate through all boxes to capture all configs
+            for xyz in self.mol.xyzs:
+                span = xyz.max(0) - xyz.min(0)
+                span_diag = float((span**2).sum()**0.5)
+                if span_diag > maxbox:
+                    maxbox = span_diag
+            if maxbox > 1e3:
+                warn_press_key("The box size of the molecule is larger than 100 nm.  Are you sure you want to run a vacuum simulation with this molecule?")
+ 
+            # cutoff: divide by 10 for nm
+            # then multiply by 4 in case of conformational change and for buffer
+            # Use a minimum to avoid overly short cutoffs for small molecules.
+            CUTOFF = max((maxbox / 10) * 4, 1.0)
+            # box_length: A -- to be safely more than double CUTOFF
+            BOX_LENGTH = ((CUTOFF + 2) * 4) * 10
+            NSTLIST = int(1e2)
+
+            box_center = array([BOX_LENGTH/2, BOX_LENGTH/2, BOX_LENGTH/2])
+            for i in range(len(self.mol.boxes)):
+                self.mol.boxes[i] = Box(a=BOX_LENGTH, b=BOX_LENGTH, c=BOX_LENGTH,
+                                        alpha=90.0, beta=90.0, gamma=90.0,
+                                        A=array([BOX_LENGTH, 0., 0.]),
+                                        B=array([0., BOX_LENGTH, 0.]),
+                                        C=array([0., 0., BOX_LENGTH]),
+                                        V=BOX_LENGTH**3)
+                # Shift all atoms to the center of the large box so no atom starts near
+                # a periodic boundary.
+                centroid = self.mol.xyzs[i].mean(0)
+                self.mol.xyzs[i] = self.mol.xyzs[i] - centroid + box_center
+            gmx_opts["pbc"] = "xyz"
+            gmx_opts["coulombtype"] = "cut-off"
+            gmx_opts["vdwtype"] = "cut-off"
+            gmx_opts["nstlist"] = NSTLIST
+            gmx_opts["rcoulomb"] = "%.2f" % CUTOFF
+            gmx_opts["rvdw"] = "%.2f" % CUTOFF
+            # GROMACS Verlet scheme auto-applies coulomb-modifier = Potential-shift,
+            # which shifts each Coulomb interaction energy by -kC*qi*qj/rc.
+            # Setting modifier = None restores a plain cutoff so
+            # energies match the original pbc=no results.
+            gmx_opts["coulomb-modifier"] = "None"
+            gmx_opts["vdw-modifier"] = "None"
         
         ## Link files into the temp directory.
         if self.top is not None:
@@ -778,7 +893,7 @@ class GMX(Engine):
         mdpfile = onefile('%s.mdp' % self.name, 'mdp', err=True)
         LinkFile(mdpfile, "%s.mdp" % self.name, nosrcok=True)
 
-    def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, **kwargs):
+    def callgmx(self, command, stdin=None, print_to_screen=False, print_command=False, copy_stderr=True, **kwargs):
 
         """ Call GROMACS; prepend the gmxpath to the call to the GROMACS program. """
 
@@ -790,14 +905,18 @@ class GMX(Engine):
         ## Call a GROMACS program as you would from the command line.
         csplit = command.split()
         prog = os.path.join(self.gmxpath, csplit[0])
+        # gmxversion == 5 means "has the unified gmx wrapper" — covers GROMACS 5.x
+        # and all 20xx releases, so have left this alone for now.
+        # Old-style program names (g_energy, gmxdump, …)
+        # are mapped to their modern subcommand equivalents (energy, dump, …).
+        # gmxversion == 4 means only a standalone mdrun was found (GROMACS 4.x).
+        # 2026-03-17: gmxversion == 4 is no longer supported.
         if self.gmxversion == 5:
             csplit[0] = csplit[0].replace('g_','').replace('gmxdump','dump')
             csplit = ['gmx' + self.gmxsuffix] + csplit
-        elif self.gmxversion == 4:
-            csplit[0] = prog + self.gmxsuffix
         else:
-            raise RuntimeError('gmxversion can only be 4 or 5')
-        return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, **kwargs)
+            raise RuntimeError('gmxversion must be 5 (gmx wrapper, valid for GROMACS 5.x and all 20xx releases)')
+        return _exec(' '.join(csplit), stdin=stdin, print_to_screen=print_to_screen, print_command=print_command, copy_stderr=copy_stderr, **kwargs)
 
     def warngmx(self, command, warnings=[], maxwarn=1, **kwargs):
         
@@ -849,8 +968,8 @@ class GMX(Engine):
         if not os.path.exists(edrfile):
             logger.error('Cannot determine energy term names without an .edr file\n')
             raise RuntimeError
-        ## Figure out which energy terms need to be printed.
-        o = self.callgmx("g_energy -f %s -xvg no" % (edrfile), stdin="Total-Energy\n", copy_stdout=False, copy_stderr=True)
+        ## Figure out which energy terms need to be printed, use 1 as placeholder value
+        o = self.callgmx("g_energy -f %s -xvg no" % (edrfile), stdin="1\n", copy_stdout=False, copy_stderr=True)
         parsemode = 0
         energyterms = OrderedDict()
         for line in o:
@@ -894,9 +1013,13 @@ class GMX(Engine):
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-min.mdp -o %s-min.tpr" % (self.name, self.name, self.name, self.name))
         self.callgmx("mdrun -deffnm %s-min -nt 1" % self.name)
         # self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.gro -ndec 9" % (self.name, self.name, self.name), stdin="System")
-        self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.g96" % (self.name, self.name, self.name), stdin="System")
+        # -pbc whole reconstructs each molecule as a contiguous unit after GROMACS
+        # applies periodic wrapping.  Without this, atoms that started near a box
+        # boundary can end up in different periodic images, making the RMSD
+        # calculation meaningless.
+        self.callgmx("trjconv -f %s-min.trr -s %s-min.tpr -o %s-min.g96 -pbc whole" % (self.name, self.name, self.name), stdin="System")
         self.callgmx("g_energy -xvg no -f %s-min.edr -o %s-min-e.xvg" % (self.name, self.name), stdin='Potential')
-        
+
         E = float(open("%s-min-e.xvg" % self.name).readlines()[-1].split()[1])
         M = Molecule("%s.gro" % self.name, build_topology=False) + Molecule("%s-min.g96" % self.name)
         if not self.pbc:
@@ -921,13 +1044,37 @@ class GMX(Engine):
         Result: Dictionary containing energies, forces and/or dipoles.
         """
 
-        shot_opts = OrderedDict([("nsteps", 0), ("nstxout", 0), ("nstxtcout", 0), ("nstenergy", 1)])
+        shot_opts = OrderedDict([("nsteps", 0), ("nstxout", 0), ("nstxout-compressed", 0), ("nstenergy", 1)])
         shot_opts["nstfout"] = 1 if force else 0
+        # Disable pressure coupling for 0-step energy evaluation: Parrinello-Rahman
+        # requires box matrix velocities from a checkpoint, which don't exist for a
+        # fresh 0-step run. GROMACS 2025 added strict validation that rejects this.
+        shot_opts["pcoupl"] = "no"
+        # Set nstlist=1 so GROMACS does not auto-tune the neighbor-list interval or
+        # expand rlist beyond the value in the MDP.  GROMACS 2025.3+ added a fatal
+        # check in rerun.cpp that aborts when any trajectory frame's box is smaller
+        # than 2*rlist; the auto-tuner can inflate rlist (e.g. 0.9→0.979 nm) to
+        # match a larger nstlist, causing the check to fail for frames whose box
+        # shrank slightly during NPT equilibration.  With nstlist=1 the neighbor
+        # list is rebuilt every frame, no buffer expansion is needed, and rlist
+        # stays at the value in the MDP (typically 0.9 nm).
+        shot_opts["nstlist"] = 1
         edit_mdp(fin="%s.mdp" % self.name, fout="%s-1.mdp" % self.name, options=shot_opts)
 
         ## Call grompp followed by mdrun.
+        # Remove any stale checkpoint so that mdrun does not auto-load it.
+        # GROMACS 2025 added strict tpr/cpt compatibility checks; a checkpoint
+        # from a previous MD run or evaluate_() call with different parameters
+        # will cause mdrun to abort.  The checkpoint is irrelevant here because
+        # we always start from the .gro file (nsteps=0 single-point eval).
+        cpt_file = "%s.cpt" % self.name
+        if os.path.exists(cpt_file):
+            os.remove(cpt_file)
         self.warngmx("grompp -c %s.gro -p %s.top -f %s-1.mdp -o %s.tpr" % (self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s -nt 1 -rerunvsite %s" % (self.name, "-rerun %s" % traj if traj else ''))
+        # Only pass -rerunvsite when performing an actual trajectory rerun;
+        # GROMACS 2025 rejects the flag for a standalone 0-step mdrun (no -rerun).
+        rerunvsite_flag = "-rerunvsite" if traj else ""
+        self.callgmx(("mdrun -deffnm %s -nt 1 %s %s" % (self.name, rerunvsite_flag, "-rerun %s" % traj if traj else '')).strip())
 
         ## Gather information
         Result = OrderedDict()
@@ -935,7 +1082,8 @@ class GMX(Engine):
         ## Calculate and record energy
         self.callgmx("g_energy -xvg no -f %s.edr -o %s-e.xvg" % (self.name, self.name), stdin='Potential')
         Efile = open("%s-e.xvg" % self.name).readlines()
-        Result["Energy"] = np.array([float(Eline.split()[1]) for Eline in Efile])
+        Result["Energy"] = np.array([float(Eline.split()[1]) for Eline in Efile
+                                     if Eline.strip() and not Eline.startswith('#') and not Eline.startswith('@')])
 
         ## Calculate and record force
         if force:
@@ -945,7 +1093,8 @@ class GMX(Engine):
         ## Calculate and record dipole
         if dipole:
             self.callgmx("g_dipoles -s %s.tpr -f %s -o %s-d.xvg -xvg no" % (self.name, traj if traj else '%s.gro' % self.name, self.name), stdin="System\n")
-            Result["Dipole"] = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-d.xvg" % self.name)])
+            Result["Dipole"] = np.array([[float(i) for i in line.split()[1:4]] for line in open("%s-d.xvg" % self.name)
+                                         if line.strip() and not line.startswith('#') and not line.startswith('@')])
 
         return Result
 
@@ -1008,45 +1157,72 @@ class GMX(Engine):
         else:
             self.mol[shot].write("%s.gro" % self.name)
             self.warngmx("grompp -c %s.gro -p %s.top -f %s.mdp -o %s-1.tpr" % (self.name, self.name, self.name, self.name))
-            self.callgmx("mdrun -deffnm %s-1 -nt 1 -rerunvsite" % (self.name, self.name))
+            self.callgmx("mdrun -deffnm %s-1 -nt 1 -rerunvsite" % self.name)
             self.callgmx("g_energy -xvg no -f %s-1.edr -o %s-1-e.xvg" % (self.name, self.name), stdin='Potential')
             E = float(open("%s-1-e.xvg" % self.name).readlines()[0].split()[1])
             return E, 0.0
 
     def interaction_energy(self, fraga, fragb):
 
-        """ Computes the interaction energy between two fragments over a trajectory. """
+        """Computes the interaction energy between two fragments over a trajectory.
+
+        GROMACS 2021+ dropped the energygrp-excl mechanism that the old implementation
+        relied on (running two separate mdrun calls — one fully-interacting, one with
+        A-B excluded — and differencing the potentials).  Instead we request all
+        cross-group ``A-B`` terms directly from a single mdrun + gmx energy call.
+        """
+
+        import subprocess
 
         self.mol[0].write("%s.gro" % self.name)
 
-        ## Create an index file with the requisite groups.
-        write_ndx('%s.ndx' % self.name, OrderedDict([('A',[i+1 for i in fraga]),('B',[i+1 for i in fragb])]))
+        # Index file labels the two fragments A and B so GROMACS tracks cross-group terms.
+        write_ndx(f"{self.name}.ndx", OrderedDict([
+            ("A", [i+1 for i in fraga]),
+            ("B", [i+1 for i in fragb])
+        ]))
 
-        ## .mdp files for fully interacting and interaction-excluded systems.
-        edit_mdp(fin='%s.mdp' % self.name, fout='%s-i.mdp' % self.name, options={'xtc_grps':'A B', 'energygrps':'A B'})
-        edit_mdp(fin='%s.mdp' % self.name, fout='%s-x.mdp' % self.name, options={'xtc_grps':'A B', 'energygrps':'A B', 'energygrp-excl':'A B'})
+        # energygrps causes GROMACS to write per-pair interaction energies to the .edr.
+        edit_mdp(fin=f"{self.name}.mdp", fout=f"{self.name}-i.mdp", options={
+            # 'xtc_grps': 'A B',
+            'energygrps': 'A B'
+        })
 
-        ## Call grompp followed by mdrun for interacting system.
-        self.warngmx("grompp -c %s.gro -p %s.top -f %s-i.mdp -n %s.ndx -o %s-i.tpr" % \
-                         (self.name, self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s-i -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
-        self.callgmx("g_energy -f %s-i.edr -o %s-i-e.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
-        I = []
-        for line in open('%s-i-e.xvg' % self.name):
-            I.append(sum([float(i) for i in line.split()[1:]]))
-        I = np.array(I)
+        self.warngmx(f"grompp -c {self.name}.gro -p {self.name}.top -f {self.name}-i.mdp -n {self.name}.ndx -o {self.name}-i.tpr")
+        self.callgmx(f"mdrun -deffnm {self.name}-i -nt 1 -rerunvsite -rerun {self.name}-all.gro")
 
-        ## Call grompp followed by mdrun for noninteracting system.
-        self.warngmx("grompp -c %s.gro -p %s.top -f %s-x.mdp -n %s.ndx -o %s-x.tpr" % \
-                         (self.name, self.name, self.name, self.name, self.name))
-        self.callgmx("mdrun -deffnm %s-x -nt 1 -rerunvsite -rerun %s-all.gro" % (self.name, self.name))
-        self.callgmx("g_energy -f %s-x.edr -o %s-x-e.xvg -xvg no" % (self.name, self.name), stdin='Potential\n')
-        X = []
-        for line in open('%s-x-e.xvg' % self.name):
-            X.append(sum([float(i) for i in line.split()[1:]]))
-        X = np.array(X)
+        # gmx energy is interactive: feed term names via stdin.
+        # subprocess is used directly because callgmx() does not support piping
+        # multi-line stdin in the way gmx energy expects.
+        edrfile = f"{self.name}-i.edr"
+        energy_terms = self.energy_termnames(edrfile=edrfile)
+        a_b_terms = [term for term in energy_terms if term.endswith(":A-B") or term.endswith(":B-A")] # if B-A is possible?
+        if len(a_b_terms) == 0:
+            logger.error("No cross-group A-B energy terms were found in %s\n" % edrfile)
+            raise RuntimeError
+        xvgfile = f"{self.name}-i-interaction.xvg"
+        proc = subprocess.Popen(
+            [os.path.join(self.gmxpath, f"gmx{self.gmxsuffix}"), "energy", "-f", edrfile, "-o", xvgfile],
+            stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            universal_newlines=True
+        )
+        proc.communicate(input="\n".join(a_b_terms) + "\n\n")
 
-        return (I - X) / 4.184 # kcal/mol
+        # Sum all selected cross-group columns per frame (column 0 is time).
+        energies = []
+        with open(xvgfile) as fin:
+            for line in fin:
+                if line.startswith("#") or line.startswith("@"):
+                    continue
+                fields = line.split()
+                if len(fields) < len(a_b_terms) + 1:
+                    continue
+                try:
+                    energies.append(sum(float(fields[i+1]) for i in range(len(a_b_terms))))
+                except ValueError:
+                    continue
+        energies = np.array(energies)
+        return energies / 4.184  # kJ/mol → kcal/mol
 
     def multipole_moments(self, shot=0, optimize=True, polarizability=False):
         
@@ -1247,15 +1423,17 @@ class GMX(Engine):
             md_opts["comm_mode"] = "None"
             md_opts["nstcomm"] = 0
 
-        # In gromacs version 5, default cutoff scheme becomes verlet. 
-        # Need to set to group for backwards compatibility
-        md_defs["cutoff-scheme"] = 'group'
+        # The group cutoff scheme was removed in GROMACS 2021; always use Verlet.
+        md_defs["cutoff-scheme"] = 'verlet'
         md_opts["nstenergy"] = nsave
         md_opts["nstcalcenergy"] = nsave
         md_opts["nstxout"] = nsave
         md_opts["nstvout"] = nsave
         md_opts["nstfout"] = 0
-        md_opts["nstxtcout"] = 0
+        # nstxtcout was renamed to nstxout-compressed in GROMACS 5.0; using the
+        # new name avoids an "Unknown mdp parameter" warning in GROMACS 2022+.
+        if "nstxtcout" in md_opts:
+            md_opts["nxtxout_compressed"] = md_opts.pop("nstxtcout")
 
         # Minimize the energy.
         if minimize:
@@ -1291,8 +1469,11 @@ class GMX(Engine):
         self.callgmx("mdrun -v -deffnm %s-md -nt %i -stepout %i" % (self.name, threads, nsave), print_command=verbose, print_to_screen=verbose)
 
         self.mdtraj = '%s-md.trr' % self.name
-
-        if verbose: logger.info("Production run finished, calculating properties...\n")
+        self.mdene  = '%s-md.edr' % self.name
+         
+        # Run post-processing.
+        if verbose:
+            logger.info("Production run finished, calculating properties...\n")
         # Figure out dipoles - note we use g_dipoles and not the multipole_moments function.
         self.callgmx("g_dipoles -s %s-md.tpr -f %s-md.trr -o %s-md-dip.xvg -xvg no" % (self.name, self.name, self.name), stdin="System\n")
 

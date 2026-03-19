@@ -8,11 +8,9 @@ nstfout		= 0
 nstlog		= 0
 nstenergy	= 100
 nstcomm         = 0
-xtc_grps        = System
 energygrps      = System
 
 nstlist		= 0
-ns_type		= simple
 rlist		= 0.0
 vdwtype		= cut-off
 coulombtype	= cut-off
@@ -20,7 +18,7 @@ rcoulomb	= 0.0
 rvdw		= 0.0
 rvdw_switch     = 0.0
 constraints	= all-bonds
-pbc		= no
+pbc		= xyz
 
 tcoupl		= v-rescale
 tc_grps		= System

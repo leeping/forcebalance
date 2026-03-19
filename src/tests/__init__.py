@@ -1,12 +1,15 @@
 from builtins import object
 import os, re
+import subprocess
+from shutil import which
+from packaging.version import Version
 import forcebalance.output
 
 forcebalance.output.getLogger("forcebalance.test").propagate=False
 
 os.chdir(os.path.dirname(__file__))
 __all__ = [module[:-3] for module in sorted(os.listdir('.'))
-           if re.match("^test_.*\.py$",module)]
+           if re.match(r"^test_.*\.py$",module)]
 
 
 class ForceBalanceTestCase(object):
@@ -22,10 +25,18 @@ class ForceBalanceTestCase(object):
         if 'OMP_NUM_THREADS' in os.environ:
             os.environ.pop('OMP_NUM_THREADS')
 
+
     def setup_method(self, method):
-        pass
+        # Change to the test files directory before each test
+        self._test_files_dir = os.path.join(os.path.dirname(__file__), "files")
+        if os.path.isdir(self._test_files_dir):
+            os.chdir(self._test_files_dir)
+        else:
+            # If the files directory does not exist, stay in the current directory
+            self._test_files_dir = None
 
     def teardown_method(self):
+        # Restore the original directory after each test
         os.chdir(self.start_directory)
 
 def check_for_openmm():
@@ -45,3 +56,4 @@ def check_for_openmm():
         # If OpenMM classes cannot be imported, then set this flag 
         # so the testing classes/functions can use to skip.
         return False
+

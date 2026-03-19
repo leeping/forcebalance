@@ -2,6 +2,8 @@ from __future__ import absolute_import
 
 from builtins import str
 import os, shutil
+import subprocess
+import re
 import sys
 import tarfile
 from .__init__ import ForceBalanceTestCase, check_for_openmm
@@ -138,6 +140,7 @@ class ForceBalanceSystemTest(ForceBalanceTestCase):
             assert ITERATIONS_TO_CONVERGE >= Counter(), "Calculation took longer than expected to converge (%d iterations vs previous of %d)" %\
                 (ITERATIONS_TO_CONVERGE, Counter())
         return result
+
 
 class TestWaterTutorial(ForceBalanceSystemTest):
     def setup_method(self, method):

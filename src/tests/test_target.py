@@ -16,7 +16,7 @@ class TargetTests(ForceBalanceTestCase):
         self.options = forcebalance.parser.gen_opts_defaults.copy()
         self.tgt_opt = forcebalance.parser.tgt_opts_defaults.copy()
         self.ff = None  # Forcefield this target is fitting
-        self.options.update({'root': os.path.join(os.getcwd(), 'files')})
+        self.options.update({'root': os.getcwd()})
         self.check_grad_fd = True # Whether to check gradient vs. finite difference. Set to False for liquid targets.
 
         os.chdir(self.options['root'])

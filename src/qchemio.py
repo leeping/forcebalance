@@ -52,14 +52,14 @@ class QCIn_Reader(BaseReader):
         # No sense in doing anything for an empty line or a comment line.
         if len(s) == 0 or match('^!',line): return None, None
         # Now go through all the cases.
-        if match('^\$',line):
+        if match(r'^\$',line):
             # Makes a word like "atoms", "bonds" etc.
-            self.sec = sub('^\$','',line)
+            self.sec = sub(r'^\$','',line)
         elif self.sec == 'basis':
             if match('^[A-Za-z][a-z]* +0$',line):
                 self.atom = s[0]
                 self.snum = -1
-            elif match('^[SPDFGH]P? +[0-9]+ +1\.0+$',line):
+            elif match(r'^[SPDFGH]P? +[0-9]+ +1\.0+$',line):
                 self.snum += 1
                 self.cnum  = -1
                 self.shell = s[0]
