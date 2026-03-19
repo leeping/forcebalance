@@ -560,9 +560,7 @@ class Evaluator_SMIRNOFF(Target):
         )
 
         if (
-            self._pending_estimate_request.results(
-                True, polling_interval=self._options.polling_interval
-            )[0] is None
+            self._pending_estimate_request.results(False)[0] is None
         ):
 
             raise RuntimeError(
@@ -772,6 +770,19 @@ class Evaluator_SMIRNOFF(Target):
         # Ensure the input flags are actual booleans.
         AGrad = bool(AGrad)
         AHess = bool(AHess)
+
+        # Block until the Evaluator computation is finished.  This is intentionally
+        # placed here (not in submit_jobs) so that Work Queue tasks submitted by other
+        # targets can run concurrently while we wait.
+        estimation_results, _ = self._pending_estimate_request.results(
+            True, polling_interval=self._options.polling_interval
+        )
+        if estimation_results is None:
+            raise RuntimeError(
+                "No `EvaluatorServer` could be found to retrieve results from. "
+                "Please double check that a server is running, and that the connection "
+                "settings specified in the input script are correct."
+            )
 
         # Extract the properties estimated using the unperturbed parameters.
         estimated_data_set, estimated_gradients = self._extract_property_data(
