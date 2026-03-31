@@ -435,6 +435,9 @@ class TestEvaluatorWaterVSiteStudy(EvaluatorServerMixin, ForceBalanceSystemTest)
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '..', '..', 'studies', '028_smirnoff_tip4p_geometry_fit'))
         self.study_directory = os.getcwd()
+        targets = tarfile.open('targets.tar.gz', 'r')
+        targets.extractall()
+        targets.close()
         self._start_evaluator_server()
         self.input_file = 'optimize.in'
         self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
@@ -461,6 +464,9 @@ class TestWaterVSiteGradients(ForceBalanceSystemTest):
         cwd = os.path.dirname(os.path.realpath(__file__))
         os.chdir(os.path.join(cwd, '..', '..', 'studies',
                               '029_smirnoff_vs_openmm_water_vsite'))
+        targets = tarfile.open('targets.tar.gz', 'r')
+        targets.extractall()
+        targets.close()
         self.study_directory = os.getcwd()
         self.atol = 1e-6
 
