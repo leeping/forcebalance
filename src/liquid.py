@@ -29,7 +29,7 @@ try:
     _MBAR_SOLVER_KW = {}  # v3: self-consistent-iteration default is fine
 except ImportError:
     import pymbar  # pymbar 4: MBAR lives at pymbar top-level
-    _MBAR_SOLVER_KW = {'solver_protocol': 'adaptive'}  # v4: default hybr diverges on some data
+    _MBAR_SOLVER_KW = {'solver_protocol': 'robust'}  # v4: default hybr diverges on some data
 
 def _mbar_weights(U_kln, N_k, verbose=False):
     """Run MBAR and return weight matrix W[n, m] (shape (sum(N_k), K))."""
