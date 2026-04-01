@@ -84,7 +84,7 @@ jobs:
       with:
         environment-file: devtools/conda-envs/test_env.yaml
         create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
-          python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }}.*=nompi_dblprec*
+          python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }}.*=nompi_dblprec* pymbar=${{ matrix.pymbar-version }}.*
 
     - name: Set up conda environment without gromacs
       if: matrix.gmx-version == '5' || matrix.gmx-version == '4'
@@ -93,7 +93,7 @@ jobs:
         # Use the legacy env for Python 3.9/3.10, full env otherwise.
         environment-file: ${{ (matrix.python-version == '3.9' || matrix.python-version == '3.10') && 'devtools/conda-envs/test_env_py39.yaml' || 'devtools/conda-envs/test_env.yaml' }}
         create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
-          python=${{ matrix.python-version }}
+          python=${{ matrix.python-version }} pymbar=${{ matrix.pymbar-version }}.*
 
     - name: Set up conda environment with single-precision gromacs (rejected versions)
       if: matrix.gmx-version == '2022' || matrix.gmx-version == '2023'
@@ -104,16 +104,13 @@ jobs:
         # Use the legacy env for Python 3.9/3.10, full env otherwise.
         environment-file: ${{ (matrix.python-version == '3.9' || matrix.python-version == '3.10') && 'devtools/conda-envs/test_env_py39.yaml' || 'devtools/conda-envs/test_env.yaml' }}
         create-args: >-
-          python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }}
+          python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }} pymbar=${{ matrix.pymbar-version }}.*
 
     - name: Pin setuptools for Python <= 3.10
       if: matrix.python-version == '3.9' || matrix.python-version == '3.10'
       shell: bash -l {0}
       run: pip install "setuptools<82"
 
-    - name: Set pymbar version
-      run: micromamba install "pymbar=${{ matrix.pymbar-version }}.*" -c conda-forge -y
-          
     - name: Additional info about the build
       shell: bash
       run: |
