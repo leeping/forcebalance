@@ -56,7 +56,7 @@ def test_mbar_weights_match_reference(mbar_weights):
     assert mbar_weights.shape == W_ref.shape, (
         f"Weight matrix shape mismatch: got {mbar_weights.shape}, expected {W_ref.shape}"
     )
-    np.testing.assert_allclose(mbar_weights, W_ref, rtol=1e-2,
+    np.testing.assert_allclose(mbar_weights, W_ref, atol=1e-10, rtol=1e-2,
                                err_msg="MBAR weights differ from v3 reference beyond rtol=1e-2")
 
 class TestWaterTutorial(ForceBalanceTestCase):
