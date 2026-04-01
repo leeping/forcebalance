@@ -40,7 +40,7 @@ def _run_mbar(U_kln, N_k):
     except ImportError:
         import pymbar               # pymbar 4: MBAR at top level
         # v4 default (hybr + continuation) diverges on some data;
-        # 'robust' (adaptive -> L-BFGS-B, no poisoned continuation) is safe.
+        # 'robust' (adaptive -> L-BFGS-B, adaptive was the v3 default) is safe.
         solver_kw = {'solver_protocol': 'robust'}
     mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8, **solver_kw)
     return mbar.weights() if hasattr(mbar, 'weights') else mbar.getWeights()
