@@ -8,6 +8,7 @@ from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer
+from forcebalance.liquid import _mbar_weights
 from .__init__ import ForceBalanceTestCase, check_for_openmm
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'files', 'test_liquid')
@@ -32,25 +33,11 @@ N_K_PATH    = os.path.join(FIXTURE_DIR, 'N_k.npy')
 REF_PATH    = os.path.join(FIXTURE_DIR, 'mbar_weights_ref.npy')
 
 
-def _run_mbar(U_kln, N_k):
-    """Run MBAR using the same backward-compat import pattern as liquid.py."""
-    try:
-        from pymbar import pymbar   # pymbar 3: MBAR in submodule
-        solver_kw = {}
-    except ImportError:
-        import pymbar               # pymbar 4: MBAR at top level
-        # v4 default (hybr + continuation) diverges on some data;
-        # 'robust' (adaptive -> L-BFGS-B, adaptive was the v3 default) is safe.
-        solver_kw = {'solver_protocol': 'robust'}
-    mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8, **solver_kw)
-    return mbar.weights() if hasattr(mbar, 'weights') else mbar.getWeights()
-
-
 @pytest.fixture(scope='module')
 def mbar_weights():
     if not os.path.exists(U_KLN_PATH) or not os.path.exists(N_K_PATH):
         pytest.skip(f"MBAR fixtures not found in {FIXTURE_DIR}; run tools/mbar_mre.py --save-ref")
-    return _run_mbar(np.load(U_KLN_PATH), np.load(N_K_PATH))
+    return _mbar_weights(np.load(U_KLN_PATH), np.load(N_K_PATH))
 
 
 def test_mbar_weights_normalized(mbar_weights):
