@@ -14,7 +14,7 @@ defaults:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }} (py=${{ matrix.python-version }}, gmx=${{ matrix.gmx-version }})
+    name: Test on ${{ matrix.os }} (py=${{ matrix.python-version }}, gmx=${{ matrix.gmx-version }}, pymbar=${{ matrix.pymbar-version }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -35,6 +35,9 @@ jobs:
           - "2019"
           - "2024"
           - "2025"
+        pymbar-version:
+          - "3"
+          - "4"
 
         exclude:
           # a 2022 build doesn't seem to exist for mac
@@ -107,6 +110,9 @@ jobs:
       if: matrix.python-version == '3.9' || matrix.python-version == '3.10'
       shell: bash -l {0}
       run: pip install "setuptools<82"
+
+    - name: Set pymbar version
+      run: micromamba install "pymbar=${{ matrix.pymbar-version }}.*" -c conda-forge -y
           
     - name: Additional info about the build
       shell: bash

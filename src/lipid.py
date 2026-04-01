@@ -25,7 +25,12 @@ from subprocess import PIPE
 try:
     from lxml import etree
 except: pass
-from pymbar import pymbar
+try:
+    from pymbar import pymbar  # pymbar 3: MBAR lives in pymbar.pymbar submodule
+    _MBAR_SOLVER_KW = {}  # v3: self-consistent-iteration default is fine
+except ImportError:
+    import pymbar  # pymbar 4: MBAR lives at pymbar top-level
+    _MBAR_SOLVER_KW = {'solver_protocol': 'robust'}  # v4: default hybr diverges on some data
 import itertools
 from collections import defaultdict, namedtuple, OrderedDict
 import csv
@@ -663,8 +668,8 @@ class Lipid(Target):
         W1 = None
         if len(BPoints) > 1:
             logger.info("Running MBAR analysis on %i states...\n" % len(BPoints))
-            mbar = pymbar.MBAR(U_kln, N_k, verbose=mbar_verbose, relative_tolerance=5.0e-8)
-            W1 = mbar.getWeights()
+            mbar = pymbar.MBAR(U_kln, N_k, verbose=mbar_verbose, relative_tolerance=5.0e-8, **_MBAR_SOLVER_KW)
+            W1 = mbar.weights() if hasattr(mbar, 'weights') else mbar.getWeights()
             logger.info("Done\n")
         elif len(BPoints) == 1:
             W1 = np.ones((BPoints*Shots,BPoints))

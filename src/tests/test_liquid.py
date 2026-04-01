@@ -2,12 +2,77 @@ from __future__ import absolute_import
 import os
 import sys
 import shutil
+import numpy as np
 import pytest
 from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer
 from .__init__ import ForceBalanceTestCase, check_for_openmm
+
+FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'files', 'test_liquid')
+
+# U_kln.npy — shape (6, 6, 801), float64
+#   Reduced potential energy matrix U_kln[k, m, n] = (E_k[n] + P_m * V_k[n] * pvkj) * beta_m
+#   where k = source simulation index, m = evaluation state index, n = snapshot index.
+#   Built from the six npt_result.p pickles in files/test_liquid/single.tmp/Liquid/iter_0000/
+#   (water at 249.15 K/1 atm, 273.15 K/1 atm, 298.15 K/1 atm, 373.15 K/1 atm,
+#    298.15 K/20 bar, 298.15 K/2000 bar; 801 snapshots each).
+#   Regenerate with: conda run -n <env> python tools/mbar_mre.py --save-ref
+U_KLN_PATH  = os.path.join(FIXTURE_DIR, 'U_kln.npy')
+
+# N_k.npy — shape (6,), int64, all entries = 801
+#   Number of uncorrelated snapshots per simulation state; matches the first axis of U_kln.
+N_K_PATH    = os.path.join(FIXTURE_DIR, 'N_k.npy')
+
+# mbar_weights_ref.npy — shape (4806, 6), float64
+#   MBAR weight matrix W[n, m] produced by pymbar 3.0.5 on U_kln above.
+#   Used as the reference for cross-version agreement checks (atol=1e-4).
+#   Regenerate with: conda run -n <env> python tools/mbar_mre.py --save-ref
+REF_PATH    = os.path.join(FIXTURE_DIR, 'mbar_weights_ref.npy')
+
+
+def _run_mbar(U_kln, N_k):
+    """Run MBAR using the same backward-compat import pattern as liquid.py."""
+    try:
+        from pymbar import pymbar   # pymbar 3: MBAR in submodule
+        solver_kw = {}
+    except ImportError:
+        import pymbar               # pymbar 4: MBAR at top level
+        # v4 default (hybr + continuation) diverges on some data;
+        # 'robust' (adaptive -> L-BFGS-B, no poisoned continuation) is safe.
+        solver_kw = {'solver_protocol': 'robust'}
+    mbar = pymbar.MBAR(U_kln, N_k, verbose=False, relative_tolerance=5.0e-8, **solver_kw)
+    return mbar.weights() if hasattr(mbar, 'weights') else mbar.getWeights()
+
+
+@pytest.fixture(scope='module')
+def mbar_weights():
+    if not os.path.exists(U_KLN_PATH) or not os.path.exists(N_K_PATH):
+        pytest.skip(f"MBAR fixtures not found in {FIXTURE_DIR}; run tools/mbar_mre.py --save-ref")
+    return _run_mbar(np.load(U_KLN_PATH), np.load(N_K_PATH))
+
+
+def test_mbar_weights_normalized(mbar_weights):
+    """MBAR weight matrix columns must each sum to 1 (pymbar v3 and v4)."""
+    col_sums = mbar_weights.sum(axis=0)
+    assert np.allclose(col_sums, 1.0, atol=1e-6), (
+        f"MBAR weight columns do not sum to 1: {col_sums}"
+    )
+
+
+def test_mbar_weights_match_reference(mbar_weights):
+    """MBAR weights must agree with the pymbar-v3 reference within 1e-4."""
+    if not os.path.exists(REF_PATH):
+        pytest.skip(f"Reference weights not found at {REF_PATH}; run tools/mbar_mre.py --save-ref")
+    W_ref = np.load(REF_PATH)
+    assert mbar_weights.shape == W_ref.shape, (
+        f"Weight matrix shape mismatch: got {mbar_weights.shape}, expected {W_ref.shape}"
+    )
+    max_diff = np.abs(mbar_weights - W_ref).max()
+    assert max_diff < 1e-4, (
+        f"MBAR weights differ from v3 reference by {max_diff:.3e} (tol=1e-4)"
+    )
 
 class TestWaterTutorial(ForceBalanceTestCase):
     def setup_method(self, method):
