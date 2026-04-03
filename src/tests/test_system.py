@@ -33,6 +33,10 @@ EXPECTED_EVALUATOR_BROMINE_OBJECTIVE = array([1000])
 # expected gradient elements from 003d evaluator bromine study. Very large uncertainties of +/- 2000 (updated 11/23/19)
 EXPECTED_EVALUATOR_BROMINE_GRADIENT = array([4500, 5500])
 
+# expected objective values from 029 cross-engine consistency study. Update after first run.
+EXPECTED_TIP4P_OBJECTIVE = array([0.473572])
+EXPECTED_TIP5P_OBJECTIVE = array([0.360085])
+
 # expected result (pvals) taken from ethanol GB parameter optimization. Update this if it changes and seems reasonable (updated 09/05/14)
 EXPECTED_ETHANOL_RESULTS = array([1.2286e-01, 8.3624e-01, 1.0014e-01, 8.4533e-01, 1.8740e-01, 6.8820e-01, 1.4606e-01, 8.3518e-01])
 
@@ -54,6 +58,16 @@ EXPECTED_RECHARGE_METHANE_FIELD_OBJECTIVE = array([7.43711e-04])
 # expected gradient elements from 025 recharge methane. (updated 08/04/20)
 EXPECTED_RECHARGE_METHANE_ESP_GRADIENT = array([9.76931016e-03])
 EXPECTED_RECHARGE_METHANE_FIELD_GRADIENT = array([1.12071584e-02])
+
+# in practice these aren't hit, we don't simulate nearly long enough
+EXPECTED_VSITE_VDW_PARAMETERS = array([
+    # CX4 epsilon, sigma
+    0.1088406109251, 3.3795317616266205,
+    # water O epsilon, sigma
+    0.7492790213533, 0.3165552430462,
+    # vsite distance, charge increment2
+    -0.010527445756662016, 0.5258681106763
+])
 
 
 class ForceBalanceSystemTest(ForceBalanceTestCase):
@@ -191,21 +205,27 @@ class TestThermoBromineStudy(ForceBalanceSystemTest):
         self.run_optimizer()
 
 
-@skip_openff_py39
-class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
-    def setup_method(self, method):
-        pytest.importorskip("openff.evaluator")
-        super(TestEvaluatorBromineStudy, self).setup_method(method)
-        cwd = os.path.dirname(os.path.realpath(__file__))
-        os.chdir(os.path.join(cwd, '..', '..', 'studies', '003d_evaluator_liquid_bromine'))
-        ## Extract targets archive.
-        targets = tarfile.open('targets.tar.gz','r')
-        targets.extractall()
-        targets.close()
-        ## Start the estimator server.
-        ## - Redirect output to a log file (not PIPE) so Dask worker subprocesses
-        ##   that inherit the fd don't fill the pipe buffer and deadlock.
-        ## - Use 'python -u' so each log line is flushed immediately to disk.
+class EvaluatorServerMixin:
+    """Mixin that manages an openff-evaluator server subprocess for tests.
+
+    Subclasses should call ``_start_evaluator_server()`` in ``setup_method``
+    and may set ``_cleanup_folders`` to a tuple of directory names to remove
+    in ``teardown_method``.
+
+    Notes
+    -----
+    - Output is redirected to a log file (not PIPE) so Dask worker subprocesses
+      that inherit the fd don't fill the pipe buffer and deadlock.
+    - ``python -u`` is used so each log line is flushed immediately to disk.
+    - We poll the log file rather than making a raw TCP probe: a bare
+      connect+disconnect causes recvall() in _handle_stream to return None,
+      which crashes struct.unpack and kills the _handle_connections loop.
+    """
+
+    _server_port = 8000
+    _cleanup_folders = ()
+
+    def _start_evaluator_server(self):
         import subprocess, time
         self._server_log_path = os.path.abspath("server.log")
         self._server_log = open(self._server_log_path, "w")
@@ -213,20 +233,14 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
             ["python", "-u", "run_server.py", "-ngpus=0", "-ncpus=1"],
             stdout=self._server_log, stderr=self._server_log,
         )
-        ## Wait for the server to log that it is ready.  We intentionally avoid
-        ## making a raw TCP probe: a bare connect+disconnect causes recvall() in
-        ## _handle_stream to return None, which crashes struct.unpack and kills
-        ## the _handle_connections loop because the except is outside the while.
-        server_port = 8000
-        ready_marker = "listening at port {}".format(server_port)
+        ready_marker = "listening at port {}".format(self._server_port)
         deadline = time.time() + 120
         while time.time() < deadline:
             if self.estimator_process.poll() is not None:
                 self._server_log.flush()
-                log_contents = open(self._server_log_path).read()
                 pytest.fail(
                     "Evaluator server process exited prematurely (rc=%d). Log:\n%s"
-                    % (self.estimator_process.returncode, log_contents[-2000:])
+                    % (self.estimator_process.returncode, open(self._server_log_path).read()[-2000:])
                 )
             with open(self._server_log_path) as f:
                 if ready_marker in f.read():
@@ -234,41 +248,68 @@ class TestEvaluatorBromineStudy(ForceBalanceSystemTest):
             time.sleep(0.5)
         else:
             self.estimator_process.terminate()
-            log_contents = open(self._server_log_path).read()
             pytest.fail(
                 "Evaluator server did not start within 120 seconds. Log:\n%s"
-                % log_contents[-2000:]
+                % open(self._server_log_path).read()[-2000:]
             )
-        self.input_file='gradient.in'
-        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
     def teardown_method(self):
-        self.estimator_process.terminate()
-        self._server_log.close()
-        if os.path.exists(self._server_log_path):
-            os.remove(self._server_log_path)
-        for dnm in ["working_directory", "stored_data"]:
-            if os.path.exists(dnm):
-                shutil.rmtree(dnm)
-        super(TestEvaluatorBromineStudy, self).teardown_method()
+        try:
+            if hasattr(self, 'estimator_process') and self.estimator_process is not None:
+                self.estimator_process.terminate()
+                self.estimator_process.wait(timeout=10)
+        except Exception:
+            pass
+        try:
+            if hasattr(self, '_server_log') and self._server_log is not None:
+                self._server_log.close()
+            if hasattr(self, '_server_log_path') and os.path.exists(self._server_log_path):
+                os.remove(self._server_log_path)
+        except Exception:
+            pass
+        try:
+            if hasattr(self, 'study_directory'):
+                os.chdir(self.study_directory)
+            for folder in self._cleanup_folders:
+                if os.path.isdir(folder):
+                    shutil.rmtree(folder)
+        finally:
+            super().teardown_method()
+
+
+@skip_openff_py39
+class TestEvaluatorBromineStudy(EvaluatorServerMixin, ForceBalanceSystemTest):
+    _cleanup_folders = ("working_directory", "stored_data")
+
+    def setup_method(self, method):
+        pytest.importorskip("openff.evaluator")
+        super().setup_method(method)
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies', '003d_evaluator_liquid_bromine'))
+        self.study_directory = os.getcwd()
+        targets = tarfile.open('targets.tar.gz', 'r')
+        targets.extractall()
+        targets.close()
+        self._start_evaluator_server()
+        self.input_file = 'gradient.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
 
     def test_bromine_study(self):
         """Check bromine study produces objective function and gradient in expected range """
         objective = self.get_objective()
         try:
-            data = objective.Full(np.zeros(objective.FF.np),1,verbose=True)
+            data = objective.Full(np.zeros(objective.FF.np), 1, verbose=True)
         except Exception as exc:
             self._server_log.flush()
-            log_contents = open(self._server_log_path).read()
             raise RuntimeError(
                 "objective.Full raised %s: %s\nServer log (last 2000 chars):\n%s"
-                % (type(exc).__name__, exc, log_contents[-2000:])
+                % (type(exc).__name__, exc, open(self._server_log_path).read()[-2000:])
             ) from exc
-        X, G, H   = data['X'], data['G'], data['H']
-        msgX="\nCalculated objective function is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_OBJECTIVE in test_system.py with these values"
-        np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_OBJECTIVE, X, atol=200, err_msg=msgX)
-        msgG="\nCalculated gradient is outside expected range.\n If this seems reasonable, update EXPECTED_EVALUATOR_BROMINE_GRADIENT in test_system.py with these values"
-        np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_GRADIENT, G, atol=4000, err_msg=msgG)
+        X, G, H = data['X'], data['G'], data['H']
+        np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_OBJECTIVE, X, atol=200,
+            err_msg="\nObjective outside expected range. Update EXPECTED_EVALUATOR_BROMINE_OBJECTIVE if reasonable.")
+        np.testing.assert_allclose(EXPECTED_EVALUATOR_BROMINE_GRADIENT, G, atol=4300,
+            err_msg="\nGradient outside expected range. Update EXPECTED_EVALUATOR_BROMINE_GRADIENT if reasonable.")
 
 class TestLipidStudy(ForceBalanceSystemTest):
     def setup_method(self, method):
@@ -377,4 +418,97 @@ class TestRechargeMethaneStudy(ForceBalanceSystemTest):
             G,
             rtol=5.0e-7,
             err_msg=msgG
+        )
+
+@skip_openff_py39
+class TestEvaluatorWaterVSiteStudy(EvaluatorServerMixin, ForceBalanceSystemTest):
+    """Check that we can co-optimize pure and mixture properties of water with a virtual site.
+
+    Physical values may be imprecise due to short simulations; this primarily
+    checks that nothing breaks technically.
+    """
+
+    def setup_method(self, method):
+        pytest.importorskip("openff.evaluator")
+        pytest.importorskip("openff.toolkit")
+        super().setup_method(method)
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies', '028_smirnoff_tip4p_geometry_fit'))
+        self.study_directory = os.getcwd()
+        targets = tarfile.open('targets.tar.gz', 'r')
+        targets.extractall()
+        targets.close()
+        self._start_evaluator_server()
+        self.input_file = 'optimize.in'
+        self.logger.debug("\nSetting input file to '%s'\n" % self.input_file)
+        self.expected_results_name = "EXPECTED_VSITE_VDW_PARAMETERS"
+        self.expected_results = EXPECTED_VSITE_VDW_PARAMETERS
+        self.absolute_tolerance = 0.02
+
+    def test_water_vsite_study(self):
+        """Check water virtual site study produces objective function and gradient in expected range"""
+        self.run_optimizer(check_result=False, use_pvals=True)
+
+
+@skip_openff_py39
+class TestWaterVSiteGradients(ForceBalanceSystemTest):
+    """Test that AbInitio_SMIRNOFF and AbInitio_OpenMM give identical
+    objective values for TIP4P-FB and TIP5P water at mvals=0.
+    
+    This basically tests the Toolkit and Interchange parsing of virtual sites.
+    """
+
+    def setup_method(self, method):
+        pytest.importorskip("openff.toolkit")
+        super(TestWaterVSiteGradients, self).setup_method(method)
+        cwd = os.path.dirname(os.path.realpath(__file__))
+        os.chdir(os.path.join(cwd, '..', '..', 'studies',
+                              '029_smirnoff_vs_openmm_water_vsite'))
+        targets = tarfile.open('targets.tar.gz', 'r')
+        targets.extractall()
+        targets.close()
+        self.study_directory = os.getcwd()
+        self.atol = 1e-6
+
+    def teardown_method(self):
+        os.chdir(self.start_directory)
+
+    def _eval(self, input_file):
+        """Parse input_file, build objective, evaluate at mvals=0, return (X, G)."""
+        options, tgt_opts = parse_inputs(input_file)
+        ff  = FF(options)
+        obj = Objective(options, tgt_opts, ff)
+        data = obj.Full(np.zeros(ff.np), Order=1, verbose=True)
+        return data['X'], data['G']
+
+    def test_tip4p_smirnoff(self):
+        """AbInitio_SMIRNOFF objective for TIP4P-FB is in expected range."""
+        X, G = self._eval('gradient_tip4p_smirnoff.in')
+        np.testing.assert_allclose(
+            EXPECTED_TIP4P_OBJECTIVE, X, atol=self.atol,
+            err_msg="TIP4P SMIRNOFF objective changed; update EXPECTED_TIP4P_OBJECTIVE"
+        )
+
+    def test_tip4p_openmm(self):
+        """AbInitio_OpenMM objective for TIP4P-FB matches SMIRNOFF value."""
+        X, G = self._eval('gradient_tip4p_openmm.in')
+        np.testing.assert_allclose(
+            EXPECTED_TIP4P_OBJECTIVE, X, atol=self.atol,
+            err_msg="TIP4P OpenMM objective changed; update EXPECTED_TIP4P_OBJECTIVE"
+        )
+
+    def test_tip5p_smirnoff(self):
+        """AbInitio_SMIRNOFF objective for TIP5P is in expected range."""
+        X, G = self._eval('gradient_tip5p_smirnoff.in')
+        np.testing.assert_allclose(
+            EXPECTED_TIP5P_OBJECTIVE, X, atol=self.atol,
+            err_msg="TIP5P SMIRNOFF objective changed; update EXPECTED_TIP5P_OBJECTIVE"
+        )
+
+    def test_tip5p_openmm(self):
+        """AbInitio_OpenMM objective for TIP5P matches SMIRNOFF value."""
+        X, G = self._eval('gradient_tip5p_openmm.in')
+        np.testing.assert_allclose(
+            EXPECTED_TIP5P_OBJECTIVE, X, atol=self.atol,
+            err_msg="TIP5P OpenMM objective changed; update EXPECTED_TIP5P_OBJECTIVE"
         )
