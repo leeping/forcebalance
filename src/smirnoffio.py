@@ -10,6 +10,7 @@ from builtins import range
 import os
 from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
+from forcebalance.abinitio_pairwise import AbInitioPairwise
 from forcebalance.binding import BindingEnergy
 from forcebalance.liquid import Liquid
 from forcebalance.interaction import Interaction
@@ -828,6 +829,24 @@ class AbInitio_SMIRNOFF(AbInitio):
         self.engine_ = SMIRNOFF
         ## Initialize base class.
         super(AbInitio_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
+
+    def submit_jobs(self, mvals, AGrad=False, AHess=False):
+        # we update the self.pgrads here so it's not overwritten in rtarget.py
+        smirnoff_update_pgrads(self)
+
+class AbInitioPairwise_SMIRNOFF(AbInitioPairwise):
+    """ Pairwise energy matching using OpenMM. """
+    def __init__(self,options,tgt_opts,forcefield):
+        ## Default file names for coordinates and key file.
+        self.set_option(tgt_opts,'pdb',default="conf.pdb")
+        # List of .mol2 files for SMIRNOFF to set up the system
+        self.set_option(tgt_opts,'mol2',forceprint=True)
+        self.set_option(tgt_opts,'coords',default="all.gro")
+        self.set_option(tgt_opts,'openmm_precision','precision',default="double", forceprint=True)
+        self.set_option(tgt_opts,'openmm_platform','platname',default="Reference", forceprint=True)
+        self.engine_ = SMIRNOFF
+        ## Initialize base class.
+        super(AbInitioPairwise_SMIRNOFF,self).__init__(options,tgt_opts,forcefield)
 
     def submit_jobs(self, mvals, AGrad=False, AHess=False):
         # we update the self.pgrads here so it's not overwritten in rtarget.py
