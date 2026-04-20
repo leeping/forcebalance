@@ -64,7 +64,6 @@ jobs:
       PYVER: ${{ matrix.python-version }}
       GMXVER: ${{ matrix.gmx-version }}
       PACKAGE: forcebalance
-      PYMBAR_DISABLE_JAX: ${{ matrix.pymbar-version == '4' && 'TRUE' || '' }}
 
     steps:
     - name: Checkout
