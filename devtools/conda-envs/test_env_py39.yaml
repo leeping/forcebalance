@@ -18,7 +18,7 @@ dependencies:
   - zlib
   - swig
   - future
-  - pymbar =3
+  - pymbar
   - openmm >= 8
   # ambertools has no Python 3.9 builds on conda-forge
   - ndcctools
