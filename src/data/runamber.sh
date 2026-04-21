@@ -35,12 +35,12 @@ export BAK=$HOME/temp/rungmx-backups
 # Disable GROMACS backup files
 export GMX_MAXBACKUP=-1
 
-echo "#=======================#"
-echo "# ENVIRONMENT VARIABLES #"
-echo "#=======================#"
-echo
+# echo "#=======================#"
+# echo "# ENVIRONMENT VARIABLES #"
+# echo "#=======================#"
+# echo
 
-env
+# env
 
 echo
 echo "#=======================#"

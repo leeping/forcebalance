@@ -121,12 +121,12 @@ elif [[ x$PBS_JOBID != x ]] ; then
     sleep $(( PBS_JOBID * 10 ))
 fi
 
-echo "#=======================#"
-echo "# ENVIRONMENT VARIABLES #"
-echo "#=======================#"
-echo
+# echo "#=======================#"
+# echo "# ENVIRONMENT VARIABLES #"
+# echo "#=======================#"
+# echo
 
-env
+# env
 
 echo
 echo "#=======================#"

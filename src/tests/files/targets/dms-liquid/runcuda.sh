@@ -71,12 +71,12 @@ elif [[ $ARCHIVER == "ranch.tacc.utexas.edu" ]] ; then
     # export BAK=$SCRATCH/runcuda-backups
 fi
 
-echo "#=======================#"
-echo "# ENVIRONMENT VARIABLES #"
-echo "#=======================#"
-echo
+# echo "#=======================#"
+# echo "# ENVIRONMENT VARIABLES #"
+# echo "#=======================#"
+# echo
 
-set
+# set
 
 echo
 echo "#=======================#"
