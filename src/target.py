@@ -843,7 +843,7 @@ class RemoteTarget(Target):
                 prefix = os.path.commonprefix([abs_directory, abs_target])
                 return prefix == abs_directory
             
-            def safe_extract(tar, path=".", members=None, *, numeric_owner=False):
+            def safe_extract(tar, path=".", members=None, numeric_owner=False):
                 for member in tar.getmembers():
                     member_path = os.path.join(path, member.name)
                     if not is_within_directory(path, member_path):
