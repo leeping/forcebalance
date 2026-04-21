@@ -32,12 +32,12 @@ fi
 # Backup folder
 export BAK=$HOME/temp/runtinker-backups
 
-echo "#=======================#"
-echo "# ENVIRONMENT VARIABLES #"
-echo "#=======================#"
-echo
+# echo "#=======================#"
+# echo "# ENVIRONMENT VARIABLES #"
+# echo "#=======================#"
+# echo
 
-env
+# env
 
 echo
 echo "#=======================#"
