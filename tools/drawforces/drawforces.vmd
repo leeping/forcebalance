@@ -60,7 +60,7 @@ proc min {x y} {expr {$x<$y? $x: $y}}
 # lot of vectors easily.
 # field has to be a list of pairs of xyz triples (center and vector).
 # the function returns a list of the graphics ids for easy deletion.
-proc vmd_draw_vector {mol cnt vec {scale 1.0} {res 35} {radius 0.05}} {
+proc vmd_draw_vector {mol cnt vec {scale 1.0} {res 35} {radius 0.1}} {
     global cid
 
     set camz [lindex [lindex [molinfo 0 get view_matrix] 0] 2]
@@ -81,7 +81,7 @@ proc vmd_draw_vector {mol cnt vec {scale 1.0} {res 35} {radius 0.05}} {
     # Choose a direction that is normal to the present vector.
     set offset [ vecscale $x3 [expr [expr $cid - 0.5] * 0.05] ]
     set cnt [ vecadd $cnt $offset ]
-    set radius [min [expr 0.1 * [veclength $vec]] $radius]
+    set radius [min [expr 0.3 * [veclength $vec]] $radius]
     return [list \
       [graphics $mol cylinder [vecsub $cnt $veczero] \
         [vecadd $cnt [vecscale 0.8 $vecfull]] \
@@ -91,7 +91,7 @@ proc vmd_draw_vector {mol cnt vec {scale 1.0} {res 35} {radius 0.05}} {
 	resolution $res]]
 }
 
-proc vmd_draw_vecfield {mol field {scale 1.0} {res 35} {radius 0.05}} {
+proc vmd_draw_vecfield {mol field {scale 1.0} {res 35} {radius 0.1}} {
     set gids ""
     foreach i $field {
         lassign $i cnt vec
@@ -121,7 +121,7 @@ proc do_frcdraw {args} {
         set cid 0
         foreach frcdata $frcdatas($frame) {
             graphics $molid color [ lindex $colors $cid ]
-            lappend frcgraphs [vmd_draw_vecfield $molid $frcdata 3.0 35 1.2]
+            lappend frcgraphs [vmd_draw_vecfield $molid $frcdata 3.0 35 0.1]
             incr cid
         }
     }

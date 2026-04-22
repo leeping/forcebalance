@@ -643,7 +643,7 @@ class TINKER(Engine):
         Result = OrderedDict()
         # If we want the dipoles (or just energies), analyze is the way to go.
         if dipole or (not force):
-            oanl = self.calltinker("analyze %s -k %s" % (xyzin, self.name), stdin="G,E,M", print_to_screen=False)
+            oanl = self.calltinker("analyze %s -k %s" % (xyzin, self.name), stdin="G E M", print_to_screen=False)
             # Read potential energy and dipole from file.
             eanl = []
             dip = []
@@ -986,7 +986,7 @@ class TINKER(Engine):
         temps = np.array(temps)
     
         if verbose: logger.info("Post-processing to get the dipole moments\n")
-        oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="G,E,M", print_to_screen=False)
+        oanl = self.calltinker("analyze %s-md.arc" % self.name, stdin="G E M", print_to_screen=False)
 
         # Read potential energy and dipole from file.
         eanl = []
@@ -1006,7 +1006,7 @@ class TINKER(Engine):
                 dip.append([float(s[i]) for i in range(-3,0)])
             if first_shot:
                 for key in eckeys:
-                    if strip.startswith(key):
+                    if strip.startswith(key) and isfloat(s[-2]):
                         if key in ecomp:
                             ecomp[key].append(float(s[-2])*4.184)
                         else:
@@ -1016,7 +1016,7 @@ class TINKER(Engine):
                         havekeys.add(key)
             else:
                 for key in havekeys:
-                    if strip.startswith(key):
+                    if strip.startswith(key) and isfloat(s[-2]):
                         if key in ecomp:
                             ecomp[key].append(float(s[-2])*4.184)
                         else:
