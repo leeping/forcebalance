@@ -17,7 +17,7 @@ from forcebalance.output import getLogger
 from forcebalance.target import Target
 
 try:
-    from openff.recharge.charges import ChargeSettings
+    from openff.recharge.charges.qc import QCChargeSettings
     from openff.recharge.esp.storage import MoleculeESPStore
     from openff.recharge.optimize import ElectricFieldObjective, ESPObjective # ElectricFieldOptimization, ESPOptimization
     from openff.recharge.charges.bcc import BCCCollection
@@ -131,7 +131,7 @@ class Recharge_SMIRNOFF(Target):
         )
 
         # TODO: Currently only AM1 is supported by the SMIRNOFF handler.
-        charge_settings = ChargeSettings(theory="am1", symmetrize=True, optimize=True)
+        charge_settings = QCChargeSettings(theory="am1", symmetrize=True, optimize=True)
 
         # Pre-calculate the expensive operations which are needed to evaluate the
         # objective function, but do not depend on the current parameters.

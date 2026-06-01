@@ -1,0 +1,35 @@
+<ForceField>
+ <AtomTypes>
+  <Type name="tip4p-O" class="OW" element="O" mass="15.99943"/>
+  <Type name="tip4p-H" class="HW" element="H" mass="1.007947"/>
+  <Type name="tip4p-M" class="MW" mass="0"/>
+  <Type name="tip4p-L" class="LW" mass="0"/>
+ </AtomTypes>
+ <Residues>
+  <Residue name="HOH">
+   <Atom name="O" type="tip4p-O"/>
+   <Atom name="H1" type="tip4p-H"/>
+   <Atom name="H2" type="tip4p-H"/>
+   <Atom name="M" type="tip4p-M"/>
+   <Atom name="L1" type="tip4p-L"/>
+   <Atom name="L2" type="tip4p-L"/>
+   <VirtualSite type="average3" index="3" atom1="0" atom2="1" atom3="2" weight1="1.023787149847e+00" weight2="-1.189357492343e-02" weight3="-1.189357492343e-02" parameterize="weight1" parameter_eval="weight2=0.5*(1.0-PARM['VirtualSite/weight1/HOH-3']), weight3=0.5*(1.0-PARM['VirtualSite/weight1/HOH-3'])"/>
+   <VirtualSite type="average2" index="4" atom1="0" atom2="1" weight1="-5.235784773271e-03" weight2="1.005235784773e+00" parameterize="weight1" parameter_eval="weight2=1.0-PARM['VirtualSite/weight1/HOH-4']"/>
+   <VirtualSite type="average2" index="5" atom1="0" atom2="2" weight1="-5.235784773271e-03" weight2="1.005235784773e+00" parameter_eval="weight1=PARM['VirtualSite/weight1/HOH-4'], weight2=1.0-PARM['VirtualSite/weight1/HOH-4']"/>
+   <Bond from="0" to="1"/>
+   <Bond from="0" to="2"/>
+  </Residue>
+ </Residues>
+ <HarmonicBondForce>
+  <Bond class1="OW" class2="HW" length="0.1" k="462750.4"/>
+ </HarmonicBondForce>
+ <HarmonicAngleForce>
+  <Angle class1="HW" class2="OW" class3="HW" angle="1.9106119321581925" k="836.8"/>
+ </HarmonicAngleForce>
+ <NonbondedForce coulomb14scale="0.833333" lj14scale="0.5">
+  <Atom type="tip4p-O" charge="0" sigma="1" epsilon="0"/>
+  <Atom type="tip4p-H" charge="0" sigma="1" epsilon="0"/>
+  <Atom type="tip4p-L" charge="4.234447011332e-01" sigma="1" epsilon="0" parameterize="charge"/>
+  <Atom type="tip4p-M" charge="-8.468894022664e-01" sigma="3.178132992662e-01" epsilon="6.518502969140e-01" parameterize="sigma, epsilon" parameter_eval="charge=-2.0*PARM['Atom/charge/tip4p-L']"/>
+ </NonbondedForce>
+</ForceField>
