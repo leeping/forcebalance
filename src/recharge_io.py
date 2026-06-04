@@ -37,7 +37,11 @@ logger = getLogger(__name__)
 class Recharge_SMIRNOFF(Target):
     """A custom optimisation target which employs the `openff-recharge`
     package to train bond charge correction parameters against QM derived
-    electrostatic potential data."""
+    electrostatic potential data.
+    
+    Note -- this has NOT been written to work with anything but BCCs.
+    It will NOT work for a force field with virtual sites.
+    """
 
     def __init__(self, options, tgt_opts, forcefield):
 
@@ -55,7 +59,7 @@ class Recharge_SMIRNOFF(Target):
 
         # Pre-calculate the expensive portion of the objective function.
         self._design_matrix = None
-        self._target_residuals = None
+        self._reference_values = None
 
         # Store a copy of the objective function details from the previous
         # optimisation cycle.
@@ -165,7 +169,7 @@ class Recharge_SMIRNOFF(Target):
         self._design_matrix = np.vstack(
             [objective_term.atom_charge_design_matrix for objective_term in objective_terms]
         )
-        self._target_residuals = np.vstack(
+        self._reference_values = np.vstack(
             [objective_term.reference_values for objective_term in objective_terms]
         )
 
@@ -263,7 +267,7 @@ class Recharge_SMIRNOFF(Target):
             bcc_values = bcc_values.flatten()
 
         # Compute the objective function
-        delta = self._target_residuals - np.matmul(self._design_matrix, bcc_values)
+        delta = self._reference_values - np.matmul(self._design_matrix, bcc_values)
         loss = (delta * delta).sum()
 
         loss_gradient = np.zeros(len(parameter_values))
