@@ -17,7 +17,7 @@ from forcebalance.output import getLogger
 from forcebalance.target import Target
 
 try:
-    from openff.recharge.charges import ChargeSettings
+    from openff.recharge.charges.qc import QCChargeSettings
     from openff.recharge.esp.storage import MoleculeESPStore
     from openff.recharge.optimize import ElectricFieldObjective, ESPObjective # ElectricFieldOptimization, ESPOptimization
     from openff.recharge.charges.bcc import BCCCollection
@@ -118,20 +118,24 @@ class Recharge_SMIRNOFF(Target):
             bcc_index = bcc_smirks.index(parameter_smirks)
             bcc_to_parameter_index[bcc_index] = parameter_index
 
-        fixed_parameters = [
-            i for i in range(len(bcc_smirks)) if i not in bcc_to_parameter_index
+        # The BCC parameters being optimized, identified by their SMIRKS pattern.
+        # ``compute_objective_terms`` now expects the SMIRKS of the *trainable*
+        # parameters (previously it expected the indices of the *fixed* ones). The
+        # order of these keys defines the column ordering of the design matrix, so it
+        # must match the ``_parameter_to_bcc_map`` used to map BCCs back to FB params.
+        trainable_bcc_indices = [
+            i for i in range(len(bcc_smirks)) if i in bcc_to_parameter_index
         ]
+        bcc_parameter_keys = [bcc_smirks[i] for i in trainable_bcc_indices]
 
         self._parameter_to_bcc_map = np.array(
-            [
-                bcc_to_parameter_index[i]
-                for i in range(len(bcc_collection.parameters))
-                if i not in fixed_parameters
-            ]
+            [bcc_to_parameter_index[i] for i in trainable_bcc_indices]
         )
 
         # TODO: Currently only AM1 is supported by the SMIRNOFF handler.
-        charge_settings = ChargeSettings(theory="am1", symmetrize=True, optimize=True)
+        charge_settings = QCChargeSettings(
+            theory="am1", symmetrize=True, optimize=True
+        )
 
         # Pre-calculate the expensive operations which are needed to evaluate the
         # objective function, but do not depend on the current parameters.
@@ -140,18 +144,29 @@ class Recharge_SMIRNOFF(Target):
             "electric-field": ElectricFieldObjective,
         }[self.recharge_property]
 
+        # Retrieve the ESP records to train against. They are gathered per molecule so
+        # that the ordering matches the per-molecule residual ranges computed below.
+        esp_records = [
+            esp_record
+            for smiles_pattern in smiles
+            for esp_record in esp_store.retrieve(smiles_pattern)
+        ]
+
         objective_terms = [
             objective_term
             for objective_term in optimization_class.compute_objective_terms(
-                smiles, esp_store, bcc_collection, fixed_parameters, charge_settings
+                esp_records,
+                charge_collection=charge_settings,
+                bcc_collection=bcc_collection,
+                bcc_parameter_keys=bcc_parameter_keys,
             )
         ]
 
         self._design_matrix = np.vstack(
-            [objective_term.design_matrix for objective_term in objective_terms]
+            [objective_term.atom_charge_design_matrix for objective_term in objective_terms]
         )
         self._target_residuals = np.vstack(
-            [objective_term.target_residuals for objective_term in objective_terms]
+            [objective_term.reference_values for objective_term in objective_terms]
         )
 
         # Track which residuals map to which molecule.
@@ -284,6 +299,12 @@ class Recharge_SMIRNOFF(Target):
 
             else:
                 raise NotImplementedError()
+
+            # Flatten to a 1-D vector of one gradient per BCC. The ESP branch yields
+            # a column vector of shape (n_bcc, 1); older NumPy used to silently squeeze
+            # the resulting (1,)-shaped slices into the scalar assignment below, but
+            # newer NumPy raises instead, so squeeze explicitly here.
+            bcc_gradient = np.asarray(bcc_gradient).reshape(-1)
 
             for bcc_index, parameter_index in enumerate(self._parameter_to_bcc_map):
                 loss_gradient[parameter_index] = bcc_gradient[bcc_index]
