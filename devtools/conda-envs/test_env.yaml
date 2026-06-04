@@ -27,6 +27,6 @@ dependencies:
   - openff-toolkit >=0.18.0
   - openff-interchange >=0.5.1
   - openff-evaluator-base >= 0.5.3
-  # - openff-recharge
+  - openff-recharge
   # - openeye-toolkits (Don't have a license file to use with GH Actions.)
   - pint <0.25

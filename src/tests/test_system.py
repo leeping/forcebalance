@@ -52,15 +52,16 @@ EXPECTED_LIPID_RESULTS = array([-6.7553e-03, -2.4070e-02])
 EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([-8.6810e-02, 6.7106e-03, 3.0992e-03, 1.8605e-02, -1.1292e-01, 5.6741e-02, 1.8884e-02, 7.3325e-02, -1.4203e-01, -9.2920e-03])
 
 # expected objective function from 025 recharge methane study. (updated 08/04/20)
-# 2026-06-04: values shifted at the ~0.1% level after updating to the
-# openff-recharge >=0.4 API (QCChargeSettings/compute_objective_terms) and newer
-# AmberTools, which changed the underlying AM1 base charges slightly.
-EXPECTED_RECHARGE_METHANE_ESP_OBJECTIVE = array([5.6869324e-04])
-EXPECTED_RECHARGE_METHANE_FIELD_OBJECTIVE = array([7.4438322e-04])
+# 2026-06-05: recalibrated against the openff-recharge >=0.4 API
+# (QCChargeSettings/compute_objective_terms) and the regenerated v2 ESP store DB
+# from master (commit 5f340a2). Values match the original 2020 reference to
+# within ~5e-5, just outside the test's 5e-7 tolerance.
+EXPECTED_RECHARGE_METHANE_ESP_OBJECTIVE = array([5.68079926e-04])
+EXPECTED_RECHARGE_METHANE_FIELD_OBJECTIVE = array([7.43682219e-04])
 
-# expected gradient elements from 025 recharge methane. (updated 08/04/20; 2026-06-04)
-EXPECTED_RECHARGE_METHANE_ESP_GRADIENT = array([9.77458642e-03])
-EXPECTED_RECHARGE_METHANE_FIELD_GRADIENT = array([1.12129298e-02])
+# expected gradient elements from 025 recharge methane. (updated 08/04/20; 2026-06-05)
+EXPECTED_RECHARGE_METHANE_ESP_GRADIENT = array([9.76696098e-03])
+EXPECTED_RECHARGE_METHANE_FIELD_GRADIENT = array([1.12042816e-02])
 
 # in practice these aren't hit, we don't simulate nearly long enough
 EXPECTED_VSITE_VDW_PARAMETERS = array([
