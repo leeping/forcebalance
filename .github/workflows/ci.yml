@@ -14,7 +14,7 @@ defaults:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os }} (py=${{ matrix.python-version }}, gmx=${{ matrix.gmx-version }}, pymbar=${{ matrix.pymbar-version }}${{ matrix.recharge == 'true' && ', recharge' || '' }})
+    name: Test on ${{ matrix.os }} (py=${{ matrix.python-version }}, gmx=${{ matrix.gmx-version }}, pymbar=${{ matrix.pymbar-version }})
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -58,12 +58,6 @@ jobs:
           - os: ubuntu-latest
             python-version: "3.11"
             gmx-version: "2024.3"
-          # Exercise the openff-recharge target (gromacs is not needed here).
-          - os: ubuntu-latest
-            python-version: "3.11"
-            pymbar-version: "4"
-            gmx-version: "none"
-            recharge: "true"
 
     env:
       CI_OS: ${{ matrix.os }}
@@ -86,19 +80,11 @@ jobs:
 
     - name: Set up conda environment with gromacs for Python 3.11 or higher
       uses: mamba-org/setup-micromamba@v1
-      if: (matrix.python-version != '3.9' && matrix.python-version != '3.10') && (matrix.gmx-version != '5' && matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023') && matrix.recharge != 'true'
+      if: (matrix.python-version != '3.9' && matrix.python-version != '3.10') && (matrix.gmx-version != '5' && matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023')
       with:
         environment-file: devtools/conda-envs/test_env.yaml
         create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
           python=${{ matrix.python-version }} gromacs=${{ matrix.gmx-version }}.*=nompi_dblprec* pymbar=${{ matrix.pymbar-version }}.*
-
-    - name: Set up conda environment with openff-recharge (no gromacs)
-      if: matrix.recharge == 'true'
-      uses: mamba-org/setup-micromamba@v1
-      with:
-        environment-file: devtools/conda-envs/test_env.yaml
-        create-args: >- # beware the >- instead of |, we don't split on newlines but on spaces
-          python=${{ matrix.python-version }} pymbar=${{ matrix.pymbar-version }}.* openff-recharge
 
     - name: Set up conda environment without gromacs
       if: matrix.gmx-version == '5' || matrix.gmx-version == '4'
@@ -147,7 +133,6 @@ jobs:
 #        export PATH="$GITHUB_WORKSPACE/opt/cctools/current/bin:$PATH"
 
     - name: Install Tinker
-      if: matrix.recharge != 'true'
       run: |
         if [[ "$CI_OS" == 'ubuntu-latest' ]]; then
           wget https://dasher.wustl.edu/tinker/downloads/bin-linux-8.8.3.tar.gz -O tinker.tar.gz
@@ -228,18 +213,13 @@ jobs:
       run: |
         pytest -v --run-gmx-rejected -k test_gmx_version_rejected src/tests/test_gmxio.py
 
-    - name: Run openff-recharge test
-      if: matrix.recharge == 'true'
-      run: |
-        pytest -v --timeout=2000 src/tests/test_system.py::TestRechargeMethaneStudy
-
     - name: Run tests
-      if: matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023' && matrix.gmx-version != '2024.3' && matrix.recharge != 'true'
+      if: matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023' && matrix.gmx-version != '2024.3'
       run: |
         pytest -v --cov=forcebalance --cov-config=setup.cfg --durations=0 --cov-report=xml --timeout=2000 src/tests/
 
     - name: Run water study
-      if: matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023' && matrix.gmx-version != '2024.3' && matrix.recharge != 'true'
+      if: matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023' && matrix.gmx-version != '2024.3'
       run: |
         cd studies/001_water_tutorial
         tar xvjf targets.tar.bz2
@@ -247,7 +227,7 @@ jobs:
         cd ../../
 
     - name: Codecov
-      if: matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023' && matrix.gmx-version != '2024.3' && matrix.recharge != 'true'
+      if: matrix.gmx-version != '4' && matrix.gmx-version != '2022' && matrix.gmx-version != '2023' && matrix.gmx-version != '2024.3'
       uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
