@@ -423,6 +423,45 @@ class TestRechargeMethaneStudy(ForceBalanceSystemTest):
             err_msg=msgG
         )
 
+
+# A minimal SMIRNOFF force field with a single BondCharge virtual site whose
+# leading charge increment is templated, used to check the Recharge target's
+# virtual-site guard.
+_VIRTUAL_SITE_FF_TEMPLATE = """<?xml version="1.0" encoding="utf-8"?>
+<SMIRNOFF version="0.3" aromaticity_model="OEAroModel_MDL">
+  <VirtualSites version="0.3" exclusion_policy="parents">
+    <VirtualSite type="BondCharge" name="EP" smirks="[#7:1]#[#7:2]"
+                 distance="1.4 * angstrom"
+                 charge_increment1="{charge} * elementary_charge"
+                 charge_increment2="0.0 * elementary_charge"
+                 sigma="1.0 * angstrom" epsilon="0.0 * kilocalorie_per_mole"
+                 match="all_permutations"/>
+  </VirtualSites>
+</SMIRNOFF>
+"""
+
+
+@skip_openff_py39
+def test_recharge_rejects_charged_virtual_sites():
+    """Recharge_SMIRNOFF must refuse a force field whose virtual sites carry
+    charge, while tolerating charge-free virtual sites (and none at all)."""
+    pytest.importorskip("openff.toolkit")
+    from openff.toolkit.typing.engines.smirnoff import ForceField
+    from forcebalance.recharge_io import Recharge_SMIRNOFF
+
+    # A virtual site carrying charge cannot be represented -> must raise.
+    charged_ff = ForceField(_VIRTUAL_SITE_FF_TEMPLATE.format(charge="0.2"))
+    with pytest.raises(NotImplementedError):
+        Recharge_SMIRNOFF._check_no_virtual_site_charges(charged_ff)
+
+    # Charge-free virtual sites do not affect the ESP and must be allowed.
+    uncharged_ff = ForceField(_VIRTUAL_SITE_FF_TEMPLATE.format(charge="0.0"))
+    Recharge_SMIRNOFF._check_no_virtual_site_charges(uncharged_ff)
+
+    # A force field without any virtual sites is fine too.
+    Recharge_SMIRNOFF._check_no_virtual_site_charges(ForceField())
+
+
 @skip_openff_py39
 class TestEvaluatorWaterVSiteStudy(EvaluatorServerMixin, ForceBalanceSystemTest):
     """Check that we can co-optimize pure and mixture properties of water with a virtual site.

@@ -39,8 +39,9 @@ class Recharge_SMIRNOFF(Target):
     package to train bond charge correction parameters against QM derived
     electrostatic potential data.
     
-    Note -- this has NOT been written to work with anything but BCCs.
-    It will NOT work for a force field with virtual sites.
+    Note -- this has NOT been written to work with anything but BCCs. It will
+    refuse a force field whose virtual sites carry charge (see
+    ``_check_no_virtual_site_charges``); charge-free virtual sites are ignored.
     """
 
     def __init__(self, options, tgt_opts, forcefield):
@@ -76,6 +77,34 @@ class Recharge_SMIRNOFF(Target):
         # Initialize the target.
         self._initialize()
 
+    @staticmethod
+    def _check_no_virtual_site_charges(force_field):
+        """Raise ``NotImplementedError`` if ``force_field`` defines virtual sites
+        that carry charge.
+
+        The target only places charge on atoms (AM1 base charges perturbed by bond
+        charge corrections) and never passes a virtual site collection to
+        ``openff-recharge``. A virtual site with a non-zero ``charge_increment``
+        would contribute to the electrostatic potential in a way this target cannot
+        represent, and would otherwise be silently ignored - biasing the fitted
+        bond charge corrections. Virtual sites whose charge increments are all zero
+        do not affect the ESP and are therefore permitted.
+        """
+
+        vsite_handler = force_field.get_parameter_handler("VirtualSites")
+
+        for parameter in vsite_handler.parameters:
+            if any(
+                getattr(charge_increment, "m", charge_increment) != 0.0
+                for charge_increment in parameter.charge_increment
+            ):
+                raise NotImplementedError(
+                    "The Recharge_SMIRNOFF target does not support virtual sites "
+                    "that carry charge (VirtualSites parameter '{}' has a non-zero "
+                    "charge_increment). Only bond charge corrections on atoms can "
+                    "be trained.".format(parameter.smirks)
+                )
+
     def _initialize(self):
         """Initializes the target."""
 
@@ -96,6 +125,11 @@ class Recharge_SMIRNOFF(Target):
 
         if bcc_handler.partial_charge_method.lower() != "am1elf10":
             raise NotImplementedError()
+        
+        # The target only models charge on atoms (AM1 base charges perturbed by
+        # bond charge corrections); a virtual site that carries charge cannot be
+        # represented and would otherwise be silently ignored, biasing the fit.
+        self._check_no_virtual_site_charges(force_field)
 
         # TODO: it is assumed that the MDL aromaticity model should be used
         #       rather than the once specified in the FF as the model is not
