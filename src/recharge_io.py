@@ -37,7 +37,12 @@ logger = getLogger(__name__)
 class Recharge_SMIRNOFF(Target):
     """A custom optimisation target which employs the `openff-recharge`
     package to train bond charge correction parameters against QM derived
-    electrostatic potential data."""
+    electrostatic potential data.
+    
+    Note -- this has NOT been written to work with anything but BCCs. It will
+    refuse a force field whose virtual sites carry charge (see
+    ``_check_no_virtual_site_charges``); charge-free virtual sites are ignored.
+    """
 
     def __init__(self, options, tgt_opts, forcefield):
 
@@ -55,7 +60,7 @@ class Recharge_SMIRNOFF(Target):
 
         # Pre-calculate the expensive portion of the objective function.
         self._design_matrix = None
-        self._target_residuals = None
+        self._reference_values = None
 
         # Store a copy of the objective function details from the previous
         # optimisation cycle.
@@ -71,6 +76,34 @@ class Recharge_SMIRNOFF(Target):
 
         # Initialize the target.
         self._initialize()
+
+    @staticmethod
+    def _check_no_virtual_site_charges(force_field):
+        """Raise ``NotImplementedError`` if ``force_field`` defines virtual sites
+        that carry charge.
+
+        The target only places charge on atoms (AM1 base charges perturbed by bond
+        charge corrections) and never passes a virtual site collection to
+        ``openff-recharge``. A virtual site with a non-zero ``charge_increment``
+        would contribute to the electrostatic potential in a way this target cannot
+        represent, and would otherwise be silently ignored - biasing the fitted
+        bond charge corrections. Virtual sites whose charge increments are all zero
+        do not affect the ESP and are therefore permitted.
+        """
+
+        vsite_handler = force_field.get_parameter_handler("VirtualSites")
+
+        for parameter in vsite_handler.parameters:
+            if any(
+                getattr(charge_increment, "m", charge_increment) != 0.0
+                for charge_increment in parameter.charge_increment
+            ):
+                raise NotImplementedError(
+                    "The Recharge_SMIRNOFF target does not support virtual sites "
+                    "that carry charge (VirtualSites parameter '{}' has a non-zero "
+                    "charge_increment). Only bond charge corrections on atoms can "
+                    "be trained.".format(parameter.smirks)
+                )
 
     def _initialize(self):
         """Initializes the target."""
@@ -92,6 +125,11 @@ class Recharge_SMIRNOFF(Target):
 
         if bcc_handler.partial_charge_method.lower() != "am1elf10":
             raise NotImplementedError()
+        
+        # The target only models charge on atoms (AM1 base charges perturbed by
+        # bond charge corrections); a virtual site that carries charge cannot be
+        # represented and would otherwise be silently ignored, biasing the fit.
+        self._check_no_virtual_site_charges(force_field)
 
         # TODO: it is assumed that the MDL aromaticity model should be used
         #       rather than the once specified in the FF as the model is not
@@ -118,20 +156,24 @@ class Recharge_SMIRNOFF(Target):
             bcc_index = bcc_smirks.index(parameter_smirks)
             bcc_to_parameter_index[bcc_index] = parameter_index
 
-        fixed_parameters = [
-            i for i in range(len(bcc_smirks)) if i not in bcc_to_parameter_index
+        # The BCC parameters being optimized, identified by their SMIRKS pattern.
+        # ``compute_objective_terms`` now expects the SMIRKS of the *trainable*
+        # parameters (previously it expected the indices of the *fixed* ones). The
+        # order of these keys defines the column ordering of the design matrix, so it
+        # must match the ``_parameter_to_bcc_map`` used to map BCCs back to FB params.
+        trainable_bcc_indices = [
+            i for i in range(len(bcc_smirks)) if i in bcc_to_parameter_index
         ]
+        bcc_parameter_keys = [bcc_smirks[i] for i in trainable_bcc_indices]
 
         self._parameter_to_bcc_map = np.array(
-            [
-                bcc_to_parameter_index[i]
-                for i in range(len(bcc_collection.parameters))
-                if i not in fixed_parameters
-            ]
+            [bcc_to_parameter_index[i] for i in trainable_bcc_indices]
         )
 
         # TODO: Currently only AM1 is supported by the SMIRNOFF handler.
-        charge_settings = QCChargeSettings(theory="am1", symmetrize=True, optimize=True)
+        charge_settings = QCChargeSettings(
+            theory="am1", symmetrize=True, optimize=True
+        )
 
         # Pre-calculate the expensive operations which are needed to evaluate the
         # objective function, but do not depend on the current parameters.
@@ -140,18 +182,29 @@ class Recharge_SMIRNOFF(Target):
             "electric-field": ElectricFieldObjective,
         }[self.recharge_property]
 
+        # Retrieve the ESP records to train against. They are gathered per molecule so
+        # that the ordering matches the per-molecule residual ranges computed below.
+        esp_records = [
+            esp_record
+            for smiles_pattern in smiles
+            for esp_record in esp_store.retrieve(smiles_pattern)
+        ]
+
         objective_terms = [
             objective_term
             for objective_term in optimization_class.compute_objective_terms(
-                smiles, esp_store, bcc_collection, fixed_parameters, charge_settings
+                esp_records,
+                charge_collection=charge_settings,
+                bcc_collection=bcc_collection,
+                bcc_parameter_keys=bcc_parameter_keys,
             )
         ]
 
         self._design_matrix = np.vstack(
-            [objective_term.design_matrix for objective_term in objective_terms]
+            [objective_term.atom_charge_design_matrix for objective_term in objective_terms]
         )
-        self._target_residuals = np.vstack(
-            [objective_term.target_residuals for objective_term in objective_terms]
+        self._reference_values = np.vstack(
+            [objective_term.reference_values for objective_term in objective_terms]
         )
 
         # Track which residuals map to which molecule.
@@ -248,7 +301,7 @@ class Recharge_SMIRNOFF(Target):
             bcc_values = bcc_values.flatten()
 
         # Compute the objective function
-        delta = self._target_residuals - np.matmul(self._design_matrix, bcc_values)
+        delta = self._reference_values - np.matmul(self._design_matrix, bcc_values)
         loss = (delta * delta).sum()
 
         loss_gradient = np.zeros(len(parameter_values))
@@ -284,6 +337,12 @@ class Recharge_SMIRNOFF(Target):
 
             else:
                 raise NotImplementedError()
+
+            # Flatten to a 1-D vector of one gradient per BCC. The ESP branch yields
+            # a column vector of shape (n_bcc, 1); older NumPy used to silently squeeze
+            # the resulting (1,)-shaped slices into the scalar assignment below, but
+            # newer NumPy raises instead, so squeeze explicitly here.
+            bcc_gradient = np.asarray(bcc_gradient).reshape(-1)
 
             for bcc_index, parameter_index in enumerate(self._parameter_to_bcc_map):
                 loss_gradient[parameter_index] = bcc_gradient[bcc_index]
