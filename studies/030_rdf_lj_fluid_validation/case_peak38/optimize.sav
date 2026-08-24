@@ -1,0 +1,45 @@
+$options
+ffdir forcefield
+penalty_type L2
+jobtype OPTIMIZE
+forcefield lj.xml
+maxstep 12
+convergence_step 0.001
+convergence_objective 0.01
+convergence_gradient 0.001
+trust0 0.1
+mintrust 0.01
+finite_difference_h 0.001
+normalize_weights False
+backup False
+read_mvals
+   0 [  1.25894006e-01 ] : Atom/sigma/LJ-Ar
+/read_mvals
+$end
+
+$target
+name LJ_RDF
+type Liquid_OpenMM
+weight 1.0
+
+w_rho 0.0
+w_hvap 0.0
+w_alpha 0.0
+w_kappa 0.0
+w_cp 0.0
+w_eps0 0.0
+w_surf_ten 0.0
+w_rdf 1.0
+
+liquid_equ_steps 20000
+liquid_prod_steps 40000
+liquid_timestep 2
+liquid_interval 0.2
+liquid_coords liquid.pdb
+
+gas_equ_steps 5000
+gas_prod_steps 5000
+gas_timestep 2
+gas_interval 0.2
+gas_coords gas.pdb
+$end

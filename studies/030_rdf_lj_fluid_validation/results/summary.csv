@@ -1,0 +1,3 @@
+target,sigma_true_ang,sigma0_ang,sigma_fit_ang,error_pct,rdf_peak_target_ang,rdf_peak_fit_ang,lj_min_fit_ang
+peak30,3.0,3.4,3.0274,0.913,3.223,3.223,3.398
+peak38,3.8,3.4,3.828,0.737,4.236,4.034,4.297

@@ -1,0 +1,618 @@
+Warning on use of the timeseries module: If the inherent timescales of the system are long compared to those being analyzed, this statistical inefficiency may be an underestimate.  The estimate presumes the use of many statistically independent samples.  Tests should be performed to assess whether this condition is satisfied.   Be cautious in the interpretation of the data.
+
+****** PyMBAR will use 64-bit JAX! *******
+* JAX is currently set to 32-bit bitsize *
+* which is its default.                  *
+*                                        *
+* PyMBAR requires 64-bit mode and WILL   *
+* enable JAX's 64-bit mode when called.  *
+*                                        *
+* This MAY cause problems with other     *
+* Uses of JAX in the same code.          *
+******************************************
+
+#======================================================================#
+#| [1m     Welcome to ForceBalance version v1.9.6+236.g2e4dcbc7! =D     [0m |#
+#| [1m                 Force Field Optimization System                  [0m |#
+#| [1m                                                                  [0m |#
+#| [1m                             Authors:                             [0m |#
+#| [1m                          Lee-Ping Wang                           [0m |#
+#| [1m                  Yudong Qiu, Keri A. McKiernan                   [0m |#
+#| [1m          Jeffrey R. Wagner, Hyesu Jang, Simon Boothroyd          [0m |#
+#| [1m          Arthur Vigil, Erik G. Brandt, John Stoppelman           [0m |#
+#| [1m                  Johnny Israeli, Matt Thompson                   [0m |#
+#======================================================================#
+
+                          [44m     [0m                                        
+                       [44m        [0m      [43m     [0m                              
+                    [44m        [0m   [44m  [0m    [43m         [0m                          
+                 [44m       [0m    [44m      [0m      [43m         [0m                       
+             [44m        [0m    [44m        [0m          [43m         [0m                    
+          [44m        [0m    [44m        [0m                 [43m        [0m                 
+       [44m        [0m    [44m       [0m                        [43m        [0m              
+    [44m        [0m   [44m        [0m                              [43m         [0m          
+   [44m      [0m   [44m        [0m               `.:+@@###@'          [43m         [0m       
+    [44m [0m    [44m        [0m          ,;'+###############.             [43m     [0m       
+      [44m        [0m         +################':`                    [43m [0m        
+      [44m     [0m              `.,,...####+.                                  
+                                ,#####      +##.               [44m   [0m   [44m   [0m
+ [43m    [0m                            #####      ######             [44m   [0m   [44m   [0m
+ [43m    [0m                ###'        ####'     :#####'             [44m   [0m   [44m   [0m
+ [43m    [0m                :####@      ####.    ,####'               [44m   [0m   [44m   [0m
+ [43m    [0m                 ######     ####    +###+                 [44m   [0m   [44m   [0m
+ [43m    [0m                  #####     ####   ###;                   [44m   [0m   [44m   [0m
+ [43m    [0m                   :##      ####  ++`                     [44m   [0m   [44m   [0m
+ [43m    [0m                            ####``..:;+##############+`   [44m   [0m   [44m   [0m
+ [43m    [0m             .,:;;'++##################################`  [44m   [0m   [44m   [0m
+ [43m    [0m    `############################++++''';;;;;;;;;;;'';    [44m   [0m   [44m   [0m
+ [43m    [0m      ,########':,.``       ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+ [43m    [0m                            ####                          [44m   [0m   [44m   [0m
+      [44m    [0m                       ####                                   
+     [44m        [0m                    ####                                   
+    [44m [0m    [44m       [0m                 ####                       [43m     [0m       
+   [44m     [0m    [44m        [0m             ####                    [43m        [0m       
+   [44m        [0m    [44m        [0m          ###                  [43m         [0m         
+      [44m        [0m    [44m        [0m        +`               [43m        [0m             
+          [44m        [0m   [44m        [0m                   [43m        [0m                
+             [44m        [0m   [44m         [0m           [43m         [0m                   
+                [44m        [0m    [44m       [0m      [43m         [0m                      
+                   [44m        [0m    [44m   [0m    [43m        [0m                          
+                      [44m        [0m       [43m      [0m                             
+                          [44m      [0m      [43m  [0m                                
+                             [44m  [0m                                         
+
+Reading options from file: optimize.in
+#========================================================#
+#| [95m  Options at their default values are not printed   [0m |#
+#| [95m        Use 'verbose_options True' to Enable        [0m |#
+#========================================================#
+Reading force field from file: lj.xml
+#=========================================================#
+#| [92m Starting parameter indices, physical values and IDs [0m |#
+#=========================================================#
+   0 [  3.4000e-01 ] : Atom/sigma/LJ-Ar
+-----------------------------------------------------------
+#=========================================================#
+#| [91m Rescaling Factors by Type (Lower Takes Precedence): [0m |#
+#=========================================================#
+   Atom/sigma                           : 3.40000e-01
+-----------------------------------------------------------
+#========================================================#
+#| [91m   Rescaling Types / Factors by Parameter Number:   [0m |#
+#========================================================#
+   0 [    Atom/sigma                    : 3.40000e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+#========================================================#
+#| [92m               Setup for force field                [0m |#
+#========================================================#
+fnms                      ['lj.xml'] 
+----------------------------------------------------------
+Autodetected 512 molecules with 1 atoms each in liquid coordinates
+#========================================================#
+#| [92m             Setup for target LJ_RDF :              [0m |#
+#========================================================#
+force_cuda                0 
+mts_integrator            0 
+rpmd_beads                0 
+liquid_coords             liquid.pdb 
+gas_coords                gas.pdb 
+nvt_coords                surf.pdb 
+name                      LJ_RDF 
+type                      LIQUID_OPENMM 
+backup                    False 
+tgtdir                    targets/LJ_RDF 
+w_rho                     0.0 
+w_hvap                    0.0 
+w_alpha                   0.0 
+w_kappa                   0.0 
+w_cp                      0.0 
+w_eps0                    0.0 
+w_normalize               0 
+liquid_eq_steps           20000 
+liquid_md_steps           40000 
+gas_eq_steps              5000 
+gas_md_steps              5000 
+liquid_timestep           2.0 
+liquid_interval           0.2 
+gas_timestep              2.0 
+gas_interval              0.2 
+adapt_errors              0 
+minimize_energy           1 
+self_pol_mu0              0.0 
+self_pol_alpha            0.0 
+anisotropic_box           0 
+w_surf_ten                0.0 
+nvt_eq_steps              10000 
+nvt_md_steps              100000 
+nvt_timestep              1.0 
+nvt_interval              0.1 
+w_rdf                     1.0 
+pure_num_grad             0 
+liquid_fdiff_h            0.01 
+rdf_denom                 0.05 
+----------------------------------------------------------
+Using parabolic regularization (Gaussian prior) with strength 0.0e+00 (+), 0.0e+00 (x)
+#========================================================#
+#| [92m           Setup for objective function :           [0m |#
+#========================================================#
+normalize_weights         False 
+----------------------------------------------------------
+#========================================================#
+#| [92m                Setup for optimizer                 [0m |#
+#========================================================#
+jobtype                   OPTIMIZE 
+mintrust                  0.01 
+convergence_objective     0.01 
+convergence_step          0.001 
+maxstep                   12 
+backup                    False 
+input_file                optimize.in 
+----------------------------------------------------------
+Calculation started at 2026-08-24 11:18 PM
+#========================================================#
+#| [1m                  Main Optimizer                    [0m |#
+#| [1m   Newton-Raphson Method (Adaptive Trust Radius)    [0m |#
+#| [1m                                                    [0m |#
+#| [1m       [0mConvergence criteria (1 of 3 needed):        [0m |#
+#| [1m          [0mObjective Function  : 1.000e-02           [0m |#
+#| [1m          [0mNorm of Gradient    : 1.000e-03           [0m |#
+#| [1m          [0mParameter step size : 1.000e-03           [0m |#
+#========================================================#
+#========================================================================#
+#|               Color Key for Objective Function -=X2=-                |#
+#|  [1mBold[0m = Initial step                                                 |#
+#|  [92mGreen = Current lowest value of objective function (best estimate)[0m  |#
+#|  [91mRed = Objective function rises, step rejected[0m                       |#
+#|  [0mNo color = Not at the lowest value                                  |#
+#========================================================================#
+#========================================================#
+#| [94m     Iteration 0: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+#========================================================#
+#|      Target: LJ_RDF - launching MD simulations       |#
+#|         Time steps: 20000 (eq) + 40000 (md)          |#
+#========================================================#
+Running condensed phase simulation locally.
+You may tail -f /home/a/forcebalance/studies/030_rdf_lj_fluid_validation/case_peak38/optimize.tmp/LJ_RDF/iter_0000/100.00K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py openmm 100.000 1.000[0m Output: npt.out
+Reading information from ./100.00K-1.0atm/npt_result.p
+Weights have been renormalized to 1.0
+Physical quantity name Ar&name Ar uses denominator =  0.0500
+#==========================================================================================#
+#| [1;94m                              LJ_RDF RDF name Ar&name Ar                              [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      100.00      1.0 atm     0.000        0.392 +- 0.003     0.392   1.00000  61.38662 
+--------------------------------------------------------------------------------------------
+#==================================================================#
+#| [92m RDF name Ar&name Ar objective function:  61.387, Derivative: [0m |#
+#==================================================================#
+   0 [ -1.8152e+03 ] : Atom/sigma/LJ-Ar
+--------------------------------------------------------------------
+#====================================================================#
+#| [94m               LJ_RDF Condensed Phase Properties:               [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+RDF name Ar&name Ar               61.38662    1.000    6.13866e+01 
+Total                                                  6.13866e+01 
+----------------------------------------------------------------------
+#====================================================================#
+#| [94m                  Objective Function Breakdown                  [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution [0m |#
+#====================================================================#
+LJ_RDF                        61.38662      1.000 [94m     6.13866e+01[0m 
+Regularization                 0.00000      1.000 [94m     0.00000e+00[0m 
+Total                                             [94m     6.13866e+01[0m 
+----------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     0   0.000e+00   0.000e+00   1.815e+03[1m   6.13866e+01[0m   0.000e+00      0.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -1.81517451e+03 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 6.7637e-02)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  0.0000e+00 + 6.7637e-02 =  6.7637e-02 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  3.4000e-01 + 2.2997e-02 =  3.6300e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 1: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+#========================================================#
+#|      Target: LJ_RDF - launching MD simulations       |#
+#|         Time steps: 20000 (eq) + 40000 (md)          |#
+#========================================================#
+Running condensed phase simulation locally.
+You may tail -f /home/a/forcebalance/studies/030_rdf_lj_fluid_validation/case_peak38/optimize.tmp/LJ_RDF/iter_0001/100.00K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py openmm 100.000 1.000[0m Output: npt.out
+Reading information from ./100.00K-1.0atm/npt_result.p
+Weights have been renormalized to 1.0
+Physical quantity name Ar&name Ar uses denominator =  0.0500
+#==========================================================================================#
+#| [1;94m                              LJ_RDF RDF name Ar&name Ar                              [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      100.00      1.0 atm     0.000        0.111 +- 0.001     0.111   1.00000   4.93486 
+--------------------------------------------------------------------------------------------
+#=================================================================#
+#| [92m RDF name Ar&name Ar objective function:  4.935, Derivative: [0m |#
+#=================================================================#
+   0 [ -3.1042e+02 ] : Atom/sigma/LJ-Ar
+-------------------------------------------------------------------
+#====================================================================#
+#| [94m               LJ_RDF Condensed Phase Properties:               [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+RDF name Ar&name Ar                4.93486    1.000    4.93486e+00 
+Total                                                  4.93486e+00 
+----------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+LJ_RDF                         4.93486      1.000 [92m     4.93486e+00[0m ( -5.645e+01 ) 
+Regularization                 0.00000      1.000 [92m     0.00000e+00[0m ( +0.000e+00 ) 
+Total                                             [92m     4.93486e+00[0m ( -5.645e+01 ) 
+-------------------------------------------------------------------------------------
+Creating the directory /home/a/forcebalance/studies/030_rdf_lj_fluid_validation/case_peak38/result/optimize to print the force field
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     1   6.764e-02   6.764e-02   3.104e+02[92m   4.93486e+00[0m  -5.645e+01      0.920
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -3.10423415e+02 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 3.1794e-02)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  6.7637e-02 + 3.1794e-02 =  9.9432e-02 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  3.6300e-01 + 1.0810e-02 =  3.7381e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 2: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+#========================================================#
+#|      Target: LJ_RDF - launching MD simulations       |#
+#|         Time steps: 20000 (eq) + 40000 (md)          |#
+#========================================================#
+Running condensed phase simulation locally.
+You may tail -f /home/a/forcebalance/studies/030_rdf_lj_fluid_validation/case_peak38/optimize.tmp/LJ_RDF/iter_0002/100.00K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py openmm 100.000 1.000[0m Output: npt.out
+Reading information from ./100.00K-1.0atm/npt_result.p
+Weights have been renormalized to 1.0
+Physical quantity name Ar&name Ar uses denominator =  0.0500
+#==========================================================================================#
+#| [1;94m                              LJ_RDF RDF name Ar&name Ar                              [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      100.00      1.0 atm     0.000        0.029 +- 0.001     0.029   1.00000   0.33811 
+--------------------------------------------------------------------------------------------
+#=================================================================#
+#| [92m RDF name Ar&name Ar objective function:  0.338, Derivative: [0m |#
+#=================================================================#
+   0 [ -3.8596e+01 ] : Atom/sigma/LJ-Ar
+-------------------------------------------------------------------
+#====================================================================#
+#| [94m               LJ_RDF Condensed Phase Properties:               [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+RDF name Ar&name Ar                0.33811    1.000    3.38111e-01 
+Total                                                  3.38111e-01 
+----------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+LJ_RDF                         0.33811      1.000 [92m     3.38111e-01[0m ( -4.597e+00 ) 
+Regularization                 0.00000      1.000 [92m     0.00000e+00[0m ( +0.000e+00 ) 
+Total                                             [92m     3.38111e-01[0m ( -4.597e+00 ) 
+-------------------------------------------------------------------------------------
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     2   9.943e-02   3.179e-02   3.860e+01[92m   3.38111e-01[0m  -4.597e+00      0.931
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -3.85957715e+01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 1.7521e-02)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  9.9432e-02 + 1.7521e-02 =  1.1695e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  3.7381e-01 + 5.9570e-03 =  3.7976e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 3: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+#========================================================#
+#|      Target: LJ_RDF - launching MD simulations       |#
+#|         Time steps: 20000 (eq) + 40000 (md)          |#
+#========================================================#
+Running condensed phase simulation locally.
+You may tail -f /home/a/forcebalance/studies/030_rdf_lj_fluid_validation/case_peak38/optimize.tmp/LJ_RDF/iter_0003/100.00K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py openmm 100.000 1.000[0m Output: npt.out
+Reading information from ./100.00K-1.0atm/npt_result.p
+Weights have been renormalized to 1.0
+Physical quantity name Ar&name Ar uses denominator =  0.0500
+#==========================================================================================#
+#| [1;94m                              LJ_RDF RDF name Ar&name Ar                              [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      100.00      1.0 atm     0.000        0.007 +- 0.000     0.007   1.00000   0.01704 
+--------------------------------------------------------------------------------------------
+#=================================================================#
+#| [92m RDF name Ar&name Ar objective function:  0.017, Derivative: [0m |#
+#=================================================================#
+   0 [ -3.8120e+00 ] : Atom/sigma/LJ-Ar
+-------------------------------------------------------------------
+#====================================================================#
+#| [94m               LJ_RDF Condensed Phase Properties:               [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+RDF name Ar&name Ar                0.01704    1.000    1.70432e-02 
+Total                                                  1.70432e-02 
+----------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+LJ_RDF                         0.01704      1.000 [92m     1.70432e-02[0m ( -3.211e-01 ) 
+Regularization                 0.00000      1.000 [92m     0.00000e+00[0m ( +0.000e+00 ) 
+Total                                             [92m     1.70432e-02[0m ( -3.211e-01 ) 
+-------------------------------------------------------------------------------------
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     3   1.170e-01   1.752e-02   3.812e+00[92m   1.70432e-02[0m  -3.211e-01      0.950
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -3.81200315e+00 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 8.9419e-03)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  1.1695e-01 + 8.9419e-03 =  1.2589e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  3.7976e-01 + 3.0402e-03 =  3.8280e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 4: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+#========================================================#
+#|      Target: LJ_RDF - launching MD simulations       |#
+#|         Time steps: 20000 (eq) + 40000 (md)          |#
+#========================================================#
+Running condensed phase simulation locally.
+You may tail -f /home/a/forcebalance/studies/030_rdf_lj_fluid_validation/case_peak38/optimize.tmp/LJ_RDF/iter_0004/100.00K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py openmm 100.000 1.000[0m Output: npt.out
+Reading information from ./100.00K-1.0atm/npt_result.p
+Weights have been renormalized to 1.0
+Physical quantity name Ar&name Ar uses denominator =  0.0500
+#==========================================================================================#
+#| [1;94m                              LJ_RDF RDF name Ar&name Ar                              [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      100.00      1.0 atm     0.000        0.003 +- 0.000     0.003   1.00000   0.00344 
+--------------------------------------------------------------------------------------------
+#=================================================================#
+#| [92m RDF name Ar&name Ar objective function:  0.003, Derivative: [0m |#
+#=================================================================#
+   0 [ -2.4927e-01 ] : Atom/sigma/LJ-Ar
+-------------------------------------------------------------------
+#====================================================================#
+#| [94m               LJ_RDF Condensed Phase Properties:               [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+RDF name Ar&name Ar                0.00344    1.000    3.44267e-03 
+Total                                                  3.44267e-03 
+----------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+LJ_RDF                         0.00344      1.000 [92m     3.44267e-03[0m ( -1.360e-02 ) 
+Regularization                 0.00000      1.000 [92m     0.00000e+00[0m ( +0.000e+00 ) 
+Total                                             [92m     3.44267e-03[0m ( -1.360e-02 ) 
+-------------------------------------------------------------------------------------
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     4   1.259e-01   8.942e-03   2.493e-01[92m   3.44267e-03[0m  -1.360e-02      0.798
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -2.49272317e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+Calculating nonlinear optimization step
+Newton-Raphson step found (length 2.7622e-02)
+#========================================================#
+#| [95m  Mathematical Parameters (Current + Step = Next)   [0m |#
+#========================================================#
+   0 [  1.2589e-01 + 2.7622e-02 =  1.5352e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+#========================================================#
+#| [95m    Physical Parameters (Current + Step = Next)     [0m |#
+#========================================================#
+   0 [  3.8280e-01 + 9.3914e-03 =  3.9220e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+Input file with saved parameters: optimize.sav
+#========================================================#
+#| [94m     Iteration 5: Evaluating objective function     [0m |#
+#| [94m        and derivatives through second order        [0m |#
+#========================================================#
+#========================================================#
+#|      Target: LJ_RDF - launching MD simulations       |#
+#|         Time steps: 20000 (eq) + 40000 (md)          |#
+#========================================================#
+Running condensed phase simulation locally.
+You may tail -f /home/a/forcebalance/studies/030_rdf_lj_fluid_validation/case_peak38/optimize.tmp/LJ_RDF/iter_0005/100.00K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py openmm 100.000 1.000[0m Output: npt.out
+Reading information from ./100.00K-1.0atm/npt_result.p
+Weights have been renormalized to 1.0
+Physical quantity name Ar&name Ar uses denominator =  0.0500
+#==========================================================================================#
+#| [1;94m                              LJ_RDF RDF name Ar&name Ar                              [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      100.00      1.0 atm     0.000        0.022 +- 0.000     0.022   1.00000   0.19381 
+--------------------------------------------------------------------------------------------
+#=================================================================#
+#| [92m RDF name Ar&name Ar objective function:  0.194, Derivative: [0m |#
+#=================================================================#
+   0 [  2.7511e+01 ] : Atom/sigma/LJ-Ar
+-------------------------------------------------------------------
+#====================================================================#
+#| [94m               LJ_RDF Condensed Phase Properties:               [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+RDF name Ar&name Ar                0.19381    1.000    1.93809e-01 
+Total                                                  1.93809e-01 
+----------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+LJ_RDF                         0.19381      1.000 [91m     1.93809e-01[0m ( +1.904e-01 ) 
+Regularization                 0.00000      1.000 [92m     0.00000e+00[0m ( +0.000e+00 ) 
+Total                                             [91m     1.93809e-01[0m ( +1.904e-01 ) 
+-------------------------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     5   1.259e-01   2.762e-02   2.493e-01[91m   1.93809e-01[0m   1.904e-01    -55.296
+
+#========================================================#
+#| [91m             Objective function rises!              [0m |#
+#| [91m       Re-evaluating at the previous point..        [0m |#
+#========================================================#
+Input file with saved parameters: optimize.sav
+#========================================================#
+#|      Target: LJ_RDF - launching MD simulations       |#
+#|         Time steps: 20000 (eq) + 40000 (md)          |#
+#========================================================#
+Running condensed phase simulation locally.
+You may tail -f /home/a/forcebalance/studies/030_rdf_lj_fluid_validation/case_peak38/optimize.tmp/LJ_RDF/iter_0006/100.00K-1.0atm/npt.out in another terminal window
+Executing process: [92mbash runcuda.sh python npt.py openmm 100.000 1.000[0m Output: npt.out
+Reading information from ./100.00K-1.0atm/npt_result.p
+Weights have been renormalized to 1.0
+Physical quantity name Ar&name Ar uses denominator =  0.0500
+#==========================================================================================#
+#| [1;94m                              LJ_RDF RDF name Ar&name Ar                              [0m |#
+#| [1;94m Temperature  Pressure  Reference  Calculated +- Stdev     Delta    Weight    Term    [0m |#
+#==========================================================================================#
+      100.00      1.0 atm     0.000        0.003 +- 0.000     0.003   1.00000   0.00370 
+--------------------------------------------------------------------------------------------
+#=================================================================#
+#| [92m RDF name Ar&name Ar objective function:  0.004, Derivative: [0m |#
+#=================================================================#
+   0 [ -4.0889e-01 ] : Atom/sigma/LJ-Ar
+-------------------------------------------------------------------
+#====================================================================#
+#| [94m               LJ_RDF Condensed Phase Properties:               [0m |#
+#| [94m  Property Name                Residual x Weight = Contribution [0m |#
+#====================================================================#
+RDF name Ar&name Ar                0.00370    1.000    3.70209e-03 
+Total                                                  3.70209e-03 
+----------------------------------------------------------------------
+#===================================================================================#
+#| [94m                         Objective Function Breakdown                          [0m |#
+#| [94m  Target Name              Residual  x  Weight  =  Contribution (Current-Prev) [0m |#
+#===================================================================================#
+LJ_RDF                         0.00370      1.000 [91m     3.70209e-03[0m ( +2.594e-04 ) 
+Regularization                 0.00000      1.000 [92m     0.00000e+00[0m ( +0.000e+00 ) 
+Total                                             [91m     3.70209e-03[0m ( +2.594e-04 ) 
+-------------------------------------------------------------------------------------
+
+  Step       |k|        |dk|       |grad|       -=X2=-     Delta(X2)    StepQual
+     6   1.259e-01   0.000e+00   4.089e-01[92m   3.70209e-03[0m  -1.901e-01      0.000
+
+#========================================================#
+#| [94m                   Total Gradient                   [0m |#
+#========================================================#
+   0 [ -4.08890025e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+Convergence criterion reached in step size (1.00e-03)
+#========================================================#
+#| [92m               [0m[1mOptimization Converged[0m               [0m |#
+#| [92m           Final objective function value           [0m |#
+#| [92m  Full:  3.702091e-03  Un-penalized:  3.702091e-03  [0m |#
+#========================================================#
+#========================================================#
+#| [94m           Final optimization parameters:           [0m |#
+#========================================================#
+   0 [  1.2589e-01 ] : Atom/sigma/LJ-Ar
+#========================================================#
+#| [94m             Final physical parameters:             [0m |#
+#========================================================#
+   0 [  3.8280e-01 ] : Atom/sigma/LJ-Ar
+----------------------------------------------------------
+#========================================================================#
+#|  The force field has been written to the result/optimize directory.  |#
+#|    Input file with optimization parameters saved to optimize.sav.    |#
+#========================================================================#
+Wall time since calculation start: 138.5 seconds
+#========================================================#
+#| [1;44;93m               Calculation Finished.                [0m |#
+#| [1;44;93m     ---==(  May the Force be with you!  )==---     [0m |#
+#========================================================#
