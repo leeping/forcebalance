@@ -386,11 +386,19 @@ def assign_openff_parameter(ff, new_value, pid):
         setattr(parameter_container, value_name, new_value)
 
 
-def smirnoff_update_pgrads(target):
+def smirnoff_update_pgrads(target, smirks_counter=None):
     """
     Updates a targets pgrads based on smirks present in mol2 files
 
     This can greatly improve gradients evaluation in big optimizations
+
+    Parameters
+    ----------
+    target : Target
+        The target whose pgrad will be updated.
+    smirks_counter : Counter, optional
+        Pre-computed SMIRKS match counts. If None, uses
+        target.engine.get_smirks_counter().
 
     Note
     ----
@@ -424,7 +432,8 @@ def smirnoff_update_pgrads(target):
                 smirks_params_map[smirks].append(pidx)
 
     # get the smirks for this target, keep only the pidx corresponding to these smirks
-    smirks_counter = target.engine.get_smirks_counter()
+    if smirks_counter is None:
+        smirks_counter = target.engine.get_smirks_counter()
     for smirks in smirks_counter:
         if smirks_counter[smirks] > 0:
             pidx_list = smirks_params_map[smirks]
@@ -837,6 +846,45 @@ class Liquid_SMIRNOFF(Liquid):
             self.extra_output = ['liquid-md.pdb', 'liquid-md.dcd']
         # These functions need to be called after self.nptfiles is populated
         self.post_init(options)
+
+    def submit_jobs(self, mvals, AGrad=True, AHess=True):
+        # Update pgrads based on SMIRKS present in the target's molecules.
+        # This skips gradient evaluations for parameters whose SMIRKS don't
+        # match any atoms in the target (e.g. organic vdW params on pure water).
+        if not hasattr(self, '_smirks_counter'):
+            self._smirks_counter = self._compute_smirks_counter()
+        smirnoff_update_pgrads(self, smirks_counter=self._smirks_counter)
+        # Sync OptionDict because smirnoff_update_pgrads creates a new list,
+        # and Liquid.submit_jobs serializes OptionDict into forcebalance.p
+        # which the WQ worker unpacks to get pgrad.
+        self.OptionDict['pgrad'] = self.pgrad
+        super(Liquid_SMIRNOFF, self).submit_jobs(mvals, AGrad, AHess)
+
+    def _compute_smirks_counter(self):
+        """Compute SMIRKS match counts from mol2 files for pgrad filtering.
+
+        Unlike AbInitio targets which have a full engine in the main process,
+        Liquid targets run MD in WQ workers and don't create an engine here.
+        We build a minimal topology from the mol2 files (one copy of each
+        unique molecule) and use label_molecules() to find which SMIRKS match.
+        """
+        openff_mols = []
+        for fnm in self.mol2:
+            # mol2 files can be in the target dir or the FF dir
+            mol2_path = os.path.join(self.root, self.tgtdir, fnm)
+            if not os.path.exists(mol2_path):
+                mol2_path = os.path.join(self.root, self.FF.ffdir, fnm)
+            openff_mols.append(OffMolecule.from_file(mol2_path))
+        off_topology = OffTopology.from_molecules(openff_mols)
+        smirks_counter = Counter()
+        for mol_forces in self.FF.openff_forcefield.label_molecules(off_topology):
+            for force_dict in mol_forces.values():
+                for parameters in force_dict.values():
+                    if not isinstance(parameters, list):
+                        parameters = [parameters]
+                    for parameter in parameters:
+                        smirks_counter[parameter.smirks] += 1
+        return smirks_counter
 
 class AbInitio_SMIRNOFF(AbInitio):
     """ Force and energy matching using OpenMM. """
