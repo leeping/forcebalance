@@ -8,7 +8,7 @@ from forcebalance.parser import parse_inputs
 from forcebalance.forcefield import FF
 from forcebalance.objective import Objective
 from forcebalance.optimizer import Optimizer
-from forcebalance.liquid import _mbar_weights
+from forcebalance.liquid import _mbar_weights, RDF
 from .__init__ import ForceBalanceTestCase, check_for_openmm
 
 FIXTURE_DIR = os.path.join(os.path.dirname(__file__), 'files', 'test_liquid')
@@ -58,6 +58,63 @@ def test_mbar_weights_match_reference(mbar_weights):
     )
     np.testing.assert_allclose(mbar_weights, W_ref, atol=1e-7, rtol=1e-2,
                                err_msg="MBAR weights differ from v3 reference beyond rtol=1e-2")
+
+def test_rdf_init_unit_conversion():
+    """RDF() takes r in Angstrom and stores nm-scale binning parameters for MDTraj."""
+    rdf = RDF(r=[2.0, 4.0, 6.0], name='OW & OW')
+    assert rdf.dr == pytest.approx(0.2)
+    assert rdf.r_range == pytest.approx((0.1, 0.8))
+    assert rdf.length == 3
+
+
+def test_rdf_compute_msd():
+    """compute_msd() should give the per-snapshot mean squared deviation from the experimental g(r)."""
+    rdf = RDF(r=[2.0, 4.0, 6.0], exp={'PT1': [1.0, 2.0, 3.0], 'PT2': [1.0, 2.0, 3.0]}, name='OW & OW')
+    data = [[1.0, 2.0, 3.0], [1.0, 2.0, 4.0]]  # snapshot 0 matches exactly; snapshot 1 is off by 1 in the last bin
+    rdf.compute_msd(data, 'PT1')
+    np.testing.assert_allclose(rdf.msd['PT1'], [0.0, 1.0/3.0])
+    np.testing.assert_allclose(rdf.MSD, [0.0, 1.0/3.0])
+    assert len(rdf.RDF_errs) == 1
+    assert np.isfinite(rdf.RDF_errs[0])
+    # A second phase point's snapshots should concatenate onto rdf.MSD, not replace it.
+    rdf.compute_msd([[1.0, 2.0, 3.0]], 'PT2')
+    np.testing.assert_allclose(rdf.MSD, [0.0, 1.0/3.0, 0.0])
+    assert len(rdf.RDF_errs) == 2
+
+
+def test_rdf_pairs_and_calc(tmp_path, monkeypatch):
+    """Pairs() (atom selection from pairs.pdb) and Calc() (MDTraj g(r)) should find the O-O peak."""
+    md = pytest.importorskip('mdtraj')
+
+    top = md.Topology()
+    chain = top.add_chain()
+    for _ in range(2):
+        res = top.add_residue('HOH', chain)
+        top.add_atom('O', md.element.oxygen, res)
+        top.add_atom('H1', md.element.hydrogen, res)
+        top.add_atom('H2', md.element.hydrogen, res)
+    # Two waters with O-O separated by 0.3 nm, in a 2 nm cubic box.
+    xyz = np.array([[
+        [0.0, 0.0, 0.0], [0.05, 0.08, 0.0], [-0.05, 0.08, 0.0],
+        [0.3, 0.0, 0.0], [0.35, 0.08, 0.0], [0.25, 0.08, 0.0],
+    ]], dtype=np.float32)
+    traj = md.Trajectory(xyz=xyz, topology=top, unitcell_lengths=[[2.0, 2.0, 2.0]], unitcell_angles=[[90., 90., 90.]])
+
+    monkeypatch.chdir(tmp_path)
+    traj.save_pdb('pairs.pdb')
+
+    # r in Angstrom, binned so the 0.3 nm O-O distance falls in the middle bin.
+    rdf = RDF(r=[1.0, 2.0, 3.0, 4.0, 5.0], name='name O & name O')
+    rdf.Pairs()
+    rdf.Calc(traj)
+
+    assert len(rdf.data) == 1
+    gr = rdf.data[0]
+    assert len(gr) == rdf.length
+    peak_bin = int(np.argmax(gr))
+    assert peak_bin == 2  # bin covering ~0.3 nm
+    assert gr[peak_bin] > 0
+
 
 class TestWaterTutorial(ForceBalanceTestCase):
     def setup_method(self, method):
