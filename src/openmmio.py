@@ -1630,8 +1630,10 @@ class OpenMM(Engine):
                 PDBFile.writeFile(self.mod.topology, self.mod.positions, f)
 
         ## Build RDFs (target ranges only; experimental g(r) is not needed for the simulation side).
+        ## Only relevant for the periodic (condensed-phase) engine instance; skip entirely for
+        ## the gas-phase engine so we don't re-parse a stale pairs.pdb for no reason.
         RDFs = []
-        if os.path.exists('rdf.dat'):
+        if self.pbc and os.path.exists('rdf.dat'):
             try:
                 with open('rdf.dat') as lines:
                     for line in lines:
@@ -1654,9 +1656,9 @@ class OpenMM(Engine):
             except Exception:
                 logger.error("rdf.dat could not be read, please check its format\n")
                 raise RuntimeError
-        for rdf in RDFs:
-            # Build the list of atom pairs to use for this RDF's calculation.
-            rdf.Pairs()
+            for rdf in RDFs:
+                # Build the list of atom pairs to use for this RDF's calculation.
+                rdf.Pairs()
         #========================#
         # Now run the simulation #
         #========================#
@@ -1718,11 +1720,13 @@ class OpenMM(Engine):
                 density = 0.0 * kilogram / meter ** 3
             positions = state.getPositions(asNumpy=True).astype(np.float32) * nanometer
             self.xyz_omms.append([positions, box_vectors])
-            ## Calculate RDFs for this snapshot (assumes a cubic box).
+            ## Calculate RDFs for this snapshot (assumes an orthorhombic box, consistent with compute_volume()).
             if self.pbc and RDFs:
-                side = box_vectors[0][0].value_in_unit(nanometer)
+                a = box_vectors[0][0].value_in_unit(nanometer)
+                b = box_vectors[1][1].value_in_unit(nanometer)
+                c = box_vectors[2][2].value_in_unit(nanometer)
                 traj = md.Trajectory(xyz=positions.value_in_unit(nanometer), topology=None,
-                                      unitcell_lengths=(side, side, side), unitcell_angles=(90, 90, 90))
+                                      unitcell_lengths=(a, b, c), unitcell_angles=(90, 90, 90))
                 for rdf in RDFs:
                     rdf.Calc(traj)
             # Perform energy decomposition.

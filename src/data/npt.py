@@ -259,6 +259,10 @@ def main():
 
     printcool("ForceBalance condensed phase simulation using engine: %s" % engname.upper(), color=4, bold=True)
 
+    if os.path.exists('rdf.dat') and engname != "openmm":
+        logger.error("RDF calculation is currently only supported for the OpenMM engine (got '%s').\n" % engname)
+        raise RuntimeError
+
     #----
     # Load the ForceBalance pickle file which contains:
     #----
@@ -435,7 +439,9 @@ def main():
     Volumes = prop_return['Volumes']
     Dips = prop_return['Dips']
     EDA = prop_return['Ecomps']
-    RDF_data = prop_return['RDF_data']
+    # Only the OpenMM engine's molecular_dynamics() returns RDF_data (guarded above);
+    # other engines omit the key entirely, so default to an empty list.
+    RDF_data = prop_return.get('RDF_data', [])
 
     # Create a bunch of physical constants.
     # Energies are in kJ/mol

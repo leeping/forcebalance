@@ -26,7 +26,9 @@ try:
 except: pass
 try:
     import mdtraj as md
-except: pass
+    _HAVE_MDTRAJ = True
+except ImportError:
+    _HAVE_MDTRAJ = False
 try:
     from pymbar import pymbar  # pymbar 3: MBAR lives in pymbar.pymbar submodule
     _MBAR_SOLVER_KW = {}  # v3: self-consistent-iteration default is fine
@@ -276,6 +278,10 @@ class Liquid(Target):
         # Scripts to be copied from the ForceBalance installation directory.
         self.scripts += ['npt.py']
         if 'rdf' in self.RefData:
+            # Check if mdtraj is installed; RDF calculation depends on it.
+            if not _HAVE_MDTRAJ:
+                logger.error("RDF calculation requires mdtraj, which could not be imported. Please install mdtraj.\n")
+                raise RuntimeError
             # Check if rdf.dat exists
             if not os.path.exists(os.path.join(self.root, self.tgtdir, 'rdf.dat')):
                 logger.error("RDF calculation requires rdf.dat, but it is not found.")
@@ -867,6 +873,12 @@ class Liquid(Target):
             RDF_data = [Results[t][17] for t in range(len(Points))]
         else:
             RDF_data = [[] for t in range(len(Points))]
+            if 'rdf' in self.RefData:
+                logger.error("An RDF target is configured, but the cached npt_result.p files were "
+                              "written before RDF support was added and contain no RDF data. Please "
+                              "delete the existing simulation directories/results for this target and "
+                              "rerun so they can be regenerated.\n")
+                raise RuntimeError
         # Determine the number of molecules
         if len(set(NMols)) != 1:
             logger.error(str(NMols))
@@ -1047,15 +1059,16 @@ class Liquid(Target):
 
         ## Build RDFs.
         RDFs = []
-        if 'rdf' in self.RefData:
-            if Nrpt > 1:
-                # RDF snapshot data isn't threaded through self.AllResults across repeat
-                # evaluations at the same parameter values (unlike Rho/E/V/etc.), so it can't
-                # yet be combined with adapt_errors-style dataset concatenation.
-                logger.error("RDF targets do not yet support combining multiple simulation "
-                              "datasets at the same parameter values (adapt_errors / repeat "
-                              "evaluation). Disable adapt_errors or remove the RDF target.\n")
-                raise RuntimeError
+        if 'rdf' in self.RefData and Nrpt > 1:
+            # RDF snapshot data isn't threaded through self.AllResults across repeat
+            # evaluations at the same parameter values (unlike Rho/E/V/etc.), so it can't
+            # yet be combined with adapt_errors-style dataset concatenation. Rather than
+            # aborting the whole run, skip the RDF contribution for this evaluation only;
+            # other properties (density, Hvap, etc.) are unaffected and still combine normally.
+            logger.warning("RDF targets do not yet support combining multiple simulation "
+                            "datasets at the same parameter values (adapt_errors / repeat "
+                            "evaluation); skipping the RDF contribution for this evaluation.\n")
+        if 'rdf' in self.RefData and Nrpt == 1:
             exp = OrderedDict([])
             with open('%s/%s/rdf.dat' % (self.root, self.tgtdir)) as lines:
                 for line in lines:
@@ -1081,6 +1094,16 @@ class Liquid(Target):
                         exp_data = exp_data.split()
                         gr.append(float(exp_data[1]))
                         r.append(float(exp_data[0]))
+
+            # Every simulated phase point must have experimental g(r) data in rdf.dat for
+            # each RDF target; otherwise fail early with a clear message instead of a
+            # KeyError deep inside compute_msd().
+            for rdf in RDFs:
+                missing = [PT for PT in Points if PT not in rdf.exp]
+                if missing:
+                    logger.error("rdf.dat does not provide experimental g(r) for RDF '%s' at phase "
+                                  "point(s): %s\n" % (rdf.name, missing))
+                    raise RuntimeError
 
             ## Calculate MSD for each RDF, per phase point.
             for i, PT in enumerate(Points):
