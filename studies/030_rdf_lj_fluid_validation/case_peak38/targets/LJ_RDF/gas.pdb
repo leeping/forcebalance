@@ -1,0 +1,4 @@
+REMARK   1 CREATED WITH OPENMM 8.1.1, 2026-08-24
+HETATM    1 Ar    LJ A   1       0.000   0.000   0.000  1.00  0.00          Ar  
+TER       2       LJ A   1
+END

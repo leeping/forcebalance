@@ -12,6 +12,7 @@ from forcebalance import BaseReader
 from forcebalance.abinitio import AbInitio
 from forcebalance.binding import BindingEnergy
 from forcebalance.liquid import Liquid
+from forcebalance.liquid import RDF
 from forcebalance.interaction import Interaction
 from forcebalance.moments import Moments
 from forcebalance.hydration import Hydration
@@ -52,6 +53,10 @@ try:
 except ImportError:
     # Need to have "pass" conditional if neither is installed so that non-openmm builds can parse this file
     pass
+
+try:
+    import mdtraj as md
+except: pass
 
 def force_name(force):
     if openmm_post76:
@@ -1617,6 +1622,43 @@ class OpenMM(Engine):
         Volumes = []
         Dips = []
         Temps = []
+
+        # If the user-supplied liquid coordinates don't match OpenMM's internal topology
+        # (e.g. virtual sites were added), write out a PDB that does, for RDF atom selection.
+        if self.pbc:
+            with open('pairs.pdb', 'w') as f:
+                PDBFile.writeFile(self.mod.topology, self.mod.positions, f)
+
+        ## Build RDFs (target ranges only; experimental g(r) is not needed for the simulation side).
+        ## Only relevant for the periodic (condensed-phase) engine instance; skip entirely for
+        ## the gas-phase engine so we don't re-parse a stale pairs.pdb for no reason.
+        RDFs = []
+        if self.pbc and os.path.exists('rdf.dat'):
+            try:
+                with open('rdf.dat') as lines:
+                    for line in lines:
+                        # Read in the name and r-range of each RDF to be computed.
+                        if line[0:3] == 'RDF':
+                            name = line[4:50]
+                            name = name.rstrip('\n')
+                        elif line[0:1] == '@':
+                            r = []
+                        elif line[0:6] == 'ENDRDF':
+                            RDFs.append(RDF(r=r, name=name))
+                        elif line[0:5] == 'ENDPT':
+                            pass
+                        elif line[0:1] == '#':
+                            pass
+                        else:
+                            exp_data = line[0:30]
+                            exp_data = exp_data.split()
+                            r.append(float(exp_data[0]))
+            except Exception:
+                logger.error("rdf.dat could not be read, please check its format\n")
+                raise RuntimeError
+            for rdf in RDFs:
+                # Build the list of atom pairs to use for this RDF's calculation.
+                rdf.Pairs()
         #========================#
         # Now run the simulation #
         #========================#
@@ -1678,6 +1720,15 @@ class OpenMM(Engine):
                 density = 0.0 * kilogram / meter ** 3
             positions = state.getPositions(asNumpy=True).astype(np.float32) * nanometer
             self.xyz_omms.append([positions, box_vectors])
+            ## Calculate RDFs for this snapshot (assumes an orthorhombic box, consistent with compute_volume()).
+            if self.pbc and RDFs:
+                a = box_vectors[0][0].value_in_unit(nanometer)
+                b = box_vectors[1][1].value_in_unit(nanometer)
+                c = box_vectors[2][2].value_in_unit(nanometer)
+                traj = md.Trajectory(xyz=positions.value_in_unit(nanometer), topology=None,
+                                      unitcell_lengths=(a, b, c), unitcell_angles=(90, 90, 90))
+                for rdf in RDFs:
+                    rdf.Calc(traj)
             # Perform energy decomposition.
             for comp, val in energy_components(self.simulation).items():
                 if comp in edecomp:
@@ -1707,9 +1758,11 @@ class OpenMM(Engine):
         Ecomps["Kinetic Energy"] = Kinetics
         Ecomps["Temperature"] = Temps
         Ecomps["Total Energy"] = Potentials + Kinetics
+        # Snapshot-level RDF data, one list of g(r) arrays per named RDF target.
+        RDF_data = [rdf.data for rdf in RDFs]
         # Initialized property dictionary.
         prop_return = OrderedDict()
-        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps})
+        prop_return.update({'Rhos': Rhos, 'Potentials': Potentials, 'Kinetics': Kinetics, 'Volumes': Volumes, 'Dips': Dips, 'Ecomps': Ecomps, 'RDF_data': RDF_data})
         return prop_return
 
     def scale_box(self, x=1.0, y=1.0, z=1.0):
