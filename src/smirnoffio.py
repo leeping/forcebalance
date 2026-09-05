@@ -688,6 +688,16 @@ class SMIRNOFF(OpenMM):
         except Exception as error:
             logger.error("Error when creating system for %s" % self.mol2)
             raise error
+
+        # Interchange adds a CMMotionRemover by default.  For gas-phase
+        # (non-PBC) systems this is wrong: a single molecule's translational
+        # KE is physical and contributes to Hvap.  The OpenMM path handles
+        # this via removeCMMotion=False in mmopts (openmmio.py:870); here
+        # we strip the force post-hoc to match.
+        if not self.pbc:
+            for i in reversed(range(self.system.getNumForces())):
+                if isinstance(self.system.getForce(i), CMMotionRemover):
+                    self.system.removeForce(i)
         # Commenting out all virtual site stuff for now.
         # self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
