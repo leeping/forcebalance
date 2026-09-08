@@ -701,8 +701,7 @@ class SMIRNOFF(OpenMM):
         # Commenting out all virtual site stuff for now.
         # self.vsinfo = PrepareVirtualSites(self.system)
         self.nbcharges = np.zeros(self.system.getNumParticles())
-        # Populate nbcharges from the NonbondedForce (needed for eps0
-        # gradient via dipole derivatives in npt.py).
+        # Populate nbcharges from the NonbondedForce
         # Mirrors openmmio.py:1051-1053.
         nb_forces = [
             f for f in self.system.getForces()
@@ -711,14 +710,8 @@ class SMIRNOFF(OpenMM):
         if len(nb_forces) != 1:
             raise RuntimeError(
                 f"Expected exactly 1 NonbondedForce, found {len(nb_forces)}; "
-                "cannot populate nbcharges for dipole/eps0 gradient."
             )
         nbf = nb_forces[0]
-        if nbf.getNumParticles() != self.system.getNumParticles():
-            raise RuntimeError(
-                f"NonbondedForce particle count ({nbf.getNumParticles()}) "
-                f"!= system particle count ({self.system.getNumParticles()})"
-            )
         self.nbcharges = np.array([
             nbf.getParticleParameters(j)[0].value_in_unit(elementary_charge)
             for j in range(nbf.getNumParticles())
