@@ -484,7 +484,7 @@ def main():
     #============================================#
     logger.info("Calculating potential energy derivatives with finite difference step size: %f\n" % h)
     # Switch for whether to compute the derivatives two different ways for consistency.
-    FDCheck = os.environ.get("FORCEBALANCE_FDCHECK", "0") == "1"
+    FDCheck = False
 
     # Create a double-precision simulation object if desired (seems unnecessary).
     DoublePrecisionDerivatives = False
