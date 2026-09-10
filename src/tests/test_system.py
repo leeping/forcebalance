@@ -49,7 +49,9 @@ EXPECTED_LIPID_RESULTS = array([-6.7553e-03, -2.4070e-02])
 # expected results taken from OpenFF torsion profile optimization using OpenFF toolkit 0.4.1 and OpenEye toolkit 2019.10.2. (updated 02/06/23)
 # EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([-9.4238e-02, 7.3350e-03, -7.9467e-05, 1.7172e-02, -1.3309e-01, 6.0076e-02, 1.7895e-02, 6.5866e-02, -1.4084e-01, -2.2906e-02])
 # 02/06/23: As of toolkit v0.11, the default charge assignment method changed, which caused the following change in the optimization result:
-EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([-8.6810e-02, 6.7106e-03, 3.0992e-03, 1.8605e-02, -1.1292e-01, 5.6741e-02, 1.8884e-02, 7.3325e-02, -1.4203e-01, -9.2920e-03])
+# EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([-8.6810e-02, 6.7106e-03, 3.0992e-03, 1.8605e-02, -1.1292e-01, 5.6741e-02, 1.8884e-02, 7.3325e-02, -1.4203e-01, -9.2920e-03])
+# 09/10/26: Updated OpenEye toolkit (2023+) generates the updated set of values.
+EXPECTED_OPENFF_TORSIONPROFILE_RESULTS = array([-0.084093,  0.006465,  0.003285,  0.018405, -0.111179,  0.055885,  0.019134,  0.075178, -0.140129, -0.007877])
 
 # expected objective function from 025 recharge methane study. (updated 08/04/20)
 # 2026-06-05: recalibrated for the openff-recharge >=0.4 API
