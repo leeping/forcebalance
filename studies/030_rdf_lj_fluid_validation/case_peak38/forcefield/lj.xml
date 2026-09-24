@@ -1,0 +1,13 @@
+<ForceField>
+ <AtomTypes>
+  <Type name="LJ-Ar" class="Ar" element="Ar" mass="39.948"/>
+ </AtomTypes>
+ <Residues>
+  <Residue name="LJ">
+   <Atom name="Ar" type="LJ-Ar"/>
+  </Residue>
+ </Residues>
+ <NonbondedForce coulomb14scale="0.833333" lj14scale="0.5">
+  <Atom type="LJ-Ar" charge="0.0" sigma="3.400000e-01" epsilon="9.960000e-01" parameterize="sigma"/>
+ </NonbondedForce>
+</ForceField>
